@@ -52,6 +52,7 @@ FILES_DSP += $(wildcard Rack/src/*/*.cpp)
 EXTRA_LIBS += Rack/dep/lib/libglfw3.a
 EXTRA_LIBS += Rack/dep/lib/libjansson.a
 EXTRA_LIBS += Rack/dep/lib/libspeexdsp.a
+EXTRA_LIBS += Rack/dep/lib/libzstd.a
 
 ifeq ($(WINDOWS),true)
 EXTRA_LIBS += Rack/dep/lib/libarchive_static.a
@@ -89,6 +90,11 @@ BASE_FLAGS += -IRack/dep/nanosvg/src
 BASE_FLAGS += -IRack/dep/osdialog
 BASE_FLAGS += -IRack/dep/oui-blendish
 BASE_FLAGS += -IRack/dep/pffft
+
+ifeq ($(WINDOWS),true)
+BASE_FLAGS      += -Imingw-compat
+BUILD_CXX_FLAGS += -Imingw-std-threads
+endif
 
 ifeq ($(MACOS),true)
 BASE_FLAGS += -DARCH_MAC

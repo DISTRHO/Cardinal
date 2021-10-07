@@ -4,3 +4,6 @@
 [submodule "dpf"]
 	path = dpf
 	url = https://github.com/DISTRHO/DPF.git
+[submodule "plugins/CVCRack/mingw-std-threads"]
+	path = plugins/CVCRack/mingw-std-threads
+	url = https://github.com/meganz/mingw-std-threads.git
