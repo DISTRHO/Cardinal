@@ -259,6 +259,8 @@ jobs:
           sudo apt-get update -qq
           # build-deps
           sudo apt-get install -yq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+          # extra for vcv deps
+          sudo apt-get install -yq libxi-dev libxinerama-dev
           # runtime testing
           sudo apt-get install -yq carla-git lilv-utils lv2-dev lv2lint valgrind
       - name: Build plugins
