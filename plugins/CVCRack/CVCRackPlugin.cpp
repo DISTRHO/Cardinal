@@ -14,11 +14,101 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <asset.hpp>
+#include <audio.hpp>
+#include <context.hpp>
+#include <library.hpp>
+#include <keyboard.hpp>
+#include <midi.hpp>
+#include <plugin.hpp>
+#include <random.hpp>
+#include <settings.hpp>
+#include <system.hpp>
+
+#include <osdialog.h>
+
 #include "DistrhoPlugin.hpp"
 
 START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
+
+struct Initializer {
+    Initializer()
+    {
+        using namespace rack;
+
+        settings::devMode = true;
+        system::init();
+        asset::init();
+        logger::init();
+        random::init();
+
+        // Log environment
+        INFO("%s %s v%s", APP_NAME.c_str(), APP_EDITION.c_str(), APP_VERSION.c_str());
+        INFO("%s", system::getOperatingSystemInfo().c_str());
+        INFO("System directory: %s", asset::systemDir.c_str());
+        INFO("User directory: %s", asset::userDir.c_str());
+        INFO("System time: %s", string::formatTimeISO(system::getUnixTime()).c_str());
+
+        // Load settings
+        settings::init();
+        try {
+            settings::load();
+        }
+        catch (Exception& e) {
+            std::string message = e.what();
+            message += "\n\nResetting settings to default";
+            d_stdout(message.c_str());
+            /*
+            if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, msg.c_str())) {
+                exit(1);
+            }
+            */
+        }
+
+        // Check existence of the system res/ directory
+        std::string resDir = asset::system("res");
+        if (!system::isDirectory(resDir)) {
+            std::string message = string::f("Rack's resource directory \"%s\" does not exist. Make sure Rack is correctly installed and launched.", resDir.c_str());
+            d_stderr2(message.c_str());
+            /*
+            osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, message.c_str());
+            */
+            exit(1);
+        }
+
+        INFO("Initializing environment");
+        // network::init();
+        audio::init();
+        // rtaudioInit();
+        midi::init();
+        // rtmidiInit();
+        keyboard::init();
+        plugin::init();
+        library::init();
+        // discord::init();
+    }
+
+    ~Initializer()
+    {
+        using namespace rack;
+
+        // discord::destroy();
+        library::destroy();
+        midi::destroy();
+        audio::destroy();
+        plugin::destroy();
+	    INFO("Destroying logger");
+	    logger::destroy();
+    }
+};
+
+static Initializer& getInitializerInstance()
+{
+    static Initializer init;
+    return init;
+}
 
 /**
   Plugin to demonstrate parameter outputs using meters.
@@ -130,6 +220,7 @@ private:
 
 Plugin* createPlugin()
 {
+    getInitializerInstance();
     return new CVCRackPlugin();
 }
 

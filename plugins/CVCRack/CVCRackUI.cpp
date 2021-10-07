@@ -14,19 +14,92 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <app/common.hpp>
+#include <app/Scene.hpp>
+#include <context.hpp>
+#include <engine/Engine.hpp>
+#include <patch.hpp>
+#include <ui/common.hpp>
+#include <window/Window.hpp>
+
 #include "DistrhoUI.hpp"
+
+GLFWAPI const char* glfwGetClipboardString(GLFWwindow* window) { return nullptr; }
+GLFWAPI void glfwSetClipboardString(GLFWwindow* window, const char*) {}
+GLFWAPI const char* glfwGetKeyName(int key, int scancode) { return nullptr; }
+GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
+
+namespace rack {
+namespace window {
+    DISTRHO_NAMESPACE::UI* lastUI = nullptr;
+}
+}
 
 START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
+struct Initializer {
+    Initializer()
+    {
+        using namespace rack;
+
+		ui::init();
+		window::init();
+    }
+
+    ~Initializer()
+    {
+        using namespace rack;
+
+		window::destroy();
+		ui::destroy();
+    }
+};
+
+static Initializer& getInitializerInstance()
+{
+    static Initializer init;
+    return init;
+}
+
 class CVCRackUI : public UI
 {
 public:
     CVCRackUI()
-        : UI(128, 512)
+        : UI(1280, 720)
     {
-        setGeometryConstraints(32, 128, false);
+        using namespace rack;
+
+        // Initialize context
+        INFO("Initializing context");
+        window::lastUI = this;
+        contextSet(new Context);
+        APP->engine = new engine::Engine;
+        APP->history = new history::State;
+        APP->event = new widget::EventState;
+        APP->scene = new app::Scene;
+        APP->event->rootWidget = APP->scene;
+        APP->patch = new patch::Manager;
+        /*if (!settings::headless)*/ {
+            APP->window = new window::Window;
+        }
+        window::lastUI = nullptr;
+
+    	APP->engine->startFallbackThread();
+    }
+
+    ~CVCRackUI() override
+    {
+        using namespace rack;
+
+	    delete APP;
+	    contextSet(NULL);
+    }
+
+    void onNanoDisplay() override
+    {
+		APP->window->step();
     }
 
 protected:
@@ -38,16 +111,6 @@ protected:
       This is called by the host to inform the UI about parameter changes.
     */
     void parameterChanged(uint32_t index, float value) override
-    {
-    }
-
-   /* --------------------------------------------------------------------------------------------------------
-    * Widget Callbacks */
-
-   /**
-      The drawing function.
-    */
-    void onDisplay() override
     {
     }
 
@@ -65,6 +128,7 @@ private:
 
 UI* createUI()
 {
+    getInitializerInstance();
     return new CVCRackUI();
 }
 
