@@ -1,0 +1,6 @@
+[submodule "plugins/CVCRack/Rack"]
+	path = plugins/CVCRack/Rack
+	url = https://github.com/VCVRack/Rack.git
+[submodule "dpf"]
+	path = dpf
+	url = https://github.com/DISTRHO/DPF.git
