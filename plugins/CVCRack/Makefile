@@ -45,16 +45,19 @@ endif
 
 FILES_DSP += $(wildcard Rack/src/*.c)
 FILES_DSP += $(wildcard Rack/src/*/*.c)
-FILES_DSP += $(filter-out Rack/src/rtaudio.cpp Rack/src/rtmidi.cpp, $(wildcard Rack/src/*.cpp))
+FILES_DSP += $(filter-out Rack/src/network.cpp Rack/src/rtaudio.cpp Rack/src/rtmidi.cpp, $(wildcard Rack/src/*.cpp))
 FILES_DSP += $(wildcard Rack/src/*/*.cpp)
 
-EXTRA_LIBS  = Rack/dep/lib/libglfw3.a
+# EXTRA_LIBS  = Rack/dep/lib/libcurl.a
+EXTRA_LIBS += Rack/dep/lib/libglfw3.a
 EXTRA_LIBS += Rack/dep/lib/libjansson.a
 EXTRA_LIBS += Rack/dep/lib/libspeexdsp.a
 
 ifeq ($(WINDOWS),true)
+EXTRA_LIBS += Rack/dep/lib/libarchive_static.a
 EXTRA_LIBS += Rack/dep/lib/libglew32.a
 else
+EXTRA_LIBS += Rack/dep/lib/libarchive.a
 EXTRA_LIBS += Rack/dep/lib/libGLEW.a
 endif
 
@@ -63,8 +66,14 @@ endif
 
 include ../../dpf/Makefile.plugins.mk
 
+ifeq ($(WINDOWS),true)
+CMAKE := cmake -G 'Unix Makefiles' -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_RC_COMPILER=$(subst gcc,windres,$(CC))
+else
+CMAKE := cmake
+endif
+
 Rack/dep/lib/%.a:
-	$(MAKE) -C Rack/dep lib/$*.a
+	$(MAKE) CMAKE="$(CMAKE) -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX='$(abspath Rack/dep)'" -C Rack/dep lib/$*.a
 
 # --------------------------------------------------------------
 # Extra flags for VCV stuff

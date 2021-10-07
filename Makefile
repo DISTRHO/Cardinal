@@ -36,6 +36,13 @@ clean:
 	$(MAKE) clean -C dpf/utils/lv2-ttl-generator
 	$(MAKE) clean -C plugins/CVCRack
 	rm -rf bin build
+	rm -rf plugins/CVCRack/Rack/dep/bin
+	rm -rf plugins/CVCRack/Rack/dep/include
+	rm -rf plugins/CVCRack/Rack/dep/lib
+	rm -rf plugins/CVCRack/Rack/dep/share
+	rm -rf plugins/CVCRack/Rack/dep/glew-2.1.0
+	rm -rf plugins/CVCRack/Rack/dep/jansson-2.12
+	rm -rf plugins/CVCRack/Rack/dep/speexdsp-SpeexDSP-1.2rc3
 
 # --------------------------------------------------------------
 
