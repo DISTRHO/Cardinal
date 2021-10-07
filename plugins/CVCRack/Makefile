@@ -113,6 +113,10 @@ ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
 LINK_FLAGS += -ldl
 endif
 
+ifeq ($(MACOS),true)
+LINK_FLAGS += -framework IOKit
+endif
+
 # TODO needed on windows? need to check
 LINK_FLAGS += -lpthread
 
