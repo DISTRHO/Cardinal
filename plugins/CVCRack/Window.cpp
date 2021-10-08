@@ -68,6 +68,7 @@ std::shared_ptr<Image> Image::load(const std::string& filename) {
 
 struct Window::Internal {
 	DISTRHO_NAMESPACE::UI* ui;
+	math::Vec size;
 
 	std::string lastWindowTitle;
 
@@ -94,10 +95,17 @@ struct Window::Internal {
 Window::Window() {
 	internal = new Internal;
 	internal->ui = lastUI;
-
-	vg = lastUI->getContext();
+	internal->size = minWindowSize;
 
 	int err;
+
+	// Set up GLEW
+	glewExperimental = GL_TRUE;
+	err = glewInit();
+	if (err != GLEW_OK) {
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLEW. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
+		exit(1);
+	}
 
 	const GLubyte* vendor = glGetString(GL_VENDOR);
 	const GLubyte* renderer = glGetString(GL_RENDERER);
@@ -108,6 +116,21 @@ Window::Window() {
 
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
+
+	// Set up NanoVG
+	int nvgFlags = NVG_ANTIALIAS;
+#if defined NANOVG_GL2
+	vg = nvgCreateGL2(nvgFlags);
+	fbVg = nvgCreateSharedGL2(vg, nvgFlags);
+#elif defined NANOVG_GL3
+	vg = nvgCreateGL3(nvgFlags);
+#elif defined NANOVG_GLES2
+	vg = nvgCreateGLES2(nvgFlags);
+#endif
+	if (!vg) {
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize NanoVG. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
+		exit(1);
+	}
 
 	// Load default Blendish font
 	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
@@ -132,17 +155,26 @@ Window::~Window() {
 
 	// nvgDeleteClone(fbVg);
 
+#if defined NANOVG_GL2
+	nvgDeleteGL2(vg);
+	nvgDeleteGL2(fbVg);
+#elif defined NANOVG_GL3
+	nvgDeleteGL3(vg);
+#elif defined NANOVG_GLES2
+	nvgDeleteGLES2(vg);
+#endif
+
 	delete internal;
 }
 
 
 math::Vec Window::getSize() {
-	return math::Vec(1280, 720);
+	return internal->size;
 }
 
 
 void Window::setSize(math::Vec size) {
-	size = size.max(minWindowSize);
+	internal->size = size.max(minWindowSize);
 }
 
 
@@ -163,14 +195,12 @@ void Window::step() {
 	nvgReset(vg);
 
 	bndSetFont(uiFont->handle);
-	nvgFillColor(vg, nvgRGBf(1, 1, 1));
-	nvgStrokeColor(vg, nvgRGBf(1, 1, 1));
 
 	// Poll events
 	// Save and restore context because event handler set their own context based on which window they originate from.
-	Context* context = contextGet();
+	// Context* context = contextGet();
 	// glfwPollEvents();
-	contextSet(context);
+	// contextSet(context);
 
 	// Set window title
 	std::string windowTitle = APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION;
@@ -223,9 +253,9 @@ void Window::step() {
 			APP->scene->draw(args);
 			t3 = system::getTime();
 
-			// glViewport(0, -winHeight, fbWidth, fbHeight);
-			// glClearColor(0.0, 0.0, 0.0, 1.0);
-			// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			glViewport(0, 0, fbWidth, fbHeight);
+			glClearColor(0.0, 0.0, 0.0, 1.0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 			nvgEndFrame(vg);
 			t4 = system::getTime();
 		}
@@ -367,6 +397,56 @@ std::shared_ptr<Image> Window::loadImage(const std::string& filename) {
 
 bool& Window::fbDirtyOnSubpixelChange() {
 	return internal->fbDirtyOnSubpixelChange;
+}
+
+
+void mouseButtonCallback(Window* win, int button, int action, int mods) {
+	/*
+#if defined ARCH_MAC
+	// Remap Ctrl-left click to right click on Mac
+	if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & RACK_MOD_MASK) == GLFW_MOD_CONTROL) {
+		button = GLFW_MOUSE_BUTTON_RIGHT;
+		mods &= ~GLFW_MOD_CONTROL;
+	}
+	// Remap Ctrl-shift-left click to middle click on Mac
+	if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & RACK_MOD_MASK) == (GLFW_MOD_CONTROL | GLFW_MOD_SHIFT)) {
+		button = GLFW_MOUSE_BUTTON_MIDDLE;
+		mods &= ~(GLFW_MOD_CONTROL | GLFW_MOD_SHIFT);
+	}
+#endif
+*/
+
+	APP->event->handleButton(win->internal->lastMousePos, button, action, mods);
+}
+
+void cursorPosCallback(Window* win, double xpos, double ypos) {
+	math::Vec mousePos = math::Vec(xpos, ypos).div(win->pixelRatio / win->windowRatio).round();
+	math::Vec mouseDelta = mousePos.minus(win->internal->lastMousePos);
+
+	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
+	if (win->internal->ignoreNextMouseDelta) {
+		win->internal->ignoreNextMouseDelta = false;
+		mouseDelta = math::Vec();
+	}
+
+	win->internal->lastMousePos = mousePos;
+
+	APP->event->handleHover(mousePos, mouseDelta);
+
+	// Keyboard/mouse MIDI driver
+	math::Vec scaledPos(xpos / win->internal->ui->getWidth(), ypos / win->internal->ui->getHeight());
+	keyboard::mouseMove(scaledPos);
+}
+
+void scrollCallback(Window* win, double x, double y) {
+	math::Vec scrollDelta = math::Vec(x, y);
+#if defined ARCH_MAC
+	scrollDelta = scrollDelta.mult(10.0);
+#else
+	scrollDelta = scrollDelta.mult(50.0);
+#endif
+
+	APP->event->handleScroll(win->internal->lastMousePos, scrollDelta);
 }
 
 

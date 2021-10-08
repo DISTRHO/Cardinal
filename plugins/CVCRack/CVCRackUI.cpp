@@ -23,6 +23,7 @@
 #include <window/Window.hpp>
 
 #include "DistrhoUI.hpp"
+#include "ResizeHandle.hpp"
 
 GLFWAPI const char* glfwGetClipboardString(GLFWwindow* window) { return nullptr; }
 GLFWAPI void glfwSetClipboardString(GLFWwindow* window, const char*) {}
@@ -32,6 +33,10 @@ GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
 namespace rack {
 namespace window {
     DISTRHO_NAMESPACE::UI* lastUI = nullptr;
+
+    void mouseButtonCallback(Window* win, int button, int action, int mods);
+    void cursorPosCallback(Window* win, double xpos, double ypos);
+    void scrollCallback(Window* win, double x, double y);
 }
 }
 
@@ -39,35 +44,33 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
-struct Initializer {
-    Initializer()
+struct Initializer2 {
+    Initializer2()
     {
         using namespace rack;
 
-		ui::init();
-		window::init();
     }
 
-    ~Initializer()
+    ~Initializer2()
     {
         using namespace rack;
 
-		window::destroy();
-		ui::destroy();
     }
 };
 
-static Initializer& getInitializerInstance()
+static const Initializer2& getInitializer2Instance()
 {
-    static Initializer init;
+    static const Initializer2 init;
     return init;
 }
 
 class CVCRackUI : public UI
 {
+    ResizeHandle fResizeHandle;
 public:
     CVCRackUI()
-        : UI(1280, 720)
+        : UI(1280, 720),
+          fResizeHandle(this)
     {
         using namespace rack;
 
@@ -97,9 +100,14 @@ public:
 	    contextSet(NULL);
     }
 
-    void onNanoDisplay() override
+    void onDisplay() override
     {
 		APP->window->step();
+    }
+
+    void uiIdle() override
+    {
+        repaint();
     }
 
 protected:
@@ -116,6 +124,61 @@ protected:
 
     // -------------------------------------------------------------------------------------------------------
 
+    bool onMouse(const MouseEvent& ev) override
+    {
+        int button;
+        int mods = 0;
+        int action = ev.press;
+
+        if (ev.mod & kModifierControl)
+            mods |= GLFW_MOD_CONTROL;
+        if (ev.mod & kModifierShift)
+            mods |= GLFW_MOD_SHIFT;
+        if (ev.mod & kModifierAlt)
+            mods |= GLFW_MOD_ALT;
+
+        switch (ev.button)
+        {
+        case 0:
+            button = GLFW_MOUSE_BUTTON_MIDDLE;
+            break;
+        case 1:
+            button = GLFW_MOUSE_BUTTON_LEFT;
+            break;
+        case 2:
+            button = GLFW_MOUSE_BUTTON_RIGHT;
+            break;
+        default:
+            button = 0;
+            break;
+        }
+
+        mouseButtonCallback(APP->window, button, action, mods);
+        return true;
+    }
+
+    bool onMotion(const MotionEvent& ev) override
+    {
+        cursorPosCallback(APP->window, ev.pos.getX(), ev.pos.getY());
+        return true;
+    }
+
+    bool onScroll(const ScrollEvent& ev) override
+    {
+        scrollCallback(APP->window, ev.delta.getX(), ev.delta.getY());
+        return true;
+    }
+
+    #if 0
+    void onResize(const ResizeEvent& ev) override
+    {
+        UI::onResize(ev);
+        // APP->window->setSize(rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
+    }
+    #endif
+
+    // TODO uiFocus
+
 private:
    /**
       Set our UI class as non-copyable and add a leak detector just in case.
@@ -128,7 +191,7 @@ private:
 
 UI* createUI()
 {
-    getInitializerInstance();
+    getInitializer2Instance();
     return new CVCRackUI();
 }
 

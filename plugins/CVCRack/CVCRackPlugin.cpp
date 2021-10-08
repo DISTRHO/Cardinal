@@ -25,6 +25,9 @@
 #include <settings.hpp>
 #include <system.hpp>
 
+#include <ui/common.hpp>
+#include <window/Window.hpp>
+
 #include <osdialog.h>
 
 #include "DistrhoPlugin.hpp"
@@ -53,6 +56,7 @@ struct Initializer {
 
         // Load settings
         settings::init();
+        #if 0
         try {
             settings::load();
         }
@@ -66,6 +70,7 @@ struct Initializer {
             }
             */
         }
+        #endif
 
         // Check existence of the system res/ directory
         std::string resDir = asset::system("res");
@@ -88,11 +93,17 @@ struct Initializer {
         plugin::init();
         library::init();
         // discord::init();
+
+		ui::init();
+		window::init();
     }
 
     ~Initializer()
     {
         using namespace rack;
+
+		window::destroy();
+		ui::destroy();
 
         // discord::destroy();
         library::destroy();
@@ -104,9 +115,9 @@ struct Initializer {
     }
 };
 
-static Initializer& getInitializerInstance()
+static const Initializer& getInitializerInstance()
 {
-    static Initializer init;
+    static const Initializer init;
     return init;
 }
 

@@ -20,7 +20,7 @@
 
 #define DISTRHO_PLUGIN_BRAND "DISTRHO"
 #define DISTRHO_PLUGIN_NAME  "CVCRack"
-#define DISTRHO_PLUGIN_URI   "http://distrho.sf.net/plugins/glBars"
+#define DISTRHO_PLUGIN_URI   "http://distrho.sf.net/plugins/CVCRack"
 
 #define DISTRHO_PLUGIN_HAS_UI             1
 #define DISTRHO_PLUGIN_NUM_INPUTS         2
@@ -30,8 +30,8 @@
 // #define DISTRHO_PLUGIN_VST3_CATEGORIES    "Fx|Analyzer"
 // #define DISTRHO_PLUGIN_HAS_EMBED_UI       1
 // #define DISTRHO_PLUGIN_HAS_EXTERNAL_UI    1
-#define DISTRHO_UI_USE_NANOVG             1
-#define DISTRHO_UI_USER_RESIZABLE         1
+// #define DISTRHO_UI_USE_NANOVG             1
+#define DISTRHO_UI_USER_RESIZABLE         0
 
 enum Parameters {
     kParameterCount
