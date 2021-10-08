@@ -52,7 +52,6 @@ FILES_DSP += $(filter-out Rack/src/window/Window.cpp, $(wildcard Rack/src/*/*.cp
 
 EXTRA_LIBS += Rack/dep/lib/libjansson.a
 EXTRA_LIBS += Rack/dep/lib/libspeexdsp.a
-EXTRA_LIBS += Rack/dep/lib/libzstd.a
 
 ifeq ($(WINDOWS),true)
 EXTRA_LIBS += Rack/dep/lib/libarchive_static.a
@@ -61,6 +60,8 @@ else
 EXTRA_LIBS += Rack/dep/lib/libarchive.a
 EXTRA_LIBS += Rack/dep/lib/libGLEW.a
 endif
+
+EXTRA_LIBS += Rack/dep/lib/libzstd.a
 
 # --------------------------------------------------------------
 # Do some magic
@@ -126,7 +127,8 @@ endif
 
 ifeq ($(MACOS),true)
 LINK_FLAGS += -framework IOKit
-# LINK_FLAGS += -Wl,-all_load
+else ifeq ($(WINDOWS),true)
+LINK_FLAGS += -ldbghelp -lshlwapi
 endif
 
 # LINK_FLAGS += $(OPENGL_LIBS)

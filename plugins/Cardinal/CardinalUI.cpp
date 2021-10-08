@@ -36,7 +36,7 @@ namespace rack {
 namespace network {
     std::string encodeUrl(const std::string&) { return {}; }
     json_t* requestJson(Method, const std::string&, json_t*, const CookieMap&) { return nullptr; }
-    bool requestDownload(const std::string&, const std::string&, float*, const CookieMap&) { return nullptr; }
+    bool requestDownload(const std::string&, const std::string&, float*, const CookieMap&) { return false; }
 }
 }
 
