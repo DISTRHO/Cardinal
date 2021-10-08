@@ -33,6 +33,8 @@
 // #define DISTRHO_UI_USE_NANOVG             1
 #define DISTRHO_UI_USER_RESIZABLE         0
 
+#define DPF_AS_GLFW 1
+
 enum Parameters {
     kParameterCount
 };

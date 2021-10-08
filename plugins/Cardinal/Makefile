@@ -63,6 +63,10 @@ endif
 
 EXTRA_LIBS += Rack/dep/lib/libzstd.a
 
+# for raw GLFW window
+# EXTRA_LIBS += Rack/dep/lib/libglfw3.a
+# FILES_DSP += Rack/src/gamepad.cpp Rack/src/window/Window.cpp
+
 # --------------------------------------------------------------
 # Do some magic
 

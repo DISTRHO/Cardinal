@@ -18,6 +18,7 @@
 #include <asset.hpp>
 #include <audio.hpp>
 #include <context.hpp>
+#include <gamepad.hpp>
 #include <library.hpp>
 #include <keyboard.hpp>
 #include <midi.hpp>
@@ -100,6 +101,9 @@ struct Initializer {
         midi::init();
         // rtmidiInit();
         keyboard::init();
+#ifndef DPF_AS_GLFW
+        gamepad::init();
+#endif
         plugin::init();
         library::init();
         // discord::init();

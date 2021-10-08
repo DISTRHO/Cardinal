@@ -27,11 +27,6 @@
 #include "DistrhoUI.hpp"
 #include "ResizeHandle.hpp"
 
-GLFWAPI const char* glfwGetClipboardString(GLFWwindow* window) { return nullptr; }
-GLFWAPI void glfwSetClipboardString(GLFWwindow* window, const char*) {}
-GLFWAPI const char* glfwGetKeyName(int key, int scancode) { return nullptr; }
-GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
-
 namespace rack {
 namespace network {
     std::string encodeUrl(const std::string&) { return {}; }
@@ -39,6 +34,12 @@ namespace network {
     bool requestDownload(const std::string&, const std::string&, float*, const CookieMap&) { return false; }
 }
 }
+
+#ifdef DPF_AS_GLFW
+GLFWAPI const char* glfwGetClipboardString(GLFWwindow* window) { return nullptr; }
+GLFWAPI void glfwSetClipboardString(GLFWwindow* window, const char*) {}
+GLFWAPI const char* glfwGetKeyName(int key, int scancode) { return nullptr; }
+GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
 
 namespace rack {
 namespace window {
@@ -49,6 +50,7 @@ namespace window {
     void scrollCallback(Window* win, double x, double y);
 }
 }
+#endif
 
 START_NAMESPACE_DISTRHO
 
@@ -95,7 +97,9 @@ public:
         */
         // Initialize context
         INFO("Initializing context");
+#ifdef DPF_AS_GLFW
         window::lastUI = this;
+#endif
         contextSet(new Context);
         APP->engine = new engine::Engine;
         APP->history = new history::State;
@@ -106,7 +110,9 @@ public:
         /*if (!settings::headless)*/ {
             APP->window = new window::Window;
         }
+#ifdef DPF_AS_GLFW
         window::lastUI = nullptr;
+#endif
 
     	APP->engine->startFallbackThread();
     }
@@ -143,6 +149,7 @@ protected:
 
     // -------------------------------------------------------------------------------------------------------
 
+#ifdef DPF_AS_GLFW
     bool onMouse(const MouseEvent& ev) override
     {
         int button;
@@ -205,6 +212,7 @@ protected:
         scrollCallback(APP->window, ev.delta.getX(), ev.delta.getY());
         return true;
     }
+#endif
 
     #if 0
     void onResize(const ResizeEvent& ev) override
