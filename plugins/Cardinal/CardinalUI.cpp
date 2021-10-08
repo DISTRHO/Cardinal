@@ -156,21 +156,39 @@ protected:
         if (ev.mod & kModifierAlt)
             mods |= GLFW_MOD_ALT;
 
+#ifdef DISTRHO_OS_MAC
         switch (ev.button)
         {
-        case 0:
-            button = GLFW_MOUSE_BUTTON_MIDDLE;
-            break;
         case 1:
             button = GLFW_MOUSE_BUTTON_LEFT;
             break;
         case 2:
             button = GLFW_MOUSE_BUTTON_RIGHT;
             break;
+        case 3:
+            button = GLFW_MOUSE_BUTTON_MIDDLE;
+            break;
         default:
             button = 0;
             break;
         }
+#else
+        switch (ev.button)
+        {
+        case 1:
+            button = GLFW_MOUSE_BUTTON_LEFT;
+            break;
+        case 2:
+            button = GLFW_MOUSE_BUTTON_MIDDLE;
+            break;
+        case 3:
+            button = GLFW_MOUSE_BUTTON_RIGHT;
+            break;
+        default:
+            button = 0;
+            break;
+        }
+#endif
 
         mouseButtonCallback(APP->window, button, action, mods);
         return true;
