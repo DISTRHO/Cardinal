@@ -8,15 +8,13 @@ include dpf/Makefile.base.mk
 
 all: dgl plugins gen
 
-SKIP_NANOVG = true
-
 # --------------------------------------------------------------
 
 dgl:
-	$(MAKE) -C dpf/dgl opengl
+	$(MAKE) SKIP_NANOVG=true -C dpf/dgl opengl
 
 plugins: dgl
-	$(MAKE) all -C plugins/CVCRack
+	$(MAKE) all -C plugins/Cardinal
 
 ifneq ($(CROSS_COMPILING),true)
 gen: plugins dpf/utils/lv2_ttl_generator
@@ -36,19 +34,19 @@ endif
 clean:
 	$(MAKE) clean -C dpf/dgl
 	$(MAKE) clean -C dpf/utils/lv2-ttl-generator
-	$(MAKE) clean -C plugins/CVCRack
+	$(MAKE) clean -C plugins/Cardinal
 	rm -rf bin build
-	rm -rf plugins/CVCRack/Rack/dep/bin
-	rm -rf plugins/CVCRack/Rack/dep/include
-	rm -rf plugins/CVCRack/Rack/dep/lib
-	rm -rf plugins/CVCRack/Rack/dep/share
-	rm -rf plugins/CVCRack/Rack/dep/curl-7.66.0
-	rm -rf plugins/CVCRack/Rack/dep/glew-2.1.0
-	rm -rf plugins/CVCRack/Rack/dep/jansson-2.12
-	rm -rf plugins/CVCRack/Rack/dep/libarchive-3.4.3
-	rm -rf plugins/CVCRack/Rack/dep/openssl-1.1.1d
-	rm -rf plugins/CVCRack/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-	rm -rf plugins/CVCRack/Rack/dep/zstd-1.4.5
+	rm -rf plugins/Cardinal/Rack/dep/bin
+	rm -rf plugins/Cardinal/Rack/dep/include
+	rm -rf plugins/Cardinal/Rack/dep/lib
+	rm -rf plugins/Cardinal/Rack/dep/share
+	rm -rf plugins/Cardinal/Rack/dep/curl-7.66.0
+	rm -rf plugins/Cardinal/Rack/dep/glew-2.1.0
+	rm -rf plugins/Cardinal/Rack/dep/jansson-2.12
+	rm -rf plugins/Cardinal/Rack/dep/libarchive-3.4.3
+	rm -rf plugins/Cardinal/Rack/dep/openssl-1.1.1d
+	rm -rf plugins/Cardinal/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+	rm -rf plugins/Cardinal/Rack/dep/zstd-1.4.5
 
 # --------------------------------------------------------------
 

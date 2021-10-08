@@ -1,9 +1,9 @@
-[submodule "plugins/CVCRack/Rack"]
-	path = plugins/CVCRack/Rack
+[submodule "plugins/Cardinal/Rack"]
+	path = plugins/Cardinal/Rack
 	url = https://github.com/VCVRack/Rack.git
 [submodule "dpf"]
 	path = dpf
 	url = https://github.com/DISTRHO/DPF.git
-[submodule "plugins/CVCRack/mingw-std-threads"]
-	path = plugins/CVCRack/mingw-std-threads
+[submodule "plugins/Cardinal/mingw-std-threads"]
+	path = plugins/Cardinal/mingw-std-threads
 	url = https://github.com/meganz/mingw-std-threads.git

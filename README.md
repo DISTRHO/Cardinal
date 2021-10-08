@@ -1,4 +1,6 @@
-# DISTRHO CVCRack
+# DISTRHO Cardinal
+
+*Cardinal, bring forth the Rack!*
 
 WORK IN PROGRESS - nothing to see here
 

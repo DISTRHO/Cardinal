@@ -1,17 +1,18 @@
 /*
- * DISTRHO CVCRack Plugin
+ * DISTRHO Cardinal Plugin
  * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
  *
- * Permission to use, copy, modify, and/or distribute this software for any purpose with
- * or without fee is hereby granted, provided that the above copyright notice and this
- * permission notice appear in all copies.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or any later version.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD
- * TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN
- * NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
- * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
- * IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
 #include <asset.hpp>
@@ -35,6 +36,15 @@
 START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
+// The following code was based from VCVRack adapters/standalone.cpp
+
+/*
+   Copyright (C) 2016-2021 VCV
+
+   This program is free software: you can redistribute it and/or modify it under the terms of the
+   GNU General Public License as published by the Free Software Foundation, either version 3 of the
+   License, or (at your option) any later version.
+*/
 
 struct Initializer {
     Initializer()
@@ -121,13 +131,12 @@ static const Initializer& getInitializerInstance()
     return init;
 }
 
-/**
-  Plugin to demonstrate parameter outputs using meters.
- */
-class CVCRackPlugin : public Plugin
+// -----------------------------------------------------------------------------------------------------------
+
+class CardinalPlugin : public Plugin
 {
 public:
-    CVCRackPlugin()
+    CardinalPlugin()
         : Plugin(0, 0, 0)
     {
     }
@@ -142,7 +151,7 @@ protected:
     */
     const char* getLabel() const override
     {
-        return "CVCRack";
+        return "Cardinal";
     }
 
    /**
@@ -166,7 +175,7 @@ protected:
     */
     const char* getHomePage() const override
     {
-        return "https://github.com/DISTRHO/CVCRack";
+        return "https://github.com/DISTRHO/Cardinal";
     }
 
    /**
@@ -192,7 +201,7 @@ protected:
     */
     int64_t getUniqueId() const override
     {
-        return d_cconst('d', 'C', 'V', 'C');
+        return d_cconst('d', 'C', 'd', 'n');
     }
 
    /* --------------------------------------------------------------------------------------------------------
@@ -223,7 +232,7 @@ private:
    /**
       Set our plugin class as non-copyable and add a leak detector just in case.
     */
-    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CVCRackPlugin)
+    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CardinalPlugin)
 };
 
 /* ------------------------------------------------------------------------------------------------------------
@@ -232,7 +241,7 @@ private:
 Plugin* createPlugin()
 {
     getInitializerInstance();
-    return new CVCRackPlugin();
+    return new CardinalPlugin();
 }
 
 // -----------------------------------------------------------------------------------------------------------

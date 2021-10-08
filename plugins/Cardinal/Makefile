@@ -7,16 +7,16 @@
 # --------------------------------------------------------------
 # Project name, used for binaries
 
-NAME = CVCRack
+NAME = Cardinal
 
 # --------------------------------------------------------------
 # Files to build (DPF stuff)
 
 FILES_DSP = \
-	CVCRackPlugin.cpp
+	CardinalPlugin.cpp
 
 FILES_UI = \
-	CVCRackUI.cpp \
+	CardinalUI.cpp \
 	Window.cpp
 
 # --------------------------------------------------------------
