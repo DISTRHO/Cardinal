@@ -47,15 +47,11 @@ endif
 
 FILES_DSP += $(wildcard Rack/src/*.c)
 FILES_DSP += $(wildcard Rack/src/*/*.c)
-FILES_DSP += $(filter-out Rack/src/gamepad.cpp Rack/src/rtaudio.cpp Rack/src/rtmidi.cpp, $(wildcard Rack/src/*.cpp))
+FILES_DSP += $(filter-out Rack/src/discord.cpp Rack/src/gamepad.cpp Rack/src/network.cpp Rack/src/rtaudio.cpp Rack/src/rtmidi.cpp, $(wildcard Rack/src/*.cpp))
 FILES_DSP += $(filter-out Rack/src/window/Window.cpp, $(wildcard Rack/src/*/*.cpp))
 
-EXTRA_LIBS  = Rack/dep/lib/libcrypto.a
-EXTRA_LIBS += Rack/dep/lib/libcurl.a
-# EXTRA_LIBS += Rack/dep/lib/libglfw3.a
 EXTRA_LIBS += Rack/dep/lib/libjansson.a
 EXTRA_LIBS += Rack/dep/lib/libspeexdsp.a
-EXTRA_LIBS += Rack/dep/lib/libssl.a
 EXTRA_LIBS += Rack/dep/lib/libzstd.a
 
 ifeq ($(WINDOWS),true)
@@ -77,8 +73,14 @@ else
 CMAKE := cmake
 endif
 
+BUILD_C_FLAGS += -std=gnu11
+
 Rack/dep/lib/%.a:
 	$(MAKE) CMAKE="$(CMAKE) -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX='$(abspath Rack/dep)'" -C Rack/dep lib/$*.a
+
+Rack/dep/lib/libarchive.a: Rack/dep/lib/libzstd.a
+
+Rack/dep/lib/libarchive_static.a: Rack/dep/lib/libzstd.a
 
 Rack/dep/lib/libcrypto.a: Rack/dep/lib/libssl.a
 
@@ -91,6 +93,7 @@ BASE_FLAGS += -IRack/include
 BASE_FLAGS += -IRack/dep/include
 BASE_FLAGS += -IRack/dep/filesystem/include
 BASE_FLAGS += -IRack/dep/fuzzysearchdatabase/src
+BASE_FLAGS += -IRack/dep/glew-2.1.0/include
 BASE_FLAGS += -IRack/dep/glfw/deps
 BASE_FLAGS += -IRack/dep/glfw/include
 BASE_FLAGS += -IRack/dep/nanovg/src

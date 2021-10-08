@@ -19,6 +19,7 @@
 #include <app/Scene.hpp>
 #include <context.hpp>
 #include <engine/Engine.hpp>
+#include <network.hpp>
 #include <patch.hpp>
 #include <ui/common.hpp>
 #include <window/Window.hpp>
@@ -30,6 +31,14 @@ GLFWAPI const char* glfwGetClipboardString(GLFWwindow* window) { return nullptr;
 GLFWAPI void glfwSetClipboardString(GLFWwindow* window, const char*) {}
 GLFWAPI const char* glfwGetKeyName(int key, int scancode) { return nullptr; }
 GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
+
+namespace rack {
+namespace network {
+    std::string encodeUrl(const std::string&) { return {}; }
+    json_t* requestJson(Method, const std::string&, json_t*, const CookieMap&) { return nullptr; }
+    bool requestDownload(const std::string&, const std::string&, float*, const CookieMap&) { return nullptr; }
+}
+}
 
 namespace rack {
 namespace window {
