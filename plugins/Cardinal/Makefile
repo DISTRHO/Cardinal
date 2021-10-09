@@ -105,7 +105,7 @@ CMAKE += -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX='$(DEP_PATH)'
 # VCV internal dependencies target
 
 Rack/dep/lib/%.a:
-	$(MAKE) ARCH_NAME=$(ARCH_NAME) CMAKE="$(CMAKE)" CONFIGURE="$(CONFIGURE)" MACHINE=$(MACHINE)$(MACHINE_SUFFIX) -C Rack/dep lib/$*.a
+	$(MAKE) ARCH_NAME=$(ARCH_NAME) CMAKE="$(CMAKE)" CONFIGURE="$(CONFIGURE)" DEP_FLAGS="$(BASE_FLAGS)" MACHINE=$(MACHINE)$(MACHINE_SUFFIX) -C Rack/dep lib/$*.a
 
 Rack/dep/lib/libarchive.a: Rack/dep/lib/libzstd.a
 
