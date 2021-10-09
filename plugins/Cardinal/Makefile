@@ -67,18 +67,9 @@ EXTRA_LIBS += Rack/dep/lib/libzstd.a
 include ../../dpf/Makefile.plugins.mk
 
 # --------------------------------------------------------------
-# Fix up cmake for windows cross-compilation
-
-ifeq ($(WINDOWS),true)
-CMAKE := cmake -G 'Unix Makefiles' -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_RC_COMPILER=$(subst gcc,windres,$(CC))
-else
-CMAKE := cmake
-endif
-
-CMAKE += -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX='$(abspath Rack/dep)'
-
-# --------------------------------------------------------------
 # override VCV arch.mk stuff so we can build more architectures
+
+DEP_PATH = $(abspath Rack/dep)
 
 ifeq ($(CPU_ARM),true)
 ARCH_NAME = arm
@@ -89,17 +80,32 @@ MACHINE = x86_64-bring-forth-the-rack
 else ifeq ($(CPU_AARCH64),true)
 ARCH_NAME = aarch64
 MACHINE = x86_64-bring-forth-the-rack
+else
+MACHINE = $(TARGET_MACHINE)
 endif
 
 ifneq ($(MACOS_OR_WINDOWS),true)
-MACHINE += -linux
+MACHINE_SUFFIX = -linux
 endif
+
+CONFIGURE = ./configure --prefix="$(DEP_PATH)" --host=$(TARGET_MACHINE)
+
+# --------------------------------------------------------------
+# Fix up cmake for windows cross-compilation
+
+ifeq ($(WINDOWS),true)
+CMAKE = cmake -G 'Unix Makefiles' -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_RC_COMPILER=$(subst gcc,windres,$(CC))
+else
+CMAKE = cmake
+endif
+
+CMAKE += -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX='$(DEP_PATH)'
 
 # --------------------------------------------------------------
 # VCV internal dependencies target
 
 Rack/dep/lib/%.a:
-	$(MAKE) ARCH_NAME=$(ARCH_NAME) CMAKE="$(CMAKE)" MACHINE=$(MACHINE) -C Rack/dep lib/$*.a
+	$(MAKE) ARCH_NAME=$(ARCH_NAME) CMAKE="$(CMAKE)" CONFIGURE="$(CONFIGURE)" MACHINE=$(MACHINE)$(MACHINE_SUFFIX) -C Rack/dep lib/$*.a
 
 Rack/dep/lib/libarchive.a: Rack/dep/lib/libzstd.a
 

@@ -40,11 +40,8 @@ clean:
 	rm -rf plugins/Cardinal/Rack/dep/include
 	rm -rf plugins/Cardinal/Rack/dep/lib
 	rm -rf plugins/Cardinal/Rack/dep/share
-	rm -rf plugins/Cardinal/Rack/dep/curl-7.66.0
-	rm -rf plugins/Cardinal/Rack/dep/glew-2.1.0
 	rm -rf plugins/Cardinal/Rack/dep/jansson-2.12
 	rm -rf plugins/Cardinal/Rack/dep/libarchive-3.4.3
-	rm -rf plugins/Cardinal/Rack/dep/openssl-1.1.1d
 	rm -rf plugins/Cardinal/Rack/dep/speexdsp-SpeexDSP-1.2rc3
 	rm -rf plugins/Cardinal/Rack/dep/zstd-1.4.5
 
