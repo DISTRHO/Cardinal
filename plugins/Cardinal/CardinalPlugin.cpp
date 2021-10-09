@@ -22,11 +22,14 @@
 #include <library.hpp>
 #include <keyboard.hpp>
 #include <midi.hpp>
+#include <patch.hpp>
 #include <plugin.hpp>
 #include <random.hpp>
 #include <settings.hpp>
 #include <system.hpp>
 
+#include <app/Scene.hpp>
+#include <engine/Engine.hpp>
 #include <ui/common.hpp>
 #include <window/Window.hpp>
 
@@ -99,38 +102,23 @@ struct Initializer {
         }
 
         INFO("Initializing environment");
-        // network::init();
         audio::init();
-        // rtaudioInit();
         midi::init();
-        // rtmidiInit();
         keyboard::init();
-#ifndef DPF_AS_GLFW
-        gamepad::init();
-#endif
         plugin::init();
         library::init();
-        // discord::init();
-
 		ui::init();
-		window::init();
     }
 
     ~Initializer()
     {
         using namespace rack;
 
-		window::destroy();
 		ui::destroy();
-
-        // discord::destroy();
         library::destroy();
         midi::destroy();
         audio::destroy();
         plugin::destroy();
-#ifndef DPF_AS_GLFW
-        gamepad::destroy();
-#endif
 	    INFO("Destroying logger");
 	    logger::destroy();
     }
@@ -146,10 +134,46 @@ static const Initializer& getInitializerInstance()
 
 class CardinalPlugin : public Plugin
 {
+    rack::Context* const fContext;
+
+    struct ScopedContext {
+        ScopedContext(CardinalPlugin* const plugin)
+        {
+            rack::contextSet(plugin->fContext);
+        }
+
+        ~ScopedContext()
+        {
+	        rack::contextSet(nullptr);
+        }
+    };
+
 public:
     CardinalPlugin()
-        : Plugin(0, 0, 0)
+        : Plugin(0, 0, 0),
+          fContext(new rack::Context)
     {
+        const ScopedContext sc(this);
+
+        fContext->engine = new rack::engine::Engine;
+        fContext->history = new rack::history::State;
+        fContext->event = new rack::widget::EventState;
+        fContext->scene = new rack::app::Scene;
+        fContext->event->rootWidget = fContext->scene;
+        fContext->patch = new rack::patch::Manager;
+    	fContext->engine->startFallbackThread();
+    }
+
+    ~CardinalPlugin() override
+    {
+        const ScopedContext sc(this);
+
+	    delete fContext;
+    }
+
+    rack::Context* getRackContext() const noexcept
+    {
+        return fContext;
     }
 
 protected:
@@ -245,6 +269,11 @@ private:
     */
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CardinalPlugin)
 };
+
+rack::Context* getRackContextFromPlugin(void* const ptr)
+{
+    return static_cast<CardinalPlugin*>(ptr)->getRackContext();
+}
 
 /* ------------------------------------------------------------------------------------------------------------
  * Plugin entry point, called by DPF to create a new plugin instance. */

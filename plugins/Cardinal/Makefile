@@ -16,15 +16,13 @@ FILES_DSP = \
 	CardinalPlugin.cpp
 
 FILES_UI = \
-	CardinalUI.cpp
-
-FILES_UI += dep.cpp
-FILES_UI += Window.cpp
+	CardinalUI.cpp \
+	dep.cpp \
+	Window.cpp
 
 # --------------------------------------------------------------
 # Import base definitions
 
-# UI_TYPE = external
 USE_NANOVG_FBO = true
 include ../../dpf/Makefile.base.mk
 
@@ -35,7 +33,6 @@ FILES_DSP += Rack/dep/pffft/pffft.c
 FILES_DSP += Rack/dep/pffft/fftpack.c
 
 FILES_UI += Rack/dep/oui-blendish/blendish.c
-# FILES_UI += Rack/dep/nanovg/src/nanovg.c
 
 # FIXME dont use this
 FILES_UI += Rack/dep/osdialog/osdialog.c
@@ -63,10 +60,6 @@ endif
 
 EXTRA_LIBS += Rack/dep/lib/libzstd.a
 
-# for raw GLFW window
-# EXTRA_LIBS += Rack/dep/lib/libglfw3.a
-# FILES_DSP += Rack/src/gamepad.cpp Rack/src/window/Window.cpp
-
 # --------------------------------------------------------------
 # Do some magic
 
@@ -87,8 +80,6 @@ Rack/dep/lib/libarchive.a: Rack/dep/lib/libzstd.a
 
 Rack/dep/lib/libarchive_static.a: Rack/dep/lib/libzstd.a
 
-Rack/dep/lib/libcrypto.a: Rack/dep/lib/libssl.a
-
 # --------------------------------------------------------------
 # Extra flags for VCV stuff
 
@@ -98,10 +89,7 @@ BASE_FLAGS += -IRack/include
 BASE_FLAGS += -IRack/dep/include
 BASE_FLAGS += -IRack/dep/filesystem/include
 BASE_FLAGS += -IRack/dep/fuzzysearchdatabase/src
-# BASE_FLAGS += -IRack/dep/glew-2.1.0/include
-# BASE_FLAGS += -IRack/dep/glfw/deps
 BASE_FLAGS += -IRack/dep/glfw/include
-# BASE_FLAGS += -IRack/dep/nanovg/src
 BASE_FLAGS += -IRack/dep/nanosvg/src
 BASE_FLAGS += -IRack/dep/osdialog
 BASE_FLAGS += -IRack/dep/oui-blendish

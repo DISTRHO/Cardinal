@@ -18,9 +18,6 @@
 #include <app/common.hpp>
 #include <app/Scene.hpp>
 #include <context.hpp>
-#include <engine/Engine.hpp>
-#include <network.hpp>
-#include <patch.hpp>
 #include <ui/common.hpp>
 #include <window/Window.hpp>
 
@@ -30,15 +27,6 @@
 #include "DistrhoUI.hpp"
 #include "ResizeHandle.hpp"
 
-namespace rack {
-namespace network {
-    std::string encodeUrl(const std::string&) { return {}; }
-    json_t* requestJson(Method, const std::string&, json_t*, const CookieMap&) { return nullptr; }
-    bool requestDownload(const std::string&, const std::string&, float*, const CookieMap&) { return false; }
-}
-}
-
-#ifdef DPF_AS_GLFW
 GLFWAPI const char* glfwGetClipboardString(GLFWwindow* window) { return nullptr; }
 GLFWAPI void glfwSetClipboardString(GLFWwindow* window, const char*) {}
 GLFWAPI const char* glfwGetKeyName(int key, int scancode) { return nullptr; }
@@ -48,89 +36,66 @@ namespace rack {
 namespace window {
     DISTRHO_NAMESPACE::UI* lastUI = nullptr;
 
-    void mouseButtonCallback(Window* win, int button, int action, int mods);
-    void cursorPosCallback(Window* win, double xpos, double ypos);
-    void scrollCallback(Window* win, double x, double y);
+    void mouseButtonCallback(Context* ctx, int button, int action, int mods);
+    void cursorPosCallback(Context* ctx, double xpos, double ypos);
+    void cursorEnterCallback(Context* ctx, int entered);
+    void scrollCallback(Context* ctx, double x, double y);
+    void charCallback(Context* ctx, unsigned int codepoint);
+    void keyCallback(Context* ctx, int key, int scancode, int action, int mods);
 }
 }
-#endif
 
 START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
-struct Initializer2 {
-    Initializer2()
-    {
-        using namespace rack;
-
-    }
-
-    ~Initializer2()
-    {
-        using namespace rack;
-
-    }
-};
-
-static const Initializer2& getInitializer2Instance()
-{
-    static const Initializer2 init;
-    return init;
-}
+rack::Context* getRackContextFromPlugin(void* ptr);
 
 class CardinalUI : public UI
 {
+    rack::Context* const fContext;
     ResizeHandle fResizeHandle;
+
+    struct ScopedContext {
+        ScopedContext(CardinalUI* const ui)
+        {
+            rack::contextSet(ui->fContext);
+        }
+
+        ~ScopedContext()
+        {
+	        rack::contextSet(nullptr);
+        }
+    };
+
 public:
     CardinalUI()
         : UI(1280, 720),
+          fContext(getRackContextFromPlugin(getPluginInstancePointer())),
           fResizeHandle(this)
     {
-        using namespace rack;
+        const ScopedContext sc(this);
 
-        /*
-           The following code was based from VCVRack adapters/standalone.cpp
-
-           Copyright (C) 2016-2021 VCV
-
-           This program is free software: you can redistribute it and/or modify it under the terms of the
-           GNU General Public License as published by the Free Software Foundation, either version 3 of the
-           License, or (at your option) any later version.
-        */
         // Initialize context
         d_stdout("UI context ptr %p", NanoVG::getContext());
-#ifdef DPF_AS_GLFW
-        window::lastUI = this;
-#endif
-        contextSet(new Context);
-        APP->engine = new engine::Engine;
-        APP->history = new history::State;
-        APP->event = new widget::EventState;
-        APP->scene = new app::Scene;
-        APP->event->rootWidget = APP->scene;
-        APP->patch = new patch::Manager;
-        /*if (!settings::headless)*/ {
-            APP->window = new window::Window;
-        }
-#ifdef DPF_AS_GLFW
-        window::lastUI = nullptr;
-#endif
-
-    	APP->engine->startFallbackThread();
+        rack::window::lastUI = this;
+        fContext->window = new rack::window::Window;
+        rack::window::lastUI = nullptr;
     }
 
     ~CardinalUI() override
     {
-        using namespace rack;
+        const ScopedContext sc(this);
 
-	    delete APP;
-	    contextSet(NULL);
+        delete fContext->window;
+        fContext->window = nullptr;
     }
 
     void onNanoDisplay() override
     {
-		APP->window->step();
+        const ScopedContext sc(this);
+
+		fContext->window->step();
     }
 
     void uiIdle() override
@@ -152,9 +117,10 @@ protected:
 
     // -------------------------------------------------------------------------------------------------------
 
-#ifdef DPF_AS_GLFW
     bool onMouse(const MouseEvent& ev) override
     {
+        const ScopedContext sc(this);
+
         int button;
         int mods = 0;
         int action = ev.press;
@@ -206,22 +172,25 @@ protected:
         }
 #endif
 
-        mouseButtonCallback(APP->window, button, action, mods);
+        rack::window::mouseButtonCallback(fContext, button, action, mods);
         return true;
     }
 
     bool onMotion(const MotionEvent& ev) override
     {
-        cursorPosCallback(APP->window, ev.pos.getX(), ev.pos.getY());
+        const ScopedContext sc(this);
+
+        rack::window::cursorPosCallback(fContext, ev.pos.getX(), ev.pos.getY());
         return true;
     }
 
     bool onScroll(const ScrollEvent& ev) override
     {
-        scrollCallback(APP->window, ev.delta.getX(), ev.delta.getY());
+        const ScopedContext sc(this);
+
+        rack::window::scrollCallback(fContext, ev.delta.getX(), ev.delta.getY());
         return true;
     }
-#endif
 
     #if 0
     void onResize(const ResizeEvent& ev) override
@@ -232,6 +201,36 @@ protected:
     #endif
 
     // TODO uiFocus
+
+    bool onCharacterInput(const CharacterInputEvent& ev) override
+    {
+        if (ev.character == 0)
+            return false;
+
+        const ScopedContext sc(this);
+
+        rack::window::charCallback(fContext, ev.character);
+        return true;
+    }
+
+    bool onKeyboard(const KeyboardEvent& ev) override
+    {
+        const ScopedContext sc(this);
+
+        int mods = 0;
+        int action = ev.press;
+
+        if (ev.mod & kModifierControl)
+            mods |= GLFW_MOD_CONTROL;
+        if (ev.mod & kModifierShift)
+            mods |= GLFW_MOD_SHIFT;
+        if (ev.mod & kModifierAlt)
+            mods |= GLFW_MOD_ALT;
+
+        // TODO special key conversion
+        rack::window::keyCallback(fContext, ev.key, ev.keycode, action, mods);
+        return true;
+    }
 
 private:
    /**
@@ -245,7 +244,6 @@ private:
 
 UI* createUI()
 {
-    getInitializer2Instance();
     return new CardinalUI();
 }
 

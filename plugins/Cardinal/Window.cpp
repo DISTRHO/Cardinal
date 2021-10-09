@@ -363,7 +363,7 @@ bool& Window::fbDirtyOnSubpixelChange() {
 }
 
 
-void mouseButtonCallback(Window* win, int button, int action, int mods) {
+void mouseButtonCallback(Context* ctx, int button, int action, int mods) {
 	/*
 #if defined ARCH_MAC
 	// Remap Ctrl-left click to right click on Mac
@@ -379,29 +379,35 @@ void mouseButtonCallback(Window* win, int button, int action, int mods) {
 #endif
 */
 
-	APP->event->handleButton(win->internal->lastMousePos, button, action, mods);
+	ctx->event->handleButton(ctx->window->internal->lastMousePos, button, action, mods);
 }
 
-void cursorPosCallback(Window* win, double xpos, double ypos) {
-	math::Vec mousePos = math::Vec(xpos, ypos).div(win->pixelRatio / win->windowRatio).round();
-	math::Vec mouseDelta = mousePos.minus(win->internal->lastMousePos);
+void cursorPosCallback(Context* ctx, double xpos, double ypos) {
+	math::Vec mousePos = math::Vec(xpos, ypos).div(ctx->window->pixelRatio / ctx->window->windowRatio).round();
+	math::Vec mouseDelta = mousePos.minus(ctx->window->internal->lastMousePos);
 
 	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
-	if (win->internal->ignoreNextMouseDelta) {
-		win->internal->ignoreNextMouseDelta = false;
+	if (ctx->window->internal->ignoreNextMouseDelta) {
+		ctx->window->internal->ignoreNextMouseDelta = false;
 		mouseDelta = math::Vec();
 	}
 
-	win->internal->lastMousePos = mousePos;
+	ctx->window->internal->lastMousePos = mousePos;
 
-	APP->event->handleHover(mousePos, mouseDelta);
+	ctx->event->handleHover(mousePos, mouseDelta);
 
 	// Keyboard/mouse MIDI driver
-	math::Vec scaledPos(xpos / win->internal->ui->getWidth(), ypos / win->internal->ui->getHeight());
+	math::Vec scaledPos(xpos / ctx->window->internal->ui->getWidth(), ypos / ctx->window->internal->ui->getHeight());
 	keyboard::mouseMove(scaledPos);
 }
 
-void scrollCallback(Window* win, double x, double y) {
+void cursorEnterCallback(Context* ctx, int entered) {
+	if (!entered) {
+		ctx->event->handleLeave();
+	}
+}
+
+void scrollCallback(Context* ctx, double x, double y) {
 	math::Vec scrollDelta = math::Vec(x, y);
 #if defined ARCH_MAC
 	scrollDelta = scrollDelta.mult(10.0);
@@ -409,14 +415,25 @@ void scrollCallback(Window* win, double x, double y) {
 	scrollDelta = scrollDelta.mult(50.0);
 #endif
 
-	APP->event->handleScroll(win->internal->lastMousePos, scrollDelta);
+	ctx->event->handleScroll(ctx->window->internal->lastMousePos, scrollDelta);
 }
 
-
-void init() {
+void charCallback(Context* ctx, unsigned int codepoint) {
+	if (ctx->event->handleText(ctx->window->internal->lastMousePos, codepoint))
+		return;
 }
 
-void destroy() {
+void keyCallback(Context* ctx, int key, int scancode, int action, int mods) {
+	if (ctx->event->handleKey(ctx->window->internal->lastMousePos, key, scancode, action, mods))
+		return;
+
+	// Keyboard/mouse MIDI driver
+	if (action == GLFW_PRESS && (mods & RACK_MOD_MASK) == 0) {
+		keyboard::press(key);
+	}
+	if (action == GLFW_RELEASE) {
+		keyboard::release(key);
+	}
 }
 
 
