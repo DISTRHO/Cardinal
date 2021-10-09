@@ -57,10 +57,8 @@ EXTRA_LIBS += Rack/dep/lib/libspeexdsp.a
 
 ifeq ($(WINDOWS),true)
 EXTRA_LIBS += Rack/dep/lib/libarchive_static.a
-EXTRA_LIBS += Rack/dep/lib/libglew32.a
 else
 EXTRA_LIBS += Rack/dep/lib/libarchive.a
-EXTRA_LIBS += Rack/dep/lib/libGLEW.a
 endif
 
 EXTRA_LIBS += Rack/dep/lib/libzstd.a
