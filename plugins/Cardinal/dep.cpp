@@ -2,6 +2,9 @@
 
 #include <common.hpp> // for fopen_u8
 
+#ifdef NDEBUG
+# undef DEBUG
+#endif
 #include "OpenGL.hpp"
 
 #define BLENDISH_IMPLEMENTATION

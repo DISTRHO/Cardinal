@@ -32,7 +32,9 @@
 
 #include <osdialog.h>
 
-#undef DEBUG
+#ifdef NDEBUG
+# undef DEBUG
+#endif
 #include "DistrhoPlugin.hpp"
 
 START_NAMESPACE_DISTRHO
@@ -54,6 +56,7 @@ struct Initializer {
         using namespace rack;
 
         settings::devMode = true;
+        settings::autosaveInterval = 0;
         system::init();
         asset::init();
         logger::init();

@@ -24,7 +24,9 @@
 #include <ui/common.hpp>
 #include <window/Window.hpp>
 
-#undef DEBUG
+#ifdef NDEBUG
+# undef DEBUG
+#endif
 #include "DistrhoUI.hpp"
 #include "ResizeHandle.hpp"
 

@@ -1,3 +1,7 @@
 #pragma once
-#undef DEBUG
+
+#ifdef NDEBUG
+# undef DEBUG
+#endif
+
 #include "OpenGL.hpp"

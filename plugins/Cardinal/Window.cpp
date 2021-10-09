@@ -15,7 +15,9 @@
 #include <plugin.hpp> // used in Window::screenshot
 #include <system.hpp> // used in Window::screenshot
 
-#undef DEBUG
+#ifdef NDEBUG
+# undef DEBUG
+#endif
 #include "DistrhoUI.hpp"
 
 namespace rack {
@@ -74,7 +76,7 @@ struct Window::Internal {
 
 	int frame = 0;
 	bool ignoreNextMouseDelta = false;
-	int frameSwapInterval = -1;
+	int frameSwapInterval = 1;
 	double monitorRefreshRate = 60.0; // FIXME
 	double frameTime = 0.0;
 	double lastFrameDuration = 0.0;
@@ -102,8 +104,7 @@ Window::Window() {
 	INFO("UI pointer: %p", lastUI);
 
 	vg = lastUI->getContext();
-	INFO("NanoVG context: %p", vg);
-// 	fbVg = nvgCreateSharedGL2(vg, nvgFlags);
+	fbVg = nvgCreateSharedGL2(vg, NVG_ANTIALIAS);
 
 	// Load default Blendish font
 	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
@@ -154,7 +155,7 @@ void Window::step() {
 	double t1 = 0.0, t2 = 0.0, t3 = 0.0, t4 = 0.0, t5 = 0.0;
 
 	// Make event handlers and step() have a clean NanoVG context
-	nvgReset(vg);
+// 	nvgReset(vg);
 
 	bndSetFont(uiFont->handle);
 
