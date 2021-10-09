@@ -100,15 +100,14 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yq g++-multilib libasound2-dev:i386 libcairo2-dev:i386 libgl1-mesa-dev:i386 liblo-dev:i386 libpulse-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
+          sudo apt-get install -yq g++-i686-linux-gnu libasound2-dev:i386 libcairo2-dev:i386 libgl1-mesa-dev:i386 liblo-dev:i386 libpulse-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
           # extra for vcv deps
           sudo apt-get install -yq libxi-dev:i386 libxinerama-dev:i386
       - name: Build linux x86
         env:
-          CFLAGS: -m32
-          CXXFLAGS: -m32
-          LDFLAGS: -m32 -static-libgcc -static-libstdc++
-          PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
+          CC: i686-linux-gnu-gcc
+          CXX: i686-linux-gnu-g++
+          LDFLAGS: -static-libgcc -static-libstdc++
         run: |
           make features
           make -j $(nproc)
