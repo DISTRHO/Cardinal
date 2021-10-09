@@ -107,7 +107,10 @@ jobs:
         env:
           CC: i686-linux-gnu-gcc
           CXX: i686-linux-gnu-g++
-          LDFLAGS: -static-libgcc -static-libstdc++
+          CFLAGS: -m32
+          CXXFLAGS: -m32
+          LDFLAGS: -m32 -static-libgcc -static-libstdc++
+          PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
         run: |
           make features
           make -j $(nproc)

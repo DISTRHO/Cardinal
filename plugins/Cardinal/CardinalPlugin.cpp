@@ -103,7 +103,7 @@ struct Initializer {
             /*
             osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, message.c_str());
             */
-            exit(1);
+            // exit(1);
         }
 
         INFO("Initializing environment");
@@ -167,14 +167,14 @@ public:
         fContext->event->rootWidget = fContext->scene;
         fContext->patch = new rack::patch::Manager;
         fContext->patch->autosavePath = "/OBVIOUSLY-NOT-VALID-PATH/";
-    	fContext->engine->startFallbackThread();
+        fContext->engine->startFallbackThread();
     }
 
     ~CardinalPlugin() override
     {
         const ScopedContext sc(this);
 
-	    delete fContext;
+        delete fContext;
     }
 
     rack::Context* getRackContext() const noexcept
