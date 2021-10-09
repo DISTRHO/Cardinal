@@ -24,6 +24,7 @@
 #include <ui/common.hpp>
 #include <window/Window.hpp>
 
+#undef DEBUG
 #include "DistrhoUI.hpp"
 #include "ResizeHandle.hpp"
 
@@ -96,7 +97,7 @@ public:
            License, or (at your option) any later version.
         */
         // Initialize context
-        INFO("Initializing context");
+        d_stdout("UI context ptr %p", NanoVG::getContext());
 #ifdef DPF_AS_GLFW
         window::lastUI = this;
 #endif
@@ -125,7 +126,7 @@ public:
 	    contextSet(NULL);
     }
 
-    void onDisplay() override
+    void onNanoDisplay() override
     {
 		APP->window->step();
     }
@@ -191,6 +192,12 @@ protected:
         case 3:
             button = GLFW_MOUSE_BUTTON_RIGHT;
             break;
+//         case 4:
+//             button = GLFW_MOUSE_WHEELUP;
+//             break;
+//         case 5:
+//             button = GLFW_MOUSE_WHEELDOWN;
+//             break;
         default:
             button = 0;
             break;

@@ -32,6 +32,7 @@
 
 #include <osdialog.h>
 
+#undef DEBUG
 #include "DistrhoPlugin.hpp"
 
 START_NAMESPACE_DISTRHO
@@ -124,6 +125,9 @@ struct Initializer {
         midi::destroy();
         audio::destroy();
         plugin::destroy();
+#ifndef DPF_AS_GLFW
+        gamepad::destroy();
+#endif
 	    INFO("Destroying logger");
 	    logger::destroy();
     }

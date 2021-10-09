@@ -2,7 +2,6 @@
 #include <queue>
 #include <thread>
 
-#include <stb_image_write.h>
 #include <osdialog.h>
 
 #include <window/Window.hpp>
@@ -16,6 +15,7 @@
 #include <plugin.hpp> // used in Window::screenshot
 #include <system.hpp> // used in Window::screenshot
 
+#undef DEBUG
 #include "DistrhoUI.hpp"
 
 namespace rack {
@@ -94,14 +94,6 @@ Window::Window() {
 
 	int err;
 
-	// Set up GLEW
-	glewExperimental = GL_TRUE;
-	err = glewInit();
-	if (err != GLEW_OK) {
-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLEW. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
-		exit(1);
-	}
-
 	const GLubyte* vendor = glGetString(GL_VENDOR);
 	const GLubyte* renderer = glGetString(GL_RENDERER);
 	const GLubyte* version = glGetString(GL_VERSION);
@@ -109,24 +101,9 @@ Window::Window() {
 	INFO("OpenGL: %s", version);
 	INFO("UI pointer: %p", lastUI);
 
-	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
-	glGetError();
-
-	// Set up NanoVG
-	int nvgFlags = NVG_ANTIALIAS;
-#if defined NANOVG_GL2
-	vg = nvgCreateGL2(nvgFlags);
-	fbVg = nvgCreateSharedGL2(vg, nvgFlags);
-#elif defined NANOVG_GL3
-	vg = nvgCreateGL3(nvgFlags);
-#elif defined NANOVG_GLES2
-	vg = nvgCreateGLES2(nvgFlags);
-#endif
-	if (!vg) {
-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize NanoVG. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
-		exit(1);
-	}
-	d_stderr2("framebuffer is %p", fbVg);
+	vg = lastUI->getContext();
+	INFO("NanoVG context: %p", vg);
+// 	fbVg = nvgCreateSharedGL2(vg, nvgFlags);
 
 	// Load default Blendish font
 	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
@@ -148,17 +125,6 @@ Window::~Window() {
 	// Fonts and Images in the cache must be deleted before the NanoVG context is deleted
 	internal->fontCache.clear();
 	internal->imageCache.clear();
-
-	// nvgDeleteClone(fbVg);
-
-#if defined NANOVG_GL2
-	nvgDeleteGL2(vg);
-	nvgDeleteGL2(fbVg);
-#elif defined NANOVG_GL3
-	nvgDeleteGL3(vg);
-#elif defined NANOVG_GLES2
-	nvgDeleteGLES2(vg);
-#endif
 
 	delete internal;
 }
@@ -239,7 +205,7 @@ void Window::step() {
 		bool visible = true;
 		if (visible) {
 			// Update and render
-			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
+// 			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
 			nvgScale(vg, pixelRatio, pixelRatio);
 
 			// Draw scene
@@ -252,7 +218,7 @@ void Window::step() {
 			glViewport(0, 0, fbWidth, fbHeight);
 			glClearColor(0.0, 0.0, 0.0, 1.0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-			nvgEndFrame(vg);
+// 			nvgEndFrame(vg);
 			t4 = system::getTime();
 		}
 	}

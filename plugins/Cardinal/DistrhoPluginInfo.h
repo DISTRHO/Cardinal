@@ -30,7 +30,7 @@
 // #define DISTRHO_PLUGIN_VST3_CATEGORIES    "Fx|Analyzer"
 // #define DISTRHO_PLUGIN_HAS_EMBED_UI       1
 // #define DISTRHO_PLUGIN_HAS_EXTERNAL_UI    1
-// #define DISTRHO_UI_USE_NANOVG             1
+#define DISTRHO_UI_USE_NANOVG             1
 #define DISTRHO_UI_USER_RESIZABLE         0
 
 #define DPF_AS_GLFW 1

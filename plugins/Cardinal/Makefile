@@ -16,14 +16,16 @@ FILES_DSP = \
 	CardinalPlugin.cpp
 
 FILES_UI = \
-	CardinalUI.cpp \
-	Window.cpp
+	CardinalUI.cpp
+
+FILES_UI += dep.cpp
+FILES_UI += Window.cpp
 
 # --------------------------------------------------------------
 # Import base definitions
 
 # UI_TYPE = external
-SKIP_NANOVG = true
+USE_NANOVG_FBO = true
 include ../../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -33,7 +35,7 @@ FILES_DSP += Rack/dep/pffft/pffft.c
 FILES_DSP += Rack/dep/pffft/fftpack.c
 
 FILES_UI += Rack/dep/oui-blendish/blendish.c
-FILES_UI += Rack/dep/nanovg/src/nanovg.c
+# FILES_UI += Rack/dep/nanovg/src/nanovg.c
 
 # FIXME dont use this
 FILES_UI += Rack/dep/osdialog/osdialog.c
@@ -47,7 +49,7 @@ endif
 
 FILES_DSP += $(wildcard Rack/src/*.c)
 FILES_DSP += $(wildcard Rack/src/*/*.c)
-FILES_DSP += $(filter-out Rack/src/discord.cpp Rack/src/gamepad.cpp Rack/src/network.cpp Rack/src/rtaudio.cpp Rack/src/rtmidi.cpp, $(wildcard Rack/src/*.cpp))
+FILES_DSP += $(filter-out Rack/src/dep.cpp Rack/src/discord.cpp Rack/src/gamepad.cpp Rack/src/network.cpp Rack/src/rtaudio.cpp Rack/src/rtmidi.cpp, $(wildcard Rack/src/*.cpp))
 FILES_DSP += $(filter-out Rack/src/window/Window.cpp, $(wildcard Rack/src/*/*.cpp))
 
 EXTRA_LIBS += Rack/dep/lib/libjansson.a
@@ -93,15 +95,15 @@ Rack/dep/lib/libcrypto.a: Rack/dep/lib/libssl.a
 # Extra flags for VCV stuff
 
 BASE_FLAGS += -D_APP_VERSION=2.git.0
-# BASE_FLAGS += -I$(DPF_PATH)/dgl/src/nanovg
+BASE_FLAGS += -I$(DPF_PATH)/dgl/src/nanovg
 BASE_FLAGS += -IRack/include
 BASE_FLAGS += -IRack/dep/include
 BASE_FLAGS += -IRack/dep/filesystem/include
 BASE_FLAGS += -IRack/dep/fuzzysearchdatabase/src
-BASE_FLAGS += -IRack/dep/glew-2.1.0/include
-BASE_FLAGS += -IRack/dep/glfw/deps
+# BASE_FLAGS += -IRack/dep/glew-2.1.0/include
+# BASE_FLAGS += -IRack/dep/glfw/deps
 BASE_FLAGS += -IRack/dep/glfw/include
-BASE_FLAGS += -IRack/dep/nanovg/src
+# BASE_FLAGS += -IRack/dep/nanovg/src
 BASE_FLAGS += -IRack/dep/nanosvg/src
 BASE_FLAGS += -IRack/dep/osdialog
 BASE_FLAGS += -IRack/dep/oui-blendish

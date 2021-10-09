@@ -6,27 +6,33 @@
 
 include dpf/Makefile.base.mk
 
-all: dgl plugins gen
+all: dgl plugins gen resources
 
 # --------------------------------------------------------------
 
 dgl:
-	$(MAKE) SKIP_NANOVG=true -C dpf/dgl opengl
+	$(MAKE) USE_NANOVG_FBO=true USE_RGBA=true -C dpf/dgl opengl
 
 plugins: dgl
 	$(MAKE) all -C plugins/Cardinal
 
 ifneq ($(CROSS_COMPILING),true)
-gen: plugins dpf/utils/lv2_ttl_generator
+gen: plugins resources dpf/utils/lv2_ttl_generator
 	@$(CURDIR)/dpf/utils/generate-ttl.sh
 ifeq ($(MACOS),true)
 	@$(CURDIR)/dpf/utils/generate-vst-bundles.sh
 endif
 
+resources: bin/Cardinal.lv2/res
+
+bin/Cardinal.lv2/res: plugins
+	ln -sf $(CURDIR)/plugins/Cardinal/Rack/res bin/Cardinal.lv2/res
+
 dpf/utils/lv2_ttl_generator:
 	$(MAKE) -C dpf/utils/lv2-ttl-generator
 else
 gen:
+resources:
 endif
 
 # --------------------------------------------------------------
