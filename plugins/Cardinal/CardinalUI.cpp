@@ -64,7 +64,7 @@ class CardinalUI : public UI
 
         ~ScopedContext()
         {
-	        rack::contextSet(nullptr);
+            rack::contextSet(nullptr);
         }
     };
 
@@ -95,7 +95,7 @@ public:
     {
         const ScopedContext sc(this);
 
-		fContext->window->step();
+        fContext->window->step();
     }
 
     void uiIdle() override

@@ -24,6 +24,7 @@ FILES_UI = \
 # Import base definitions
 
 USE_NANOVG_FBO = true
+USE_RGBA = true
 include ../../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -65,16 +66,40 @@ EXTRA_LIBS += Rack/dep/lib/libzstd.a
 
 include ../../dpf/Makefile.plugins.mk
 
+# --------------------------------------------------------------
+# Fix up cmake for windows cross-compilation
+
 ifeq ($(WINDOWS),true)
 CMAKE := cmake -G 'Unix Makefiles' -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_RC_COMPILER=$(subst gcc,windres,$(CC))
 else
 CMAKE := cmake
 endif
 
-BUILD_C_FLAGS += -std=gnu11
+CMAKE += -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX='$(abspath Rack/dep)'
+
+# --------------------------------------------------------------
+# override VCV arch.mk stuff so we can build more architectures
+
+ifeq ($(CPU_ARM),true)
+ARCH_NAME = arm
+MACHINE = i686-bring-forth-the-rack
+else ifeq ($(CPU_ARM64),true)
+ARCH_NAME = arm64
+MACHINE = x86_64-bring-forth-the-rack
+else ifeq ($(CPU_AARCH64),true)
+ARCH_NAME = aarch64
+MACHINE = x86_64-bring-forth-the-rack
+endif
+
+ifneq ($(MACOS_OR_WINDOWS),true)
+MACHINE += -linux
+endif
+
+# --------------------------------------------------------------
+# VCV internal dependencies target
 
 Rack/dep/lib/%.a:
-	$(MAKE) CMAKE="$(CMAKE) -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX='$(abspath Rack/dep)'" -C Rack/dep lib/$*.a
+	$(MAKE) ARCH_NAME=$(ARCH_NAME) CMAKE="$(CMAKE)" MACHINE=$(MACHINE) -C Rack/dep lib/$*.a
 
 Rack/dep/lib/libarchive.a: Rack/dep/lib/libzstd.a
 
@@ -83,7 +108,25 @@ Rack/dep/lib/libarchive_static.a: Rack/dep/lib/libzstd.a
 # --------------------------------------------------------------
 # Extra flags for VCV stuff
 
-BASE_FLAGS += -D_APP_VERSION=2.git.0
+ifeq ($(MACOS),true)
+BASE_FLAGS += -DARCH_MAC
+else ifeq ($(WINDOWS),true)
+BASE_FLAGS += -DARCH_WIN
+else
+BASE_FLAGS += -DARCH_LIN
+endif
+
+BUILD_C_FLAGS += -std=gnu11
+
+# temporary macro just to get the ball rolling
+ifeq ($(EXE_WRAPPER),wine)
+SOURCE_DIR = Z:$(subst /,\\,$(CURDIR))
+else
+SOURCE_DIR = $(CURDIR)
+endif
+BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_SOURCE_DIR='"$(SOURCE_DIR)"'
+
+BASE_FLAGS += -D_APP_VERSION=Cardinal
 BASE_FLAGS += -I$(DPF_PATH)/dgl/src/nanovg
 BASE_FLAGS += -IRack/include
 BASE_FLAGS += -IRack/dep/include
@@ -94,18 +137,11 @@ BASE_FLAGS += -IRack/dep/nanosvg/src
 BASE_FLAGS += -IRack/dep/osdialog
 BASE_FLAGS += -IRack/dep/oui-blendish
 BASE_FLAGS += -IRack/dep/pffft
+BASE_FLAGS += -pthread
 
 ifeq ($(WINDOWS),true)
 BASE_FLAGS      += -Imingw-compat
 BUILD_CXX_FLAGS += -Imingw-std-threads
-endif
-
-ifeq ($(MACOS),true)
-BASE_FLAGS += -DARCH_MAC
-else ifeq ($(WINDOWS),true)
-BASE_FLAGS += -DARCH_WIN
-else
-BASE_FLAGS += -DARCH_LIN
 endif
 
 # FIXME lots of warnings from VCV side
@@ -122,11 +158,6 @@ LINK_FLAGS += -framework IOKit
 else ifeq ($(WINDOWS),true)
 LINK_FLAGS += -ldbghelp -lshlwapi
 endif
-
-# LINK_FLAGS += $(OPENGL_LIBS)
-
-# TODO needed on windows? need to check
-LINK_FLAGS += -lpthread
 
 # --------------------------------------------------------------
 # Enable all possible plugin types

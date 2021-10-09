@@ -58,12 +58,17 @@ struct Initializer {
     {
         using namespace rack;
 
-        settings::devMode = true;
+        settings::autoCheckUpdates = false;
         settings::autosaveInterval = 0;
+        settings::discordUpdateActivity = false;
+        settings::isPlugin = true;
         system::init();
         asset::init();
         logger::init();
         random::init();
+
+        // Make system dir point to source code location. It is good enough for now
+        asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
 
         // Log environment
         INFO("%s %s v%s", APP_NAME.c_str(), APP_EDITION.c_str(), APP_VERSION.c_str());
@@ -107,20 +112,20 @@ struct Initializer {
         keyboard::init();
         plugin::init();
         library::init();
-		ui::init();
+        ui::init();
     }
 
     ~Initializer()
     {
         using namespace rack;
 
-		ui::destroy();
+        ui::destroy();
         library::destroy();
         midi::destroy();
         audio::destroy();
         plugin::destroy();
-	    INFO("Destroying logger");
-	    logger::destroy();
+        INFO("Destroying logger");
+        logger::destroy();
     }
 };
 
@@ -144,7 +149,7 @@ class CardinalPlugin : public Plugin
 
         ~ScopedContext()
         {
-	        rack::contextSet(nullptr);
+            rack::contextSet(nullptr);
         }
     };
 
@@ -161,6 +166,7 @@ public:
         fContext->scene = new rack::app::Scene;
         fContext->event->rootWidget = fContext->scene;
         fContext->patch = new rack::patch::Manager;
+        fContext->patch->autosavePath = "/OBVIOUSLY-NOT-VALID-PATH/";
     	fContext->engine->startFallbackThread();
     }
 
