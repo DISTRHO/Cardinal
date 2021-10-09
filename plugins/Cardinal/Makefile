@@ -88,7 +88,8 @@ ifneq ($(MACOS_OR_WINDOWS),true)
 MACHINE_SUFFIX = -linux
 endif
 
-CONFIGURE = ./configure --prefix="$(DEP_PATH)" --host=$(TARGET_MACHINE)
+# NOTE speex fails to build when neon is enabled
+CONFIGURE = ./configure --prefix="$(DEP_PATH)" --host=$(TARGET_MACHINE) --enable-neon=no
 
 # --------------------------------------------------------------
 # Fix up cmake for windows cross-compilation
@@ -144,6 +145,10 @@ BASE_FLAGS += -IRack/dep/osdialog
 BASE_FLAGS += -IRack/dep/oui-blendish
 BASE_FLAGS += -IRack/dep/pffft
 BASE_FLAGS += -pthread
+
+ifeq ($(CPU_ARM_OR_AARCH64),true)
+BASE_FLAGS += -Ineon-compat
+endif
 
 ifeq ($(WINDOWS),true)
 BASE_FLAGS      += -Imingw-compat

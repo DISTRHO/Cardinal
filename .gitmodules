@@ -7,3 +7,6 @@
 [submodule "plugins/Cardinal/mingw-std-threads"]
 	path = plugins/Cardinal/mingw-std-threads
 	url = https://github.com/meganz/mingw-std-threads.git
+[submodule "plugins/Cardinal/sse2neon"]
+	path = plugins/Cardinal/sse2neon
+	url = https://github.com/DLTcollab/sse2neon.git
