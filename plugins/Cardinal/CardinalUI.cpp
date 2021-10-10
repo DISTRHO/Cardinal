@@ -76,6 +76,10 @@ public:
     {
         const ScopedContext sc(this);
 
+        fContext->event = new rack::widget::EventState;
+        fContext->scene = new rack::app::Scene;
+        fContext->event->rootWidget = fContext->scene;
+
         // Initialize context
         d_stdout("UI context ptr %p", NanoVG::getContext());
         rack::window::lastUI = this;
@@ -217,8 +221,74 @@ protected:
     {
         const ScopedContext sc(this);
 
+        int key;
         int mods = 0;
         int action = ev.press;
+
+        /* These are unsupported in pugl right now
+        #define GLFW_KEY_KP_0               320
+        #define GLFW_KEY_KP_1               321
+        #define GLFW_KEY_KP_2               322
+        #define GLFW_KEY_KP_3               323
+        #define GLFW_KEY_KP_4               324
+        #define GLFW_KEY_KP_5               325
+        #define GLFW_KEY_KP_6               326
+        #define GLFW_KEY_KP_7               327
+        #define GLFW_KEY_KP_8               328
+        #define GLFW_KEY_KP_9               329
+        #define GLFW_KEY_KP_DECIMAL         330
+        #define GLFW_KEY_KP_DIVIDE          331
+        #define GLFW_KEY_KP_MULTIPLY        332
+        #define GLFW_KEY_KP_SUBTRACT        333
+        #define GLFW_KEY_KP_ADD             334
+        #define GLFW_KEY_KP_ENTER           335
+        #define GLFW_KEY_KP_EQUAL           336
+        */
+
+        switch (ev.key)
+        {
+        case '\r': key = GLFW_KEY_ENTER; break;
+        case '\t': key = GLFW_KEY_TAB; break;
+        case kKeyBackspace: key = GLFW_KEY_BACKSPACE; break;
+        case kKeyEscape: key = GLFW_KEY_ESCAPE; break;
+        case kKeyDelete: key = GLFW_KEY_DELETE; break;
+        case kKeyF1: key = GLFW_KEY_F1; break;
+        case kKeyF2: key = GLFW_KEY_F2; break;
+        case kKeyF3: key = GLFW_KEY_F3; break;
+        case kKeyF4: key = GLFW_KEY_F4; break;
+        case kKeyF5: key = GLFW_KEY_F5; break;
+        case kKeyF6: key = GLFW_KEY_F6; break;
+        case kKeyF7: key = GLFW_KEY_F7; break;
+        case kKeyF8: key = GLFW_KEY_F8; break;
+        case kKeyF9: key = GLFW_KEY_F9; break;
+        case kKeyF10: key = GLFW_KEY_F10; break;
+        case kKeyF11: key = GLFW_KEY_F11; break;
+        case kKeyF12: key = GLFW_KEY_F12; break;
+        case kKeyLeft: key = GLFW_KEY_LEFT; break;
+        case kKeyUp: key = GLFW_KEY_UP; break;
+        case kKeyRight: key = GLFW_KEY_RIGHT; break;
+        case kKeyDown: key = GLFW_KEY_DOWN; break;
+        case kKeyPageUp: key = GLFW_KEY_PAGE_UP; break;
+        case kKeyPageDown: key = GLFW_KEY_PAGE_DOWN; break;
+        case kKeyHome: key = GLFW_KEY_HOME; break;
+        case kKeyEnd: key = GLFW_KEY_END; break;
+        case kKeyInsert: key = GLFW_KEY_INSERT; break;
+        case kKeyShiftL: key = GLFW_KEY_LEFT_SHIFT; break;
+        case kKeyShiftR: key = GLFW_KEY_RIGHT_SHIFT; break;
+        case kKeyControlL: key = GLFW_KEY_LEFT_CONTROL; break;
+        case kKeyControlR: key = GLFW_KEY_RIGHT_CONTROL; break;
+        case kKeyAltL: key = GLFW_KEY_LEFT_ALT; break;
+        case kKeyAltR: key = GLFW_KEY_RIGHT_ALT; break;
+        case kKeySuperL: key = GLFW_KEY_LEFT_SUPER; break;
+        case kKeySuperR: key = GLFW_KEY_RIGHT_SUPER; break;
+        case kKeyMenu: key = GLFW_KEY_MENU; break;
+        case kKeyCapsLock: key = GLFW_KEY_CAPS_LOCK; break;
+        case kKeyScrollLock: key = GLFW_KEY_SCROLL_LOCK; break;
+        case kKeyNumLock: key = GLFW_KEY_NUM_LOCK; break;
+        case kKeyPrintScreen: key = GLFW_KEY_PRINT_SCREEN; break;
+        case kKeyPause: key = GLFW_KEY_PAUSE; break;
+        default: key = ev.key; break;
+        }
 
         if (ev.mod & kModifierControl)
             mods |= GLFW_MOD_CONTROL;
@@ -228,7 +298,7 @@ protected:
             mods |= GLFW_MOD_ALT;
 
         // TODO special key conversion
-        rack::window::keyCallback(fContext, ev.key, ev.keycode, action, mods);
+        rack::window::keyCallback(fContext, key, ev.keycode, action, mods);
         return true;
     }
 

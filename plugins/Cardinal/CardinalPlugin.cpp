@@ -162,9 +162,6 @@ public:
 
         fContext->engine = new rack::engine::Engine;
         fContext->history = new rack::history::State;
-        fContext->event = new rack::widget::EventState;
-        fContext->scene = new rack::app::Scene;
-        fContext->event->rootWidget = fContext->scene;
         fContext->patch = new rack::patch::Manager;
         fContext->patch->autosavePath = "/OBVIOUSLY-NOT-VALID-PATH/";
         fContext->engine->startFallbackThread();

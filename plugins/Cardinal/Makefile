@@ -99,9 +99,9 @@ SPACE +=
 
 CMAKE = cmake
 
-# ifneq (,$(findstring -arch$(SPACE),$(CXXFLAGS)))
-# CMAKE += -DCMAKE_OSX_ARCHITECTURES=$(subst $(SPACE),;,$(subst -arch=,,$(filter -arch=%,$(subst -arch$(SPACE),-arch=,$(CXXFLAGS)))))
-# endif
+ifneq (,$(findstring -arch$(SPACE),$(CXXFLAGS)))
+CMAKE += -DCMAKE_OSX_ARCHITECTURES='$(subst $(SPACE),;,$(subst -arch=,,$(filter -arch=%,$(subst -arch$(SPACE),-arch=,$(CXXFLAGS)))))'
+endif
 ifneq (,$(findstring -mmacosx-version-min=,$(CXXFLAGS)))
 CMAKE += -DCMAKE_OSX_DEPLOYMENT_TARGET=$(subst -mmacosx-version-min=,,$(filter -mmacosx-version-min=%,$(CXXFLAGS)))
 endif
