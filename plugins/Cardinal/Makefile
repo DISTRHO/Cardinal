@@ -92,12 +92,30 @@ endif
 CONFIGURE = ./configure --prefix="$(DEP_PATH)" --host=$(TARGET_MACHINE) --enable-neon=no
 
 # --------------------------------------------------------------
-# Fix up cmake for windows cross-compilation
+# Fix up cmake
+
+SPACE =
+SPACE +=
+
+CMAKE = cmake
+
+# ifneq (,$(findstring -arch$(SPACE),$(CXXFLAGS)))
+# CMAKE += -DCMAKE_OSX_ARCHITECTURES=$(subst $(SPACE),;,$(subst -arch=,,$(filter -arch=%,$(subst -arch$(SPACE),-arch=,$(CXXFLAGS)))))
+# endif
+ifneq (,$(findstring -mmacosx-version-min=,$(CXXFLAGS)))
+CMAKE += -DCMAKE_OSX_DEPLOYMENT_TARGET=$(subst -mmacosx-version-min=,,$(filter -mmacosx-version-min=%,$(CXXFLAGS)))
+endif
 
 ifeq ($(WINDOWS),true)
-CMAKE = cmake -G 'Unix Makefiles' -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_RC_COMPILER=$(subst gcc,windres,$(CC))
+CMAKE += -G 'Unix Makefiles'
+CMAKE += -DCMAKE_RC_COMPILER=$(subst gcc,windres,$(CC))
+CMAKE += -DCMAKE_SYSTEM_NAME=Windows
+endif
+
+ifeq ($(DEBUG),true)
+CMAKE += -DCMAKE_BUILD_TYPE=Debug
 else
-CMAKE = cmake
+CMAKE += -DCMAKE_BUILD_TYPE=Release
 endif
 
 CMAKE += -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX='$(DEP_PATH)'
@@ -106,11 +124,31 @@ CMAKE += -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX='$(DEP_PATH)'
 # VCV internal dependencies target
 
 Rack/dep/lib/%.a:
-	$(MAKE) ARCH_NAME=$(ARCH_NAME) CMAKE="$(CMAKE)" CONFIGURE="$(CONFIGURE)" DEP_FLAGS="$(BASE_FLAGS)" DEP_MAC_SDK_FLAGS= MACHINE=$(MACHINE)$(MACHINE_SUFFIX) -C Rack/dep lib/$*.a
+	$(MAKE) \
+		ARCH_NAME=$(ARCH_NAME) \
+		CFLAGS="$(BUILD_C_FLAGS)" \
+		CXXFLAGS="$(BUILD_CXX_FLAGS)" \
+		LDFLAGS="$(LINK_FLAGS)" \
+		CMAKE="$(CMAKE)" \
+		CONFIGURE="$(CONFIGURE)" \
+		DEP_FLAGS="$(BASE_FLAGS)" \
+		DEP_MAC_SDK_FLAGS= \
+		MACHINE=$(MACHINE)$(MACHINE_SUFFIX) \
+		-C Rack/dep lib/$*.a
 
 Rack/dep/lib/libarchive.a: Rack/dep/lib/libzstd.a
 
 Rack/dep/lib/libarchive_static.a: Rack/dep/lib/libzstd.a
+
+ifeq ($(MACOS),true)
+# zstd cmake is borked, see https://github.com/facebook/zstd/issues/1401
+Rack/dep/lib/libzstd.a: Rack/dep/zstd-1.4.5/.stamp-patched
+
+Rack/dep/zstd-1.4.5/.stamp-patched:
+	$(MAKE) -C Rack/dep zstd-1.4.5
+	sed -i -e "56,66d" Rack/dep/zstd-1.4.5/build/cmake/CMakeModules/AddZstdCompilationFlags.cmake
+	touch $@
+endif
 
 # --------------------------------------------------------------
 # Extra flags for VCV stuff
@@ -146,9 +184,7 @@ BASE_FLAGS += -IRack/dep/oui-blendish
 BASE_FLAGS += -IRack/dep/pffft
 BASE_FLAGS += -pthread
 
-ifeq ($(CPU_ARM_OR_AARCH64),true)
 BASE_FLAGS += -Ineon-compat
-endif
 
 ifeq ($(WINDOWS),true)
 BASE_FLAGS      += -Imingw-compat

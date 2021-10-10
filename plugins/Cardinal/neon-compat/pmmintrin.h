@@ -17,7 +17,10 @@
 
 #pragma once
 
-#include "../sse2neon/sse2neon.h"
+#if defined(__i386__) || defined(__x86_64__)
+# include_next <pmmintrin.h>
+#else
+# include "../sse2neon/sse2neon.h"
 
 static inline
 void __builtin_ia32_pause()
@@ -30,3 +33,5 @@ uint32_t _mm_getcsr()
 {
     return 0;
 }
+
+#endif
