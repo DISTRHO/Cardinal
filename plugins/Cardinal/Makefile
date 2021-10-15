@@ -50,16 +50,18 @@ FILES_DSP += $(wildcard Rack/src/*/*.c)
 FILES_DSP += $(filter-out Rack/src/dep.cpp Rack/src/discord.cpp Rack/src/gamepad.cpp Rack/src/network.cpp Rack/src/rtaudio.cpp Rack/src/rtmidi.cpp, $(wildcard Rack/src/*.cpp))
 FILES_DSP += $(filter-out Rack/src/window/Window.cpp, $(wildcard Rack/src/*/*.cpp))
 
-EXTRA_LIBS += Rack/dep/lib/libjansson.a
-EXTRA_LIBS += Rack/dep/lib/libspeexdsp.a
+EXTRA_DEPENDENCIES += Rack/dep/lib/libjansson.a
+EXTRA_DEPENDENCIES += Rack/dep/lib/libspeexdsp.a
 
 ifeq ($(WINDOWS),true)
-EXTRA_LIBS += Rack/dep/lib/libarchive_static.a
+EXTRA_DEPENDENCIES += Rack/dep/lib/libarchive_static.a
 else
-EXTRA_LIBS += Rack/dep/lib/libarchive.a
+EXTRA_DEPENDENCIES += Rack/dep/lib/libarchive.a
 endif
 
-EXTRA_LIBS += Rack/dep/lib/libzstd.a
+EXTRA_DEPENDENCIES += Rack/dep/lib/libzstd.a
+
+EXTRA_LIBS = $(EXTRA_DEPENDENCIES)
 
 # --------------------------------------------------------------
 # Do some magic
