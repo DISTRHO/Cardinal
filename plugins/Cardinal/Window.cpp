@@ -8,7 +8,6 @@
 #include <asset.hpp>
 #include <widget/Widget.hpp>
 #include <app/Scene.hpp>
-#include <keyboard.hpp>
 #include <context.hpp>
 #include <patch.hpp>
 #include <settings.hpp>
@@ -395,10 +394,6 @@ void cursorPosCallback(Context* ctx, double xpos, double ypos) {
 	ctx->window->internal->lastMousePos = mousePos;
 
 	ctx->event->handleHover(mousePos, mouseDelta);
-
-	// Keyboard/mouse MIDI driver
-	math::Vec scaledPos(xpos / ctx->window->internal->ui->getWidth(), ypos / ctx->window->internal->ui->getHeight());
-	keyboard::mouseMove(scaledPos);
 }
 
 void cursorEnterCallback(Context* ctx, int entered) {
@@ -419,21 +414,11 @@ void scrollCallback(Context* ctx, double x, double y) {
 }
 
 void charCallback(Context* ctx, unsigned int codepoint) {
-	if (ctx->event->handleText(ctx->window->internal->lastMousePos, codepoint))
-		return;
+	ctx->event->handleText(ctx->window->internal->lastMousePos, codepoint);
 }
 
 void keyCallback(Context* ctx, int key, int scancode, int action, int mods) {
-	if (ctx->event->handleKey(ctx->window->internal->lastMousePos, key, scancode, action, mods))
-		return;
-
-	// Keyboard/mouse MIDI driver
-	if (action == GLFW_PRESS && (mods & RACK_MOD_MASK) == 0) {
-		keyboard::press(key);
-	}
-	if (action == GLFW_RELEASE) {
-		keyboard::release(key);
-	}
+	ctx->event->handleKey(ctx->window->internal->lastMousePos, key, scancode, action, mods);
 }
 
 

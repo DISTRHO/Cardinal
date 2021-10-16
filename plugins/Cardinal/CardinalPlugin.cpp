@@ -109,7 +109,6 @@ struct Initializer {
         INFO("Initializing environment");
         audio::init();
         midi::init();
-        keyboard::init();
         plugin::init();
         library::init();
         ui::init();
