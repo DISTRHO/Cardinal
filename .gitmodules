@@ -1,12 +1,15 @@
 [submodule "plugins/Cardinal/Rack"]
-	path = plugins/Cardinal/Rack
+	path = src/Rack
 	url = https://github.com/VCVRack/Rack.git
 [submodule "dpf"]
 	path = dpf
 	url = https://github.com/DISTRHO/DPF.git
 [submodule "plugins/Cardinal/mingw-std-threads"]
-	path = plugins/Cardinal/mingw-std-threads
+	path = src/mingw-std-threads
 	url = https://github.com/meganz/mingw-std-threads.git
 [submodule "plugins/Cardinal/sse2neon"]
-	path = plugins/Cardinal/sse2neon
+	path = src/sse2neon
 	url = https://github.com/DLTcollab/sse2neon.git
+[submodule "plugins/Fundamental"]
+	path = plugins/Fundamental
+	url = https://github.com/VCVRack/Fundamental.git

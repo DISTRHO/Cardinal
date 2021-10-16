@@ -40,6 +40,12 @@
 #endif
 #include "DistrhoPlugin.hpp"
 
+namespace rack {
+namespace plugin {
+void initStaticPlugins();
+}
+}
+
 START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
@@ -111,6 +117,8 @@ struct Initializer {
         midi::init(); // does nothing
         plugin::init();
         ui::init();
+
+        plugin::initStaticPlugins();
     }
 
     ~Initializer()

@@ -17,6 +17,7 @@
 #ifdef NDEBUG
 # undef DEBUG
 #endif
+
 #include "DistrhoUI.hpp"
 
 namespace rack {

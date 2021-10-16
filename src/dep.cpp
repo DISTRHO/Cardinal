@@ -7,8 +7,14 @@
 #endif
 #include "OpenGL.hpp"
 
-#define BLENDISH_IMPLEMENTATION
-#include <blendish.h>
+#ifdef DEBUG
+// fix blendish build, missing symbol in debug mode
+extern "C" {
+float bnd_clamp(float v, float mn, float mx) {
+    return (v > mx)?mx:(v < mn)?mn:v;
+}
+}
+#endif
 
 #define NANOSVG_IMPLEMENTATION
 #define NANOSVG_ALL_COLOR_KEYWORDS

@@ -6,18 +6,25 @@
 
 include dpf/Makefile.base.mk
 
-all: dgl plugins gen
+all: cardinal deps dgl plugins gen
 
 # --------------------------------------------------------------
 
+cardinal: deps dgl plugins
+	$(MAKE) all -C src
+
+deps:
+	$(MAKE) all -C deps
+
 dgl:
 	$(MAKE) USE_NANOVG_FBO=true USE_RGBA=true -C dpf/dgl opengl
+	# $(MAKE) opengl -C dpf/dgl USE_NANOVG_FBO=true USE_RGBA=true
 
-plugins: dgl
-	$(MAKE) all -C plugins/Cardinal
+plugins: deps
+	$(MAKE) all -C plugins
 
 ifneq ($(CROSS_COMPILING),true)
-gen: plugins dpf/utils/lv2_ttl_generator
+gen: cardinal dpf/utils/lv2_ttl_generator
 	@$(CURDIR)/dpf/utils/generate-ttl.sh
 ifeq ($(MACOS),true)
 	@$(CURDIR)/dpf/utils/generate-vst-bundles.sh
@@ -32,19 +39,13 @@ endif
 # --------------------------------------------------------------
 
 clean:
+	$(MAKE) clean -C deps
 	$(MAKE) clean -C dpf/dgl
 	$(MAKE) clean -C dpf/utils/lv2-ttl-generator
-	$(MAKE) clean -C plugins/Cardinal
+	$(MAKE) clean -C plugins
+	$(MAKE) clean -C src
 	rm -rf bin build
-	rm -rf plugins/Cardinal/Rack/dep/bin
-	rm -rf plugins/Cardinal/Rack/dep/include
-	rm -rf plugins/Cardinal/Rack/dep/lib
-	rm -rf plugins/Cardinal/Rack/dep/share
-	rm -rf plugins/Cardinal/Rack/dep/jansson-2.12
-	rm -rf plugins/Cardinal/Rack/dep/libarchive-3.4.3
-	rm -rf plugins/Cardinal/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-	rm -rf plugins/Cardinal/Rack/dep/zstd-1.4.5
 
 # --------------------------------------------------------------
 
-.PHONY: plugins
+.PHONY: deps plugins
