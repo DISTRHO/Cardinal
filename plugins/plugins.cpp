@@ -19,10 +19,18 @@
 
 #include "Fundamental/src/plugin.hpp"
 
+Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Fundamental;
 
 namespace rack {
 namespace plugin {
+
+static void initStatic__Befaco()
+{
+	Plugin* p = new Plugin;
+    pluginInstance__Befaco = p;
+    plugins.push_back(p);
+}
 
 static void initStatic__Fundamental()
 {
@@ -60,6 +68,7 @@ static void initStatic__Fundamental()
 
 void initStaticPlugins()
 {
+    initStatic__Befaco();
     initStatic__Fundamental();
 }
 
