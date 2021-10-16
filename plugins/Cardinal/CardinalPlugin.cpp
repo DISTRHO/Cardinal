@@ -107,10 +107,9 @@ struct Initializer {
         }
 
         INFO("Initializing environment");
-        audio::init();
-        midi::init();
+        audio::init(); // does nothing
+        midi::init(); // does nothing
         plugin::init();
-        library::init();
         ui::init();
     }
 
@@ -119,7 +118,6 @@ struct Initializer {
         using namespace rack;
 
         ui::destroy();
-        library::destroy();
         midi::destroy();
         audio::destroy();
         plugin::destroy();
