@@ -70,7 +70,7 @@ struct Initializer {
         settings::discordUpdateActivity = false;
         settings::isPlugin = true;
         settings::skipLoadOnLaunch = true;
-        settings::showTipsOnLaunch = true;
+        settings::showTipsOnLaunch = false;
         settings::threadCount = 1;
         system::init();
         asset::init();
@@ -87,33 +87,12 @@ struct Initializer {
         INFO("User directory: %s", asset::userDir.c_str());
         INFO("System time: %s", string::formatTimeISO(system::getUnixTime()).c_str());
 
-        // Load settings
-        settings::init();
-        #if 0
-        try {
-            settings::load();
-        }
-        catch (Exception& e) {
-            std::string message = e.what();
-            message += "\n\nResetting settings to default";
-            d_stdout(message.c_str());
-            /*
-            if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, msg.c_str())) {
-                exit(1);
-            }
-            */
-        }
-        #endif
-
         // Check existence of the system res/ directory
-        std::string resDir = asset::system("res");
-        if (!system::isDirectory(resDir)) {
-            std::string message = string::f("Rack's resource directory \"%s\" does not exist. Make sure Rack is correctly installed and launched.", resDir.c_str());
-            d_stderr2(message.c_str());
-            /*
-            osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, message.c_str());
-            */
-            // exit(1);
+        const std::string resDir = asset::system("res");
+        if (! system::isDirectory(resDir))
+        {
+            d_stderr2("Resource directory \"%s\" does not exist.\n"
+                      "Make sure Cardinal was downloaded and installed correctly.", resDir.c_str());
         }
 
         INFO("Initializing environment");
