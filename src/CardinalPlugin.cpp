@@ -130,6 +130,7 @@ static const Initializer& getInitializerInstance()
 class CardinalPlugin : public Plugin
 {
     rack::Context* const fContext;
+    std::string fAutosavePath;
 
     struct ScopedContext {
         ScopedContext(CardinalPlugin* const plugin)
@@ -148,20 +149,44 @@ public:
         : Plugin(0, 0, 0),
           fContext(new rack::Context)
     {
+        // create unique temporary path for this instance
+        try {
+            char uidBuf[24];
+            const std::string tmp = rack::system::getTempDirectory();
+
+            for (int i=1;; ++i)
+            {
+                std::snprintf(uidBuf, sizeof(uidBuf), "Cardinal.%04d", i);
+                const std::string trypath = rack::system::join(tmp, uidBuf);
+
+                if (! rack::system::exists(trypath))
+                {
+                    if (rack::system::createDirectories(trypath))
+                        fAutosavePath = trypath;
+                    break;
+                }
+            }
+        } DISTRHO_SAFE_EXCEPTION("create unique temporary path");
+
+        // create temporary path
         const ScopedContext sc(this);
 
         fContext->engine = new rack::engine::Engine;
         fContext->history = new rack::history::State;
         fContext->patch = new rack::patch::Manager;
-        fContext->patch->autosavePath = "/OBVIOUSLY-NOT-VALID-PATH/";
+        fContext->patch->autosavePath = fAutosavePath;
         fContext->engine->startFallbackThread();
     }
 
     ~CardinalPlugin() override
     {
-        const ScopedContext sc(this);
+        {
+            const ScopedContext sc(this);
+            delete fContext;
+        }
 
-        delete fContext;
+        if (! fAutosavePath.empty())
+            rack::system::removeRecursively(fAutosavePath);
     }
 
     rack::Context* getRackContext() const noexcept
@@ -246,6 +271,11 @@ protected:
     */
     void run(const float** inputs, float** outputs, uint32_t frames) override
     {
+        /*
+        fContext->engine->setFrame(getTimePosition().frame);
+        fContext->engine->stepBlock(frames);
+        */
+
         // copy inputs over outputs if needed
         if (outputs[0] != inputs[0])
             std::memcpy(outputs[0], inputs[0], sizeof(float)*frames);
@@ -253,6 +283,13 @@ protected:
         if (outputs[1] != inputs[1])
             std::memcpy(outputs[1], inputs[1], sizeof(float)*frames);
     }
+
+    /*
+    void sampleRateChanged(const double newSampleRate) override
+    {
+        fContext->engine->setSampleRate(newSampleRate);
+    }
+    */
 
     // -------------------------------------------------------------------------------------------------------
 
