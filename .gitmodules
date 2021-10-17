@@ -25,3 +25,6 @@
 [submodule "plugins/ZetaCarinaeModules"]
 	path = plugins/ZetaCarinaeModules
 	url = https://github.com/mhampton/ZetaCarinaeModules.git
+[submodule "plugins/GrandeModular"]
+	path = plugins/GrandeModular
+	url = https://github.com/dbgrande/GrandeModular.git

@@ -23,12 +23,14 @@
 #include "AudibleInstruments/src/plugin.hpp"
 #include "Befaco/src/plugin.hpp"
 #include "Fundamental/src/plugin.hpp"
+#include "GrandeModular/src/plugin.hpp"
 #include "ZetaCarinaeModules/src/plugin.hpp"
 
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Fundamental;
+Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__ZetaCarinaeModules;
 
 namespace rack {
@@ -185,6 +187,30 @@ static void initStatic__Fundamental()
 	}
 }
 
+static void initStatic__GrandeModular()
+{
+    Plugin* p = new Plugin;
+    pluginInstance__GrandeModular = p;
+
+	const StaticPluginLoader spl(p, "GrandeModular");
+	if (spl.ok())
+	{
+		p->addModel(modelClip);
+		p->addModel(modelMergeSplit4);
+		p->addModel(modelMicrotonalChords);
+		p->addModel(modelMicrotonalNotes);
+		p->addModel(modelNoteMT);
+		p->addModel(modelPolyMergeResplit);
+		p->addModel(modelQuant);
+		p->addModel(modelQuantIntervals);
+		p->addModel(modelQuantMT);
+		p->addModel(modelSampleDelays);
+		p->addModel(modelScale);
+		p->addModel(modelTails);
+		p->addModel(modelVarSampleDelays);
+	}
+}
+
 static void initStatic__ZetaCarinaeModules()
 {
     Plugin* p = new Plugin;
@@ -210,6 +236,7 @@ void initStaticPlugins()
     initStatic__AudibleInstruments();
     initStatic__Befaco();
     initStatic__Fundamental();
+	initStatic__GrandeModular();
     initStatic__ZetaCarinaeModules();
 }
 
