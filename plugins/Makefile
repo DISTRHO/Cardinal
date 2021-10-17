@@ -180,8 +180,11 @@ BUILD_C_FLAGS += -std=gnu11
 
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
+
+BASE_FLAGS += -I../include
+BASE_FLAGS += -I../include/neon-compat
+
 BASE_FLAGS += -I../src
-BASE_FLAGS += -I../src/neon-compat
 BASE_FLAGS += -I../src/Rack/include
 BASE_FLAGS += -I../src/Rack/dep/include
 # BASE_FLAGS += -I../src/Rack/dep/filesystem/include
@@ -191,12 +194,13 @@ BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
 # BASE_FLAGS += -I../src/Rack/dep/osdialog
 BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
+
 BASE_FLAGS += -pthread
 
 ifeq ($(WINDOWS),true)
 BASE_FLAGS += -D_USE_MATH_DEFINES
-BASE_FLAGS += -I../src/mingw-compat
-BASE_FLAGS += -I../src/mingw-std-threads
+BASE_FLAGS += -I../include/mingw-compat
+BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
 # --------------------------------------------------------------

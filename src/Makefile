@@ -92,6 +92,8 @@ endif
 
 BASE_FLAGS += -D_APP_VERSION=Cardinal
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
+BASE_FLAGS += -I../include
+BASE_FLAGS += -I../include/neon-compat
 BASE_FLAGS += -IRack/include
 BASE_FLAGS += -IRack/dep/include
 BASE_FLAGS += -IRack/dep/filesystem/include
@@ -101,7 +103,7 @@ BASE_FLAGS += -IRack/dep/nanosvg/src
 BASE_FLAGS += -IRack/dep/osdialog
 BASE_FLAGS += -IRack/dep/oui-blendish
 BASE_FLAGS += -IRack/dep/pffft
-BASE_FLAGS += -Ineon-compat
+
 BASE_FLAGS += -pthread
 
 ifeq ($(WINDOWS),true)
