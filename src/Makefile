@@ -107,8 +107,8 @@ BASE_FLAGS += -pthread
 
 ifeq ($(WINDOWS),true)
 BASE_FLAGS += -D_USE_MATH_DEFINES
-BASE_FLAGS += -Imingw-compat
-BASE_FLAGS += -Imingw-std-threads
+BASE_FLAGS += -I../include/mingw-compat
+BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
 BUILD_C_FLAGS += -std=gnu11

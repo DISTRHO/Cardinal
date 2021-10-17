@@ -81,8 +81,6 @@ struct Window::Internal {
 	double frameTime = 0.0;
 	double lastFrameDuration = 0.0;
 
-	math::Vec lastMousePos;
-
 	std::map<std::string, std::shared_ptr<Font>> fontCache;
 	std::map<std::string, std::shared_ptr<Image>> imageCache;
 
@@ -364,37 +362,10 @@ bool& Window::fbDirtyOnSubpixelChange() {
 
 
 void mouseButtonCallback(Context* ctx, int button, int action, int mods) {
-	/*
-#if defined ARCH_MAC
-	// Remap Ctrl-left click to right click on Mac
-	if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & RACK_MOD_MASK) == GLFW_MOD_CONTROL) {
-		button = GLFW_MOUSE_BUTTON_RIGHT;
-		mods &= ~GLFW_MOD_CONTROL;
-	}
-	// Remap Ctrl-shift-left click to middle click on Mac
-	if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & RACK_MOD_MASK) == (GLFW_MOD_CONTROL | GLFW_MOD_SHIFT)) {
-		button = GLFW_MOUSE_BUTTON_MIDDLE;
-		mods &= ~(GLFW_MOD_CONTROL | GLFW_MOD_SHIFT);
-	}
-#endif
-*/
 
-	ctx->event->handleButton(ctx->window->internal->lastMousePos, button, action, mods);
 }
 
 void cursorPosCallback(Context* ctx, double xpos, double ypos) {
-	math::Vec mousePos = math::Vec(xpos, ypos).div(ctx->window->pixelRatio / ctx->window->windowRatio).round();
-	math::Vec mouseDelta = mousePos.minus(ctx->window->internal->lastMousePos);
-
-	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
-	if (ctx->window->internal->ignoreNextMouseDelta) {
-		ctx->window->internal->ignoreNextMouseDelta = false;
-		mouseDelta = math::Vec();
-	}
-
-	ctx->window->internal->lastMousePos = mousePos;
-
-	ctx->event->handleHover(mousePos, mouseDelta);
 }
 
 void cursorEnterCallback(Context* ctx, int entered) {
@@ -404,22 +375,12 @@ void cursorEnterCallback(Context* ctx, int entered) {
 }
 
 void scrollCallback(Context* ctx, double x, double y) {
-	math::Vec scrollDelta = math::Vec(x, y);
-#if defined ARCH_MAC
-	scrollDelta = scrollDelta.mult(10.0);
-#else
-	scrollDelta = scrollDelta.mult(50.0);
-#endif
-
-	ctx->event->handleScroll(ctx->window->internal->lastMousePos, scrollDelta);
 }
 
 void charCallback(Context* ctx, unsigned int codepoint) {
-	ctx->event->handleText(ctx->window->internal->lastMousePos, codepoint);
 }
 
 void keyCallback(Context* ctx, int key, int scancode, int action, int mods) {
-	ctx->event->handleKey(ctx->window->internal->lastMousePos, key, scancode, action, mods);
 }
 
 

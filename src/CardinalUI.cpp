@@ -35,13 +35,6 @@ GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
 namespace rack {
 namespace window {
     DISTRHO_NAMESPACE::UI* lastUI = nullptr;
-
-    void mouseButtonCallback(Context* ctx, int button, int action, int mods);
-    void cursorPosCallback(Context* ctx, double xpos, double ypos);
-    void cursorEnterCallback(Context* ctx, int entered);
-    void scrollCallback(Context* ctx, double x, double y);
-    void charCallback(Context* ctx, unsigned int codepoint);
-    void keyCallback(Context* ctx, int key, int scancode, int action, int mods);
 }
 }
 
@@ -54,6 +47,7 @@ rack::Context* getRackContextFromPlugin(void* ptr);
 class CardinalUI : public UI
 {
     rack::Context* const fContext;
+    rack::math::Vec fLastMousePos;
     ResizeHandle fResizeHandle;
 
     struct ScopedContext {
@@ -93,6 +87,12 @@ public:
 
         delete fContext->window;
         fContext->window = nullptr;
+
+        delete fContext->scene;
+        fContext->scene = nullptr;
+
+        delete fContext->event;
+        fContext->event = nullptr;
     }
 
     void onNanoDisplay() override
@@ -127,7 +127,7 @@ protected:
 
         int button;
         int mods = 0;
-        int action = ev.press;
+        int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
 
         if (ev.mod & kModifierControl)
             mods |= GLFW_MOD_CONTROL;
@@ -176,35 +176,57 @@ protected:
         }
 #endif
 
-        rack::window::mouseButtonCallback(fContext, button, action, mods);
-        return true;
+        /*
+        #if defined ARCH_MAC
+        // Remap Ctrl-left click to right click on Mac
+        if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & RACK_MOD_MASK) == GLFW_MOD_CONTROL) {
+            button = GLFW_MOUSE_BUTTON_RIGHT;
+            mods &= ~GLFW_MOD_CONTROL;
+        }
+        // Remap Ctrl-shift-left click to middle click on Mac
+        if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & RACK_MOD_MASK) == (GLFW_MOD_CONTROL | GLFW_MOD_SHIFT)) {
+            button = GLFW_MOUSE_BUTTON_MIDDLE;
+            mods &= ~(GLFW_MOD_CONTROL | GLFW_MOD_SHIFT);
+        }
+        #endif
+        */
+
+        return fContext->event->handleButton(fLastMousePos, button, action, mods);
     }
 
     bool onMotion(const MotionEvent& ev) override
     {
         const ScopedContext sc(this);
 
-        rack::window::cursorPosCallback(fContext, ev.pos.getX(), ev.pos.getY());
-        return true;
+        rack::math::Vec mousePos = rack::math::Vec(ev.pos.getX(), ev.pos.getY());
+        // .div(ctx->window->pixelRatio / ctx->window->windowRatio).round();
+        rack::math::Vec mouseDelta = mousePos.minus(fLastMousePos);
+
+        /*
+        // Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
+        if (ctx->window->internal->ignoreNextMouseDelta)
+        {
+            ctx->window->internal->ignoreNextMouseDelta = false;
+            mouseDelta = math::Vec();
+        }
+        */
+
+        fLastMousePos = mousePos;
+        return fContext->event->handleHover(mousePos, mouseDelta);
     }
 
     bool onScroll(const ScrollEvent& ev) override
     {
         const ScopedContext sc(this);
 
-        rack::window::scrollCallback(fContext, ev.delta.getX(), ev.delta.getY());
-        return true;
+        rack::math::Vec scrollDelta = rack::math::Vec(ev.delta.getX(), ev.delta.getY());
+#ifdef DISTRHO_OS_MAC
+        scrollDelta = scrollDelta.mult(10.0);
+#else
+        scrollDelta = scrollDelta.mult(50.0);
+#endif
+        return fContext->event->handleScroll(fLastMousePos, scrollDelta);
     }
-
-    #if 0
-    void onResize(const ResizeEvent& ev) override
-    {
-        UI::onResize(ev);
-        // APP->window->setSize(rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
-    }
-    #endif
-
-    // TODO uiFocus
 
     bool onCharacterInput(const CharacterInputEvent& ev) override
     {
@@ -213,8 +235,7 @@ protected:
 
         const ScopedContext sc(this);
 
-        rack::window::charCallback(fContext, ev.character);
-        return true;
+        return fContext->event->handleText(fLastMousePos, ev.character);
     }
 
     bool onKeyboard(const KeyboardEvent& ev) override
@@ -223,7 +244,7 @@ protected:
 
         int key;
         int mods = 0;
-        int action = ev.press;
+        int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
 
         /* These are unsupported in pugl right now
         #define GLFW_KEY_KP_0               320
@@ -297,9 +318,15 @@ protected:
         if (ev.mod & kModifierAlt)
             mods |= GLFW_MOD_ALT;
 
-        // TODO special key conversion
-        rack::window::keyCallback(fContext, key, ev.keycode, action, mods);
-        return true;
+        return fContext->event->handleKey(fLastMousePos, key, ev.keycode, action, mods);
+    }
+
+    void uiFocus(const bool focus, CrossingMode) override
+    {
+        const ScopedContext sc(this);
+
+        if (! focus)
+            fContext->event->handleLeave();
     }
 
 private:
