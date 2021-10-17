@@ -20,6 +20,11 @@ include ../dpf/Makefile.base.mk
 PLUGIN_FILES  = plugins.cpp
 
 # --------------------------------------------------------------
+# AnimatedCircuits
+
+PLUGIN_FILES += $(wildcard AnimatedCircuits/src/Folding/*.cpp)
+
+# --------------------------------------------------------------
 # AudibleInstruments
 
 PLUGIN_FILES += $(filter-out AudibleInstruments/src/plugin.cpp,$(wildcard AudibleInstruments/src/*.cpp))
@@ -219,6 +224,11 @@ $(BUILD_DIR)/plugins.cpp.o: plugins.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
+
+$(BUILD_DIR)/AnimatedCircuits/%.cpp.o: AnimatedCircuits/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AnimatedCircuits -c -o $@
 
 $(BUILD_DIR)/AudibleInstruments/%.cc.o: AudibleInstruments/%.cc
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

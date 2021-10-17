@@ -19,10 +19,12 @@
 
 #include "DistrhoUtils.hpp"
 
+#include "AnimatedCircuits/src/plugin.hpp"
 #include "AudibleInstruments/src/plugin.hpp"
 #include "Befaco/src/plugin.hpp"
 #include "Fundamental/src/plugin.hpp"
 
+Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Fundamental;
@@ -56,6 +58,11 @@ struct StaticPluginLoader {
 			d_stderr2("JSON parsing error at %s %d:%d %s", manifestFilename.c_str(), error.line, error.column, error.text);
 			return;
 		}
+
+		// force ABI, we use static plugins so this doesnt matter as long as it builds
+		json_t* const version = json_string((APP_VERSION_MAJOR + ".0").c_str());
+		json_object_set(rootJ, "version", version);
+		json_decref(version);
 	}
 
 	~StaticPluginLoader()
@@ -77,9 +84,21 @@ struct StaticPluginLoader {
 	}
 };
 
+static void initStatic__AnimatedCircuits()
+{
+    Plugin* p = new Plugin;
+    pluginInstance__AnimatedCircuits = p;
+
+	const StaticPluginLoader spl(p, "AnimatedCircuits");
+	if (spl.ok())
+	{
+		p->addModel(model_AC_Folding);
+	}
+}
+
 static void initStatic__AudibleInstruments()
 {
-	Plugin* p = new Plugin;
+    Plugin* p = new Plugin;
     pluginInstance__AudibleInstruments = p;
 
 	const StaticPluginLoader spl(p, "AudibleInstruments");
@@ -110,7 +129,7 @@ static void initStatic__AudibleInstruments()
 
 static void initStatic__Befaco()
 {
-	Plugin* p = new Plugin;
+    Plugin* p = new Plugin;
     pluginInstance__Befaco = p;
 
 	const StaticPluginLoader spl(p, "Befaco");
@@ -128,7 +147,7 @@ static void initStatic__Befaco()
 
 static void initStatic__Fundamental()
 {
-	Plugin* p = new Plugin;
+    Plugin* p = new Plugin;
     pluginInstance__Fundamental = p;
 
 	const StaticPluginLoader spl(p, "Fundamental");
@@ -166,6 +185,7 @@ static void initStatic__Fundamental()
 
 void initStaticPlugins()
 {
+    initStatic__AnimatedCircuits();
     initStatic__AudibleInstruments();
     initStatic__Befaco();
     initStatic__Fundamental();

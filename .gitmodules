@@ -19,3 +19,6 @@
 [submodule "plugins/AudibleInstruments"]
 	path = plugins/AudibleInstruments
 	url = https://github.com/VCVRack/AudibleInstruments.git
+[submodule "plugins/AnimatedCircuits"]
+	path = plugins/AnimatedCircuits
+	url = https://github.com/AnimatedCircuits/RackModules.git

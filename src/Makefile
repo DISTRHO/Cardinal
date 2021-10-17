@@ -64,6 +64,8 @@ EXTRA_LIBS += Rack/dep/lib/libarchive.a
 endif
 EXTRA_LIBS += Rack/dep/lib/libzstd.a
 
+EXTRA_DEPENDENCIES = $(EXTRA_LIBS)
+
 # --------------------------------------------------------------
 # Do some magic
 
