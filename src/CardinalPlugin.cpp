@@ -18,9 +18,7 @@
 #include <asset.hpp>
 #include <audio.hpp>
 #include <context.hpp>
-#include <gamepad.hpp>
 #include <library.hpp>
-#include <keyboard.hpp>
 #include <midi.hpp>
 #include <patch.hpp>
 #include <plugin.hpp>
@@ -39,11 +37,13 @@
 #ifdef NDEBUG
 # undef DEBUG
 #endif
+
 #include "DistrhoPlugin.hpp"
 
 namespace rack {
 namespace plugin {
 void initStaticPlugins();
+void destroyStaticPlugins();
 }
 }
 
@@ -69,6 +69,9 @@ struct Initializer {
         settings::autosaveInterval = 0;
         settings::discordUpdateActivity = false;
         settings::isPlugin = true;
+        settings::skipLoadOnLaunch = true;
+        settings::showTipsOnLaunch = true;
+        settings::threadCount = 1;
         system::init();
         asset::init();
         logger::init();
@@ -117,20 +120,21 @@ struct Initializer {
         audio::init(); // does nothing
         midi::init(); // does nothing
         // rtaudioInit();
-        plugin::init();
-        ui::init();
-
         plugin::initStaticPlugins();
+        ui::init();
     }
 
     ~Initializer()
     {
         using namespace rack;
 
-        ui::destroy();
+        ui::destroy(); // does nothing
+
+        INFO("Destroying plugins");
+        plugin::destroyStaticPlugins();
+
         midi::destroy();
         audio::destroy();
-        plugin::destroy();
         INFO("Destroying logger");
         logger::destroy();
     }
