@@ -235,7 +235,7 @@ clean:
 # Build commands
 
 # function for custom module names macro
-custom_module_name = -Dmodel${1}=model${2}${1}
+custom_module_names = -Dmodel${1}=model${2}${1} -D${1}Widget=${2}${1}Widget
 
 $(TARGET): $(PLUGIN_OBJS)
 	@echo "Creating $@"
@@ -275,7 +275,7 @@ $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 $(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__BogaudioModules $(foreach m,$(BOGAUDIO_CUSTOM),$(call custom_module_name,$(m),Bogaudio)) -DRACK_SIMD=1 -IBogaudioModules/lib -IBogaudioModules/src/dsp -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__BogaudioModules $(foreach m,$(BOGAUDIO_CUSTOM),$(call custom_module_names,$(m),Bogaudio)) -DRACK_SIMD=1 -IBogaudioModules/lib -IBogaudioModules/src/dsp -c -o $@
 
 $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

@@ -33,9 +33,6 @@ ifneq ($(MACOS_OR_WINDOWS),true)
 MACHINE_SUFFIX = -linux
 endif
 
-# NOTE speex fails to build when neon is enabled
-CONFIGURE = ./configure --prefix="$(DEP_PATH)" --host=$(TARGET_MACHINE) --enable-neon=no
-
 # --------------------------------------------------------------
 # Fix up cmake
 
@@ -44,6 +41,11 @@ SPACE +=
 
 CMAKE = cmake
 
+CMAKE += -DCMAKE_INSTALL_LIBDIR=lib
+CMAKE += -DCMAKE_INSTALL_PREFIX='$(DEP_PATH)'
+CMAKE += -DBUILD_SHARED_LIBS=OFF
+
+# make sure macOS target matches ours
 ifneq (,$(findstring -arch$(SPACE),$(CXXFLAGS)))
 CMAKE += -DCMAKE_OSX_ARCHITECTURES='$(subst $(SPACE),;,$(subst -arch=,,$(filter -arch=%,$(subst -arch$(SPACE),-arch=,$(CXXFLAGS)))))'
 endif
@@ -51,19 +53,34 @@ ifneq (,$(findstring -mmacosx-version-min=,$(CXXFLAGS)))
 CMAKE += -DCMAKE_OSX_DEPLOYMENT_TARGET=$(subst -mmacosx-version-min=,,$(filter -mmacosx-version-min=%,$(CXXFLAGS)))
 endif
 
-ifeq ($(WINDOWS),true)
-CMAKE += -G 'Unix Makefiles'
-CMAKE += -DCMAKE_RC_COMPILER=$(subst gcc,windres,$(CC))
-CMAKE += -DCMAKE_SYSTEM_NAME=Windows
-endif
-
+# make sure debug/release matches
 ifeq ($(DEBUG),true)
 CMAKE += -DCMAKE_BUILD_TYPE=Debug
 else
 CMAKE += -DCMAKE_BUILD_TYPE=Release
 endif
 
-CMAKE += -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX='$(DEP_PATH)'
+# fix cross-compilation for windows
+ifeq ($(WINDOWS),true)
+CMAKE += -G 'Unix Makefiles'
+CMAKE += -DCMAKE_RC_COMPILER=$(subst gcc,windres,$(CC))
+CMAKE += -DCMAKE_SYSTEM_NAME=Windows
+endif
+
+# --------------------------------------------------------------
+# Fix up configure
+
+CONFIGURE  = ./configure
+CONFIGURE += --prefix="$(DEP_PATH)"
+CONFIGURE += --host=$(TARGET_MACHINE)
+CONFIGURE += --enable-static
+CONFIGURE += --disable-shared
+# NOTE libsamplerate wants to link against alsa, so we disable that
+CONFIGURE += --disable-alsa
+# NOTE speex fails to build when neon is enabled, so we disable that
+CONFIGURE += --disable-neon
+# NOTE libsamplerate fails with invalid host, so we force ac_cv_host
+CONFIGURE += ac_cv_host=$(TARGET_MACHINE)
 
 # --------------------------------------------------------------
 # VCV internal dependencies target
@@ -94,28 +111,6 @@ $(DEP_PATH)/zstd-1.4.5/.stamp-patched:
 	sed -i -e "56,66d" $(DEP_PATH)/zstd-1.4.5/build/cmake/CMakeModules/AddZstdCompilationFlags.cmake
 	touch $@
 endif
-
-# libsamplerate fails to link its tests in some systems
-$(DEP_PATH)/libsamplerate-0.1.9:
-	$(MAKE) -C $(DEP_PATH) libsamplerate-0.1.9
-
-$(DEP_PATH)/lib/libsamplerate.a: $(DEP_PATH)/libsamplerate-0.1.9
-	cd $(DEP_PATH)/libsamplerate-0.1.9 && $(CONFIGURE) --disable-fftw --disable-sndfile
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/termination_test
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/simple_test
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/misc_test
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/callback_test
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/reset_test
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/varispeed_test
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/float_short_test
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/multi_channel_test
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/callback_hang_test
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/src-evaluate
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/throughput_test
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/multichan_throughput_test
-	touch $(DEP_PATH)/libsamplerate-0.1.9/tests/downsample_test
-	$(MAKE) -C $(DEP_PATH)/libsamplerate-0.1.9
-	$(MAKE) -C $(DEP_PATH)/libsamplerate-0.1.9 install
 
 # --------------------------------------------------------------
 # Build targets
