@@ -32,6 +32,10 @@ def res2c(filename):
 
     print("const unsigned int %s_len = %d;\n" % (resname, fhandle.tell()))
 
+    if sys.platform != "darwin":
+        print("const unsigned char* _binary_%s_start = %s;\n" % (resname, resname))
+        print("const unsigned char* _binary_%s_end = %s + %d;\n" % (resname, resname, fhandle.tell()))
+
 # -----------------------------------------------------
 
 if __name__ == '__main__':
