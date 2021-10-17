@@ -16,3 +16,6 @@
 [submodule "plugins/Befaco"]
 	path = plugins/Befaco
 	url = https://github.com/VCVRack/Befaco.git
+[submodule "plugins/AudibleInstruments"]
+	path = plugins/AudibleInstruments
+	url = https://github.com/VCVRack/AudibleInstruments.git
