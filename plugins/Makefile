@@ -135,6 +135,11 @@ PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
 
 # --------------------------------------------------------------
+# ZetaCarinaeModules
+
+PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCarinaeModules/src/*.cpp))
+
+# --------------------------------------------------------------
 # Resources to symlink
 
 # TODO
@@ -220,6 +225,11 @@ $(TARGET): $(PLUGIN_OBJS)
 	$(SILENT)rm -f $@
 	$(SILENT)$(AR) crs $@ $^
 
+$(BUILD_DIR)/%.bin.o: % res2c.py
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Generating and Compiling $<"
+	$(shell ./res2c.py $< | $(CC) -x c - $(BUILD_C_FLAGS) -c -o $@)
+
 $(BUILD_DIR)/plugins.cpp.o: plugins.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -250,11 +260,10 @@ $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Fundamental -c -o $@
 
-# copied and adjusted from VCVRack's compile.mk
-$(BUILD_DIR)/%.bin.o: % res2c.py
+$(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Generating and Compiling $<"
-	$(shell ./res2c.py $< | $(CC) -x c - $(BUILD_C_FLAGS) -c -o $@)
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ZetaCarinaeModules -c -o $@
 
 # --------------------------------------------------------------
 

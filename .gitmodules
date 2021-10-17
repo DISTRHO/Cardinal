@@ -22,3 +22,6 @@
 [submodule "plugins/AnimatedCircuits"]
 	path = plugins/AnimatedCircuits
 	url = https://github.com/AnimatedCircuits/RackModules.git
+[submodule "plugins/ZetaCarinaeModules"]
+	path = plugins/ZetaCarinaeModules
+	url = https://github.com/mhampton/ZetaCarinaeModules.git

@@ -23,11 +23,13 @@
 #include "AudibleInstruments/src/plugin.hpp"
 #include "Befaco/src/plugin.hpp"
 #include "Fundamental/src/plugin.hpp"
+#include "ZetaCarinaeModules/src/plugin.hpp"
 
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Fundamental;
+Plugin* pluginInstance__ZetaCarinaeModules;
 
 namespace rack {
 namespace plugin {
@@ -183,12 +185,32 @@ static void initStatic__Fundamental()
 	}
 }
 
+static void initStatic__ZetaCarinaeModules()
+{
+    Plugin* p = new Plugin;
+    pluginInstance__ZetaCarinaeModules = p;
+
+	const StaticPluginLoader spl(p, "ZetaCarinaeModules");
+	if (spl.ok())
+	{
+		p->addModel(modelBrownianBridge);
+		p->addModel(modelOrnsteinUhlenbeck);
+		p->addModel(modelIOU);
+		p->addModel(modelWarbler);
+		p->addModel(modelRosenchance);
+		p->addModel(modelGuildensTurn);
+		p->addModel(modelRosslerRustler);
+		p->addModel(modelFirefly);
+	}
+}
+
 void initStaticPlugins()
 {
     initStatic__AnimatedCircuits();
     initStatic__AudibleInstruments();
     initStatic__Befaco();
     initStatic__Fundamental();
+    initStatic__ZetaCarinaeModules();
 }
 
 }
