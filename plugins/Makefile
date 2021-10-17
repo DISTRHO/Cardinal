@@ -197,7 +197,6 @@ ifeq ($(WINDOWS),true)
 BASE_FLAGS += -D_USE_MATH_DEFINES
 BASE_FLAGS += -I../src/mingw-compat
 BASE_FLAGS += -I../src/mingw-std-threads
-BASE_FLAGS += -municode
 endif
 
 # --------------------------------------------------------------

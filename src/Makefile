@@ -108,7 +108,6 @@ ifeq ($(WINDOWS),true)
 BASE_FLAGS += -D_USE_MATH_DEFINES
 BASE_FLAGS += -Imingw-compat
 BASE_FLAGS += -Imingw-std-threads
-BASE_FLAGS += -municode
 endif
 
 BUILD_C_FLAGS += -std=gnu11
