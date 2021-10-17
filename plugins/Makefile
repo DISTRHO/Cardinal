@@ -130,6 +130,16 @@ PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
 PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 
 # --------------------------------------------------------------
+# BogaudioModules
+
+PLUGIN_FILES += $(filter-out BogaudioModules/src/bogaudio.cpp,$(wildcard BogaudioModules/src/*.cpp))
+PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/*.cpp)
+PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/filters/*.cpp)
+
+# modules which are present in other plugins
+BOGAUDIO_CUSTOM = ADSR LFO Noise VCA VCO VCF
+
+# --------------------------------------------------------------
 # Fundamental
 
 PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
@@ -225,6 +235,9 @@ clean:
 # --------------------------------------------------------------
 # Build commands
 
+# function for custom module names macro
+custom_module_name = -Dmodel${1}=model${2}${1}
+
 $(TARGET): $(PLUGIN_OBJS)
 	@echo "Creating $@"
 	$(SILENT)rm -f $@
@@ -238,7 +251,7 @@ $(BUILD_DIR)/%.bin.o: % res2c.py
 $(BUILD_DIR)/plugins.cpp.o: plugins.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -IBogaudioModules/lib -IBogaudioModules/src/dsp -c -o $@
 
 $(BUILD_DIR)/AnimatedCircuits/%.cpp.o: AnimatedCircuits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -259,6 +272,11 @@ $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Befaco -c -o $@
+
+$(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__BogaudioModules $(foreach m,$(BOGAUDIO_CUSTOM),$(call custom_module_name,$(m),Bogaudio)) -DRACK_SIMD=1 -IBogaudioModules/lib -IBogaudioModules/src/dsp -c -o $@
 
 $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

@@ -28,3 +28,6 @@
 [submodule "plugins/GrandeModular"]
 	path = plugins/GrandeModular
 	url = https://github.com/dbgrande/GrandeModular.git
+[submodule "plugins/BogaudioModules"]
+	path = plugins/BogaudioModules
+	url = https://github.com/bogaudio/BogaudioModules.git

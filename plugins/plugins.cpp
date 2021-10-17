@@ -19,16 +19,150 @@
 
 #include "DistrhoUtils.hpp"
 
+// AnimatedCircuits
 #include "AnimatedCircuits/src/plugin.hpp"
+
+// AudibleInstruments
 #include "AudibleInstruments/src/plugin.hpp"
+
+// Befaco
 #include "Befaco/src/plugin.hpp"
+
+// BogaudioModules
+#define modelADSR modelBogaudioADSR
+#define modelLFO modelBogaudioLFO
+#define modelNoise modelBogaudioNoise
+#define modelVCA modelBogaudioVCA
+#define modelVCF modelBogaudioVCF
+#define modelVCO modelBogaudioVCO
+#include "BogaudioModules/src/AD.hpp"
+#include "BogaudioModules/src/Additator.hpp"
+#include "BogaudioModules/src/AddrSeqX.hpp"
+#include "BogaudioModules/src/ADSR.hpp"
+#include "BogaudioModules/src/AMRM.hpp"
+#include "BogaudioModules/src/Analyzer.hpp"
+#include "BogaudioModules/src/AnalyzerXL.hpp"
+#include "BogaudioModules/src/Assign.hpp"
+#include "BogaudioModules/src/ASR.hpp"
+#include "BogaudioModules/src/Arp.hpp"
+#include "BogaudioModules/src/Blank3.hpp"
+#include "BogaudioModules/src/Blank6.hpp"
+#include "BogaudioModules/src/Bool.hpp"
+#include "BogaudioModules/src/Chirp.hpp"
+#include "BogaudioModules/src/Clpr.hpp"
+#include "BogaudioModules/src/Cmp.hpp"
+#include "BogaudioModules/src/CmpDist.hpp"
+#include "BogaudioModules/src/CVD.hpp"
+#include "BogaudioModules/src/DADSRH.hpp"
+#include "BogaudioModules/src/DADSRHPlus.hpp"
+#include "BogaudioModules/src/Detune.hpp"
+#include "BogaudioModules/src/DGate.hpp"
+#include "BogaudioModules/src/Edge.hpp"
+#include "BogaudioModules/src/EightFO.hpp"
+#include "BogaudioModules/src/EightOne.hpp"
+#include "BogaudioModules/src/EQ.hpp"
+#include "BogaudioModules/src/EQS.hpp"
+#include "BogaudioModules/src/FFB.hpp"
+#include "BogaudioModules/src/FlipFlop.hpp"
+#include "BogaudioModules/src/FMOp.hpp"
+#include "BogaudioModules/src/Follow.hpp"
+#include "BogaudioModules/src/FourFO.hpp"
+#include "BogaudioModules/src/FourMan.hpp"
+#include "BogaudioModules/src/Inv.hpp"
+#include "BogaudioModules/src/LFO.hpp"
+#include "BogaudioModules/src/Lgsw.hpp"
+#include "BogaudioModules/src/LLFO.hpp"
+#include "BogaudioModules/src/LLPG.hpp"
+#include "BogaudioModules/src/Lmtr.hpp"
+#include "BogaudioModules/src/LPG.hpp"
+#include "BogaudioModules/src/LVCF.hpp"
+#include "BogaudioModules/src/LVCO.hpp"
+#include "BogaudioModules/src/Manual.hpp"
+#include "BogaudioModules/src/Matrix18.hpp"
+#include "BogaudioModules/src/Matrix44.hpp"
+#include "BogaudioModules/src/Matrix81.hpp"
+#include "BogaudioModules/src/Matrix88.hpp"
+#include "BogaudioModules/src/Matrix88Cv.hpp"
+#include "BogaudioModules/src/Matrix88M.hpp"
+#include "BogaudioModules/src/MegaGate.hpp"
+#include "BogaudioModules/src/Mix1.hpp"
+#include "BogaudioModules/src/Mix2.hpp"
+#include "BogaudioModules/src/Mix4.hpp"
+#include "BogaudioModules/src/Mix4x.hpp"
+#include "BogaudioModules/src/Mix8x.hpp"
+#include "BogaudioModules/src/Mono.hpp"
+#include "BogaudioModules/src/Mult.hpp"
+#include "BogaudioModules/src/Mumix.hpp"
+#include "BogaudioModules/src/Mute8.hpp"
+#include "BogaudioModules/src/Noise.hpp"
+#include "BogaudioModules/src/Nsgt.hpp"
+#include "BogaudioModules/src/Offset.hpp"
+#include "BogaudioModules/src/OneEight.hpp"
+#include "BogaudioModules/src/Pan.hpp"
+#include "BogaudioModules/src/PEQ.hpp"
+#include "BogaudioModules/src/PEQ6.hpp"
+#include "BogaudioModules/src/PEQ6XF.hpp"
+#include "BogaudioModules/src/PEQ14.hpp"
+#include "BogaudioModules/src/PEQ14XF.hpp"
+#include "BogaudioModules/src/Pgmr.hpp"
+#include "BogaudioModules/src/PgmrX.hpp"
+#include "BogaudioModules/src/PolyCon16.hpp"
+#include "BogaudioModules/src/PolyCon8.hpp"
+#include "BogaudioModules/src/PolyMult.hpp"
+#include "BogaudioModules/src/PolyOff16.hpp"
+#include "BogaudioModules/src/PolyOff8.hpp"
+#include "BogaudioModules/src/Pressor.hpp"
+#include "BogaudioModules/src/Pulse.hpp"
+#include "BogaudioModules/src/Ranalyzer.hpp"
+#include "BogaudioModules/src/Reftone.hpp"
+#include "BogaudioModules/src/RGate.hpp"
+#include "BogaudioModules/src/SampleHold.hpp"
+#include "BogaudioModules/src/Shaper.hpp"
+#include "BogaudioModules/src/ShaperPlus.hpp"
+#include "BogaudioModules/src/Sine.hpp"
+#include "BogaudioModules/src/Slew.hpp"
+#include "BogaudioModules/src/Stack.hpp"
+#include "BogaudioModules/src/Sums.hpp"
+#include "BogaudioModules/src/Switch.hpp"
+#include "BogaudioModules/src/Switch1616.hpp"
+#include "BogaudioModules/src/Switch18.hpp"
+#include "BogaudioModules/src/Switch44.hpp"
+#include "BogaudioModules/src/Switch81.hpp"
+#include "BogaudioModules/src/Switch88.hpp"
+#include "BogaudioModules/src/UMix.hpp"
+#include "BogaudioModules/src/Unison.hpp"
+#include "BogaudioModules/src/VCA.hpp"
+#include "BogaudioModules/src/VCAmp.hpp"
+#include "BogaudioModules/src/VCF.hpp"
+#include "BogaudioModules/src/VCM.hpp"
+#include "BogaudioModules/src/VCO.hpp"
+#include "BogaudioModules/src/Velo.hpp"
+#include "BogaudioModules/src/Vish.hpp"
+#include "BogaudioModules/src/VU.hpp"
+#include "BogaudioModules/src/Walk.hpp"
+#include "BogaudioModules/src/Walk2.hpp"
+#include "BogaudioModules/src/XCO.hpp"
+#include "BogaudioModules/src/XFade.hpp"
+#undef modelADSR
+#undef modelLFO
+#undef modelNoise
+#undef modelVCA
+#undef modelVCF
+#undef modelVCO
+
+// Fundamental
 #include "Fundamental/src/plugin.hpp"
+
+// GrandeModular
 #include "GrandeModular/src/plugin.hpp"
+
+// ZetaCarinaeModules
 #include "ZetaCarinaeModules/src/plugin.hpp"
 
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__Befaco;
+Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__ZetaCarinaeModules;
@@ -149,6 +283,153 @@ static void initStatic__Befaco()
 	}
 }
 
+static void initStatic__BogaudioModules()
+{
+    Plugin* p = new Plugin;
+    pluginInstance__BogaudioModules = p;
+
+	const StaticPluginLoader spl(p, "BogaudioModules");
+	if (spl.ok())
+	{
+#define modelADSR modelBogaudioADSR
+#define modelLFO modelBogaudioLFO
+#define modelNoise modelBogaudioNoise
+#define modelVCA modelBogaudioVCA
+#define modelVCF modelBogaudioVCF
+#define modelVCO modelBogaudioVCO
+		p->addModel(modelVCO);
+		p->addModel(modelLVCO);
+		p->addModel(modelSine);
+		p->addModel(modelPulse);
+		p->addModel(modelXCO);
+		p->addModel(modelAdditator);
+		p->addModel(modelFMOp);
+		p->addModel(modelChirp);
+		p->addModel(modelLFO);
+		p->addModel(modelLLFO);
+		p->addModel(modelFourFO);
+		p->addModel(modelEightFO);
+		p->addModel(modelVCF);
+		p->addModel(modelLVCF);
+		p->addModel(modelFFB);
+		p->addModel(modelEQ);
+		p->addModel(modelEQS);
+		p->addModel(modelLPG);
+		p->addModel(modelLLPG);
+		p->addModel(modelMegaGate);
+		p->addModel(modelPEQ);
+		p->addModel(modelPEQ6);
+		p->addModel(modelPEQ6XF);
+		p->addModel(modelPEQ14);
+		p->addModel(modelPEQ14XF);
+		p->addModel(modelDADSRH);
+		p->addModel(modelDADSRHPlus);
+		p->addModel(modelShaper);
+		p->addModel(modelShaperPlus);
+		p->addModel(modelAD);
+		p->addModel(modelASR);
+		p->addModel(modelADSR);
+		p->addModel(modelVish);
+		p->addModel(modelFollow);
+		p->addModel(modelDGate);
+		p->addModel(modelRGate);
+		p->addModel(modelEdge);
+		p->addModel(modelNoise);
+		p->addModel(modelSampleHold);
+		p->addModel(modelWalk2);
+		p->addModel(modelWalk);
+		p->addModel(modelMix8);
+		p->addModel(modelMix8x);
+		p->addModel(modelMix4);
+		p->addModel(modelMix4x);
+		p->addModel(modelMix2);
+		p->addModel(modelMix1);
+		p->addModel(modelVCM);
+		p->addModel(modelMute8);
+		p->addModel(modelPan);
+		p->addModel(modelXFade);
+		p->addModel(modelVCA);
+		p->addModel(modelVCAmp);
+		p->addModel(modelVelo);
+		p->addModel(modelUMix);
+		p->addModel(modelMumix);
+		p->addModel(modelMatrix81);
+		p->addModel(modelMatrix18);
+		p->addModel(modelMatrix44);
+		p->addModel(modelMatrix44Cvm);
+		p->addModel(modelMatrix88);
+		p->addModel(modelMatrix88Cv);
+		p->addModel(modelMatrix88M);
+		p->addModel(modelSwitch81);
+		p->addModel(modelSwitch18);
+		p->addModel(modelSwitch44);
+		p->addModel(modelSwitch88);
+		p->addModel(modelSwitch1616);
+		p->addModel(modelAMRM);
+		p->addModel(modelPressor);
+		p->addModel(modelClpr);
+		p->addModel(modelLmtr);
+		p->addModel(modelNsgt);
+		p->addModel(modelCmpDist);
+		p->addModel(modelOneEight);
+		p->addModel(modelEightOne);
+		p->addModel(modelAddrSeq);
+		p->addModel(modelAddrSeqX);
+		p->addModel(modelPgmr);
+		p->addModel(modelPgmrX);
+		p->addModel(modelVU);
+		p->addModel(modelAnalyzer);
+		p->addModel(modelAnalyzerXL);
+		p->addModel(modelRanalyzer);
+		p->addModel(modelDetune);
+		p->addModel(modelStack);
+		p->addModel(modelReftone);
+		p->addModel(modelMono);
+		p->addModel(modelArp);
+		p->addModel(modelAssign);
+		p->addModel(modelUnison);
+		p->addModel(modelPolyCon8);
+		p->addModel(modelPolyCon16);
+		p->addModel(modelPolyOff8);
+		p->addModel(modelPolyOff16);
+		p->addModel(modelPolyMult);
+		p->addModel(modelBool);
+		p->addModel(modelCmp);
+		p->addModel(modelCVD);
+		p->addModel(modelFlipFlop);
+		p->addModel(modelInv);
+		p->addModel(modelManual);
+		p->addModel(modelFourMan);
+		p->addModel(modelMult);
+		p->addModel(modelOffset);
+		p->addModel(modelSlew);
+		p->addModel(modelSums);
+		p->addModel(modelSwitch);
+		p->addModel(modelLgsw);
+		p->addModel(modelBlank3);
+		p->addModel(modelBlank6);
+#ifdef EXPERIMENTAL
+		p->addModel(modelLag);
+		p->addModel(modelPEQ14XR);
+		p->addModel(modelPEQ14XV);
+#endif
+#ifdef TEST
+		p->addModel(modelTest);
+		p->addModel(modelTest2);
+		p->addModel(modelTestExpanderBase);
+		p->addModel(modelTestExpanderExtension);
+		p->addModel(modelTestGl);
+		p->addModel(modelTestVCF);
+#endif
+#undef modelADSR
+#undef modelLFO
+#undef modelNoise
+#undef modelVCA
+#undef modelVCF
+#undef modelVCO
+	}
+}
+
 static void initStatic__Fundamental()
 {
     Plugin* p = new Plugin;
@@ -235,6 +516,7 @@ void initStaticPlugins()
     initStatic__AnimatedCircuits();
     initStatic__AudibleInstruments();
     initStatic__Befaco();
+	initStatic__BogaudioModules();
     initStatic__Fundamental();
 	initStatic__GrandeModular();
     initStatic__ZetaCarinaeModules();
