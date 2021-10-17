@@ -25,6 +25,7 @@
 #include <patch.hpp>
 #include <plugin.hpp>
 #include <random.hpp>
+// #include <rtaudio.hpp>
 #include <settings.hpp>
 #include <system.hpp>
 
@@ -115,6 +116,7 @@ struct Initializer {
         INFO("Initializing environment");
         audio::init(); // does nothing
         midi::init(); // does nothing
+        // rtaudioInit();
         plugin::init();
         ui::init();
 

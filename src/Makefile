@@ -50,6 +50,9 @@ FILES_DSP += $(wildcard Rack/src/*/*.c)
 FILES_DSP += $(filter-out Rack/src/dep.cpp Rack/src/discord.cpp Rack/src/gamepad.cpp Rack/src/keyboard.cpp Rack/src/library.cpp Rack/src/network.cpp Rack/src/rtaudio.cpp Rack/src/rtmidi.cpp, $(wildcard Rack/src/*.cpp))
 FILES_DSP += $(filter-out Rack/src/window/Window.cpp, $(wildcard Rack/src/*/*.cpp))
 
+# FOR TESTING
+# FILES_DSP += Rack/src/rtaudio.cpp
+
 # --------------------------------------------------------------
 # Extra libraries to link against
 
@@ -83,6 +86,9 @@ BASE_FLAGS += -DARCH_WIN
 else
 BASE_FLAGS += -DARCH_LIN
 endif
+
+# FOR TESTING
+# BASE_FLAGS += -I../dpf/distrho/src/jackbridge
 
 BASE_FLAGS += -D_APP_VERSION=Cardinal
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
