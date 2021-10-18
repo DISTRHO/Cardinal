@@ -53,6 +53,7 @@ struct Initializer {
         settings::allowCursorLock = false;
         settings::autoCheckUpdates = false;
         settings::autosaveInterval = 0;
+        settings::devMode = true;
         settings::discordUpdateActivity = false;
         settings::isPlugin = true;
         settings::skipLoadOnLaunch = true;

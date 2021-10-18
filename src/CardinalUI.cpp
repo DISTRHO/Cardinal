@@ -15,11 +15,11 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#include <app/common.hpp>
 #include <app/Scene.hpp>
 #include <context.hpp>
 #include <patch.hpp>
-#include <ui/common.hpp>
+#include <ui/Button.hpp>
+#include <ui/MenuItem.hpp>
 #include <window/Window.hpp>
 
 #include "PluginContext.hpp"
@@ -79,6 +79,44 @@ public:
         rack::window::lastUI = this;
         fContext->window = new rack::window::Window;
         rack::window::lastUI = nullptr;
+
+        // Hide non-wanted menu entries
+        typedef rack::ui::Button rButton;
+        // typedef rack::ui::MenuItem rMenuItem;
+        typedef rack::widget::Widget rWidget;
+        typedef std::list<rWidget*>::iterator rWidgetIterator;
+
+        rWidget* const layout = fContext->scene->menuBar->children.front();
+
+        for (rWidgetIterator it = layout->children.begin(); it != layout->children.end(); ++it)
+        {
+            if (rButton* const button = reinterpret_cast<rButton*>(*it))
+            {
+                /* FIXME this doesnt work
+                if (button->text == "Engine")
+                {
+                    for (rWidgetIterator it2 = button->children.begin(); it2 != button->children.end(); ++it2)
+                    {
+                        if (rMenuItem* const item = reinterpret_cast<rMenuItem*>(*it2))
+                        {
+                            if (item->text == "Sample rate")
+                            {
+                                button->children.erase(it2);
+                                delete button;
+                                break;
+                            }
+                        }
+                    }
+                }
+                */
+                if (button->text == "Library")
+                {
+                    layout->children.erase(it);
+                    delete button;
+                    break;
+                }
+            }
+        }
 
         // we need to reload current patch for things to show on screen :(
         // FIXME always save
