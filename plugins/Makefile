@@ -168,6 +168,11 @@ PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/s
 PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModular/src/*.cpp))
 
 # --------------------------------------------------------------
+# ValleyAudio (does not build against v2)
+
+# PLUGIN_FILES += $(wildcard ValleyAudio/src/*.cpp)
+
+# --------------------------------------------------------------
 # ZetaCarinaeModules
 
 PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCarinaeModules/src/*.cpp))
@@ -205,6 +210,7 @@ BASE_FLAGS += -I../include/neon-compat
 
 BASE_FLAGS += -I../src
 BASE_FLAGS += -I../src/Rack/include
+BASE_FLAGS += -I../src/Rack/include/dsp
 BASE_FLAGS += -I../src/Rack/dep/include
 # BASE_FLAGS += -I../src/Rack/dep/filesystem/include
 # BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
@@ -324,6 +330,11 @@ $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__GrandeModular -c -o $@
+
+$(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ValleyAudio -c -o $@
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

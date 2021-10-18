@@ -165,6 +165,11 @@
 // GrandeModular
 #include "GrandeModular/src/plugin.hpp"
 
+// ValleyAudio
+/* does not build against v2
+#include "ValleyAudio/src/Valley.hpp"
+*/
+
 // ZetaCarinaeModules
 #include "ZetaCarinaeModules/src/plugin.hpp"
 
@@ -177,6 +182,7 @@ Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
+Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
 
 namespace rack {
@@ -672,6 +678,27 @@ static void initStatic__GrandeModular()
     }
 }
 
+/* does not build against v2
+static void initStatic__ValleyAudio()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__ValleyAudio = p;
+
+    const StaticPluginLoader spl(p, "ValleyAudio");
+    if (spl.ok())
+    {
+        p->addModel(modelTopograph);
+        p->addModel(modelUGraph);
+        p->addModel(modelDexter);
+        p->addModel(modelPlateau);
+        p->addModel(modelInterzone);
+        p->addModel(modelAmalgam);
+        p->addModel(modelFeline);
+        p->addModel(modelTerrorform);
+    }
+}
+*/
+
 static void initStatic__ZetaCarinaeModules()
 {
     Plugin* p = new Plugin;
@@ -703,6 +730,9 @@ void initStaticPlugins()
     initStatic__ESeries();
     initStatic__Fundamental();
     initStatic__GrandeModular();
+    /* does not build against v2
+    initStatic__ValleyAudio();
+    */
     initStatic__ZetaCarinaeModules();
 }
 
