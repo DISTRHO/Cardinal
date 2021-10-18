@@ -21,9 +21,8 @@
 #include <ui/common.hpp>
 #include <window/Window.hpp>
 
-#ifdef NDEBUG
-# undef DEBUG
-#endif
+#include "PluginContext.hpp"
+
 #include "DistrhoUI.hpp"
 #include "ResizeHandle.hpp"
 
@@ -42,11 +41,11 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
-rack::Context* getRackContextFromPlugin(void* ptr);
+CardinalPluginContext* getRackContextFromPlugin(void* ptr);
 
 class CardinalUI : public UI
 {
-    rack::Context* const fContext;
+    CardinalPluginContext* const fContext;
     rack::math::Vec fLastMousePos;
     ResizeHandle fResizeHandle;
 

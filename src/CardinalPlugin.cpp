@@ -16,14 +16,11 @@
  */
 
 #include <asset.hpp>
-#include <audio.hpp>
-#include <context.hpp>
 #include <library.hpp>
 #include <midi.hpp>
 #include <patch.hpp>
 #include <plugin.hpp>
 #include <random.hpp>
-// #include <rtaudio.hpp>
 #include <settings.hpp>
 #include <system.hpp>
 
@@ -34,11 +31,7 @@
 
 #include <osdialog.h>
 
-#ifdef NDEBUG
-# undef DEBUG
-#endif
-
-#include "DistrhoPlugin.hpp"
+#include "PluginContext.hpp"
 
 namespace rack {
 namespace plugin {
@@ -50,15 +43,6 @@ void destroyStaticPlugins();
 START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
-// The following code was based from VCVRack adapters/standalone.cpp
-
-/*
-   Copyright (C) 2016-2021 VCV
-
-   This program is free software: you can redistribute it and/or modify it under the terms of the
-   GNU General Public License as published by the Free Software Foundation, either version 3 of the
-   License, or (at your option) any later version.
-*/
 
 struct Initializer {
     Initializer()
@@ -98,7 +82,9 @@ struct Initializer {
         INFO("Initializing environment");
         audio::init(); // does nothing
         midi::init(); // does nothing
-        // rtaudioInit();
+
+        rack::audio::addDriver(0, new CardinalAudioDriver);
+
         plugin::initStaticPlugins();
         ui::init();
     }
@@ -127,110 +113,16 @@ static const Initializer& getInitializerInstance()
 
 // -----------------------------------------------------------------------------------------------------------
 
-struct CardinalAudioDevice : rack::audio::Device {
-    Plugin* const fPlugin;
-
-    CardinalAudioDevice(Plugin* const plugin)
-        : fPlugin(plugin) {}
-
-    std::string getName() override
-    {
-        return "Plugin Device";
-    }
-
-    int getNumInputs() override
-    {
-        return DISTRHO_PLUGIN_NUM_INPUTS;
-    }
-
-    int getNumOutputs() override
-    {
-        return DISTRHO_PLUGIN_NUM_OUTPUTS;
-    }
-
-    std::set<float> getSampleRates() override
-    {
-        return { getSampleRate() };
-    }
-
-    float getSampleRate() override
-    {
-        return fPlugin->getSampleRate();
-    }
-
-    void setSampleRate(float) override {}
-
-    std::set<int> getBlockSizes() override
-    {
-        return { getBlockSize() };
-    }
-
-    int getBlockSize() override
-    {
-        return fPlugin->getBufferSize();
-    }
-
-    void setBlockSize(int) override {}
-};
-
-// -----------------------------------------------------------------------------------------------------------
-
-struct CardinalAudioDriver : rack::audio::Driver {
-    Plugin* const fPlugin;
-    CardinalAudioDevice fDevice;
-
-    CardinalAudioDriver(Plugin* const plugin)
-        : fPlugin(plugin),
-          fDevice(plugin) {}
-
-    std::string getName() override
-    {
-        return "Plugin Driver";
-    }
-
-    std::vector<int> getDeviceIds() override
-    {
-        return { 0 };
-    }
-
-    std::string getDeviceName(int) override
-    {
-        return "Plugin Driver Device";
-    }
-
-    int getDeviceNumInputs(int) override
-    {
-        return DISTRHO_PLUGIN_NUM_INPUTS;
-    }
-
-    int getDeviceNumOutputs(int) override
-    {
-        return DISTRHO_PLUGIN_NUM_OUTPUTS;
-    }
-
-    rack::audio::Device* subscribe(int, rack::audio::Port* const port) override
-    {
-        fDevice.subscribe(port);
-        fDevice.onStartStream();
-        return &fDevice;
-    }
-
-    void unsubscribe(int, rack::audio::Port* const port) override
-    {
-        fDevice.onStopStream();
-        fDevice.unsubscribe(port);
-    }
-};
-
-// -----------------------------------------------------------------------------------------------------------
-
-class CardinalPlugin : public Plugin
+class CardinalPlugin : public CardinalBasePlugin
 {
-    rack::Context* const fContext;
-    CardinalAudioDriver* const fAudioDriver;
+    CardinalPluginContext* const fContext;
     float* fAudioBufferIn;
     float* fAudioBufferOut;
     std::string fAutosavePath;
+
+    // for base/context handling
+    bool fIsActive;
+    rack::audio::Device* fCurrentDevice;
 
     struct ScopedContext {
         ScopedContext(CardinalPlugin* const plugin)
@@ -246,11 +138,12 @@ class CardinalPlugin : public Plugin
 
 public:
     CardinalPlugin()
-        : Plugin(0, 0, 0),
-          fContext(new rack::Context),
-          fAudioDriver(new CardinalAudioDriver(this)),
+        : CardinalBasePlugin(0, 0, 0),
+          fContext(new CardinalPluginContext(this)),
           fAudioBufferIn(nullptr),
-          fAudioBufferOut(nullptr)
+          fAudioBufferOut(nullptr),
+          fIsActive(false),
+          fCurrentDevice(nullptr)
     {
         // create unique temporary path for this instance
         try {
@@ -273,8 +166,6 @@ public:
 
         const ScopedContext sc(this);
 
-        rack::audio::addDriver(0, fAudioDriver);
-
         fContext->engine = new rack::engine::Engine;
         fContext->history = new rack::history::State;
         fContext->patch = new rack::patch::Manager;
@@ -288,19 +179,47 @@ public:
         {
             const ScopedContext sc(this);
             delete fContext;
-            // rack::audio::destroy();
         }
 
         if (! fAutosavePath.empty())
             rack::system::removeRecursively(fAutosavePath);
     }
 
-    rack::Context* getRackContext() const noexcept
+    CardinalPluginContext* getRackContext() const noexcept
     {
         return fContext;
     }
 
 protected:
+   /* --------------------------------------------------------------------------------------------------------
+    * Cardinal Base things */
+
+    bool isActive() const noexcept override
+    {
+        return fIsActive;
+    }
+
+    bool canAssignDevice() const noexcept override
+    {
+        return fCurrentDevice == nullptr;
+    }
+
+    void assignDevice(rack::audio::Device* const dev) noexcept override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(fCurrentDevice == nullptr,);
+
+        fCurrentDevice = dev;
+    }
+
+    bool clearDevice(rack::audio::Device* const dev) noexcept override
+    {
+        if (fCurrentDevice != dev)
+            return false;
+
+        fCurrentDevice = dev;
+        return true;
+    }
+
    /* --------------------------------------------------------------------------------------------------------
     * Information */
 
@@ -378,11 +297,15 @@ protected:
         fAudioBufferIn = new float[bufferSize];
         fAudioBufferOut = new float[bufferSize];
         std::memset(fAudioBufferIn, 0, sizeof(float)*bufferSize);
+
+        if (fCurrentDevice != nullptr)
+            fCurrentDevice->onStartStream();
     }
 
     void deactivate() override
     {
-        fAudioDriver->fDevice.onStopStream();
+        if (fCurrentDevice != nullptr)
+            fCurrentDevice->onStopStream();
 
         delete[] fAudioBufferIn;
         delete[] fAudioBufferOut;
@@ -399,6 +322,15 @@ protected:
         fContext->engine->stepBlock(frames);
         */
 
+        if (fCurrentDevice == nullptr)
+        {
+            if (outputs[0] != inputs[0])
+                std::memcpy(outputs[0], inputs[0], sizeof(float)*frames);
+            if (outputs[1] != inputs[1])
+                std::memcpy(outputs[1], inputs[1], sizeof(float)*frames);
+            return;
+        }
+
         for (uint32_t i=0, j=0; i<frames; ++i)
         {
             fAudioBufferIn[j++] = inputs[0][i];
@@ -407,8 +339,8 @@ protected:
 
         std::memset(fAudioBufferOut, 0, sizeof(float)*frames*DISTRHO_PLUGIN_NUM_OUTPUTS);
 
-        fAudioDriver->fDevice.processBuffer(fAudioBufferIn, DISTRHO_PLUGIN_NUM_INPUTS,
-                                            fAudioBufferOut, DISTRHO_PLUGIN_NUM_OUTPUTS, frames);
+        fCurrentDevice->processBuffer(fAudioBufferIn, DISTRHO_PLUGIN_NUM_INPUTS,
+                                      fAudioBufferOut, DISTRHO_PLUGIN_NUM_OUTPUTS, frames);
 
         for (uint32_t i=0, j=0; i<frames; ++i)
         {
@@ -433,7 +365,7 @@ private:
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CardinalPlugin)
 };
 
-rack::Context* getRackContextFromPlugin(void* const ptr)
+CardinalPluginContext* getRackContextFromPlugin(void* const ptr)
 {
     return static_cast<CardinalPlugin*>(ptr)->getRackContext();
 }
