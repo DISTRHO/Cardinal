@@ -90,6 +90,7 @@ endif
 # FOR TESTING
 # BASE_FLAGS += -I../dpf/distrho/src/jackbridge
 
+BASE_FLAGS += -fno-finite-math-only
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat

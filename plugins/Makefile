@@ -220,6 +220,7 @@ endif
 
 BUILD_C_FLAGS += -std=gnu11
 
+BASE_FLAGS += -fno-finite-math-only
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
 
