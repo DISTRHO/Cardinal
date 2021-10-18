@@ -127,9 +127,109 @@ static const Initializer& getInitializerInstance()
 
 // -----------------------------------------------------------------------------------------------------------
 
+struct CardinalAudioDevice : rack::audio::Device {
+    Plugin* const fPlugin;
+
+    CardinalAudioDevice(Plugin* const plugin)
+        : fPlugin(plugin) {}
+
+    std::string getName() override
+    {
+        return "Plugin Device";
+    }
+
+    int getNumInputs() override
+    {
+        return DISTRHO_PLUGIN_NUM_INPUTS;
+    }
+
+    int getNumOutputs() override
+    {
+        return DISTRHO_PLUGIN_NUM_OUTPUTS;
+    }
+
+    std::set<float> getSampleRates() override
+    {
+        return { getSampleRate() };
+    }
+
+    float getSampleRate() override
+    {
+        return fPlugin->getSampleRate();
+    }
+
+    void setSampleRate(float) override {}
+
+    std::set<int> getBlockSizes() override
+    {
+        return { getBlockSize() };
+    }
+
+    int getBlockSize() override
+    {
+        return fPlugin->getBufferSize();
+    }
+
+    void setBlockSize(int) override {}
+};
+
+// -----------------------------------------------------------------------------------------------------------
+
+struct CardinalAudioDriver : rack::audio::Driver {
+    Plugin* const fPlugin;
+    CardinalAudioDevice fDevice;
+
+    CardinalAudioDriver(Plugin* const plugin)
+        : fPlugin(plugin),
+          fDevice(plugin) {}
+
+    std::string getName() override
+    {
+        return "Plugin Driver";
+    }
+
+    std::vector<int> getDeviceIds() override
+    {
+        return { 0 };
+    }
+
+    std::string getDeviceName(int) override
+    {
+        return "Plugin Driver Device";
+    }
+
+    int getDeviceNumInputs(int) override
+    {
+        return DISTRHO_PLUGIN_NUM_INPUTS;
+    }
+
+    int getDeviceNumOutputs(int) override
+    {
+        return DISTRHO_PLUGIN_NUM_OUTPUTS;
+    }
+
+    rack::audio::Device* subscribe(int, rack::audio::Port* const port) override
+    {
+        fDevice.subscribe(port);
+        fDevice.onStartStream();
+        return &fDevice;
+    }
+
+    void unsubscribe(int, rack::audio::Port* const port) override
+    {
+        fDevice.onStopStream();
+        fDevice.unsubscribe(port);
+    }
+};
+
+// -----------------------------------------------------------------------------------------------------------
+
 class CardinalPlugin : public Plugin
 {
     rack::Context* const fContext;
+    CardinalAudioDriver* const fAudioDriver;
+    float* fAudioBufferIn;
+    float* fAudioBufferOut;
     std::string fAutosavePath;
 
     struct ScopedContext {
@@ -147,7 +247,10 @@ class CardinalPlugin : public Plugin
 public:
     CardinalPlugin()
         : Plugin(0, 0, 0),
-          fContext(new rack::Context)
+          fContext(new rack::Context),
+          fAudioDriver(new CardinalAudioDriver(this)),
+          fAudioBufferIn(nullptr),
+          fAudioBufferOut(nullptr)
     {
         // create unique temporary path for this instance
         try {
@@ -168,13 +271,15 @@ public:
             }
         } DISTRHO_SAFE_EXCEPTION("create unique temporary path");
 
-        // create temporary path
         const ScopedContext sc(this);
+
+        rack::audio::addDriver(0, fAudioDriver);
 
         fContext->engine = new rack::engine::Engine;
         fContext->history = new rack::history::State;
         fContext->patch = new rack::patch::Manager;
         fContext->patch->autosavePath = fAutosavePath;
+        fContext->patch->templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
         fContext->engine->startFallbackThread();
     }
 
@@ -183,6 +288,7 @@ public:
         {
             const ScopedContext sc(this);
             delete fContext;
+            // rack::audio::destroy();
         }
 
         if (! fAutosavePath.empty())
@@ -266,22 +372,49 @@ protected:
    /* --------------------------------------------------------------------------------------------------------
     * Process */
 
+    void activate() override
+    {
+        const uint32_t bufferSize = getBufferSize() * DISTRHO_PLUGIN_NUM_OUTPUTS;
+        fAudioBufferIn = new float[bufferSize];
+        fAudioBufferOut = new float[bufferSize];
+        std::memset(fAudioBufferIn, 0, sizeof(float)*bufferSize);
+    }
+
+    void deactivate() override
+    {
+        fAudioDriver->fDevice.onStopStream();
+
+        delete[] fAudioBufferIn;
+        delete[] fAudioBufferOut;
+        fAudioBufferIn = fAudioBufferOut = nullptr;
+    }
+
    /**
       Run/process function for plugins without MIDI input.
     */
-    void run(const float** inputs, float** outputs, uint32_t frames) override
+    void run(const float** const inputs, float** const outputs, const uint32_t frames) override
     {
         /*
         fContext->engine->setFrame(getTimePosition().frame);
         fContext->engine->stepBlock(frames);
         */
 
-        // copy inputs over outputs if needed
-        if (outputs[0] != inputs[0])
-            std::memcpy(outputs[0], inputs[0], sizeof(float)*frames);
+        for (uint32_t i=0, j=0; i<frames; ++i)
+        {
+            fAudioBufferIn[j++] = inputs[0][i];
+            fAudioBufferIn[j++] = inputs[1][i];
+        }
 
-        if (outputs[1] != inputs[1])
-            std::memcpy(outputs[1], inputs[1], sizeof(float)*frames);
+        std::memset(fAudioBufferOut, 0, sizeof(float)*frames*DISTRHO_PLUGIN_NUM_OUTPUTS);
+
+        fAudioDriver->fDevice.processBuffer(fAudioBufferIn, DISTRHO_PLUGIN_NUM_INPUTS,
+                                            fAudioBufferOut, DISTRHO_PLUGIN_NUM_OUTPUTS, frames);
+
+        for (uint32_t i=0, j=0; i<frames; ++i)
+        {
+            outputs[0][i] = fAudioBufferOut[j++];
+            outputs[1][i] = fAudioBufferOut[j++];
+        }
     }
 
     /*
