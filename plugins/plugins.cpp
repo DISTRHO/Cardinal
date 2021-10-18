@@ -193,7 +193,9 @@ namespace rack {
 
 // core plugins
 namespace core {
+extern Model* modelAudioInterface;
 extern Model* modelAudioInterface2;
+extern Model* modelAudioInterface16;
 extern Model* modelMIDI_CV;
 extern Model* modelMIDI_CC;
 extern Model* modelMIDI_Gate;
@@ -295,7 +297,9 @@ static void initStatic__Core()
     const StaticPluginLoader spl(p);
     if (spl.ok())
     {
+        p->addModel(rack::core::modelAudioInterface);
         p->addModel(rack::core::modelAudioInterface2);
+        p->addModel(rack::core::modelAudioInterface16);
         p->addModel(rack::core::modelMIDI_CV);
         p->addModel(rack::core::modelMIDI_CC);
         p->addModel(rack::core::modelMIDI_Gate);
