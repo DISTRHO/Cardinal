@@ -174,6 +174,7 @@ public:
         fContext->patch = new rack::patch::Manager;
         fContext->patch->autosavePath = fAutosavePath;
         fContext->patch->templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
+        fContext->patch->loadTemplate();
         fContext->engine->startFallbackThread();
     }
 

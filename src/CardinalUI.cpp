@@ -80,10 +80,11 @@ public:
         fContext->window = new rack::window::Window;
         rack::window::lastUI = nullptr;
 
-        if (fContext->patch->hasAutosave())
-            fContext->patch->loadAutosave();
-        else
-            fContext->patch->loadTemplate();
+        // we need to reload current patch for things to show on screen :(
+        // FIXME always save
+        if (! fContext->patch->hasAutosave())
+            fContext->patch->saveAutosave();
+        fContext->patch->loadAutosave();
     }
 
     ~CardinalUI() override
