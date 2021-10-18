@@ -83,20 +83,24 @@ CONFIGURE += --disable-neon
 CONFIGURE += ac_cv_host=$(TARGET_MACHINE)
 
 # --------------------------------------------------------------
+# Fix up make
+
+DEP_MAKE  = $(MAKE)
+DEP_MAKE += ARCH_NAME=$(ARCH_NAME)
+DEP_MAKE += CFLAGS="$(BUILD_C_FLAGS)"
+DEP_MAKE += CXXFLAGS="$(BUILD_CXX_FLAGS)"
+DEP_MAKE += LDFLAGS="$(LINK_FLAGS)"
+DEP_MAKE += CMAKE="$(CMAKE)"
+DEP_MAKE += CONFIGURE="$(CONFIGURE)"
+DEP_MAKE += DEP_FLAGS="$(BASE_FLAGS)"
+DEP_MAKE += DEP_MAC_SDK_FLAGS=
+DEP_MAKE += MACHINE=$(MACHINE)$(MACHINE_SUFFIX)
+
+# --------------------------------------------------------------
 # VCV internal dependencies target
 
 $(DEP_PATH)/lib/%.a:
-	$(MAKE) \
-		ARCH_NAME=$(ARCH_NAME) \
-		CFLAGS="$(BUILD_C_FLAGS)" \
-		CXXFLAGS="$(BUILD_CXX_FLAGS)" \
-		LDFLAGS="$(LINK_FLAGS)" \
-		CMAKE="$(CMAKE)" \
-		CONFIGURE="$(CONFIGURE)" \
-		DEP_FLAGS="$(BASE_FLAGS)" \
-		DEP_MAC_SDK_FLAGS= \
-		MACHINE=$(MACHINE)$(MACHINE_SUFFIX) \
-		-C $(DEP_PATH) lib/$*.a
+	$(DEP_MAKE) -C $(DEP_PATH) lib/$*.a
 
 # skip libarchive shared lib
 $(DEP_PATH)/lib/libarchive.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
@@ -104,7 +108,7 @@ $(DEP_PATH)/lib/libarchive.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3
 $(DEP_PATH)/lib/libarchive_static.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
 
 $(DEP_PATH)/libarchive-3.4.3/.stamp-patched:
-	$(MAKE) -C $(DEP_PATH) libarchive-3.4.3
+	$(DEP_MAKE) -C $(DEP_PATH) libarchive-3.4.3
 	sed -i -e "238,243d" $(DEP_PATH)/libarchive-3.4.3/libarchive/CMakeLists.txt
 	sed -i -e "s/TARGETS archive archive_static/TARGETS archive_static/" $(DEP_PATH)/libarchive-3.4.3/libarchive/CMakeLists.txt
 	touch $@
@@ -114,7 +118,7 @@ ifeq ($(MACOS),true)
 $(DEP_PATH)/lib/libzstd.a: $(DEP_PATH)/zstd-1.4.5/.stamp-patched
 
 $(DEP_PATH)/zstd-1.4.5/.stamp-patched:
-	$(MAKE) -C $(DEP_PATH) zstd-1.4.5
+	$(DEP_MAKE) -C $(DEP_PATH) zstd-1.4.5
 	sed -i -e "56,66d" $(DEP_PATH)/zstd-1.4.5/build/cmake/CMakeModules/AddZstdCompilationFlags.cmake
 	touch $@
 endif
