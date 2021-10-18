@@ -168,6 +168,19 @@ PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/s
 PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModular/src/*.cpp))
 
 # --------------------------------------------------------------
+# JW-Modules
+
+PLUGIN_FILES += $(filter-out JW-Modules/src/JWModules.cpp,$(wildcard JW-Modules/src/*.cpp))
+PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/*.cpp)
+PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/osc/*.cpp)
+ifeq ($(WINDOWS),true)
+PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/win32/*.cpp)
+# LDFLAGS += -lws2_32 -lwinmm
+else
+PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/posix/*.cpp)
+endif
+
+# --------------------------------------------------------------
 # ValleyAudio (does not build against v2)
 
 # PLUGIN_FILES += $(wildcard ValleyAudio/src/*.cpp)
@@ -330,6 +343,11 @@ $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__GrandeModular -c -o $@
+
+$(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__JW -IJW-Modules/src -IJW-Modules/lib/oscpack -c -o $@
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

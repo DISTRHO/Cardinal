@@ -37,3 +37,6 @@
 [submodule "plugins/ESeries"]
 	path = plugins/ESeries
 	url = https://github.com/VCVRack/ESeries.git
+[submodule "plugins/JW-Modules"]
+	path = plugins/JW-Modules
+	url = https://github.com/jeremywen/JW-Modules.git

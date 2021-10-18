@@ -165,6 +165,9 @@
 // GrandeModular
 #include "GrandeModular/src/plugin.hpp"
 
+// JW-Modules
+#include "JW-Modules/src/JWModules.hpp"
+
 // ValleyAudio
 /* does not build against v2
 #include "ValleyAudio/src/Valley.hpp"
@@ -182,6 +185,7 @@ Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
+Plugin* pluginInstance__JW;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
 
@@ -678,6 +682,46 @@ static void initStatic__GrandeModular()
     }
 }
 
+static void initStatic__JW()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__JW = p;
+
+    const StaticPluginLoader spl(p, "JW-Modules");
+    if (spl.ok())
+    {
+        p->addModel(modelAdd5);
+        p->addModel(modelBouncyBalls);
+        p->addModel(modelCat);
+        p->addModel(modelTree);
+        p->addModel(modelFullScope);
+        p->addModel(modelGridSeq);
+        p->addModel(modelEightSeq);
+        p->addModel(modelDivSeq);
+        p->addModel(modelMinMax);
+        p->addModel(modelNoteSeq);
+        p->addModel(modelNoteSeqFu);
+        p->addModel(modelNoteSeq16);
+        p->addModel(modelTrigs);
+        p->addModel(modelOnePattern);
+        p->addModel(modelPatterns);
+        p->addModel(modelQuantizer);
+        p->addModel(modelSimpleClock);
+        p->addModel(modelStr1ker);
+        p->addModel(modelD1v1de);
+        p->addModel(modelPres1t);
+        p->addModel(modelThingThing);
+        p->addModel(modelWavHead);
+        p->addModel(modelXYPad);
+        p->addModel(modelBlankPanel1hp);
+        p->addModel(modelBlankPanelSmall);
+        p->addModel(modelBlankPanelMedium);
+        p->addModel(modelBlankPanelLarge);
+        p->addModel(modelCoolBreeze);
+        p->addModel(modelPete);
+    }
+}
+
 /* does not build against v2
 static void initStatic__ValleyAudio()
 {
@@ -730,6 +774,7 @@ void initStaticPlugins()
     initStatic__ESeries();
     initStatic__Fundamental();
     initStatic__GrandeModular();
+    initStatic__JW();
     /* does not build against v2
     initStatic__ValleyAudio();
     */

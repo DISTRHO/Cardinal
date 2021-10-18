@@ -1,10 +1,15 @@
 List of plugins still to add, sorted by popularity
 
+- Working but limited: (v2 related limitations)
+Befaco
+
+- Have definitions in place but cannot build against v2
+Valley
+
+- TODO
 Grayscale                 74754.0
-JW-Modules                65172.0
 AS                        64626.0
 ImpromptuModular          62537.0
-Valley                    62078.0
 VultModulesFree           61804.0
 AmalgamatedHarmonics      59071.0
 NYSTHI                    58494.0
@@ -16,7 +21,6 @@ ArableInstruments         48756.0
 squinkylabs-plug1         48682.0
 SonusModular              45245.0
 LindenbergResearch        43959.0
-
 Geodesics                 42761.0
 mscHack                   42316.0
 BaconMusic                42095.0
