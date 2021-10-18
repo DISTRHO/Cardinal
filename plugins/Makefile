@@ -175,7 +175,6 @@ PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/*.cpp)
 PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/osc/*.cpp)
 ifeq ($(WINDOWS),true)
 PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/win32/*.cpp)
-# LDFLAGS += -lws2_32 -lwinmm
 else
 PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/posix/*.cpp)
 endif

@@ -17,4 +17,16 @@
 
 #pragma once
 
-#include <windows.h>
+#include_next "rack.hpp"
+
+// If building for Windows, make sure to import the windows header now so we can undef some stuff
+#ifdef _WIN32
+# include <windows.h>
+# undef IN
+# undef OUT
+# undef VOID
+# undef far
+# undef near
+# define ABC ABC_
+# define VOID VOID_
+#endif

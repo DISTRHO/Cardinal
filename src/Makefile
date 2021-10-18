@@ -132,6 +132,8 @@ ifeq ($(MACOS),true)
 LINK_FLAGS += -framework IOKit
 else ifeq ($(WINDOWS),true)
 LINK_FLAGS += -ldbghelp -lshlwapi
+# needed by JW-Modules
+EXTRA_LIBS += -lws2_32 -lwinmm
 endif
 
 # --------------------------------------------------------------

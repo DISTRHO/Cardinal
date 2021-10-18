@@ -19,6 +19,7 @@
 
 #include_next "common.hpp"
 
+// Make binary resources work the same no matter the OS
 #undef BINARY
 #undef BINARY_START
 #undef BINARY_END
