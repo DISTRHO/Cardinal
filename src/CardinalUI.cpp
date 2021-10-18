@@ -236,7 +236,7 @@ protected:
 
     bool onCharacterInput(const CharacterInputEvent& ev) override
     {
-        if (ev.character == 0)
+        if (ev.character <= ' ' || ev.character >= kKeyDelete)
             return false;
 
         const ScopedContext sc(this);
