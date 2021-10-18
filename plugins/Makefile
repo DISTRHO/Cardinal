@@ -181,6 +181,11 @@ PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/posix/*.cpp)
 endif
 
 # --------------------------------------------------------------
+# rackwindows
+
+PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/src/*.cpp))
+
+# --------------------------------------------------------------
 # ValleyAudio (does not build against v2)
 
 # PLUGIN_FILES += $(wildcard ValleyAudio/src/*.cpp)
@@ -348,6 +353,11 @@ $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__JW -IJW-Modules/src -IJW-Modules/lib/oscpack -c -o $@
+
+$(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__rackwindows -c -o $@
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

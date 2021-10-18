@@ -168,6 +168,18 @@
 // JW-Modules
 #include "JW-Modules/src/JWModules.hpp"
 
+// rackwindows
+#include "rackwindows/src/plugin.hpp"
+// stuff that reads config files, we dont want that
+int loadConsoleType() { return 0; }
+int loadDirectOutMode() { return 0; }
+bool loadDarkAsDefault() { return true; }
+bool loadQuality() { return false; }
+void saveConsoleType(int) {}
+void saveDarkAsDefault(bool) {}
+void saveDirectOutMode(bool) {}
+void saveHighQualityAsDefault(bool) {}
+
 // ValleyAudio
 /* does not build against v2
 #include "ValleyAudio/src/Valley.hpp"
@@ -186,6 +198,7 @@ Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__JW;
+Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
 
@@ -726,6 +739,36 @@ static void initStatic__JW()
     }
 }
 
+static void initStatic__rackwindows()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__rackwindows = p;
+
+    const StaticPluginLoader spl(p, "rackwindows");
+    if (spl.ok())
+    {
+        // p->addModel(modelAcceleration);
+        p->addModel(modelBitshiftgain);
+        p->addModel(modelCapacitor);
+        p->addModel(modelCapacitor_stereo);
+        p->addModel(modelChorus);
+        p->addModel(modelConsole);
+        p->addModel(modelConsole_mm);
+        p->addModel(modelDistance);
+        p->addModel(modelGolem);
+        p->addModel(modelHolt);
+        p->addModel(modelHombre);
+        p->addModel(modelInterstage);
+        p->addModel(modelMonitoring);
+        p->addModel(modelMv);
+        p->addModel(modelRasp);
+        p->addModel(modelReseq);
+        p->addModel(modelTape);
+        p->addModel(modelTremolo);
+        p->addModel(modelVibrato);
+    }
+}
+
 /* does not build against v2
 static void initStatic__ValleyAudio()
 {
@@ -779,6 +822,7 @@ void initStaticPlugins()
     initStatic__Fundamental();
     initStatic__GrandeModular();
     initStatic__JW();
+    initStatic__rackwindows();
     /* does not build against v2
     initStatic__ValleyAudio();
     */

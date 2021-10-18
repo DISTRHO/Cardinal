@@ -6,14 +6,26 @@ Befaco
 - Have definitions in place but cannot build against v2
 Valley
 
-- TODO
-Grayscale                 74754.0
+- TODO, see list at https://github.com/VCVRack/library/tree/v1/repos
+
+Grayscale                 74754.0 (not opensource?)
+
 AS                        64626.0
+https://github.com/AScustomWorks/AS
+
 ImpromptuModular          62537.0
-VultModulesFree           61804.0
+https://github.com/MarcBoule/ImpromptuModular
+
+VultModulesFree           61804.0 (not opensource?)
+
 AmalgamatedHarmonics      59071.0
-NYSTHI                    58494.0
+https://github.com/jhoar/AmalgamatedHarmonics
+
+NYSTHI                    58494.0 (not opensource?)
+
 DrumKit                   58468.0
+https://github.com/SVModular/DrumKit
+
 ML_modules                55847.0
 FrozenWasteland           53690.0
 cf                        49812.0

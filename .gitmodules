@@ -40,3 +40,6 @@
 [submodule "plugins/JW-Modules"]
 	path = plugins/JW-Modules
 	url = https://github.com/jeremywen/JW-Modules.git
+[submodule "plugins/rackwindows"]
+	path = plugins/rackwindows
+	url = https://github.com/n0jo/rackwindows.git
