@@ -34,3 +34,6 @@
 [submodule "plugins/Bidoo"]
 	path = plugins/Bidoo
 	url = https://github.com/sebastien-bouffier/Bidoo.git
+[submodule "plugins/ESeries"]
+	path = plugins/ESeries
+	url = https://github.com/VCVRack/ESeries.git

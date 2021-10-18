@@ -1,7 +1,5 @@
 List of plugins still to add, sorted by popularity
 
-ESeries                   94243.0
-
 Grayscale                 74754.0
 JW-Modules                65172.0
 AS                        64626.0
@@ -18,7 +16,7 @@ ArableInstruments         48756.0
 squinkylabs-plug1         48682.0
 SonusModular              45245.0
 LindenbergResearch        43959.0
-Bidoo                     43471.0
+
 Geodesics                 42761.0
 mscHack                   42316.0
 BaconMusic                42095.0

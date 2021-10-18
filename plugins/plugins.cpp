@@ -156,6 +156,9 @@
 // Cardinal (built-in)
 #include "Cardinal/src/plugin.hpp"
 
+// ESeries
+#include "ESeries/src/plugin.hpp"
+
 // Fundamental
 #include "Fundamental/src/plugin.hpp"
 
@@ -171,6 +174,7 @@ Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__Cardinal;
+Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__ZetaCarinaeModules;
@@ -594,6 +598,18 @@ static void initStatic__Cardinal()
     }
 }
 
+static void initStatic__ESeries()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__ESeries = p;
+
+    const StaticPluginLoader spl(p, "ESeries");
+    if (spl.ok())
+    {
+        p->addModel(modelE340);
+    }
+}
+
 static void initStatic__Fundamental()
 {
     Plugin* const p = new Plugin;
@@ -684,6 +700,7 @@ void initStaticPlugins()
     initStatic__Bidoo();
     initStatic__BogaudioModules();
     initStatic__Cardinal();
+    initStatic__ESeries();
     initStatic__Fundamental();
     initStatic__GrandeModular();
     initStatic__ZetaCarinaeModules();

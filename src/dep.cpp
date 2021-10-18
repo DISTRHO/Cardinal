@@ -49,9 +49,9 @@ FILE* fopen_u8(const char* filename, const char* mode)
 
 // Define the global names to indicate this is Cardinal and not VCVRack
 namespace rack {
-const std::string APP_NAME = "";
+const std::string APP_NAME = "Cardinal";
 const std::string APP_EDITION = "";
-const std::string APP_EDITION_NAME = "Cardinal Audio Plugin";
+const std::string APP_EDITION_NAME = "Audio Plugin";
 const std::string APP_VERSION_MAJOR = "2";
 const std::string APP_VERSION = "2.0";
 #if defined(ARCH_WIN)

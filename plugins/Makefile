@@ -153,6 +153,11 @@ BOGAUDIO_CUSTOM = ADSR LFO Noise VCA VCO VCF
 PLUGIN_FILES += $(wildcard Cardinal/src/*.cpp)
 
 # --------------------------------------------------------------
+# ESeries
+
+PLUGIN_FILES += ESeries/src/E340.cpp
+
+# --------------------------------------------------------------
 # Fundamental
 
 PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
@@ -304,6 +309,11 @@ $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Cardinal -c -o $@
+
+$(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ESeries -c -o $@
 
 $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
