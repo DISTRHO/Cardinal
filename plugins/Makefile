@@ -257,7 +257,7 @@ $(TARGET): $(PLUGIN_OBJS)
 $(BUILD_DIR)/%.bin.o: % res2c.py
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Generating and Compiling $<"
-	$(shell ./res2c.py $< | $(CC) -x c - $(BUILD_C_FLAGS) -c -o $@)
+	$(shell python3 ./res2c.py $< | $(CC) -x c - $(BUILD_C_FLAGS) -c -o $@)
 
 $(BUILD_DIR)/plugins.cpp.o: plugins.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
