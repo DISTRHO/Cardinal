@@ -32,6 +32,7 @@
 #include <osdialog.h>
 
 #include "PluginContext.hpp"
+#include "extra/Mutex.hpp"
 
 namespace rack {
 namespace plugin {
@@ -123,6 +124,7 @@ class CardinalPlugin : public CardinalBasePlugin
     // for base/context handling
     bool fIsActive;
     rack::audio::Device* fCurrentDevice;
+    Mutex fDeviceMutex;
 
     struct ScopedContext {
         ScopedContext(CardinalPlugin* const plugin)
@@ -201,6 +203,7 @@ protected:
 
     bool canAssignDevice() const noexcept override
     {
+        const MutexLocker cml(fDeviceMutex);
         return fCurrentDevice == nullptr;
     }
 
@@ -208,11 +211,14 @@ protected:
     {
         DISTRHO_SAFE_ASSERT_RETURN(fCurrentDevice == nullptr,);
 
+        const MutexLocker cml(fDeviceMutex);
         fCurrentDevice = dev;
     }
 
     bool clearDevice(rack::audio::Device* const dev) noexcept override
     {
+        const MutexLocker cml(fDeviceMutex);
+
         if (fCurrentDevice != dev)
             return false;
 
@@ -298,14 +304,22 @@ protected:
         fAudioBufferOut = new float[bufferSize];
         std::memset(fAudioBufferIn, 0, sizeof(float)*bufferSize);
 
-        if (fCurrentDevice != nullptr)
-            fCurrentDevice->onStartStream();
+        {
+            const MutexLocker cml(fDeviceMutex);
+
+            if (fCurrentDevice != nullptr)
+                fCurrentDevice->onStartStream();
+        }
     }
 
     void deactivate() override
     {
-        if (fCurrentDevice != nullptr)
-            fCurrentDevice->onStopStream();
+        {
+            const MutexLocker cml(fDeviceMutex);
+
+            if (fCurrentDevice != nullptr)
+                fCurrentDevice->onStopStream();
+        }
 
         delete[] fAudioBufferIn;
         delete[] fAudioBufferOut;
@@ -321,6 +335,8 @@ protected:
         fContext->engine->setFrame(getTimePosition().frame);
         fContext->engine->stepBlock(frames);
         */
+
+        const MutexLocker cml(fDeviceMutex);
 
         if (fCurrentDevice == nullptr)
         {
