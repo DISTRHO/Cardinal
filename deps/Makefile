@@ -98,9 +98,16 @@ $(DEP_PATH)/lib/%.a:
 		MACHINE=$(MACHINE)$(MACHINE_SUFFIX) \
 		-C $(DEP_PATH) lib/$*.a
 
-$(DEP_PATH)/lib/libarchive.a: $(DEP_PATH)/lib/libzstd.a
+# skip libarchive shared lib
+$(DEP_PATH)/lib/libarchive.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
 
-$(DEP_PATH)/lib/libarchive_static.a: $(DEP_PATH)/lib/libzstd.a
+$(DEP_PATH)/lib/libarchive_static.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
+
+$(DEP_PATH)/libarchive-3.4.3/.stamp-patched:
+	$(MAKE) -C $(DEP_PATH) libarchive-3.4.3
+	sed -i -e "238,243d" $(DEP_PATH)/libarchive-3.4.3/libarchive/CMakeLists.txt
+	sed -i -e "s/TARGETS archive archive_static/TARGETS archive_static/" $(DEP_PATH)/libarchive-3.4.3/libarchive/CMakeLists.txt
+	touch $@
 
 ifeq ($(MACOS),true)
 # zstd cmake is borked, see https://github.com/facebook/zstd/issues/1401

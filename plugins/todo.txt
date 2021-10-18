@@ -33,7 +33,10 @@ ArableInstruments         48756.0
 squinkylabs-plug1         48682.0
 SonusModular              45245.0
 LindenbergResearch        43959.0
+
 Geodesics                 42761.0
+https://github.com/MarcBoule/Geodesics
+
 mscHack                   42316.0
 BaconMusic                42095.0
 HetrickCV                 42077.0
