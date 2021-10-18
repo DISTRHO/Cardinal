@@ -204,7 +204,7 @@ protected:
     {
         const ScopedContext sc(this);
 
-        rack::math::Vec mousePos = rack::math::Vec(ev.pos.getX(), ev.pos.getY()).div(1).round();
+        rack::math::Vec mousePos = rack::math::Vec(ev.pos.getX(), ev.pos.getY()).div(getScaleFactor()).round();
         // .div(ctx->window->pixelRatio / ctx->window->windowRatio).round();
         rack::math::Vec mouseDelta = mousePos.minus(fLastMousePos);
 
