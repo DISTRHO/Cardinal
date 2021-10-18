@@ -129,8 +129,6 @@ protected:
 
     bool onMouse(const MouseEvent& ev) override
     {
-        const ScopedContext sc(this);
-
         int button;
         int mods = 0;
         int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
@@ -197,40 +195,31 @@ protected:
         #endif
         */
 
+        const ScopedContext sc(this);
         return fContext->event->handleButton(fLastMousePos, button, action, mods);
     }
 
     bool onMotion(const MotionEvent& ev) override
     {
-        const ScopedContext sc(this);
-
-        rack::math::Vec mousePos = rack::math::Vec(ev.pos.getX(), ev.pos.getY()).div(getScaleFactor()).round();
-        // .div(ctx->window->pixelRatio / ctx->window->windowRatio).round();
-        rack::math::Vec mouseDelta = mousePos.minus(fLastMousePos);
-
-        /*
-        // Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
-        if (ctx->window->internal->ignoreNextMouseDelta)
-        {
-            ctx->window->internal->ignoreNextMouseDelta = false;
-            mouseDelta = rack::math::Vec();
-        }
-        */
+        const rack::math::Vec mousePos = rack::math::Vec(ev.pos.getX(), ev.pos.getY()).div(getScaleFactor()).round();
+        const rack::math::Vec mouseDelta = mousePos.minus(fLastMousePos);
 
         fLastMousePos = mousePos;
+
+        const ScopedContext sc(this);
         return fContext->event->handleHover(mousePos, mouseDelta);
     }
 
     bool onScroll(const ScrollEvent& ev) override
     {
-        const ScopedContext sc(this);
-
         rack::math::Vec scrollDelta = rack::math::Vec(ev.delta.getX(), ev.delta.getY());
 #ifdef DISTRHO_OS_MAC
         scrollDelta = scrollDelta.mult(10.0);
 #else
         scrollDelta = scrollDelta.mult(50.0);
 #endif
+
+        const ScopedContext sc(this);
         return fContext->event->handleScroll(fLastMousePos, scrollDelta);
     }
 
@@ -240,14 +229,11 @@ protected:
             return false;
 
         const ScopedContext sc(this);
-
         return fContext->event->handleText(fLastMousePos, ev.character);
     }
 
     bool onKeyboard(const KeyboardEvent& ev) override
     {
-        const ScopedContext sc(this);
-
         int key;
         int mods = 0;
         int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
@@ -324,15 +310,17 @@ protected:
         if (ev.mod & kModifierAlt)
             mods |= GLFW_MOD_ALT;
 
+        const ScopedContext sc(this);
         return fContext->event->handleKey(fLastMousePos, key, ev.keycode, action, mods);
     }
 
     void uiFocus(const bool focus, CrossingMode) override
     {
-        const ScopedContext sc(this);
+        if (focus)
+            return;
 
-        if (! focus)
-            fContext->event->handleLeave();
+        const ScopedContext sc(this);
+        fContext->event->handleLeave();
     }
 
 private:
