@@ -148,6 +148,11 @@ PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/filters/*.cpp)
 BOGAUDIO_CUSTOM = ADSR LFO Noise VCA VCO VCF
 
 # --------------------------------------------------------------
+# Cardinal (built-in)
+
+PLUGIN_FILES += $(wildcard Cardinal/src/*.cpp)
+
+# --------------------------------------------------------------
 # Fundamental
 
 PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
@@ -294,6 +299,11 @@ $(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__BogaudioModules $(foreach m,$(BOGAUDIO_CUSTOM),$(call custom_module_names,$(m),Bogaudio)) -DRACK_SIMD=1 -IBogaudioModules/lib -IBogaudioModules/src/dsp -c -o $@
+
+$(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Cardinal -c -o $@
 
 $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

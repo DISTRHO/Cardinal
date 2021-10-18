@@ -1,0 +1,15 @@
+{
+  "slug": "Cardinal",
+  "name": "Cardinal",
+  "version": "2.0.0",
+  "license": "GPL-3.0-or-later",
+  "brand": "DISTRHO",
+  "author": "DISTRHO",
+  "authorEmail": "falktx@falktx.com",
+  "pluginUrl": "https://github.com/DISTRHO/Cardinal",
+  "authorUrl": "https://github.com/DISTRHO/Cardinal",
+  "manualUrl": "https://github.com/DISTRHO/Cardinal/wiki",
+  "sourceUrl": "https://github.com/DISTRHO/Cardinal",
+  "changelogUrl": "",
+  "modules": []
+}

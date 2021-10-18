@@ -17,14 +17,11 @@
 
 #pragma once
 
-#include_next "common.hpp"
+#include "rack.hpp"
 
-#undef BINARY
-#undef BINARY_START
-#undef BINARY_END
-#undef BINARY_SIZE
+using namespace rack;
 
-#define BINARY(sym) extern const unsigned char sym[]; extern const unsigned int sym##_len
-#define BINARY_START(sym) ((const void*) sym)
-#define BINARY_END(sym) ((const void*) sym + sym##_len)
-#define BINARY_SIZE(sym) (sym##_len)
+extern Plugin* pluginInstance;
+
+extern Model* modelHostParameters;
+extern Model* modelHostTime;

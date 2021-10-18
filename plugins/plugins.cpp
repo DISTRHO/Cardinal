@@ -153,6 +153,9 @@
 #undef modelVCF
 #undef modelVCO
 
+// Cardinal (built-in)
+#include "Cardinal/src/plugin.hpp"
+
 // Fundamental
 #include "Fundamental/src/plugin.hpp"
 
@@ -167,6 +170,7 @@ Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
+Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__ZetaCarinaeModules;
@@ -576,6 +580,20 @@ static void initStatic__BogaudioModules()
     }
 }
 
+static void initStatic__Cardinal()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Cardinal = p;
+
+    const StaticPluginLoader spl(p, "Cardinal");
+    if (spl.ok())
+    {
+        // TODO implement these
+        // p->addModel(modelHostParameters);
+        // p->addModel(modelHostTime);
+    }
+}
+
 static void initStatic__Fundamental()
 {
     Plugin* const p = new Plugin;
@@ -665,6 +683,7 @@ void initStaticPlugins()
     initStatic__Befaco();
     initStatic__Bidoo();
     initStatic__BogaudioModules();
+    initStatic__Cardinal();
     initStatic__Fundamental();
     initStatic__GrandeModular();
     initStatic__ZetaCarinaeModules();
