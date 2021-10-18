@@ -1,0 +1,34 @@
+{
+  "version": "2.0",
+  "modules": [
+    {
+      "id": 1,
+      "plugin": "Core",
+      "model": "AudioInterface2",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        }
+      ],
+      "data": {
+        "audio": {
+          "driver": 0,
+          "deviceName": "Plugin Device",
+          "sampleRate": 48000.0,
+          "blockSize": 512,
+          "inputOffset": 0,
+          "outputOffset": 0
+        },
+        "dcFilter": true
+      },
+      "pos": [
+        0,
+        0
+      ]
+    }
+  ],
+  "cables": [],
+  "masterModuleId": 1
+}
