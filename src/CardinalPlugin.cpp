@@ -343,10 +343,8 @@ protected:
 
         if (fCurrentDevice == nullptr)
         {
-            if (outputs[0] != inputs[0])
-                std::memcpy(outputs[0], inputs[0], sizeof(float)*frames);
-            if (outputs[1] != inputs[1])
-                std::memcpy(outputs[1], inputs[1], sizeof(float)*frames);
+            std::memset(outputs[0], 0, sizeof(float)*frames);
+            std::memset(outputs[1], 0, sizeof(float)*frames);
             return;
         }
 
