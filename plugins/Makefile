@@ -129,6 +129,15 @@ PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
 PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 
 # --------------------------------------------------------------
+# Bidoo
+
+PLUGIN_FILES += $(filter-out Bidoo/src/plugin.cpp Bidoo/src/ANTN.cpp,$(wildcard Bidoo/src/*.cpp))
+PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
+PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
+PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
+PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
+
+# --------------------------------------------------------------
 # BogaudioModules
 
 PLUGIN_FILES += $(filter-out BogaudioModules/src/bogaudio.cpp,$(wildcard BogaudioModules/src/*.cpp))
@@ -191,7 +200,7 @@ BASE_FLAGS += -I../src/Rack/dep/include
 # BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
 BASE_FLAGS += -I../src/Rack/dep/glfw/include
 BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
-# BASE_FLAGS += -I../src/Rack/dep/osdialog
+BASE_FLAGS += -I../src/Rack/dep/osdialog
 BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
 
@@ -274,6 +283,11 @@ $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Befaco -c -o $@
+
+$(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Bidoo -IBidoo/src/dep/gverb/include -c -o $@
 
 $(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

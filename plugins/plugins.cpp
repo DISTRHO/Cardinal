@@ -28,6 +28,9 @@
 // Befaco
 #include "Befaco/src/plugin.hpp"
 
+// Bidoo
+#include "Bidoo/src/plugin.hpp"
+
 // BogaudioModules
 #define modelADSR modelBogaudioADSR
 #define modelLFO modelBogaudioLFO
@@ -162,6 +165,7 @@
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__Befaco;
+Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
@@ -344,6 +348,84 @@ static void initStatic__Befaco()
         p->addModel(modelMixer);
         p->addModel(modelSlewLimiter);
         p->addModel(modelDualAtenuverter);
+    }
+}
+
+static void initStatic__Bidoo()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Bidoo = p;
+
+    const StaticPluginLoader spl(p, "Bidoo");
+    if (spl.ok())
+    {
+        p->addModel(modelTOCANTE);
+        p->addModel(modelLATE);
+        p->addModel(modelDIKTAT);
+        p->addModel(modelDTROY);
+        p->addModel(modelBORDL);
+        p->addModel(modelZOUMAI);
+        p->addModel(modelMU);
+        p->addModel(modelCHUTE);
+        p->addModel(modelLOURDE);
+        p->addModel(modelACNE);
+        p->addModel(modelMS);
+        p->addModel(modelDUKE);
+        p->addModel(modelMOIRE);
+        p->addModel(modelPILOT);
+        p->addModel(modelHUITRE);
+        p->addModel(modelOUAIVE);
+        p->addModel(modelPOUPRE);
+        p->addModel(modelMAGMA);
+        p->addModel(modelOAI);
+        p->addModel(modelCANARD);
+        p->addModel(modelEMILE);
+        p->addModel(modelFORK);
+        p->addModel(modelTIARE);
+        //p->addModel(modelCLACOS);
+        //p->addModel(modelPENEQUE);
+        p->addModel(modelLIMONADE);
+        p->addModel(modelLIMBO);
+        p->addModel(modelPERCO);
+        p->addModel(modelBAFIS);
+        p->addModel(modelFFILTR);
+        p->addModel(modelBAR);
+        p->addModel(modelMINIBAR);
+        p->addModel(modelZINC);
+        p->addModel(modelFREIN);
+        p->addModel(modelHCTIP);
+        //p->addModel(modelCURT);
+        p->addModel(modelDFUZE);
+        p->addModel(modelREI);
+        p->addModel(modelRABBIT);
+        p->addModel(modelBISTROT);
+        p->addModel(modelSIGMA);
+        p->addModel(modelGARCON);
+        p->addModel(modelVOID);
+
+        // NOTE disabled in Cardinal due to curl usage
+        // p->addModel(modelANTN);
+
+        // intentionally remove known bad plugin
+        if (json_t* const modules = json_object_get(spl.rootJ, "modules"))
+        {
+            size_t i;
+            json_t* v;
+            json_array_foreach(modules, i, v)
+            {
+                if (json_t* const slug = json_object_get(v, "slug"))
+                {
+                    if (const char* const value = json_string_value(slug))
+                    {
+                        if (std::strcmp(value, "antN") == 0)
+                        {
+                            json_array_remove(modules, i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -581,6 +663,7 @@ void initStaticPlugins()
     initStatic__AnimatedCircuits();
     initStatic__AudibleInstruments();
     initStatic__Befaco();
+    initStatic__Bidoo();
     initStatic__BogaudioModules();
     initStatic__Fundamental();
     initStatic__GrandeModular();

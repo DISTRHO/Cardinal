@@ -31,3 +31,6 @@
 [submodule "plugins/BogaudioModules"]
 	path = plugins/BogaudioModules
 	url = https://github.com/bogaudio/BogaudioModules.git
+[submodule "plugins/Bidoo"]
+	path = plugins/Bidoo
+	url = https://github.com/sebastien-bouffier/Bidoo.git
