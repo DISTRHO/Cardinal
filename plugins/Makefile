@@ -160,7 +160,8 @@ PLUGIN_FILES += ESeries/src/E340.cpp
 # --------------------------------------------------------------
 # Fundamental
 
-PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
+PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp Fundamental/src/VCA.cpp,$(wildcard Fundamental/src/*.cpp))
+PLUGIN_FILES += Fundamental-workaround/VCA.cpp
 
 # --------------------------------------------------------------
 # GrandeModular
@@ -340,6 +341,11 @@ $(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ESeries -c -o $@
 
 $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Fundamental -c -o $@
+
+$(BUILD_DIR)/Fundamental-workaround/%.cpp.o: Fundamental-workaround/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Fundamental -c -o $@
