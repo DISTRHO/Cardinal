@@ -18,6 +18,7 @@
 #include <app/common.hpp>
 #include <app/Scene.hpp>
 #include <context.hpp>
+#include <patch.hpp>
 #include <ui/common.hpp>
 #include <window/Window.hpp>
 
@@ -78,6 +79,11 @@ public:
         rack::window::lastUI = this;
         fContext->window = new rack::window::Window;
         rack::window::lastUI = nullptr;
+
+        if (fContext->patch->hasAutosave())
+            fContext->patch->loadAutosave();
+        else
+            fContext->patch->loadTemplate();
     }
 
     ~CardinalUI() override
