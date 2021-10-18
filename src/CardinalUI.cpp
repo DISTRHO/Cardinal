@@ -197,7 +197,7 @@ protected:
     {
         const ScopedContext sc(this);
 
-        rack::math::Vec mousePos = rack::math::Vec(ev.pos.getX(), ev.pos.getY());
+        rack::math::Vec mousePos = rack::math::Vec(ev.pos.getX(), ev.pos.getY()).div(1).round();
         // .div(ctx->window->pixelRatio / ctx->window->windowRatio).round();
         rack::math::Vec mouseDelta = mousePos.minus(fLastMousePos);
 
@@ -206,7 +206,7 @@ protected:
         if (ctx->window->internal->ignoreNextMouseDelta)
         {
             ctx->window->internal->ignoreNextMouseDelta = false;
-            mouseDelta = math::Vec();
+            mouseDelta = rack::math::Vec();
         }
         */
 

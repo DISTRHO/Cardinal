@@ -50,6 +50,7 @@ struct Initializer {
     {
         using namespace rack;
 
+        settings::allowCursorLock = false;
         settings::autoCheckUpdates = false;
         settings::autosaveInterval = 0;
         settings::discordUpdateActivity = false;
@@ -222,7 +223,7 @@ protected:
         if (fCurrentDevice != dev)
             return false;
 
-        fCurrentDevice = dev;
+        fCurrentDevice = nullptr;
         return true;
     }
 

@@ -75,7 +75,6 @@ struct Window::Internal {
 	std::string lastWindowTitle;
 
 	int frame = 0;
-	bool ignoreNextMouseDelta = false;
 	int frameSwapInterval = 1;
 	double monitorRefreshRate = 60.0; // FIXME
 	double frameTime = 0.0;
@@ -150,18 +149,11 @@ void Window::step() {
 	internal->frameTime = frameTime;
 	internal->lastFrameDuration = frameTime - lastFrameTime;
 	// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
-	double t1 = 0.0, t2 = 0.0, t3 = 0.0, t4 = 0.0, t5 = 0.0;
 
 	// Make event handlers and step() have a clean NanoVG context
 // 	nvgReset(vg);
 
 	bndSetFont(uiFont->handle);
-
-	// Poll events
-	// Save and restore context because event handler set their own context based on which window they originate from.
-	// Context* context = contextGet();
-	// glfwPollEvents();
-	// contextSet(context);
 
 	// Set window title
 	std::string windowTitle = APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION;
@@ -189,7 +181,6 @@ void Window::step() {
 	int fbWidth = winWidth;// * newPixelRatio;
 	int fbHeight = winHeight;// * newPixelRatio;
 	windowRatio = (float)fbWidth / winWidth;
-	t1 = system::getTime();
 
 	if (APP->scene) {
 		// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
@@ -198,40 +189,22 @@ void Window::step() {
 
 		// Step scene
 		APP->scene->step();
-		t2 = system::getTime();
 
 		// Render scene
-		bool visible = true;
-		if (visible) {
-			// Update and render
-// 			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
-			nvgScale(vg, pixelRatio, pixelRatio);
+		// Update and render
+		nvgScale(vg, pixelRatio, pixelRatio);
 
-			// Draw scene
-			widget::Widget::DrawArgs args;
-			args.vg = vg;
-			args.clipBox = APP->scene->box.zeroPos();
-			APP->scene->draw(args);
-			t3 = system::getTime();
+		// Draw scene
+		widget::Widget::DrawArgs args;
+		args.vg = vg;
+		args.clipBox = APP->scene->box.zeroPos();
+		APP->scene->draw(args);
 
-			glViewport(0, 0, fbWidth, fbHeight);
-			glClearColor(0.0, 0.0, 0.0, 1.0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-// 			nvgEndFrame(vg);
-			t4 = system::getTime();
-		}
+		glViewport(0, 0, fbWidth, fbHeight);
+		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
-	t5 = system::getTime();
-
-	// DEBUG("pre-step %6.1f step %6.1f draw %6.1f nvgEndFrame %6.1f glfwSwapBuffers %6.1f total %6.1f",
-	// 	(t1 - frameTime) * 1e3f,
-	// 	(t2 - t1) * 1e3f,
-	// 	(t3 - t2) * 1e3f,
-	// 	(t4 - t2) * 1e3f,
-	// 	(t5 - t4) * 1e3f,
-	// 	(t5 - frameTime) * 1e3f
-	// );
 	internal->frame++;
 }
 
@@ -250,23 +223,15 @@ void Window::close() {
 
 
 void Window::cursorLock() {
-	if (!settings::allowCursorLock)
-		return;
-
-	internal->ignoreNextMouseDelta = true;
 }
 
 
 void Window::cursorUnlock() {
-	if (!settings::allowCursorLock)
-		return;
-
-	internal->ignoreNextMouseDelta = true;
 }
 
 
 bool Window::isCursorLocked() {
-	return internal->ignoreNextMouseDelta;
+	return false;
 }
 
 

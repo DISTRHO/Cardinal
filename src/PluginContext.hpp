@@ -60,7 +60,7 @@ struct CardinalAudioDevice : rack::audio::Device {
 
     std::string getName() override
     {
-        return "Plugin Device";
+        return "Cardinal";
     }
 
     int getNumInputs() override
@@ -115,7 +115,7 @@ struct CardinalAudioDriver : rack::audio::Driver {
 
     std::string getDeviceName(int) override
     {
-        return "Plugin Driver Device";
+        return "Plugin Device";
     }
 
     int getDeviceNumInputs(int) override
