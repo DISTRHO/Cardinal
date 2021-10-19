@@ -18,3 +18,8 @@
 #pragma once
 #include_next <mutex>
 #include "mingw.mutex.h"
+
+#undef IN
+#undef OUT
+#undef far
+#undef near

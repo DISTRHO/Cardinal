@@ -18,3 +18,8 @@
 #pragma once
 #include_next <condition_variable>
 #include "mingw.condition_variable.h"
+
+#undef IN
+#undef OUT
+#undef far
+#undef near

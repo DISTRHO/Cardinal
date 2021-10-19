@@ -18,3 +18,8 @@
 #pragma once
 #include_next <thread>
 #include "mingw.thread.h"
+
+#undef IN
+#undef OUT
+#undef far
+#undef near
