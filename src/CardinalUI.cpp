@@ -34,7 +34,12 @@ GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
 
 namespace rack {
 namespace window {
-    DISTRHO_NAMESPACE::UI* lastUI = nullptr;
+    struct Window::Internal {
+        int mods;
+        DISTRHO_NAMESPACE::UI* ui;
+        // more stuff below
+    };
+    void WindowInit(Window* window, DISTRHO_NAMESPACE::UI* ui);
 }
 }
 
@@ -77,11 +82,8 @@ public:
         fContext->scene = new rack::app::Scene;
         fContext->event->rootWidget = fContext->scene;
 
-        // Initialize context
-        d_stdout("UI context ptr %p", NanoVG::getContext());
-        rack::window::lastUI = this;
         fContext->window = new rack::window::Window;
-        rack::window::lastUI = nullptr;
+        rack::window::WindowInit(fContext->window, this);
 
         // Hide non-wanted menu entries
         typedef rack::ui::Button rButton;

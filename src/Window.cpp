@@ -23,7 +23,6 @@
 namespace rack {
 namespace window {
 
-extern DISTRHO_NAMESPACE::UI* lastUI;
 
 static const math::Vec minWindowSize = math::Vec(640, 480);
 
@@ -69,8 +68,9 @@ std::shared_ptr<Image> Image::load(const std::string& filename) {
 
 
 struct Window::Internal {
-	DISTRHO_NAMESPACE::UI* ui;
-	math::Vec size;
+	int mods = 0;
+	DISTRHO_NAMESPACE::UI* ui = nullptr;
+	math::Vec size = minWindowSize;
 
 	std::string lastWindowTitle;
 
@@ -88,31 +88,28 @@ struct Window::Internal {
 
 Window::Window() {
 	internal = new Internal;
-	internal->ui = lastUI;
-	internal->size = minWindowSize;
+}
 
-	int err;
-
+void WindowInit(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
+{
 	const GLubyte* vendor = glGetString(GL_VENDOR);
 	const GLubyte* renderer = glGetString(GL_RENDERER);
 	const GLubyte* version = glGetString(GL_VERSION);
 	INFO("Renderer: %s %s", vendor, renderer);
 	INFO("OpenGL: %s", version);
-	INFO("UI pointer: %p", lastUI);
 
-	vg = lastUI->getContext();
-	fbVg = nvgCreateSharedGL2(vg, NVG_ANTIALIAS);
+	window->vg = ui->getContext();
+	window->fbVg = nvgCreateSharedGL2(window->vg, NVG_ANTIALIAS);
 
 	// Load default Blendish font
-	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
-	bndSetFont(uiFont->handle);
+	window->uiFont = window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
+	bndSetFont(window->uiFont->handle);
 
 	if (APP->scene) {
 		widget::Widget::ContextCreateEvent e;
 		APP->scene->onContextCreate(e);
 	}
 }
-
 
 Window::~Window() {
 	if (APP->scene) {
@@ -323,29 +320,6 @@ std::shared_ptr<Image> Window::loadImage(const std::string& filename) {
 
 bool& Window::fbDirtyOnSubpixelChange() {
 	return internal->fbDirtyOnSubpixelChange;
-}
-
-
-void mouseButtonCallback(Context* ctx, int button, int action, int mods) {
-
-}
-
-void cursorPosCallback(Context* ctx, double xpos, double ypos) {
-}
-
-void cursorEnterCallback(Context* ctx, int entered) {
-	if (!entered) {
-		ctx->event->handleLeave();
-	}
-}
-
-void scrollCallback(Context* ctx, double x, double y) {
-}
-
-void charCallback(Context* ctx, unsigned int codepoint) {
-}
-
-void keyCallback(Context* ctx, int key, int scancode, int action, int mods) {
 }
 
 

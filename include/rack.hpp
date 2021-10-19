@@ -28,5 +28,6 @@
 # undef far
 # undef near
 # define ABC ABC_
+# define Chord Chord_
 # define VOID VOID_
 #endif

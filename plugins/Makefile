@@ -24,7 +24,7 @@ PLUGIN_FILES  = plugins.cpp
 PLUGIN_FILES += $(filter-out AmalgamatedHarmonics/src/AH.cpp,$(wildcard AmalgamatedHarmonics/src/*.cpp))
 
 # modules/types which are present in other plugins
-AMALGAMATEDHARMONICS_CUSTOM = BasePinkNoiseGenerator LowFrequencyOscillator Pattern PinkNoiseGenerator RedNoiseGenerator
+AMALGAMATEDHARMONICS_CUSTOM = BasePinkNoiseGenerator EvenVCO LowFrequencyOscillator Pattern PinkNoiseGenerator RedNoiseGenerator
 
 # --------------------------------------------------------------
 # AnimatedCircuits
@@ -38,7 +38,7 @@ PLUGIN_FILES += $(filter-out AS/src/AS.cpp,$(wildcard AS/src/*.cpp))
 PLUGIN_FILES += AS/freeverb/revmodel.cpp
 
 # modules/types which are present in other plugins
-AS_CUSTOM = ADSR LabelDisplayWidget LowFrequencyOscillator Param VCA allpass comb revmodel
+AS_CUSTOM = ADSR LabelDisplayWidget LowFrequencyOscillator VCA allpass comb revmodel
 
 # --------------------------------------------------------------
 # AudibleInstruments
@@ -144,9 +144,6 @@ PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
 
 PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
 PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
-
-# modules/types which are present in other plugins
-BEFACO_CUSTOM = EvenVCO
 
 # --------------------------------------------------------------
 # Bidoo
