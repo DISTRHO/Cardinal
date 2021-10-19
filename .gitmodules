@@ -52,3 +52,6 @@
 [submodule "plugins/AmalgamatedHarmonics"]
 	path = plugins/AmalgamatedHarmonics
 	url = https://github.com/jhoar/AmalgamatedHarmonics.git
+[submodule "plugins/cf"]
+	path = plugins/cf
+	url = https://github.com/cfoulc/cf.git

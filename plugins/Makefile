@@ -177,6 +177,11 @@ BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 PLUGIN_FILES += $(wildcard Cardinal/src/*.cpp)
 
 # --------------------------------------------------------------
+# cf
+
+PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
+
+# --------------------------------------------------------------
 # ESeries
 
 PLUGIN_FILES += ESeries/src/E340.cpp
@@ -396,6 +401,13 @@ $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Cardinal -c -o $@
+
+$(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
+		-DpluginInstance=pluginInstance__cf
 
 $(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

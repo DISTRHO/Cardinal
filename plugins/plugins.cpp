@@ -166,6 +166,9 @@
 // Cardinal (built-in)
 #include "Cardinal/src/plugin.hpp"
 
+// cf
+#include "cf/src/plugin.hpp"
+
 // ESeries
 #include "ESeries/src/plugin.hpp"
 
@@ -241,6 +244,7 @@ Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__Cardinal;
+Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
@@ -771,6 +775,43 @@ static void initStatic__Cardinal()
     }
 }
 
+static void initStatic__cf()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__cf = p;
+
+    const StaticPluginLoader spl(p, "cf");
+    if (spl.ok())
+    {
+        p->addModel(modelMETRO);
+        p->addModel(modelEACH);
+        p->addModel(modeltrSEQ);
+        p->addModel(modelLEDSEQ);
+        p->addModel(modelL3DS3Q);
+        p->addModel(modelSLIDERSEQ);
+        p->addModel(modelPLAYER);
+        p->addModel(modelPLAY);
+        p->addModel(modelMONO);
+        p->addModel(modelSTEREO);
+        p->addModel(modelSUB);
+        p->addModel(modelMASTER);
+        p->addModel(modelVARIABLE);
+        p->addModel(modelALGEBRA);
+        p->addModel(modelFUNKTION);
+        p->addModel(modelCHOKE);
+        p->addModel(modelFOUR);
+        p->addModel(modelSTEPS);
+        p->addModel(modelPEAK);
+        p->addModel(modelCUTS);
+        p->addModel(modelBUFFER);
+        p->addModel(modelDISTO);
+        p->addModel(modelCUBE);
+        p->addModel(modelPATCH);
+        p->addModel(modelLABEL);
+        p->addModel(modelDAVE);
+    }
+}
+
 static void initStatic__ESeries()
 {
     Plugin* const p = new Plugin;
@@ -1005,6 +1046,7 @@ void initStaticPlugins()
     initStatic__Bidoo();
     initStatic__BogaudioModules();
     initStatic__Cardinal();
+    initStatic__cf();
     initStatic__ESeries();
     initStatic__Fundamental();
     initStatic__GrandeModular();
