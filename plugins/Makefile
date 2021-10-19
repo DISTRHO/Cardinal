@@ -179,7 +179,7 @@ PLUGIN_FILES += $(wildcard Cardinal/src/*.cpp)
 # --------------------------------------------------------------
 # cf
 
-PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
+PLUGIN_FILES += $(filter-out cf/src/plugin.cpp cf/src/PLAY.cpp,$(wildcard cf/src/*.cpp))
 
 # --------------------------------------------------------------
 # ESeries
