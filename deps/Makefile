@@ -16,20 +16,24 @@ include ../dpf/Makefile.base.mk
 # --------------------------------------------------------------
 # override VCV arch.mk stuff so we can build more architectures
 
-ifeq ($(CPU_ARM),true)
-ARCH_NAME = arm
-MACHINE = i686-bring-forth-the-rack
+ifeq ($(CPU_AARCH64),true)
+ARCH_NAME = aarch64
+MACHINE = x86_64-bring-forth-the-rack
 else ifeq ($(CPU_ARM64),true)
 ARCH_NAME = arm64
 MACHINE = x86_64-bring-forth-the-rack
-else ifeq ($(CPU_AARCH64),true)
-ARCH_NAME = aarch64
-MACHINE = x86_64-bring-forth-the-rack
+else ifeq ($(CPU_ARM),true)
+ARCH_NAME = arm
+MACHINE = i686-bring-forth-the-rack
 else
 MACHINE = $(TARGET_MACHINE)
 endif
 
-ifneq ($(MACOS_OR_WINDOWS),true)
+ifeq ($(MACOS),true)
+MACHINE_SUFFIX = -darwin
+else ifeq ($(WINDOWS),true)
+MACHINE_SUFFIX = -mingw32
+else
 MACHINE_SUFFIX = -linux
 endif
 

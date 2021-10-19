@@ -290,10 +290,15 @@ $(TARGET): $(PLUGIN_OBJS)
 	$(SILENT)rm -f $@
 	$(SILENT)$(AR) crs $@ $^
 
-$(BUILD_DIR)/%.bin.o: % res2c.py
+$(BUILD_DIR)/%.bin.c: % res2c.py
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Generating and Compiling $<"
-	$(shell python3 ./res2c.py $< | $(CC) -x c - $(BUILD_C_FLAGS) -c -o $@)
+	@echo "Generating $*.bin.c"
+	$(SILENT)python3 ./res2c.py $< > $@
+
+$(BUILD_DIR)/%.bin.o: $(BUILD_DIR)/%.bin.c
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $*.bin"
+	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@
 
 $(BUILD_DIR)/plugins.cpp.o: plugins.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
