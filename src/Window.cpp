@@ -98,6 +98,8 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 	INFO("Renderer: %s %s", vendor, renderer);
 	INFO("OpenGL: %s", version);
 
+	window->internal->ui = ui;
+
 	window->vg = ui->getContext();
 	window->fbVg = nvgCreateSharedGL2(window->vg, NVG_ANTIALIAS);
 
