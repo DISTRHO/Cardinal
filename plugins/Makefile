@@ -178,6 +178,12 @@ PLUGIN_FILES += Fundamental-workaround/VCA.cpp
 PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModular/src/*.cpp))
 
 # --------------------------------------------------------------
+# ImpromptuModular
+
+PLUGIN_FILES += $(wildcard ImpromptuModular/src/*.cpp)
+PLUGIN_FILES += $(wildcard ImpromptuModular/src/comp/*.cpp)
+
+# --------------------------------------------------------------
 # JW-Modules
 
 PLUGIN_FILES += $(filter-out JW-Modules/src/JWModules.cpp,$(wildcard JW-Modules/src/*.cpp))
@@ -373,6 +379,16 @@ $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__GrandeModular -c -o $@
+
+$(BUILD_DIR)/ImpromptuModular/%.cpp.o: ImpromptuModular/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ImpromptuModular -Dinit=init__ImpromptuModular -c -o $@
+
+$(BUILD_DIR)/ImpromptuModular/src/comp/Components.cpp.o: ImpromptuModular/src/comp/Components.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ImpromptuModular -DsaveDarkAsDefault=ImpromptuModularIgnore1 -DloadDarkAsDefault=ImpromptuModularIgonre2 -c -o $@
 
 $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

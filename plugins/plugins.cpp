@@ -172,11 +172,53 @@
 // GrandeModular
 #include "GrandeModular/src/plugin.hpp"
 
+// ImpromptuModular
+/* NOTE too much noise in original include, do this a different way
+// #include "ImpromptuModular/src/ImpromptuModular.hpp"
+*/
+extern Model *modelBigButtonSeq;
+extern Model *modelBigButtonSeq2;
+extern Model *modelChordKey;
+extern Model *modelChordKeyExpander;
+extern Model *modelClocked;
+extern Model *modelClockedExpander;
+extern Model *modelClkd;
+extern Model *modelCvPad;
+extern Model *modelFoundry;
+extern Model *modelFoundryExpander;
+extern Model *modelFourView;
+extern Model *modelGateSeq64;
+extern Model *modelGateSeq64Expander;
+extern Model *modelHotkey;
+extern Model *modelPart;
+extern Model *modelPhraseSeq16;
+extern Model *modelPhraseSeq32;
+extern Model *modelPhraseSeqExpander;
+extern Model *modelProbKey;
+// extern Model *modelProbKeyExpander;
+extern Model *modelSemiModularSynth;
+extern Model *modelTact;
+extern Model *modelTact1;
+extern Model *modelTactG;
+extern Model *modelTwelveKey;
+extern Model *modelWriteSeq32;
+extern Model *modelWriteSeq64;
+extern Model *modelBlankPanel;
+
 // JW-Modules
 #include "JW-Modules/src/JWModules.hpp"
 
 // rackwindows
 #include "rackwindows/src/plugin.hpp"
+
+// ValleyAudio
+/* does not build against v2
+#include "ValleyAudio/src/Valley.hpp"
+*/
+
+// ZetaCarinaeModules
+#include "ZetaCarinaeModules/src/plugin.hpp"
+
 // stuff that reads config files, we dont want that
 int loadConsoleType() { return 0; }
 int loadDirectOutMode() { return 0; }
@@ -187,14 +229,7 @@ void saveDarkAsDefault(bool) {}
 void saveDirectOutMode(bool) {}
 void saveHighQualityAsDefault(bool) {}
 
-// ValleyAudio
-/* does not build against v2
-#include "ValleyAudio/src/Valley.hpp"
-*/
-
-// ZetaCarinaeModules
-#include "ZetaCarinaeModules/src/plugin.hpp"
-
+// plugin instances
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__AS;
 Plugin* pluginInstance__AudibleInstruments;
@@ -205,6 +240,7 @@ Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
+extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__JW;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__ValleyAudio;
@@ -773,6 +809,45 @@ static void initStatic__GrandeModular()
     }
 }
 
+static void initStatic__ImpromptuModular()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__ImpromptuModular = p;
+
+    const StaticPluginLoader spl(p, "ImpromptuModular");
+    if (spl.ok())
+    {
+        p->addModel(modelBigButtonSeq);
+        p->addModel(modelBigButtonSeq2);
+        p->addModel(modelChordKey);
+        p->addModel(modelChordKeyExpander);
+        p->addModel(modelClocked);
+        p->addModel(modelClockedExpander);
+        p->addModel(modelClkd);
+        p->addModel(modelCvPad);
+        p->addModel(modelFoundry);
+        p->addModel(modelFoundryExpander);
+        p->addModel(modelFourView);
+        p->addModel(modelGateSeq64);
+        p->addModel(modelGateSeq64Expander);
+        p->addModel(modelHotkey);
+        p->addModel(modelPart);
+        p->addModel(modelPhraseSeq16);
+        p->addModel(modelPhraseSeq32);
+        p->addModel(modelPhraseSeqExpander);
+        p->addModel(modelProbKey);
+        // p->addModel(modelProbKeyExpander);
+        p->addModel(modelSemiModularSynth);
+        p->addModel(modelTact);
+        p->addModel(modelTact1);
+        p->addModel(modelTactG);
+        p->addModel(modelTwelveKey);
+        p->addModel(modelWriteSeq32);
+        p->addModel(modelWriteSeq64);
+        p->addModel(modelBlankPanel);
+    }
+}
+
 static void initStatic__JW()
 {
     Plugin* const p = new Plugin;
@@ -896,6 +971,7 @@ void initStaticPlugins()
     initStatic__ESeries();
     initStatic__Fundamental();
     initStatic__GrandeModular();
+    initStatic__ImpromptuModular();
     initStatic__JW();
     initStatic__rackwindows();
     /* does not build against v2

@@ -10,9 +10,6 @@ Valley
 
 Grayscale                 74754.0 (not opensource?)
 
-ImpromptuModular          62537.0
-https://github.com/MarcBoule/ImpromptuModular
-
 VultModulesFree           61804.0 (not opensource?)
 
 AmalgamatedHarmonics      59071.0
