@@ -28,10 +28,10 @@ BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
-# ifneq ($(DEBUG),true)
-# BASE_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
-# LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
-# endif
+ifeq ($(WITH_LTO),true)
+BASE_FLAGS += -fno-strict-aliasing -flto
+LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
+endif
 
 # --------------------------------------------------------------
 # override VCV arch.mk stuff so we can build more architectures

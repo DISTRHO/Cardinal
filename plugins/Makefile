@@ -16,7 +16,7 @@ include ../dpf/Makefile.base.mk
 # --------------------------------------------------------------
 # Files to build
 
-PLUGIN_FILES  = plugins.cpp
+PLUGIN_FILES = plugins.cpp
 
 # --------------------------------------------------------------
 # AmalgamatedHarmonics
@@ -155,7 +155,9 @@ PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
 
 # modules/types which are present in other plugins
-BIDOO_CUSTOM = LadderFilter channel filterType
+BIDOO_CUSTOM = LadderFilter
+BIDOO_CUSTOM_PER_FILE = channel channel filterType
+# randomize
 
 # --------------------------------------------------------------
 # BogaudioModules
@@ -165,7 +167,8 @@ PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/*.cpp)
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/filters/*.cpp)
 
 # modules/types which are present in other plugins
-BOGAUDIO_CUSTOM = ADSR ARQuantity AttackMenuItem BlueNoiseGenerator LFO Noise ReleaseMenuItem VCA VCO VCF
+BOGAUDIO_CUSTOM = ADSR BlueNoiseGenerator LFO Noise VCA VCO VCF
+BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 
 # --------------------------------------------------------------
 # Cardinal (built-in)
@@ -195,7 +198,7 @@ PLUGIN_FILES += $(wildcard ImpromptuModular/src/*.cpp)
 PLUGIN_FILES += $(wildcard ImpromptuModular/src/comp/*.cpp)
 
 # modules/types which are present in other plugins
-IMPROMPTUMODULAR_CUSTOM = Clock StepAttributes stepClock
+IMPROMPTUMODULAR_CUSTOM_PER_FILE = Clock stepClock
 
 # --------------------------------------------------------------
 # JW-Modules
@@ -276,9 +279,9 @@ BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
-# ifneq ($(DEBUG),true)
-# BASE_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
-# endif
+ifeq ($(WITH_LTO),true)
+BASE_FLAGS += -fno-strict-aliasing -flto
+endif
 
 # --------------------------------------------------------------
 # FIXME lots of warnings from VCV side
@@ -316,6 +319,7 @@ clean:
 
 # function for custom module names macro
 custom_module_names = -D${1}=${2}${1} -Dmodel${1}=model${2}${1} -D${1}Widget=${2}${1}Widget
+custom_per_file_names = -D${1}=${2}_${1}
 
 $(TARGET): $(PLUGIN_OBJS)
 	@echo "Creating $@"
@@ -370,12 +374,22 @@ $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Bidoo $(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) -IBidoo/src/dep/gverb/include -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) \
+		$(foreach m,$(BIDOO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bidoo_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__Bidoo \
+		-IBidoo/src/dep/gverb/include
 
 $(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__BogaudioModules $(foreach m,$(BOGAUDIO_CUSTOM),$(call custom_module_names,$(m),Bogaudio)) -DRACK_SIMD=1 -IBogaudioModules/lib -IBogaudioModules/src/dsp -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(BOGAUDIO_CUSTOM),$(call custom_module_names,$(m),Bogaudio)) \
+		$(foreach m,$(BOGAUDIO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bogaudio_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__BogaudioModules \
+		-DRACK_SIMD=1 \
+		-IBogaudioModules/lib \
+		-IBogaudioModules/src/dsp
 
 $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -405,12 +419,28 @@ $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 $(BUILD_DIR)/ImpromptuModular/%.cpp.o: ImpromptuModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ImpromptuModular -Dinit=init__ImpromptuModular $(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
+		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ImpromptuModular_$(shell basename $*))) \
+		-Dinit=init__ImpromptuModular \
+		-DpluginInstance=pluginInstance__ImpromptuModular
+
+$(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
+		-DpluginInstance=pluginInstance__ImpromptuModular \
+		-DStepAttributes=StepAttributesKernel
 
 $(BUILD_DIR)/ImpromptuModular/src/comp/Components.cpp.o: ImpromptuModular/src/comp/Components.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ImpromptuModular $(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) -DsaveDarkAsDefault=ImpromptuModularIgnore1 -DloadDarkAsDefault=ImpromptuModularIgonre2 -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
+		-DpluginInstance=pluginInstance__ImpromptuModular \
+		-DsaveDarkAsDefault=ImpromptuModularIgnore1 \
+		-DloadDarkAsDefault=ImpromptuModularIgonre2
 
 $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

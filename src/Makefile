@@ -50,9 +50,6 @@ FILES_DSP += $(wildcard Rack/src/*/*.c)
 FILES_DSP += $(filter-out Rack/src/common.cpp Rack/src/dep.cpp Rack/src/discord.cpp Rack/src/gamepad.cpp Rack/src/keyboard.cpp Rack/src/library.cpp Rack/src/network.cpp Rack/src/rtaudio.cpp Rack/src/rtmidi.cpp, $(wildcard Rack/src/*.cpp))
 FILES_DSP += $(filter-out Rack/src/window/Window.cpp, $(wildcard Rack/src/*/*.cpp))
 
-# FOR TESTING
-# FILES_DSP += Rack/src/rtaudio.cpp
-
 # --------------------------------------------------------------
 # Extra libraries to link against
 
@@ -87,9 +84,6 @@ else
 BASE_FLAGS += -DARCH_LIN
 endif
 
-# FOR TESTING
-# BASE_FLAGS += -I../dpf/distrho/src/jackbridge
-
 BASE_FLAGS += -fno-finite-math-only
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../include
@@ -112,9 +106,9 @@ BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
-# ifneq ($(DEBUG),true)
-# BASE_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
-# endif
+ifeq ($(WITH_LTO),true)
+BASE_FLAGS += -fno-strict-aliasing -flto
+endif
 
 BUILD_C_FLAGS += -std=gnu11
 
@@ -141,9 +135,9 @@ LINK_FLAGS += -ldbghelp -lshlwapi
 EXTRA_LIBS += -lws2_32 -lwinmm
 endif
 
-# ifneq ($(DEBUG),true)
-# LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
-# endif
+ifeq ($(WITH_LTO),true)
+LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
+endif
 
 # --------------------------------------------------------------
 # temporary macro just to get the ball rolling
