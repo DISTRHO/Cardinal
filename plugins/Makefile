@@ -150,10 +150,11 @@ PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 # Bidoo
 
 PLUGIN_FILES += $(filter-out Bidoo/src/plugin.cpp Bidoo/src/ANTN.cpp,$(wildcard Bidoo/src/*.cpp))
-PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
+PLUGIN_FILES += $(filter-out Bidoo/src/dep/waves.cpp,$(wildcard Bidoo/src/dep/*.cpp))
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
+PLUGIN_FILES += Bidoo-workaround/waves.cpp
 
 # modules/types which are present in other plugins
 BIDOO_CUSTOM = LadderFilter
@@ -179,7 +180,7 @@ PLUGIN_FILES += $(wildcard Cardinal/src/*.cpp)
 # --------------------------------------------------------------
 # cf
 
-PLUGIN_FILES += $(filter-out cf/src/plugin.cpp cf/src/PLAY.cpp,$(wildcard cf/src/*.cpp))
+PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 
 # --------------------------------------------------------------
 # ESeries
@@ -244,9 +245,6 @@ PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCa
 # Build setup
 
 BUILD_DIR = ../build/plugins
-
-PLUGIN_OBJS  = $(PLUGIN_FILES:%=$(BUILD_DIR)/%.o)
-PLUGIN_OBJS += $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.o)
 
 ifeq ($(MACOS),true)
 BASE_FLAGS += -DARCH_MAC
@@ -323,6 +321,11 @@ clean:
 # --------------------------------------------------------------
 # Build commands
 
+PLUGIN_OBJS  = $(PLUGIN_FILES:%=$(BUILD_DIR)/%.o)
+PLUGIN_OBJS += $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.o)
+
+.PRECIOUS: $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin)
+
 # function for custom module names macro
 custom_module_names = -D${1}=${2}${1} -Dmodel${1}=model${2}${1} -D${1}Widget=${2}${1}Widget
 custom_per_file_names = -D${1}=${2}_${1}
@@ -378,6 +381,15 @@ $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Befaco $(foreach m,$(BEFACO_CUSTOM),$(call custom_module_names,$(m),Befaco)) -c -o $@
 
 $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) \
+		$(foreach m,$(BIDOO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bidoo_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__Bidoo \
+		-IBidoo/src/dep/gverb/include
+
+$(BUILD_DIR)/Bidoo-workaround/%.cpp.o: Bidoo-workaround/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \

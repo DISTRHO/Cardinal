@@ -790,8 +790,7 @@ static void initStatic__cf()
         p->addModel(modelL3DS3Q);
         p->addModel(modelSLIDERSEQ);
         p->addModel(modelPLAYER);
-        // TODO deal with drwav in multiple projects
-        // p->addModel(modelPLAY);
+        p->addModel(modelPLAY);
         p->addModel(modelMONO);
         p->addModel(modelSTEREO);
         p->addModel(modelSUB);
