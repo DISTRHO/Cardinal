@@ -25,6 +25,7 @@ PLUGIN_FILES += $(filter-out AmalgamatedHarmonics/src/AH.cpp,$(wildcard Amalgama
 
 # modules/types which are present in other plugins
 AMALGAMATEDHARMONICS_CUSTOM = BasePinkNoiseGenerator EvenVCO LowFrequencyOscillator Pattern PinkNoiseGenerator RedNoiseGenerator
+AMALGAMATEDHARMONICS_CUSTOM += bogaudio
 
 # --------------------------------------------------------------
 # AnimatedCircuits
