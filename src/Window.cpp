@@ -113,6 +113,11 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 	}
 }
 
+void WindowMods(Window* const window, const int mods)
+{
+	window->internal->mods = mods;
+}
+
 Window::~Window() {
 	if (APP->scene) {
 		widget::Widget::ContextDestroyEvent e;
@@ -235,18 +240,7 @@ bool Window::isCursorLocked() {
 
 
 int Window::getMods() {
-	int mods = 0;
-	/*
-	if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
-		mods |= GLFW_MOD_SHIFT;
-	if (glfwGetKey(win, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
-		mods |= GLFW_MOD_CONTROL;
-	if (glfwGetKey(win, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS)
-		mods |= GLFW_MOD_ALT;
-	if (glfwGetKey(win, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS)
-		mods |= GLFW_MOD_SUPER;
-	*/
-	return mods;
+	return internal->mods;
 }
 
 

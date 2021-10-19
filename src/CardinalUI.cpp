@@ -34,12 +34,8 @@ GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
 
 namespace rack {
 namespace window {
-    struct Window::Internal {
-        int mods;
-        DISTRHO_NAMESPACE::UI* ui;
-        // more stuff below
-    };
     void WindowInit(Window* window, DISTRHO_NAMESPACE::UI* ui);
+    void WindowMods(Window* window, int mods);
 }
 }
 
@@ -170,19 +166,37 @@ protected:
 
     // -------------------------------------------------------------------------------------------------------
 
-    bool onMouse(const MouseEvent& ev) override
+    static int glfwMods(const uint mod) noexcept
     {
-        int button;
         int mods = 0;
-        int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
 
-        if (ev.mod & kModifierControl)
+        if (mod & kModifierControl)
             mods |= GLFW_MOD_CONTROL;
-        if (ev.mod & kModifierShift)
+        if (mod & kModifierShift)
             mods |= GLFW_MOD_SHIFT;
-        if (ev.mod & kModifierAlt)
+        if (mod & kModifierAlt)
             mods |= GLFW_MOD_ALT;
 
+        /*
+        if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
+            mods |= GLFW_MOD_SHIFT;
+        if (glfwGetKey(win, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
+            mods |= GLFW_MOD_CONTROL;
+        if (glfwGetKey(win, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS)
+            mods |= GLFW_MOD_ALT;
+        if (glfwGetKey(win, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS)
+            mods |= GLFW_MOD_SUPER;
+        */
+
+        return mods;
+    }
+
+    bool onMouse(const MouseEvent& ev) override
+    {
+        const int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
+        const int mods = glfwMods(ev.mod);
+
+        int button;
 #ifdef DISTRHO_OS_MAC
         switch (ev.button)
         {
@@ -238,6 +252,8 @@ protected:
         #endif
         */
 
+        rack::window::WindowMods(fContext->window, mods);
+
         const ScopedContext sc(this);
         return fContext->event->handleButton(fLastMousePos, button, action, mods);
     }
@@ -248,6 +264,7 @@ protected:
         const rack::math::Vec mouseDelta = mousePos.minus(fLastMousePos);
 
         fLastMousePos = mousePos;
+        rack::window::WindowMods(fContext->window, glfwMods(ev.mod));
 
         const ScopedContext sc(this);
         return fContext->event->handleHover(mousePos, mouseDelta);
@@ -262,6 +279,8 @@ protected:
         scrollDelta = scrollDelta.mult(50.0);
 #endif
 
+        rack::window::WindowMods(fContext->window, glfwMods(ev.mod));
+
         const ScopedContext sc(this);
         return fContext->event->handleScroll(fLastMousePos, scrollDelta);
     }
@@ -271,15 +290,16 @@ protected:
         if (ev.character <= ' ' || ev.character >= kKeyDelete)
             return false;
 
+        rack::window::WindowMods(fContext->window, glfwMods(ev.mod));
+
         const ScopedContext sc(this);
         return fContext->event->handleText(fLastMousePos, ev.character);
     }
 
     bool onKeyboard(const KeyboardEvent& ev) override
     {
-        int key;
-        int mods = 0;
-        int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
+        const int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
+        const int mods = glfwMods(ev.mod);
 
         /* These are unsupported in pugl right now
         #define GLFW_KEY_KP_0               320
@@ -301,6 +321,7 @@ protected:
         #define GLFW_KEY_KP_EQUAL           336
         */
 
+        int key;
         switch (ev.key)
         {
         case '\r': key = GLFW_KEY_ENTER; break;
@@ -346,12 +367,7 @@ protected:
         default: key = ev.key; break;
         }
 
-        if (ev.mod & kModifierControl)
-            mods |= GLFW_MOD_CONTROL;
-        if (ev.mod & kModifierShift)
-            mods |= GLFW_MOD_SHIFT;
-        if (ev.mod & kModifierAlt)
-            mods |= GLFW_MOD_ALT;
+        rack::window::WindowMods(fContext->window, mods);
 
         const ScopedContext sc(this);
         return fContext->event->handleKey(fLastMousePos, key, ev.keycode, action, mods);
@@ -361,6 +377,8 @@ protected:
     {
         if (focus)
             return;
+
+        rack::window::WindowMods(fContext->window, 0);
 
         const ScopedContext sc(this);
         fContext->event->handleLeave();
