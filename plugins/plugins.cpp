@@ -22,6 +22,13 @@
 // AnimatedCircuits
 #include "AnimatedCircuits/src/plugin.hpp"
 
+// AS
+#define modelADSR modelASADSR
+#define modelVCA modelASVCA
+#include "AS/src/AS.hpp"
+#undef modelADSR
+#undef modelVCA
+
 // AudibleInstruments
 #include "AudibleInstruments/src/plugin.hpp"
 
@@ -189,6 +196,7 @@ void saveHighQualityAsDefault(bool) {}
 #include "ZetaCarinaeModules/src/plugin.hpp"
 
 Plugin* pluginInstance__AnimatedCircuits;
+Plugin* pluginInstance__AS;
 Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
@@ -334,6 +342,72 @@ static void initStatic__AnimatedCircuits()
     if (spl.ok())
     {
         p->addModel(model_AC_Folding);
+    }
+}
+
+static void initStatic__AS()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__AS = p;
+
+    const StaticPluginLoader spl(p, "AS");
+    if (spl.ok())
+    {
+#define modelADSR modelASADSR
+#define modelVCA modelASVCA
+        //OSCILLATORS
+        p->addModel(modelSineOsc);
+        p->addModel(modelSawOsc);
+
+        //TOOLS
+        p->addModel(modelADSR);
+        p->addModel(modelVCA);
+        p->addModel(modelQuadVCA);
+        p->addModel(modelTriLFO);
+        p->addModel(modelAtNuVrTr);
+        p->addModel(modelBPMClock);
+        p->addModel(modelSEQ16);
+        p->addModel(modelMixer2ch);
+        p->addModel(modelMixer4ch);
+        p->addModel(modelMixer8ch);
+        p->addModel(modelMonoVUmeter);
+        p->addModel(modelStereoVUmeter);
+        p->addModel(modelMultiple2_5);
+        p->addModel(modelMerge2_5);
+        p->addModel(modelSteps);
+        p->addModel(modelLaunchGate);
+        p->addModel(modelKillGate);
+        p->addModel(modelFlow);
+        p->addModel(modelSignalDelay);
+        p->addModel(modelTriggersMKI);
+        p->addModel(modelTriggersMKII);
+        p->addModel(modelTriggersMKIII);
+        p->addModel(modelBPMCalc);
+        p->addModel(modelBPMCalc2);
+        p->addModel(modelCv2T);
+        p->addModel(modelZeroCV2T);
+        p->addModel(modelReScale);
+
+        //EFFECTS
+        p->addModel(modelDelayPlusFx);
+        p->addModel(modelDelayPlusStereoFx);
+        p->addModel(modelPhaserFx);
+        p->addModel(modelReverbFx);
+        p->addModel(modelReverbStereoFx);
+        p->addModel(modelSuperDriveFx);
+        p->addModel(modelSuperDriveStereoFx);
+        p->addModel(modelTremoloFx);
+        p->addModel(modelTremoloStereoFx);
+        p->addModel(modelWaveShaper);
+        p->addModel(modelWaveShaperStereo);
+
+        //BLANK PANELS
+        p->addModel(modelBlankPanel4);
+        p->addModel(modelBlankPanel6);
+        p->addModel(modelBlankPanel8);
+        p->addModel(modelBlankPanelSpecial);
+#undef modelADSR
+#undef modelVCA
     }
 }
 
@@ -813,6 +887,7 @@ void initStaticPlugins()
 {
     initStatic__Core();
     initStatic__AnimatedCircuits();
+    initStatic__AS();
     initStatic__AudibleInstruments();
     initStatic__Befaco();
     initStatic__Bidoo();

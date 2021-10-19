@@ -10,9 +10,6 @@ Valley
 
 Grayscale                 74754.0 (not opensource?)
 
-AS                        64626.0
-https://github.com/AScustomWorks/AS
-
 ImpromptuModular          62537.0
 https://github.com/MarcBoule/ImpromptuModular
 

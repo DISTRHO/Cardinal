@@ -43,3 +43,6 @@
 [submodule "plugins/rackwindows"]
 	path = plugins/rackwindows
 	url = https://github.com/n0jo/rackwindows.git
+[submodule "plugins/AS"]
+	path = plugins/AS
+	url = https://github.com/AScustomWorks/AS.git

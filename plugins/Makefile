@@ -24,6 +24,15 @@ PLUGIN_FILES  = plugins.cpp
 PLUGIN_FILES += $(wildcard AnimatedCircuits/src/Folding/*.cpp)
 
 # --------------------------------------------------------------
+# AS
+
+PLUGIN_FILES += $(filter-out AS/src/AS.cpp,$(wildcard AS/src/*.cpp))
+PLUGIN_FILES += AS/freeverb/revmodel.cpp
+
+# modules which are present in other plugins
+AS_CUSTOM = ADSR VCA revmodel
+
+# --------------------------------------------------------------
 # AudibleInstruments
 
 PLUGIN_FILES += $(filter-out AudibleInstruments/src/plugin.cpp,$(wildcard AudibleInstruments/src/*.cpp))
@@ -283,7 +292,7 @@ clean:
 # Build commands
 
 # function for custom module names macro
-custom_module_names = -Dmodel${1}=model${2}${1} -D${1}Widget=${2}${1}Widget
+custom_module_names = -D${1}=${2}${1} -Dmodel${1}=model${2}${1} -D${1}Widget=${2}${1}Widget
 
 $(TARGET): $(PLUGIN_OBJS)
 	@echo "Creating $@"
@@ -309,6 +318,11 @@ $(BUILD_DIR)/AnimatedCircuits/%.cpp.o: AnimatedCircuits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AnimatedCircuits -c -o $@
+
+$(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AS $(foreach m,$(AS_CUSTOM),$(call custom_module_names,$(m),AS)) -c -o $@
 
 $(BUILD_DIR)/AudibleInstruments/%.cc.o: AudibleInstruments/%.cc
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
