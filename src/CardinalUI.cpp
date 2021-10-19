@@ -68,6 +68,9 @@ public:
           fContext(getRackContextFromPlugin(getPluginInstancePointer())),
           fResizeHandle(this)
     {
+        if (isResizable())
+            fResizeHandle.hide();
+
         const ScopedContext sc(this);
 
         fContext->event = new rack::widget::EventState;

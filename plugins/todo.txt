@@ -12,9 +12,6 @@ Grayscale                 74754.0 (not opensource?)
 
 VultModulesFree           61804.0 (not opensource?)
 
-AmalgamatedHarmonics      59071.0
-https://github.com/jhoar/AmalgamatedHarmonics
-
 NYSTHI                    58494.0 (not opensource?)
 
 DrumKit                   58468.0

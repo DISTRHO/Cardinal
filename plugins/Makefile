@@ -19,6 +19,11 @@ include ../dpf/Makefile.base.mk
 PLUGIN_FILES  = plugins.cpp
 
 # --------------------------------------------------------------
+# AmalgamatedHarmonics
+
+PLUGIN_FILES += $(filter-out AmalgamatedHarmonics/src/AH.cpp,$(wildcard AmalgamatedHarmonics/src/*.cpp))
+
+# --------------------------------------------------------------
 # AnimatedCircuits
 
 PLUGIN_FILES += $(wildcard AnimatedCircuits/src/Folding/*.cpp)
@@ -319,6 +324,11 @@ $(BUILD_DIR)/plugins.cpp.o: plugins.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -IBogaudioModules/lib -IBogaudioModules/src/dsp -c -o $@
+
+$(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AmalgamatedHarmonics -c -o $@
 
 $(BUILD_DIR)/AnimatedCircuits/%.cpp.o: AnimatedCircuits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

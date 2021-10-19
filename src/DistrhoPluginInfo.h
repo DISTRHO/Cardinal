@@ -30,7 +30,7 @@
 // #define DISTRHO_PLUGIN_LV2_CATEGORY       "lv2:AnalyserPlugin"
 // #define DISTRHO_PLUGIN_VST3_CATEGORIES    "Fx|Analyzer"
 #define DISTRHO_UI_USE_NANOVG             1
-#define DISTRHO_UI_USER_RESIZABLE         0
+#define DISTRHO_UI_USER_RESIZABLE         1
 
 enum Parameters {
     kParameterCount

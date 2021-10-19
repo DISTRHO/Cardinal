@@ -19,6 +19,9 @@
 
 #include "DistrhoUtils.hpp"
 
+// AmalgamatedHarmonics
+#include "AmalgamatedHarmonics/src/AH.hpp"
+
 // AnimatedCircuits
 #include "AnimatedCircuits/src/plugin.hpp"
 
@@ -230,6 +233,7 @@ void saveDirectOutMode(bool) {}
 void saveHighQualityAsDefault(bool) {}
 
 // plugin instances
+Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__AS;
 Plugin* pluginInstance__AudibleInstruments;
@@ -366,6 +370,38 @@ static void initStatic__Core()
         p->addModel(rack::core::modelCV_Gate);
         p->addModel(rack::core::modelBlank);
         p->addModel(rack::core::modelNotes);
+    }
+}
+
+static void initStatic__AmalgamatedHarmonics()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__AmalgamatedHarmonics = p;
+
+    const StaticPluginLoader spl(p, "AmalgamatedHarmonics");
+    if (spl.ok())
+    {
+        p->addModel(modelArp31);
+        p->addModel(modelArp32);
+        p->addModel(modelBombe);
+        p->addModel(modelChord);
+        p->addModel(modelCircle);
+        p->addModel(modelGalaxy);
+        p->addModel(modelGenerative);
+        p->addModel(modelImp);
+        p->addModel(modelImperfect2);
+        p->addModel(modelProgress2);
+        p->addModel(modelRuckus);
+        p->addModel(modelScaleQuantizer2);
+        p->addModel(modelSLN);
+        p->addModel(modelMuxDeMux);
+        p->addModel(modelPolyProbe);
+        p->addModel(modelPolyScope);
+        p->addModel(modelPolyUtils);
+        p->addModel(modelPolyVolt);
+        p->addModel(modelScaleQuantizer);
+        p->addModel(modelArpeggiator2);
+        p->addModel(modelProgress);
     }
 }
 
@@ -961,6 +997,7 @@ static void initStatic__ZetaCarinaeModules()
 void initStaticPlugins()
 {
     initStatic__Core();
+    initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__AS();
     initStatic__AudibleInstruments();

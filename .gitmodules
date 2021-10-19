@@ -49,3 +49,6 @@
 [submodule "plugins/ImpromptuModular"]
 	path = plugins/ImpromptuModular
 	url = https://github.com/MarcBoule/ImpromptuModular.git
+[submodule "plugins/AmalgamatedHarmonics"]
+	path = plugins/AmalgamatedHarmonics
+	url = https://github.com/jhoar/AmalgamatedHarmonics.git
