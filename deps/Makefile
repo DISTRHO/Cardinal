@@ -14,6 +14,26 @@ USE_RGBA = true
 include ../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
+# custom build flags
+
+BASE_FLAGS += -fno-finite-math-only
+BASE_FLAGS += -I../include
+BASE_FLAGS += -I../include/neon-compat
+BASE_FLAGS += -pthread
+
+ifeq ($(WINDOWS),true)
+BASE_FLAGS += -D_USE_MATH_DEFINES
+BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
+BASE_FLAGS += -I../include/mingw-compat
+BASE_FLAGS += -I../include/mingw-std-threads
+endif
+
+# ifneq ($(DEBUG),true)
+# BASE_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
+# LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
+# endif
+
+# --------------------------------------------------------------
 # override VCV arch.mk stuff so we can build more architectures
 
 ifeq ($(CPU_AARCH64),true)

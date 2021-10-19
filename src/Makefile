@@ -103,7 +103,6 @@ BASE_FLAGS += -IRack/dep/nanosvg/src
 BASE_FLAGS += -IRack/dep/osdialog
 BASE_FLAGS += -IRack/dep/oui-blendish
 BASE_FLAGS += -IRack/dep/pffft
-
 BASE_FLAGS += -pthread
 
 ifeq ($(WINDOWS),true)
@@ -112,6 +111,10 @@ BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
 BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
 endif
+
+# ifneq ($(DEBUG),true)
+# BASE_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
+# endif
 
 BUILD_C_FLAGS += -std=gnu11
 
@@ -124,6 +127,8 @@ BASE_FLAGS += -Wno-unused-variable
 # --------------------------------------------------------------
 # extra linker flags
 
+LINK_FLAGS += -pthread
+
 ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
 LINK_FLAGS += -ldl
 endif
@@ -135,6 +140,10 @@ LINK_FLAGS += -ldbghelp -lshlwapi
 # needed by JW-Modules
 EXTRA_LIBS += -lws2_32 -lwinmm
 endif
+
+# ifneq ($(DEBUG),true)
+# LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
+# endif
 
 # --------------------------------------------------------------
 # temporary macro just to get the ball rolling

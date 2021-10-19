@@ -23,6 +23,9 @@ PLUGIN_FILES  = plugins.cpp
 
 PLUGIN_FILES += $(filter-out AmalgamatedHarmonics/src/AH.cpp,$(wildcard AmalgamatedHarmonics/src/*.cpp))
 
+# modules/types which are present in other plugins
+AMALGAMATEDHARMONICS_CUSTOM = BasePinkNoiseGenerator LowFrequencyOscillator Pattern PinkNoiseGenerator RedNoiseGenerator
+
 # --------------------------------------------------------------
 # AnimatedCircuits
 
@@ -34,8 +37,8 @@ PLUGIN_FILES += $(wildcard AnimatedCircuits/src/Folding/*.cpp)
 PLUGIN_FILES += $(filter-out AS/src/AS.cpp,$(wildcard AS/src/*.cpp))
 PLUGIN_FILES += AS/freeverb/revmodel.cpp
 
-# modules which are present in other plugins
-AS_CUSTOM = ADSR VCA revmodel
+# modules/types which are present in other plugins
+AS_CUSTOM = ADSR LabelDisplayWidget LowFrequencyOscillator Param VCA allpass comb revmodel
 
 # --------------------------------------------------------------
 # AudibleInstruments
@@ -142,6 +145,9 @@ PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
 PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
 PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 
+# modules/types which are present in other plugins
+BEFACO_CUSTOM = EvenVCO
+
 # --------------------------------------------------------------
 # Bidoo
 
@@ -151,6 +157,9 @@ PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
 
+# modules/types which are present in other plugins
+BIDOO_CUSTOM = LadderFilter channel filterType
+
 # --------------------------------------------------------------
 # BogaudioModules
 
@@ -158,8 +167,8 @@ PLUGIN_FILES += $(filter-out BogaudioModules/src/bogaudio.cpp,$(wildcard Bogaudi
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/*.cpp)
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/filters/*.cpp)
 
-# modules which are present in other plugins
-BOGAUDIO_CUSTOM = ADSR LFO Noise VCA VCO VCF
+# modules/types which are present in other plugins
+BOGAUDIO_CUSTOM = ADSR ARQuantity AttackMenuItem BlueNoiseGenerator LFO Noise ReleaseMenuItem VCA VCO VCF
 
 # --------------------------------------------------------------
 # Cardinal (built-in)
@@ -187,6 +196,9 @@ PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModul
 
 PLUGIN_FILES += $(wildcard ImpromptuModular/src/*.cpp)
 PLUGIN_FILES += $(wildcard ImpromptuModular/src/comp/*.cpp)
+
+# modules/types which are present in other plugins
+IMPROMPTUMODULAR_CUSTOM = Clock StepAttributes stepClock
 
 # --------------------------------------------------------------
 # JW-Modules
@@ -258,7 +270,6 @@ BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
 BASE_FLAGS += -I../src/Rack/dep/osdialog
 BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
-
 BASE_FLAGS += -pthread
 
 ifeq ($(WINDOWS),true)
@@ -267,6 +278,10 @@ BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
 BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
 endif
+
+# ifneq ($(DEBUG),true)
+# BASE_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
+# endif
 
 # --------------------------------------------------------------
 # FIXME lots of warnings from VCV side
@@ -328,12 +343,12 @@ $(BUILD_DIR)/plugins.cpp.o: plugins.cpp
 $(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AmalgamatedHarmonics -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AmalgamatedHarmonics $(foreach m,$(AMALGAMATEDHARMONICS_CUSTOM),$(call custom_module_names,$(m),AmalgamatedHarmonics)) -c -o $@
 
 $(BUILD_DIR)/AnimatedCircuits/%.cpp.o: AnimatedCircuits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AnimatedCircuits -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AnimatedCircuits $(foreach m,$(ANIMATEDCIRCUITS_CUSTOM),$(call custom_module_names,$(m),AnimatedCircuits)) -c -o $@
 
 $(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -343,22 +358,22 @@ $(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
 $(BUILD_DIR)/AudibleInstruments/%.cc.o: AudibleInstruments/%.cc
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AudibleInstruments -DTEST -IAudibleInstruments/eurorack -Wno-unused-local-typedefs -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AudibleInstruments $(foreach m,$(AUDIBLEINSTRUMENTS_CUSTOM),$(call custom_module_names,$(m),AudibleInstruments)) -DTEST -IAudibleInstruments/eurorack -Wno-unused-local-typedefs -c -o $@
 
 $(BUILD_DIR)/AudibleInstruments/%.cpp.o: AudibleInstruments/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AudibleInstruments -DTEST -IAudibleInstruments/eurorack -Wno-unused-local-typedefs -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AudibleInstruments $(foreach m,$(AUDIBLEINSTRUMENTS_CUSTOM),$(call custom_module_names,$(m),AudibleInstruments)) -DTEST -IAudibleInstruments/eurorack -Wno-unused-local-typedefs -c -o $@
 
 $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Befaco -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Befaco $(foreach m,$(BEFACO_CUSTOM),$(call custom_module_names,$(m),Befaco)) -c -o $@
 
 $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Bidoo -IBidoo/src/dep/gverb/include -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Bidoo $(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) -IBidoo/src/dep/gverb/include -c -o $@
 
 $(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -373,52 +388,52 @@ $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 $(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ESeries -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ESeries $(foreach m,$(ESERIES_CUSTOM),$(call custom_module_names,$(m),ESeries)) -c -o $@
 
 $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Fundamental -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Fundamental $(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) -c -o $@
 
 $(BUILD_DIR)/Fundamental-workaround/%.cpp.o: Fundamental-workaround/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Fundamental -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Fundamental $(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) -c -o $@
 
 $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__GrandeModular -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__GrandeModular $(foreach m,$(GRANDEMODULAR_CUSTOM),$(call custom_module_names,$(m),GrandeModular)) -c -o $@
 
 $(BUILD_DIR)/ImpromptuModular/%.cpp.o: ImpromptuModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ImpromptuModular -Dinit=init__ImpromptuModular -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ImpromptuModular -Dinit=init__ImpromptuModular $(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) -c -o $@
 
 $(BUILD_DIR)/ImpromptuModular/src/comp/Components.cpp.o: ImpromptuModular/src/comp/Components.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ImpromptuModular -DsaveDarkAsDefault=ImpromptuModularIgnore1 -DloadDarkAsDefault=ImpromptuModularIgonre2 -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ImpromptuModular $(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) -DsaveDarkAsDefault=ImpromptuModularIgnore1 -DloadDarkAsDefault=ImpromptuModularIgonre2 -c -o $@
 
 $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__JW -IJW-Modules/src -IJW-Modules/lib/oscpack -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__JW $(foreach m,$(JW_CUSTOM),$(call custom_module_names,$(m),JW)) -IJW-Modules/src -IJW-Modules/lib/oscpack -c -o $@
 
 $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__rackwindows -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__rackwindows $(foreach m,$(RACKWINDOWS_CUSTOM),$(call custom_module_names,$(m),rackwindows)) -c -o $@
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ValleyAudio -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ValleyAudio $(foreach m,$(VALLEYAUDIO_CUSTOM),$(call custom_module_names,$(m),ValleyAudio)) -c -o $@
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ZetaCarinaeModules -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ZetaCarinaeModules $(foreach m,$(ZETACARINAE_CUSTOM),$(call custom_module_names,$(m),ZetaCarinae)) -c -o $@
 
 # --------------------------------------------------------------
 
