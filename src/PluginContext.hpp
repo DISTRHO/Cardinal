@@ -25,6 +25,7 @@
 #endif
 
 #include "DistrhoPlugin.hpp"
+#include "extra/Mutex.hpp"
 
 START_NAMESPACE_DISTRHO
 
@@ -39,6 +40,9 @@ public:
     virtual bool canAssignDevice() const noexcept = 0;
     virtual void assignDevice(rack::audio::Device* dev) noexcept = 0;
     virtual bool clearDevice(rack::audio::Device* dev) noexcept = 0;
+
+    // ensure context validity through UI and setState
+    Mutex contextMutex;
 };
 
 // -----------------------------------------------------------------------------------------------------------
@@ -110,7 +114,7 @@ struct CardinalAudioDriver : rack::audio::Driver {
 
     std::vector<int> getDeviceIds() override
     {
-        return std::vector<int>({ 0 });
+        return std::vector<int>({ 1 });
     }
 
     std::string getDeviceName(int) override

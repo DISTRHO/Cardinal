@@ -32,7 +32,8 @@
 #include <osdialog.h>
 
 #include "PluginContext.hpp"
-#include "extra/Mutex.hpp"
+#include "WindowParameters.hpp"
+#include "extra/Base64.hpp"
 
 namespace rack {
 namespace plugin {
@@ -128,8 +129,13 @@ class CardinalPlugin : public CardinalBasePlugin
     rack::audio::Device* fCurrentDevice;
     Mutex fDeviceMutex;
 
+    float fParameters[kWindowParameterCount];
+
     struct ScopedContext {
-        ScopedContext(CardinalPlugin* const plugin)
+        const MutexLocker cml;
+
+        ScopedContext(const CardinalPlugin* const plugin)
+            : cml(plugin->contextMutex)
         {
             rack::contextSet(plugin->fContext);
         }
@@ -142,13 +148,18 @@ class CardinalPlugin : public CardinalBasePlugin
 
 public:
     CardinalPlugin()
-        : CardinalBasePlugin(0, 0, 0),
+        : CardinalBasePlugin(kWindowParameterCount, 0, 1),
           fContext(new CardinalPluginContext(this)),
           fAudioBufferIn(nullptr),
           fAudioBufferOut(nullptr),
           fIsActive(false),
           fCurrentDevice(nullptr)
     {
+        fParameters[kWindowParameterCableOpacity] = 50.0f;
+        fParameters[kWindowParameterCableTension] = 50.0f;
+        fParameters[kWindowParameterRackBrightness] = 100.0f;
+        fParameters[kWindowParameterHaloBrightness] = 25.0f;
+
         // create unique temporary path for this instance
         try {
             char uidBuf[24];
@@ -232,60 +243,38 @@ protected:
    /* --------------------------------------------------------------------------------------------------------
     * Information */
 
-   /**
-      Get the plugin label.
-      A plugin label follows the same rules as Parameter::symbol, with the exception that it can start with numbers.
-    */
     const char* getLabel() const override
     {
         return "Cardinal";
     }
 
-   /**
-      Get an extensive comment/description about the plugin.
-    */
     const char* getDescription() const override
     {
-        return "...";
+        return ""
+        "Cardinal is an open-source self-contained special plugin version of VCVRack, using DPF.\n"
+        "It is NOT an official VCV project, and it is not affiliated with it in any way.\n";
     }
 
-   /**
-      Get the plugin author/maker.
-    */
     const char* getMaker() const override
     {
         return "DISTRHO";
     }
 
-   /**
-      Get the plugin homepage.
-    */
     const char* getHomePage() const override
     {
         return "https://github.com/DISTRHO/Cardinal";
     }
 
-   /**
-      Get the plugin license name (a single line of text).
-      For commercial plugins this should return some short copyright information.
-    */
     const char* getLicense() const override
     {
-        return "ISC";
+        return "GPLv3+";
     }
 
-   /**
-      Get the plugin version, in hexadecimal.
-    */
     uint32_t getVersion() const override
     {
-        return d_version(1, 0, 0);
+        return d_version(2, 0, 0);
     }
 
-   /**
-      Get the plugin unique Id.
-      This value is used by LADSPA, DSSI and VST plugin formats.
-    */
     int64_t getUniqueId() const override
     {
         return d_cconst('d', 'C', 'd', 'n');
@@ -294,8 +283,109 @@ protected:
    /* --------------------------------------------------------------------------------------------------------
     * Init */
 
+    void initParameter(const uint32_t index, Parameter& parameter) override
+    {
+        switch (index)
+        {
+        case kWindowParameterCableOpacity:
+            parameter.name = "Cable Opacity";
+            parameter.symbol = "cableOpacity";
+            parameter.unit = "%";
+            parameter.hints = kParameterIsAutomable;
+            parameter.ranges.def = 50.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 100.0f;
+            break;
+        case kWindowParameterCableTension:
+            parameter.name = "Cable Tension";
+            parameter.symbol = "cableTension";
+            parameter.unit = "%";
+            parameter.hints = kParameterIsAutomable;
+            parameter.ranges.def = 50.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 100.0f;
+            break;
+        case kWindowParameterRackBrightness:
+            parameter.name = "Rack Brightness";
+            parameter.symbol = "rackBrightness";
+            parameter.unit = "%";
+            parameter.hints = kParameterIsAutomable;
+            parameter.ranges.def = 100.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 100.0f;
+            break;
+        case kWindowParameterHaloBrightness:
+            parameter.name = "Halo Brightness";
+            parameter.symbol = "haloBrightness";
+            parameter.unit = "%";
+            parameter.hints = kParameterIsAutomable;
+            parameter.ranges.def = 25.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 100.0f;
+            break;
+        }
+    }
+
+    void initState(const uint32_t index, String& stateKey, String& defaultStateValue) override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(index == 0,);
+
+        stateKey = "patch";
+        defaultStateValue = "";
+    }
+
    /* --------------------------------------------------------------------------------------------------------
     * Internal data */
+
+    float getParameterValue(const uint32_t index) const override
+    {
+        return fParameters[index];
+    }
+
+    void setParameterValue(const uint32_t index, float value) override
+    {
+        fParameters[index] = value;
+    }
+
+    String getState(const char* const key) const override
+    {
+        if (std::strcmp(key, "patch") != 0)
+            return String();
+        if (fAutosavePath.empty())
+            return String();
+
+        std::vector<uint8_t> data;
+
+        {
+            const ScopedContext sc(this);
+
+            fContext->engine->prepareSave();
+            fContext->patch->saveAutosave();
+            fContext->patch->cleanAutosave();
+
+            data = rack::system::archiveDirectory(fAutosavePath, 1);
+        }
+
+        return String::asBase64(data.data(), data.size());
+    }
+
+    void setState(const char* const key, const char* const value) override
+    {
+        if (std::strcmp(key, "patch") != 0)
+            return;
+        if (fAutosavePath.empty())
+            return;
+
+        const std::vector<uint8_t> data(d_getChunkFromBase64String(value));
+
+        const ScopedContext sc(this);
+
+        rack::system::removeRecursively(fAutosavePath);
+        rack::system::createDirectories(fAutosavePath);
+        rack::system::unarchiveToDirectory(data, fAutosavePath);
+
+        fContext->patch->loadAutosave();
+    }
 
    /* --------------------------------------------------------------------------------------------------------
     * Process */
@@ -329,9 +419,6 @@ protected:
         fAudioBufferIn = fAudioBufferOut = nullptr;
     }
 
-   /**
-      Run/process function for plugins without MIDI input.
-    */
     void run(const float** const inputs, float** const outputs, const uint32_t frames) override
     {
         /*
@@ -340,8 +427,9 @@ protected:
         */
 
         const MutexLocker cml(fDeviceMutex);
+        // const MutexTryLocker cmtl(fPatchMutex);
 
-        if (fCurrentDevice == nullptr)
+        if (fCurrentDevice == nullptr /*|| cmtl.wasNotLocked()*/)
         {
             std::memset(outputs[0], 0, sizeof(float)*frames);
             std::memset(outputs[1], 0, sizeof(float)*frames);

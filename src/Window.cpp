@@ -19,6 +19,7 @@
 #endif
 
 #include "DistrhoUI.hpp"
+#include "WindowParameters.hpp"
 
 namespace rack {
 namespace window {
@@ -67,13 +68,19 @@ std::shared_ptr<Image> Image::load(const std::string& filename) {
 }
 
 
-struct Window::Internal {
-	int mods = 0;
-	DISTRHO_NAMESPACE::UI* ui = nullptr;
-	math::Vec size = minWindowSize;
+struct WindowParams {
+	float rackBrightness = 1.0f;
+};
 
+struct Window::Internal {
+	DISTRHO_NAMESPACE::UI* ui = nullptr;
+	DISTRHO_NAMESPACE::WindowParameters params;
+	DISTRHO_NAMESPACE::WindowParametersCallback* callback = nullptr;
+
+	math::Vec size = minWindowSize;
 	std::string lastWindowTitle;
 
+	int mods = 0;
 	int frame = 0;
 	int frameSwapInterval = 1;
 	double monitorRefreshRate = 60.0; // FIXME
@@ -106,6 +113,9 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 	// Load default Blendish font
 	window->uiFont = window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
 	bndSetFont(window->uiFont->handle);
+
+	// Init settings
+	WindowParametersRestore(window);
 
 	if (APP->scene) {
 		widget::Widget::ContextCreateEvent e;
@@ -321,3 +331,59 @@ bool& Window::fbDirtyOnSubpixelChange() {
 
 } // namespace window
 } // namespace rack
+
+
+START_NAMESPACE_DISTRHO
+
+void WindowParametersSave(rack::window::Window* const window)
+{
+	if (d_isNotEqual(window->internal->params.cableOpacity, rack::settings::cableOpacity))
+	{
+		window->internal->params.cableOpacity = rack::settings::cableOpacity;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterCableOpacity,
+			                                                    rack::settings::cableOpacity);
+	}
+	if (d_isNotEqual(window->internal->params.cableTension, rack::settings::cableTension))
+	{
+		window->internal->params.cableTension = rack::settings::cableTension;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterCableTension,
+			                                                    rack::settings::cableTension);
+	}
+	if (d_isNotEqual(window->internal->params.rackBrightness, rack::settings::rackBrightness))
+	{
+		window->internal->params.rackBrightness = rack::settings::rackBrightness;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterRackBrightness,
+			                                                    rack::settings::rackBrightness);
+	}
+	if (d_isNotEqual(window->internal->params.haloBrightness, rack::settings::haloBrightness))
+	{
+		window->internal->params.haloBrightness = rack::settings::haloBrightness;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterHaloBrightness,
+			                                                    rack::settings::haloBrightness);
+	}
+}
+
+void WindowParametersRestore(rack::window::Window* const window)
+{
+	rack::settings::cableOpacity = window->internal->params.cableOpacity;
+	rack::settings::cableTension = window->internal->params.cableTension;
+	rack::settings::rackBrightness = window->internal->params.rackBrightness;
+	rack::settings::haloBrightness = window->internal->params.haloBrightness;
+}
+
+void WindowParametersSetCallback(rack::window::Window* const window, WindowParametersCallback* const callback)
+{
+	window->internal->callback = callback;
+}
+
+void WindowParametersSetValues(rack::window::Window* const window, const WindowParameters& params)
+{
+	window->internal->params = params;
+}
+
+END_NAMESPACE_DISTRHO
+

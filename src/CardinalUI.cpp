@@ -22,9 +22,13 @@
 #include <ui/MenuItem.hpp>
 #include <window/Window.hpp>
 
-#include "PluginContext.hpp"
+#ifdef NDEBUG
+# undef DEBUG
+#endif
 
 #include "DistrhoUI.hpp"
+#include "PluginContext.hpp"
+#include "WindowParameters.hpp"
 #include "ResizeHandle.hpp"
 
 GLFWAPI const char* glfwGetClipboardString(GLFWwindow* window) { return nullptr; }
@@ -45,20 +49,29 @@ START_NAMESPACE_DISTRHO
 
 CardinalPluginContext* getRackContextFromPlugin(void* ptr);
 
-class CardinalUI : public UI
+class CardinalUI : public UI,
+                   public WindowParametersCallback
 {
     CardinalPluginContext* const fContext;
     rack::math::Vec fLastMousePos;
     ResizeHandle fResizeHandle;
+    WindowParameters fWindowParameters;
 
     struct ScopedContext {
+        CardinalPluginContext* const context;
+        const MutexLocker cml;
+
         ScopedContext(CardinalUI* const ui)
+            : context(ui->fContext),
+              cml(context->plugin->contextMutex)
         {
-            rack::contextSet(ui->fContext);
+            rack::contextSet(context);
+            WindowParametersRestore(context->window);
         }
 
         ~ScopedContext()
         {
+            WindowParametersSave(context->window);
             rack::contextSet(nullptr);
         }
     };
@@ -72,58 +85,63 @@ public:
         if (isResizable())
             fResizeHandle.hide();
 
-        const ScopedContext sc(this);
-
-        fContext->event = new rack::widget::EventState;
-        fContext->scene = new rack::app::Scene;
-        fContext->event->rootWidget = fContext->scene;
-
         fContext->window = new rack::window::Window;
-        rack::window::WindowInit(fContext->window, this);
 
-        // Hide non-wanted menu entries
-        typedef rack::ui::Button rButton;
-        // typedef rack::ui::MenuItem rMenuItem;
-        typedef rack::widget::Widget rWidget;
-        typedef std::list<rWidget*>::iterator rWidgetIterator;
-
-        rWidget* const layout = fContext->scene->menuBar->children.front();
-
-        for (rWidgetIterator it = layout->children.begin(); it != layout->children.end(); ++it)
         {
-            if (rButton* const button = reinterpret_cast<rButton*>(*it))
+            const ScopedContext sc(this);
+
+            fContext->event = new rack::widget::EventState;
+            fContext->scene = new rack::app::Scene;
+            fContext->event->rootWidget = fContext->scene;
+
+            rack::window::WindowInit(fContext->window, this);
+
+            // Hide non-wanted menu entries
+            typedef rack::ui::Button rButton;
+            // typedef rack::ui::MenuItem rMenuItem;
+            typedef rack::widget::Widget rWidget;
+            typedef std::list<rWidget*>::iterator rWidgetIterator;
+
+            rWidget* const layout = fContext->scene->menuBar->children.front();
+
+            for (rWidgetIterator it = layout->children.begin(); it != layout->children.end(); ++it)
             {
-                /* FIXME this doesnt work
-                if (button->text == "Engine")
+                if (rButton* const button = reinterpret_cast<rButton*>(*it))
                 {
-                    for (rWidgetIterator it2 = button->children.begin(); it2 != button->children.end(); ++it2)
+                    /* FIXME this doesnt work
+                    if (button->text == "Engine")
                     {
-                        if (rMenuItem* const item = reinterpret_cast<rMenuItem*>(*it2))
+                        for (rWidgetIterator it2 = button->children.begin(); it2 != button->children.end(); ++it2)
                         {
-                            if (item->text == "Sample rate")
+                            if (rMenuItem* const item = reinterpret_cast<rMenuItem*>(*it2))
                             {
-                                button->children.erase(it2);
-                                delete button;
-                                break;
+                                if (item->text == "Sample rate")
+                                {
+                                    button->children.erase(it2);
+                                    delete button;
+                                    break;
+                                }
                             }
                         }
                     }
-                }
-                */
-                if (button->text == "Library")
-                {
-                    layout->children.erase(it);
-                    delete button;
-                    break;
+                    */
+                    if (button->text == "Library")
+                    {
+                        layout->children.erase(it);
+                        delete button;
+                        break;
+                    }
                 }
             }
+
+            // we need to reload current patch for things to show on screen :(
+            // FIXME always save
+            if (! fContext->patch->hasAutosave())
+                fContext->patch->saveAutosave();
+            fContext->patch->loadAutosave();
         }
 
-        // we need to reload current patch for things to show on screen :(
-        // FIXME always save
-        if (! fContext->patch->hasAutosave())
-            fContext->patch->saveAutosave();
-        fContext->patch->loadAutosave();
+        WindowParametersSetCallback(fContext->window, this);
     }
 
     ~CardinalUI() override
@@ -143,13 +161,41 @@ public:
     void onNanoDisplay() override
     {
         const ScopedContext sc(this);
-
         fContext->window->step();
     }
 
     void uiIdle() override
     {
         repaint();
+    }
+
+    void WindowParametersChanged(const WindowParameterList param, const float value) override
+    {
+        float mult;
+
+        switch (param)
+        {
+        case kWindowParameterCableOpacity:
+            mult = 100.0f;
+            fWindowParameters.cableOpacity = value;
+            break;
+        case kWindowParameterCableTension:
+            mult = 100.0f;
+            fWindowParameters.cableTension = value;
+            break;
+        case kWindowParameterRackBrightness:
+            mult = 100.0f;
+            fWindowParameters.rackBrightness = value;
+            break;
+        case kWindowParameterHaloBrightness:
+            mult = 100.0f;
+            fWindowParameters.haloBrightness = value;
+            break;
+        default:
+            return;
+        }
+
+        setParameterValue((uint)param, value * mult);
     }
 
 protected:
@@ -160,7 +206,30 @@ protected:
       A parameter has changed on the plugin side.
       This is called by the host to inform the UI about parameter changes.
     */
-    void parameterChanged(uint32_t index, float value) override
+    void parameterChanged(const uint32_t index, const float value) override
+    {
+        switch (index)
+        {
+        case kWindowParameterCableOpacity:
+            fWindowParameters.cableOpacity = value / 100.0f;
+            break;
+        case kWindowParameterCableTension:
+            fWindowParameters.cableTension = value / 100.0f;
+            break;
+        case kWindowParameterRackBrightness:
+            fWindowParameters.rackBrightness = value / 100.0f;
+            break;
+        case kWindowParameterHaloBrightness:
+            fWindowParameters.haloBrightness = value / 100.0f;
+            break;
+        default:
+            return;
+        }
+
+        WindowParametersSetValues(fContext->window, fWindowParameters);
+    }
+
+    void stateChanged(const char* key, const char* value) override
     {
     }
 
