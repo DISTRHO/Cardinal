@@ -31,6 +31,8 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
+static constexpr const uint kModuleParameters = 24;
+
 class CardinalBasePlugin : public Plugin {
 public:
     CardinalBasePlugin(uint32_t parameterCount, uint32_t programCount, uint32_t stateCount)

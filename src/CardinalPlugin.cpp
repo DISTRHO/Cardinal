@@ -129,7 +129,7 @@ class CardinalPlugin : public CardinalBasePlugin
     rack::audio::Device* fCurrentDevice;
     Mutex fDeviceMutex;
 
-    float fParameters[kWindowParameterCount];
+    float fParameters[kModuleParameters + kWindowParameterCount];
 
     struct ScopedContext {
         const MutexLocker cml;
@@ -148,17 +148,19 @@ class CardinalPlugin : public CardinalBasePlugin
 
 public:
     CardinalPlugin()
-        : CardinalBasePlugin(kWindowParameterCount, 0, 1),
+        : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, 1),
           fContext(new CardinalPluginContext(this)),
           fAudioBufferIn(nullptr),
           fAudioBufferOut(nullptr),
           fIsActive(false),
           fCurrentDevice(nullptr)
     {
-        fParameters[kWindowParameterCableOpacity] = 50.0f;
-        fParameters[kWindowParameterCableTension] = 50.0f;
-        fParameters[kWindowParameterRackBrightness] = 100.0f;
-        fParameters[kWindowParameterHaloBrightness] = 25.0f;
+        std::memset(fParameters, 0, sizeof(fParameters));
+
+        fParameters[kModuleParameters + kWindowParameterCableOpacity] = 50.0f;
+        fParameters[kModuleParameters + kWindowParameterCableTension] = 50.0f;
+        fParameters[kModuleParameters + kWindowParameterRackBrightness] = 100.0f;
+        fParameters[kModuleParameters + kWindowParameterHaloBrightness] = 25.0f;
 
         // create unique temporary path for this instance
         try {
@@ -186,6 +188,11 @@ public:
         fContext->patch = new rack::patch::Manager;
         fContext->patch->autosavePath = fAutosavePath;
         fContext->patch->templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
+
+        fContext->event = new rack::widget::EventState;
+        fContext->scene = new rack::app::Scene;
+        fContext->event->rootWidget = fContext->scene;
+
         fContext->patch->loadTemplate();
         fContext->engine->startFallbackThread();
     }
@@ -194,6 +201,13 @@ public:
     {
         {
             const ScopedContext sc(this);
+            /*
+            delete fContext->scene;
+            fContext->scene = nullptr;
+
+            delete fContext->event;
+            fContext->event = nullptr;
+            */
             delete fContext;
         }
 
@@ -285,7 +299,21 @@ protected:
 
     void initParameter(const uint32_t index, Parameter& parameter) override
     {
-        switch (index)
+        if (index < kModuleParameters)
+        {
+            parameter.name = "Parameter ";
+            parameter.name += String(index + 1);
+            parameter.symbol = "param_";
+            parameter.symbol += String(index + 1);
+            parameter.unit = "v";
+            parameter.hints = kParameterIsAutomable;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 10.0f;
+            return;
+        }
+
+        switch (index - kModuleParameters)
         {
         case kWindowParameterCableOpacity:
             parameter.name = "Cable Opacity";

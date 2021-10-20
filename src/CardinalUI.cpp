@@ -100,10 +100,6 @@ public:
         {
             const ScopedContext sc(this);
 
-            fContext->event = new rack::widget::EventState;
-            fContext->scene = new rack::app::Scene;
-            fContext->event->rootWidget = fContext->scene;
-
             rack::window::WindowInit(fContext->window, this);
 
             // Hide non-wanted menu entries
@@ -143,12 +139,6 @@ public:
                     }
                 }
             }
-
-            // we need to reload current patch for things to show on screen :(
-            // FIXME always save
-            if (! fContext->patch->hasAutosave())
-                fContext->patch->saveAutosave();
-            fContext->patch->loadAutosave();
         }
 
         WindowParametersSetCallback(fContext->window, this);
@@ -160,12 +150,6 @@ public:
 
         delete fContext->window;
         fContext->window = nullptr;
-
-        delete fContext->scene;
-        fContext->scene = nullptr;
-
-        delete fContext->event;
-        fContext->event = nullptr;
     }
 
     void onNanoDisplay() override
@@ -218,7 +202,10 @@ protected:
     */
     void parameterChanged(const uint32_t index, const float value) override
     {
-        switch (index)
+        if (index < kModuleParameters)
+            return;
+
+        switch (index - kModuleParameters)
         {
         case kWindowParameterCableOpacity:
             fWindowParameters.cableOpacity = value / 100.0f;
