@@ -17,6 +17,26 @@
 
 #include "plugin.hpp"
 
+// -----------------------------------------------------------------------------------------------------------
+// from PluginContext.hpp
+
+namespace DISTRHO {
+
+static constexpr const uint kModuleParameters = 24;
+
+struct CardinalPluginContext : rack::Context {
+    uint32_t bufferSize;
+    double sampleRate;
+    float parameters[kModuleParameters];
+    // more stuff follows, but we dont care..
+};
+
+}
+
+using namespace DISTRHO;
+
+// -----------------------------------------------------------------------------------------------------------
+
 struct HostParameters : Module {
     enum ParamIds {
         NUM_PARAMS
@@ -25,18 +45,55 @@ struct HostParameters : Module {
         NUM_INPUTS
     };
     enum OutputIds {
-        NUM_OUTPUTS
+        NUM_OUTPUTS = 24
     };
     enum LightIds {
         NUM_LIGHTS
     };
 
-    HostParameters() {
+    rack::dsp::SlewLimiter parameters[kModuleParameters];
+    float sampleTime = 0.0f;
+
+    HostParameters()
+    {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+
+        CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP);
+
+        if (pcontext == nullptr)
+            throw rack::Exception("Plugin context is null.");
+
+        const float fsampleRate = static_cast<float>(pcontext->sampleRate);
+        SampleRateChangeEvent e = {
+            fsampleRate,
+            1.0f / fsampleRate
+        };
+        onSampleRateChange(e);
     }
 
-    void process(const ProcessArgs&) override {
-        // TODO
+    void process(const ProcessArgs&) override
+    {
+        if (CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP))
+        {
+            for (uint i=0; i<kModuleParameters; ++i)
+                outputs[i].setVoltage(parameters[i].process(sampleTime, pcontext->parameters[i]));
+        }
+    }
+
+    void onSampleRateChange(const SampleRateChangeEvent& e) override
+    {
+        if (CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP))
+        {
+            const double fall = 1.0 / (double(pcontext->bufferSize) / e.sampleRate);
+
+            for (uint i=0; i<kModuleParameters; ++i)
+            {
+                parameters[i].reset();
+                parameters[i].setRiseFall(fall, fall);
+            }
+
+            sampleTime = e.sampleTime;
+        }
     }
 };
 
@@ -44,6 +101,22 @@ struct HostParametersWidget : ModuleWidget {
     HostParametersWidget(HostParameters* const module) {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostParameters.svg")));
+
+        addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+        addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+        addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+        const float startX = 10.0f;
+        const float startY = 170.0f;
+        const float padding = 30.0f;
+
+        for (int i=0; i<24; ++i)
+        {
+            const float x = startX + int(i / 6) * padding;
+            const float y = startY + int(i % 6) * padding;
+            addOutput(createOutput<PJ301MPort>(Vec(x, y), module, i));
+        }
     }
 };
 

@@ -11,5 +11,25 @@
   "manualUrl": "https://github.com/DISTRHO/Cardinal/wiki",
   "sourceUrl": "https://github.com/DISTRHO/Cardinal",
   "changelogUrl": "",
-  "modules": []
+  "modules":
+  [
+    {
+      "slug": "HostParameters",
+      "disabled": false,
+      "name": "Host Parameters",
+      "description": "Exposes host-controlled plugin parameters as module",
+      "tags": [
+        "Utility"
+      ]
+    },
+    {
+      "slug": "HostTime",
+      "disabled": false,
+      "name": "Host Time",
+      "description": "Exposes host-provided timing information as module",
+      "tags": [
+        "Utility"
+      ]
+    }
+  ]
 }

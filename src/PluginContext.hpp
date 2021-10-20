@@ -33,27 +33,51 @@ START_NAMESPACE_DISTRHO
 
 static constexpr const uint kModuleParameters = 24;
 
+// -----------------------------------------------------------------------------------------------------------
+
+struct CardinalPluginContext : rack::Context {
+    uint32_t bufferSize;
+    double sampleRate;
+    float parameters[kModuleParameters];
+
+    Mutex mutex;
+    Plugin* const plugin;
+
+    CardinalPluginContext(Plugin* const p)
+        : bufferSize(p->getBufferSize()),
+          sampleRate(p->getSampleRate()),
+          plugin(p)
+    {
+        std::memset(parameters, 0, sizeof(parameters));
+    }
+};
+
+// -----------------------------------------------------------------------------------------------------------
+
 class CardinalBasePlugin : public Plugin {
 public:
+    CardinalPluginContext* const context;
+
     CardinalBasePlugin(uint32_t parameterCount, uint32_t programCount, uint32_t stateCount)
-        : Plugin(parameterCount, programCount, stateCount) {}
+        : Plugin(parameterCount, programCount, stateCount),
+          context(new CardinalPluginContext(this)) {}
     ~CardinalBasePlugin() override {}
     virtual bool isActive() const noexcept = 0;
     virtual bool canAssignDevice() const noexcept = 0;
     virtual void assignDevice(rack::audio::Device* dev) noexcept = 0;
     virtual bool clearDevice(rack::audio::Device* dev) noexcept = 0;
 
-    // ensure context validity through UI and setState
-    Mutex contextMutex;
-};
+protected:
+    void bufferSizeChanged(const uint32_t newBufferSize) override
+    {
+        context->bufferSize = newBufferSize;
+    }
 
-// -----------------------------------------------------------------------------------------------------------
-
-struct CardinalPluginContext : rack::Context {
-    CardinalBasePlugin* const plugin;
-
-    CardinalPluginContext(CardinalBasePlugin* const p)
-        : plugin(p) {}
+    void sampleRateChanged(const double newSampleRate) override
+    {
+        context->sampleRate = newSampleRate;
+        // context->engine->setSampleRate(newSampleRate);
+    }
 };
 
 // -----------------------------------------------------------------------------------------------------------
@@ -144,7 +168,7 @@ struct CardinalAudioDriver : rack::audio::Driver {
         CardinalPluginContext* const pluginContext = reinterpret_cast<CardinalPluginContext*>(port->context);
         DISTRHO_SAFE_ASSERT_RETURN(pluginContext != nullptr, nullptr);
 
-        CardinalBasePlugin* const plugin = pluginContext->plugin;
+        CardinalBasePlugin* const plugin = reinterpret_cast<CardinalBasePlugin*>(pluginContext->plugin);
         DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, nullptr);
 
         if (! plugin->canAssignDevice())
@@ -168,7 +192,7 @@ struct CardinalAudioDriver : rack::audio::Driver {
         CardinalPluginContext* const pluginContext = reinterpret_cast<CardinalPluginContext*>(port->context);
         DISTRHO_SAFE_ASSERT_RETURN(pluginContext != nullptr,);
 
-        CardinalBasePlugin* const plugin = pluginContext->plugin;
+        CardinalBasePlugin* const plugin = reinterpret_cast<CardinalBasePlugin*>(pluginContext->plugin);
         DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr,);
 
         if (plugin->clearDevice(device))

@@ -119,7 +119,6 @@ static const Initializer& getInitializerInstance()
 
 class CardinalPlugin : public CardinalBasePlugin
 {
-    CardinalPluginContext* const fContext;
     float* fAudioBufferIn;
     float* fAudioBufferOut;
     std::string fAutosavePath;
@@ -129,15 +128,15 @@ class CardinalPlugin : public CardinalBasePlugin
     rack::audio::Device* fCurrentDevice;
     Mutex fDeviceMutex;
 
-    float fParameters[kModuleParameters + kWindowParameterCount];
+    float fWindowParameters[kWindowParameterCount];
 
     struct ScopedContext {
         const MutexLocker cml;
 
         ScopedContext(const CardinalPlugin* const plugin)
-            : cml(plugin->contextMutex)
+            : cml(plugin->context->mutex)
         {
-            rack::contextSet(plugin->fContext);
+            rack::contextSet(plugin->context);
         }
 
         ~ScopedContext()
@@ -149,18 +148,15 @@ class CardinalPlugin : public CardinalBasePlugin
 public:
     CardinalPlugin()
         : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, 1),
-          fContext(new CardinalPluginContext(this)),
           fAudioBufferIn(nullptr),
           fAudioBufferOut(nullptr),
           fIsActive(false),
           fCurrentDevice(nullptr)
     {
-        std::memset(fParameters, 0, sizeof(fParameters));
-
-        fParameters[kModuleParameters + kWindowParameterCableOpacity] = 50.0f;
-        fParameters[kModuleParameters + kWindowParameterCableTension] = 50.0f;
-        fParameters[kModuleParameters + kWindowParameterRackBrightness] = 100.0f;
-        fParameters[kModuleParameters + kWindowParameterHaloBrightness] = 25.0f;
+        fWindowParameters[kWindowParameterCableOpacity] = 50.0f;
+        fWindowParameters[kWindowParameterCableTension] = 50.0f;
+        fWindowParameters[kWindowParameterRackBrightness] = 100.0f;
+        fWindowParameters[kWindowParameterHaloBrightness] = 25.0f;
 
         // create unique temporary path for this instance
         try {
@@ -183,18 +179,18 @@ public:
 
         const ScopedContext sc(this);
 
-        fContext->engine = new rack::engine::Engine;
-        fContext->history = new rack::history::State;
-        fContext->patch = new rack::patch::Manager;
-        fContext->patch->autosavePath = fAutosavePath;
-        fContext->patch->templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
+        context->engine = new rack::engine::Engine;
+        context->history = new rack::history::State;
+        context->patch = new rack::patch::Manager;
+        context->patch->autosavePath = fAutosavePath;
+        context->patch->templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
 
-        fContext->event = new rack::widget::EventState;
-        fContext->scene = new rack::app::Scene;
-        fContext->event->rootWidget = fContext->scene;
+        context->event = new rack::widget::EventState;
+        context->scene = new rack::app::Scene;
+        context->event->rootWidget = context->scene;
 
-        fContext->patch->loadTemplate();
-        fContext->engine->startFallbackThread();
+        context->patch->loadTemplate();
+        context->engine->startFallbackThread();
     }
 
     ~CardinalPlugin() override
@@ -202,13 +198,13 @@ public:
         {
             const ScopedContext sc(this);
             /*
-            delete fContext->scene;
-            fContext->scene = nullptr;
+            delete context->scene;
+            context->scene = nullptr;
 
-            delete fContext->event;
-            fContext->event = nullptr;
+            delete context->event;
+            context->event = nullptr;
             */
-            delete fContext;
+            delete context;
         }
 
         if (! fAutosavePath.empty())
@@ -217,7 +213,7 @@ public:
 
     CardinalPluginContext* getRackContext() const noexcept
     {
-        return fContext;
+        return context;
     }
 
 protected:
@@ -365,14 +361,34 @@ protected:
    /* --------------------------------------------------------------------------------------------------------
     * Internal data */
 
-    float getParameterValue(const uint32_t index) const override
+    float getParameterValue(uint32_t index) const override
     {
-        return fParameters[index];
+        if (index < kModuleParameters)
+            return context->parameters[index];
+
+        index -= kModuleParameters;
+
+        if (index < kWindowParameterCount)
+            return fWindowParameters[index];
+
+        return 0.0f;
     }
 
-    void setParameterValue(const uint32_t index, float value) override
+    void setParameterValue(uint32_t index, float value) override
     {
-        fParameters[index] = value;
+        if (index < kModuleParameters)
+        {
+            context->parameters[index] = value;
+            return;
+        }
+
+        index -= kModuleParameters;
+
+        if (index < kWindowParameterCount)
+        {
+            fWindowParameters[index] = value;
+            return;
+        }
     }
 
     String getState(const char* const key) const override
@@ -387,9 +403,9 @@ protected:
         {
             const ScopedContext sc(this);
 
-            fContext->engine->prepareSave();
-            fContext->patch->saveAutosave();
-            fContext->patch->cleanAutosave();
+            context->engine->prepareSave();
+            context->patch->saveAutosave();
+            context->patch->cleanAutosave();
 
             data = rack::system::archiveDirectory(fAutosavePath, 1);
         }
@@ -412,7 +428,7 @@ protected:
         rack::system::createDirectories(fAutosavePath);
         rack::system::unarchiveToDirectory(data, fAutosavePath);
 
-        fContext->patch->loadAutosave();
+        context->patch->loadAutosave();
     }
 
    /* --------------------------------------------------------------------------------------------------------
@@ -450,8 +466,8 @@ protected:
     void run(const float** const inputs, float** const outputs, const uint32_t frames) override
     {
         /*
-        fContext->engine->setFrame(getTimePosition().frame);
-        fContext->engine->stepBlock(frames);
+        context->engine->setFrame(getTimePosition().frame);
+        context->engine->stepBlock(frames);
         */
 
         const MutexLocker cml(fDeviceMutex);
@@ -481,13 +497,6 @@ protected:
             outputs[1][i] = fAudioBufferOut[j++];
         }
     }
-
-    /*
-    void sampleRateChanged(const double newSampleRate) override
-    {
-        fContext->engine->setSampleRate(newSampleRate);
-    }
-    */
 
     // -------------------------------------------------------------------------------------------------------
 

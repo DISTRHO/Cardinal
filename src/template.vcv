@@ -1,5 +1,11 @@
 {
   "version": "2.0",
+  "unsaved": true,
+  "zoom": 1.0,
+  "gridOffset": [
+    -3.5333333015441895,
+    -0.078947365283966064
+  ],
   "modules": [
     {
       "id": 1,
@@ -12,10 +18,11 @@
           "id": 0
         }
       ],
+      "rightModuleId": 4245168092954973,
       "data": {
         "audio": {
           "driver": 0,
-          "deviceName": "Plugin Device",
+          "deviceName": "Cardinal",
           "sampleRate": 48000.0,
           "blockSize": 512,
           "inputOffset": 0,
@@ -25,6 +32,18 @@
       },
       "pos": [
         0,
+        0
+      ]
+    },
+    {
+      "id": 4245168092954973,
+      "plugin": "Cardinal",
+      "model": "HostParameters",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 1,
+      "pos": [
+        5,
         0
       ]
     }

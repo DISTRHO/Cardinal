@@ -63,7 +63,7 @@ class CardinalUI : public UI,
 
         ScopedContext(CardinalUI* const ui)
             : context(ui->fContext),
-              cml(context->plugin->contextMutex)
+              cml(context->mutex)
         {
             rack::contextSet(context);
             WindowParametersRestore(context->window);
@@ -71,7 +71,7 @@ class CardinalUI : public UI,
 
         ScopedContext(CardinalUI* const ui, const int mods)
             : context(ui->fContext),
-              cml(context->plugin->contextMutex)
+              cml(context->mutex)
         {
             rack::contextSet(context);
             rack::window::WindowMods(context->window, mods);

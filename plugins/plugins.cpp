@@ -769,9 +769,8 @@ static void initStatic__Cardinal()
     const StaticPluginLoader spl(p, "Cardinal");
     if (spl.ok())
     {
-        // TODO implement these
-        // p->addModel(modelHostParameters);
-        // p->addModel(modelHostTime);
+        p->addModel(modelHostParameters);
+        p->addModel(modelHostTime);
     }
 }
 
