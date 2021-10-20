@@ -166,6 +166,8 @@ all: $(TARGETS)
 
 clean:
 	rm -f $(TARGETS)
+	rm -f $(DEP_PATH)/*.tgz
+	rm -f $(DEP_PATH)/*.tar.gz
 	rm -rf $(DEP_PATH)/bin
 	rm -rf $(DEP_PATH)/include
 	rm -rf $(DEP_PATH)/lib

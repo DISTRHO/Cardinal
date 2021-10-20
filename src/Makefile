@@ -70,6 +70,7 @@ EXTRA_DEPENDENCIES = $(EXTRA_LIBS)
 # Do some magic
 
 DPF_PATH = ../dpf
+DPF_BUILD_DIR = ../build
 DPF_TARGET_DIR = ../bin
 include ../dpf/Makefile.plugins.mk
 
