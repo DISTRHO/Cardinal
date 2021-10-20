@@ -69,9 +69,19 @@ class CardinalUI : public UI,
             WindowParametersRestore(context->window);
         }
 
+        ScopedContext(CardinalUI* const ui, const int mods)
+            : context(ui->fContext),
+              cml(context->plugin->contextMutex)
+        {
+            rack::contextSet(context);
+            rack::window::WindowMods(context->window, mods);
+            WindowParametersRestore(context->window);
+        }
+
         ~ScopedContext()
         {
-            WindowParametersSave(context->window);
+            if (context->window != nullptr)
+                WindowParametersSave(context->window);
             rack::contextSet(nullptr);
         }
     };
@@ -321,9 +331,7 @@ protected:
         #endif
         */
 
-        rack::window::WindowMods(fContext->window, mods);
-
-        const ScopedContext sc(this);
+        const ScopedContext sc(this, mods);
         return fContext->event->handleButton(fLastMousePos, button, action, mods);
     }
 
@@ -333,9 +341,8 @@ protected:
         const rack::math::Vec mouseDelta = mousePos.minus(fLastMousePos);
 
         fLastMousePos = mousePos;
-        rack::window::WindowMods(fContext->window, glfwMods(ev.mod));
 
-        const ScopedContext sc(this);
+        const ScopedContext sc(this, glfwMods(ev.mod));
         return fContext->event->handleHover(mousePos, mouseDelta);
     }
 
@@ -348,9 +355,7 @@ protected:
         scrollDelta = scrollDelta.mult(50.0);
 #endif
 
-        rack::window::WindowMods(fContext->window, glfwMods(ev.mod));
-
-        const ScopedContext sc(this);
+        const ScopedContext sc(this, glfwMods(ev.mod));
         return fContext->event->handleScroll(fLastMousePos, scrollDelta);
     }
 
@@ -359,9 +364,7 @@ protected:
         if (ev.character <= ' ' || ev.character >= kKeyDelete)
             return false;
 
-        rack::window::WindowMods(fContext->window, glfwMods(ev.mod));
-
-        const ScopedContext sc(this);
+        const ScopedContext sc(this, glfwMods(ev.mod));
         return fContext->event->handleText(fLastMousePos, ev.character);
     }
 
@@ -438,7 +441,7 @@ protected:
 
         rack::window::WindowMods(fContext->window, mods);
 
-        const ScopedContext sc(this);
+        const ScopedContext sc(this, mods);
         return fContext->event->handleKey(fLastMousePos, key, ev.keycode, action, mods);
     }
 
@@ -447,9 +450,7 @@ protected:
         if (focus)
             return;
 
-        rack::window::WindowMods(fContext->window, 0);
-
-        const ScopedContext sc(this);
+        const ScopedContext sc(this, 0);
         fContext->event->handleLeave();
     }
 

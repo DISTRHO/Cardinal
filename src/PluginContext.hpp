@@ -114,7 +114,12 @@ struct CardinalAudioDriver : rack::audio::Driver {
 
     std::vector<int> getDeviceIds() override
     {
-        return std::vector<int>({ 1 });
+        return std::vector<int>({ 0 });
+    }
+
+    int getDefaultDeviceId() override
+    {
+        return 0;
     }
 
     std::string getDeviceName(int) override
