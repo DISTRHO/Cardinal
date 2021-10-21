@@ -292,7 +292,9 @@ struct StaticPluginLoader {
           file(nullptr),
           rootJ(nullptr)
     {
+#ifdef DEBUG
         DEBUG("Loading plugin module %s", name);
+#endif
 
         p->path = asset::pluginPath(name);
 
