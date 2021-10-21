@@ -173,7 +173,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
             bin/*
 
