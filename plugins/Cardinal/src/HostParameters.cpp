@@ -16,24 +16,29 @@
  */
 
 #include "plugin.hpp"
+#include "../dpf/distrho/extra/Mutex.hpp"
 
 // -----------------------------------------------------------------------------------------------------------
 // from PluginContext.hpp
 
-namespace DISTRHO {
+START_NAMESPACE_DISTRHO
 
 static constexpr const uint32_t kModuleParameters = 24;
+
+class Plugin;
 
 struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize;
     double sampleRate;
     float parameters[kModuleParameters];
-    // more stuff follows, but we dont care..
+    Mutex mutex;
+    Plugin* const plugin;
+    CardinalPluginContext(Plugin* const p);
 };
 
-}
+END_NAMESPACE_DISTRHO
 
-using namespace DISTRHO;
+USE_NAMESPACE_DISTRHO;
 
 // -----------------------------------------------------------------------------------------------------------
 
