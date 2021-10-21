@@ -5,6 +5,13 @@
 #
 
 # --------------------------------------------------------------
+# Build config
+
+PREFIX  ?= /usr/local
+DESTDIR ?=
+SYSDEPS ?= false
+
+# --------------------------------------------------------------
 # Project name, used for binaries
 
 NAME = Cardinal
@@ -150,10 +157,41 @@ SOURCE_DIR = $(CURDIR)
 endif
 
 BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_SOURCE_DIR='"$(SOURCE_DIR)"'
+BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 
 # --------------------------------------------------------------
 # Enable all possible plugin types
 
-all: jack lv2 vst2 vst3
+all: jack lv2 vst2 vst3 resources
+
+# --------------------------------------------------------------
+
+CORE_RESOURCES = $(wildcard Rack/res/*)
+
+PLUGIN_RESOURCES += $(CORE_RESOURCES:%=../bin/Cardinal.lv2/resources/%)
+ifeq ($(MACOS),true)
+PLUGIN_RESOURCES += $(CORE_RESOURCES:%=../bin/Cardinal.vst/Contents/Resources/%)
+else
+PLUGIN_RESOURCES += $(CORE_RESOURCES:%=../bin/Cardinal.vst/resources/%)
+endif
+PLUGIN_RESOURCES += $(CORE_RESOURCES:%=../bin/Cardinal.vst3/Contents/Resources/%)
+
+resources: $(PLUGIN_RESOURCES)
+
+../bin/Cardinal.lv2/resources/%: Rack/res/%
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
+
+../bin/Cardinal.vst/resources/%: Rack/res/%
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
+
+../bin/Cardinal.vst/Contents/Resources/%: Rack/res/%
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
+
+../bin/Cardinal.vst3/Contents/Resources/%: Rack/res/%
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
 
 # --------------------------------------------------------------

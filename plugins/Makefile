@@ -319,6 +319,55 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 # --------------------------------------------------------------
+
+PLUGIN_LIST       = $(subst /plugin.json,,$(wildcard */plugin.json))
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/%)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
+ifeq ($(MACOS),true)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst/Contents/Resources/%)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst/Contents/Resources/PluginManifests/%.json)
+else
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst/resources/%)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst/resources/PluginManifests/%.json)
+endif
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst3/Contents/Resources/%)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst3/Contents/Resources/PluginManifests/%.json)
+
+resources: $(PLUGIN_RESOURCES)
+
+../bin/Cardinal.lv2/resources/%: %/res
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
+
+../bin/Cardinal.vst/resources/%: %/res
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
+
+../bin/Cardinal.vst/Contents/Resources/%: %/res
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
+
+../bin/Cardinal.vst3/Contents/Resources/%: %/res
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
+
+../bin/Cardinal.lv2/resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
+
+../bin/Cardinal.vst/resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
+
+../bin/Cardinal.vst/Contents/Resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
+
+../bin/Cardinal.vst3/Contents/Resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
+
+# --------------------------------------------------------------
 # Build commands
 
 PLUGIN_OBJS  = $(PLUGIN_FILES:%=$(BUILD_DIR)/%.o)

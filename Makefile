@@ -6,7 +6,24 @@
 
 include dpf/Makefile.base.mk
 
-all: cardinal deps dgl plugins gen
+all: cardinal deps dgl plugins gen resources
+
+# --------------------------------------------------------------
+# Build config
+
+PREFIX  ?= /usr/local
+DESTDIR ?=
+SYSDEPS ?= false
+
+# --------------------------------------------------------------
+# Check for system-wide dependencies
+
+# HAVE_LIBARCHIVE = $(shell pkg-config --exists libarchive && echo true)
+#
+# libjansson.a
+# libsamplerate.a
+# libspeexdsp.a
+# libzstd.a
 
 # --------------------------------------------------------------
 
@@ -22,6 +39,9 @@ dgl:
 
 plugins: deps
 	$(MAKE) all -C plugins
+
+resources: cardinal gen
+	$(MAKE) resources -C plugins
 
 ifneq ($(CROSS_COMPILING),true)
 gen: cardinal dpf/utils/lv2_ttl_generator

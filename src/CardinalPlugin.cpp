@@ -72,23 +72,32 @@ struct Initializer {
         random::init();
         ui::init();
 
-        std::string resDir;
-
-        if (const char* const bundlePath = plugin->getBundlePath())
+        if (asset::systemDir.empty())
         {
-            asset::systemDir = bundlePath;
-#ifdef DISTRHO_OS_MAC
-            asset::systemDir += "/Contents/Resources";
-#endif
-        }
-        else
-        {
-            // Make system dir point to source code location as fallback
-            // TODO use /usr/share if on linux? if we count on it being installed..
-            asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack" DISTRHO_OS_SEP_STR "res";
-        }
+            if (const char* const bundlePath = plugin->getBundlePath())
+            {
+                if (const char* const resourcePath = getResourcePath(bundlePath))
+                {
+                    asset::bundlePath = system::join(resourcePath, "PluginManifests");
+                    asset::systemDir = resourcePath;
+                }
+            }
 
-        asset::userDir = asset::systemDir;
+            if (asset::systemDir.empty())
+            {
+                // Make system dir point to source code location as fallback
+                // TODO use /usr/share if on linux? if we count on it being installed..
+                asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
+
+                if (! system::isDirectory(system::join(asset::systemDir, "res")))
+                {
+                    asset::bundlePath = CARDINAL_PLUGIN_PREFIX "/share/Cardinal/Plugins";
+                    asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/Cardinal/Resources";
+                }
+            }
+
+            asset::userDir = asset::systemDir;
+        }
 
         // Log environment
         INFO("%s %s v%s", APP_NAME.c_str(), APP_EDITION.c_str(), APP_VERSION.c_str());

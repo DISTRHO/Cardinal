@@ -87,14 +87,19 @@ static inline std::string& trim(std::string& s) {
     return s;
 }
 std::string system(std::string filename) {
-	return system::join(systemDir, trim(filename));
+    return system::join(systemDir, bundlePath.empty() ? filename : trim(filename));
 }
 std::string user(std::string filename) {
-	return system::join(userDir, trim(filename));
+    return system(filename);
 }
 std::string plugin(plugin::Plugin* plugin, std::string filename) {
-	DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, {});
-	return system::join(systemDir, plugin->path, trim(filename));
+    DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, {});
+    return system::join(systemDir, plugin->path, bundlePath.empty() ? filename : trim(filename));
+}
+std::string pluginManifest(std::string dirname) {
+    if (bundlePath.empty())
+        return system::join(systemDir, dirname, "plugin.json");
+    return system::join(bundlePath, dirname + ".json");
 }
 }
 }
