@@ -228,16 +228,19 @@ public:
     ~CardinalPlugin() override
     {
         {
-            const ScopedContext sc(this);
+            const MutexLocker cml(context->mutex);
+            rack::contextSet(context);
+
             /*
             delete context->scene;
             context->scene = nullptr;
-
             delete context->event;
             context->event = nullptr;
             */
-            delete context;
         }
+
+        delete context;
+        rack::contextSet(nullptr);
 
         if (! fAutosavePath.empty())
             rack::system::removeRecursively(fAutosavePath);

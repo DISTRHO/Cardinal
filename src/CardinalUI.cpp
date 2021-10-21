@@ -139,6 +139,7 @@ public:
                     if (button->text == "Library")
                     {
                         layout->children.erase(it);
+                        button->parent = nullptr;
                         delete button;
                         break;
                     }
