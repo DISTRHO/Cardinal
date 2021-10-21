@@ -22,7 +22,7 @@
 
 namespace DISTRHO {
 
-static constexpr const uint kModuleParameters = 24;
+static constexpr const uint32_t kModuleParameters = 24;
 
 struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize;
@@ -75,7 +75,7 @@ struct HostParameters : Module {
     {
         if (CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP))
         {
-            for (uint i=0; i<kModuleParameters; ++i)
+            for (uint32_t i=0; i<kModuleParameters; ++i)
                 outputs[i].setVoltage(parameters[i].process(sampleTime, pcontext->parameters[i]));
         }
     }
@@ -86,7 +86,7 @@ struct HostParameters : Module {
         {
             const double fall = 1.0 / (double(pcontext->bufferSize) / e.sampleRate);
 
-            for (uint i=0; i<kModuleParameters; ++i)
+            for (uint32_t i=0; i<kModuleParameters; ++i)
             {
                 parameters[i].reset();
                 parameters[i].setRiseFall(fall, fall);
