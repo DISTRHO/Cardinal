@@ -15,7 +15,6 @@ SYSDEPS ?= false
 # Import base definitions
 
 USE_NANOVG_FBO = true
-USE_RGBA = true
 include ../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------

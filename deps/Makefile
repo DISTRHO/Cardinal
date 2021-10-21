@@ -10,7 +10,6 @@ DEP_PATH = $(abspath ../src/Rack/dep)
 # Import base definitions
 
 USE_NANOVG_FBO = true
-USE_RGBA = true
 include ../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------

@@ -46,8 +46,8 @@ ifneq ($(SYSDEPS),true)
 endif
 
 dgl:
-	$(MAKE) USE_NANOVG_FBO=true USE_RGBA=true -C dpf/dgl opengl
-	# $(MAKE) opengl -C dpf/dgl USE_NANOVG_FBO=true USE_RGBA=true
+	$(MAKE) USE_NANOVG_FBO=true -C dpf/dgl opengl
+	# $(MAKE) opengl -C dpf/dgl USE_NANOVG_FBO=true
 
 plugins: deps
 	$(MAKE) all -C plugins
