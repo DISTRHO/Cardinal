@@ -256,6 +256,11 @@ Plugin* pluginInstance__ZetaCarinaeModules;
 
 namespace rack {
 
+namespace asset {
+std::string pluginManifest(const std::string& dirname);
+std::string pluginPath(const std::string& dirname);
+}
+
 // core plugins
 namespace core {
 extern Model* modelAudioInterface;
@@ -280,42 +285,14 @@ struct StaticPluginLoader {
     FILE* file;
     json_t* rootJ;
 
-    // core
-    StaticPluginLoader(Plugin* const p)
-        : plugin(p),
-          file(nullptr),
-          rootJ(nullptr)
-    {
-        p->path = system::join(CARDINAL_PLUGINS_DIR, "Core.json");
-
-        if ((file = std::fopen(p->path.c_str(), "r")) == nullptr)
-        {
-            d_stderr2("Manifest file %s does not exist", p->path.c_str());
-            return;
-        }
-
-        json_error_t error;
-        if ((rootJ = json_loadf(file, 0, &error)) == nullptr)
-        {
-            d_stderr2("JSON parsing error at %s %d:%d %s", p->path.c_str(), error.line, error.column, error.text);
-            return;
-        }
-
-        // force ABI, we use static plugins so this doesnt matter as long as it builds
-        json_t* const version = json_string((APP_VERSION_MAJOR + ".0").c_str());
-        json_object_set(rootJ, "version", version);
-        json_decref(version);
-    }
-
-    // regular plugins
     StaticPluginLoader(Plugin* const p, const char* const name)
         : plugin(p),
           file(nullptr),
           rootJ(nullptr)
     {
-        p->path = system::join(CARDINAL_PLUGINS_DIR, name);
+        p->path = asset::pluginPath(name);
 
-        const std::string manifestFilename = system::join(p->path, "plugin.json");
+        const std::string manifestFilename = asset::pluginManifest(name);
 
         if ((file = std::fopen(manifestFilename.c_str(), "r")) == nullptr)
         {
@@ -359,7 +336,7 @@ static void initStatic__Core()
 {
     Plugin* const p = new Plugin;
 
-    const StaticPluginLoader spl(p);
+    const StaticPluginLoader spl(p, "Core");
     if (spl.ok())
     {
         p->addModel(rack::core::modelAudioInterface);

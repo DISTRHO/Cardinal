@@ -68,4 +68,20 @@ clean:
 
 # --------------------------------------------------------------
 
+install:
+	install -d $(DESTDIR)$(PREFIX)/bin
+	install -d $(DESTDIR)$(PREFIX)/lib/lv2
+	install -d $(DESTDIR)$(PREFIX)/lib/vst
+	install -d $(DESTDIR)$(PREFIX)/lib/vst3
+	install -d $(DESTDIR)$(PREFIX)/share/Cardinal
+
+	cp -rL bin/Cardinal.lv2  $(DESTDIR)$(PREFIX)/lib/lv2/
+	cp -rL bin/Cardinal.vst  $(DESTDIR)$(PREFIX)/lib/vst/
+	cp -rL bin/Cardinal.vst3 $(DESTDIR)$(PREFIX)/lib/vst3/
+
+	install -m 755 bin/Cardinal$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
+	cp -rL bin/Cardinal.lv2/resources/* $(DESTDIR)$(PREFIX)/share/Cardinal/
+
+# --------------------------------------------------------------
+
 .PHONY: deps plugins

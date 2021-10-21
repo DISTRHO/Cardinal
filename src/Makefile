@@ -79,6 +79,7 @@ EXTRA_DEPENDENCIES = $(EXTRA_LIBS)
 DPF_PATH = ../dpf
 DPF_BUILD_DIR = ../build
 DPF_TARGET_DIR = ../bin
+USE_VST2_BUNDLE = true
 include ../dpf/Makefile.plugins.mk
 
 # --------------------------------------------------------------
@@ -166,7 +167,7 @@ all: jack lv2 vst2 vst3 resources
 
 # --------------------------------------------------------------
 
-CORE_RESOURCES = $(wildcard Rack/res/*)
+CORE_RESOURCES = $(subst Rack/res/,,$(wildcard Rack/res/*)) template.vcv
 
 PLUGIN_RESOURCES += $(CORE_RESOURCES:%=../bin/Cardinal.lv2/resources/%)
 ifeq ($(MACOS),true)
@@ -177,6 +178,10 @@ endif
 PLUGIN_RESOURCES += $(CORE_RESOURCES:%=../bin/Cardinal.vst3/Contents/Resources/%)
 
 resources: $(PLUGIN_RESOURCES)
+
+../bin/Cardinal.%/template.vcv: template.vcv
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
 
 ../bin/Cardinal.lv2/resources/%: Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"

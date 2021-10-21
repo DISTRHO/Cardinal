@@ -86,13 +86,13 @@ struct Initializer {
             if (asset::systemDir.empty())
             {
                 // Make system dir point to source code location as fallback
-                // TODO use /usr/share if on linux? if we count on it being installed..
                 asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
 
+                // And if that fails, use install target prefix
                 if (! system::isDirectory(system::join(asset::systemDir, "res")))
                 {
-                    asset::bundlePath = CARDINAL_PLUGIN_PREFIX "/share/Cardinal/Plugins";
-                    asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/Cardinal/Resources";
+                    asset::bundlePath = CARDINAL_PLUGIN_PREFIX "/share/Cardinal/PluginManifests";
+                    asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/Cardinal";
                 }
             }
 
@@ -212,7 +212,8 @@ public:
         context->history = new rack::history::State;
         context->patch = new rack::patch::Manager;
         context->patch->autosavePath = fAutosavePath;
-        context->patch->templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
+        context->patch->templatePath = rack::system::join(rack::asset::systemDir, "template.vcv");
+        // context->patch->templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
 
         context->event = new rack::widget::EventState;
         context->scene = new rack::app::Scene;

@@ -235,13 +235,6 @@ PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/s
 PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCarinaeModules/src/*.cpp))
 
 # --------------------------------------------------------------
-# Resources to symlink
-
-# TODO
-# PLUGIN_RESOURCES = res/Befaco/res
-# PLUGIN_RESOURCES = res/Befaco/res
-
-# --------------------------------------------------------------
 # Build setup
 
 BUILD_DIR = ../build/plugins
@@ -297,17 +290,6 @@ BASE_FLAGS += -Wno-unused-variable
 BASE_FLAGS += -Wno-deprecated-declarations
 
 # --------------------------------------------------------------
-# temporary macro just to get the ball rolling
-
-ifeq ($(EXE_WRAPPER),wine)
-PLUGINS_DIR = Z:$(subst /,\\,$(CURDIR))
-else
-PLUGINS_DIR = $(CURDIR)
-endif
-
-BUILD_CXX_FLAGS += -DCARDINAL_PLUGINS_DIR='"$(PLUGINS_DIR)"'
-
-# --------------------------------------------------------------
 # Build targets
 
 TARGET = plugins.a
@@ -321,19 +303,27 @@ clean:
 # --------------------------------------------------------------
 
 PLUGIN_LIST       = $(subst /plugin.json,,$(wildcard */plugin.json))
+PLUGIN_RESOURCES  = ../bin/Cardinal.lv2/resources/PluginManifests/Core.json
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
 ifeq ($(MACOS),true)
+PLUGIN_RESOURCES += ../bin/Cardinal.vst/Contents/Resources/PluginManifests/Core.json
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst/Contents/Resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst/Contents/Resources/PluginManifests/%.json)
 else
+PLUGIN_RESOURCES += ../bin/Cardinal.vst/resources/PluginManifests/Core.json
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst/resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst/resources/PluginManifests/%.json)
 endif
+PLUGIN_RESOURCES += ../bin/Cardinal.vst3/Contents/Resources/PluginManifests/Core.json
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst3/Contents/Resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst3/Contents/Resources/PluginManifests/%.json)
 
 resources: $(PLUGIN_RESOURCES)
+
+../bin/Cardinal.%/Core.json: Core.json
+	-@mkdir -p "$(shell dirname $@)"
+	ln -sf $(abspath $<) $@
 
 ../bin/Cardinal.lv2/resources/%: %/res
 	-@mkdir -p "$(shell dirname $@)"

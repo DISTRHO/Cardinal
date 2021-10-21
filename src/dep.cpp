@@ -78,29 +78,57 @@ Exception::Exception(const char* format, ...)
 #include <plugin/Plugin.hpp>
 namespace rack {
 namespace asset {
-std::string systemDir;
-std::string userDir;
-std::string bundlePath;
-static inline std::string& trim(std::string& s) {
+
+std::string userDir; // ignored
+std::string systemDir; // points to plugin resources dir (or installed/local Rack dir)
+std::string bundlePath; // points to plugin manifests dir (or empty)
+
+// get rid of "res/" prefix
+static inline std::string& trim(std::string& s)
+{
     if (std::strncmp(s.c_str(), "res" DISTRHO_OS_SEP_STR, 4) == 0)
         s = s.substr(4, s.size()-4);
     return s;
 }
-std::string system(std::string filename) {
-    return system::join(systemDir, bundlePath.empty() ? filename : trim(filename));
-}
+
+// ignored, returns the same as `system`
 std::string user(std::string filename) {
     return system(filename);
 }
+
+// get system resource, trimming "res/" prefix if we are loaded as a plugin bundle
+std::string system(std::string filename) {
+    return system::join(systemDir, bundlePath.empty() ? filename : trim(filename));
+}
+
+// get plugin resource, also trims "res/" as needed
 std::string plugin(plugin::Plugin* plugin, std::string filename) {
     DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, {});
-    return system::join(systemDir, plugin->path, bundlePath.empty() ? filename : trim(filename));
+    return system::join(plugin->path, bundlePath.empty() ? filename : trim(filename));
 }
-std::string pluginManifest(std::string dirname) {
+
+// path to plugin manifest
+std::string pluginManifest(const std::string& dirname) {
     if (bundlePath.empty())
-        return system::join(systemDir, dirname, "plugin.json");
+    {
+        if (dirname == "Core")
+            return system::join(systemDir, "Core.json");
+        return system::join(systemDir, "..", "..", "plugins", dirname, "plugin.json");
+    }
     return system::join(bundlePath, dirname + ".json");
 }
+
+// path to plugin files
+std::string pluginPath(const std::string& dirname) {
+    if (bundlePath.empty())
+    {
+        if (dirname == "Core")
+            return systemDir;
+        return system::join(systemDir, "..", "..", "plugins", dirname);
+    }
+    return system::join(systemDir, dirname);
+}
+
 }
 }
 
