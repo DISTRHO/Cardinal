@@ -34,6 +34,7 @@
 #include "PluginContext.hpp"
 #include "WindowParameters.hpp"
 #include "extra/Base64.hpp"
+#include "extra/SharedResourcePointer.hpp"
 
 namespace rack {
 namespace plugin {
@@ -47,7 +48,7 @@ START_NAMESPACE_DISTRHO
 // -----------------------------------------------------------------------------------------------------------
 
 struct Initializer {
-    Initializer()
+    Initializer(const CardinalBasePlugin* const plugin)
     {
         using namespace rack;
 
@@ -60,10 +61,12 @@ struct Initializer {
         settings::skipLoadOnLaunch = true;
         settings::showTipsOnLaunch = false;
         settings::threadCount = 1;
+
         system::init();
         asset::init();
         logger::init();
         random::init();
+        ui::init();
 
         // Make system dir point to source code location. It is good enough for now
         asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
@@ -73,7 +76,6 @@ struct Initializer {
         INFO("%s", system::getOperatingSystemInfo().c_str());
         INFO("System directory: %s", asset::systemDir.c_str());
         INFO("User directory: %s", asset::userDir.c_str());
-        INFO("System time: %s", string::formatTimeISO(system::getUnixTime()).c_str());
 
         // Check existence of the system res/ directory
         const std::string resDir = asset::system("res");
@@ -83,42 +85,54 @@ struct Initializer {
                       "Make sure Cardinal was downloaded and installed correctly.", resDir.c_str());
         }
 
-        INFO("Initializing environment");
-        audio::init(); // does nothing
-        midi::init(); // does nothing
-
+        INFO("Initializing audio driver");
         rack::audio::addDriver(0, new CardinalAudioDriver);
 
+        INFO("Initializing plugins");
         plugin::initStaticPlugins();
-        ui::init();
     }
 
     ~Initializer()
     {
         using namespace rack;
 
-        ui::destroy(); // does nothing
-
         INFO("Destroying plugins");
         plugin::destroyStaticPlugins();
 
+        INFO("Destroying MIDI devices");
         midi::destroy();
+
+        INFO("Destroying audio devices");
         audio::destroy();
+
         INFO("Destroying logger");
         logger::destroy();
     }
 };
 
-static const Initializer& getInitializerInstance()
-{
-    static const Initializer init;
-    return init;
-}
+// -----------------------------------------------------------------------------------------------------------
+
+struct ScopedContext {
+    const MutexLocker cml;
+
+    ScopedContext(const CardinalBasePlugin* const plugin)
+        : cml(plugin->context->mutex)
+    {
+        rack::contextSet(plugin->context);
+    }
+
+    ~ScopedContext()
+    {
+        rack::contextSet(nullptr);
+    }
+};
 
 // -----------------------------------------------------------------------------------------------------------
 
 class CardinalPlugin : public CardinalBasePlugin
 {
+    SharedResourcePointer<Initializer> fInitializer;
+
     float* fAudioBufferIn;
     float* fAudioBufferOut;
     std::string fAutosavePath;
@@ -130,24 +144,10 @@ class CardinalPlugin : public CardinalBasePlugin
 
     float fWindowParameters[kWindowParameterCount];
 
-    struct ScopedContext {
-        const MutexLocker cml;
-
-        ScopedContext(const CardinalPlugin* const plugin)
-            : cml(plugin->context->mutex)
-        {
-            rack::contextSet(plugin->context);
-        }
-
-        ~ScopedContext()
-        {
-            rack::contextSet(nullptr);
-        }
-    };
-
 public:
     CardinalPlugin()
         : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, 1),
+          fInitializer(this),
           fAudioBufferIn(nullptr),
           fAudioBufferOut(nullptr),
           fIsActive(false),
@@ -517,7 +517,6 @@ CardinalPluginContext* getRackContextFromPlugin(void* const ptr)
 
 Plugin* createPlugin()
 {
-    getInitializerInstance();
     return new CardinalPlugin();
 }
 
