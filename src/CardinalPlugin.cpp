@@ -35,8 +35,11 @@
 # undef DEBUG
 #endif
 
+#include <atomic>
+#include <list>
+
 #include "DistrhoPluginUtils.hpp"
-#include "PluginContext.hpp"
+#include "PluginDriver.hpp"
 #include "WindowParameters.hpp"
 #include "extra/Base64.hpp"
 #include "extra/SharedResourcePointer.hpp"
@@ -119,6 +122,9 @@ struct Initializer {
         INFO("Initializing audio driver");
         rack::audio::addDriver(0, new CardinalAudioDriver);
 
+        INFO("Initializing midi driver");
+        rack::midi::addDriver(0, new CardinalMidiDriver);
+
         INFO("Initializing plugins");
         plugin::initStaticPlugins();
     }
@@ -170,8 +176,11 @@ class CardinalPlugin : public CardinalBasePlugin
 
     // for base/context handling
     bool fIsActive;
+    std::atomic<bool> fIsProcessing;
     rack::audio::Device* fCurrentDevice;
     Mutex fDeviceMutex;
+    std::list<CardinalMidiInputDevice*> fMidiInputs;
+    volatile pthread_t fProcessThread;
 
     float fWindowParameters[kWindowParameterCount];
 
@@ -182,7 +191,13 @@ public:
           fAudioBufferIn(nullptr),
           fAudioBufferOut(nullptr),
           fIsActive(false),
-          fCurrentDevice(nullptr)
+          fIsProcessing(false),
+          fCurrentDevice(nullptr),
+#ifdef PTW32_DLLPORT
+          fProcessThread({nullptr, 0})
+#else
+          fProcessThread(0)
+#endif
     {
         fWindowParameters[kWindowParameterCableOpacity] = 50.0f;
         fWindowParameters[kWindowParameterCableTension] = 50.0f;
@@ -260,6 +275,11 @@ protected:
         return fIsActive;
     }
 
+    bool isProcessing() const noexcept override
+    {
+        return fIsProcessing.load() && pthread_equal(fProcessThread, pthread_self() != 0);
+    }
+
     bool canAssignDevice() const noexcept override
     {
         const MutexLocker cml(fDeviceMutex);
@@ -283,6 +303,19 @@ protected:
 
         fCurrentDevice = nullptr;
         return true;
+    }
+
+    void addMidiInput(CardinalMidiInputDevice* const dev) override
+    {
+        const MutexLocker cml(fDeviceMutex);
+
+        fMidiInputs.push_back(dev);
+    }
+
+    void removeMidiInput(CardinalMidiInputDevice* const dev) override
+    {
+        const MutexLocker cml(fDeviceMutex);
+
     }
 
    /* --------------------------------------------------------------------------------------------------------
@@ -498,12 +531,15 @@ protected:
         fAudioBufferIn = fAudioBufferOut = nullptr;
     }
 
-    void run(const float** const inputs, float** const outputs, const uint32_t frames) override
+    void run(const float** const inputs, float** const outputs, const uint32_t frames,
+             const MidiEvent* const midiEvents, const uint32_t midiEventCount) override
     {
         /*
         context->engine->setFrame(getTimePosition().frame);
         context->engine->stepBlock(frames);
         */
+
+        fProcessThread = pthread_self();
 
         const MutexLocker cml(fDeviceMutex);
         // const MutexTryLocker cmtl(fPatchMutex);
@@ -523,8 +559,14 @@ protected:
 
         std::memset(fAudioBufferOut, 0, sizeof(float)*frames*DISTRHO_PLUGIN_NUM_OUTPUTS);
 
+        fIsProcessing.store(1);
+
+        for (CardinalMidiInputDevice* dev : fMidiInputs)
+            dev->handleMessagesFromHost(midiEvents, midiEventCount);
+
         fCurrentDevice->processBuffer(fAudioBufferIn, DISTRHO_PLUGIN_NUM_INPUTS,
                                       fAudioBufferOut, DISTRHO_PLUGIN_NUM_OUTPUTS, frames);
+        fIsProcessing.store(0);
 
         for (uint32_t i=0, j=0; i<frames; ++i)
         {
