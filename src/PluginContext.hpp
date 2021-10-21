@@ -55,6 +55,7 @@ struct CardinalPluginContext : rack::Context {
 
 // -----------------------------------------------------------------------------------------------------------
 
+struct CardinalAudioDevice;
 struct CardinalMidiInputDevice;
 struct CardinalMidiOutputDevice;
 
@@ -67,10 +68,12 @@ public:
           context(new CardinalPluginContext(this)) {}
     ~CardinalBasePlugin() override {}
     virtual bool isActive() const noexcept = 0;
-    virtual bool isProcessing() const noexcept = 0;
-    virtual bool canAssignDevice() const noexcept = 0;
-    virtual void assignDevice(rack::audio::Device* dev) noexcept = 0;
-    virtual bool clearDevice(rack::audio::Device* dev) noexcept = 0;
+    virtual bool canAssignAudioDevice() const noexcept = 0;
+    virtual bool canAssignMidiOutputDevice() const noexcept = 0;
+    virtual void assignAudioDevice(CardinalAudioDevice* dev) noexcept = 0;
+    virtual void assignMidiOutputDevice(CardinalMidiOutputDevice* dev) noexcept = 0;
+    virtual bool clearAudioDevice(CardinalAudioDevice* dev) noexcept = 0;
+    virtual bool clearMidiOutputDevice(CardinalMidiOutputDevice* dev) noexcept = 0;
     virtual void addMidiInput(CardinalMidiInputDevice* dev) = 0;
     virtual void removeMidiInput(CardinalMidiInputDevice* dev) = 0;
 

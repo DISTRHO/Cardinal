@@ -113,7 +113,7 @@ struct CardinalAudioDriver : rack::audio::Driver
         CardinalBasePlugin* const plugin = reinterpret_cast<CardinalBasePlugin*>(pluginContext->plugin);
         DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, nullptr);
 
-        if (! plugin->canAssignDevice())
+        if (! plugin->canAssignAudioDevice())
             throw rack::Exception("Plugin driver only allows one audio device to be used simultaneously");
 
         CardinalAudioDevice* const device = new CardinalAudioDevice(plugin);
@@ -122,7 +122,7 @@ struct CardinalAudioDriver : rack::audio::Driver
         if (plugin->isActive())
             device->onStartStream();
 
-        plugin->assignDevice(device);
+        plugin->assignAudioDevice(device);
         return device;
     }
 
@@ -137,7 +137,7 @@ struct CardinalAudioDriver : rack::audio::Driver
         CardinalBasePlugin* const plugin = reinterpret_cast<CardinalBasePlugin*>(pluginContext->plugin);
         DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr,);
 
-        if (plugin->clearDevice(device))
+        if (plugin->clearAudioDevice(device))
         {
             device->onStopStream();
             device->unsubscribe(port);
@@ -197,27 +197,44 @@ struct CardinalMidiInputDevice : rack::midi::InputDevice
 struct CardinalMidiOutputDevice : rack::midi::OutputDevice
 {
     CardinalBasePlugin* const fPlugin;
+    MidiEvent fQueue[128];
+    Mutex fQueueMutex;
+    uint8_t fQueueIndex;
 
     CardinalMidiOutputDevice(CardinalBasePlugin* const plugin)
-        : fPlugin(plugin) {}
+        : fPlugin(plugin),
+          fQueueIndex(0) {}
 
     std::string getName() override
     {
         return "Cardinal";
     }
 
+    void processMessages()
+    {
+        const MutexLocker cml(fQueueMutex);
+
+        for (uint8_t i=0; i<fQueueIndex; ++i)
+            fPlugin->writeMidiEvent(fQueue[i]);
+
+        fQueueIndex = 0;
+    }
+
     void sendMessage(const rack::midi::Message& message) override
     {
-        DISTRHO_SAFE_ASSERT_RETURN(fPlugin->isProcessing(),);
-
-        if (message.bytes.size() > MidiEvent::kDataSize)
+        if (message.bytes.size() < 3) // FIXME
+            return;
+        if ((message.bytes[0] & 0xf0) == 0xf0)
+            return;
+        if (fQueueIndex == 128)
             return;
 
-        MidiEvent event;
-        event.frame = message.frame < 0 ? 0 : message.frame;
+        const MutexLocker cml(fQueueMutex);
+
+        MidiEvent& event(fQueue[fQueueIndex++]);
+        event.frame = message.frame < 0 ? 0 : (message.frame - fPlugin->context->engine->getBlockFrame());
         event.size = 3; // FIXME
         std::memcpy(event.data, message.bytes.data(), event.size);
-        fPlugin->writeMidiEvent(event);
     }
 };
 
@@ -285,9 +302,13 @@ struct CardinalMidiDriver : rack::midi::Driver
         CardinalBasePlugin* const plugin = reinterpret_cast<CardinalBasePlugin*>(pluginContext->plugin);
         DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, nullptr);
 
+        if (! plugin->canAssignMidiOutputDevice())
+            throw rack::Exception("Plugin driver only allows one midi output device to be used simultaneously");
+
         CardinalMidiOutputDevice* const device = new CardinalMidiOutputDevice(plugin);
         device->subscribe(output);
 
+        plugin->assignMidiOutputDevice(device);
         return device;
     }
 
@@ -312,8 +333,17 @@ struct CardinalMidiDriver : rack::midi::Driver
         CardinalMidiOutputDevice* const device = reinterpret_cast<CardinalMidiOutputDevice*>(output->device);
         DISTRHO_SAFE_ASSERT_RETURN(device != nullptr,);
 
-        device->unsubscribe(output);
-        delete device;
+        CardinalPluginContext* const pluginContext = reinterpret_cast<CardinalPluginContext*>(output->context);
+        DISTRHO_SAFE_ASSERT_RETURN(pluginContext != nullptr,);
+
+        CardinalBasePlugin* const plugin = reinterpret_cast<CardinalBasePlugin*>(pluginContext->plugin);
+        DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr,);
+
+        if (plugin->clearMidiOutputDevice(device))
+        {
+            device->unsubscribe(output);
+            delete device;
+        }
     }
 };
 

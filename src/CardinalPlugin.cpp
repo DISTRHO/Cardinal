@@ -35,7 +35,6 @@
 # undef DEBUG
 #endif
 
-#include <atomic>
 #include <list>
 
 #include "DistrhoPluginUtils.hpp"
@@ -176,11 +175,10 @@ class CardinalPlugin : public CardinalBasePlugin
 
     // for base/context handling
     bool fIsActive;
-    std::atomic<bool> fIsProcessing;
-    rack::audio::Device* fCurrentDevice;
-    Mutex fDeviceMutex;
+    CardinalAudioDevice* fCurrentAudioDevice;
+    CardinalMidiOutputDevice* fCurrentMidiOutput;
     std::list<CardinalMidiInputDevice*> fMidiInputs;
-    volatile pthread_t fProcessThread;
+    Mutex fDeviceMutex;
 
     float fWindowParameters[kWindowParameterCount];
 
@@ -191,13 +189,8 @@ public:
           fAudioBufferIn(nullptr),
           fAudioBufferOut(nullptr),
           fIsActive(false),
-          fIsProcessing(false),
-          fCurrentDevice(nullptr),
-#ifdef PTW32_DLLPORT
-          fProcessThread({nullptr, 0})
-#else
-          fProcessThread(0)
-#endif
+          fCurrentAudioDevice(nullptr),
+          fCurrentMidiOutput(nullptr)
     {
         fWindowParameters[kWindowParameterCableOpacity] = 50.0f;
         fWindowParameters[kWindowParameterCableTension] = 50.0f;
@@ -275,38 +268,59 @@ protected:
         return fIsActive;
     }
 
-    bool isProcessing() const noexcept override
-    {
-        return fIsProcessing.load() && pthread_equal(fProcessThread, pthread_self() != 0);
-    }
-
-    bool canAssignDevice() const noexcept override
+    bool canAssignAudioDevice() const noexcept override
     {
         const MutexLocker cml(fDeviceMutex);
-        return fCurrentDevice == nullptr;
+        return fCurrentAudioDevice == nullptr;
     }
 
-    void assignDevice(rack::audio::Device* const dev) noexcept override
+    bool canAssignMidiOutputDevice() const noexcept override
     {
-        DISTRHO_SAFE_ASSERT_RETURN(fCurrentDevice == nullptr,);
-
         const MutexLocker cml(fDeviceMutex);
-        fCurrentDevice = dev;
+        return fCurrentMidiOutput == nullptr;
     }
 
-    bool clearDevice(rack::audio::Device* const dev) noexcept override
+    void assignAudioDevice(CardinalAudioDevice* const dev) noexcept override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(fCurrentAudioDevice == nullptr,);
+
+        const MutexLocker cml(fDeviceMutex);
+        fCurrentAudioDevice = dev;
+    }
+
+    void assignMidiOutputDevice(CardinalMidiOutputDevice* const dev) noexcept override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(fCurrentMidiOutput == nullptr,);
+
+        const MutexLocker cml(fDeviceMutex);
+        fCurrentMidiOutput = dev;
+    }
+
+    bool clearAudioDevice(CardinalAudioDevice* const dev) noexcept override
     {
         const MutexLocker cml(fDeviceMutex);
 
-        if (fCurrentDevice != dev)
+        if (fCurrentAudioDevice != dev)
             return false;
 
-        fCurrentDevice = nullptr;
+        fCurrentAudioDevice = nullptr;
+        return true;
+    }
+
+    bool clearMidiOutputDevice(CardinalMidiOutputDevice* const dev) noexcept override
+    {
+        const MutexLocker cml(fDeviceMutex);
+
+        if (fCurrentMidiOutput != dev)
+            return false;
+
+        fCurrentMidiOutput = nullptr;
         return true;
     }
 
     void addMidiInput(CardinalMidiInputDevice* const dev) override
     {
+        // NOTE this will xrun
         const MutexLocker cml(fDeviceMutex);
 
         fMidiInputs.push_back(dev);
@@ -314,8 +328,10 @@ protected:
 
     void removeMidiInput(CardinalMidiInputDevice* const dev) override
     {
+        // NOTE this will xrun
         const MutexLocker cml(fDeviceMutex);
 
+        fMidiInputs.remove(dev);
     }
 
    /* --------------------------------------------------------------------------------------------------------
@@ -512,8 +528,8 @@ protected:
         {
             const MutexLocker cml(fDeviceMutex);
 
-            if (fCurrentDevice != nullptr)
-                fCurrentDevice->onStartStream();
+            if (fCurrentAudioDevice != nullptr)
+                fCurrentAudioDevice->onStartStream();
         }
     }
 
@@ -522,8 +538,8 @@ protected:
         {
             const MutexLocker cml(fDeviceMutex);
 
-            if (fCurrentDevice != nullptr)
-                fCurrentDevice->onStopStream();
+            if (fCurrentAudioDevice != nullptr)
+                fCurrentAudioDevice->onStopStream();
         }
 
         delete[] fAudioBufferIn;
@@ -539,34 +555,33 @@ protected:
         context->engine->stepBlock(frames);
         */
 
-        fProcessThread = pthread_self();
-
         const MutexLocker cml(fDeviceMutex);
-        // const MutexTryLocker cmtl(fPatchMutex);
 
-        if (fCurrentDevice == nullptr /*|| cmtl.wasNotLocked()*/)
+        if (fCurrentAudioDevice != nullptr)
+        {
+            for (uint32_t i=0, j=0; i<frames; ++i)
+            {
+                fAudioBufferIn[j++] = inputs[0][i];
+                fAudioBufferIn[j++] = inputs[1][i];
+            }
+        }
+        else
         {
             std::memset(outputs[0], 0, sizeof(float)*frames);
             std::memset(outputs[1], 0, sizeof(float)*frames);
-            return;
-        }
-
-        for (uint32_t i=0, j=0; i<frames; ++i)
-        {
-            fAudioBufferIn[j++] = inputs[0][i];
-            fAudioBufferIn[j++] = inputs[1][i];
         }
 
         std::memset(fAudioBufferOut, 0, sizeof(float)*frames*DISTRHO_PLUGIN_NUM_OUTPUTS);
 
-        fIsProcessing.store(1);
-
         for (CardinalMidiInputDevice* dev : fMidiInputs)
             dev->handleMessagesFromHost(midiEvents, midiEventCount);
 
-        fCurrentDevice->processBuffer(fAudioBufferIn, DISTRHO_PLUGIN_NUM_INPUTS,
-                                      fAudioBufferOut, DISTRHO_PLUGIN_NUM_OUTPUTS, frames);
-        fIsProcessing.store(0);
+        if (fCurrentAudioDevice != nullptr)
+            fCurrentAudioDevice->processBuffer(fAudioBufferIn, DISTRHO_PLUGIN_NUM_INPUTS,
+                                               fAudioBufferOut, DISTRHO_PLUGIN_NUM_OUTPUTS, frames);
+
+        if (fCurrentMidiOutput != nullptr)
+            fCurrentMidiOutput->processMessages();
 
         for (uint32_t i=0, j=0; i<frames; ++i)
         {
