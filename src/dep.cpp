@@ -23,6 +23,7 @@
 #endif
 
 #include "OpenGL.hpp"
+#include "DistrhoPluginUtils.hpp"
 
 // fix blendish build, missing symbol in debug mode
 #ifdef DEBUG
@@ -30,6 +31,16 @@ extern "C" {
 float bnd_clamp(float v, float mn, float mx) {
     return (v > mx)?mx:(v < mn)?mn:v;
 }
+}
+#endif
+
+// fix bogaudio build, another missing symbol
+#ifdef DEBUG
+namespace bogaudio {
+struct FollowerBase {
+    static float efGainMaxDecibelsDebug;
+};
+float FollowerBase::efGainMaxDecibelsDebug = 12.0f;
 }
 #endif
 
@@ -50,7 +61,7 @@ FILE* fopen_u8(const char* filename, const char* mode)
 // Define the global names to indicate this is Cardinal and not VCVRack
 namespace rack {
 const std::string APP_NAME = "Cardinal";
-const std::string APP_EDITION = "";
+const std::string APP_EDITION = getPluginFormatName();
 const std::string APP_EDITION_NAME = "Audio Plugin";
 const std::string APP_VERSION_MAJOR = "2";
 const std::string APP_VERSION = "2.0";

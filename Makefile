@@ -52,11 +52,11 @@ dgl:
 plugins: deps
 	$(MAKE) all -C plugins
 
-resources: cardinal gen
+resources: cardinal
 	$(MAKE) resources -C plugins
 
 ifneq ($(CROSS_COMPILING),true)
-gen: cardinal dpf/utils/lv2_ttl_generator
+gen: cardinal resources dpf/utils/lv2_ttl_generator
 	@$(CURDIR)/dpf/utils/generate-ttl.sh
 ifeq ($(MACOS),true)
 	@$(CURDIR)/dpf/utils/generate-vst-bundles.sh
