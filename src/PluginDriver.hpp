@@ -208,6 +208,16 @@ struct CardinalMidiOutputDevice : rack::midi::OutputDevice
 
     void sendMessage(const rack::midi::Message& message) override
     {
+        DISTRHO_SAFE_ASSERT_RETURN(fPlugin->isProcessing(),);
+
+        if (message.bytes.size() > MidiEvent::kDataSize)
+            return;
+
+        MidiEvent event;
+        event.frame = message.frame < 0 ? 0 : message.frame;
+        event.size = 3; // FIXME
+        std::memcpy(event.data, message.bytes.data(), event.size);
+        fPlugin->writeMidiEvent(event);
     }
 };
 
