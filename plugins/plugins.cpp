@@ -212,7 +212,9 @@ extern Model *modelWriteSeq64;
 extern Model *modelBlankPanel;
 
 // JW-Modules
+#define modelQuantizer modelJWQuantizer
 #include "JW-Modules/src/JWModules.hpp"
+#undef modelQuantizer
 
 // rackwindows
 #include "rackwindows/src/plugin.hpp"
@@ -290,6 +292,8 @@ struct StaticPluginLoader {
           file(nullptr),
           rootJ(nullptr)
     {
+        DEBUG("Loading plugin module %s", name);
+
         p->path = asset::pluginPath(name);
 
         const std::string manifestFilename = asset::pluginManifest(name);
@@ -909,6 +913,7 @@ static void initStatic__JW()
     const StaticPluginLoader spl(p, "JW-Modules");
     if (spl.ok())
     {
+#define modelQuantizer modelJWQuantizer
         p->addModel(modelAdd5);
         p->addModel(modelBouncyBalls);
         p->addModel(modelCat);
@@ -938,6 +943,7 @@ static void initStatic__JW()
         p->addModel(modelBlankPanelLarge);
         p->addModel(modelCoolBreeze);
         p->addModel(modelPete);
+#undef modelQuantizer
     }
 }
 

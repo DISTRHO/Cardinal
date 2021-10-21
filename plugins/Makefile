@@ -224,6 +224,9 @@ else
 PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/posix/*.cpp)
 endif
 
+# modules/types which are present in other plugins
+JW_CUSTOM = Quantizer
+
 # --------------------------------------------------------------
 # rackwindows
 
@@ -264,6 +267,8 @@ BASE_FLAGS += -I../include/neon-compat
 BASE_FLAGS += -I../src
 BASE_FLAGS += -I../src/Rack/include
 BASE_FLAGS += -I../src/Rack/include/dsp
+# # BASE_FLAGS += -I../src/Rack/dep/filesystem/include
+# # BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
 BASE_FLAGS += -I../src/Rack/dep/glfw/include
 BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
 BASE_FLAGS += -I../src/Rack/dep/osdialog
@@ -271,11 +276,9 @@ BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
 BASE_FLAGS += -pthread
 
-# ifneq ($(SYSDEPS),true)
-# BASE_FLAGS += -I../src/Rack/dep/include
-# # BASE_FLAGS += -I../src/Rack/dep/filesystem/include
-# # BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
-# endif
+ifneq ($(SYSDEPS),true)
+BASE_FLAGS += -I../src/Rack/dep/include
+endif
 
 ifeq ($(WINDOWS),true)
 BASE_FLAGS += -D_USE_MATH_DEFINES
@@ -456,6 +459,17 @@ $(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
 		-IBogaudioModules/lib \
 		-IBogaudioModules/src/dsp
 
+$(BUILD_DIR)/BogaudioModules/src/follower_base.cpp.o: BogaudioModules/src/follower_base.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(BOGAUDIO_CUSTOM),$(call custom_module_names,$(m),Bogaudio)) \
+		-DpluginInstance=pluginInstance__BogaudioModules \
+		-DefGainMaxDecibels=efGainMaxDecibelsDebug \
+		-DRACK_SIMD=1 \
+		-IBogaudioModules/lib \
+		-IBogaudioModules/src/dsp
+
 $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -517,7 +531,11 @@ $(BUILD_DIR)/ImpromptuModular/src/comp/Components.cpp.o: ImpromptuModular/src/co
 $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__JW $(foreach m,$(JW_CUSTOM),$(call custom_module_names,$(m),JW)) -IJW-Modules/src -IJW-Modules/lib/oscpack -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(JW_CUSTOM),$(call custom_module_names,$(m),JW)) \
+		-DpluginInstance=pluginInstance__JW \
+		-IJW-Modules/src \
+		-IJW-Modules/lib/oscpack
 
 $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
