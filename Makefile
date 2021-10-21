@@ -18,12 +18,22 @@ SYSDEPS ?= false
 # --------------------------------------------------------------
 # Check for system-wide dependencies
 
-# HAVE_LIBARCHIVE = $(shell pkg-config --exists libarchive && echo true)
-#
-# libjansson.a
-# libsamplerate.a
-# libspeexdsp.a
-# libzstd.a
+ifeq ($(SYSDEPS),true)
+
+ifneq ($(shell pkg-config --exists jansson && echo true),true)
+$(error jansson dpendency not installed/available)
+endif
+ifneq ($(shell pkg-config --exists libarchive && echo true),true)
+$(error libarchive dpendency not installed/available)
+endif
+ifneq ($(shell pkg-config --exists samplerate && echo true),true)
+$(error samplerate dpendency not installed/available)
+endif
+ifneq ($(shell pkg-config --exists speexdsp && echo true),true)
+$(error speexdsp dpendency not installed/available)
+endif
+
+endif
 
 # --------------------------------------------------------------
 
@@ -31,7 +41,9 @@ cardinal: deps dgl plugins
 	$(MAKE) all -C src
 
 deps:
+ifneq ($(SYSDEPS),true)
 	$(MAKE) all -C deps
+endif
 
 dgl:
 	$(MAKE) USE_NANOVG_FBO=true USE_RGBA=true -C dpf/dgl opengl

@@ -60,6 +60,7 @@ FILES_DSP += $(filter-out Rack/src/window/Window.cpp, $(wildcard Rack/src/*/*.cp
 # --------------------------------------------------------------
 # Extra libraries to link against
 
+ifneq ($(SYSDEPS),true)
 EXTRA_LIBS  = ../plugins/plugins.a
 EXTRA_LIBS += Rack/dep/lib/libjansson.a
 EXTRA_LIBS += Rack/dep/lib/libsamplerate.a
@@ -72,6 +73,7 @@ endif
 EXTRA_LIBS += Rack/dep/lib/libzstd.a
 
 EXTRA_DEPENDENCIES = $(EXTRA_LIBS)
+endif
 
 # --------------------------------------------------------------
 # Do some magic
@@ -98,7 +100,11 @@ BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat
 BASE_FLAGS += -IRack/include
+ifeq ($(SYSDEPS),true)
+BASE_FLAGS += $(shell pkg-config --cflags jansson libarchive samplerate speexdsp)
+else
 BASE_FLAGS += -IRack/dep/include
+endif
 BASE_FLAGS += -IRack/dep/filesystem/include
 BASE_FLAGS += -IRack/dep/fuzzysearchdatabase/src
 BASE_FLAGS += -IRack/dep/glfw/include
@@ -144,12 +150,16 @@ LINK_FLAGS += -ldbghelp -lshlwapi
 EXTRA_LIBS += -lws2_32 -lwinmm
 endif
 
+ifeq ($(SYSDEPS),true)
+LINK_FLAGS += $(shell pkg-config --libs jansson libarchive samplerate speexdsp)
+endif
+
 ifeq ($(WITH_LTO),true)
 LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
 endif
 
 # --------------------------------------------------------------
-# temporary macro just to get the ball rolling
+# fallback path to resource files
 
 ifeq ($(EXE_WRAPPER),wine)
 SOURCE_DIR = Z:$(subst /,\\,$(CURDIR))
@@ -157,7 +167,10 @@ else
 SOURCE_DIR = $(CURDIR)
 endif
 
+ifneq ($(SYSDEPS),true)
 BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_SOURCE_DIR='"$(SOURCE_DIR)"'
+endif
+
 BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 
 # --------------------------------------------------------------

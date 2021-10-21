@@ -4,7 +4,12 @@
 # Created by falkTX
 #
 
-DEP_PATH = $(abspath ../src/Rack/dep)
+# --------------------------------------------------------------
+# Build config
+
+PREFIX  ?= /usr/local
+DESTDIR ?=
+SYSDEPS ?= false
 
 # --------------------------------------------------------------
 # Import base definitions
@@ -259,15 +264,18 @@ BASE_FLAGS += -I../include/neon-compat
 BASE_FLAGS += -I../src
 BASE_FLAGS += -I../src/Rack/include
 BASE_FLAGS += -I../src/Rack/include/dsp
-BASE_FLAGS += -I../src/Rack/dep/include
-# BASE_FLAGS += -I../src/Rack/dep/filesystem/include
-# BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
 BASE_FLAGS += -I../src/Rack/dep/glfw/include
 BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
 BASE_FLAGS += -I../src/Rack/dep/osdialog
 BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
 BASE_FLAGS += -pthread
+
+# ifneq ($(SYSDEPS),true)
+# BASE_FLAGS += -I../src/Rack/dep/include
+# # BASE_FLAGS += -I../src/Rack/dep/filesystem/include
+# # BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
+# endif
 
 ifeq ($(WINDOWS),true)
 BASE_FLAGS += -D_USE_MATH_DEFINES

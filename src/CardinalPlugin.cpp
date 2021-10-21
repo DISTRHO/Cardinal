@@ -85,11 +85,13 @@ struct Initializer {
 
             if (asset::systemDir.empty())
             {
+               #ifdef CARDINAL_PLUGIN_SOURCE_DIR
                 // Make system dir point to source code location as fallback
                 asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
 
                 // And if that fails, use install target prefix
                 if (! system::isDirectory(system::join(asset::systemDir, "res")))
+               #endif
                 {
                     asset::bundlePath = CARDINAL_PLUGIN_PREFIX "/share/Cardinal/PluginManifests";
                     asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/Cardinal";
