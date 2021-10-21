@@ -99,6 +99,10 @@ static inline std::string& trim(std::string& s)
 {
     if (std::strncmp(s.c_str(), "res" DISTRHO_OS_SEP_STR, 4) == 0)
         s = s.substr(4, s.size()-4);
+#if DISTRHO_OS_SEP != '/'
+    if (std::strncmp(s.c_str(), "res/", 4) == 0)
+        s = s.substr(4, s.size()-4);
+#endif
     return s;
 }
 
