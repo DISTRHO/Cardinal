@@ -88,12 +88,17 @@ class CardinalUI : public UI,
 
 public:
     CardinalUI()
-        : UI(1280, 720),
+        : UI(1228, 666),
           fContext(getRackContextFromPlugin(getPluginInstancePointer())),
           fResizeHandle(this)
     {
         if (isResizable())
             fResizeHandle.hide();
+
+        const double scaleFactor = getScaleFactor();
+
+        if (scaleFactor != 1)
+            setSize(1228 * scaleFactor, 666 * scaleFactor);
 
         fContext->window = new rack::window::Window;
 

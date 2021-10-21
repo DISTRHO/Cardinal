@@ -31,6 +31,11 @@
 
 #include <osdialog.h>
 
+#ifdef NDEBUG
+# undef DEBUG
+#endif
+
+#include "DistrhoPluginUtils.hpp"
 #include "PluginContext.hpp"
 #include "WindowParameters.hpp"
 #include "extra/Base64.hpp"
@@ -63,26 +68,41 @@ struct Initializer {
         settings::threadCount = 1;
 
         system::init();
-        asset::init();
         logger::init();
         random::init();
         ui::init();
 
-        // Make system dir point to source code location. It is good enough for now
-        asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
+        std::string resDir;
+
+        if (const char* const bundlePath = plugin->getBundlePath())
+        {
+            asset::systemDir = bundlePath;
+#ifdef DISTRHO_OS_MAC
+            asset::systemDir += "/Contents/Resources";
+#endif
+        }
+        else
+        {
+            // Make system dir point to source code location as fallback
+            // TODO use /usr/share if on linux? if we count on it being installed..
+            asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack" DISTRHO_OS_SEP_STR "res";
+        }
+
+        asset::userDir = asset::systemDir;
 
         // Log environment
         INFO("%s %s v%s", APP_NAME.c_str(), APP_EDITION.c_str(), APP_VERSION.c_str());
         INFO("%s", system::getOperatingSystemInfo().c_str());
+        INFO("Binary filename: %s", getBinaryFilename());
+        INFO("Bundle path: %s", plugin->getBundlePath());
         INFO("System directory: %s", asset::systemDir.c_str());
         INFO("User directory: %s", asset::userDir.c_str());
 
         // Check existence of the system res/ directory
-        const std::string resDir = asset::system("res");
-        if (! system::isDirectory(resDir))
+        if (! system::isDirectory(asset::systemDir))
         {
-            d_stderr2("Resource directory \"%s\" does not exist.\n"
-                      "Make sure Cardinal was downloaded and installed correctly.", resDir.c_str());
+            d_stderr2("System directory \"%s\" does not exist.\n"
+                      "Make sure Cardinal was downloaded and installed correctly.", asset::systemDir.c_str());
         }
 
         INFO("Initializing audio driver");

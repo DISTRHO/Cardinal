@@ -71,6 +71,34 @@ Exception::Exception(const char* format, ...)
 }
 }
 
+// Custom assets location
+#include <algorithm>
+#include <asset.hpp>
+#include <system.hpp>
+#include <plugin/Plugin.hpp>
+namespace rack {
+namespace asset {
+std::string systemDir;
+std::string userDir;
+std::string bundlePath;
+static inline std::string& trim(std::string& s) {
+    if (std::strncmp(s.c_str(), "res" DISTRHO_OS_SEP_STR, 4) == 0)
+        s = s.substr(4, s.size()-4);
+    return s;
+}
+std::string system(std::string filename) {
+	return system::join(systemDir, trim(filename));
+}
+std::string user(std::string filename) {
+	return system::join(userDir, trim(filename));
+}
+std::string plugin(plugin::Plugin* plugin, std::string filename) {
+	DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, {});
+	return system::join(systemDir, plugin->path, trim(filename));
+}
+}
+}
+
 // Define the stuff needed for VCVRack but unused for Cardinal
 #include <library.hpp>
 #include <network.hpp>
