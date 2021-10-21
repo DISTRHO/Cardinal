@@ -112,7 +112,8 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 
 	// Load default Blendish font
 	window->uiFont = window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
-	bndSetFont(window->uiFont->handle);
+	if (window->uiFont != nullptr)
+		bndSetFont(window->uiFont->handle);
 
 	// Init settings
 	WindowParametersRestore(window);
@@ -167,7 +168,8 @@ void Window::step() {
 	// Make event handlers and step() have a clean NanoVG context
 // 	nvgReset(vg);
 
-	bndSetFont(uiFont->handle);
+	if (uiFont != nullptr)
+		bndSetFont(uiFont->handle);
 
 	// Set window title
 	std::string windowTitle = APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION;
