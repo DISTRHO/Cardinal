@@ -478,6 +478,9 @@ protected:
 
     void uiFileBrowserSelected(const char* const filename) override
     {
+        if (filename == nullptr)
+            return;
+
         const ScopedContext sc(this);
         fContext->patch->loadAction(filename);
     }
