@@ -180,6 +180,7 @@ class CardinalPlugin : public CardinalBasePlugin
     std::list<CardinalMidiInputDevice*> fMidiInputs;
     Mutex fDeviceMutex;
 
+    // real values, not VCV interpreted ones
     float fWindowParameters[kWindowParameterCount];
 
 public:
@@ -192,10 +193,15 @@ public:
           fCurrentAudioDevice(nullptr),
           fCurrentMidiOutput(nullptr)
     {
+        fWindowParameters[kWindowParameterShowTooltips] = 1.0f;
         fWindowParameters[kWindowParameterCableOpacity] = 50.0f;
         fWindowParameters[kWindowParameterCableTension] = 50.0f;
         fWindowParameters[kWindowParameterRackBrightness] = 100.0f;
         fWindowParameters[kWindowParameterHaloBrightness] = 25.0f;
+        fWindowParameters[kWindowParameterKnobMode] = 0.0f;
+        fWindowParameters[kWindowParameterWheelKnobControl] = 0.0f;
+        fWindowParameters[kWindowParameterWheelSensitivity] = 1.0f;
+        fWindowParameters[kWindowParameterLockModulePositions] = 0.0f;
 
         // create unique temporary path for this instance
         try {
@@ -395,8 +401,16 @@ protected:
 
         switch (index - kModuleParameters)
         {
+        case kWindowParameterShowTooltips:
+            parameter.name = "Show tooltips";
+            parameter.symbol = "tooltips";
+            parameter.hints = kParameterIsAutomable|kParameterIsInteger|kParameterIsBoolean;
+            parameter.ranges.def = 1.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 1.0f;
+            break;
         case kWindowParameterCableOpacity:
-            parameter.name = "Cable Opacity";
+            parameter.name = "Cable opacity";
             parameter.symbol = "cableOpacity";
             parameter.unit = "%";
             parameter.hints = kParameterIsAutomable;
@@ -405,7 +419,7 @@ protected:
             parameter.ranges.max = 100.0f;
             break;
         case kWindowParameterCableTension:
-            parameter.name = "Cable Tension";
+            parameter.name = "Cable tension";
             parameter.symbol = "cableTension";
             parameter.unit = "%";
             parameter.hints = kParameterIsAutomable;
@@ -414,7 +428,7 @@ protected:
             parameter.ranges.max = 100.0f;
             break;
         case kWindowParameterRackBrightness:
-            parameter.name = "Rack Brightness";
+            parameter.name = "Room brightness";
             parameter.symbol = "rackBrightness";
             parameter.unit = "%";
             parameter.hints = kParameterIsAutomable;
@@ -423,13 +437,54 @@ protected:
             parameter.ranges.max = 100.0f;
             break;
         case kWindowParameterHaloBrightness:
-            parameter.name = "Halo Brightness";
+            parameter.name = "Light Bloom";
             parameter.symbol = "haloBrightness";
             parameter.unit = "%";
             parameter.hints = kParameterIsAutomable;
             parameter.ranges.def = 25.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 100.0f;
+            break;
+        case kWindowParameterKnobMode:
+            parameter.name = "Knob mode";
+            parameter.symbol = "knobMode";
+            parameter.hints = kParameterIsAutomable|kParameterIsInteger;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 2.0f;
+            parameter.enumValues.count = 3;
+            parameter.enumValues.restrictedMode = true;
+            parameter.enumValues.values = new ParameterEnumerationValue[3];
+            parameter.enumValues.values[0].label = "Linear";
+            parameter.enumValues.values[0].value = 0.0f;
+            parameter.enumValues.values[1].label = "Absolute rotary";
+            parameter.enumValues.values[1].value = 1.0f;
+            parameter.enumValues.values[2].label = "Relative rotary";
+            parameter.enumValues.values[2].value = 2.0f;
+            break;
+        case kWindowParameterWheelKnobControl:
+            parameter.name = "Scroll wheel knob control";
+            parameter.symbol = "knobScroll";
+            parameter.hints = kParameterIsAutomable|kParameterIsInteger|kParameterIsBoolean;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 1.0f;
+            break;
+        case kWindowParameterWheelSensitivity:
+            parameter.name = "Scroll wheel knob sensitivity";
+            parameter.symbol = "knobScrollSensitivity";
+            parameter.hints = kParameterIsAutomable|kParameterIsLogarithmic;
+            parameter.ranges.def = 1.0f;
+            parameter.ranges.min = 0.1f;
+            parameter.ranges.max = 10.0f;
+            break;
+        case kWindowParameterLockModulePositions:
+            parameter.name = "Lock module positions";
+            parameter.symbol = "lockModules";
+            parameter.hints = kParameterIsAutomable|kParameterIsInteger|kParameterIsBoolean;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 1.0f;
             break;
         }
     }

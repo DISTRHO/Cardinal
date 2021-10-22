@@ -367,6 +367,41 @@ void WindowParametersSave(rack::window::Window* const window)
 			window->internal->callback->WindowParametersChanged(kWindowParameterHaloBrightness,
 			                                                    rack::settings::haloBrightness);
 	}
+	if (d_isNotEqual(window->internal->params.knobScrollSensitivity, rack::settings::knobScrollSensitivity))
+	{
+		window->internal->params.knobScrollSensitivity = rack::settings::knobScrollSensitivity;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterWheelSensitivity,
+			                                                    rack::settings::knobScrollSensitivity);
+	}
+	if (window->internal->params.knobMode != rack::settings::knobMode)
+	{
+		window->internal->params.knobMode = rack::settings::knobMode;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterKnobMode,
+			                                                    rack::settings::knobMode);
+	}
+	if (window->internal->params.tooltips != rack::settings::tooltips)
+	{
+		window->internal->params.tooltips = rack::settings::tooltips;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterShowTooltips,
+			                                                    rack::settings::tooltips);
+	}
+	if (window->internal->params.knobScroll != rack::settings::knobScroll)
+	{
+		window->internal->params.knobScroll = rack::settings::knobScroll;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterWheelKnobControl,
+			                                                    rack::settings::knobScroll);
+	}
+	if (window->internal->params.lockModules != rack::settings::lockModules)
+	{
+		window->internal->params.lockModules = rack::settings::lockModules;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterLockModulePositions,
+			                                                    rack::settings::lockModules);
+	}
 }
 
 void WindowParametersRestore(rack::window::Window* const window)
@@ -375,6 +410,11 @@ void WindowParametersRestore(rack::window::Window* const window)
 	rack::settings::cableTension = window->internal->params.cableTension;
 	rack::settings::rackBrightness = window->internal->params.rackBrightness;
 	rack::settings::haloBrightness = window->internal->params.haloBrightness;
+	rack::settings::knobScrollSensitivity = window->internal->params.knobScrollSensitivity;
+	rack::settings::knobMode = static_cast<rack::settings::KnobMode>(window->internal->params.knobMode);
+	rack::settings::tooltips = window->internal->params.tooltips;
+	rack::settings::knobScroll = window->internal->params.knobScroll;
+	rack::settings::lockModules = window->internal->params.lockModules;
 }
 
 void WindowParametersSetCallback(rack::window::Window* const window, WindowParametersCallback* const callback)

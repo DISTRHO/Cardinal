@@ -18,6 +18,7 @@
 #include <app/Scene.hpp>
 #include <context.hpp>
 #include <patch.hpp>
+#include <settings.hpp>
 #include <ui/Button.hpp>
 #include <ui/MenuItem.hpp>
 #include <window/Window.hpp>
@@ -169,12 +170,15 @@ public:
         repaint();
     }
 
-    void WindowParametersChanged(const WindowParameterList param, const float value) override
+    void WindowParametersChanged(const WindowParameterList param, float value) override
     {
-        float mult;
+        float mult = 1.0f;
 
         switch (param)
         {
+        case kWindowParameterShowTooltips:
+            fWindowParameters.tooltips = value > 0.5f;
+            break;
         case kWindowParameterCableOpacity:
             mult = 100.0f;
             fWindowParameters.cableOpacity = value;
@@ -190,6 +194,33 @@ public:
         case kWindowParameterHaloBrightness:
             mult = 100.0f;
             fWindowParameters.haloBrightness = value;
+            break;
+        case kWindowParameterKnobMode:
+            switch (static_cast<int>(value + 0.5f))
+            {
+            case rack::settings::KNOB_MODE_LINEAR:
+                value = 0;
+                fWindowParameters.knobMode = rack::settings::KNOB_MODE_LINEAR;
+                break;
+            case rack::settings::KNOB_MODE_ROTARY_ABSOLUTE:
+                value = 1;
+                fWindowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_ABSOLUTE;
+                break;
+            case rack::settings::KNOB_MODE_ROTARY_RELATIVE:
+                value = 2;
+                fWindowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_RELATIVE;
+                break;
+            }
+            break;
+        case kWindowParameterWheelKnobControl:
+            fWindowParameters.knobScroll = value > 0.5f;
+            break;
+        case kWindowParameterWheelSensitivity:
+            mult = 1000.0f;
+            fWindowParameters.knobScrollSensitivity = value;
+            break;
+        case kWindowParameterLockModulePositions:
+            fWindowParameters.lockModules = value > 0.5f;
             break;
         default:
             return;
@@ -213,6 +244,9 @@ protected:
 
         switch (index - kModuleParameters)
         {
+        case kWindowParameterShowTooltips:
+            fWindowParameters.tooltips = value > 0.5f;
+            break;
         case kWindowParameterCableOpacity:
             fWindowParameters.cableOpacity = value / 100.0f;
             break;
@@ -224,6 +258,29 @@ protected:
             break;
         case kWindowParameterHaloBrightness:
             fWindowParameters.haloBrightness = value / 100.0f;
+            break;
+        case kWindowParameterKnobMode:
+            switch (static_cast<int>(value + 0.5f))
+            {
+            case 0:
+                fWindowParameters.knobMode = rack::settings::KNOB_MODE_LINEAR;
+                break;
+            case 1:
+                fWindowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_ABSOLUTE;
+                break;
+            case 2:
+                fWindowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_RELATIVE;
+                break;
+            }
+            break;
+        case kWindowParameterWheelKnobControl:
+            fWindowParameters.knobScroll = value > 0.5f;
+            break;
+        case kWindowParameterWheelSensitivity:
+            fWindowParameters.knobScrollSensitivity = value / 1000.0f;
+            break;
+        case kWindowParameterLockModulePositions:
+            fWindowParameters.lockModules = value > 0.5f;
             break;
         default:
             return;

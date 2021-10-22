@@ -30,10 +30,15 @@ START_NAMESPACE_DISTRHO
 // -----------------------------------------------------------------------------------------------------------
 
 enum WindowParameterList {
+    kWindowParameterShowTooltips,
     kWindowParameterCableOpacity,
     kWindowParameterCableTension,
     kWindowParameterRackBrightness,
     kWindowParameterHaloBrightness,
+    kWindowParameterKnobMode,
+    kWindowParameterWheelKnobControl,
+    kWindowParameterWheelSensitivity,
+    kWindowParameterLockModulePositions,
     kWindowParameterCount,
 };
 
@@ -42,7 +47,11 @@ struct WindowParameters {
     float cableTension = 0.5f;
     float rackBrightness = 1.0f;
     float haloBrightness = 0.25f;
-    // KnobMode knobMode = KNOB_MODE_LINEAR;
+    float knobScrollSensitivity = 0.001f;
+    int knobMode = 0;
+    bool tooltips = true;
+    bool knobScroll = false;
+    bool lockModules = false;
 };
 
 struct WindowParametersCallback {
