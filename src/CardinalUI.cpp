@@ -195,7 +195,7 @@ public:
             return;
         }
 
-        setParameterValue((uint)param, value * mult);
+        setParameterValue(kModuleParameters + param, value * mult);
     }
 
 protected:
