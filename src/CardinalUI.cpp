@@ -42,7 +42,7 @@ GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
 
 namespace rack {
 namespace app {
-    widget::Widget* createMenuBar(CardinalPluginContext* context, bool isStandalone);
+    widget::Widget* createMenuBar(Window& window, bool isStandalone);
 }
 namespace window {
     void WindowInit(Window* window, DISTRHO_NAMESPACE::UI* ui);
@@ -116,7 +116,7 @@ public:
             rack::window::WindowInit(fContext->window, this);
 
             fContext->scene->removeChild(fContext->scene->menuBar);
-            fContext->scene->menuBar = rack::app::createMenuBar(fContext, getApp().isStandalone());
+            fContext->scene->menuBar = rack::app::createMenuBar(getWindow(), getApp().isStandalone());
             fContext->scene->addChildBelow(fContext->scene->menuBar, fContext->scene->rackScroll);
         }
 
@@ -474,6 +474,12 @@ protected:
 
         const ScopedContext sc(this, 0);
         fContext->event->handleLeave();
+    }
+
+    void uiFileBrowserSelected(const char* const filename) override
+    {
+        const ScopedContext sc(this);
+        fContext->patch->loadAction(filename);
     }
 
 private:

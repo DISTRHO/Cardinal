@@ -57,6 +57,7 @@
 # undef DEBUG
 #endif
 
+#include <Window.hpp>
 #include "../PluginContext.hpp"
 
 
@@ -88,10 +89,11 @@ struct MenuButton : ui::Button {
 
 
 struct FileButton : MenuButton {
+	Window& window;
 	const bool isStandalone;
 
-	FileButton(const bool standalone)
-		: MenuButton(), isStandalone(standalone) {}
+	FileButton(Window& win, const bool standalone)
+		: MenuButton(), window(win), isStandalone(standalone) {}
 
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
@@ -99,11 +101,16 @@ struct FileButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 		menu->addChild(createMenuItem("New", RACK_MOD_CTRL_NAME "+N", []() {
-			APP->patch->loadTemplateDialog();
+			// APP->patch->loadTemplateDialog();
+			APP->patch->loadTemplate();
 		}));
 
-		menu->addChild(createMenuItem("Open", RACK_MOD_CTRL_NAME "+O", []() {
-			APP->patch->loadDialog();
+		menu->addChild(createMenuItem("Open", RACK_MOD_CTRL_NAME "+O", [this]() {
+			Window::FileBrowserOptions opts;
+			const std::string dir = system::getDirectory(APP->patch->path);
+			opts.startDir = dir.c_str();
+			window.openFileBrowser(opts);
+			// APP->patch->loadDialog();
 		}));
 
 		/*
@@ -121,7 +128,8 @@ struct FileButton : MenuButton {
 		*/
 
 		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
-			APP->patch->revertDialog();
+			// APP->patch->revertDialog();
+			APP->patch->loadAction(APP->patch->path);
 		}, APP->patch->path == ""));
 
 		if (isStandalone) {
@@ -569,11 +577,12 @@ struct MeterLabel : ui::Label {
 
 
 struct MenuBar : widget::OpaqueWidget {
-	CardinalPluginContext* const context;
+	// CardinalPluginContext* const context;
 	MeterLabel* meterLabel;
 
-	MenuBar(CardinalPluginContext* const ctx, const bool isStandalone)
-		: context(ctx)
+	MenuBar(Window& window, const bool isStandalone)
+		: widget::OpaqueWidget()
+		// : context(ctx)
     {
 		const float margin = 5;
 		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
@@ -583,7 +592,7 @@ struct MenuBar : widget::OpaqueWidget {
 		layout->spacing = math::Vec(0, 0);
 		addChild(layout);
 
-		FileButton* fileButton = new FileButton(isStandalone);
+		FileButton* fileButton = new FileButton(window, isStandalone);
 		fileButton->text = "File";
 		layout->addChild(fileButton);
 
@@ -636,8 +645,8 @@ widget::Widget* createMenuBar() {
 	return new widget::Widget;
 }
 
-widget::Widget* createMenuBar(CardinalPluginContext* const context, const bool isStandalone) {
-	menuBar::MenuBar* menuBar = new menuBar::MenuBar(context, isStandalone);
+widget::Widget* createMenuBar(Window& window, const bool isStandalone) {
+	menuBar::MenuBar* menuBar = new menuBar::MenuBar(window, isStandalone);
 	return menuBar;
 }
 
