@@ -29,6 +29,7 @@
 # undef DEBUG
 #endif
 
+#include <Application.hpp>
 #include "DistrhoUI.hpp"
 #include "PluginContext.hpp"
 #include "WindowParameters.hpp"
@@ -40,6 +41,9 @@ GLFWAPI const char* glfwGetKeyName(int key, int scancode) { return nullptr; }
 GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
 
 namespace rack {
+namespace app {
+    widget::Widget* createMenuBar(CardinalPluginContext* context, bool isStandalone);
+}
 namespace window {
     void WindowInit(Window* window, DISTRHO_NAMESPACE::UI* ui);
     void WindowMods(Window* window, int mods);
@@ -47,66 +51,6 @@ namespace window {
 }
 
 START_NAMESPACE_DISTRHO
-
-// -----------------------------------------------------------------------------------------------------------
-
-struct CardinalMenuButton : rack::ui::Button {
-    void step() override {
-        box.size.x = bndLabelWidth(APP->window->vg, -1, text.c_str()) + 1.0;
-        Widget::step();
-    }
-    void draw(const DrawArgs& args) override {
-        BNDwidgetState state = BND_DEFAULT;
-        if (APP->event->hoveredWidget == this)
-            state = BND_HOVER;
-        if (APP->event->draggedWidget == this)
-            state = BND_ACTIVE;
-        bndMenuItem(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());
-        Widget::draw(args);
-    }
-};
-
-struct CardinalFileButton : CardinalMenuButton {
-    CardinalFileButton()
-        : CardinalMenuButton()
-    {
-        text = "File";
-    }
-
-    void onAction(const ActionEvent& e) override {
-        rack::ui::Menu* menu = rack::createMenu();
-        menu->cornerFlags = BND_CORNER_TOP;
-        menu->box.pos = getAbsoluteOffset(rack::math::Vec(0, box.size.y));
-
-        menu->addChild(rack::createMenuItem("New", RACK_MOD_CTRL_NAME "+N", []() {
-            APP->patch->loadTemplateDialog();
-        }));
-
-        menu->addChild(rack::createMenuItem("Open", RACK_MOD_CTRL_NAME "+O", []() {
-            APP->patch->loadDialog();
-        }));
-
-        /*
-        menu->addChild(rack::createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
-            APP->patch->saveDialog();
-        }));
-
-        menu->addChild(rack::createMenuItem("Save as", RACK_MOD_CTRL_NAME "+Shift+S", []() {
-            APP->patch->saveAsDialog();
-        }));
-        */
-
-        menu->addChild(rack::createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
-            APP->patch->revertDialog();
-        }, APP->patch->path == ""));
-
-        menu->addChild(new rack::ui::MenuSeparator);
-
-        menu->addChild(rack::createMenuItem("Quit", RACK_MOD_CTRL_NAME "+Q", []() {
-            APP->window->close();
-        }));
-    }
-};
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -169,56 +113,11 @@ public:
 
         {
             const ScopedContext sc(this);
-
             rack::window::WindowInit(fContext->window, this);
 
-            // Hide non-wanted menu entries
-            typedef rack::ui::Button rButton;
-            // typedef rack::ui::MenuItem rMenuItem;
-            typedef rack::widget::Widget rWidget;
-            typedef std::list<rWidget*>::iterator rWidgetIterator;
-
-            rWidget* const layout = fContext->scene->menuBar->children.front();
-
-            const auto removeMenu = [layout](const char* const name) -> void
-            {
-                for (rWidgetIterator it = layout->children.begin(); it != layout->children.end(); ++it)
-                {
-                    if (rButton* const button = reinterpret_cast<rButton*>(*it))
-                    {
-                        if (button->text == name)
-                        {
-                            layout->removeChild(button);
-                            // button->parent = nullptr;
-                            delete button;
-                            break;
-                        }
-                    }
-                }
-            };
-
-            removeMenu("File");
-            removeMenu("Library");
-
-            layout->addChildBottom(new CardinalFileButton());
-
-            /* FIXME this doesnt work
-            if (button->text == "Engine")
-            {
-                for (rWidgetIterator it2 = button->children.begin(); it2 != button->children.end(); ++it2)
-                {
-                    if (rMenuItem* const item = reinterpret_cast<rMenuItem*>(*it2))
-                    {
-                        if (item->text == "Sample rate")
-                        {
-                            button->children.erase(it2);
-                            delete button;
-                            break;
-                        }
-                    }
-                }
-            }
-            */
+            fContext->scene->removeChild(fContext->scene->menuBar);
+            fContext->scene->menuBar = rack::app::createMenuBar(fContext, getApp().isStandalone());
+            fContext->scene->addChildBelow(fContext->scene->menuBar, fContext->scene->rackScroll);
         }
 
         WindowParametersSetCallback(fContext->window, this);

@@ -1,0 +1,646 @@
+/*
+ * DISTRHO Cardinal Plugin
+ * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * For a full copy of the GNU General Public License see the LICENSE file.
+ */
+
+/**
+ * This file is an edited version of VCVRack's MenuBar.cpp
+ * Copyright (C) 2016-2021 VCV.
+ *
+ * This program is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ */
+
+#include <thread>
+#include <utility>
+
+#include <osdialog.h>
+
+#include <app/MenuBar.hpp>
+#include <app/TipWindow.hpp>
+#include <widget/OpaqueWidget.hpp>
+#include <ui/Button.hpp>
+#include <ui/MenuItem.hpp>
+#include <ui/MenuSeparator.hpp>
+#include <ui/SequentialLayout.hpp>
+#include <ui/Slider.hpp>
+#include <ui/TextField.hpp>
+#include <ui/PasswordField.hpp>
+#include <ui/ProgressBar.hpp>
+#include <ui/Label.hpp>
+#include <engine/Engine.hpp>
+#include <window/Window.hpp>
+#include <asset.hpp>
+#include <context.hpp>
+#include <settings.hpp>
+#include <helpers.hpp>
+#include <system.hpp>
+#include <plugin.hpp>
+#include <patch.hpp>
+#include <library.hpp>
+
+#ifdef NDEBUG
+# undef DEBUG
+#endif
+
+#include "../PluginContext.hpp"
+
+
+namespace rack {
+namespace app {
+namespace menuBar {
+
+
+struct MenuButton : ui::Button {
+	void step() override {
+		box.size.x = bndLabelWidth(APP->window->vg, -1, text.c_str()) + 1.0;
+		Widget::step();
+	}
+	void draw(const DrawArgs& args) override {
+		BNDwidgetState state = BND_DEFAULT;
+		if (APP->event->hoveredWidget == this)
+			state = BND_HOVER;
+		if (APP->event->draggedWidget == this)
+			state = BND_ACTIVE;
+		bndMenuItem(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());
+		Widget::draw(args);
+	}
+};
+
+
+////////////////////
+// File
+////////////////////
+
+
+struct FileButton : MenuButton {
+	const bool isStandalone;
+
+	FileButton(const bool standalone)
+		: MenuButton(), isStandalone(standalone) {}
+
+	void onAction(const ActionEvent& e) override {
+		ui::Menu* menu = createMenu();
+		menu->cornerFlags = BND_CORNER_TOP;
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+
+		menu->addChild(createMenuItem("New", RACK_MOD_CTRL_NAME "+N", []() {
+			APP->patch->loadTemplateDialog();
+		}));
+
+		menu->addChild(createMenuItem("Open", RACK_MOD_CTRL_NAME "+O", []() {
+			APP->patch->loadDialog();
+		}));
+
+		/*
+		menu->addChild(createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
+			APP->patch->saveDialog();
+		}));
+
+		menu->addChild(createMenuItem("Save as", RACK_MOD_CTRL_NAME "+Shift+S", []() {
+			APP->patch->saveAsDialog();
+		}));
+
+		menu->addChild(createMenuItem("Save template", "", []() {
+			APP->patch->saveTemplateDialog();
+		}));
+		*/
+
+		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
+			APP->patch->revertDialog();
+		}, APP->patch->path == ""));
+
+		if (isStandalone) {
+			menu->addChild(new ui::MenuSeparator);
+
+			menu->addChild(createMenuItem("Quit", RACK_MOD_CTRL_NAME "+Q", []() {
+				APP->window->close();
+			}));
+		};
+	}
+};
+
+
+////////////////////
+// Edit
+////////////////////
+
+
+struct EditButton : MenuButton {
+	void onAction(const ActionEvent& e) override {
+		ui::Menu* menu = createMenu();
+		menu->cornerFlags = BND_CORNER_TOP;
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+
+		struct UndoItem : ui::MenuItem {
+			void step() override {
+				text = "Undo " + APP->history->getUndoName();
+				disabled = !APP->history->canUndo();
+				MenuItem::step();
+			}
+			void onAction(const ActionEvent& e) override {
+				APP->history->undo();
+			}
+		};
+		menu->addChild(createMenuItem<UndoItem>("", RACK_MOD_CTRL_NAME "+Z"));
+
+		struct RedoItem : ui::MenuItem {
+			void step() override {
+				text = "Redo " + APP->history->getRedoName();
+				disabled = !APP->history->canRedo();
+				MenuItem::step();
+			}
+			void onAction(const ActionEvent& e) override {
+				APP->history->redo();
+			}
+		};
+		menu->addChild(createMenuItem<RedoItem>("", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+Z"));
+
+		menu->addChild(createMenuItem("Clear cables", "", [=]() {
+			APP->patch->disconnectDialog();
+		}));
+
+		menu->addChild(new ui::MenuSeparator);
+
+		APP->scene->rack->appendSelectionContextMenu(menu);
+	}
+};
+
+
+////////////////////
+// View
+////////////////////
+
+
+struct ZoomQuantity : Quantity {
+	void setValue(float value) override {
+		APP->scene->rackScroll->setZoom(std::pow(2.f, value));
+	}
+	float getValue() override {
+		return std::log2(APP->scene->rackScroll->getZoom());
+	}
+	float getMinValue() override {
+		return -2.f;
+	}
+	float getMaxValue() override {
+		return 2.f;
+	}
+	float getDefaultValue() override {
+		return 0.0;
+	}
+	float getDisplayValue() override {
+		return std::round(std::pow(2.f, getValue()) * 100);
+	}
+	void setDisplayValue(float displayValue) override {
+		setValue(std::log2(displayValue / 100));
+	}
+	std::string getLabel() override {
+		return "Zoom";
+	}
+	std::string getUnit() override {
+		return "%";
+	}
+};
+struct ZoomSlider : ui::Slider {
+	ZoomSlider() {
+		quantity = new ZoomQuantity;
+	}
+	~ZoomSlider() {
+		delete quantity;
+	}
+};
+
+
+struct CableOpacityQuantity : Quantity {
+	void setValue(float value) override {
+		settings::cableOpacity = math::clamp(value, getMinValue(), getMaxValue());
+	}
+	float getValue() override {
+		return settings::cableOpacity;
+	}
+	float getDefaultValue() override {
+		return 0.5;
+	}
+	float getDisplayValue() override {
+		return getValue() * 100;
+	}
+	void setDisplayValue(float displayValue) override {
+		setValue(displayValue / 100);
+	}
+	std::string getLabel() override {
+		return "Cable opacity";
+	}
+	std::string getUnit() override {
+		return "%";
+	}
+};
+struct CableOpacitySlider : ui::Slider {
+	CableOpacitySlider() {
+		quantity = new CableOpacityQuantity;
+	}
+	~CableOpacitySlider() {
+		delete quantity;
+	}
+};
+
+
+struct CableTensionQuantity : Quantity {
+	void setValue(float value) override {
+		settings::cableTension = math::clamp(value, getMinValue(), getMaxValue());
+	}
+	float getValue() override {
+		return settings::cableTension;
+	}
+	float getDefaultValue() override {
+		return 0.5;
+	}
+	std::string getLabel() override {
+		return "Cable tension";
+	}
+	int getDisplayPrecision() override {
+		return 2;
+	}
+};
+struct CableTensionSlider : ui::Slider {
+	CableTensionSlider() {
+		quantity = new CableTensionQuantity;
+	}
+	~CableTensionSlider() {
+		delete quantity;
+	}
+};
+
+
+struct RackBrightnessQuantity : Quantity {
+	void setValue(float value) override {
+		settings::rackBrightness = math::clamp(value, getMinValue(), getMaxValue());
+	}
+	float getValue() override {
+		return settings::rackBrightness;
+	}
+	float getDefaultValue() override {
+		return 1.0;
+	}
+	float getDisplayValue() override {
+		return getValue() * 100;
+	}
+	void setDisplayValue(float displayValue) override {
+		setValue(displayValue / 100);
+	}
+	std::string getUnit() override {
+		return "%";
+	}
+	std::string getLabel() override {
+		return "Room brightness";
+	}
+	int getDisplayPrecision() override {
+		return 3;
+	}
+};
+struct RackBrightnessSlider : ui::Slider {
+	RackBrightnessSlider() {
+		quantity = new RackBrightnessQuantity;
+	}
+	~RackBrightnessSlider() {
+		delete quantity;
+	}
+};
+
+
+struct HaloBrightnessQuantity : Quantity {
+	void setValue(float value) override {
+		settings::haloBrightness = math::clamp(value, getMinValue(), getMaxValue());
+	}
+	float getValue() override {
+		return settings::haloBrightness;
+	}
+	float getDefaultValue() override {
+		return 0.25;
+	}
+	float getDisplayValue() override {
+		return getValue() * 100;
+	}
+	void setDisplayValue(float displayValue) override {
+		setValue(displayValue / 100);
+	}
+	std::string getUnit() override {
+		return "%";
+	}
+	std::string getLabel() override {
+		return "Light bloom";
+	}
+	int getDisplayPrecision() override {
+		return 3;
+	}
+};
+struct HaloBrightnessSlider : ui::Slider {
+	HaloBrightnessSlider() {
+		quantity = new HaloBrightnessQuantity;
+	}
+	~HaloBrightnessSlider() {
+		delete quantity;
+	}
+};
+
+
+struct KnobScrollSensitivityQuantity : Quantity {
+	void setValue(float value) override {
+		value = math::clamp(value, getMinValue(), getMaxValue());
+		settings::knobScrollSensitivity = std::pow(2.f, value);
+	}
+	float getValue() override {
+		return std::log2(settings::knobScrollSensitivity);
+	}
+	float getMinValue() override {
+		return std::log2(1e-4f);
+	}
+	float getMaxValue() override {
+		return std::log2(1e-2f);
+	}
+	float getDefaultValue() override {
+		return std::log2(1e-3f);
+	}
+	float getDisplayValue() override {
+		return std::pow(2.f, getValue() - getDefaultValue());
+	}
+	void setDisplayValue(float displayValue) override {
+		setValue(std::log2(displayValue) + getDefaultValue());
+	}
+	std::string getLabel() override {
+		return "Scroll wheel knob sensitivity";
+	}
+	int getDisplayPrecision() override {
+		return 2;
+	}
+};
+struct KnobScrollSensitivitySlider : ui::Slider {
+	KnobScrollSensitivitySlider() {
+		quantity = new KnobScrollSensitivityQuantity;
+	}
+	~KnobScrollSensitivitySlider() {
+		delete quantity;
+	}
+};
+
+
+struct ViewButton : MenuButton {
+	void onAction(const ActionEvent& e) override {
+		ui::Menu* menu = createMenu();
+		menu->cornerFlags = BND_CORNER_TOP;
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+
+		menu->addChild(createBoolPtrMenuItem("Show tooltips", "", &settings::tooltips));
+
+		ZoomSlider* zoomSlider = new ZoomSlider;
+		zoomSlider->box.size.x = 250.0;
+		menu->addChild(zoomSlider);
+
+		CableOpacitySlider* cableOpacitySlider = new CableOpacitySlider;
+		cableOpacitySlider->box.size.x = 250.0;
+		menu->addChild(cableOpacitySlider);
+
+		CableTensionSlider* cableTensionSlider = new CableTensionSlider;
+		cableTensionSlider->box.size.x = 250.0;
+		menu->addChild(cableTensionSlider);
+
+		RackBrightnessSlider* rackBrightnessSlider = new RackBrightnessSlider;
+		rackBrightnessSlider->box.size.x = 250.0;
+		menu->addChild(rackBrightnessSlider);
+
+		HaloBrightnessSlider* haloBrightnessSlider = new HaloBrightnessSlider;
+		haloBrightnessSlider->box.size.x = 250.0;
+		menu->addChild(haloBrightnessSlider);
+
+		menu->addChild(new ui::MenuSeparator);
+
+		// menu->addChild(createBoolPtrMenuItem("Hide cursor while dragging", "", &settings::allowCursorLock));
+
+		static const std::vector<std::string> knobModeLabels = {
+			"Linear",
+			"Scaled linear",
+			"Absolute rotary",
+			"Relative rotary",
+		};
+		static const std::vector<int> knobModes = {0, 2, 3};
+		menu->addChild(createSubmenuItem("Knob mode", knobModeLabels[settings::knobMode], [=](ui::Menu* menu) {
+			for (int knobMode : knobModes) {
+				menu->addChild(createCheckMenuItem(knobModeLabels[knobMode], "",
+					[=]() {return settings::knobMode == knobMode;},
+					[=]() {settings::knobMode = (settings::KnobMode) knobMode;}
+				));
+			}
+		}));
+
+		menu->addChild(createBoolPtrMenuItem("Scroll wheel knob control", "", &settings::knobScroll));
+
+		KnobScrollSensitivitySlider* knobScrollSensitivitySlider = new KnobScrollSensitivitySlider;
+		knobScrollSensitivitySlider->box.size.x = 250.0;
+		menu->addChild(knobScrollSensitivitySlider);
+
+		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
+	}
+};
+
+
+////////////////////
+// Engine
+////////////////////
+
+
+struct EngineButton : MenuButton {
+	void onAction(const ActionEvent& e) override {
+		ui::Menu* menu = createMenu();
+		menu->cornerFlags = BND_CORNER_TOP;
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+
+		std::string cpuMeterText = "F3";
+		if (settings::cpuMeter)
+			cpuMeterText += " " CHECKMARK_STRING;
+		menu->addChild(createMenuItem("Performance meters", cpuMeterText, [=]() {
+			settings::cpuMeter ^= true;
+		}));
+
+		menu->addChild(createSubmenuItem("Threads | DO NOT USE", string::f("%d", settings::threadCount), [=](ui::Menu* menu) {
+			// BUG This assumes SMT is enabled.
+			int cores = system::getLogicalCoreCount() / 2;
+
+			for (int i = 1; i <= 2 * cores; i++) {
+				std::string rightText;
+				if (i == cores)
+					rightText += "(most modules)";
+				else if (i == 1)
+					rightText += "(lowest CPU usage)";
+				menu->addChild(createCheckMenuItem(string::f("%d", i), rightText,
+					[=]() {return settings::threadCount == i;},
+					[=]() {settings::threadCount = i;}
+				));
+			}
+		}));
+	}
+};
+
+
+////////////////////
+// Help
+////////////////////
+
+
+struct HelpButton : MenuButton {
+	void onAction(const ActionEvent& e) override {
+		ui::Menu* menu = createMenu();
+		menu->cornerFlags = BND_CORNER_TOP;
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+
+		menu->addChild(createMenuItem("Tips", "", [=]() {
+			APP->scene->addChild(tipWindowCreate());
+		}));
+
+		menu->addChild(createMenuItem("VCV User manual", "F1", [=]() {
+			system::openBrowser("https://vcvrack.com/manual/");
+		}));
+
+		menu->addChild(createMenuItem("Cardinal Project page", "", [=]() {
+			system::openBrowser("https://github.com/DISTRHO/Cardinal/");
+		}));
+
+		menu->addChild(new ui::MenuSeparator);
+
+		menu->addChild(createMenuLabel(APP_EDITION + " " + APP_EDITION_NAME));
+
+		menu->addChild(createMenuLabel("VCVRack " + APP_VERSION + " Compatible"));
+	}
+};
+
+
+////////////////////
+// MenuBar
+////////////////////
+
+
+struct MeterLabel : ui::Label {
+	int frameIndex = 0;
+	double frameDurationTotal = 0.0;
+	double frameDurationAvg = 0.0;
+	double uiLastTime = 0.0;
+	double uiLastThreadTime = 0.0;
+	double uiFrac = 0.0;
+
+	void step() override {
+		// Compute frame rate
+		double frameDuration = APP->window->getLastFrameDuration();
+		frameDurationTotal += frameDuration;
+		frameIndex++;
+		if (frameDurationTotal >= 1.0) {
+			frameDurationAvg = frameDurationTotal / frameIndex;
+			frameDurationTotal = 0.0;
+			frameIndex = 0;
+		}
+
+		// Compute UI thread CPU
+		// double time = system::getTime();
+		// double uiDuration = time - uiLastTime;
+		// if (uiDuration >= 1.0) {
+		// 	double threadTime = system::getThreadTime();
+		// 	uiFrac = (threadTime - uiLastThreadTime) / uiDuration;
+		// 	uiLastThreadTime = threadTime;
+		// 	uiLastTime = time;
+		// }
+
+		double meterAverage = APP->engine->getMeterAverage();
+		double meterMax = APP->engine->getMeterMax();
+		text = string::f("%.1f fps  %.1f%% avg  %.1f%% max", 1.0 / frameDurationAvg, meterAverage * 100, meterMax * 100);
+		Label::step();
+	}
+};
+
+
+struct MenuBar : widget::OpaqueWidget {
+	CardinalPluginContext* const context;
+	MeterLabel* meterLabel;
+
+	MenuBar(CardinalPluginContext* const ctx, const bool isStandalone)
+		: context(ctx)
+    {
+		const float margin = 5;
+		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
+
+		ui::SequentialLayout* layout = new ui::SequentialLayout;
+		layout->margin = math::Vec(margin, margin);
+		layout->spacing = math::Vec(0, 0);
+		addChild(layout);
+
+		FileButton* fileButton = new FileButton(isStandalone);
+		fileButton->text = "File";
+		layout->addChild(fileButton);
+
+		EditButton* editButton = new EditButton;
+		editButton->text = "Edit";
+		layout->addChild(editButton);
+
+		ViewButton* viewButton = new ViewButton;
+		viewButton->text = "View";
+		layout->addChild(viewButton);
+
+		EngineButton* engineButton = new EngineButton;
+		engineButton->text = "Engine";
+		layout->addChild(engineButton);
+
+		HelpButton* helpButton = new HelpButton;
+		helpButton->text = "Help";
+		layout->addChild(helpButton);
+
+		// ui::Label* titleLabel = new ui::Label;
+		// titleLabel->color.a = 0.5;
+		// layout->addChild(titleLabel);
+
+		meterLabel = new MeterLabel;
+		meterLabel->box.pos.y = margin;
+		meterLabel->box.size.x = 300;
+		meterLabel->alignment = ui::Label::RIGHT_ALIGNMENT;
+		meterLabel->color.a = 0.5;
+		addChild(meterLabel);
+	}
+
+	void draw(const DrawArgs& args) override {
+		bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL);
+		bndBevel(args.vg, 0.0, 0.0, box.size.x, box.size.y);
+
+		Widget::draw(args);
+	}
+
+	void step() override {
+		meterLabel->box.pos.x = box.size.x - meterLabel->box.size.x - 5;
+		Widget::step();
+	}
+};
+
+
+} // namespace menuBar
+
+
+widget::Widget* createMenuBar() {
+	return new widget::Widget;
+}
+
+widget::Widget* createMenuBar(CardinalPluginContext* const context, const bool isStandalone) {
+	menuBar::MenuBar* menuBar = new menuBar::MenuBar(context, isStandalone);
+	return menuBar;
+}
+
+
+} // namespace app
+} // namespace rack

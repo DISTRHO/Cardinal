@@ -20,13 +20,18 @@ NAME = Cardinal
 # Files to build (DPF stuff)
 
 FILES_DSP = \
-	CardinalPlugin.cpp
+	CardinalPlugin.cpp \
+	override/asset.cpp \
+	override/common.cpp \
+	override/context.cpp \
+	override/dep.cpp \
+	override/library.cpp \
+	override/network.cpp
 
 FILES_UI = \
 	CardinalUI.cpp \
-	context.cpp \
-	dep.cpp \
-	Window.cpp
+	override/MenuBar.cpp \
+	override/Window.cpp
 
 # --------------------------------------------------------------
 # Import base definitions
@@ -67,7 +72,7 @@ IGNORED_FILES += Rack/src/rtmidi.cpp
 FILES_DSP += $(wildcard Rack/src/*.c)
 FILES_DSP += $(wildcard Rack/src/*/*.c)
 FILES_DSP += $(filter-out $(IGNORED_FILES),$(wildcard Rack/src/*.cpp))
-FILES_DSP += $(filter-out Rack/src/window/Window.cpp, $(wildcard Rack/src/*/*.cpp))
+FILES_DSP += $(filter-out Rack/src/app/MenuBar.cpp Rack/src/window/Window.cpp, $(wildcard Rack/src/*/*.cpp))
 
 # --------------------------------------------------------------
 # Extra libraries to link against
