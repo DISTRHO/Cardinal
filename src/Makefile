@@ -24,6 +24,7 @@ FILES_DSP = \
 
 FILES_UI = \
 	CardinalUI.cpp \
+	context.cpp \
 	dep.cpp \
 	Window.cpp
 
@@ -51,9 +52,21 @@ else
 FILES_UI += Rack/dep/osdialog/osdialog_zenity.c
 endif
 
+IGNORED_FILES  = Rack/src/asset.cpp
+IGNORED_FILES += Rack/src/common.cpp
+IGNORED_FILES += Rack/src/context.cpp
+IGNORED_FILES += Rack/src/dep.cpp
+IGNORED_FILES += Rack/src/discord.cpp
+IGNORED_FILES += Rack/src/gamepad.cpp
+IGNORED_FILES += Rack/src/keyboard.cpp
+IGNORED_FILES += Rack/src/library.cpp
+IGNORED_FILES += Rack/src/network.cpp
+IGNORED_FILES += Rack/src/rtaudio.cpp
+IGNORED_FILES += Rack/src/rtmidi.cpp
+
 FILES_DSP += $(wildcard Rack/src/*.c)
 FILES_DSP += $(wildcard Rack/src/*/*.c)
-FILES_DSP += $(filter-out Rack/src/asset.cpp Rack/src/common.cpp Rack/src/dep.cpp Rack/src/discord.cpp Rack/src/gamepad.cpp Rack/src/keyboard.cpp Rack/src/library.cpp Rack/src/network.cpp Rack/src/rtaudio.cpp Rack/src/rtmidi.cpp, $(wildcard Rack/src/*.cpp))
+FILES_DSP += $(filter-out $(IGNORED_FILES),$(wildcard Rack/src/*.cpp))
 FILES_DSP += $(filter-out Rack/src/window/Window.cpp, $(wildcard Rack/src/*/*.cpp))
 
 # --------------------------------------------------------------

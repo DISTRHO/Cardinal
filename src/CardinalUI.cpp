@@ -17,10 +17,12 @@
 
 #include <app/Scene.hpp>
 #include <context.hpp>
+#include <helpers.hpp>
 #include <patch.hpp>
 #include <settings.hpp>
 #include <ui/Button.hpp>
 #include <ui/MenuItem.hpp>
+#include <ui/MenuSeparator.hpp>
 #include <window/Window.hpp>
 
 #ifdef NDEBUG
@@ -48,7 +50,69 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
+struct CardinalMenuButton : rack::ui::Button {
+    void step() override {
+        box.size.x = bndLabelWidth(APP->window->vg, -1, text.c_str()) + 1.0;
+        Widget::step();
+    }
+    void draw(const DrawArgs& args) override {
+        BNDwidgetState state = BND_DEFAULT;
+        if (APP->event->hoveredWidget == this)
+            state = BND_HOVER;
+        if (APP->event->draggedWidget == this)
+            state = BND_ACTIVE;
+        bndMenuItem(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());
+        Widget::draw(args);
+    }
+};
+
+struct CardinalFileButton : CardinalMenuButton {
+    CardinalFileButton()
+        : CardinalMenuButton()
+    {
+        text = "File";
+    }
+
+    void onAction(const ActionEvent& e) override {
+        rack::ui::Menu* menu = rack::createMenu();
+        menu->cornerFlags = BND_CORNER_TOP;
+        menu->box.pos = getAbsoluteOffset(rack::math::Vec(0, box.size.y));
+
+        menu->addChild(rack::createMenuItem("New", RACK_MOD_CTRL_NAME "+N", []() {
+            APP->patch->loadTemplateDialog();
+        }));
+
+        menu->addChild(rack::createMenuItem("Open", RACK_MOD_CTRL_NAME "+O", []() {
+            APP->patch->loadDialog();
+        }));
+
+        /*
+        menu->addChild(rack::createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
+            APP->patch->saveDialog();
+        }));
+
+        menu->addChild(rack::createMenuItem("Save as", RACK_MOD_CTRL_NAME "+Shift+S", []() {
+            APP->patch->saveAsDialog();
+        }));
+        */
+
+        menu->addChild(rack::createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
+            APP->patch->revertDialog();
+        }, APP->patch->path == ""));
+
+        menu->addChild(new rack::ui::MenuSeparator);
+
+        menu->addChild(rack::createMenuItem("Quit", RACK_MOD_CTRL_NAME "+Q", []() {
+            APP->window->close();
+        }));
+    }
+};
+
+// -----------------------------------------------------------------------------------------------------------
+
 CardinalPluginContext* getRackContextFromPlugin(void* ptr);
+
+// -----------------------------------------------------------------------------------------------------------
 
 class CardinalUI : public UI,
                    public WindowParametersCallback
@@ -116,36 +180,45 @@ public:
 
             rWidget* const layout = fContext->scene->menuBar->children.front();
 
-            for (rWidgetIterator it = layout->children.begin(); it != layout->children.end(); ++it)
+            const auto removeMenu = [layout](const char* const name) -> void
             {
-                if (rButton* const button = reinterpret_cast<rButton*>(*it))
+                for (rWidgetIterator it = layout->children.begin(); it != layout->children.end(); ++it)
                 {
-                    /* FIXME this doesnt work
-                    if (button->text == "Engine")
+                    if (rButton* const button = reinterpret_cast<rButton*>(*it))
                     {
-                        for (rWidgetIterator it2 = button->children.begin(); it2 != button->children.end(); ++it2)
+                        if (button->text == name)
                         {
-                            if (rMenuItem* const item = reinterpret_cast<rMenuItem*>(*it2))
-                            {
-                                if (item->text == "Sample rate")
-                                {
-                                    button->children.erase(it2);
-                                    delete button;
-                                    break;
-                                }
-                            }
+                            layout->removeChild(button);
+                            // button->parent = nullptr;
+                            delete button;
+                            break;
                         }
                     }
-                    */
-                    if (button->text == "Library")
+                }
+            };
+
+            removeMenu("File");
+            removeMenu("Library");
+
+            layout->addChildBottom(new CardinalFileButton());
+
+            /* FIXME this doesnt work
+            if (button->text == "Engine")
+            {
+                for (rWidgetIterator it2 = button->children.begin(); it2 != button->children.end(); ++it2)
+                {
+                    if (rMenuItem* const item = reinterpret_cast<rMenuItem*>(*it2))
                     {
-                        layout->children.erase(it);
-                        button->parent = nullptr;
-                        delete button;
-                        break;
+                        if (item->text == "Sample rate")
+                        {
+                            button->children.erase(it2);
+                            delete button;
+                            break;
+                        }
                     }
                 }
             }
+            */
         }
 
         WindowParametersSetCallback(fContext->window, this);
