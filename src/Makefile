@@ -28,6 +28,10 @@ FILES_DSP = \
 	override/library.cpp \
 	override/network.cpp
 
+# override/osdialog.cpp
+# override/RemoteNanoVG.cpp
+# override/RemoteWindow.cpp
+
 FILES_UI = \
 	CardinalUI.cpp \
 	override/MenuBar.cpp \
@@ -44,11 +48,10 @@ include ../dpf/Makefile.base.mk
 
 FILES_DSP += Rack/dep/pffft/pffft.c
 FILES_DSP += Rack/dep/pffft/fftpack.c
-
-FILES_UI += Rack/dep/oui-blendish/blendish.c
+FILES_DSP += Rack/dep/osdialog/osdialog.c
+FILES_DSP += Rack/dep/oui-blendish/blendish.c
 
 # FIXME dont use this
-FILES_UI += Rack/dep/osdialog/osdialog.c
 ifeq ($(MACOS),true)
 FILES_UI += Rack/dep/osdialog/osdialog_mac.m
 else ifeq ($(WINDOWS),true)
@@ -68,11 +71,13 @@ IGNORED_FILES += Rack/src/library.cpp
 IGNORED_FILES += Rack/src/network.cpp
 IGNORED_FILES += Rack/src/rtaudio.cpp
 IGNORED_FILES += Rack/src/rtmidi.cpp
+IGNORED_FILES += Rack/src/app/MenuBar.cpp
+IGNORED_FILES += Rack/src/window/Window.cpp
 
 FILES_DSP += $(wildcard Rack/src/*.c)
 FILES_DSP += $(wildcard Rack/src/*/*.c)
 FILES_DSP += $(filter-out $(IGNORED_FILES),$(wildcard Rack/src/*.cpp))
-FILES_DSP += $(filter-out Rack/src/app/MenuBar.cpp Rack/src/window/Window.cpp, $(wildcard Rack/src/*/*.cpp))
+FILES_DSP += $(filter-out $(IGNORED_FILES), $(wildcard Rack/src/*/*.cpp))
 
 # --------------------------------------------------------------
 # Extra libraries to link against

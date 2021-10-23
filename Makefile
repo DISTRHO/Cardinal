@@ -21,16 +21,33 @@ SYSDEPS ?= false
 ifeq ($(SYSDEPS),true)
 
 ifneq ($(shell pkg-config --exists jansson && echo true),true)
-$(error jansson dpendency not installed/available)
+$(error jansson dependency not installed/available)
 endif
 ifneq ($(shell pkg-config --exists libarchive && echo true),true)
-$(error libarchive dpendency not installed/available)
+$(error libarchive dependency not installed/available)
 endif
 ifneq ($(shell pkg-config --exists samplerate && echo true),true)
-$(error samplerate dpendency not installed/available)
+$(error samplerate dependency not installed/available)
 endif
 ifneq ($(shell pkg-config --exists speexdsp && echo true),true)
-$(error speexdsp dpendency not installed/available)
+$(error speexdsp dependency not installed/available)
+endif
+
+endif
+
+ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
+
+ifneq ($(HAVE_OPENGL),true)
+$(error X11 dependency not installed/available)
+endif
+ifneq ($(HAVE_X11),true)
+$(error X11 dependency not installed/available)
+endif
+ifneq ($(HAVE_XEXT),true)
+$(warning Xext dependency not installed/available)
+endif
+ifneq ($(HAVE_XRANDR),true)
+$(warning Xrandr dependency not installed/available)
 endif
 
 endif
@@ -46,8 +63,7 @@ ifneq ($(SYSDEPS),true)
 endif
 
 dgl:
-	$(MAKE) USE_NANOVG_FBO=true -C dpf/dgl opengl
-	# $(MAKE) opengl -C dpf/dgl USE_NANOVG_FBO=true
+	$(MAKE) -C dpf/dgl opengl USE_NANOVG_FBO=true
 
 plugins: deps
 	$(MAKE) all -C plugins
