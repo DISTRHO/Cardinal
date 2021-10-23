@@ -188,6 +188,14 @@ LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
 endif
 
 # --------------------------------------------------------------
+# optional liblo
+
+ifeq ($(HAVE_LIBLO),true)
+BASE_FLAGS += $(LIBLO_FLAGS)
+LINK_FLAGS += $(LIBLO_LIBS)
+endif
+
+# --------------------------------------------------------------
 # fallback path to resource files
 
 ifeq ($(EXE_WRAPPER),wine)

@@ -33,6 +33,11 @@
 # undef DEBUG
 #endif
 
+#ifdef HAVE_LIBLO
+# include <lo/lo.h>
+# include "extra/Thread.hpp"
+#endif
+
 #include <list>
 
 #include "DistrhoPluginUtils.hpp"
@@ -40,6 +45,8 @@
 #include "WindowParameters.hpp"
 #include "extra/Base64.hpp"
 #include "extra/SharedResourcePointer.hpp"
+
+#define REMOTE_HOST_PORT "2228"
 
 namespace rack {
 namespace plugin {
@@ -57,7 +64,16 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
-struct Initializer {
+struct Initializer
+#ifdef HAVE_LIBLO
+: public Thread
+#endif
+{
+#ifdef HAVE_LIBLO
+    lo_server oscServer = nullptr;
+    CardinalBasePlugin* oscPlugin = nullptr;
+#endif
+
     Initializer(const CardinalBasePlugin* const plugin)
     {
         using namespace rack;
@@ -136,11 +152,32 @@ struct Initializer {
 
         INFO("Initializing plugins");
         plugin::initStaticPlugins();
+
+#ifdef HAVE_LIBLO
+        oscServer = lo_server_new_with_proto(REMOTE_HOST_PORT, LO_UDP, osc_error_handler);
+        DISTRHO_SAFE_ASSERT_RETURN(oscServer != nullptr,);
+
+        lo_server_add_method(oscServer, "/hello", "", osc_hello_handler, this);
+        lo_server_add_method(oscServer, "/load", "b", osc_load_handler, this);
+        lo_server_add_method(oscServer, nullptr, nullptr, osc_fallback_handler, nullptr);
+
+        startThread();
+#endif
     }
 
     ~Initializer()
     {
         using namespace rack;
+
+#ifdef HAVE_LIBLO
+        if (oscServer != nullptr)
+        {
+            stopThread(5000);
+            lo_server_del_method(oscServer, nullptr, nullptr);
+            lo_server_free(oscServer);
+            oscServer = nullptr;
+        }
+#endif
 
         INFO("Destroying plugins");
         plugin::destroyStaticPlugins();
@@ -154,6 +191,77 @@ struct Initializer {
         INFO("Destroying logger");
         logger::destroy();
     }
+
+#ifdef HAVE_LIBLO
+    void run() override
+    {
+        while (! shouldThreadExit())
+        {
+            d_msleep(200);
+            while (lo_server_recv_noblock(oscServer, 0) != 0) {}
+        }
+    }
+
+    static void osc_error_handler(int num, const char* msg, const char* path)
+    {
+        d_stderr("Cardinal OSC Error: code: %i, msg: \"%s\", path: \"%s\")", num, msg, path);
+    }
+
+    static int osc_fallback_handler(const char* const path, const char* const types, lo_arg**, int, lo_message, void*)
+    {
+        d_stderr("Cardinal OSC unhandled message \"%s\" with types \"%s\"", path, types);
+        return 0;
+    }
+
+    static int osc_hello_handler(const char*, const char*, lo_arg**, int, const lo_message m, void* const self)
+    {
+        d_stdout("osc_hello_handler()");
+        const lo_address source = lo_message_get_source(m);
+        lo_send_from(source, static_cast<Initializer*>(self)->oscServer, LO_TT_IMMEDIATE, "/resp", "ss", "hello", "ok");
+        return 0;
+    }
+
+    static int osc_load_handler(const char*, const char* types, lo_arg** argv, int argc, const lo_message m, void* const self)
+    {
+        d_stdout("osc_load_handler()");
+        DISTRHO_SAFE_ASSERT_RETURN(argc == 1, 0);
+        DISTRHO_SAFE_ASSERT_RETURN(types != nullptr && types[0] == 'b', 0);
+
+        const int32_t size = argv[0]->blob.size;
+        DISTRHO_SAFE_ASSERT_RETURN(size > 4, 0);
+
+        const uint8_t* const blob = (uint8_t*)(&argv[0]->blob.data);
+        DISTRHO_SAFE_ASSERT_RETURN(blob != nullptr, 0);
+
+        bool ok = false;
+
+        if (CardinalBasePlugin* const plugin = static_cast<Initializer*>(self)->oscPlugin)
+        {
+            CardinalPluginContext* const context = plugin->context;
+            std::vector<uint8_t> data(size);
+            std::memcpy(data.data(), blob, size);
+
+            const MutexLocker cml(context->mutex);
+            rack::contextSet(context);
+            rack::system::removeRecursively(context->patch->autosavePath);
+            rack::system::createDirectories(context->patch->autosavePath);
+            try {
+                rack::system::unarchiveToDirectory(data, context->patch->autosavePath);
+                context->patch->loadAutosave();
+                ok = true;
+            }
+            catch (rack::Exception& e) {
+                WARN("%s", e.what());
+            }
+            rack::contextSet(nullptr);
+        }
+
+        const lo_address source = lo_message_get_source(m);
+        lo_send_from(source, static_cast<Initializer*>(self)->oscServer,
+                     LO_TT_IMMEDIATE, "/resp", "ss", "load", ok ? "ok" : "fail");
+        return 0;
+    }
+#endif
 };
 
 // -----------------------------------------------------------------------------------------------------------
@@ -247,6 +355,10 @@ public:
         context->patch->loadTemplate();
         context->engine->startFallbackThread();
 
+#ifdef HAVE_LIBLO
+        fInitializer->oscPlugin = this;
+#endif
+
 #if defined(__MOD_DEVICES__) && !defined(HEADLESS)
         context->window = new rack::window::Window;
         rack::window::WindowInit(context->window, this);
@@ -260,6 +372,10 @@ public:
 
     ~CardinalPlugin() override
     {
+#ifdef HAVE_LIBLO
+        fInitializer->oscPlugin = nullptr;
+#endif
+
         {
             const MutexLocker cml(context->mutex);
             rack::contextSet(context);

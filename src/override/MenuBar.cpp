@@ -57,9 +57,16 @@
 # undef DEBUG
 #endif
 
+#ifdef HAVE_LIBLO
+# include <lo/lo.h>
+#endif
+
 #include <Window.hpp>
 #include "../PluginContext.hpp"
 
+// #define REMOTE_HOST "localhost"
+#define REMOTE_HOST "192.168.51.1"
+#define REMOTE_HOST_PORT "2228"
 
 namespace rack {
 namespace app {
@@ -91,6 +98,27 @@ struct MenuButton : ui::Button {
 struct FileButton : MenuButton {
 	Window& window;
 	const bool isStandalone;
+
+#ifdef HAVE_LIBLO
+	bool oscConnected = false;
+	lo_server oscServer = nullptr;
+
+	static int osc_handler(const char* const path, const char* const types, lo_arg** argv, const int argc, lo_message, void* const self)
+	{
+		d_stdout("osc_handler(\"%s\", \"%s\", %p, %i)", path, types, argv, argc);
+
+		if (std::strcmp(path, "/resp") == 0 && argc == 2 && types[0] == 's' && types[1] == 's') {
+			d_stdout("osc_handler(\"%s\", ...) - got resp | '%s' '%s'", path, &argv[0]->s, &argv[1]->s);
+			if (std::strcmp(&argv[0]->s, "hello") == 0 && std::strcmp(&argv[1]->s, "ok") == 0)
+				static_cast<FileButton*>(self)->oscConnected = true;
+		}
+		return 0;
+	}
+
+	~FileButton() {
+		lo_server_free(oscServer);
+	}
+#endif
 
 	FileButton(Window& win, const bool standalone)
 		: MenuButton(), window(win), isStandalone(standalone) {}
@@ -127,6 +155,40 @@ struct FileButton : MenuButton {
 		}));
 		*/
 
+#ifdef HAVE_LIBLO
+		if (oscServer == nullptr || !oscConnected) {
+			menu->addChild(createMenuItem("Connect to MOD", "", [this]() {
+				if (oscServer == nullptr) {
+					oscServer = lo_server_new_with_proto(nullptr, LO_UDP, nullptr);
+					DISTRHO_SAFE_ASSERT_RETURN(oscServer != nullptr,);
+					lo_server_add_method(oscServer, "/resp", nullptr, osc_handler, this);
+				}
+				const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
+				DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
+				lo_send(addr, "/hello", "");
+				lo_address_free(addr);
+			}));
+		} else {
+			menu->addChild(createMenuItem("Deploy to MOD", "", []() {
+				const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
+				DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
+
+				APP->engine->prepareSave();
+				APP->patch->saveAutosave();
+				APP->patch->cleanAutosave();
+				std::vector<uint8_t> data(rack::system::archiveDirectory(APP->patch->autosavePath, 1));
+
+				if (const lo_blob blob = lo_blob_new(data.size(), data.data()))
+				{
+					lo_send(addr, "/load", "b", blob);
+					lo_blob_free(blob);
+				}
+
+				lo_address_free(addr);
+			}));
+		}
+#endif
+
 		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
 			// APP->patch->revertDialog();
 			APP->patch->loadAction(APP->patch->path);
@@ -140,6 +202,15 @@ struct FileButton : MenuButton {
 			}));
 		};
 	}
+
+#ifdef HAVE_LIBLO
+	void step() override {
+		MenuButton::step();
+		if (oscServer != nullptr) {
+			while (lo_server_recv_noblock(oscServer, 0) != 0) {}
+		}
+	}
+#endif
 };
 
 
