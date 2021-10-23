@@ -29,8 +29,6 @@
 #include <ui/common.hpp>
 #include <window/Window.hpp>
 
-#include <osdialog.h>
-
 #ifdef NDEBUG
 # undef DEBUG
 #endif
@@ -45,9 +43,14 @@
 
 namespace rack {
 namespace plugin {
-void initStaticPlugins();
-void destroyStaticPlugins();
+    void initStaticPlugins();
+    void destroyStaticPlugins();
 }
+#ifdef __MOD_DEVICES__
+namespace window {
+    void WindowInit(Window* window, DISTRHO_NAMESPACE::Plugin* plugin);
+}
+#endif
 }
 
 START_NAMESPACE_DISTRHO
@@ -67,7 +70,11 @@ struct Initializer {
         settings::isPlugin = true;
         settings::skipLoadOnLaunch = true;
         settings::showTipsOnLaunch = false;
+#ifdef __MOD_DEVICES__
+        settings::threadCount = 3;
+#else
         settings::threadCount = 1;
+#endif
 
         system::init();
         logger::init();
@@ -234,9 +241,18 @@ public:
         context->event = new rack::widget::EventState;
         context->scene = new rack::app::Scene;
         context->event->rootWidget = context->scene;
-
         context->patch->loadTemplate();
         context->engine->startFallbackThread();
+
+#ifdef __MOD_DEVICES__
+        context->window = new rack::window::Window;
+        rack::window::WindowInit(context->window, this);
+        /*
+        context->scene->removeChild(context->scene->menuBar);
+        context->scene->menuBar = rack::app::createMenuBar(getWindow(), getApp().isStandalone());
+        context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
+        */
+#endif
     }
 
     ~CardinalPlugin() override
@@ -244,6 +260,10 @@ public:
         {
             const MutexLocker cml(context->mutex);
             rack::contextSet(context);
+#ifdef __MOD_DEVICES__
+            delete context->window;
+            context->window = nullptr;
+#endif
 
             /*
             delete context->scene;
