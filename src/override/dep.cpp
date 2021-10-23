@@ -15,7 +15,7 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#include "OpenGL.hpp"
+#include <cstdio>
 
 // fix blendish build, missing symbol in debug mode
 #ifdef DEBUG

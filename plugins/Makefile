@@ -286,6 +286,10 @@ BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
+ifeq ($(HEADLESS),true)
+BASE_FLAGS += -DHEADLESS
+endif
+
 ifeq ($(WITH_LTO),true)
 BASE_FLAGS += -fno-strict-aliasing -flto
 endif

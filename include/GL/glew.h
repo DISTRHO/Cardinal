@@ -78,20 +78,22 @@
 // -----------------------------------------------------------------------
 // OpenGL includes
 
-#ifdef DISTRHO_OS_MAC
-# ifdef DGL_USE_OPENGL3
-#  include <OpenGL/gl3.h>
-#  include <OpenGL/gl3ext.h>
+#ifndef HEADLESS
+# ifdef DISTRHO_OS_MAC
+#  ifdef DGL_USE_OPENGL3
+#   include <OpenGL/gl3.h>
+#   include <OpenGL/gl3ext.h>
+#  else
+#   include <OpenGL/gl.h>
+#  endif
 # else
-#  include <OpenGL/gl.h>
-# endif
-#else
-# ifdef DISTRHO_OS_WINDOWS
-#  define GL_GLEXT_PROTOTYPES
-# endif
-# ifndef __GLEW_H__
-#  include <GL/gl.h>
-#  include <GL/glext.h>
+#  ifdef DISTRHO_OS_WINDOWS
+#   define GL_GLEXT_PROTOTYPES
+#  endif
+#  ifndef __GLEW_H__
+#   include <GL/gl.h>
+#   include <GL/glext.h>
+#  endif
 # endif
 #endif
 

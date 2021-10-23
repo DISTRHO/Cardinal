@@ -46,7 +46,7 @@ namespace plugin {
     void initStaticPlugins();
     void destroyStaticPlugins();
 }
-#ifdef __MOD_DEVICES__
+#if defined(__MOD_DEVICES__) && !defined(HEADLESS)
 namespace window {
     void WindowInit(Window* window, DISTRHO_NAMESPACE::Plugin* plugin);
 }
@@ -70,6 +70,9 @@ struct Initializer {
         settings::isPlugin = true;
         settings::skipLoadOnLaunch = true;
         settings::showTipsOnLaunch = false;
+#ifdef HEADLESS
+        settings::headless = true;
+#endif
 #ifdef __MOD_DEVICES__
         settings::threadCount = 3;
 #else
@@ -244,7 +247,7 @@ public:
         context->patch->loadTemplate();
         context->engine->startFallbackThread();
 
-#ifdef __MOD_DEVICES__
+#if defined(__MOD_DEVICES__) && !defined(HEADLESS)
         context->window = new rack::window::Window;
         rack::window::WindowInit(context->window, this);
         /*
@@ -260,17 +263,10 @@ public:
         {
             const MutexLocker cml(context->mutex);
             rack::contextSet(context);
-#ifdef __MOD_DEVICES__
+#if defined(__MOD_DEVICES__) && !defined(HEADLESS)
             delete context->window;
             context->window = nullptr;
 #endif
-
-            /*
-            delete context->scene;
-            context->scene = nullptr;
-            delete context->event;
-            context->event = nullptr;
-            */
         }
 
         delete context;

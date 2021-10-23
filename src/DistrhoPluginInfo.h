@@ -22,7 +22,14 @@
 #define DISTRHO_PLUGIN_NAME  "Cardinal"
 #define DISTRHO_PLUGIN_URI   "https://distrho.kx.studio/plugins/cardinal"
 
+#ifdef HEADLESS
+#define DISTRHO_PLUGIN_HAS_UI             0
+#else
 #define DISTRHO_PLUGIN_HAS_UI             1
+#define DISTRHO_PLUGIN_WANT_DIRECT_ACCESS 1
+#define DISTRHO_UI_USE_NANOVG             1
+#define DISTRHO_UI_USER_RESIZABLE         1
+#endif
 #define DISTRHO_PLUGIN_NUM_INPUTS         2
 #define DISTRHO_PLUGIN_NUM_OUTPUTS        2
 #define DISTRHO_PLUGIN_WANT_MIDI_INPUT    1
@@ -30,11 +37,8 @@
 #define DISTRHO_PLUGIN_WANT_FULL_STATE    1
 #define DISTRHO_PLUGIN_WANT_STATE         1
 #define DISTRHO_PLUGIN_WANT_TIMEPOS       1
-#define DISTRHO_PLUGIN_WANT_DIRECT_ACCESS 1
 // #define DISTRHO_PLUGIN_LV2_CATEGORY       "lv2:AnalyserPlugin"
 // #define DISTRHO_PLUGIN_VST3_CATEGORIES    "Fx|Analyzer"
-#define DISTRHO_UI_USE_NANOVG             1
-#define DISTRHO_UI_USER_RESIZABLE         1
 
 enum Parameters {
     kParameterCount

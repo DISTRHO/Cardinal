@@ -28,14 +28,17 @@ FILES_DSP = \
 	override/library.cpp \
 	override/network.cpp
 
-# override/osdialog.cpp
-# override/RemoteNanoVG.cpp
-# override/RemoteWindow.cpp
-
+ifeq ($(HEADLESS),true)
+FILES_DSP += \
+	override/osdialog.cpp \
+	override/RemoteNanoVG.cpp \
+	override/RemoteWindow.cpp
+else
 FILES_UI = \
 	CardinalUI.cpp \
 	override/MenuBar.cpp \
 	override/Window.cpp
+endif
 
 # --------------------------------------------------------------
 # Import base definitions
@@ -141,6 +144,10 @@ BASE_FLAGS += -D_USE_MATH_DEFINES
 BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
 BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
+endif
+
+ifeq ($(HEADLESS),true)
+BASE_FLAGS += -DHEADLESS
 endif
 
 ifeq ($(WITH_LTO),true)

@@ -35,7 +35,11 @@ endif
 
 endif
 
+# --------------------------------------------------------------
+# Check for X11+OpenGL dependencies (unless headless build)
+
 ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
+ifneq ($(HEADLESS),true)
 
 ifneq ($(HAVE_OPENGL),true)
 $(error X11 dependency not installed/available)
@@ -51,6 +55,7 @@ $(warning Xrandr dependency not installed/available)
 endif
 
 endif
+endif
 
 # --------------------------------------------------------------
 
@@ -63,7 +68,9 @@ ifneq ($(SYSDEPS),true)
 endif
 
 dgl:
+ifneq ($(HEADLESS),true)
 	$(MAKE) -C dpf/dgl opengl USE_NANOVG_FBO=true
+endif
 
 plugins: deps
 	$(MAKE) all -C plugins

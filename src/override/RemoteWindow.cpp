@@ -25,14 +25,9 @@
  * the License, or (at your option) any later version.
  */
 
-#define NANOVG_GL2 1
-
 #include <map>
 #include <queue>
 #include <thread>
-
-#include "../src/Rack/dep/glfw/deps/stb_image_write.h"
-#include <GL/osmesa.h>
 
 #include <window/Window.hpp>
 #include <asset.hpp>
@@ -49,8 +44,23 @@
 #endif
 
 #include "DistrhoPlugin.hpp"
-#include "extra/Thread.hpp"
 #include "../WindowParameters.hpp"
+
+#ifndef HEADLESS
+# include "../src/Rack/dep/glfw/deps/stb_image_write.h"
+# include "extra/Thread.hpp"
+# include <GL/osmesa.h>
+#endif
+
+
+#ifdef HEADLESS
+namespace rack {
+namespace app {
+widget::Widget* createMenuBar() { return new widget::Widget; }
+}
+}
+#endif
+
 
 namespace rack {
 namespace window {
@@ -103,14 +113,20 @@ struct WindowParams {
 	float rackBrightness = 1.0f;
 };
 
-struct Window::Internal : public Thread {
+struct Window::Internal
+#ifndef HEADLESS
+    : public Thread
+#endif
+{
 	DISTRHO_NAMESPACE::Plugin* plugin = nullptr;
 	DISTRHO_NAMESPACE::WindowParameters params;
 	DISTRHO_NAMESPACE::WindowParametersCallback* callback = nullptr;
 	Context* context = nullptr;
 	Window* self = nullptr;
+#ifndef HEADLESS
 	OSMesaContext mesa = nullptr;
 	GLubyte* mesaBuffer = nullptr;
+#endif
 
 	math::Vec size = minWindowSize;
 	std::string lastWindowTitle;
@@ -127,6 +143,7 @@ struct Window::Internal : public Thread {
 
 	bool fbDirtyOnSubpixelChange = true;
 
+#ifndef HEADLESS
 	void run() override {
 		self->run();
 		int i=0;
@@ -146,6 +163,7 @@ struct Window::Internal : public Thread {
 		}
 		d_stdout("thread quit");
 	}
+#endif
 };
 
 Window::Window() {
@@ -154,6 +172,7 @@ Window::Window() {
 	internal->self = this;
 }
 
+#ifndef HEADLESS
 static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
 	for (int y = 0; y < height / 2; y++) {
 		int flipY = height - y - 1;
@@ -163,11 +182,13 @@ static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
 		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
 	}
 }
+#endif
 
 void WindowInit(Window* const window, DISTRHO_NAMESPACE::Plugin* const plugin)
 {
 	window->internal->plugin = plugin;
 
+#ifndef HEADLESS
 	window->internal->mesa = OSMesaCreateContextExt(OSMESA_RGBA, 24, 8, 0, nullptr);
 	DISTRHO_SAFE_ASSERT_RETURN(window->internal->mesa != nullptr,);
 
@@ -196,6 +217,7 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::Plugin* const plugin)
 // 	window->vg = nvgCreateGLES2(nvgFlags);
 // 	window->fbVg = nvgCreateSharedGLES2(window->vg, nvgFlags);
 // #endif
+#endif
 
 	// Load default Blendish font
 	window->uiFont = window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
@@ -210,6 +232,7 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::Plugin* const plugin)
 		APP->scene->onContextCreate(e);
 	}
 
+#ifndef HEADLESS
 	d_stdout("all good with mesa and GL? %d | %p %p %p", ok, window->internal->mesa, window->vg, window->fbVg);
 	// window->internal->startThread();
 
@@ -277,6 +300,7 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::Plugin* const plugin)
 	delete[] pixels;
 
 	d_stdout("idle - after png");
+#endif
 }
 
 void WindowMods(Window* const window, const int mods)
@@ -296,6 +320,7 @@ Window::~Window() {
 	internal->fontCache.clear();
 	internal->imageCache.clear();
 
+#ifndef HEADLESS
 // #if defined NANOVG_GL2
 	nvgDeleteGL2(vg);
 	nvgDeleteGL2(fbVg);
@@ -310,6 +335,8 @@ Window::~Window() {
 		OSMesaDestroyContext(internal->mesa);
 
 	delete[] internal->mesaBuffer;
+#endif
+
 	delete internal;
 }
 

@@ -15,16 +15,23 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
+#ifndef HEADLESS
 #include "OpenGL.hpp"
+#endif
 
 #include "src/nanovg/nanovg.h"
 
-#define NANOVG_GL2_IMPLEMENTATION
-// #define NANOVG_GLES2_IMPLEMENTATION
-#include "src/nanovg/nanovg_gl.h"
-
-#define NANOVG_FBO_VALID 1
-#include "src/nanovg/nanovg_gl_utils.h"
+#ifdef HEADLESS
+struct NVGLUframebuffer;
+void nvgluBindFramebuffer(NVGLUframebuffer* fb) {}
+NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags) { return nullptr; }
+void nvgluDeleteFramebuffer(NVGLUframebuffer* fb) {}
+#else
+# define NANOVG_GLES2_IMPLEMENTATION
+# define NANOVG_FBO_VALID 1
+# include "src/nanovg/nanovg_gl.h"
+# include "src/nanovg/nanovg_gl_utils.h"
+#endif
 
 #if defined(__GNUC__) && (__GNUC__ >= 6)
 # pragma GCC diagnostic push
@@ -37,18 +44,6 @@
 #if defined(__GNUC__) && (__GNUC__ >= 6)
 # pragma GCC diagnostic pop
 #endif
-
-// typedef struct NVGLUframebuffer {
-// 	NVGcontext* ctx;
-// 	GLuint fbo;
-// 	GLuint rbo;
-// 	GLuint texture;
-// 	int image;
-// } NVGLUframebuffer;
-//
-// void nvgluBindFramebuffer(NVGLUframebuffer* fb) {}
-// NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags) { return nullptr; }
-// void nvgluDeleteFramebuffer(NVGLUframebuffer* fb) {}
 
 #define GLFWAPI
 
@@ -63,5 +58,7 @@ GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
 
 }
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "../src/Rack/dep/glfw/deps/stb_image_write.h"
+#ifndef HEADLESS
+# define STB_IMAGE_WRITE_IMPLEMENTATION
+# include "../src/Rack/dep/glfw/deps/stb_image_write.h"
+#endif

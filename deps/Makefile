@@ -136,15 +136,24 @@ $(DEP_PATH)/libarchive-3.4.3/.stamp-patched:
 	sed -i -e "s/TARGETS archive archive_static/TARGETS archive_static/" $(DEP_PATH)/libarchive-3.4.3/libarchive/CMakeLists.txt
 	touch $@
 
-ifeq ($(MACOS),true)
+# skip libsamplerate tests
+$(DEP_PATH)/lib/libsamplerate.a: $(DEP_PATH)/libsamplerate-0.1.9/.stamp-patched
+
+$(DEP_PATH)/libsamplerate-0.1.9/.stamp-patched:
+	$(DEP_MAKE) -C $(DEP_PATH) libsamplerate-0.1.9
+	sed -i -e "s/src doc examples tests/src/" $(DEP_PATH)/libsamplerate-0.1.9/Makefile.in
+	touch $@
+
 # zstd cmake is borked, see https://github.com/facebook/zstd/issues/1401
+# zstd also fails to build on old systems, patch that too
 $(DEP_PATH)/lib/libzstd.a: $(DEP_PATH)/zstd-1.4.5/.stamp-patched
 
 $(DEP_PATH)/zstd-1.4.5/.stamp-patched:
 	$(DEP_MAKE) -C $(DEP_PATH) zstd-1.4.5
 	sed -i -e "56,66d" $(DEP_PATH)/zstd-1.4.5/build/cmake/CMakeModules/AddZstdCompilationFlags.cmake
+	sed -i -e "146,175d" $(DEP_PATH)/zstd-1.4.5/programs/util.c
+	sed -i -e "142,144d" $(DEP_PATH)/zstd-1.4.5/programs/util.c
 	touch $@
-endif
 
 # --------------------------------------------------------------
 # Build targets
