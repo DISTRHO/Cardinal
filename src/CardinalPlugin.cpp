@@ -154,6 +154,7 @@ struct Initializer
         plugin::initStaticPlugins();
 
 #ifdef HAVE_LIBLO
+        INFO("Initializing OSC Remote control");
         oscServer = lo_server_new_with_proto(REMOTE_HOST_PORT, LO_UDP, osc_error_handler);
         DISTRHO_SAFE_ASSERT_RETURN(oscServer != nullptr,);
 
@@ -162,6 +163,8 @@ struct Initializer
         lo_server_add_method(oscServer, nullptr, nullptr, osc_fallback_handler, nullptr);
 
         startThread();
+#else
+        INFO("OSC Remote control is not enabled in this build");
 #endif
     }
 
@@ -195,11 +198,15 @@ struct Initializer
 #ifdef HAVE_LIBLO
     void run() override
     {
+        INFO("OSC Thread Listening for remote commands");
+
         while (! shouldThreadExit())
         {
             d_msleep(200);
             while (lo_server_recv_noblock(oscServer, 0) != 0) {}
         }
+
+        INFO("OSC Thread Closed");
     }
 
     static void osc_error_handler(int num, const char* msg, const char* path)
