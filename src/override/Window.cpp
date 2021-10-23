@@ -135,7 +135,11 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 	window->internal->ui = ui;
 
 	window->vg = ui->getContext();
+#ifdef NANOVG_GLES2
+	window->fbVg = nvgCreateSharedGLES2(window->vg, NVG_ANTIALIAS);
+#else
 	window->fbVg = nvgCreateSharedGL2(window->vg, NVG_ANTIALIAS);
+#endif
 
 	// Load default Blendish font
 	window->uiFont = window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
