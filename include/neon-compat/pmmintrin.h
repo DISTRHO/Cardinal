@@ -25,7 +25,7 @@
 static inline
 void __builtin_ia32_pause()
 {
-    // __asm__ __volatile__("isb\n");
+    __asm__ __volatile__("isb\n");
 }
 
 static inline

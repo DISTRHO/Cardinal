@@ -27,7 +27,7 @@ PLUGIN_FILES = plugins.cpp
 
 PLUGIN_FILES += $(wildcard Cardinal/src/*.cpp)
 
-ifeq ($(NOPLUGINS),true)
+ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------
 # AmalgamatedHarmonics
 
@@ -244,7 +244,7 @@ PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCa
 
 # --------------------------------------------------------------
 
-endif # NOPLUGINS
+endif # !NOPLUGINS
 
 # --------------------------------------------------------------
 # Build setup
