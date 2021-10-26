@@ -491,7 +491,9 @@ protected:
         if (filename == nullptr)
             return;
 
-        const ScopedContext sc(this);
+        // we cannot lock here
+        // const ScopedContext sc(this);
+        rack::contextSet(fContext);
         fContext->patch->loadAction(filename);
     }
 
