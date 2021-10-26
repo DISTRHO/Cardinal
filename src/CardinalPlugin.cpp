@@ -73,6 +73,7 @@ struct Initializer
     lo_server oscServer = nullptr;
     CardinalBasePlugin* oscPlugin = nullptr;
 #endif
+    std::string templatePath;
 
     Initializer(const CardinalBasePlugin* const plugin)
     {
@@ -108,6 +109,7 @@ struct Initializer
                 {
                     asset::bundlePath = system::join(resourcePath, "PluginManifests");
                     asset::systemDir = resourcePath;
+                    templatePath = system::join(asset::systemDir, "template.vcv");
                 }
             }
 
@@ -117,12 +119,17 @@ struct Initializer
                 // Make system dir point to source code location as fallback
                 asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
 
-                // And if that fails, use install target prefix
-                if (! system::isDirectory(system::join(asset::systemDir, "res")))
+                if (system::isDirectory(system::join(asset::systemDir, "res")))
+                {
+                    templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
+                }
+                else
+                // If source code dir does not exist use install target prefix as system dir
                #endif
                 {
                     asset::bundlePath = CARDINAL_PLUGIN_PREFIX "/share/Cardinal/PluginManifests";
                     asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/Cardinal";
+                    templatePath = system::join(asset::systemDir, "template.vcv");
                 }
             }
 
@@ -136,6 +143,7 @@ struct Initializer
         INFO("Bundle path: %s", plugin->getBundlePath());
         INFO("System directory: %s", asset::systemDir.c_str());
         INFO("User directory: %s", asset::userDir.c_str());
+        INFO("Template patch: %s", templatePath.c_str());
 
         // Check existence of the system res/ directory
         if (! system::isDirectory(asset::systemDir))
@@ -353,8 +361,7 @@ public:
         context->history = new rack::history::State;
         context->patch = new rack::patch::Manager;
         context->patch->autosavePath = fAutosavePath;
-        context->patch->templatePath = rack::system::join(rack::asset::systemDir, "template.vcv");
-        // context->patch->templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
+        context->patch->templatePath = fInitializer->templatePath;
 
         context->event = new rack::widget::EventState;
         context->scene = new rack::app::Scene;
