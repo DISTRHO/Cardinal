@@ -26,11 +26,11 @@ FILES_DSP = \
 	override/context.cpp \
 	override/dep.cpp \
 	override/library.cpp \
-	override/network.cpp
+	override/network.cpp \
+	override/osdialog.cpp
 
 ifeq ($(HEADLESS),true)
 FILES_DSP += \
-	override/osdialog.cpp \
 	override/RemoteNanoVG.cpp \
 	override/RemoteWindow.cpp
 else
@@ -53,15 +53,6 @@ FILES_DSP += Rack/dep/pffft/pffft.c
 FILES_DSP += Rack/dep/pffft/fftpack.c
 FILES_DSP += Rack/dep/osdialog/osdialog.c
 FILES_DSP += Rack/dep/oui-blendish/blendish.c
-
-# FIXME dont use this
-ifeq ($(MACOS),true)
-FILES_UI += Rack/dep/osdialog/osdialog_mac.m
-else ifeq ($(WINDOWS),true)
-FILES_UI += Rack/dep/osdialog/osdialog_win.c
-else
-FILES_UI += Rack/dep/osdialog/osdialog_zenity.c
-endif
 
 IGNORED_FILES  = Rack/src/asset.cpp
 IGNORED_FILES += Rack/src/common.cpp
