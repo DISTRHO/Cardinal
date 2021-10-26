@@ -109,18 +109,28 @@ public:
         if (scaleFactor != 1)
             setSize(1228 * scaleFactor, 666 * scaleFactor);
 
-        fContext->window = new rack::window::Window;
+        rack::window::Window* const window = new rack::window::Window;
+        rack::window::WindowInit(window, this);
 
         {
-            const ScopedContext sc(this);
-            rack::window::WindowInit(fContext->window, this);
+            const MutexLocker cml(fContext->mutex);
+            rack::contextSet(fContext);
 
             fContext->scene->removeChild(fContext->scene->menuBar);
             fContext->scene->menuBar = rack::app::createMenuBar(getWindow(), getApp().isStandalone());
             fContext->scene->addChildBelow(fContext->scene->menuBar, fContext->scene->rackScroll);
+
+            fContext->window = window;
+
+            rack::widget::Widget::ContextCreateEvent e;
+            fContext->scene->onContextCreate(e);
+
+            window->step();
+
+            rack::contextSet(nullptr);
         }
 
-        WindowParametersSetCallback(fContext->window, this);
+        WindowParametersSetCallback(window, this);
     }
 
     ~CardinalUI() override

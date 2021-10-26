@@ -148,11 +148,6 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 
 	// Init settings
 	WindowParametersRestore(window);
-
-	if (APP->scene) {
-		widget::Widget::ContextCreateEvent e;
-		APP->scene->onContextCreate(e);
-	}
 }
 
 void WindowMods(Window* const window, const int mods)
