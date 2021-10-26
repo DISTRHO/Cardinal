@@ -190,6 +190,11 @@ struct Initializer
         }
 #endif
 
+        INFO("Clearing asset paths");
+        asset::bundlePath.clear();
+        asset::systemDir.clear();
+        asset::userDir.clear();
+
         INFO("Destroying plugins");
         plugin::destroyStaticPlugins();
 
