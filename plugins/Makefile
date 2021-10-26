@@ -23,6 +23,12 @@ include ../dpf/Makefile.base.mk
 PLUGIN_FILES = plugins.cpp
 
 # --------------------------------------------------------------
+# Cardinal (built-in)
+
+PLUGIN_FILES += $(wildcard Cardinal/src/*.cpp)
+
+ifeq ($(NOPLUGINS),true)
+# --------------------------------------------------------------
 # AmalgamatedHarmonics
 
 PLUGIN_FILES += $(filter-out AmalgamatedHarmonics/src/AH.cpp,$(wildcard AmalgamatedHarmonics/src/*.cpp))
@@ -177,11 +183,6 @@ BOGAUDIO_CUSTOM = ADSR BlueNoiseGenerator LFO Noise VCA VCO VCF
 BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 
 # --------------------------------------------------------------
-# Cardinal (built-in)
-
-PLUGIN_FILES += $(wildcard Cardinal/src/*.cpp)
-
-# --------------------------------------------------------------
 # cf
 
 PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
@@ -242,6 +243,10 @@ PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/s
 PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCarinaeModules/src/*.cpp))
 
 # --------------------------------------------------------------
+
+endif # NOPLUGINS
+
+# --------------------------------------------------------------
 # Build setup
 
 BUILD_DIR = ../build/plugins
@@ -290,6 +295,10 @@ ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
 endif
 
+ifeq ($(NOPLUGINS),true)
+BASE_FLAGS += -DNOPLUGINS
+endif
+
 ifeq ($(WITH_LTO),true)
 BASE_FLAGS += -fno-strict-aliasing -flto
 endif
@@ -316,7 +325,12 @@ clean:
 
 # --------------------------------------------------------------
 
-PLUGIN_LIST       = $(subst /plugin.json,,$(wildcard */plugin.json))
+ifeq ($(NOPLUGINS),true)
+PLUGIN_LIST = Cardinal
+else
+PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
+endif
+
 PLUGIN_RESOURCES  = ../bin/Cardinal.lv2/resources/PluginManifests/Core.json
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
