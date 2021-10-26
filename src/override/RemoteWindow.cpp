@@ -46,20 +46,18 @@
 #include "DistrhoPlugin.hpp"
 #include "../WindowParameters.hpp"
 
-#ifndef HEADLESS
+#ifdef WITH_MESA
 # include "../src/Rack/dep/glfw/deps/stb_image_write.h"
 # include "extra/Thread.hpp"
 # include <GL/osmesa.h>
 #endif
 
 
-#ifdef HEADLESS
 namespace rack {
 namespace app {
 widget::Widget* createMenuBar() { return new widget::Widget; }
 }
 }
-#endif
 
 
 namespace rack {
@@ -114,7 +112,7 @@ struct WindowParams {
 };
 
 struct Window::Internal
-#ifndef HEADLESS
+#ifdef WITH_MESA
     : public Thread
 #endif
 {
@@ -123,7 +121,7 @@ struct Window::Internal
 	DISTRHO_NAMESPACE::WindowParametersCallback* callback = nullptr;
 	Context* context = nullptr;
 	Window* self = nullptr;
-#ifndef HEADLESS
+#ifdef WITH_MESA
 	OSMesaContext mesa = nullptr;
 	GLubyte* mesaBuffer = nullptr;
 #endif
@@ -143,7 +141,7 @@ struct Window::Internal
 
 	bool fbDirtyOnSubpixelChange = true;
 
-#ifndef HEADLESS
+#ifdef WITH_MESA
 	void run() override {
 		self->run();
 		int i=0;
@@ -172,7 +170,7 @@ Window::Window() {
 	internal->self = this;
 }
 
-#ifndef HEADLESS
+#ifdef WITH_MESA
 static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
 	for (int y = 0; y < height / 2; y++) {
 		int flipY = height - y - 1;
@@ -188,7 +186,7 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::Plugin* const plugin)
 {
 	window->internal->plugin = plugin;
 
-#ifndef HEADLESS
+#ifdef WITH_MESA
 	window->internal->mesa = OSMesaCreateContextExt(OSMESA_RGBA, 24, 8, 0, nullptr);
 	DISTRHO_SAFE_ASSERT_RETURN(window->internal->mesa != nullptr,);
 
@@ -232,7 +230,7 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::Plugin* const plugin)
 		APP->scene->onContextCreate(e);
 	}
 
-#ifndef HEADLESS
+#ifdef WITH_MESA
 	d_stdout("all good with mesa and GL? %d | %p %p %p", ok, window->internal->mesa, window->vg, window->fbVg);
 	// window->internal->startThread();
 
@@ -320,7 +318,7 @@ Window::~Window() {
 	internal->fontCache.clear();
 	internal->imageCache.clear();
 
-#ifndef HEADLESS
+#ifdef WITH_MESA
 // #if defined NANOVG_GL2
 	nvgDeleteGL2(vg);
 	nvgDeleteGL2(fbVg);

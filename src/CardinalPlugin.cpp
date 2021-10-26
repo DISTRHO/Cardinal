@@ -696,8 +696,10 @@ protected:
             context->engine->prepareSave();
             context->patch->saveAutosave();
             context->patch->cleanAutosave();
-
-            data = rack::system::archiveDirectory(fAutosavePath, 1);
+            
+            try {
+                data = rack::system::archiveDirectory(fAutosavePath, 1);
+            } DISTRHO_SAFE_EXCEPTION_RETURN("getState archiveDirectory", String());
         }
 
         return String::asBase64(data.data(), data.size());

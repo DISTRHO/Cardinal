@@ -125,15 +125,17 @@ DEP_MAKE += MACHINE=$(MACHINE)$(MACHINE_SUFFIX)
 $(DEP_PATH)/lib/%.a:
 	$(DEP_MAKE) -C $(DEP_PATH) lib/$*.a
 
-# skip libarchive shared lib
+# skip libarchive shared lib and ensure libzstd is enabled
 $(DEP_PATH)/lib/libarchive.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
 
 $(DEP_PATH)/lib/libarchive_static.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
 
 $(DEP_PATH)/libarchive-3.4.3/.stamp-patched:
 	$(DEP_MAKE) -C $(DEP_PATH) libarchive-3.4.3
+	sed -i -e "618,625d" $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt
 	sed -i -e "238,243d" $(DEP_PATH)/libarchive-3.4.3/libarchive/CMakeLists.txt
 	sed -i -e "s/TARGETS archive archive_static/TARGETS archive_static/" $(DEP_PATH)/libarchive-3.4.3/libarchive/CMakeLists.txt
+	sed -i -e "s/HAVE_LIBZSTD/1/" $(DEP_PATH)/libarchive-3.4.3/libarchive/archive_write_add_filter_zstd.c
 	touch $@
 
 # skip libsamplerate tests

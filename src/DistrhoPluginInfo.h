@@ -40,8 +40,4 @@
 // #define DISTRHO_PLUGIN_LV2_CATEGORY       "lv2:AnalyserPlugin"
 // #define DISTRHO_PLUGIN_VST3_CATEGORIES    "Fx|Analyzer"
 
-enum Parameters {
-    kParameterCount
-};
-
 #endif // DISTRHO_PLUGIN_INFO_H_INCLUDED
