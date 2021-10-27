@@ -28,6 +28,10 @@
 #include <common.hpp>
 #include <string.hpp>
 
+#ifdef NDEBUG
+# undef DEBUG
+#endif
+
 #include "DistrhoPluginUtils.hpp"
 
 // fopen_u8

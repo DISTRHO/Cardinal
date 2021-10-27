@@ -12,97 +12,15 @@ DESTDIR ?=
 SYSDEPS ?= false
 
 # --------------------------------------------------------------
-# Project name, used for binaries
-
-NAME = Cardinal
-
-# --------------------------------------------------------------
-# Files to build (DPF stuff)
-
-FILES_DSP = \
-	CardinalPlugin.cpp \
-	override/asset.cpp \
-	override/common.cpp \
-	override/context.cpp \
-	override/dep.cpp \
-	override/library.cpp \
-	override/network.cpp \
-	override/osdialog.cpp
-
-ifeq ($(HEADLESS),true)
-FILES_DSP += \
-	override/RemoteNanoVG.cpp \
-	override/RemoteWindow.cpp
-else
-FILES_UI = \
-	CardinalUI.cpp \
-	AsyncDialog.cpp \
-	override/MenuBar.cpp \
-	override/Window.cpp
-endif
-
-# --------------------------------------------------------------
 # Import base definitions
 
 USE_NANOVG_FBO = true
 include ../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
-# Files to build (VCV stuff)
+# Build setup
 
-FILES_DSP += Rack/dep/pffft/pffft.c
-FILES_DSP += Rack/dep/pffft/fftpack.c
-FILES_DSP += Rack/dep/osdialog/osdialog.c
-FILES_DSP += Rack/dep/oui-blendish/blendish.c
-
-IGNORED_FILES  = Rack/src/asset.cpp
-IGNORED_FILES += Rack/src/common.cpp
-IGNORED_FILES += Rack/src/context.cpp
-IGNORED_FILES += Rack/src/dep.cpp
-IGNORED_FILES += Rack/src/discord.cpp
-IGNORED_FILES += Rack/src/gamepad.cpp
-IGNORED_FILES += Rack/src/keyboard.cpp
-IGNORED_FILES += Rack/src/library.cpp
-IGNORED_FILES += Rack/src/network.cpp
-IGNORED_FILES += Rack/src/rtaudio.cpp
-IGNORED_FILES += Rack/src/rtmidi.cpp
-IGNORED_FILES += Rack/src/app/MenuBar.cpp
-IGNORED_FILES += Rack/src/window/Window.cpp
-
-FILES_DSP += $(wildcard Rack/src/*.c)
-FILES_DSP += $(wildcard Rack/src/*/*.c)
-FILES_DSP += $(filter-out $(IGNORED_FILES),$(wildcard Rack/src/*.cpp))
-FILES_DSP += $(filter-out $(IGNORED_FILES), $(wildcard Rack/src/*/*.cpp))
-
-# --------------------------------------------------------------
-# Extra libraries to link against
-
-ifneq ($(SYSDEPS),true)
-EXTRA_LIBS  = ../plugins/plugins.a
-EXTRA_LIBS += Rack/dep/lib/libjansson.a
-EXTRA_LIBS += Rack/dep/lib/libsamplerate.a
-EXTRA_LIBS += Rack/dep/lib/libspeexdsp.a
-ifeq ($(WINDOWS),true)
-EXTRA_LIBS += Rack/dep/lib/libarchive_static.a
-else
-EXTRA_LIBS += Rack/dep/lib/libarchive.a
-endif
-EXTRA_LIBS += Rack/dep/lib/libzstd.a
-
-EXTRA_DEPENDENCIES = $(EXTRA_LIBS)
-endif
-
-# --------------------------------------------------------------
-# Do some magic
-
-DPF_PATH = ../dpf
-DPF_BUILD_DIR = ../build
-DPF_TARGET_DIR = ../bin
-USE_VST2_BUNDLE = true
-include ../dpf/Makefile.plugins.mk
-
-# --------------------------------------------------------------
-# Extra flags for VCV stuff
+BUILD_DIR = ../build/rack
 
 ifeq ($(MACOS),true)
 BASE_FLAGS += -DARCH_MAC
@@ -114,6 +32,7 @@ endif
 
 BASE_FLAGS += -fno-finite-math-only
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
+BASE_FLAGS += -I../dpf/distrho
 BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat
 BASE_FLAGS += -IRack/include
@@ -149,96 +68,87 @@ endif
 BUILD_C_FLAGS += -std=gnu11
 
 # --------------------------------------------------------------
+# Rack files to build
+
+RACK_FILES += AsyncDialog.cpp
+RACK_FILES += override/asset.cpp
+RACK_FILES += override/context.cpp
+RACK_FILES += override/dep.cpp
+RACK_FILES += override/library.cpp
+RACK_FILES += override/network.cpp
+RACK_FILES += override/osdialog.cpp
+
+RACK_FILES += Rack/dep/pffft/pffft.c
+RACK_FILES += Rack/dep/pffft/fftpack.c
+RACK_FILES += Rack/dep/osdialog/osdialog.c
+RACK_FILES += Rack/dep/oui-blendish/blendish.c
+
+IGNORED_FILES  = Rack/src/asset.cpp
+IGNORED_FILES += Rack/src/common.cpp
+IGNORED_FILES += Rack/src/context.cpp
+IGNORED_FILES += Rack/src/dep.cpp
+IGNORED_FILES += Rack/src/discord.cpp
+IGNORED_FILES += Rack/src/gamepad.cpp
+IGNORED_FILES += Rack/src/keyboard.cpp
+IGNORED_FILES += Rack/src/library.cpp
+IGNORED_FILES += Rack/src/network.cpp
+IGNORED_FILES += Rack/src/rtaudio.cpp
+IGNORED_FILES += Rack/src/rtmidi.cpp
+IGNORED_FILES += Rack/src/app/MenuBar.cpp
+IGNORED_FILES += Rack/src/window/Window.cpp
+
+RACK_FILES += $(wildcard Rack/src/*.c)
+RACK_FILES += $(wildcard Rack/src/*/*.c)
+RACK_FILES += $(filter-out $(IGNORED_FILES),$(wildcard Rack/src/*.cpp))
+RACK_FILES += $(filter-out $(IGNORED_FILES), $(wildcard Rack/src/*/*.cpp))
+
+# --------------------------------------------------------------
 # FIXME lots of warnings from VCV side
 
 BASE_FLAGS += -Wno-unused-parameter
 BASE_FLAGS += -Wno-unused-variable
 
 # --------------------------------------------------------------
-# extra linker flags
+# Build targets
 
-LINK_FLAGS += -pthread
+TARGET = rack.a
 
-ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
-LINK_FLAGS += -ldl
-endif
+all: $(TARGET)
+	$(MAKE) -C Cardinal
+	$(MAKE) -C CardinalSynth
 
-ifeq ($(MACOS),true)
-LINK_FLAGS += -framework IOKit
-else ifeq ($(WINDOWS),true)
-LINK_FLAGS += -ldbghelp -lshlwapi
-# needed by JW-Modules
-EXTRA_LIBS += -lws2_32 -lwinmm
-endif
+resources:
+	$(MAKE) resources -C Cardinal
+	$(MAKE) resources -C CardinalSynth
 
-ifeq ($(SYSDEPS),true)
-LINK_FLAGS += $(shell pkg-config --libs jansson libarchive samplerate speexdsp)
-endif
-
-ifeq ($(WITH_LTO),true)
-LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
-endif
+clean:
+	rm -f $(TARGET)
+	rm -rf $(BUILD_DIR)
+	$(MAKE) clean -C Cardinal
+	$(MAKE) clean -C CardinalSynth
 
 # --------------------------------------------------------------
-# optional liblo
+# Build commands
 
-ifeq ($(HAVE_LIBLO),true)
-BASE_FLAGS += $(LIBLO_FLAGS)
-LINK_FLAGS += $(LIBLO_LIBS)
-endif
+RACK_OBJS = $(RACK_FILES:%=$(BUILD_DIR)/%.o)
 
-# --------------------------------------------------------------
-# fallback path to resource files
+$(TARGET): $(RACK_OBJS)
+	@echo "Creating $@"
+	$(SILENT)rm -f $@
+	$(SILENT)$(AR) crs $@ $^
 
-ifeq ($(EXE_WRAPPER),wine)
-SOURCE_DIR = Z:$(subst /,\\,$(CURDIR))
-else
-SOURCE_DIR = $(CURDIR)
-endif
+$(BUILD_DIR)/%.c.o: %.c
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@
 
-ifneq ($(SYSDEPS),true)
-BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_SOURCE_DIR='"$(SOURCE_DIR)"'
-endif
-
-BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
-
-# --------------------------------------------------------------
-# Enable all possible plugin types
-
-all: jack lv2 vst2 vst3 resources
+$(BUILD_DIR)/%.cpp.o: %.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
 
 # --------------------------------------------------------------
 
-CORE_RESOURCES = $(subst Rack/res/,,$(wildcard Rack/res/*)) template.vcv
-
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=../bin/Cardinal.lv2/resources/%)
-ifeq ($(MACOS),true)
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=../bin/Cardinal.vst/Contents/Resources/%)
-else
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=../bin/Cardinal.vst/resources/%)
-endif
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=../bin/Cardinal.vst3/Contents/Resources/%)
-
-resources: $(PLUGIN_RESOURCES)
-
-../bin/Cardinal.%/template.vcv: template.vcv
-	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
-
-../bin/Cardinal.lv2/resources/%: Rack/res/%
-	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
-
-../bin/Cardinal.vst/resources/%: Rack/res/%
-	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
-
-../bin/Cardinal.vst/Contents/Resources/%: Rack/res/%
-	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
-
-../bin/Cardinal.vst3/Contents/Resources/%: Rack/res/%
-	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+-include $(RACK_OBJS:%.o=%.d)
 
 # --------------------------------------------------------------

@@ -6,7 +6,11 @@
 #include <history.hpp>
 #include <settings.hpp>
 
-#include "DistrhoPluginUtils.hpp"
+#ifdef NDEBUG
+# undef DEBUG
+#endif
+
+#include "DistrhoUtils.hpp"
 
 /**
  * This file is an edited version of VCVRack's context.cpp

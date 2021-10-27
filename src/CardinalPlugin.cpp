@@ -307,7 +307,9 @@ class CardinalPlugin : public CardinalBasePlugin
 {
     SharedResourcePointer<Initializer> fInitializer;
 
+#if DISTRHO_PLUGIN_NUM_INPUTS != 0
     float* fAudioBufferIn;
+#endif
     float* fAudioBufferOut;
     std::string fAutosavePath;
     String fWindowSize;
@@ -326,7 +328,9 @@ public:
     CardinalPlugin()
         : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, 2),
           fInitializer(this),
+#if DISTRHO_PLUGIN_NUM_INPUTS != 0
           fAudioBufferIn(nullptr),
+#endif
           fAudioBufferOut(nullptr),
           fIsActive(false),
           fCurrentAudioDevice(nullptr),
@@ -497,7 +501,11 @@ protected:
 
     const char* getLabel() const override
     {
+#if DISTRHO_PLUGIN_IS_SYNTH
+        return "CardinalSynth";
+#else
         return "Cardinal";
+#endif
     }
 
     const char* getDescription() const override
@@ -529,7 +537,11 @@ protected:
 
     int64_t getUniqueId() const override
     {
+#if DISTRHO_PLUGIN_IS_SYNTH
+        return d_cconst('d', 'C', 'n', 'S');
+#else
         return d_cconst('d', 'C', 'd', 'n');
+#endif
     }
 
    /* --------------------------------------------------------------------------------------------------------
@@ -746,9 +758,11 @@ protected:
     void activate() override
     {
         const uint32_t bufferSize = getBufferSize() * DISTRHO_PLUGIN_NUM_OUTPUTS;
-        fAudioBufferIn = new float[bufferSize];
         fAudioBufferOut = new float[bufferSize];
+#if DISTRHO_PLUGIN_NUM_INPUTS != 0
+        fAudioBufferIn = new float[bufferSize];
         std::memset(fAudioBufferIn, 0, sizeof(float)*bufferSize);
+#endif
 
         {
             const MutexLocker cml(fDeviceMutex);
@@ -767,9 +781,12 @@ protected:
                 fCurrentAudioDevice->onStopStream();
         }
 
-        delete[] fAudioBufferIn;
         delete[] fAudioBufferOut;
-        fAudioBufferIn = fAudioBufferOut = nullptr;
+        fAudioBufferOut = nullptr;
+#if DISTRHO_PLUGIN_NUM_INPUTS != 0
+        delete[] fAudioBufferIn;
+        fAudioBufferIn = nullptr;
+#endif
     }
 
     void run(const float** const inputs, float** const outputs, const uint32_t frames,
@@ -784,11 +801,13 @@ protected:
 
         if (fCurrentAudioDevice != nullptr)
         {
+#if DISTRHO_PLUGIN_NUM_INPUTS != 0
             for (uint32_t i=0, j=0; i<frames; ++i)
             {
                 fAudioBufferIn[j++] = inputs[0][i];
                 fAudioBufferIn[j++] = inputs[1][i];
             }
+#endif
         }
         else
         {
@@ -802,8 +821,15 @@ protected:
             dev->handleMessagesFromHost(midiEvents, midiEventCount);
 
         if (fCurrentAudioDevice != nullptr)
-            fCurrentAudioDevice->processBuffer(fAudioBufferIn, DISTRHO_PLUGIN_NUM_INPUTS,
+        {
+#if DISTRHO_PLUGIN_NUM_INPUTS == 0
+            const float* const insPtr = nullptr;
+#else
+            const float* const insPtr = fAudioBufferIn;
+#endif
+            fCurrentAudioDevice->processBuffer(insPtr, DISTRHO_PLUGIN_NUM_INPUTS,
                                                fAudioBufferOut, DISTRHO_PLUGIN_NUM_OUTPUTS, frames);
+        }
 
         if (fCurrentMidiOutput != nullptr)
             fCurrentMidiOutput->processMessages();

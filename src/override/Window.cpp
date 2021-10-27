@@ -29,8 +29,6 @@
 #include <queue>
 #include <thread>
 
-#include <osdialog.h>
-
 #include <window/Window.hpp>
 #include <asset.hpp>
 #include <widget/Widget.hpp>

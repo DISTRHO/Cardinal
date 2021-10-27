@@ -19,6 +19,10 @@
 #include <system.hpp>
 #include <plugin/Plugin.hpp>
 
+#ifdef NDEBUG
+# undef DEBUG
+#endif
+
 #include <algorithm>
 
 #include "DistrhoUtils.hpp"
