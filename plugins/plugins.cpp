@@ -19,10 +19,6 @@
 
 #include "DistrhoUtils.hpp"
 
-// Cardinal (built-in)
-#include "Cardinal/src/plugin.hpp"
-
-#ifndef NOPLUGINS
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
@@ -167,6 +163,9 @@
 #undef modelVCF
 #undef modelVCO
 
+// Cardinal (built-in)
+#include "Cardinal/src/plugin.hpp"
+
 // cf
 #include "cf/src/plugin.hpp"
 
@@ -217,6 +216,17 @@ extern Model *modelBlankPanel;
 #include "JW-Modules/src/JWModules.hpp"
 #undef modelQuantizer
 
+// MindMeld
+
+extern Model *modelMixMaster;
+extern Model *modelAuxExpander;
+extern Model *modelMeld;
+extern Model *modelUnmeld;
+extern Model *modelEqMaster;
+extern Model *modelEqExpander;
+extern Model *modelBassMaster;
+extern Model *modelShapeMaster;
+
 // rackwindows
 #include "rackwindows/src/plugin.hpp"
 
@@ -227,8 +237,6 @@ extern Model *modelBlankPanel;
 
 // ZetaCarinaeModules
 #include "ZetaCarinaeModules/src/plugin.hpp"
-
-#endif // NOPLUGINS
 
 // stuff that reads config files, we dont want that
 int loadConsoleType() { return 0; }
@@ -241,8 +249,6 @@ void saveDirectOutMode(bool) {}
 void saveHighQualityAsDefault(bool) {}
 
 // plugin instances
-Plugin* pluginInstance__Cardinal;
-#ifndef NOPLUGINS
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__AS;
@@ -250,6 +256,7 @@ Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
+Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__Fundamental;
@@ -259,7 +266,7 @@ Plugin* pluginInstance__JW;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
-#endif // NOPLUGINS
+extern Plugin* pluginInstance__MindMeldModular;
 
 namespace rack {
 
@@ -365,20 +372,6 @@ static void initStatic__Core()
     }
 }
 
-static void initStatic__Cardinal()
-{
-    Plugin* const p = new Plugin;
-    pluginInstance__Cardinal = p;
-
-    const StaticPluginLoader spl(p, "Cardinal");
-    if (spl.ok())
-    {
-        p->addModel(modelHostParameters);
-        p->addModel(modelHostTime);
-    }
-}
-
-#ifndef NOPLUGINS
 static void initStatic__AmalgamatedHarmonics()
 {
     Plugin* const p = new Plugin;
@@ -763,6 +756,19 @@ static void initStatic__BogaudioModules()
     }
 }
 
+static void initStatic__Cardinal()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Cardinal = p;
+
+    const StaticPluginLoader spl(p, "Cardinal");
+    if (spl.ok())
+    {
+        p->addModel(modelHostParameters);
+        p->addModel(modelHostTime);
+    }
+}
+
 static void initStatic__cf()
 {
     Plugin* const p = new Plugin;
@@ -955,6 +961,25 @@ static void initStatic__JW()
     }
 }
 
+static void initStatic__MindMeldModular()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__MindMeldModular = p;
+
+    const StaticPluginLoader spl(p, "MindMeldModular");
+    if (spl.ok())
+    {
+	    p->addModel(modelMixMaster);
+	    p->addModel(modelAuxExpander);
+	    p->addModel(modelMeld);
+	    p->addModel(modelUnmeld);
+	    p->addModel(modelEqMaster);
+	    p->addModel(modelEqExpander);
+	    p->addModel(modelBassMaster);
+	    p->addModel(modelShapeMaster);
+    }
+}
+
 static void initStatic__rackwindows()
 {
     Plugin* const p = new Plugin;
@@ -1024,13 +1049,10 @@ static void initStatic__ZetaCarinaeModules()
         p->addModel(modelFirefly);
     }
 }
-#endif // NOPLUGINS
 
 void initStaticPlugins()
 {
     initStatic__Core();
-    initStatic__Cardinal();
-#ifndef NOPLUGINS
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__AS();
@@ -1038,6 +1060,7 @@ void initStaticPlugins()
     initStatic__Befaco();
     initStatic__Bidoo();
     initStatic__BogaudioModules();
+    initStatic__Cardinal();
     initStatic__cf();
     initStatic__ESeries();
     initStatic__Fundamental();
@@ -1049,7 +1072,7 @@ void initStaticPlugins()
     initStatic__ValleyAudio();
     */
     initStatic__ZetaCarinaeModules();
-#endif // NOPLUGINS
+    initStatic__MindMeldModular();
 }
 
 void destroyStaticPlugins()

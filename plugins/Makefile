@@ -23,11 +23,10 @@ include ../dpf/Makefile.base.mk
 PLUGIN_FILES = plugins.cpp
 
 # --------------------------------------------------------------
-# Cardinal (built-in)
+# MindMeld
 
-PLUGIN_FILES += $(wildcard Cardinal/src/*.cpp)
+PLUGIN_FILES += $(wildcard MindMeldModular/src/*.cpp)
 
-ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------
 # AmalgamatedHarmonics
 
@@ -183,6 +182,11 @@ BOGAUDIO_CUSTOM = ADSR BlueNoiseGenerator LFO Noise VCA VCO VCF
 BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 
 # --------------------------------------------------------------
+# Cardinal (built-in)
+
+PLUGIN_FILES += $(wildcard Cardinal/src/*.cpp)
+
+# --------------------------------------------------------------
 # cf
 
 PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
@@ -243,10 +247,6 @@ PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/s
 PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCarinaeModules/src/*.cpp))
 
 # --------------------------------------------------------------
-
-endif # !NOPLUGINS
-
-# --------------------------------------------------------------
 # Build setup
 
 BUILD_DIR = ../build/plugins
@@ -295,10 +295,6 @@ ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
 endif
 
-ifeq ($(NOPLUGINS),true)
-BASE_FLAGS += -DNOPLUGINS
-endif
-
 ifeq ($(WITH_LTO),true)
 BASE_FLAGS += -fno-strict-aliasing -flto
 endif
@@ -325,12 +321,7 @@ clean:
 
 # --------------------------------------------------------------
 
-ifeq ($(NOPLUGINS),true)
-PLUGIN_LIST = Cardinal
-else
-PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
-endif
-
+PLUGIN_LIST       = $(subst /plugin.json,,$(wildcard */plugin.json))
 PLUGIN_RESOURCES  = ../bin/Cardinal.lv2/resources/PluginManifests/Core.json
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
@@ -553,6 +544,32 @@ $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 		-DpluginInstance=pluginInstance__JW \
 		-IJW-Modules/src \
 		-IJW-Modules/lib/oscpack
+
+$(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MINDMELDMODULAR_CUSTOM),$(call custom_module_names,$(m),MindMeldModular)) \
+		$(foreach m,$(MINDMELDMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),MindMeldModular_$(shell basename $*))) \
+		-Dinit=init__MindMeldModular \
+		-DpluginInstance=pluginInstance__MindMeldModular
+
+$(BUILD_DIR)/MindMeldModular/src/Foundr%.cpp.o: MindMeldModular/src/Foundr%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MINDMELDMODULAR_CUSTOM),$(call custom_module_names,$(m),MindMeldModular)) \
+		-DpluginInstance=pluginInstance__MindMeldModular \
+		-DStepAttributes=StepAttributesKernel
+
+$(BUILD_DIR)/MindMeldModular/src/comp/Components.cpp.o: MindMeldModular/src/comp/Components.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MINDMELDMODULAR_CUSTOM),$(call custom_module_names,$(m),MindMeldModular)) \
+		-DpluginInstance=pluginInstance__MindMeldModular \
+		-DsaveDarkAsDefault=MindMeldModularIgnore1 \
+		-DloadDarkAsDefault=MindMeldModularIgonre2
 
 $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
