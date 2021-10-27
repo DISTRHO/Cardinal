@@ -148,7 +148,7 @@ struct FileButton : MenuButton {
 			});
 		}));
 
-		menu->addChild(createMenuItem("Open", RACK_MOD_CTRL_NAME "+O", [this]() {
+		menu->addChild(createMenuItem("Import...", RACK_MOD_CTRL_NAME "+O", [this]() {
 			// see APP->patch->loadDialog();
 			promptClear("The current patch is unsaved. Clear it and open a new patch?", [this]() {
 				std::string dir;
