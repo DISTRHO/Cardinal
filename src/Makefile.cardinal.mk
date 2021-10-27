@@ -14,6 +14,12 @@ DESTDIR ?=
 SYSDEPS ?= false
 
 # --------------------------------------------------------------
+# Import base definitions
+
+USE_NANOVG_FBO = true
+include ../../dpf/Makefile.base.mk
+
+# --------------------------------------------------------------
 # Files to build (DPF stuff)
 
 FILES_DSP  = CardinalPlugin.cpp
