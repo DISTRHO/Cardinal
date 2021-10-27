@@ -133,9 +133,9 @@ $(DEP_PATH)/lib/libarchive_static.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libar
 $(DEP_PATH)/libarchive-3.4.3/.stamp-patched:
 	$(DEP_MAKE) -C $(DEP_PATH) libarchive-3.4.3
 	sed -i -e "618,625d" $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt
+	sed -i -e "616s/^/  SET(HAVE_LIBZSTD 1)\\n/" $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt
 	sed -i -e "238,243d" $(DEP_PATH)/libarchive-3.4.3/libarchive/CMakeLists.txt
 	sed -i -e "s/TARGETS archive archive_static/TARGETS archive_static/" $(DEP_PATH)/libarchive-3.4.3/libarchive/CMakeLists.txt
-	sed -i -e "s/HAVE_LIBZSTD/1/" $(DEP_PATH)/libarchive-3.4.3/libarchive/archive_write_add_filter_zstd.c
 	touch $@
 
 # skip libsamplerate tests
