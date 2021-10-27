@@ -273,6 +273,18 @@ protected:
 
     void stateChanged(const char* key, const char* value) override
     {
+        if (std::strcmp(key, "windowSize") != 0)
+            return;
+
+        int width = 0;
+        int height = 0;
+        std::sscanf(value, "%i:%i", &width, &height);
+
+        if (width > 0 && height > 0)
+        {
+            const double scaleFactor = getScaleFactor();
+            setSize(width * scaleFactor, height * scaleFactor);
+        }
     }
 
     // -------------------------------------------------------------------------------------------------------
@@ -477,6 +489,17 @@ protected:
 
         const ScopedContext sc(this, mods);
         return fContext->event->handleKey(fLastMousePos, key, ev.keycode, action, mods);
+    }
+
+    void onResize(const ResizeEvent& ev) override
+    {
+        UI::onResize(ev);
+
+        const double scaleFactor = getScaleFactor();
+        char sizeString[64];
+        std::snprintf(sizeString, sizeof(sizeString), "%d:%d",
+                      (int)(ev.size.getWidth() / scaleFactor), (int)(ev.size.getHeight() / scaleFactor));
+        setState("windowSize", sizeString);
     }
 
     void uiFocus(const bool focus, CrossingMode) override

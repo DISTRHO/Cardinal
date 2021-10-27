@@ -310,6 +310,7 @@ class CardinalPlugin : public CardinalBasePlugin
     float* fAudioBufferIn;
     float* fAudioBufferOut;
     std::string fAutosavePath;
+    String fWindowSize;
 
     // for base/context handling
     bool fIsActive;
@@ -323,7 +324,7 @@ class CardinalPlugin : public CardinalBasePlugin
 
 public:
     CardinalPlugin()
-        : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, 1),
+        : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, 2),
           fInitializer(this),
           fAudioBufferIn(nullptr),
           fAudioBufferOut(nullptr),
@@ -642,10 +643,17 @@ protected:
 
     void initState(const uint32_t index, String& stateKey, String& defaultStateValue) override
     {
-        DISTRHO_SAFE_ASSERT_RETURN(index == 0,);
-
-        stateKey = "patch";
         defaultStateValue = "";
+
+        switch (index)
+        {
+        case 0:
+            stateKey = "patch";
+            break;
+        case 1:
+            stateKey = "windowSize";
+            break;
+        }
     }
 
    /* --------------------------------------------------------------------------------------------------------
@@ -683,6 +691,9 @@ protected:
 
     String getState(const char* const key) const override
     {
+        if (std::strcmp(key, "windowSize") == 0)
+            return fWindowSize;
+
         if (std::strcmp(key, "patch") != 0)
             return String();
         if (fAutosavePath.empty())
@@ -707,6 +718,12 @@ protected:
 
     void setState(const char* const key, const char* const value) override
     {
+        if (std::strcmp(key, "windowSize") == 0)
+        {
+            fWindowSize = value;
+            return;
+        }
+
         if (std::strcmp(key, "patch") != 0)
             return;
         if (fAutosavePath.empty())
