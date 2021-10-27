@@ -189,6 +189,9 @@ endif
 resources: $(PLUGIN_RESOURCES)
 
 ifneq ($(NAME),Cardinal)
+lv2: resources
+vst2: resources
+vst3: resources
 $(TARGET_DIR)/$(NAME).%: $(TARGET_DIR)/Cardinal.%
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@

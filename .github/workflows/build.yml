@@ -51,6 +51,7 @@ jobs:
           path: |
             bin/*
             !bin/Cardinal
+            !bin/CardinalSynth
 
   linux-armhf:
     runs-on: ubuntu-18.04
@@ -91,6 +92,7 @@ jobs:
           path: |
             bin/*
             !bin/Cardinal
+            !bin/CardinalSynth
 
   linux-x86:
     runs-on: ubuntu-18.04
@@ -125,6 +127,7 @@ jobs:
           path: |
             bin/*
             !bin/Cardinal
+            !bin/CardinalSynth
 
   linux-x86_64:
     runs-on: ubuntu-18.04
@@ -153,6 +156,7 @@ jobs:
           path: |
             bin/*
             !bin/Cardinal
+            !bin/CardinalSynth
 
   linux-x86_64-debug:
     runs-on: ubuntu-18.04
@@ -181,6 +185,7 @@ jobs:
           path: |
             bin/*
             !bin/Cardinal
+            !bin/CardinalSynth
 
   macos-universal:
     runs-on: macos-10.15
