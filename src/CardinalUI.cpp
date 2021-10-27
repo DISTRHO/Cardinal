@@ -287,6 +287,8 @@ protected:
             mods |= GLFW_MOD_SHIFT;
         if (mod & kModifierAlt)
             mods |= GLFW_MOD_ALT;
+        if (mod & kModifierSuper)
+            mods |= GLFW_MOD_SUPER;
 
         /*
         if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
