@@ -28,8 +28,6 @@
 #include <thread>
 #include <utility>
 
-#include <osdialog.h>
-
 #include <app/MenuBar.hpp>
 #include <app/TipWindow.hpp>
 #include <widget/OpaqueWidget.hpp>
@@ -57,11 +55,18 @@
 # undef DEBUG
 #endif
 
+// for finding home dir
+#ifndef ARCH_WIN
+# include <pwd.h>
+# include <unistd.h>
+#endif
+
 #ifdef HAVE_LIBLO
 # include <lo/lo.h>
 #endif
 
 #include <Window.hpp>
+#include "../AsyncDialog.hpp"
 #include "../PluginContext.hpp"
 
 // #define REMOTE_HOST "localhost"
@@ -94,6 +99,14 @@ struct MenuButton : ui::Button {
 // File
 ////////////////////
 
+
+static void promptClear(const char* const message, const std::function<void()> action)
+{
+	if (APP->history->isSaved() || APP->scene->rack->hasModules())
+		return action();
+
+	asyncDialog::create(message, action);
+}
 
 struct FileButton : MenuButton {
 	Window& window;
@@ -129,16 +142,45 @@ struct FileButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 		menu->addChild(createMenuItem("New", RACK_MOD_CTRL_NAME "+N", []() {
-			// APP->patch->loadTemplateDialog();
-			APP->patch->loadTemplate();
+			// see APP->patch->loadTemplateDialog();
+			promptClear("The current patch is unsaved. Clear it and start a new patch?", []() {
+				APP->patch->loadTemplate();
+			});
 		}));
 
 		menu->addChild(createMenuItem("Open", RACK_MOD_CTRL_NAME "+O", [this]() {
-			Window::FileBrowserOptions opts;
-			const std::string dir = system::getDirectory(APP->patch->path);
-			opts.startDir = dir.c_str();
-			window.openFileBrowser(opts);
-			// APP->patch->loadDialog();
+			// see APP->patch->loadDialog();
+			promptClear("The current patch is unsaved. Clear it and open a new patch?", [this]() {
+				std::string dir;
+				if (! APP->patch->path.empty())
+				{
+					dir = system::getDirectory(APP->patch->path);
+				}
+				else
+				{
+					// find home directory
+#ifdef ARCH_WIN
+					if (const char* const userprofile = getenv("USERPROFILE"))
+					{
+						dir = userprofile;
+					}
+					else if (const char* const homedrive = getenv("HOMEDRIVE"))
+					{
+						if (const char* const homepath = getenv("HOMEPATH"))
+							dir = system::join(homedrive, homepath);
+					}
+#else
+					if (struct passwd* const pwd = getpwuid(getuid()))
+						dir = pwd->pw_dir;
+					else if (const char* const home = getenv("HOME"))
+						dir = home;
+#endif
+				}
+
+				Window::FileBrowserOptions opts;
+				opts.startDir = dir.c_str();
+				window.openFileBrowser(opts);
+			});
 		}));
 
 		/*
@@ -191,8 +233,12 @@ struct FileButton : MenuButton {
 
 		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
 			// APP->patch->revertDialog();
-			APP->patch->loadAction(APP->patch->path);
-		}, APP->patch->path == ""));
+			if (APP->patch->path.empty())
+				return;
+			promptClear("Revert patch to the last saved state?", []{
+				APP->patch->loadAction(APP->patch->path);
+			});
+		}, APP->patch->path.empty()));
 
 		if (isStandalone) {
 			menu->addChild(new ui::MenuSeparator);

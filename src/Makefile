@@ -36,6 +36,7 @@ FILES_DSP += \
 else
 FILES_UI = \
 	CardinalUI.cpp \
+	AsyncDialog.cpp \
 	override/MenuBar.cpp \
 	override/Window.cpp
 endif
