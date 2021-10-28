@@ -551,6 +551,16 @@ static void initStatic__Befaco()
         p->addModel(modelMixer);
         p->addModel(modelSlewLimiter);
         p->addModel(modelDualAtenuverter);
+        p->addModel(modelPercall);
+        p->addModel(modelHexmixVCA);
+        p->addModel(modelChoppingKinky);
+        p->addModel(modelKickall);
+        p->addModel(modelSamplingModulator);
+        p->addModel(modelMorphader);
+        p->addModel(modelADSR);
+        p->addModel(modelSTMix);
+        p->addModel(modelMuxlicer);
+        p->addModel(modelMex);
     }
 }
 
@@ -585,25 +595,21 @@ static void initStatic__Bidoo()
         p->addModel(modelEMILE);
         p->addModel(modelFORK);
         p->addModel(modelTIARE);
-        //p->addModel(modelCLACOS);
-        //p->addModel(modelPENEQUE);
         p->addModel(modelLIMONADE);
         p->addModel(modelLIMBO);
         p->addModel(modelPERCO);
         p->addModel(modelBAFIS);
-        p->addModel(modelFFILTR);
         p->addModel(modelBAR);
         p->addModel(modelMINIBAR);
         p->addModel(modelZINC);
         p->addModel(modelFREIN);
         p->addModel(modelHCTIP);
-        //p->addModel(modelCURT);
         p->addModel(modelDFUZE);
         p->addModel(modelREI);
         p->addModel(modelRABBIT);
         p->addModel(modelBISTROT);
         p->addModel(modelSIGMA);
-        p->addModel(modelGARCON);
+        p->addModel(modelFLAME);
         p->addModel(modelVOID);
 
         // NOTE disabled in Cardinal due to curl usage

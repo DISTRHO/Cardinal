@@ -3,9 +3,6 @@ List of plugins still to add, sorted by popularity
 - Working but limited: (v2 related limitations)
 Befaco
 
-- Have definitions in place but cannot build against v2
-Valley
-
 - TODO, see list at https://github.com/VCVRack/library/tree/v1/repos
 
 Grayscale                 74754.0 (not opensource?)
