@@ -15,8 +15,6 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-// this file matches the top of `OpenGL.hpp` provided by DPF
-
 #pragma once
 
 #ifdef HEADLESS

@@ -44,9 +44,11 @@ static inline void printf() {}
 # define printf STDIO_OVERRIDE_MACRO(STDIO_OVERRIDE, printf)
 
 // step 6: place the macro prefixed names in std namespace
+/*
 namespace std {
     using ::printf;
 }
+*/
 
 // extra, there might be warnings for GCC format attribute, ignore those
 #pragma GCC diagnostic ignored "-Wformat"
