@@ -342,6 +342,18 @@ BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 
 # --------------------------------------------------------------
+# DrumKit
+
+PLUGIN_FILES += $(wildcard DrumKit/src/*.cpp)
+PLUGIN_FILES += $(wildcard DrumKit/src/controller/*.cpp)
+PLUGIN_FILES += $(wildcard DrumKit/src/view/*.cpp)
+PLUGIN_FILES += $(wildcard DrumKit/src/model/*.cpp)
+PLUGIN_FILES += $(wildcard DrumKit/deps/*.cpp)
+PLUGIN_FILES += $(wildcard DrumKit/deps/SynthDevKit/src/*.cpp)
+
+DRUMKIT_CUSTOM = ADSR Envelope
+
+# --------------------------------------------------------------
 # ESeries
 
 PLUGIN_FILES += ESeries/src/E340.cpp
@@ -749,6 +761,14 @@ $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
 		-DpluginInstance=pluginInstance__cf
 
+$(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(DRUMKIT_CUSTOM),$(call custom_module_names,$(m),DrumKit)) \
+		-DpluginInstance=pluginInstance__DrumKit \
+		-Dinit=init__DrumKit
+
 $(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -783,8 +803,8 @@ $(BUILD_DIR)/ImpromptuModular/%.cpp.o: ImpromptuModular/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ImpromptuModular_$(shell basename $*))) \
-		-Dinit=init__ImpromptuModular \
-		-DpluginInstance=pluginInstance__ImpromptuModular
+		-DpluginInstance=pluginInstance__ImpromptuModular \
+		-Dinit=init__ImpromptuModular
 
 $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

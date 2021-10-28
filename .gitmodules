@@ -61,3 +61,6 @@
 [submodule "plugins/ValleyAudio"]
 	path = plugins/ValleyAudio
 	url = https://github.com/ValleyAudio/ValleyRackFree.git
+[submodule "plugins/DrumKit"]
+	path = plugins/DrumKit
+	url = https://github.com/SVModular/DrumKit.git
