@@ -45,13 +45,14 @@ jobs:
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Pack binaries
+        run: |
+          tar -czf ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
-            bin/*
-            !bin/Cardinal
-            !bin/CardinalSynth
+            *.tar.gz
 
   linux-armhf:
     runs-on: ubuntu-18.04
@@ -86,13 +87,14 @@ jobs:
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Pack binaries
+        run: |
+          tar -czf ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
-            bin/*
-            !bin/Cardinal
-            !bin/CardinalSynth
+            *.tar.gz
 
   linux-x86:
     runs-on: ubuntu-18.04
@@ -121,13 +123,14 @@ jobs:
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Pack binaries
+        run: |
+          tar -czf ${{ github.event.repository.name }}-linux-x86-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-x86-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
-            bin/*
-            !bin/Cardinal
-            !bin/CardinalSynth
+            *.tar.gz
 
   linux-x86_64:
     runs-on: ubuntu-18.04
@@ -150,13 +153,14 @@ jobs:
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Pack binaries
+        run: |
+          tar -czf ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
-            bin/*
-            !bin/Cardinal
-            !bin/CardinalSynth
+            *.tar.gz
 
   linux-x86_64-debug:
     runs-on: ubuntu-18.04
@@ -179,13 +183,14 @@ jobs:
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Pack binaries
+        run: |
+          tar -czf ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
-            bin/*
-            !bin/Cardinal
-            !bin/CardinalSynth
+            *.tar.gz
 
   macos-universal:
     runs-on: macos-10.15
@@ -239,14 +244,14 @@ jobs:
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Pack binaries
+        run: |
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst)
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
-            bin/*
-            !bin/*-ladspa.dll
-            !bin/*-dssi.dll
-            !bin/*.exe
+            *.zip
 
   win64:
     runs-on: ubuntu-20.04
@@ -271,14 +276,14 @@ jobs:
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Pack binaries
+        run: |
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst)
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
-            bin/*
-            !bin/*-ladspa.dll
-            !bin/*-dssi.dll
-            !bin/*.exe
+            *.zip
 
   plugin-validation:
     runs-on: ubuntu-20.04
