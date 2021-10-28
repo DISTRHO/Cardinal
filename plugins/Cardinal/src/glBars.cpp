@@ -20,23 +20,23 @@
 #define SAMPLES_PER_DRAW 256
 
 struct glBarsModule : Module {
-	enum ParamIds {
-		NUM_PARAMS
-	};
-	enum InputIds {
-		IN1_INPUT,
-		NUM_INPUTS
-	};
-	enum OutputIds {
-		NUM_OUTPUTS
-	};
-	enum LightIds {
-		NUM_LIGHTS
-	};
+    enum ParamIds {
+        NUM_PARAMS
+    };
+    enum InputIds {
+        IN1_INPUT,
+        NUM_INPUTS
+    };
+    enum OutputIds {
+        NUM_OUTPUTS
+    };
+    enum LightIds {
+        NUM_LIGHTS
+    };
 
     glBarsState state;
     float audioData[SAMPLES_PER_DRAW];
-    uint audioDataFill = 0;
+    unsigned audioDataFill = 0;
 
     glBarsModule() {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
