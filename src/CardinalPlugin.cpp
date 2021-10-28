@@ -119,7 +119,7 @@ struct Initializer
                 // Make system dir point to source code location as fallback
                 asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
 
-                if (system::isDirectory(system::join(asset::systemDir, "res")))
+                if (system::exists(system::join(asset::systemDir, "res")))
                 {
                     templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
                 }
@@ -146,7 +146,7 @@ struct Initializer
         INFO("Template patch: %s", templatePath.c_str());
 
         // Check existence of the system res/ directory
-        if (! system::isDirectory(asset::systemDir))
+        if (! system::exists(asset::systemDir))
         {
             d_stderr2("System directory \"%s\" does not exist.\n"
                       "Make sure Cardinal was downloaded and installed correctly.", asset::systemDir.c_str());
