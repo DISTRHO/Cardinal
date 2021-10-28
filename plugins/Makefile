@@ -18,6 +18,129 @@ USE_NANOVG_FBO = true
 include ../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
+# List of drwav functions, used in several modules
+
+DRWAV += drwav_open_file_and_read_f32
+DRWAV += drwav_init_memory
+DRWAV += drwav_open_memory
+DRWAV += drwav_riff_chunk_size_riff
+DRWAV += drwav_data_chunk_size_riff
+DRWAV += drwav__read_and_close_s16
+DRWAV += drwav__read_and_close_s32
+DRWAV += drwav__read_and_close_f32
+DRWAV += drwav_riff_chunk_size_w64
+DRWAV += drwav_data_chunk_size_w64
+DRWAV += drwav_write_raw
+DRWAV += drwav_read_raw
+DRWAV += drwav_uninit
+DRWAV += drwav_init
+DRWAV += drwav_read_s16__mulaw
+DRWAV += drwav_read_s16__alaw
+DRWAV += drwav_read_s16__msadpcm
+DRWAV += drwav_read_s16__pcm
+DRWAV += drwav_read_s16__ieee
+DRWAV += drwav_read_s16__ima
+DRWAV += drwav_open
+DRWAV += drwav_init_memory_write_sequential
+DRWAV += drwav_open_memory_write_sequential
+DRWAV += drwav_init_write_sequential
+DRWAV += drwav_open_write_sequential
+DRWAV += drwav_s24_to_f32
+DRWAV += drwav_f64_to_f32
+DRWAV += drwav_s16_to_f32
+DRWAV += drwav_u8_to_f32
+DRWAV += drwav_alaw_to_f32
+DRWAV += drwav_read_s32
+DRWAV += drwav_f32_to_s32
+DRWAV += drwav_s24_to_s32
+DRWAV += drwav_f64_to_s32
+DRWAV += drwav_s16_to_s32
+DRWAV += drwav_u8_to_s32
+DRWAV += drwav_alaw_to_s32
+DRWAV += drwav_mulaw_to_s32
+DRWAV += drwav_open_and_read_s16
+DRWAV += drwav_read_s16
+DRWAV += drwav_f32_to_s16
+DRWAV += drwav_fopen
+DRWAV += drwav_open_write__internal
+DRWAV += drwav_init_file
+DRWAV += drwav_open_file
+DRWAV += drwav_free
+DRWAV += drwav_read
+DRWAV += drwav_init_write__internal
+DRWAV += drwav_mulaw_to_f32
+DRWAV += drwav_read_f32
+DRWAV += drwav_s32_to_f32
+DRWAV += drwav_open_and_read_f32
+DRWAV += drwav_open_and_read_s32
+DRWAV += drwav_init_file_write_sequential
+DRWAV += drwav_open_file_write_sequential
+DRWAV += drwav_init_memory_write__internal
+DRWAV += drwav_open_memory_write__internal
+DRWAV += drwav_init_file_write__internal
+DRWAV += drwav_open_file_write__internal
+DRWAV += drwav_read_s32__mulaw
+DRWAV += drwav_read_s32__alaw
+DRWAV += drwav_read_s32__msadpcm
+DRWAV += drwav_read_s32__pcm
+DRWAV += drwav_read_s32__ieee
+DRWAV += drwav_read_s32__ima
+DRWAV += drwav_read_f32__mulaw
+DRWAV += drwav_read_f32__alaw
+DRWAV += drwav_read_f32__msadpcm
+DRWAV += drwav_read_f32__pcm
+DRWAV += drwav_read_f32__ieee
+DRWAV += drwav_read_f32__ima
+DRWAV += drwav_init_memory_write
+DRWAV += drwav_open_memory_write
+DRWAV += drwav_write
+DRWAV += drwav_init_write
+DRWAV += drwav_open_write
+DRWAV += drwav_init_file_write
+DRWAV += drwav_open_file_write
+DRWAV += drwav_close
+DRWAV += drwav_seek_to_sample
+DRWAV += drwav_mulaw_to_s16
+DRWAV += drwav_alaw_to_s16
+DRWAV += drwav_u8_to_s16
+DRWAV += drwav_f64_to_s16
+DRWAV += drwav_s24_to_s16
+DRWAV += drwav_s32_to_s16
+DRWAV += drwav_init_file_write_sequential
+DRWAV += drwav_open_file_write_sequential
+DRWAV += drwav_init_memory_write__internal
+DRWAV += drwav_open_memory_write__internal
+DRWAV += drwav_init_file_write__internal
+DRWAV += drwav_open_file_write__internal
+DRWAV += drwav_read_s32__mulaw
+DRWAV += drwav_read_s32__alaw
+DRWAV += drwav_read_s32__msadpcm
+DRWAV += drwav_read_s32__pcm
+DRWAV += drwav_read_s32__ieee
+DRWAV += drwav_read_s32__ima
+DRWAV += drwav_read_f32__mulaw
+DRWAV += drwav_read_f32__alaw
+DRWAV += drwav_read_f32__msadpcm
+DRWAV += drwav_read_f32__pcm
+DRWAV += drwav_read_f32__ieee
+DRWAV += drwav_read_f32__ima
+DRWAV += drwav_init_memory_write
+DRWAV += drwav_open_memory_write
+DRWAV += drwav_write
+DRWAV += drwav_init_write
+DRWAV += drwav_open_write
+DRWAV += drwav_init_file_write
+DRWAV += drwav_open_file_write
+DRWAV += drwav_close
+DRWAV += drwav_seek_to_sample
+DRWAV += drwav_mulaw_to_s16
+DRWAV += drwav_alaw_to_s16
+DRWAV += drwav_u8_to_s16
+DRWAV += drwav_f64_to_s16
+DRWAV += drwav_s24_to_s16
+DRWAV += drwav_s32_to_s16
+
+# --------------------------------------------------------------
 # Files to build
 
 PLUGIN_FILES = plugins.cpp
@@ -247,9 +370,79 @@ MINDMELD_CUSTOM = printNote
 PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/src/*.cpp))
 
 # --------------------------------------------------------------
-# ValleyAudio (does not build against v2)
+# ValleyAudio
 
-# PLUGIN_FILES += $(wildcard ValleyAudio/src/*.cpp)
+PLUGIN_FILES += $(filter-out ValleyAudio/src/Valley.cpp,$(wildcard ValleyAudio/src/*.cpp))
+PLUGIN_FILES += $(wildcard ValleyAudio/src/*/*.cpp)
+PLUGIN_FILES += $(wildcard ValleyAudio/src/*/*/*.cpp)
+
+PLUGIN_BINARIES += ValleyAudio/src/ADD_BANK1.bin
+PLUGIN_BINARIES += ValleyAudio/src/ADD_BANK2.bin
+PLUGIN_BINARIES += ValleyAudio/src/ADD_BANK3.bin
+PLUGIN_BINARIES += ValleyAudio/src/ADD_BANK4.bin
+PLUGIN_BINARIES += ValleyAudio/src/ADD_SAW.bin
+PLUGIN_BINARIES += ValleyAudio/src/ADD_SINE.bin
+PLUGIN_BINARIES += ValleyAudio/src/ADD_SQR.bin
+PLUGIN_BINARIES += ValleyAudio/src/ALTOSAX.bin
+PLUGIN_BINARIES += ValleyAudio/src/AM_HARM.bin
+PLUGIN_BINARIES += ValleyAudio/src/BASIC.bin
+PLUGIN_BINARIES += ValleyAudio/src/BI_PULSE.bin
+PLUGIN_BINARIES += ValleyAudio/src/BITCRUSH1.bin
+PLUGIN_BINARIES += ValleyAudio/src/BITCRUSH2.bin
+PLUGIN_BINARIES += ValleyAudio/src/CELLO_1.bin
+PLUGIN_BINARIES += ValleyAudio/src/CELLO_2.bin
+PLUGIN_BINARIES += ValleyAudio/src/CHIP_1.bin
+PLUGIN_BINARIES += ValleyAudio/src/CHIP_2.bin
+PLUGIN_BINARIES += ValleyAudio/src/CHIRP.bin
+PLUGIN_BINARIES += ValleyAudio/src/DISTORT.bin
+PLUGIN_BINARIES += ValleyAudio/src/EBASS.bin
+PLUGIN_BINARIES += ValleyAudio/src/FM1.bin
+PLUGIN_BINARIES += ValleyAudio/src/FM2.bin
+PLUGIN_BINARIES += ValleyAudio/src/FM3.bin
+PLUGIN_BINARIES += ValleyAudio/src/FM4.bin
+PLUGIN_BINARIES += ValleyAudio/src/FOLD_SINE.bin
+PLUGIN_BINARIES += ValleyAudio/src/GMTRY_1.bin
+PLUGIN_BINARIES += ValleyAudio/src/GMTRY_2.bin
+PLUGIN_BINARIES += ValleyAudio/src/GMTRY_3.bin
+PLUGIN_BINARIES += ValleyAudio/src/GRIT.bin
+PLUGIN_BINARIES += ValleyAudio/src/LINEAR.bin
+PLUGIN_BINARIES += ValleyAudio/src/OBOE.bin
+PLUGIN_BINARIES += ValleyAudio/src/OPAL.bin
+PLUGIN_BINARIES += ValleyAudio/src/OVERTONE1.bin
+PLUGIN_BINARIES += ValleyAudio/src/OVERTONE2.bin
+PLUGIN_BINARIES += ValleyAudio/src/PIANO.bin
+PLUGIN_BINARIES += ValleyAudio/src/PLAITS_1.bin
+PLUGIN_BINARIES += ValleyAudio/src/PLAITS_2.bin
+PLUGIN_BINARIES += ValleyAudio/src/PLAITS_3.bin
+PLUGIN_BINARIES += ValleyAudio/src/PLUCK.bin
+PLUGIN_BINARIES += ValleyAudio/src/PWM.bin
+PLUGIN_BINARIES += ValleyAudio/src/REED.bin
+PLUGIN_BINARIES += ValleyAudio/src/RESO_SAW.bin
+PLUGIN_BINARIES += ValleyAudio/src/RESO_SQR.bin
+PLUGIN_BINARIES += ValleyAudio/src/SAW_GAP1.bin
+PLUGIN_BINARIES += ValleyAudio/src/SAW_GAP2.bin
+PLUGIN_BINARIES += ValleyAudio/src/SAW_PHASE.bin
+PLUGIN_BINARIES += ValleyAudio/src/SINE_HARM.bin
+PLUGIN_BINARIES += ValleyAudio/src/SWEEPHARM.bin
+PLUGIN_BINARIES += ValleyAudio/src/SYMMETRY.bin
+PLUGIN_BINARIES += ValleyAudio/src/TEE_EKS.bin
+PLUGIN_BINARIES += ValleyAudio/src/THEREMIN.bin
+PLUGIN_BINARIES += ValleyAudio/src/TWO_OP_RAND.bin
+PLUGIN_BINARIES += ValleyAudio/src/TWO_OPFM1.bin
+PLUGIN_BINARIES += ValleyAudio/src/TWO_OPFM2.bin
+PLUGIN_BINARIES += ValleyAudio/src/VIDEOGAME.bin
+PLUGIN_BINARIES += ValleyAudio/src/VIOLIN.bin
+PLUGIN_BINARIES += ValleyAudio/src/VOICE_1.bin
+PLUGIN_BINARIES += ValleyAudio/src/VOICE_2.bin
+PLUGIN_BINARIES += ValleyAudio/src/VOICE_3.bin
+PLUGIN_BINARIES += ValleyAudio/src/VOICE_4.bin
+PLUGIN_BINARIES += ValleyAudio/src/VOICE_5.bin
+PLUGIN_BINARIES += ValleyAudio/src/VOICE_6.bin
+PLUGIN_BINARIES += ValleyAudio/src/VOX_MACH.bin
+PLUGIN_BINARIES += ValleyAudio/src/XFADE.bin
+
+# modules/types which are present in other plugins
+VALLEYAUDIO_CUSTOM = $(DRWAV)
 
 # --------------------------------------------------------------
 # ZetaCarinaeModules
@@ -586,17 +779,23 @@ $(BUILD_DIR)/MindMeldModular/MindMeldModular.cpp.o: MindMeldModular/src/MindMeld
 $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__rackwindows $(foreach m,$(RACKWINDOWS_CUSTOM),$(call custom_module_names,$(m),rackwindows)) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(RACKWINDOWS_CUSTOM),$(call custom_module_names,$(m),rackwindows)) \
+		-DpluginInstance=pluginInstance__rackwindows
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ValleyAudio $(foreach m,$(VALLEYAUDIO_CUSTOM),$(call custom_module_names,$(m),ValleyAudio)) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(VALLEYAUDIO_CUSTOM),$(call custom_module_names,$(m),ValleyAudio)) \
+		-DpluginInstance=pluginInstance__ValleyAudio
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ZetaCarinaeModules $(foreach m,$(ZETACARINAE_CUSTOM),$(call custom_module_names,$(m),ZetaCarinae)) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ZETACARINAE_CUSTOM),$(call custom_module_names,$(m),ZetaCarinae)) \
+		-DpluginInstance=pluginInstance__ZetaCarinaeModules
 
 # --------------------------------------------------------------
 

@@ -29,6 +29,31 @@ void __builtin_ia32_pause()
 }
 
 static inline
+__m64 _mm_and_si64(__m64 a, __m64 b)
+{
+    return vreinterpret_s64_s32(vand_s32(vreinterpret_s32_m64(a), vreinterpret_s32_m64(b)));
+}
+
+static inline
+__m64 _mm_andnot_si64(__m64 a, __m64 b)
+{
+    // *NOTE* argument swap
+    return vreinterpret_s64_s32(vbic_s32(vreinterpret_s32_m64(b), vreinterpret_s32_m64(a)));
+}
+
+static inline
+__m64 _mm_or_si64(__m64 a, __m64 b)
+{
+    return vreinterpret_s64_s32(vorr_s32(vreinterpret_s32_m64(a), vreinterpret_s32_m64(b)));
+}
+
+static inline
+__m64 _mm_set1_pi16(short w)
+{
+    return vreinterpret_s64_s16(vdup_n_s16(w));
+}
+
+static inline
 uint32_t _mm_getcsr()
 {
     return 0;

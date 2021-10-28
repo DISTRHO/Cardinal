@@ -58,3 +58,6 @@
 [submodule "plugins/MindMeldModular"]
 	path = plugins/MindMeldModular
 	url = https://github.com/MarcBoule/MindMeldModular.git
+[submodule "plugins/ValleyAudio"]
+	path = plugins/ValleyAudio
+	url = https://github.com/ValleyAudio/ValleyRackFree.git

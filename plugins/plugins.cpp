@@ -237,9 +237,7 @@ extern Model *modelShapeMaster;
 #include "rackwindows/src/plugin.hpp"
 
 // ValleyAudio
-/* does not build against v2
 #include "ValleyAudio/src/Valley.hpp"
-*/
 
 // ZetaCarinaeModules
 #include "ZetaCarinaeModules/src/plugin.hpp"
@@ -1025,7 +1023,6 @@ static void initStatic__rackwindows()
     }
 }
 
-/* does not build against v2
 static void initStatic__ValleyAudio()
 {
     Plugin* const p = new Plugin;
@@ -1044,7 +1041,6 @@ static void initStatic__ValleyAudio()
         p->addModel(modelTerrorform);
     }
 }
-*/
 
 static void initStatic__ZetaCarinaeModules()
 {
@@ -1086,9 +1082,7 @@ void initStaticPlugins()
     initStatic__JW();
     initStatic__MindMeld();
     initStatic__rackwindows();
-    /* does not build against v2
     initStatic__ValleyAudio();
-    */
     initStatic__ZetaCarinaeModules();
 #endif // NOPLUGINS
 }
