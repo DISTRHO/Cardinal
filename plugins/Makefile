@@ -351,7 +351,7 @@ PLUGIN_FILES += $(wildcard DrumKit/src/model/*.cpp)
 PLUGIN_FILES += $(wildcard DrumKit/deps/*.cpp)
 PLUGIN_FILES += $(wildcard DrumKit/deps/SynthDevKit/src/*.cpp)
 
-DRUMKIT_CUSTOM = ADSR Envelope
+DRUMKIT_CUSTOM = ADSR Envelope LowFrequencyOscillator tri sin
 
 # --------------------------------------------------------------
 # ESeries
