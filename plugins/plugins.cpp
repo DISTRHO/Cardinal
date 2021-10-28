@@ -217,6 +217,22 @@ extern Model *modelBlankPanel;
 #include "JW-Modules/src/JWModules.hpp"
 #undef modelQuantizer
 
+// MindMeldModular
+/* NOTE too much noise in original include, do this a different way
+// #include "MindMeldModular/src/MindMeldModular.hpp"
+*/
+extern Model *modelMixMasterJr;
+extern Model *modelAuxExpanderJr;
+extern Model *modelMixMaster;
+extern Model *modelAuxExpander;
+extern Model *modelMeld;
+extern Model *modelUnmeld;
+extern Model *modelEqMaster;
+extern Model *modelEqExpander;
+extern Model *modelBassMaster;
+extern Model *modelBassMasterJr;
+extern Model *modelShapeMaster;
+
 // rackwindows
 #include "rackwindows/src/plugin.hpp"
 
@@ -256,6 +272,7 @@ Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__JW;
+extern Plugin* pluginInstance__MindMeld;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
@@ -956,6 +973,28 @@ static void initStatic__JW()
     }
 }
 
+static void initStatic__MindMeld()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__MindMeld = p;
+
+    const StaticPluginLoader spl(p, "MindMeldModular");
+    if (spl.ok())
+    {
+        p->addModel(modelMixMasterJr);
+        p->addModel(modelAuxExpanderJr);
+        p->addModel(modelMixMaster);
+        p->addModel(modelAuxExpander);
+        p->addModel(modelMeld);
+        p->addModel(modelUnmeld);
+        p->addModel(modelEqMaster);
+        p->addModel(modelEqExpander);
+        p->addModel(modelBassMaster);
+        p->addModel(modelBassMasterJr);
+        p->addModel(modelShapeMaster);
+    }
+}
+
 static void initStatic__rackwindows()
 {
     Plugin* const p = new Plugin;
@@ -1045,6 +1084,7 @@ void initStaticPlugins()
     initStatic__GrandeModular();
     initStatic__ImpromptuModular();
     initStatic__JW();
+    initStatic__MindMeld();
     initStatic__rackwindows();
     /* does not build against v2
     initStatic__ValleyAudio();

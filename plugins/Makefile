@@ -228,6 +228,20 @@ endif
 JW_CUSTOM = Quantizer
 
 # --------------------------------------------------------------
+# MindMeld
+
+PLUGIN_FILES += $(wildcard MindMeldModular/src/*.cpp)
+PLUGIN_FILES += $(wildcard MindMeldModular/src/dsp/*.cpp)
+PLUGIN_FILES += $(wildcard MindMeldModular/src/comp/*.cpp)
+PLUGIN_FILES += $(wildcard MindMeldModular/src/EqMaster/*.cpp)
+PLUGIN_FILES += $(wildcard MindMeldModular/src/MixMaster/*.cpp)
+PLUGIN_FILES += $(wildcard MindMeldModular/src/ShapeMaster/*.cpp)
+PLUGIN_FILES += $(wildcard MindMeldModular/src/Utilities/*.cpp)
+
+# modules/types which are present in other plugins
+MINDMELD_CUSTOM = printNote
+
+# --------------------------------------------------------------
 # rackwindows
 
 PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/src/*.cpp))
@@ -553,6 +567,21 @@ $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 		-DpluginInstance=pluginInstance__JW \
 		-IJW-Modules/src \
 		-IJW-Modules/lib/oscpack
+
+$(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),JW)) \
+		-DpluginInstance=pluginInstance__MindMeld
+
+$(BUILD_DIR)/MindMeldModular/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),JW)) \
+		-DpluginInstance=pluginInstance__MindMeld \
+		-Dinit=init__MindMeld
 
 $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
