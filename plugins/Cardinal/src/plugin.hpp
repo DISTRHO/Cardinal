@@ -23,5 +23,6 @@ using namespace rack;
 
 extern Plugin* pluginInstance;
 
+extern Model* modelGlBars;
 extern Model* modelHostParameters;
 extern Model* modelHostTime;

@@ -373,6 +373,7 @@ static void initStatic__Cardinal()
     const StaticPluginLoader spl(p, "Cardinal");
     if (spl.ok())
     {
+        p->addModel(modelGlBars);
         p->addModel(modelHostParameters);
         p->addModel(modelHostTime);
     }

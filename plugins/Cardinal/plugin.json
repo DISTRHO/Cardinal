@@ -30,6 +30,15 @@
       "tags": [
         "Utility"
       ]
+    },
+    {
+      "slug": "glBars",
+      "disabled": false,
+      "name": "glBars",
+      "description": "OpenGL bars visualization, as seen in XMMS and XBMC/Kodi",
+      "tags": [
+        "Visual"
+      ]
     }
   ]
 }

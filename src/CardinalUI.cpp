@@ -522,6 +522,20 @@ protected:
         fContext->patch->loadAction(filename);
     }
 
+#if 0
+    void uiReshape(const uint width, const uint height) override
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0.0, width, 0.0, height, -1.0, 1.0);
+        glViewport(0, 0, width, height);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+    }
+#endif
+
 private:
    /**
       Set our UI class as non-copyable and add a leak detector just in case.

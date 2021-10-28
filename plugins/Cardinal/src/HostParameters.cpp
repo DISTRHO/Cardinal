@@ -38,9 +38,9 @@ struct CardinalPluginContext : rack::Context {
 
 END_NAMESPACE_DISTRHO
 
-USE_NAMESPACE_DISTRHO;
-
 // -----------------------------------------------------------------------------------------------------------
+
+USE_NAMESPACE_DISTRHO;
 
 struct HostParameters : Module {
     enum ParamIds {
