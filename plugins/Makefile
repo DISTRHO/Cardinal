@@ -308,6 +308,9 @@ PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
 PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
 PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 
+# modules/types which are present in other plugins
+BEFACO_CUSTOM = ADSR
+
 # --------------------------------------------------------------
 # Bidoo
 

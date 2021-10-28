@@ -40,7 +40,9 @@
 #include "AudibleInstruments/src/plugin.hpp"
 
 // Befaco
+#define modelADSR modelBefacoADSR
 #include "Befaco/src/plugin.hpp"
+#undef modelADSR
 
 // Bidoo
 #include "Bidoo/src/plugin.hpp"
@@ -544,6 +546,7 @@ static void initStatic__Befaco()
     const StaticPluginLoader spl(p, "Befaco");
     if (spl.ok())
     {
+#define modelADSR modelBefacoADSR
         p->addModel(modelEvenVCO);
         p->addModel(modelRampage);
         p->addModel(modelABC);
@@ -561,6 +564,7 @@ static void initStatic__Befaco()
         p->addModel(modelSTMix);
         p->addModel(modelMuxlicer);
         p->addModel(modelMex);
+#undef modelADSR
     }
 }
 
