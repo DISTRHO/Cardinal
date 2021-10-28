@@ -20,125 +20,154 @@ include ../dpf/Makefile.base.mk
 # --------------------------------------------------------------
 # List of drwav functions, used in several modules
 
-DRWAV += drwav_open_file_and_read_f32
-DRWAV += drwav_init_memory
-DRWAV += drwav_open_memory
-DRWAV += drwav_riff_chunk_size_riff
-DRWAV += drwav_data_chunk_size_riff
+DRWAV  = drwav
+DRWAV += drwav__on_seek
+DRWAV += drwav__on_read
+DRWAV += drwav__read_and_close_f32
 DRWAV += drwav__read_and_close_s16
 DRWAV += drwav__read_and_close_s32
-DRWAV += drwav__read_and_close_f32
-DRWAV += drwav_riff_chunk_size_w64
+DRWAV += drwav_alaw_to_f32
+DRWAV += drwav_alaw_to_s16
+DRWAV += drwav_alaw_to_s16
+DRWAV += drwav_alaw_to_s32
+DRWAV += drwav_close
+DRWAV += drwav_close
+DRWAV += drwav_data_chunk_size_riff
 DRWAV += drwav_data_chunk_size_w64
-DRWAV += drwav_write_raw
-DRWAV += drwav_read_raw
-DRWAV += drwav_uninit
+DRWAV += drwav_f32_to_s16
+DRWAV += drwav_f32_to_s32
+DRWAV += drwav_f64_to_f32
+DRWAV += drwav_f64_to_s16
+DRWAV += drwav_f64_to_s16
+DRWAV += drwav_f64_to_s32
+DRWAV += drwav_fopen
+DRWAV += drwav_free
 DRWAV += drwav_init
-DRWAV += drwav_read_s16__mulaw
+DRWAV += drwav_init_ex
+DRWAV += drwav_init_file
+DRWAV += drwav_init_file_ex
+DRWAV += drwav_init_file_write
+DRWAV += drwav_init_file_write
+DRWAV += drwav_init_file_write__internal
+DRWAV += drwav_init_file_write__internal
+DRWAV += drwav_init_file_write_sequential
+DRWAV += drwav_init_file_write_sequential
+DRWAV += drwav_init_memory
+DRWAV += drwav_init_memory_ex
+DRWAV += drwav_init_memory_write
+DRWAV += drwav_init_memory_write
+DRWAV += drwav_init_memory_write__internal
+DRWAV += drwav_init_memory_write__internal
+DRWAV += drwav_init_memory_write_sequential
+DRWAV += drwav_init_write
+DRWAV += drwav_init_write
+DRWAV += drwav_init_write__internal
+DRWAV += drwav_init_write_sequential
+DRWAV += drwav_mulaw_to_f32
+DRWAV += drwav_mulaw_to_s16
+DRWAV += drwav_mulaw_to_s16
+DRWAV += drwav_mulaw_to_s32
+DRWAV += drwav_open
+DRWAV += drwav_open_and_read_f32
+DRWAV += drwav_open_and_read_pcm_frames_f32
+DRWAV += drwav_open_and_read_pcm_frames_s16
+DRWAV += drwav_open_and_read_pcm_frames_s32
+DRWAV += drwav_open_and_read_s16
+DRWAV += drwav_open_and_read_s32
+DRWAV += drwav_open_ex
+DRWAV += drwav_open_file
+DRWAV += drwav_open_file_and_read_f32
+DRWAV += drwav_open_file_and_read_pcm_frames_f32
+DRWAV += drwav_open_file_and_read_pcm_frames_s16
+DRWAV += drwav_open_file_and_read_pcm_frames_s32
+DRWAV += drwav_open_file_and_read_s16
+DRWAV += drwav_open_file_and_read_s32
+DRWAV += drwav_open_file_ex
+DRWAV += drwav_open_file_write
+DRWAV += drwav_open_file_write
+DRWAV += drwav_open_file_write__internal
+DRWAV += drwav_open_file_write__internal
+DRWAV += drwav_open_file_write_sequential
+DRWAV += drwav_open_file_write_sequential
+DRWAV += drwav_open_memory
+DRWAV += drwav_open_memory_and_read_f32
+DRWAV += drwav_open_memory_and_read_pcm_frames_f32
+DRWAV += drwav_open_memory_and_read_pcm_frames_s16
+DRWAV += drwav_open_memory_and_read_pcm_frames_s32
+DRWAV += drwav_open_memory_and_read_s16
+DRWAV += drwav_open_memory_and_read_s32
+DRWAV += drwav_open_memory_ex
+DRWAV += drwav_open_memory_write
+DRWAV += drwav_open_memory_write
+DRWAV += drwav_open_memory_write__internal
+DRWAV += drwav_open_memory_write__internal
+DRWAV += drwav_open_memory_write_sequential
+DRWAV += drwav_open_write
+DRWAV += drwav_open_write
+DRWAV += drwav_open_write__internal
+DRWAV += drwav_open_write_sequential
+DRWAV += drwav_read
+DRWAV += drwav_read_f32
+DRWAV += drwav_read_f32__alaw
+DRWAV += drwav_read_f32__alaw
+DRWAV += drwav_read_f32__ieee
+DRWAV += drwav_read_f32__ieee
+DRWAV += drwav_read_f32__ima
+DRWAV += drwav_read_f32__ima
+DRWAV += drwav_read_f32__msadpcm
+DRWAV += drwav_read_f32__msadpcm
+DRWAV += drwav_read_f32__mulaw
+DRWAV += drwav_read_f32__mulaw
+DRWAV += drwav_read_f32__pcm
+DRWAV += drwav_read_f32__pcm
+DRWAV += drwav_read_pcm_frames
+DRWAV += drwav_read_pcm_frames_f32
+DRWAV += drwav_read_pcm_frames_s16
+DRWAV += drwav_read_pcm_frames_s32
+DRWAV += drwav_read_raw
+DRWAV += drwav_read_s16
 DRWAV += drwav_read_s16__alaw
-DRWAV += drwav_read_s16__msadpcm
-DRWAV += drwav_read_s16__pcm
 DRWAV += drwav_read_s16__ieee
 DRWAV += drwav_read_s16__ima
-DRWAV += drwav_open
-DRWAV += drwav_init_memory_write_sequential
-DRWAV += drwav_open_memory_write_sequential
-DRWAV += drwav_init_write_sequential
-DRWAV += drwav_open_write_sequential
-DRWAV += drwav_s24_to_f32
-DRWAV += drwav_f64_to_f32
-DRWAV += drwav_s16_to_f32
-DRWAV += drwav_u8_to_f32
-DRWAV += drwav_alaw_to_f32
+DRWAV += drwav_read_s16__msadpcm
+DRWAV += drwav_read_s16__mulaw
+DRWAV += drwav_read_s16__pcm
 DRWAV += drwav_read_s32
-DRWAV += drwav_f32_to_s32
-DRWAV += drwav_s24_to_s32
-DRWAV += drwav_f64_to_s32
+DRWAV += drwav_read_s32__alaw
+DRWAV += drwav_read_s32__alaw
+DRWAV += drwav_read_s32__ieee
+DRWAV += drwav_read_s32__ieee
+DRWAV += drwav_read_s32__ima
+DRWAV += drwav_read_s32__ima
+DRWAV += drwav_read_s32__msadpcm
+DRWAV += drwav_read_s32__msadpcm
+DRWAV += drwav_read_s32__mulaw
+DRWAV += drwav_read_s32__mulaw
+DRWAV += drwav_read_s32__pcm
+DRWAV += drwav_read_s32__pcm
+DRWAV += drwav_riff_chunk_size_riff
+DRWAV += drwav_riff_chunk_size_w64
+DRWAV += drwav_s16_to_f32
 DRWAV += drwav_s16_to_s32
-DRWAV += drwav_u8_to_s32
-DRWAV += drwav_alaw_to_s32
-DRWAV += drwav_mulaw_to_s32
-DRWAV += drwav_open_and_read_s16
-DRWAV += drwav_read_s16
-DRWAV += drwav_f32_to_s16
-DRWAV += drwav_fopen
-DRWAV += drwav_open_write__internal
-DRWAV += drwav_init_file
-DRWAV += drwav_open_file
-DRWAV += drwav_free
-DRWAV += drwav_read
-DRWAV += drwav_init_write__internal
-DRWAV += drwav_mulaw_to_f32
-DRWAV += drwav_read_f32
+DRWAV += drwav_s24_to_f32
+DRWAV += drwav_s24_to_s16
+DRWAV += drwav_s24_to_s16
+DRWAV += drwav_s24_to_s32
 DRWAV += drwav_s32_to_f32
-DRWAV += drwav_open_and_read_f32
-DRWAV += drwav_open_and_read_s32
-DRWAV += drwav_init_file_write_sequential
-DRWAV += drwav_open_file_write_sequential
-DRWAV += drwav_init_memory_write__internal
-DRWAV += drwav_open_memory_write__internal
-DRWAV += drwav_init_file_write__internal
-DRWAV += drwav_open_file_write__internal
-DRWAV += drwav_read_s32__mulaw
-DRWAV += drwav_read_s32__alaw
-DRWAV += drwav_read_s32__msadpcm
-DRWAV += drwav_read_s32__pcm
-DRWAV += drwav_read_s32__ieee
-DRWAV += drwav_read_s32__ima
-DRWAV += drwav_read_f32__mulaw
-DRWAV += drwav_read_f32__alaw
-DRWAV += drwav_read_f32__msadpcm
-DRWAV += drwav_read_f32__pcm
-DRWAV += drwav_read_f32__ieee
-DRWAV += drwav_read_f32__ima
-DRWAV += drwav_init_memory_write
-DRWAV += drwav_open_memory_write
-DRWAV += drwav_write
-DRWAV += drwav_init_write
-DRWAV += drwav_open_write
-DRWAV += drwav_init_file_write
-DRWAV += drwav_open_file_write
-DRWAV += drwav_close
-DRWAV += drwav_seek_to_sample
-DRWAV += drwav_mulaw_to_s16
-DRWAV += drwav_alaw_to_s16
-DRWAV += drwav_u8_to_s16
-DRWAV += drwav_f64_to_s16
-DRWAV += drwav_s24_to_s16
 DRWAV += drwav_s32_to_s16
-DRWAV += drwav_init_file_write_sequential
-DRWAV += drwav_open_file_write_sequential
-DRWAV += drwav_init_memory_write__internal
-DRWAV += drwav_open_memory_write__internal
-DRWAV += drwav_init_file_write__internal
-DRWAV += drwav_open_file_write__internal
-DRWAV += drwav_read_s32__mulaw
-DRWAV += drwav_read_s32__alaw
-DRWAV += drwav_read_s32__msadpcm
-DRWAV += drwav_read_s32__pcm
-DRWAV += drwav_read_s32__ieee
-DRWAV += drwav_read_s32__ima
-DRWAV += drwav_read_f32__mulaw
-DRWAV += drwav_read_f32__alaw
-DRWAV += drwav_read_f32__msadpcm
-DRWAV += drwav_read_f32__pcm
-DRWAV += drwav_read_f32__ieee
-DRWAV += drwav_read_f32__ima
-DRWAV += drwav_init_memory_write
-DRWAV += drwav_open_memory_write
-DRWAV += drwav_write
-DRWAV += drwav_init_write
-DRWAV += drwav_open_write
-DRWAV += drwav_init_file_write
-DRWAV += drwav_open_file_write
-DRWAV += drwav_close
-DRWAV += drwav_seek_to_sample
-DRWAV += drwav_mulaw_to_s16
-DRWAV += drwav_alaw_to_s16
-DRWAV += drwav_u8_to_s16
-DRWAV += drwav_f64_to_s16
-DRWAV += drwav_s24_to_s16
 DRWAV += drwav_s32_to_s16
+DRWAV += drwav_seek_to_pcm_frame
+DRWAV += drwav_seek_to_sample
+DRWAV += drwav_seek_to_sample
+DRWAV += drwav_u8_to_f32
+DRWAV += drwav_u8_to_s16
+DRWAV += drwav_u8_to_s16
+DRWAV += drwav_u8_to_s32
+DRWAV += drwav_uninit
+DRWAV += drwav_write
+DRWAV += drwav_write
+DRWAV += drwav_write_pcm_frames
+DRWAV += drwav_write_raw
 
 # --------------------------------------------------------------
 # Files to build
@@ -283,14 +312,13 @@ PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 # Bidoo
 
 PLUGIN_FILES += $(filter-out Bidoo/src/plugin.cpp Bidoo/src/ANTN.cpp,$(wildcard Bidoo/src/*.cpp))
-PLUGIN_FILES += $(filter-out Bidoo/src/dep/waves.cpp,$(wildcard Bidoo/src/dep/*.cpp))
+PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
-PLUGIN_FILES += Bidoo-workaround/waves.cpp
 
 # modules/types which are present in other plugins
-BIDOO_CUSTOM = LadderFilter
+BIDOO_CUSTOM = LadderFilter $(DRWAV)
 BIDOO_CUSTOM_PER_FILE = channel channel filterType
 # randomize
 
@@ -333,6 +361,7 @@ PLUGIN_FILES += $(wildcard ImpromptuModular/src/*.cpp)
 PLUGIN_FILES += $(wildcard ImpromptuModular/src/comp/*.cpp)
 
 # modules/types which are present in other plugins
+IMPROMPTUMODULAR_CUSTOM = RefreshCounter
 IMPROMPTUMODULAR_CUSTOM_PER_FILE = Clock stepClock
 
 # --------------------------------------------------------------
@@ -348,7 +377,7 @@ PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/posix/*.cpp)
 endif
 
 # modules/types which are present in other plugins
-JW_CUSTOM = Quantizer
+JW_CUSTOM = PlayHead Quantizer
 
 # --------------------------------------------------------------
 # MindMeld
@@ -443,6 +472,7 @@ PLUGIN_BINARIES += ValleyAudio/src/XFADE.bin
 
 # modules/types which are present in other plugins
 VALLEYAUDIO_CUSTOM = $(DRWAV)
+VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 
 # --------------------------------------------------------------
 # ZetaCarinaeModules
@@ -598,7 +628,7 @@ resources: $(PLUGIN_RESOURCES)
 PLUGIN_OBJS  = $(PLUGIN_FILES:%=$(BUILD_DIR)/%.o)
 PLUGIN_OBJS += $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.o)
 
-.PRECIOUS: $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin)
+.PRECIOUS: $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.c)
 
 # function for custom module names macro
 custom_module_names = -D${1}=${2}${1} -Dmodel${1}=model${2}${1} -D${1}Widget=${2}${1}Widget
@@ -624,46 +654,61 @@ $(BUILD_DIR)/plugins.cpp.o: plugins.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -IBogaudioModules/lib -IBogaudioModules/src/dsp -c -o $@
 
+$(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		-DpluginInstance=pluginInstance__Cardinal
+
 $(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AmalgamatedHarmonics $(foreach m,$(AMALGAMATEDHARMONICS_CUSTOM),$(call custom_module_names,$(m),AmalgamatedHarmonics)) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(AMALGAMATEDHARMONICS_CUSTOM),$(call custom_module_names,$(m),AmalgamatedHarmonics)) \
+		-DpluginInstance=pluginInstance__AmalgamatedHarmonics
 
 $(BUILD_DIR)/AnimatedCircuits/%.cpp.o: AnimatedCircuits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AnimatedCircuits $(foreach m,$(ANIMATEDCIRCUITS_CUSTOM),$(call custom_module_names,$(m),AnimatedCircuits)) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ANIMATEDCIRCUITS_CUSTOM),$(call custom_module_names,$(m),AnimatedCircuits)) \
+		-DpluginInstance=pluginInstance__AnimatedCircuits
 
 $(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AS $(foreach m,$(AS_CUSTOM),$(call custom_module_names,$(m),AS)) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(AS_CUSTOM),$(call custom_module_names,$(m),AS)) \
+		-DpluginInstance=pluginInstance__AS
 
 $(BUILD_DIR)/AudibleInstruments/%.cc.o: AudibleInstruments/%.cc
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AudibleInstruments $(foreach m,$(AUDIBLEINSTRUMENTS_CUSTOM),$(call custom_module_names,$(m),AudibleInstruments)) -DTEST -IAudibleInstruments/eurorack -Wno-unused-local-typedefs -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(AUDIBLEINSTRUMENTS_CUSTOM),$(call custom_module_names,$(m),AudibleInstruments)) \
+		-DpluginInstance=pluginInstance__AudibleInstruments \
+		-DTEST \
+		-IAudibleInstruments/eurorack \
+		-Wno-unused-local-typedefs
 
 $(BUILD_DIR)/AudibleInstruments/%.cpp.o: AudibleInstruments/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__AudibleInstruments $(foreach m,$(AUDIBLEINSTRUMENTS_CUSTOM),$(call custom_module_names,$(m),AudibleInstruments)) -DTEST -IAudibleInstruments/eurorack -Wno-unused-local-typedefs -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(AUDIBLEINSTRUMENTS_CUSTOM),$(call custom_module_names,$(m),AudibleInstruments)) \
+		-DpluginInstance=pluginInstance__AudibleInstruments \
+		-DTEST \
+		-IAudibleInstruments/eurorack \
+		-Wno-unused-local-typedefs
 
 $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Befaco $(foreach m,$(BEFACO_CUSTOM),$(call custom_module_names,$(m),Befaco)) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(BEFACO_CUSTOM),$(call custom_module_names,$(m),Befaco)) \
+		-DpluginInstance=pluginInstance__Befaco
 
 $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) \
-		$(foreach m,$(BIDOO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bidoo_$(shell basename $*))) \
-		-DpluginInstance=pluginInstance__Bidoo \
-		-IBidoo/src/dep/gverb/include
-
-$(BUILD_DIR)/Bidoo-workaround/%.cpp.o: Bidoo-workaround/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
@@ -694,11 +739,6 @@ $(BUILD_DIR)/BogaudioModules/src/follower_base.cpp.o: BogaudioModules/src/follow
 		-IBogaudioModules/lib \
 		-IBogaudioModules/src/dsp
 
-$(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Cardinal -c -o $@
-
 $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -709,22 +749,30 @@ $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 $(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__ESeries $(foreach m,$(ESERIES_CUSTOM),$(call custom_module_names,$(m),ESeries)) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ESERIES_CUSTOM),$(call custom_module_names,$(m),ESeries)) \
+		-DpluginInstance=pluginInstance__ESeries
 
 $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Fundamental $(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
+		-DpluginInstance=pluginInstance__Fundamental
 
 $(BUILD_DIR)/Fundamental-workaround/%.cpp.o: Fundamental-workaround/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__Fundamental $(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
+		-DpluginInstance=pluginInstance__Fundamental 
 
 $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DpluginInstance=pluginInstance__GrandeModular $(foreach m,$(GRANDEMODULAR_CUSTOM),$(call custom_module_names,$(m),GrandeModular)) -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(GRANDEMODULAR_CUSTOM),$(call custom_module_names,$(m),GrandeModular)) \
+		-DpluginInstance=pluginInstance__GrandeModular
 
 $(BUILD_DIR)/ImpromptuModular/%.cpp.o: ImpromptuModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -788,6 +836,7 @@ $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(VALLEYAUDIO_CUSTOM),$(call custom_module_names,$(m),ValleyAudio)) \
+		$(foreach m,$(VALLEYAUDIO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ValleyAudio_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__ValleyAudio
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
