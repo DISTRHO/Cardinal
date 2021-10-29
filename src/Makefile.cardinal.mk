@@ -130,7 +130,7 @@ EXTRA_LIBS += -lws2_32 -lwinmm
 endif
 
 ifeq ($(SYSDEPS),true)
-LINK_FLAGS += $(shell pkg-config --libs jansson libarchive samplerate speexdsp)
+EXTRA_LIBS += $(shell pkg-config --libs jansson libarchive samplerate speexdsp)
 endif
 
 ifeq ($(WITH_LTO),true)
