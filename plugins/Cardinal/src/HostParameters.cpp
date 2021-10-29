@@ -82,25 +82,63 @@ struct HostParameters : Module {
 };
 
 struct HostParametersWidget : ModuleWidget {
-    HostParametersWidget(HostParameters* const module) {
+    static constexpr const float startX = 10.0f;
+    static constexpr const float startY = 90.0f;
+    static constexpr const float paddingH = 30.0f;
+    static constexpr const float paddingV = 49.0f;
+
+    HostParametersWidget(HostParameters* const module)
+    {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostParameters.svg")));
 
-        addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-
-        const float startX = 10.0f;
-        const float startY = 170.0f;
-        const float padding = 30.0f;
+        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
+        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
         for (int i=0; i<24; ++i)
         {
-            const float x = startX + int(i / 6) * padding;
-            const float y = startY + int(i % 6) * padding;
+            const float x = startX + int(i / 6) * paddingH;
+            const float y = startY + int(i % 6) * paddingV;
             addOutput(createOutput<PJ301MPort>(Vec(x, y), module, i));
         }
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        nvgBeginPath(args.vg);
+        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
+                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
+        nvgFill(args.vg);
+
+        nvgFontFaceId(args.vg, 0);
+        nvgFontSize(args.vg, 14);
+
+        char text[] = { '0', '0', '\0' };
+        for (int i=0; i<24; ++i)
+        {
+            const float x = startX + int(i / 6) * paddingH;
+            const float y = startY + int(i % 6) * paddingV;
+            nvgBeginPath(args.vg);
+            nvgRoundedRect(args.vg, x - 1.0f, y - 19.0f, paddingH - 4.0f, paddingV - 4.0f, 4);
+            nvgFillColor(args.vg, nvgRGBA(0xda, 0xda, 0xda, 0xf0));
+            nvgFill(args.vg);
+            nvgStrokeColor(args.vg, nvgRGBA(0x4a, 0x4a, 0x4a, 0xc0));
+            nvgStroke(args.vg);
+
+            if (text[1]++ == '9')
+            {
+                text[1] = '0';
+                ++text[0];
+            }
+            nvgBeginPath(args.vg);
+            nvgFillColor(args.vg, color::BLACK);
+            nvgText(args.vg, x + 4.0f, y - 4.0f, text, nullptr);
+        }
+
+        ModuleWidget::draw(args);
     }
 };
 

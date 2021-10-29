@@ -33,9 +33,9 @@ struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize;
     double sampleRate;
     float parameters[kModuleParameters];
-    bool playing, frameZero;
+    bool playing;
     int32_t bar, beat, beatsPerBar;
-    double tick, ticksPerBeat, ticksPerFrame;
+    double tick, tickClock, ticksPerBeat, ticksPerClock, ticksPerFrame;
     Plugin* const plugin;
     CardinalPluginContext(Plugin* const p);
 };

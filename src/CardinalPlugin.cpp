@@ -814,15 +814,20 @@ protected:
         {
             const TimePosition& timePos(getTimePosition());
             context->playing = timePos.playing;
-            context->frameZero = timePos.frame == 0;
+
             if (timePos.bbt.valid)
             {
+                const double samplesPerTick = 60.0 * getSampleRate()
+                                            / timePos.bbt.beatsPerMinute
+                                            / timePos.bbt.ticksPerBeat;
                 context->bar = timePos.bbt.bar;
                 context->beat = timePos.bbt.beat;
                 context->beatsPerBar = timePos.bbt.beatsPerBar;
                 context->tick = timePos.bbt.tick;
                 context->ticksPerBeat = timePos.bbt.ticksPerBeat;
-                context->ticksPerFrame = 1.0 / (60.0 * getSampleRate() / timePos.bbt.beatsPerMinute / timePos.bbt.ticksPerBeat);
+                context->ticksPerClock = timePos.bbt.ticksPerBeat / timePos.bbt.beatType;
+                context->ticksPerFrame = 1.0 / samplesPerTick;
+                context->tickClock = std::fmod(timePos.bbt.tick, context->ticksPerClock);
             }
         }
 
