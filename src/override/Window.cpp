@@ -140,7 +140,16 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 #endif
 
 	// Load default Blendish font
-	window->uiFont = window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
+#ifndef DGL_NO_SHARED_RESOURCES
+	ui->loadSharedResources();
+	window->uiFont = std::make_shared<Font>();
+	window->uiFont->vg = window->vg;
+	window->uiFont->handle = nvgFindFont(window->vg, NANOVG_DEJAVU_SANS_TTF);
+	window->internal->fontCache["res/fonts/DejaVuSans.ttf"] = window->uiFont;
+#else
+	window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
+#endif
+
 	if (window->uiFont != nullptr)
 		bndSetFont(window->uiFont->handle);
 
