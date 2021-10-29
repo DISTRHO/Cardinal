@@ -18,7 +18,7 @@
 #pragma once
 
 #include "plugin.hpp"
-#include "../dpf/distrho/extra/Mutex.hpp"
+#include "DistrhoUtils.hpp"
 
 // -----------------------------------------------------------------------------------------------------------
 // from PluginContext.hpp
@@ -36,7 +36,6 @@ struct CardinalPluginContext : rack::Context {
     bool playing, frameZero;
     int32_t bar, beat, beatsPerBar;
     double tick, ticksPerBeat, ticksPerFrame;
-    Mutex mutex;
     Plugin* const plugin;
     CardinalPluginContext(Plugin* const p);
 };

@@ -68,19 +68,16 @@ class CardinalUI : public UI,
 
     struct ScopedContext {
         CardinalPluginContext* const context;
-        const MutexLocker cml;
 
         ScopedContext(CardinalUI* const ui)
-            : context(ui->fContext),
-              cml(context->mutex)
+            : context(ui->fContext)
         {
             rack::contextSet(context);
             WindowParametersRestore(context->window);
         }
 
         ScopedContext(CardinalUI* const ui, const int mods)
-            : context(ui->fContext),
-              cml(context->mutex)
+            : context(ui->fContext)
         {
             rack::contextSet(context);
             rack::window::WindowMods(context->window, mods);
@@ -112,23 +109,20 @@ public:
         rack::window::Window* const window = new rack::window::Window;
         rack::window::WindowInit(window, this);
 
-        {
-            const MutexLocker cml(fContext->mutex);
-            rack::contextSet(fContext);
+        rack::contextSet(fContext);
 
-            fContext->scene->removeChild(fContext->scene->menuBar);
-            fContext->scene->menuBar = rack::app::createMenuBar(getWindow(), getApp().isStandalone());
-            fContext->scene->addChildBelow(fContext->scene->menuBar, fContext->scene->rackScroll);
+        fContext->scene->removeChild(fContext->scene->menuBar);
+        fContext->scene->menuBar = rack::app::createMenuBar(getWindow(), getApp().isStandalone());
+        fContext->scene->addChildBelow(fContext->scene->menuBar, fContext->scene->rackScroll);
 
-            fContext->window = window;
+        fContext->window = window;
 
-            rack::widget::Widget::ContextCreateEvent e;
-            fContext->scene->onContextCreate(e);
+        rack::widget::Widget::ContextCreateEvent e;
+        fContext->scene->onContextCreate(e);
 
-            window->step();
+        window->step();
 
-            rack::contextSet(nullptr);
-        }
+        rack::contextSet(nullptr);
 
         WindowParametersSetCallback(window, this);
     }

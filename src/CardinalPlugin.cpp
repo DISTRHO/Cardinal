@@ -261,7 +261,6 @@ struct Initializer
             std::vector<uint8_t> data(size);
             std::memcpy(data.data(), blob, size);
 
-            const MutexLocker cml(context->mutex);
             rack::contextSet(context);
             rack::system::removeRecursively(context->patch->autosavePath);
             rack::system::createDirectories(context->patch->autosavePath);
@@ -287,10 +286,7 @@ struct Initializer
 // -----------------------------------------------------------------------------------------------------------
 
 struct ScopedContext {
-    const MutexLocker cml;
-
     ScopedContext(const CardinalBasePlugin* const plugin)
-        : cml(plugin->context->mutex)
     {
         rack::contextSet(plugin->context);
     }
@@ -400,15 +396,11 @@ public:
         fInitializer->oscPlugin = nullptr;
 #endif
 
-        {
-            const MutexLocker cml(context->mutex);
-            rack::contextSet(context);
+        rack::contextSet(context);
 #if defined(__MOD_DEVICES__) && !defined(HEADLESS)
-            delete context->window;
-            context->window = nullptr;
+        delete context->window;
+        context->window = nullptr;
 #endif
-        }
-
         delete context;
         rack::contextSet(nullptr);
 

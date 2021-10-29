@@ -43,8 +43,6 @@ struct CardinalPluginContext : rack::Context {
     bool playing, frameZero;
     int32_t bar, beat, beatsPerBar;
     double tick, ticksPerBeat, ticksPerFrame;
-
-    Mutex mutex;
     Plugin* const plugin;
 
     CardinalPluginContext(Plugin* const p)
