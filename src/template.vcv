@@ -13,7 +13,7 @@
           "id": 0
         }
       ],
-      "rightModuleId": 4245168092954973,
+      "rightModuleId": 2,
       "data": {
         "audio": {
           "driver": 0,
@@ -31,14 +31,71 @@
       ]
     },
     {
-      "id": 4245168092954973,
+      "id": 2,
+      "plugin": "Core",
+      "version": "2.0.0",
+      "model": "MIDIToCVInterface",
+      "params": [],
+      "leftModuleId": 1,
+      "rightModuleId": 3,
+      "data": {
+        "channels": 1,
+        "polyMode": 0,
+        "clockDivision": 24,
+        "lastPitch": 8192,
+        "lastMod": 0,
+        "midi": {
+          "driver": 0,
+          "deviceName": "Cardinal",
+          "channel": -1
+        }
+      },
+      "pos": [
+        5,
+        0
+      ]
+    },
+    {
+      "id": 3,
+      "plugin": "Core",
+      "version": "2.0.0",
+      "model": "CV-MIDI",
+      "params": [],
+      "leftModuleId": 2,
+      "rightModuleId": 4,
+      "data": {
+        "midi": {
+          "driver": 0,
+          "deviceName": "Cardinal",
+          "channel": -1
+        }
+      },
+      "pos": [
+        13,
+        0
+      ]
+    },
+    {
+      "id": 4,
       "plugin": "Cardinal",
       "model": "HostParameters",
       "version": "2.0",
       "params": [],
-      "leftModuleId": 1,
+      "leftModuleId": 3,
       "pos": [
-        5,
+        21,
+        0
+      ]
+    },
+    {
+      "id": 5,
+      "plugin": "Cardinal",
+      "model": "HostTime",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 4,
+      "pos": [
+        30,
         0
       ]
     }
