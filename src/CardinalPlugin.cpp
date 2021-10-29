@@ -316,6 +316,7 @@ class CardinalPlugin : public CardinalBasePlugin
     CardinalAudioDevice* fCurrentAudioDevice;
     CardinalMidiOutputDevice* fCurrentMidiOutput;
     std::list<CardinalMidiInputDevice*> fMidiInputs;
+    uint64_t fPreviousFrame;
     Mutex fDeviceMutex;
 
     // real values, not VCV interpreted ones
@@ -331,7 +332,8 @@ public:
           fAudioBufferOut(nullptr),
           fIsActive(false),
           fCurrentAudioDevice(nullptr),
-          fCurrentMidiOutput(nullptr)
+          fCurrentMidiOutput(nullptr),
+          fPreviousFrame(0)
     {
         fWindowParameters[kWindowParameterShowTooltips] = 1.0f;
         fWindowParameters[kWindowParameterCableOpacity] = 50.0f;
@@ -760,6 +762,8 @@ protected:
         std::memset(fAudioBufferIn, 0, sizeof(float)*bufferSize);
 #endif
 
+        fPreviousFrame = 0;
+
         {
             const MutexLocker cml(fDeviceMutex);
 
@@ -829,6 +833,11 @@ protected:
                 context->ticksPerFrame = 1.0 / samplesPerTick;
                 context->tickClock = std::fmod(timePos.bbt.tick, context->ticksPerClock);
             }
+
+            if (timePos.playing && fPreviousFrame + frames != timePos.frame)
+                context->reset = true;
+
+            fPreviousFrame = timePos.frame;
         }
 
         std::memset(fAudioBufferOut, 0, sizeof(float)*frames*DISTRHO_PLUGIN_NUM_OUTPUTS);

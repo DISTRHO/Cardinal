@@ -26,13 +26,14 @@ struct HostTime : Module {
     };
     enum HostTimeIds {
         kHostTimeRolling,
+        kHostTimeReset,
         kHostTimeBar,
         kHostTimeBeat,
         kHostTimeClock,
         kHostTimeCount
     };
 
-    rack::dsp::PulseGenerator pulseBar, pulseBeat, pulseClock;
+    rack::dsp::PulseGenerator pulseReset, pulseBar, pulseBeat, pulseClock;
     float sampleTime = 0.0f;
 
     HostTime()
@@ -55,10 +56,17 @@ struct HostTime : Module {
             {
                 if (pcontext->tick == 0.0)
                 {
+                    pulseReset.trigger();
                     pulseClock.trigger();
                     pulseBeat.trigger();
                     if (pcontext->beat == 1)
                         pulseBar.trigger();
+                }
+
+                if (pcontext->reset)
+                {
+                    pcontext->reset = false;
+                    pulseReset.trigger();
                 }
 
                 if ((pcontext->tick += pcontext->ticksPerFrame) >= pcontext->ticksPerBeat)
@@ -81,16 +89,19 @@ struct HostTime : Module {
                 }
             }
 
+            const bool hasReset = pulseReset.process(args.sampleTime);
             const bool hasBar = pulseBar.process(args.sampleTime);
             const bool hasBeat = pulseBeat.process(args.sampleTime);
             const bool hasClock = pulseClock.process(args.sampleTime);
 
             lights[kHostTimeRolling].setBrightness(playing ? 1.0f : 0.0f);
+            lights[kHostTimeReset].setBrightnessSmooth(hasReset ? 1.0f : 0.0f, args.sampleTime * 0.5f);
             lights[kHostTimeBar].setBrightnessSmooth(hasBar ? 1.0f : 0.0f, args.sampleTime * 0.5f);
             lights[kHostTimeBeat].setBrightnessSmooth(hasBeat ? 1.0f : 0.0f, args.sampleTime);
             lights[kHostTimeClock].setBrightnessSmooth(hasClock ? 1.0f : 0.0f, args.sampleTime * 2.0f);
 
             outputs[kHostTimeRolling].setVoltage(playing ? 10.0f : 0.0f);
+            outputs[kHostTimeReset].setVoltage(hasReset ? 10.0f : 0.0f);
             outputs[kHostTimeBar].setVoltage(hasBar ? 10.0f : 0.0f);
             outputs[kHostTimeBeat].setVoltage(hasBeat ? 10.0f : 0.0f);
             outputs[kHostTimeClock].setVoltage(hasClock ? 10.0f : 0.0f);
@@ -114,15 +125,17 @@ struct HostTimeWidget : ModuleWidget {
         addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
         addOutput(createOutput<PJ301MPort>(Vec(startX, startY + 0 * padding), module, HostTime::kHostTimeRolling));
-        addOutput(createOutput<PJ301MPort>(Vec(startX, startY + 1 * padding), module, HostTime::kHostTimeBar));
-        addOutput(createOutput<PJ301MPort>(Vec(startX, startY + 2 * padding), module, HostTime::kHostTimeBeat));
-        addOutput(createOutput<PJ301MPort>(Vec(startX, startY + 3 * padding), module, HostTime::kHostTimeClock));
+        addOutput(createOutput<PJ301MPort>(Vec(startX, startY + 1 * padding), module, HostTime::kHostTimeReset));
+        addOutput(createOutput<PJ301MPort>(Vec(startX, startY + 2 * padding), module, HostTime::kHostTimeBar));
+        addOutput(createOutput<PJ301MPort>(Vec(startX, startY + 3 * padding), module, HostTime::kHostTimeBeat));
+        addOutput(createOutput<PJ301MPort>(Vec(startX, startY + 4 * padding), module, HostTime::kHostTimeClock));
 
         const float x = startX + 28;
         addChild(createLightCentered<SmallLight<GreenLight>> (Vec(x, startY + 0 * padding + 12), module, HostTime::kHostTimeRolling));
-        addChild(createLightCentered<SmallLight<RedLight>>   (Vec(x, startY + 1 * padding + 12), module, HostTime::kHostTimeBar));
-        addChild(createLightCentered<SmallLight<YellowLight>>(Vec(x, startY + 2 * padding + 12), module, HostTime::kHostTimeBeat));
-        addChild(createLightCentered<SmallLight<YellowLight>>(Vec(x, startY + 3 * padding + 12), module, HostTime::kHostTimeClock));
+        addChild(createLightCentered<SmallLight<WhiteLight>> (Vec(x, startY + 1 * padding + 12), module, HostTime::kHostTimeReset));
+        addChild(createLightCentered<SmallLight<RedLight>>   (Vec(x, startY + 2 * padding + 12), module, HostTime::kHostTimeBar));
+        addChild(createLightCentered<SmallLight<YellowLight>>(Vec(x, startY + 3 * padding + 12), module, HostTime::kHostTimeBeat));
+        addChild(createLightCentered<SmallLight<YellowLight>>(Vec(x, startY + 4 * padding + 12), module, HostTime::kHostTimeClock));
     }
 
     void drawOutputLine(NVGcontext* const vg, const uint offset, const char* const text)
@@ -151,9 +164,10 @@ struct HostTimeWidget : ModuleWidget {
         nvgFontSize(args.vg, 14);
 
         drawOutputLine(args.vg, 0, "Playing");
-        drawOutputLine(args.vg, 1, "Bar");
-        drawOutputLine(args.vg, 2, "Beat");
-        drawOutputLine(args.vg, 3, "Clock");
+        drawOutputLine(args.vg, 1, "Reset");
+        drawOutputLine(args.vg, 2, "Bar");
+        drawOutputLine(args.vg, 3, "Beat");
+        drawOutputLine(args.vg, 4, "Clock");
 
         ModuleWidget::draw(args);
     }
