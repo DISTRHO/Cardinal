@@ -815,6 +815,21 @@ protected:
             std::memset(outputs[1], 0, sizeof(float)*frames);
         }
 
+        {
+            const TimePosition& timePos(getTimePosition());
+            context->playing = timePos.playing;
+            context->frameZero = timePos.frame == 0;
+            if (timePos.bbt.valid)
+            {
+                context->bar = timePos.bbt.bar;
+                context->beat = timePos.bbt.beat;
+                context->beatsPerBar = timePos.bbt.beatsPerBar;
+                context->tick = timePos.bbt.tick;
+                context->ticksPerBeat = timePos.bbt.ticksPerBeat;
+                context->ticksPerFrame = 1.0 / (60.0 * getSampleRate() / timePos.bbt.beatsPerMinute / timePos.bbt.ticksPerBeat);
+            }
+        }
+
         std::memset(fAudioBufferOut, 0, sizeof(float)*frames*DISTRHO_PLUGIN_NUM_OUTPUTS);
 
         for (CardinalMidiInputDevice* dev : fMidiInputs)

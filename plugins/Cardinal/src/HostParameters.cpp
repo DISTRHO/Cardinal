@@ -15,28 +15,7 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#include "plugin.hpp"
-#include "../dpf/distrho/extra/Mutex.hpp"
-
-// -----------------------------------------------------------------------------------------------------------
-// from PluginContext.hpp
-
-START_NAMESPACE_DISTRHO
-
-static constexpr const uint32_t kModuleParameters = 24;
-
-class Plugin;
-
-struct CardinalPluginContext : rack::Context {
-    uint32_t bufferSize;
-    double sampleRate;
-    float parameters[kModuleParameters];
-    Mutex mutex;
-    Plugin* const plugin;
-    CardinalPluginContext(Plugin* const p);
-};
-
-END_NAMESPACE_DISTRHO
+#include "plugincontext.hpp"
 
 // -----------------------------------------------------------------------------------------------------------
 

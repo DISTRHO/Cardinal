@@ -40,6 +40,9 @@ struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize;
     double sampleRate;
     float parameters[kModuleParameters];
+    bool playing, frameZero;
+    int32_t bar, beat, beatsPerBar;
+    double tick, ticksPerBeat, ticksPerFrame;
 
     Mutex mutex;
     Plugin* const plugin;
@@ -47,6 +50,13 @@ struct CardinalPluginContext : rack::Context {
     CardinalPluginContext(Plugin* const p)
         : bufferSize(p->getBufferSize()),
           sampleRate(p->getSampleRate()),
+          playing(false),
+          frameZero(false),
+          bar(0),
+          beat(0),
+          beatsPerBar(0),
+          tick(0.0),
+          ticksPerBeat(0.0),
           plugin(p)
     {
         std::memset(parameters, 0, sizeof(parameters));
