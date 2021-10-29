@@ -87,6 +87,7 @@ struct Initializer
         settings::isPlugin = true;
         settings::skipLoadOnLaunch = true;
         settings::showTipsOnLaunch = false;
+        settings::windowPos = math::Vec(0, 0);
 #ifdef HEADLESS
         settings::headless = true;
 #endif
@@ -373,6 +374,7 @@ public:
         context->scene = new rack::app::Scene;
         context->event->rootWidget = context->scene;
         context->patch->loadTemplate();
+        context->scene->rackScroll->reset();
         context->engine->startFallbackThread();
 
 #ifdef HAVE_LIBLO
@@ -711,7 +713,8 @@ protected:
             context->engine->prepareSave();
             context->patch->saveAutosave();
             context->patch->cleanAutosave();
-            
+            // context->history->setSaved();
+
             try {
                 data = rack::system::archiveDirectory(fAutosavePath, 1);
             } DISTRHO_SAFE_EXCEPTION_RETURN("getState archiveDirectory", String());
@@ -742,6 +745,7 @@ protected:
         rack::system::unarchiveToDirectory(data, fAutosavePath);
 
         context->patch->loadAutosave();
+        // context->history->setSaved();
     }
 
    /* --------------------------------------------------------------------------------------------------------

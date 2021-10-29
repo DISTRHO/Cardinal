@@ -489,6 +489,9 @@ protected:
     {
         UI::onResize(ev);
 
+        if (fContext->window != nullptr)
+            fContext->window->setSize(rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
+
         const double scaleFactor = getScaleFactor();
         char sizeString[64];
         std::snprintf(sizeString, sizeof(sizeString), "%d:%d",

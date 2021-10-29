@@ -93,10 +93,6 @@ std::shared_ptr<Image> Image::load(const std::string& filename) {
 }
 
 
-struct WindowParams {
-	float rackBrightness = 1.0f;
-};
-
 struct Window::Internal {
 	DISTRHO_NAMESPACE::UI* ui = nullptr;
 	DISTRHO_NAMESPACE::WindowParameters params;
@@ -131,6 +127,7 @@ void WindowInit(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 	INFO("OpenGL: %s", version);
 
 	window->internal->ui = ui;
+	window->internal->size = rack::math::Vec(ui->getWidth(), ui->getHeight());
 
 	window->vg = ui->getContext();
 #ifdef NANOVG_GLES2
