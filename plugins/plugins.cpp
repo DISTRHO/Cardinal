@@ -174,6 +174,7 @@
 
 // DrumKit
 #include "DrumKit/src/DrumKit.hpp"
+void setupSamples();
 
 // ESeries
 #include "ESeries/src/plugin.hpp"
@@ -838,6 +839,7 @@ static void initStatic__DrumKit()
     const StaticPluginLoader spl(p, "DrumKit");
     if (spl.ok())
     {
+        setupSamples();
         p->addModel(modelBD9);
         p->addModel(modelSnare);
         p->addModel(modelClosedHH);
