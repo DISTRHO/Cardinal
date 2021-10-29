@@ -172,6 +172,9 @@
 // cf
 #include "cf/src/plugin.hpp"
 
+// DrumKit
+#include "DrumKit/src/DrumKit.hpp"
+
 // ESeries
 #include "ESeries/src/plugin.hpp"
 
@@ -267,6 +270,7 @@ Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__cf;
+extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
@@ -826,6 +830,29 @@ static void initStatic__cf()
     }
 }
 
+static void initStatic__DrumKit()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__DrumKit = p;
+
+    const StaticPluginLoader spl(p, "DrumKit");
+    if (spl.ok())
+    {
+        p->addModel(modelBD9);
+        p->addModel(modelSnare);
+        p->addModel(modelClosedHH);
+        p->addModel(modelOpenHH);
+        p->addModel(modelDMX);
+        p->addModel(modelCR78);
+        p->addModel(modelSBD);
+        p->addModel(modelGnome);
+        p->addModel(modelSequencer);
+        p->addModel(modelTomi);
+        p->addModel(modelBaronial);
+        p->addModel(modelMarionette);
+    }
+}
+
 static void initStatic__ESeries()
 {
     Plugin* const p = new Plugin;
@@ -1085,6 +1112,7 @@ void initStaticPlugins()
     initStatic__Bidoo();
     initStatic__BogaudioModules();
     initStatic__cf();
+    initStatic__DrumKit();
     initStatic__ESeries();
     initStatic__Fundamental();
     initStatic__GrandeModular();
