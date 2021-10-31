@@ -129,10 +129,12 @@ public:
 
     ~CardinalUI() override
     {
-        const ScopedContext sc(this);
+        rack::contextSet(fContext);
 
         delete fContext->window;
         fContext->window = nullptr;
+
+        rack::contextSet(nullptr);
     }
 
     void onNanoDisplay() override
@@ -513,9 +515,8 @@ protected:
         if (filename == nullptr)
             return;
 
-        // we cannot lock here
-        // const ScopedContext sc(this);
         rack::contextSet(fContext);
+        WindowParametersRestore(fContext->window);
         fContext->patch->loadAction(filename);
     }
 

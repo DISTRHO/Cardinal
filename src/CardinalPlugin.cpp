@@ -94,7 +94,7 @@ struct Initializer
 #ifdef __MOD_DEVICES__
         settings::threadCount = 3;
 #else
-        settings::threadCount = 1;
+        settings::threadCount = 0;
 #endif
 
         system::init();
@@ -768,7 +768,10 @@ protected:
             const MutexLocker cml(fDeviceMutex);
 
             if (fCurrentAudioDevice != nullptr)
+            {
+                rack::contextSet(context);
                 fCurrentAudioDevice->onStartStream();
+            }
         }
     }
 
@@ -778,7 +781,10 @@ protected:
             const MutexLocker cml(fDeviceMutex);
 
             if (fCurrentAudioDevice != nullptr)
+            {
+                rack::contextSet(context);
                 fCurrentAudioDevice->onStopStream();
+            }
         }
 
         delete[] fAudioBufferOut;
@@ -864,6 +870,13 @@ protected:
             outputs[0][i] = fAudioBufferOut[j++];
             outputs[1][i] = fAudioBufferOut[j++];
         }
+    }
+
+    void sampleRateChanged(const double newSampleRate) override
+    {
+        rack::contextSet(context);
+        rack::settings::sampleRate = newSampleRate;
+        context->engine->setSampleRate(newSampleRate);
     }
 
     // -------------------------------------------------------------------------------------------------------

@@ -108,5 +108,16 @@ int main()
                  i+1, q->name.c_str(), q->getDescription().c_str(), q->unit.c_str(),
                  q->minValue, q->maxValue, q->defaultValue);
     }
+
+    Module::ProcessArgs args = {
+        48000.0f,
+        1.0f / 48000.0f,
+        0
+    };
+    for (int i=0; i<96000; ++i)
+    {
+        module->process(args);
+        ++args.frame;
+    }
     return 0;
 }
