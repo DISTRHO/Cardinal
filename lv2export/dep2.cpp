@@ -168,6 +168,13 @@ void SvgSlider::onChange(const ChangeEvent& e) {}
 
 }
 
+namespace engine {
+
+std::string LightInfo::getName() { return name; }
+std::string LightInfo::getDescription() { return description; }
+
+}
+
 namespace widget {
 
 FramebufferWidget::FramebufferWidget() {}

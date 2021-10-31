@@ -112,6 +112,7 @@ BUILD_FILES += ../src/Rack/src/logger.cpp
 BUILD_FILES += ../src/Rack/src/random.cpp
 BUILD_FILES += ../src/Rack/src/string.cpp
 BUILD_FILES += ../src/Rack/src/system.cpp
+BUILD_FILES += ../src/Rack/src/tinyexpr.c
 BUILD_FILES += ../src/Rack/src/Quantity.cpp
 BUILD_FILES += ../src/Rack/src/engine/Module.cpp
 BUILD_FILES += ../src/Rack/src/engine/ParamQuantity.cpp

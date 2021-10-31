@@ -79,7 +79,34 @@ int main()
     Plugin* const p = new Plugin;
     pluginInstance__Befaco = p;
     p->addModel(modelSpringReverb);
+    engine::Module* module = modelSpringReverb->createModule();
 
-    d_stdout("modelSpringReverb is %p", modelSpringReverb);
+    d_stdout("modelSpringReverb is %p %p", modelSpringReverb, module);
+    d_stdout("modelSpringReverb has %d ins, %d outs, %d lights, %d params",
+             module->getNumInputs(), module->getNumOutputs(), module->getNumLights(), module->getNumParams());
+
+    for (int i=0; i<module->getNumInputs(); ++i)
+        d_stdout("  in %d has name '%s'; description '%s'",
+                 i+1, module->getInputInfo(i)->getFullName().c_str(), module->getInputInfo(i)->getDescription().c_str());
+
+    for (int i=0; i<module->getNumOutputs(); ++i)
+        d_stdout("  out %d has name '%s'; description '%s'",
+                 i+1, module->getOutputInfo(i)->getFullName().c_str(), module->getOutputInfo(i)->getDescription().c_str());
+
+//     for (int i=0; i<module->getNumLights(); ++i)
+//     {
+//         LightInfo* l = module->getLightInfo(i);
+//         DISTRHO_SAFE_ASSERT_CONTINUE(l != nullptr);
+//         d_stdout("  light %d has name '%s'; description '%s'",
+//                  i+1, l->getName().c_str(), l->getDescription().c_str());
+//     }
+
+    for (int i=0; i<module->getNumParams(); ++i)
+    {
+        ParamQuantity* q = module->getParamQuantity(i);
+        d_stdout("  param %d has name '%s'; description '%s'; unit '%s'; min %f; max %f; def %f",
+                 i+1, q->name.c_str(), q->getDescription().c_str(), q->unit.c_str(),
+                 q->minValue, q->maxValue, q->defaultValue);
+    }
     return 0;
 }
