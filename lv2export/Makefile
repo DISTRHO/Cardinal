@@ -105,7 +105,8 @@ endif
 # --------------------------------------------------------------
 # Build targets
 
-BUILD_FILES  = test.cpp
+BUILD_FILES  = lv2plugin.cpp
+BUILD_FILES += test.cpp
 BUILD_FILES += dep.cpp
 BUILD_FILES += dep2.cpp
 BUILD_FILES += ../src/Rack/src/logger.cpp
@@ -122,9 +123,9 @@ BUILD_FILES += ../src/Rack/dep/pffft/pffft.c
 BUILD_FILES += ../src/Rack/dep/pffft/fftpack.c
 endif
 
-TARGET = test
+TARGETS = test$(APP_EXT) lv2plugin$(LIB_EXT)
 
-all: $(TARGET)
+all: $(TARGETS)
 
 EXTRA_LIBS  = ../plugins/plugins.a
 
@@ -143,11 +144,18 @@ endif
 # --------------------------------------------------------------
 # Build commands
 
-OBJS = $(BUILD_FILES:%=$(BUILD_DIR)/%.o)
+# OBJS = $(BUILD_FILES:%=$(BUILD_DIR)/%.o)
 
-$(TARGET): $(OBJS)
+FILES1 = $(filter-out lv2plugin.cpp,$(BUILD_FILES))
+FILES2 = $(filter-out test.cpp,$(BUILD_FILES))
+
+test$(APP_EXT): $(FILES1:%=$(BUILD_DIR)/%.o)
 	-@mkdir -p $(shell dirname $@)
 	$(CXX) $^ $(BUILD_CXX_FLAGS) $(LINK_FLAGS) $(EXTRA_LIBS) -o $@
+
+lv2plugin$(LIB_EXT): $(FILES2:%=$(BUILD_DIR)/%.o)
+	-@mkdir -p $(shell dirname $@)
+	$(CXX) $^ $(BUILD_CXX_FLAGS) $(LINK_FLAGS) $(EXTRA_LIBS) $(SHARED) -o $@
 
 $(BUILD_DIR)/%.c.o: %.c
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
