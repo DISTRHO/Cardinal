@@ -17,8 +17,9 @@
 <urn:Cardinal:Befaco>
     a lv2:Plugin, doap:Project ;
 
+    # NOTE port 0 and 1 are actually CV ins, but we need some kind of optionally-connected stuff implemented first
     lv2:port [
-        a lv2:InputPort, lv2:CVPort, mod:CVPort ;
+        a lv2:OutputPort, lv2:ControlPort ;
         lv2:index 0 ;
         lv2:symbol "lv2_audio_in_1" ;
         lv2:name "CV1_INPUT" ;
@@ -26,7 +27,7 @@
         lv2:minimum 0;
         lv2:maximum 10;
     ] , [
-        a lv2:InputPort, lv2:CVPort, mod:CVPort ;
+        a lv2:OutputPort, lv2:ControlPort ;
         lv2:index 1 ;
         lv2:symbol "lv2_audio_in_2" ;
         lv2:name "CV2_INPUT" ;

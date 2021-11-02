@@ -15,7 +15,11 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#include "glBars.hpp"
+#ifndef HEADLESS
+# include "glBars.hpp"
+#else
+# include "plugin.hpp"
+#endif
 
 #define SAMPLES_PER_DRAW 256
 
@@ -34,24 +38,29 @@ struct glBarsModule : Module {
         NUM_LIGHTS
     };
 
+#ifndef HEADLESS
     glBarsState state;
     float audioData[SAMPLES_PER_DRAW];
     unsigned audioDataFill = 0;
+#endif
 
     glBarsModule() {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
     }
 
     void process(const ProcessArgs&) override {
+#ifndef HEADLESS
         audioData[audioDataFill++] = inputs[IN1_INPUT].getVoltage();
 
         if (audioDataFill == SAMPLES_PER_DRAW) {
             audioDataFill = 0;
             state.AudioData(audioData, SAMPLES_PER_DRAW);
         }
+#endif
     }
 };
 
+#ifndef HEADLESS
 struct glBarsRendererWidget : OpenGlWidget {
     glBarsModule* const glBars;
 
@@ -73,12 +82,17 @@ struct glBarsRendererWidget : OpenGlWidget {
         glBars->state.Render();
     }
 };
+#endif
 
 struct glBarsWidget : ModuleWidget {
+#ifndef HEADLESS
     glBarsRendererWidget* const glBarsRenderer;
+#endif
 
     glBarsWidget(glBarsModule* const module)
+#ifndef HEADLESS
         : glBarsRenderer(new glBarsRendererWidget(module))
+#endif
     {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/glBars.svg")));
@@ -88,9 +102,11 @@ struct glBarsWidget : ModuleWidget {
         addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
+#ifndef HEADLESS
         glBarsRenderer->box.pos = Vec(2 * RACK_GRID_WIDTH, 0);
         glBarsRenderer->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH, box.size.y);
         addChild(glBarsRenderer);
+#endif
 
         addInput(createInput<PJ301MPort>(Vec(3, 54), module, glBarsModule::IN1_INPUT));
     }

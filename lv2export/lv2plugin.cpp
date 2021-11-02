@@ -33,7 +33,7 @@ bool cpuMeter = false;
 }
 Context::~Context() {
 }
-static thread_local Context* threadContext = nullptr;
+static thread_local Context* threadContext;
 Context* contextGet() {
 	DISTRHO_SAFE_ASSERT(threadContext != nullptr);
 	return threadContext;
@@ -121,8 +121,8 @@ struct PluginLv2 {
             frameCount
         };
 
-        const float* CV1_INPUT = (float*)ports[0];
-        const float* CV2_INPUT = (float*)ports[1];
+        // const float* CV1_INPUT = (float*)ports[0];
+        // const float* CV2_INPUT = (float*)ports[1];
         const float* IN1_INPUT = (float*)ports[2];
         const float* IN2_INPUT = (float*)ports[3];
         const float* MIX_CV_INPUT = (float*)ports[4];
@@ -141,8 +141,8 @@ struct PluginLv2 {
 
         for (uint32_t i=0; i<sampleCount; ++i)
         {
-            module->inputs[0].setVoltage(CV1_INPUT[i]);
-            module->inputs[1].setVoltage(CV2_INPUT[i]);
+            // module->inputs[0].setVoltage(CV1_INPUT[i]);
+            // module->inputs[1].setVoltage(CV2_INPUT[i]);
             module->inputs[2].setVoltage(IN1_INPUT[i] * 10);
             module->inputs[3].setVoltage(IN2_INPUT[i] * 10);
             module->inputs[4].setVoltage(MIX_CV_INPUT[i]);

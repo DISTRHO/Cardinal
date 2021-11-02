@@ -28,7 +28,7 @@ Plugin* pluginInstance__Befaco;
 namespace rack {
 Context::~Context() {
 }
-static thread_local Context* threadContext = nullptr;
+static thread_local Context* threadContext;
 Context* contextGet() {
 	DISTRHO_SAFE_ASSERT(threadContext != nullptr);
 	return threadContext;
