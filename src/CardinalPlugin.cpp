@@ -91,11 +91,6 @@ struct Initializer
 #ifdef HEADLESS
         settings::headless = true;
 #endif
-#ifdef __MOD_DEVICES__
-        settings::threadCount = 3;
-#else
-        settings::threadCount = 0;
-#endif
 
         system::init();
         logger::init();

@@ -598,23 +598,6 @@ struct EngineButton : MenuButton {
 		menu->addChild(createMenuItem("Performance meters", cpuMeterText, [=]() {
 			settings::cpuMeter ^= true;
 		}));
-
-		menu->addChild(createSubmenuItem("Threads | DO NOT USE", string::f("%d", settings::threadCount), [=](ui::Menu* menu) {
-			// BUG This assumes SMT is enabled.
-			int cores = system::getLogicalCoreCount() / 2;
-
-			for (int i = 1; i <= 2 * cores; i++) {
-				std::string rightText;
-				if (i == cores)
-					rightText += "(most modules)";
-				else if (i == 1)
-					rightText += "(lowest CPU usage)";
-				menu->addChild(createCheckMenuItem(string::f("%d", i), rightText,
-					[=]() {return settings::threadCount == i;},
-					[=]() {settings::threadCount = i;}
-				));
-			}
-		}));
 	}
 };
 
