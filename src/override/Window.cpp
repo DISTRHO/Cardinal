@@ -44,7 +44,13 @@
 #endif
 
 #include "DistrhoUI.hpp"
+#include "Application.hpp"
 #include "../WindowParameters.hpp"
+
+#ifndef DGL_NO_SHARED_RESOURCES
+# include "NanoVG.hpp"
+# include "src/Resources.hpp"
+#endif
 
 namespace rack {
 namespace window {
@@ -93,10 +99,27 @@ std::shared_ptr<Image> Image::load(const std::string& filename) {
 }
 
 
+struct FontWithOriginalContext : Font {
+	int ohandle = -1;
+	std::string ofilename;
+};
+
+struct ImageWithOriginalContext : Image {
+	int ohandle = -1;
+	std::string ofilename;
+};
+
+
 struct Window::Internal {
 	DISTRHO_NAMESPACE::UI* ui = nullptr;
 	DISTRHO_NAMESPACE::WindowParameters params;
 	DISTRHO_NAMESPACE::WindowParametersCallback* callback = nullptr;
+	DGL_NAMESPACE::Application hiddenApp;
+	DGL_NAMESPACE::Window hiddenWindow;
+	NVGcontext* r_vg = nullptr;
+	NVGcontext* r_fbVg = nullptr;
+	NVGcontext* o_vg = nullptr;
+	NVGcontext* o_fbVg = nullptr;
 
 	math::Vec size = minWindowSize;
 	std::string lastWindowTitle;
@@ -108,66 +131,185 @@ struct Window::Internal {
 	double frameTime = 0.0;
 	double lastFrameDuration = 0.0;
 
-	std::map<std::string, std::shared_ptr<Font>> fontCache;
-	std::map<std::string, std::shared_ptr<Image>> imageCache;
+	std::map<std::string, std::shared_ptr<FontWithOriginalContext>> fontCache;
+	std::map<std::string, std::shared_ptr<ImageWithOriginalContext>> imageCache;
 
 	bool fbDirtyOnSubpixelChange = true;
+
+	Internal()
+		: hiddenApp(),
+		  hiddenWindow(hiddenApp) { hiddenApp.idle(); }
 };
+
+
+#ifndef DGL_NO_SHARED_RESOURCES
+static int loadFallbackFont(NVGcontext* const vg)
+{
+	const int font = nvgFindFont(vg, NANOVG_DEJAVU_SANS_TTF);
+	if (font >= 0)
+		return font;
+
+	using namespace dpf_resources;
+
+	return nvgCreateFontMem(vg, NANOVG_DEJAVU_SANS_TTF,
+	                        (uchar*)dejavusans_ttf, dejavusans_ttf_size, 0);
+}
+#endif
+
 
 Window::Window() {
 	internal = new Internal;
-}
 
-void WindowInit(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
-{
-	const GLubyte* vendor = glGetString(GL_VENDOR);
-	const GLubyte* renderer = glGetString(GL_RENDERER);
-	const GLubyte* version = glGetString(GL_VERSION);
-	INFO("Renderer: %s %s", vendor, renderer);
-	INFO("OpenGL: %s", version);
+	DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
 
-	window->internal->ui = ui;
-	window->internal->size = rack::math::Vec(ui->getWidth(), ui->getHeight());
-
-	window->vg = ui->getContext();
+	// Set up NanoVG
+	const int nvgFlags = NVG_ANTIALIAS;
 #ifdef NANOVG_GLES2
-	window->fbVg = nvgCreateSharedGLES2(window->vg, NVG_ANTIALIAS);
+	vg = nvgCreateGLES2(nvgFlags);
+	fbVg = nvgCreateSharedGLES2(vg, nvgFlags);
 #else
-	window->fbVg = nvgCreateSharedGL2(window->vg, NVG_ANTIALIAS);
+	vg = nvgCreateGL2(nvgFlags);
+	fbVg = nvgCreateSharedGL2(vg, nvgFlags);
 #endif
 
 	// Load default Blendish font
 #ifndef DGL_NO_SHARED_RESOURCES
-	ui->loadSharedResources();
-	window->uiFont = std::make_shared<Font>();
-	window->uiFont->vg = window->vg;
-	window->uiFont->handle = nvgFindFont(window->vg, NANOVG_DEJAVU_SANS_TTF);
-	window->internal->fontCache["res/fonts/DejaVuSans.ttf"] = window->uiFont;
+	uiFont = std::make_shared<Font>();
+	uiFont->vg = vg;
+	uiFont->handle = loadFallbackFont(vg);
+
+	std::shared_ptr<FontWithOriginalContext> uiFont2;
+	uiFont2 = std::make_shared<FontWithOriginalContext>();
+	uiFont2->vg = vg;
+	uiFont2->handle = loadFallbackFont(vg);
+	uiFont2->ofilename = asset::system("res/fonts/DejaVuSans.ttf");
+	internal->fontCache[uiFont2->ofilename] = uiFont2;
 #else
-	window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
+	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
 #endif
 
-	if (window->uiFont != nullptr)
-		bndSetFont(window->uiFont->handle);
-
-	// Init settings
-	WindowParametersRestore(window);
+	if (uiFont != nullptr)
+		bndSetFont(uiFont->handle);
 }
 
-void WindowMods(Window* const window, const int mods)
+void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
+{
+	if (ui != nullptr)
+	{
+		const GLubyte* vendor = glGetString(GL_VENDOR);
+		const GLubyte* renderer = glGetString(GL_RENDERER);
+		const GLubyte* version = glGetString(GL_VERSION);
+		INFO("Renderer: %s %s", vendor, renderer);
+		INFO("OpenGL: %s", version);
+
+		window->internal->ui = ui;
+		window->internal->size = rack::math::Vec(ui->getWidth(), ui->getHeight());
+
+		// Set up NanoVG
+		const int nvgFlags = NVG_ANTIALIAS;
+#ifdef NANOVG_GLES2
+		window->internal->r_vg = nvgCreateSharedGLES2(nvgFlags);
+		window->internal->r_fbVg = nvgCreateSharedGLES2(window->internal->r_vg, nvgFlags);
+#else
+		window->internal->r_vg = nvgCreateGL2(nvgFlags);
+		window->internal->r_fbVg = nvgCreateSharedGL2(window->internal->r_vg, nvgFlags);
+#endif
+
+		// swap contexts
+		window->internal->o_vg = window->vg;
+		window->internal->o_fbVg = window->fbVg;
+		window->vg = window->internal->r_vg;
+		window->fbVg = window->internal->r_fbVg;
+
+		// also for fonts and images
+		window->uiFont->vg = window->vg;
+		window->uiFont->handle = loadFallbackFont(window->vg);
+		for (auto& font : window->internal->fontCache)
+		{
+			font.second->vg = window->vg;
+			font.second->ohandle = font.second->handle;
+			font.second->handle = nvgCreateFont(window->vg,
+			                                    font.second->ofilename.c_str(), font.second->ofilename.c_str());
+		}
+		for (auto& image : window->internal->imageCache)
+		{
+			image.second->vg = window->vg;
+			image.second->ohandle = image.second->handle;
+			image.second->handle = nvgCreateImage(window->vg, image.second->ofilename.c_str(),
+			                                      NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+		}
+
+		// Init settings
+		WindowParametersRestore(window);
+
+		widget::Widget::ContextCreateEvent e;
+		APP->scene->onContextCreate(e);
+	}
+	else
+	{
+		widget::Widget::ContextDestroyEvent e;
+		APP->scene->onContextDestroy(e);
+
+		// swap contexts
+		window->uiFont->vg = window->internal->o_vg;
+		window->vg = window->internal->o_vg;
+		window->fbVg = window->internal->o_fbVg;
+		window->internal->o_vg = nullptr;
+		window->internal->o_fbVg = nullptr;
+
+		// also for fonts and images
+		window->uiFont->vg = window->vg;
+		window->uiFont->handle = loadFallbackFont(window->vg);
+		for (auto& font : window->internal->fontCache)
+		{
+			font.second->vg = window->vg;
+			font.second->handle = font.second->ohandle;
+			font.second->ohandle = -1;
+		}
+		for (auto& image : window->internal->imageCache)
+		{
+			image.second->vg = window->vg;
+			image.second->handle = image.second->ohandle;
+			image.second->ohandle = -1;
+		}
+
+		// also for images
+
+#if defined NANOVG_GLES2
+		nvgDeleteGLES2(window->internal->r_vg);
+		nvgDeleteGLES2(window->internal->r_fbVg);
+#else
+		nvgDeleteGL2(window->internal->r_vg);
+		nvgDeleteGL2(window->internal->r_fbVg);
+#endif
+
+		// window->internal->hiddenWindow.close();
+		window->internal->ui = nullptr;
+		window->internal->callback = nullptr;
+	}
+}
+
+void WindowSetMods(Window* const window, const int mods)
 {
 	window->internal->mods = mods;
 }
 
 Window::~Window() {
-	if (APP->scene) {
-		widget::Widget::ContextDestroyEvent e;
-		APP->scene->onContextDestroy(e);
-	}
+	{
+		DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
 
-	// Fonts and Images in the cache must be deleted before the NanoVG context is deleted
-	internal->fontCache.clear();
-	internal->imageCache.clear();
+		// Fonts and Images in the cache must be deleted before the NanoVG context is deleted
+		internal->fontCache.clear();
+		internal->imageCache.clear();
+
+#if defined NANOVG_GLES2
+		nvgDeleteGLES2(vg);
+		nvgDeleteGLES2(fbVg);
+#else
+		nvgDeleteGL2(vg);
+		nvgDeleteGL2(fbVg);
+#endif
+	}
 
 	delete internal;
 }
@@ -189,6 +331,8 @@ void Window::run() {
 
 
 void Window::step() {
+	DISTRHO_SAFE_ASSERT_RETURN(internal->ui != nullptr,);
+
 	double frameTime = system::getTime();
 	double lastFrameTime = internal->frameTime;
 	internal->frameTime = frameTime;
@@ -196,7 +340,7 @@ void Window::step() {
 	// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
 
 	// Make event handlers and step() have a clean NanoVG context
-// 	nvgReset(vg);
+	nvgReset(vg);
 
 	if (uiFont != nullptr)
 		bndSetFont(uiFont->handle);
@@ -238,6 +382,7 @@ void Window::step() {
 
 		// Render scene
 		// Update and render
+		nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
 		nvgScale(vg, pixelRatio, pixelRatio);
 
 		// Draw scene
@@ -249,6 +394,7 @@ void Window::step() {
 		glViewport(0, 0, fbWidth, fbHeight);
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		nvgEndFrame(vg);
 	}
 
 	internal->frame++;
@@ -264,6 +410,8 @@ void Window::screenshotModules(const std::string&, float) {
 
 
 void Window::close() {
+	DISTRHO_SAFE_ASSERT_RETURN(internal->ui != nullptr,);
+
 	internal->ui->getWindow().close();
 }
 
@@ -322,14 +470,15 @@ std::shared_ptr<Font> Window::loadFont(const std::string& filename) {
 		return pair->second;
 
 	// Load font
-	std::shared_ptr<Font> font;
+	std::shared_ptr<FontWithOriginalContext> font;
 	try {
-		font = std::make_shared<Font>();
+		font = std::make_shared<FontWithOriginalContext>();
+		font->ofilename = filename;
 		font->loadFile(filename, vg);
 	}
 	catch (Exception& e) {
 		WARN("%s", e.what());
-		font = NULL;
+		font = nullptr;
 	}
 	internal->fontCache[filename] = font;
 	return font;
@@ -342,14 +491,15 @@ std::shared_ptr<Image> Window::loadImage(const std::string& filename) {
 		return pair->second;
 
 	// Load image
-	std::shared_ptr<Image> image;
+	std::shared_ptr<ImageWithOriginalContext> image;
 	try {
-		image = std::make_shared<Image>();
+		image = std::make_shared<ImageWithOriginalContext>();
+		image->ofilename = filename;
 		image->loadFile(filename, vg);
 	}
 	catch (Exception& e) {
 		WARN("%s", e.what());
-		image = NULL;
+		image = nullptr;
 	}
 	internal->imageCache[filename] = image;
 	return image;

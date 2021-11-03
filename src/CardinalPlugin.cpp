@@ -379,22 +379,13 @@ public:
         context->event = new rack::widget::EventState;
         context->scene = new rack::app::Scene;
         context->event->rootWidget = context->scene;
+        context->window = new rack::window::Window;
 
         context->patch->loadTemplate();
         context->scene->rackScroll->reset();
 
 #ifdef HAVE_LIBLO
         fInitializer->oscPlugin = this;
-#endif
-
-#if defined(__MOD_DEVICES__) && !defined(HEADLESS)
-        context->window = new rack::window::Window;
-        rack::window::WindowInit(context->window, this);
-        /*
-        context->scene->removeChild(context->scene->menuBar);
-        context->scene->menuBar = rack::app::createMenuBar(getWindow(), getApp().isStandalone());
-        context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
-        */
 #endif
     }
 
@@ -413,11 +404,6 @@ public:
 
         {
             const ScopedContext sc(this);
-
-#if defined(__MOD_DEVICES__) && !defined(HEADLESS)
-            delete context->window;
-            context->window = nullptr;
-#endif
             delete context;
         }
 

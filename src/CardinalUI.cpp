@@ -45,8 +45,8 @@ namespace app {
     widget::Widget* createMenuBar(Window& window, bool isStandalone);
 }
 namespace window {
-    void WindowInit(Window* window, DISTRHO_NAMESPACE::UI* ui);
-    void WindowMods(Window* window, int mods);
+    void WindowSetPluginUI(Window* window, DISTRHO_NAMESPACE::UI* ui);
+    void WindowSetMods(Window* window, int mods);
 }
 }
 
@@ -80,7 +80,7 @@ class CardinalUI : public UI,
             : context(ui->fContext)
         {
             rack::contextSet(context);
-            rack::window::WindowMods(context->window, mods);
+            rack::window::WindowSetMods(context->window, mods);
             WindowParametersRestore(context->window);
         }
 
@@ -106,38 +106,37 @@ public:
         if (scaleFactor != 1)
             setSize(1228 * scaleFactor, 666 * scaleFactor);
 
-        rack::window::Window* const window = new rack::window::Window;
-        rack::window::WindowInit(window, this);
-
         rack::contextSet(fContext);
 
-        fContext->scene->removeChild(fContext->scene->menuBar);
+        rack::window::WindowSetPluginUI(fContext->window, this);
+
+        if (fContext->scene->menuBar != nullptr)
+            fContext->scene->removeChild(fContext->scene->menuBar);
+
         fContext->scene->menuBar = rack::app::createMenuBar(getWindow(), getApp().isStandalone());
         fContext->scene->addChildBelow(fContext->scene->menuBar, fContext->scene->rackScroll);
 
-        fContext->window = window;
-
-        rack::widget::Widget::ContextCreateEvent e;
-        fContext->scene->onContextCreate(e);
-
-        window->step();
+        fContext->window->step();
 
         rack::contextSet(nullptr);
 
-        WindowParametersSetCallback(window, this);
+        WindowParametersSetCallback(fContext->window, this);
     }
 
     ~CardinalUI() override
     {
         rack::contextSet(fContext);
 
-        delete fContext->window;
-        fContext->window = nullptr;
+        rack::widget::Widget* const menuBar = fContext->scene->menuBar;
+        fContext->scene->menuBar = nullptr;
+        fContext->scene->removeChild(menuBar);
+
+        rack::window::WindowSetPluginUI(fContext->window, nullptr);
 
         rack::contextSet(nullptr);
     }
 
-    void onNanoDisplay() override
+    void onDisplay() override
     {
         const ScopedContext sc(this);
         fContext->window->step();
@@ -480,8 +479,6 @@ protected:
         case kKeyPause: key = GLFW_KEY_PAUSE; break;
         default: key = ev.key; break;
         }
-
-        rack::window::WindowMods(fContext->window, mods);
 
         const ScopedContext sc(this, mods);
         return fContext->event->handleKey(fLastMousePos, key, ev.keycode, action, mods);
