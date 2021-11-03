@@ -80,25 +80,14 @@ public:
     ~CardinalBasePlugin() override {}
     virtual bool isActive() const noexcept = 0;
     virtual bool canAssignAudioDevice() const noexcept = 0;
+    virtual bool canAssignMidiInputDevice() const noexcept = 0;
     virtual bool canAssignMidiOutputDevice() const noexcept = 0;
     virtual void assignAudioDevice(CardinalAudioDevice* dev) noexcept = 0;
+    virtual void assignMidiInputDevice(CardinalMidiInputDevice* dev) noexcept = 0;
     virtual void assignMidiOutputDevice(CardinalMidiOutputDevice* dev) noexcept = 0;
     virtual bool clearAudioDevice(CardinalAudioDevice* dev) noexcept = 0;
+    virtual bool clearMidiInputDevice(CardinalMidiInputDevice* dev) noexcept = 0;
     virtual bool clearMidiOutputDevice(CardinalMidiOutputDevice* dev) noexcept = 0;
-    virtual void addMidiInput(CardinalMidiInputDevice* dev) = 0;
-    virtual void removeMidiInput(CardinalMidiInputDevice* dev) = 0;
-
-protected:
-    void bufferSizeChanged(const uint32_t newBufferSize) override
-    {
-        context->bufferSize = newBufferSize;
-    }
-
-    void sampleRateChanged(const double newSampleRate) override
-    {
-        context->sampleRate = newSampleRate;
-        // context->engine->setSampleRate(newSampleRate);
-    }
 };
 
 // -----------------------------------------------------------------------------------------------------------

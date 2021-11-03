@@ -314,8 +314,8 @@ class CardinalPlugin : public CardinalBasePlugin
     // for base/context handling
     bool fIsActive;
     CardinalAudioDevice* fCurrentAudioDevice;
+    CardinalMidiInputDevice* fCurrentMidiInput;
     CardinalMidiOutputDevice* fCurrentMidiOutput;
-    std::list<CardinalMidiInputDevice*> fMidiInputs;
     uint64_t fPreviousFrame;
     Mutex fDeviceMutex;
 
@@ -332,6 +332,7 @@ public:
           fAudioBufferOut(nullptr),
           fIsActive(false),
           fCurrentAudioDevice(nullptr),
+          fCurrentMidiInput(nullptr),
           fCurrentMidiOutput(nullptr),
           fPreviousFrame(0)
     {
@@ -364,9 +365,17 @@ public:
             }
         } DISTRHO_SAFE_EXCEPTION("create unique temporary path");
 
+        const float sampleRate = getSampleRate();
+        rack::settings::sampleRate = sampleRate;
+
+        context->bufferSize = getBufferSize();
+        context->sampleRate = sampleRate;
+
         const ScopedContext sc(this);
 
         context->engine = new rack::engine::Engine;
+        context->engine->setSampleRate(sampleRate);
+
         context->history = new rack::history::State;
         context->patch = new rack::patch::Manager;
         context->patch->autosavePath = fAutosavePath;
@@ -375,9 +384,9 @@ public:
         context->event = new rack::widget::EventState;
         context->scene = new rack::app::Scene;
         context->event->rootWidget = context->scene;
+
         context->patch->loadTemplate();
         context->scene->rackScroll->reset();
-        context->engine->startFallbackThread();
 
 #ifdef HAVE_LIBLO
         fInitializer->oscPlugin = this;
@@ -400,13 +409,22 @@ public:
         fInitializer->oscPlugin = nullptr;
 #endif
 
-        rack::contextSet(context);
+        {
+            const MutexLocker cml(fDeviceMutex);
+            fCurrentAudioDevice = nullptr;
+            fCurrentMidiInput = nullptr;
+            fCurrentMidiOutput = nullptr;
+        }
+
+        {
+            const ScopedContext sc(this);
+
 #if defined(__MOD_DEVICES__) && !defined(HEADLESS)
-        delete context->window;
-        context->window = nullptr;
+            delete context->window;
+            context->window = nullptr;
 #endif
-        delete context;
-        rack::contextSet(nullptr);
+            delete context;
+        }
 
         if (! fAutosavePath.empty())
             rack::system::removeRecursively(fAutosavePath);
@@ -432,6 +450,12 @@ protected:
         return fCurrentAudioDevice == nullptr;
     }
 
+    bool canAssignMidiInputDevice() const noexcept override
+    {
+        const MutexLocker cml(fDeviceMutex);
+        return fCurrentMidiInput == nullptr;
+    }
+
     bool canAssignMidiOutputDevice() const noexcept override
     {
         const MutexLocker cml(fDeviceMutex);
@@ -444,6 +468,14 @@ protected:
 
         const MutexLocker cml(fDeviceMutex);
         fCurrentAudioDevice = dev;
+    }
+
+    void assignMidiInputDevice(CardinalMidiInputDevice* const dev) noexcept override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(fCurrentMidiInput == nullptr,);
+
+        const MutexLocker cml(fDeviceMutex);
+        fCurrentMidiInput = dev;
     }
 
     void assignMidiOutputDevice(CardinalMidiOutputDevice* const dev) noexcept override
@@ -465,6 +497,17 @@ protected:
         return true;
     }
 
+    bool clearMidiInputDevice(CardinalMidiInputDevice* const dev) noexcept override
+    {
+        const MutexLocker cml(fDeviceMutex);
+
+        if (fCurrentMidiInput != dev)
+            return false;
+
+        fCurrentMidiInput = nullptr;
+        return true;
+    }
+
     bool clearMidiOutputDevice(CardinalMidiOutputDevice* const dev) noexcept override
     {
         const MutexLocker cml(fDeviceMutex);
@@ -474,22 +517,6 @@ protected:
 
         fCurrentMidiOutput = nullptr;
         return true;
-    }
-
-    void addMidiInput(CardinalMidiInputDevice* const dev) override
-    {
-        // NOTE this will xrun
-        const MutexLocker cml(fDeviceMutex);
-
-        fMidiInputs.push_back(dev);
-    }
-
-    void removeMidiInput(CardinalMidiInputDevice* const dev) override
-    {
-        // NOTE this will xrun
-        const MutexLocker cml(fDeviceMutex);
-
-        fMidiInputs.remove(dev);
     }
 
    /* --------------------------------------------------------------------------------------------------------
@@ -746,7 +773,10 @@ protected:
         rack::system::createDirectories(fAutosavePath);
         rack::system::unarchiveToDirectory(data, fAutosavePath);
 
-        context->patch->loadAutosave();
+        try {
+            context->patch->loadAutosave();
+        } DISTRHO_SAFE_EXCEPTION_RETURN("setState loadAutosave",);
+
         // context->history->setSaved();
     }
 
@@ -798,28 +828,8 @@ protected:
     void run(const float** const inputs, float** const outputs, const uint32_t frames,
              const MidiEvent* const midiEvents, const uint32_t midiEventCount) override
     {
-        /*
-        context->engine->setFrame(getTimePosition().frame);
-        context->engine->stepBlock(frames);
-        */
-
         const MutexLocker cml(fDeviceMutex);
-
-        if (fCurrentAudioDevice != nullptr)
-        {
-#if DISTRHO_PLUGIN_NUM_INPUTS != 0
-            for (uint32_t i=0, j=0; i<frames; ++i)
-            {
-                fAudioBufferIn[j++] = inputs[0][i];
-                fAudioBufferIn[j++] = inputs[1][i];
-            }
-#endif
-        }
-        else
-        {
-            std::memset(outputs[0], 0, sizeof(float)*frames);
-            std::memset(outputs[1], 0, sizeof(float)*frames);
-        }
+        rack::contextSet(context);
 
         {
             const TimePosition& timePos(getTimePosition());
@@ -846,36 +856,55 @@ protected:
             fPreviousFrame = timePos.frame;
         }
 
-        std::memset(fAudioBufferOut, 0, sizeof(float)*frames*DISTRHO_PLUGIN_NUM_OUTPUTS);
-
-        for (CardinalMidiInputDevice* dev : fMidiInputs)
-            dev->handleMessagesFromHost(midiEvents, midiEventCount);
+        if (fCurrentMidiInput != nullptr)
+            fCurrentMidiInput->handleMessagesFromHost(midiEvents, midiEventCount);
 
         if (fCurrentAudioDevice != nullptr)
         {
-#if DISTRHO_PLUGIN_NUM_INPUTS == 0
-            const float* const insPtr = nullptr;
-#else
-            const float* const insPtr = fAudioBufferIn;
+#if DISTRHO_PLUGIN_NUM_INPUTS != 0
+            for (uint32_t i=0, j=0; i<frames; ++i)
+            {
+                fAudioBufferIn[j++] = inputs[0][i];
+                fAudioBufferIn[j++] = inputs[1][i];
+            }
+            fCurrentAudioDevice->processInput(fAudioBufferIn, DISTRHO_PLUGIN_NUM_INPUTS, frames);
 #endif
-            fCurrentAudioDevice->processBuffer(insPtr, DISTRHO_PLUGIN_NUM_INPUTS,
-                                               fAudioBufferOut, DISTRHO_PLUGIN_NUM_OUTPUTS, frames);
+        }
+
+        context->engine->stepBlock(frames);
+
+        if (fCurrentAudioDevice != nullptr)
+        {
+            std::memset(fAudioBufferOut, 0, sizeof(float)*frames*DISTRHO_PLUGIN_NUM_OUTPUTS);
+            fCurrentAudioDevice->processOutput(fAudioBufferOut, DISTRHO_PLUGIN_NUM_OUTPUTS, frames);
+
+            for (uint32_t i=0, j=0; i<frames; ++i)
+            {
+                outputs[0][i] = fAudioBufferOut[j++];
+                outputs[1][i] = fAudioBufferOut[j++];
+            }
+        }
+        else
+        {
+            std::memset(outputs[0], 0, sizeof(float)*frames);
+            std::memset(outputs[1], 0, sizeof(float)*frames);
         }
 
         if (fCurrentMidiOutput != nullptr)
             fCurrentMidiOutput->processMessages();
+    }
 
-        for (uint32_t i=0, j=0; i<frames; ++i)
-        {
-            outputs[0][i] = fAudioBufferOut[j++];
-            outputs[1][i] = fAudioBufferOut[j++];
-        }
+    void bufferSizeChanged(const uint32_t newBufferSize) override
+    {
+        rack::contextSet(context);
+        context->bufferSize = newBufferSize;
     }
 
     void sampleRateChanged(const double newSampleRate) override
     {
         rack::contextSet(context);
         rack::settings::sampleRate = newSampleRate;
+        context->sampleRate = newSampleRate;
         context->engine->setSampleRate(newSampleRate);
     }
 

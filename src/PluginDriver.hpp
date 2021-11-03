@@ -67,6 +67,18 @@ struct CardinalAudioDevice : rack::audio::Device
 
     void setBlockSize(int) override {}
     void setSampleRate(float) override {}
+
+    void processInput(const float* const input, const int inputStride, const int frames)
+    {
+        for (rack::audio::Port* port : subscribed)
+            port->processInput(input + port->inputOffset, inputStride, frames);
+    }
+
+    void processOutput(float* const output, const int outputStride, const int frames)
+    {
+        for (rack::audio::Port* port : subscribed)
+            port->processOutput(output + port->outputOffset, outputStride, frames);
+    }
 };
 
 // -----------------------------------------------------------------------------------------------------------
@@ -139,7 +151,9 @@ struct CardinalAudioDriver : rack::audio::Driver
 
         if (plugin->clearAudioDevice(device))
         {
-            device->onStopStream();
+            if (plugin->isActive())
+                device->onStopStream();
+
             device->unsubscribe(port);
             delete device;
         }
@@ -156,7 +170,7 @@ struct CardinalMidiInputDevice : rack::midi::InputDevice
     CardinalMidiInputDevice(CardinalBasePlugin* const plugin)
         : fPlugin(plugin)
     {
-        msg.bytes.reserve(0xff);
+        msg.bytes.resize(0xff);
     }
 
     std::string getName() override
@@ -177,7 +191,7 @@ struct CardinalMidiInputDevice : rack::midi::InputDevice
             if (midiEvent.size > MidiEvent::kDataSize)
             {
                 data = midiEvent.dataExt;
-                msg.bytes.reserve(midiEvent.size);
+                msg.bytes.resize(midiEvent.size);
             }
             else
             {
@@ -287,10 +301,13 @@ struct CardinalMidiDriver : rack::midi::Driver
         CardinalBasePlugin* const plugin = reinterpret_cast<CardinalBasePlugin*>(pluginContext->plugin);
         DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, nullptr);
 
+        if (! plugin->canAssignMidiInputDevice())
+            throw rack::Exception("Plugin driver only allows one midi input device to be used simultaneously");
+
         CardinalMidiInputDevice* const device = new CardinalMidiInputDevice(plugin);
         device->subscribe(input);
 
-        plugin->addMidiInput(device);
+        plugin->assignMidiInputDevice(device);
         return device;
     }
 
@@ -323,9 +340,11 @@ struct CardinalMidiDriver : rack::midi::Driver
         CardinalBasePlugin* const plugin = reinterpret_cast<CardinalBasePlugin*>(pluginContext->plugin);
         DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr,);
 
-        plugin->removeMidiInput(device);
-        device->unsubscribe(input);
-        delete device;
+        if (plugin->clearMidiInputDevice(device))
+        {
+            device->unsubscribe(input);
+            delete device;
+        }
     }
 
     void unsubscribeOutput(int, rack::midi::Output* const output) override
