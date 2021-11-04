@@ -133,7 +133,7 @@ jobs:
             *.tar.gz
 
   linux-x86_64:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -163,7 +163,7 @@ jobs:
             *.tar.gz
 
   linux-x86_64-debug:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -237,9 +237,12 @@ jobs:
           CXX: i686-w64-mingw32-g++
           EXE_WRAPPER: wine
           PKG_CONFIG: "false"
+          WINEARCH: "win32"
           WINEDEBUG: "-all"
+          WINEDLLOVERRIDES: "mscoree,mshtml="
         run: |
           make features
+          xvfb-run wineboot -u
           xvfb-run make WITH_LTO=true -j $(nproc)
       - name: Set sha8
         id: slug
@@ -269,9 +272,12 @@ jobs:
           CXX: x86_64-w64-mingw32-g++
           EXE_WRAPPER: wine
           PKG_CONFIG: "false"
+          WINEARCH: "win64"
           WINEDEBUG: "-all"
+          WINEDLLOVERRIDES: "mscoree,mshtml="
         run: |
           make features
+          xvfb-run wineboot -u
           xvfb-run make WITH_LTO=true -j $(nproc)
       - name: Set sha8
         id: slug
