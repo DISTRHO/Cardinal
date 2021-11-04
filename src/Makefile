@@ -68,6 +68,9 @@ BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only
 BUILD_CXX_FLAGS += -fno-finite-math-only
 
+# use our custom function to filter out VCV trademarks
+BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
+
 # --------------------------------------------------------------
 # Rack files to build
 

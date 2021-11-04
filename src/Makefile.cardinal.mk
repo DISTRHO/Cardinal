@@ -170,7 +170,7 @@ all: jack lv2 vst2 vst3 resources
 
 ifeq ($(NAME),Cardinal)
 
-CORE_RESOURCES = $(subst ../Rack/res/,,$(wildcard ../Rack/res/*)) template.vcv
+CORE_RESOURCES = $(filter-out icon.png,$(subst ../Rack/res/,,$(wildcard ../Rack/res/*))) template.vcv
 
 PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.lv2/resources/%)
 ifeq ($(MACOS),true)
