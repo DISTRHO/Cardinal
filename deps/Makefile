@@ -15,7 +15,6 @@ include ../dpf/Makefile.base.mk
 # --------------------------------------------------------------
 # custom build flags
 
-BASE_FLAGS += -fno-finite-math-only
 BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat
 BASE_FLAGS += -pthread
@@ -31,6 +30,9 @@ ifeq ($(WITH_LTO),true)
 BASE_FLAGS += -fno-strict-aliasing -flto
 LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
 endif
+
+BUILD_C_FLAGS += -fno-finite-math-only
+BUILD_CXX_FLAGS += -fno-finite-math-only
 
 # --------------------------------------------------------------
 # override VCV arch.mk stuff so we can build more architectures

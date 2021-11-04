@@ -72,7 +72,6 @@ else
 BASE_FLAGS += -DARCH_LIN
 endif
 
-BASE_FLAGS += -fno-finite-math-only
 BASE_FLAGS += -I..
 BASE_FLAGS += -I../../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../../include
@@ -104,6 +103,8 @@ BASE_FLAGS += -fno-strict-aliasing -flto
 endif
 
 BUILD_C_FLAGS += -std=gnu11
+BUILD_C_FLAGS += -fno-finite-math-only
+BUILD_CXX_FLAGS += -fno-finite-math-only
 
 # --------------------------------------------------------------
 # FIXME lots of warnings from VCV side
