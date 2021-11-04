@@ -26,14 +26,15 @@ jobs:
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           sudo apt-get update -qq
-          sudo apt-get install -yq g++-aarch64-linux-gnu libasound2-dev:arm64 libcairo2-dev:arm64 libgl1-mesa-dev:arm64 liblo-dev:arm64 libpulse-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static xvfb
+          sudo apt-get install -yqq g++-aarch64-linux-gnu libasound2-dev:arm64 libcairo2-dev:arm64 libgl1-mesa-dev:arm64 liblo-dev:arm64 libpulse-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static xvfb
           # extra for vcv deps
-          sudo apt-get install -yq libxi-dev:arm64 libxinerama-dev:arm64
+          sudo apt-get install -yqq libxi-dev:arm64 libxinerama-dev:arm64
       - name: Build linux arm64 cross-compiled
         env:
           CC: aarch64-linux-gnu-gcc
           CXX: aarch64-linux-gnu-g++
           LDFLAGS: -static-libgcc -static-libstdc++
+          PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
           LIBGL_ALWAYS_SOFTWARE: "true"
         run: |
           make features
@@ -64,14 +65,15 @@ jobs:
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           sudo apt-get update -qq
-          sudo apt-get install -yq g++-arm-linux-gnueabihf libasound2-dev:armhf libcairo2-dev:armhf libgl1-mesa-dev:armhf liblo-dev:armhf libpulse-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static xvfb
+          sudo apt-get install -yqq g++-arm-linux-gnueabihf libasound2-dev:armhf libcairo2-dev:armhf libgl1-mesa-dev:armhf liblo-dev:armhf libpulse-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static xvfb
           # extra for vcv deps
-          sudo apt-get install -yq libxi-dev:armhf libxinerama-dev:armhf
+          sudo apt-get install -yqq libxi-dev:armhf libxinerama-dev:armhf
       - name: Build linux armhf cross-compiled
         env:
           CC: arm-linux-gnueabihf-gcc
           CXX: arm-linux-gnueabihf-g++
           LDFLAGS: -static-libgcc -static-libstdc++
+          PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
           LIBGL_ALWAYS_SOFTWARE: "true"
         run: |
           make features
@@ -98,9 +100,9 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yq g++-i686-linux-gnu libasound2-dev:i386 libcairo2-dev:i386 libgl1-mesa-dev:i386 liblo-dev:i386 libpulse-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386 xvfb
+          sudo apt-get install -yqq g++-i686-linux-gnu libasound2-dev:i386 libcairo2-dev:i386 libgl1-mesa-dev:i386 liblo-dev:i386 libpulse-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386 xvfb
           # extra for vcv deps
-          sudo apt-get install -yq libxi-dev:i386 libxinerama-dev:i386
+          sudo apt-get install -yqq libxi-dev:i386 libxinerama-dev:i386
       - name: Build linux x86
         env:
           CC: i686-linux-gnu-gcc
@@ -134,9 +136,9 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev xvfb
+          sudo apt-get install -yqq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev xvfb
           # extra for vcv deps
-          sudo apt-get install -yq libxi-dev libxinerama-dev
+          sudo apt-get install -yqq libxi-dev libxinerama-dev
       - name: Build linux x86_64
         env:
           LDFLAGS: -static-libgcc -static-libstdc++
@@ -165,9 +167,9 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev xvfb
+          sudo apt-get install -yqq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev xvfb
           # extra for vcv deps
-          sudo apt-get install -yq libxi-dev libxinerama-dev
+          sudo apt-get install -yqq libxi-dev libxinerama-dev
       - name: Build linux x86_64 (debug)
         env:
           LDFLAGS: -static-libgcc -static-libstdc++
@@ -225,7 +227,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 xvfb
+          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 xvfb
       - name: Build win32 cross-compiled
         env:
           CC: i686-w64-mingw32-gcc
@@ -239,6 +241,8 @@ jobs:
         run: |
           make features
           xvfb-run wineboot -u
+          echo -e '[HKEY_CURRENT_USER\Software\Wine\WineDbg]\n"ShowCrashDialog"=dword:00000000\n' > nodiag.reg
+          xvfb-run regedit nodiag.reg
           xvfb-run make WITH_LTO=true -j $(nproc)
       - name: Set sha8
         id: slug
@@ -261,7 +265,7 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable xvfb
+          sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable xvfb
       - name: Build win64 cross-compiled
         env:
           CC: x86_64-w64-mingw32-gcc
@@ -275,6 +279,8 @@ jobs:
         run: |
           make features
           xvfb-run wineboot -u
+          echo -e '[HKEY_CURRENT_USER\Software\Wine\WineDbg]\n"ShowCrashDialog"=dword:00000000\n' > nodiag.reg
+          xvfb-run regedit nodiag.reg
           xvfb-run make WITH_LTO=true -j $(nproc)
       - name: Set sha8
         id: slug
@@ -301,11 +307,11 @@ jobs:
           sudo dpkg -i kxstudio-repos_10.0.3_all.deb
           sudo apt-get update -qq
           # build-deps
-          sudo apt-get install -yq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev xvfb
+          sudo apt-get install -yqq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev xvfb
           # extra for vcv deps
-          sudo apt-get install -yq libxi-dev libxinerama-dev
+          sudo apt-get install -yqq libxi-dev libxinerama-dev
           # runtime testing
-          sudo apt-get install -yq carla-git lilv-utils lv2-dev lv2lint valgrind
+          sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint valgrind
       - name: Build plugins
         env:
           CFLAGS: -g
