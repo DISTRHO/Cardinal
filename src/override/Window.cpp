@@ -48,7 +48,6 @@
 #include "../WindowParameters.hpp"
 
 #ifndef DGL_NO_SHARED_RESOURCES
-# include "NanoVG.hpp"
 # include "src/Resources.hpp"
 #endif
 
@@ -164,11 +163,11 @@ Window::Window() {
 
 	// Set up NanoVG
 	const int nvgFlags = NVG_ANTIALIAS;
+	vg = nvgCreateGL(nvgFlags);
+	DISTRHO_SAFE_ASSERT_RETURN(vg != nullptr,);
 #ifdef NANOVG_GLES2
-	vg = nvgCreateGLES2(nvgFlags);
 	fbVg = nvgCreateSharedGLES2(vg, nvgFlags);
 #else
-	vg = nvgCreateGL2(nvgFlags);
 	fbVg = nvgCreateSharedGL2(vg, nvgFlags);
 #endif
 
