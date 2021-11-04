@@ -47,6 +47,16 @@
 // Bidoo
 #include "Bidoo/src/plugin.hpp"
 
+// BogaudioModules - force dark skin as default
+#include <mutex>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#define private public
+#include "BogaudioModules/src/skins.hpp"
+#undef private
+
 // BogaudioModules
 #define modelADSR modelBogaudioADSR
 #define modelLFO modelBogaudioLFO
@@ -655,6 +665,9 @@ static void initStatic__BogaudioModules()
     const StaticPluginLoader spl(p, "BogaudioModules");
     if (spl.ok())
     {
+        // Make sure to use dark theme as default
+        Skins& skins(Skins::skins());
+        skins._default = "dark";
 #define modelADSR modelBogaudioADSR
 #define modelLFO modelBogaudioLFO
 #define modelNoise modelBogaudioNoise
