@@ -39,7 +39,6 @@
 #include <settings.hpp>
 #include <system.hpp>
 #include <random.hpp>
-#include <context.hpp>
 #include <patch.hpp>
 #include <plugin.hpp>
 
@@ -61,27 +60,23 @@ struct ReadWriteMutex {
 	pthread_rwlock_t rwlock;
 
 	ReadWriteMutex() {
-		if (pthread_rwlock_init(&rwlock, NULL))
+		if (pthread_rwlock_init(&rwlock, nullptr))
 			throw Exception("pthread_rwlock_init failed");
 	}
 	~ReadWriteMutex() {
 		pthread_rwlock_destroy(&rwlock);
 	}
 	void lockReader() {
-		if (pthread_rwlock_rdlock(&rwlock))
-			throw Exception("pthread_rwlock_rdlock failed");
+		DISTRHO_SAFE_ASSERT_RETURN(pthread_rwlock_rdlock(&rwlock) == 0,);
 	}
 	void unlockReader() {
-		if (pthread_rwlock_unlock(&rwlock))
-			throw Exception("pthread_rwlock_unlock failed");
+		DISTRHO_SAFE_ASSERT_RETURN(pthread_rwlock_unlock(&rwlock) == 0,);
 	}
 	void lockWriter() {
-		if (pthread_rwlock_wrlock(&rwlock))
-			throw Exception("pthread_rwlock_wrlock failed");
+		DISTRHO_SAFE_ASSERT_RETURN(pthread_rwlock_wrlock(&rwlock) == 0,);
 	}
 	void unlockWriter() {
-		if (pthread_rwlock_unlock(&rwlock))
-			throw Exception("pthread_rwlock_unlock failed");
+		DISTRHO_SAFE_ASSERT_RETURN(pthread_rwlock_unlock(&rwlock) == 0,);
 	}
 };
 
@@ -144,9 +139,6 @@ struct Engine::Internal {
 	Readers lock when using the engine's state.
 	*/
 	ReadWriteMutex mutex;
-
-	// For worker threads
-	Context* context;
 };
 
 
@@ -314,9 +306,6 @@ static void Engine_refreshParamHandleCache(Engine* that) {
 
 Engine::Engine() {
 	internal = new Internal;
-
-	internal->context = contextGet();
-	setSuggestedSampleRate(0.f);
 }
 
 
@@ -987,7 +976,7 @@ void Engine::fromJson(json_t* rootJ) {
 		}
 		catch (Exception& e) {
 			WARN("Cannot load model: %s", e.what());
-			APP->patch->log(e.what());
+			// APP->patch->log(e.what());
 			continue;
 		}
 
@@ -1009,7 +998,7 @@ void Engine::fromJson(json_t* rootJ) {
 		}
 		catch (Exception& e) {
 			WARN("Cannot load module: %s", e.what());
-			APP->patch->log(e.what());
+			// APP->patch->log(e.what());
 			delete module;
 			continue;
 		}
