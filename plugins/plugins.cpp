@@ -406,6 +406,7 @@ static void initStatic__Cardinal()
     if (spl.ok())
     {
         p->addModel(modelGlBars);
+        p->addModel(modelIldaeil);
         p->addModel(modelHostParameters);
         p->addModel(modelHostTime);
     }

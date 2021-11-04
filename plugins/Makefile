@@ -178,6 +178,7 @@ PLUGIN_FILES = plugins.cpp
 # Cardinal (built-in)
 
 PLUGIN_FILES += $(wildcard Cardinal/src/*.cpp)
+PLUGIN_FILES += $(wildcard Cardinal/src/*/*.cpp)
 
 ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------

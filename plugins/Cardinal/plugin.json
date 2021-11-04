@@ -39,6 +39,15 @@
       "tags": [
         "Visual"
       ]
+    },
+    {
+      "slug": "Ildaeil",
+      "disabled": false,
+      "name": "Ildaeil Plugin Host",
+      "description": "A plugin host within Cardinal for loading any FX",
+      "tags": [
+        "Utility"
+      ]
     }
   ]
 }
