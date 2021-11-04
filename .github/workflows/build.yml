@@ -332,7 +332,7 @@ jobs:
           cp -r bin/*.lv2 \
               /usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,instance-access,midi,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 \
               ${LV2_PATH}
-          lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
+          xvfb-run lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
       - name: Test LV2 plugin
         run: |
             export LV2_PATH=/tmp/lv2-path
