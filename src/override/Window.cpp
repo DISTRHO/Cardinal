@@ -283,7 +283,6 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 		nvgDeleteGL2(window->internal->r_fbVg);
 #endif
 
-		// window->internal->hiddenWindow.close();
 		window->internal->ui = nullptr;
 		window->internal->callback = nullptr;
 	}
@@ -297,6 +296,8 @@ void WindowSetMods(Window* const window, const int mods)
 Window::~Window() {
 	{
 		DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
+		internal->hiddenWindow.close();
+		internal->hiddenApp.idle();
 
 		// Fonts and Images in the cache must be deleted before the NanoVG context is deleted
 		internal->fontCache.clear();
