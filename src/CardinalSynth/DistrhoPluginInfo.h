@@ -27,6 +27,7 @@
 #else
 #define DISTRHO_PLUGIN_HAS_UI             1
 #define DISTRHO_PLUGIN_WANT_DIRECT_ACCESS 1
+#define DISTRHO_UI_USE_NANOVG             1
 #define DISTRHO_UI_USER_RESIZABLE         1
 #endif
 #define DISTRHO_PLUGIN_IS_SYNTH           1

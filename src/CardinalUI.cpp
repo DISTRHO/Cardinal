@@ -136,7 +136,7 @@ public:
         rack::contextSet(nullptr);
     }
 
-    void onDisplay() override
+    void onNanoDisplay() override
     {
         const ScopedContext sc(this);
         fContext->window->step();

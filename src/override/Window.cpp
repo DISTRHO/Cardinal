@@ -206,13 +206,11 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 		window->internal->size = rack::math::Vec(ui->getWidth(), ui->getHeight());
 
 		// Set up NanoVG
-		const int nvgFlags = NVG_ANTIALIAS;
+		window->internal->r_vg = ui->getContext();
 #ifdef NANOVG_GLES2
-		window->internal->r_vg = nvgCreateSharedGLES2(nvgFlags);
-		window->internal->r_fbVg = nvgCreateSharedGLES2(window->internal->r_vg, nvgFlags);
+		window->internal->r_fbVg = nvgCreateSharedGLES2(window->internal->r_vg, NVG_ANTIALIAS);
 #else
-		window->internal->r_vg = nvgCreateGL2(nvgFlags);
-		window->internal->r_fbVg = nvgCreateSharedGL2(window->internal->r_vg, nvgFlags);
+		window->internal->r_fbVg = nvgCreateSharedGL2(window->internal->r_vg, NVG_ANTIALIAS);
 #endif
 
 		// swap contexts
@@ -274,10 +272,8 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 		}
 
 #if defined NANOVG_GLES2
-		nvgDeleteGLES2(window->internal->r_vg);
 		nvgDeleteGLES2(window->internal->r_fbVg);
 #else
-		nvgDeleteGL2(window->internal->r_vg);
 		nvgDeleteGL2(window->internal->r_fbVg);
 #endif
 
@@ -381,7 +377,6 @@ void Window::step() {
 
 		// Render scene
 		// Update and render
-		nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
 		nvgScale(vg, pixelRatio, pixelRatio);
 
 		// Draw scene
@@ -393,7 +388,6 @@ void Window::step() {
 		glViewport(0, 0, fbWidth, fbHeight);
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		nvgEndFrame(vg);
 	}
 
 	internal->frame++;
