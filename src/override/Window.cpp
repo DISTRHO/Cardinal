@@ -137,7 +137,7 @@ struct Window::Internal {
 	bool fbDirtyOnSubpixelChange = true;
 
 	Internal()
-		: hiddenApp(),
+		: hiddenApp(false),
 		  hiddenWindow(hiddenApp) { hiddenApp.idle(); }
 };
 
@@ -273,8 +273,6 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 			image.second->ohandle = -1;
 		}
 
-		// also for images
-
 #if defined NANOVG_GLES2
 		nvgDeleteGLES2(window->internal->r_vg);
 		nvgDeleteGLES2(window->internal->r_fbVg);
@@ -304,11 +302,11 @@ Window::~Window() {
 		internal->imageCache.clear();
 
 #if defined NANOVG_GLES2
-		nvgDeleteGLES2(vg);
-		nvgDeleteGLES2(fbVg);
+		nvgDeleteGLES2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
+		nvgDeleteGLES2(internal->o_vg != nullptr ? internal->o_vg : vg);
 #else
-		nvgDeleteGL2(vg);
-		nvgDeleteGL2(fbVg);
+		nvgDeleteGL2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
+		nvgDeleteGL2(internal->o_vg != nullptr ? internal->o_vg : vg);
 #endif
 	}
 
