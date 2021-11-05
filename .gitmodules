@@ -64,3 +64,6 @@
 [submodule "plugins/DrumKit"]
 	path = plugins/DrumKit
 	url = https://github.com/SVModular/DrumKit.git
+[submodule "carla"]
+	path = carla
+	url = https://github.com/falkTX/Carla.git

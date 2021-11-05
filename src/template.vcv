@@ -82,6 +82,7 @@
       "version": "2.0",
       "params": [],
       "leftModuleId": 3,
+      "rightModuleId": 5,
       "pos": [
         21,
         0
@@ -94,8 +95,21 @@
       "version": "2.0",
       "params": [],
       "leftModuleId": 4,
+      "rightModuleId": 6,
       "pos": [
         30,
+        0
+      ]
+    },
+    {
+      "id": 6,
+      "plugin": "Cardinal",
+      "model": "Ildaeil",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 4,
+      "pos": [
+        38,
         0
       ]
     }

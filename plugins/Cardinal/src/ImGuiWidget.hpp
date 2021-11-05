@@ -18,6 +18,7 @@
 #pragma once
 
 #include "plugin.hpp"
+#include "DearImGui/imgui.h"
 
 struct ImGuiWidget : OpenGlWidget {
     struct PrivateData;
@@ -25,8 +26,20 @@ struct ImGuiWidget : OpenGlWidget {
 
     ImGuiWidget(float width, float height);
     ~ImGuiWidget() override;
-    void drawFramebuffer() override;
 
+    virtual void drawImGui()
+    {
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImVec2(box.size.x, box.size.y));
+        ImGui::ShowDemoWindow();
+    }
+
+private:
+    void drawFramebuffer() override;
     void onHover(const HoverEvent& e) override;
+    void onDragHover(const DragHoverEvent& e) override;
+    void onHoverScroll(const HoverScrollEvent& e) override;
     void onButton(const ButtonEvent& e) override;
+    void onSelectKey(const SelectKeyEvent& e) override;
+    void onSelectText(const SelectTextEvent& e) override;
 };

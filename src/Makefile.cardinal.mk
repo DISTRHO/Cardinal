@@ -14,6 +14,58 @@ DESTDIR ?=
 SYSDEPS ?= false
 
 # --------------------------------------------------------------
+# Carla stuff
+
+CWD = ../../carla/source
+include $(CWD)/Makefile.deps.mk
+
+CARLA_BUILD_DIR = ../../carla/build
+ifeq ($(DEBUG),true)
+CARLA_BUILD_TYPE = Debug
+else
+CARLA_BUILD_TYPE = Release
+endif
+
+CARLA_EXTRA_LIBS  = $(CARLA_BUILD_DIR)/plugin/$(CARLA_BUILD_TYPE)/carla-host-plugin.cpp.o
+# ifneq ($(MACOS),true)
+# CARLA_EXTRA_LIBS += -Wl,--start-group -Wl,--whole-archive
+# endif
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/carla_engine_plugin.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/carla_plugin.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/native-plugins.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/audio_decoder.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/jackbridge.min.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/lilv.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/rtmempool.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/sfzero.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/water.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/zita-resampler.a
+# CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/eel2.a
+# CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/jsusfx.a
+ifeq ($(USING_JUCE),true)
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/juce_audio_basics.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/juce_audio_processors.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/juce_core.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/juce_data_structures.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/juce_events.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/juce_graphics.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/juce_gui_basics.a
+ifeq ($(USING_JUCE_GUI_EXTRA),true)
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/juce_gui_extra.a
+endif
+endif
+# ifneq ($(MACOS),true)
+# CARLA_EXTRA_LIBS += -Wl,--no-whole-archive -Wl,--end-group
+# endif
+
+# FIXME patch fluidsynth package
+ifeq ($(WINDOWS),true)
+STATIC_CARLA_PLUGIN_LIBS += -ldsound -lwinmm
+endif
+
+CARLA_EXTRA_LIBS += $(STATIC_CARLA_PLUGIN_LIBS)
+
+# --------------------------------------------------------------
 # Import base definitions
 
 USE_NANOVG_FBO = true
@@ -37,22 +89,25 @@ endif
 # --------------------------------------------------------------
 # Extra libraries to link against
 
-EXTRA_LIBS  = ../../plugins/plugins.a
-EXTRA_LIBS += ../rack.a
+RACK_EXTRA_LIBS  = ../../plugins/plugins.a
+RACK_EXTRA_LIBS += ../rack.a
 
 ifneq ($(SYSDEPS),true)
-EXTRA_LIBS += ../Rack/dep/lib/libjansson.a
-EXTRA_LIBS += ../Rack/dep/lib/libsamplerate.a
-EXTRA_LIBS += ../Rack/dep/lib/libspeexdsp.a
+RACK_EXTRA_LIBS += ../Rack/dep/lib/libjansson.a
+RACK_EXTRA_LIBS += ../Rack/dep/lib/libsamplerate.a
+RACK_EXTRA_LIBS += ../Rack/dep/lib/libspeexdsp.a
 ifeq ($(WINDOWS),true)
-EXTRA_LIBS += ../Rack/dep/lib/libarchive_static.a
+RACK_EXTRA_LIBS += ../Rack/dep/lib/libarchive_static.a
 else
-EXTRA_LIBS += ../Rack/dep/lib/libarchive.a
+RACK_EXTRA_LIBS += ../Rack/dep/lib/libarchive.a
 endif
-EXTRA_LIBS += ../Rack/dep/lib/libzstd.a
+RACK_EXTRA_LIBS += ../Rack/dep/lib/libzstd.a
 endif
 
-EXTRA_DEPENDENCIES = $(EXTRA_LIBS)
+# --------------------------------------------------------------
+
+EXTRA_DEPENDENCIES = $(RACK_EXTRA_LIBS)
+EXTRA_LIBS = $(CARLA_EXTRA_LIBS) $(RACK_EXTRA_LIBS)
 
 # --------------------------------------------------------------
 # Do some magic

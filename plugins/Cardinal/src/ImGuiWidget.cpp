@@ -21,7 +21,6 @@
 # include "../../../dpf/dgl/src/Resources.hpp"
 #endif
 
-#include "DearImGui/imgui.h"
 #include "DearImGui/imgui_impl_opengl2.h"
 
 struct ImGuiWidget::PrivateData {
@@ -115,13 +114,10 @@ void ImGuiWidget::drawFramebuffer()
 //     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     ImGui::SetCurrentContext(imData->context);
-
     ImGui_ImplOpenGL2_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::SetNextWindowPos(ImVec2(0, 0));
-    ImGui::SetNextWindowSize(ImVec2(box.size.x, box.size.y));
-    ImGui::ShowDemoWindow();
+    drawImGui();
 
     ImGui::Render();
 
@@ -140,8 +136,30 @@ void ImGuiWidget::onHover(const HoverEvent& e)
     ImGui::SetCurrentContext(imData->context);
 
     ImGuiIO& io(ImGui::GetIO());
-    io.MousePos.x = e.pos.x;
-    io.MousePos.y = e.pos.y;
+    io.MousePos.x = e.pos.x + e.mouseDelta.x;
+    io.MousePos.y = e.pos.y + e.mouseDelta.y;
+
+}
+
+void ImGuiWidget::onDragHover(const DragHoverEvent& e)
+{
+    ImGui::SetCurrentContext(imData->context);
+
+    ImGuiIO& io(ImGui::GetIO());
+    io.MousePos.x = e.pos.x + e.mouseDelta.x;
+    io.MousePos.y = e.pos.y + e.mouseDelta.y;
+}
+
+void ImGuiWidget::onHoverScroll(const HoverScrollEvent& e)
+{
+    ImGui::SetCurrentContext(imData->context);
+
+    ImGuiIO& io(ImGui::GetIO());
+    io.MouseWheel += e.scrollDelta.y * 0.01f;
+    io.MouseWheelH += e.scrollDelta.x * 0.01f;
+
+    if (io.WantCaptureMouse)
+        e.consume(this);
 }
 
 void ImGuiWidget::onButton(const ButtonEvent& e)
@@ -153,13 +171,75 @@ void ImGuiWidget::onButton(const ButtonEvent& e)
     switch (e.button)
     {
     case GLFW_MOUSE_BUTTON_LEFT:
-        io.MouseDown[0] = e.action;
+        io.MouseDown[0] = e.action == GLFW_PRESS;
         break;
     case GLFW_MOUSE_BUTTON_MIDDLE:
-        io.MouseDown[1] = e.action;
+        io.MouseDown[1] = e.action == GLFW_PRESS;
         break;
     case GLFW_MOUSE_BUTTON_RIGHT:
-        io.MouseDown[2] = e.action;
+        io.MouseDown[2] = e.action == GLFW_PRESS;
         break;
     }
+
+    io.KeyCtrl  = e.mods & GLFW_MOD_CTRL;
+    io.KeyShift = e.mods & GLFW_MOD_SHIFT;
+    io.KeyAlt   = e.mods & GLFW_MOD_ALT;
+    io.KeySuper = e.mods & GLFW_MOD_SUPER;
+
+    if (io.WantCaptureMouse)
+        e.consume(this);
+}
+
+void ImGuiWidget::onSelectKey(const SelectKeyEvent& e)
+{
+    ImGui::SetCurrentContext(imData->context);
+
+    ImGuiIO& io(ImGui::GetIO());
+
+    io.KeyCtrl  = e.mods & GLFW_MOD_CTRL;
+    io.KeyShift = e.mods & GLFW_MOD_SHIFT;
+    io.KeyAlt   = e.mods & GLFW_MOD_ALT;
+    io.KeySuper = e.mods & GLFW_MOD_SUPER;
+
+    printf("onSelectKey %i %i\n", e.key, e.scancode);
+
+    // d_stdout("onKeyboard %u %u", event.key, event.keycode);
+
+    /*
+    if (event.key <= kKeyDelete)
+        io.KeysDown[event.key] = event.press;
+    else if (event.key >= kKeyF1 && event.key <= kKeyPause)
+        io.KeysDown[0xff + event.key - kKeyF1] = event.press;
+    */
+
+    if (io.WantCaptureKeyboard)
+        e.consume(this);
+}
+
+void ImGuiWidget::onSelectText(const SelectTextEvent& e)
+{
+    ImGui::SetCurrentContext(imData->context);
+
+    ImGuiIO& io(ImGui::GetIO());
+
+    switch (e.codepoint)
+    {
+      /*
+    case kKeyBackspace:
+    case kKeyEscape:
+    case kKeyDelete:
+      */
+    case '\n':
+    case '\r':
+    case '\t':
+        break;
+    default:
+        // d_stdout("input %u %u %lu '%s'", event.keycode, event.character, std::strlen(event.string), event.string);
+        char character[2] = { (char)e.codepoint, 0 };
+        io.AddInputCharactersUTF8(character);
+        break;
+    }
+
+    if (io.WantCaptureKeyboard)
+        e.consume(this);
 }

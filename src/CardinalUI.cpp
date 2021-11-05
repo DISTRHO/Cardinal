@@ -98,6 +98,8 @@ public:
           fContext(getRackContextFromPlugin(getPluginInstancePointer())),
           fResizeHandle(this)
     {
+        fContext->nativeWindowId = getWindow().getNativeWindowHandle();
+
         if (isResizable())
             fResizeHandle.hide();
 

@@ -676,7 +676,13 @@ $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		-DpluginInstance=pluginInstance__Cardinal
+		-DpluginInstance=pluginInstance__Cardinal \
+		-DREAL_BUILD \
+		-DSTATIC_PLUGIN_TARGET \
+		-I../carla/source/backend \
+		-I../carla/source/includes \
+		-I../carla/source/modules \
+		-I../carla/source/utils
 
 $(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

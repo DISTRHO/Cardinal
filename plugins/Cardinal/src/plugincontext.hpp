@@ -36,6 +36,7 @@ struct CardinalPluginContext : rack::Context {
     bool playing, reset;
     int32_t bar, beat, beatsPerBar;
     double tick, tickClock, ticksPerBeat, ticksPerClock, ticksPerFrame;
+    uintptr_t nativeWindowId;
     Plugin* const plugin;
     CardinalPluginContext(Plugin* const p);
 };

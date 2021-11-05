@@ -6,7 +6,7 @@
 
 include dpf/Makefile.base.mk
 
-all: cardinal deps dgl plugins gen resources
+all: cardinal carla deps dgl plugins gen resources
 
 # --------------------------------------------------------------
 # Build config
@@ -62,6 +62,11 @@ endif
 cardinal: deps dgl plugins
 	$(MAKE) all -C src
 
+carla:
+	$(MAKE) -C carla plugin \
+		CAN_GENERATE_LV2_TTL=false \
+		STATIC_PLUGIN_TARGET=true
+
 deps:
 ifneq ($(SYSDEPS),true)
 	$(MAKE) all -C deps
@@ -116,4 +121,4 @@ install:
 
 # --------------------------------------------------------------
 
-.PHONY: deps plugins
+.PHONY: carla deps plugins

@@ -43,6 +43,7 @@ struct CardinalPluginContext : rack::Context {
     bool playing, reset;
     int32_t bar, beat, beatsPerBar;
     double tick, tickClock, ticksPerBeat, ticksPerClock, ticksPerFrame;
+    uintptr_t nativeWindowId;
     Plugin* const plugin;
 
     CardinalPluginContext(Plugin* const p)
@@ -58,6 +59,7 @@ struct CardinalPluginContext : rack::Context {
           ticksPerBeat(0.0),
           ticksPerClock(0.0),
           ticksPerFrame(0.0),
+          nativeWindowId(0),
           plugin(p)
     {
         std::memset(parameters, 0, sizeof(parameters));
