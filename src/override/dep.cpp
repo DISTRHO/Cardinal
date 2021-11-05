@@ -131,7 +131,7 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
 
             if (std::strncmp(filename + (filenamelen-filterlen), pathToFilterOut, filterlen) == 0)
             {
-                printf("Removing CC-ND deadlock from file...\n");
+                puts("Removing CC-ND deadlock from file...\n");
                 removeShape(handle, pathsToFilterOut[i].shapes[0]);
                 removeShape(handle, pathsToFilterOut[i].shapes[1]);
                 removeShape(handle, pathsToFilterOut[i].shapes[2]);
