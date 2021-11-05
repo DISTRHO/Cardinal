@@ -1111,8 +1111,8 @@ struct IldaeilModuleWidget : ModuleWidget {
 
         addInput(createInput<PJ301MPort>(Vec(3, 54), module, IldaeilModule::INPUT1));
         addInput(createInput<PJ301MPort>(Vec(3, 54 + 30), module, IldaeilModule::INPUT2));
-        addInput(createOutput<PJ301MPort>(Vec(3, 54 + 60), module, IldaeilModule::OUTPUT1));
-        addInput(createOutput<PJ301MPort>(Vec(3, 54 + 90), module, IldaeilModule::OUTPUT2));
+        addOutput(createOutput<PJ301MPort>(Vec(3, 54 + 60), module, IldaeilModule::OUTPUT1));
+        addOutput(createOutput<PJ301MPort>(Vec(3, 54 + 90), module, IldaeilModule::OUTPUT2));
     }
 };
 

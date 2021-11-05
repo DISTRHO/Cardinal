@@ -19,6 +19,10 @@
 
 #include "rack.hpp"
 
+#ifdef NDEBUG
+# undef DEBUG
+#endif
+
 using namespace rack;
 
 extern Plugin* pluginInstance;
