@@ -93,115 +93,115 @@ static const struct {
         {"path6935","path6939","path6941","path6937"}
     },
     {
-        "Fundamental/res/8vert.svg",
+        "Fundamental/8vert.svg",
         {"path69642","path69646","path69640","path69644"}
     },
     {
-        "Fundamental/res/ADSR.svg",
+        "Fundamental/ADSR.svg",
         {"path33693","path33697","path33699","path33695"}
     },
     {
-        "Fundamental/res/Delay.svg",
+        "Fundamental/Delay.svg",
         {"path25369","path25373","path25375","path25371"}
     },
     {
-        "Fundamental/res/LFO-1.svg",
+        "Fundamental/LFO-1.svg",
         {"path35889","path35893","path35895","path35891"}
     },
     {
-        "Fundamental/res/LFO-2.svg",
+        "Fundamental/LFO-2.svg",
         {"path36131","path36135","path36137","path36133"}
     },
     {
-        "Fundamental/res/Merge.svg",
+        "Fundamental/Merge.svg",
         {"path29991","path29995","path29989","path29993"}
     },
     {
-        "Fundamental/res/MidSide.svg",
+        "Fundamental/MidSide.svg",
         {"path44181","path44185","path44179","path44183"}
     },
     {
-        "Fundamental/res/Mutes.svg",
+        "Fundamental/Mutes.svg",
         {"path21613","path21617","path21611","path21615"}
     },
     {
-        "Fundamental/res/Noise.svg",
+        "Fundamental/Noise.svg",
         {"path105594","path105598","path105592","path105596"}
     },
     {
-        "Fundamental/res/Octave.svg",
+        "Fundamental/Octave.svg",
         {"path38471","path38475","path38469","path38473"}
     },
     {
-        "Fundamental/res/Pulses.svg",
+        "Fundamental/Pulses.svg",
         {"path46241","path46245","path46239","path46243"}
     },
     {
-        "Fundamental/res/Quantizer.svg",
+        "Fundamental/Quantizer.svg",
         {"path38549","path38553","path38547","path38551"}
     },
     {
-        "Fundamental/res/Random.svg",
+        "Fundamental/Random.svg",
         {"path89732","path89736","path89730","path89734"}
     },
     {
-        "Fundamental/res/SEQ3.svg",
+        "Fundamental/SEQ3.svg",
         {"path35687","path35691","path35693","path35689"}
     },
     {
-        "Fundamental/res/Scope.svg",
+        "Fundamental/Scope.svg",
         {"path33887","path33891","path33893","path33889"}
     },
     /* These 2 do not have logos on them?
     {
-        "Fundamental/res/SequentialSwitch1.svg",
+        "Fundamental/SequentialSwitch1.svg",
         {"_______","_______","_______","_______"}
     },
     {
-        "Fundamental/res/SequentialSwitch2.svg",
+        "Fundamental/SequentialSwitch2.svg",
         {"_______","_______","_______","_______"}
     },
     */
     {
-        "Fundamental/res/Split.svg",
+        "Fundamental/Split.svg",
         {"path29999","path30003","path29997","path30001"}
     },
     {
-        "Fundamental/res/Sum.svg",
+        "Fundamental/Sum.svg",
         {"path10913","path10917","path10911","path10915"}
     },
     {
-        "Fundamental/res/Unity.svg",
+        "Fundamental/Unity.svg",
         {"path21219","path21223","path21217","path21221"}
     },
     /* These 2 do not have logos on them?
     {
-        "Fundamental/res/VCA-1.svg",
+        "Fundamental/VCA-1.svg",
         {"_______","_______","_______","_______"}
     },
     {
-        "Fundamental/res/VCA.svg",
+        "Fundamental/VCA.svg",
         {"_______","_______","_______","_______"}
     },
     */
     {
-        "Fundamental/res/VCF.svg",
+        "Fundamental/VCF.svg",
         {"path25239","path25243","path25245","path25241"}
     },
     {
-        "Fundamental/res/VCMixer.svg",
+        "Fundamental/VCMixer.svg",
         {"path125839","path125843","path125845","path125841"}
     },
     {
-        "Fundamental/res/VCO-1.svg",
+        "Fundamental/VCO-1.svg",
         {"path33533","path33537","path33539","path33535"}
     },
     {
-        "Fundamental/res/VCO-2.svg",
+        "Fundamental/VCO-2.svg",
         {"path37557","path37561","path37563","path37559"}
     },
     {
-        "Fundamental/res/Viz.svg",
+        "Fundamental/Viz.svg",
         {"path41769","path41773","path41767","path41771"}
     },
 };
