@@ -37,12 +37,8 @@ std::string bundlePath; // points to plugin manifests dir (or empty)
 // get rid of "res/" prefix
 static inline std::string& trim(std::string& s)
 {
-    if (std::strncmp(s.c_str(), "res" DISTRHO_OS_SEP_STR, 4) == 0)
-        s = s.substr(4, s.size()-4);
-#if DISTRHO_OS_SEP != '/'
     if (std::strncmp(s.c_str(), "res/", 4) == 0)
         s = s.substr(4, s.size()-4);
-#endif
     return s;
 }
 
@@ -59,7 +55,7 @@ std::string system(std::string filename) {
 // get plugin resource, also trims "res/" as needed
 std::string plugin(plugin::Plugin* plugin, std::string filename) {
     DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, {});
-    return system::join(plugin->path, bundlePath.empty() ? filename : trim(filename));
+    return system::join(plugin->path, trim(filename));
 }
 
 // path to plugin manifest
@@ -79,7 +75,7 @@ std::string pluginPath(const std::string& dirname) {
     {
         if (dirname == "Core")
             return systemDir;
-        return system::join(systemDir, "..", "..", "plugins", dirname);
+        return system::join(systemDir, "..", "..", "plugins", "res", dirname);
     }
     return system::join(systemDir, dirname);
 }
