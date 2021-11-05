@@ -26,7 +26,7 @@ jobs:
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-aarch64-linux-gnu libasound2-dev:arm64 libcairo2-dev:arm64 libgl1-mesa-dev:arm64 liblo-dev:arm64 libpulse-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static xvfb
+          sudo apt-get install -yqq g++-aarch64-linux-gnu libasound2-dev:arm64 libcairo2-dev:arm64 libgl1-mesa-dev:arm64 liblo-dev:arm64 libpulse-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
           # extra for vcv deps
           sudo apt-get install -yqq libxi-dev:arm64 libxinerama-dev:arm64
       - name: Build linux arm64 cross-compiled
@@ -38,7 +38,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: "true"
         run: |
           make features
-          xvfb-run -a -- make WITH_LTO=true -j $(nproc)
+          make WITH_LTO=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -65,7 +65,7 @@ jobs:
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-arm-linux-gnueabihf libasound2-dev:armhf libcairo2-dev:armhf libgl1-mesa-dev:armhf liblo-dev:armhf libpulse-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static xvfb
+          sudo apt-get install -yqq g++-arm-linux-gnueabihf libasound2-dev:armhf libcairo2-dev:armhf libgl1-mesa-dev:armhf liblo-dev:armhf libpulse-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static
           # extra for vcv deps
           sudo apt-get install -yqq libxi-dev:armhf libxinerama-dev:armhf
       - name: Build linux armhf cross-compiled
@@ -77,7 +77,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: "true"
         run: |
           make features
-          xvfb-run -a -- make WITH_LTO=true -j $(nproc)
+          make WITH_LTO=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -100,7 +100,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-i686-linux-gnu libasound2-dev:i386 libcairo2-dev:i386 libgl1-mesa-dev:i386 liblo-dev:i386 libpulse-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386 xvfb
+          sudo apt-get install -yqq g++-i686-linux-gnu libasound2-dev:i386 libcairo2-dev:i386 libgl1-mesa-dev:i386 liblo-dev:i386 libpulse-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
           # extra for vcv deps
           sudo apt-get install -yqq libxi-dev:i386 libxinerama-dev:i386
       - name: Build linux x86
@@ -114,7 +114,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: "true"
         run: |
           make features
-          xvfb-run -a -- make WITH_LTO=true -j $(nproc)
+          make WITH_LTO=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -136,7 +136,7 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev xvfb
+          sudo apt-get install -yqq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
           # extra for vcv deps
           sudo apt-get install -yqq libxi-dev libxinerama-dev
       - name: Build linux x86_64
@@ -145,7 +145,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: "true"
         run: |
           make features
-          xvfb-run -a -- make WITH_LTO=true -j $(nproc)
+          make WITH_LTO=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -167,7 +167,7 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev xvfb
+          sudo apt-get install -yqq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
           # extra for vcv deps
           sudo apt-get install -yqq libxi-dev libxinerama-dev
       - name: Build linux x86_64 (debug)
@@ -176,7 +176,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: "true"
         run: |
           make features
-          xvfb-run -a -- make DEBUG=true -j $(nproc)
+          make DEBUG=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -227,7 +227,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 xvfb
+          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386
       - name: Build win32 cross-compiled
         env:
           CC: i686-w64-mingw32-gcc
@@ -240,10 +240,7 @@ jobs:
           WINEDLLOVERRIDES: "mscoree,mshtml="
         run: |
           make features
-          xvfb-run wineboot -u
-          echo -e '[HKEY_CURRENT_USER\Software\Wine\WineDbg]\n"ShowCrashDialog"=dword:00000000\n' > nodiag.reg
-          xvfb-run regedit nodiag.reg
-          xvfb-run -a -- make WITH_LTO=true -j $(nproc)
+          make WITH_LTO=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -265,7 +262,7 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable xvfb
+          sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable
       - name: Build win64 cross-compiled
         env:
           CC: x86_64-w64-mingw32-gcc
@@ -278,10 +275,7 @@ jobs:
           WINEDLLOVERRIDES: "mscoree,mshtml="
         run: |
           make features
-          xvfb-run wineboot -u
-          echo -e '[HKEY_CURRENT_USER\Software\Wine\WineDbg]\n"ShowCrashDialog"=dword:00000000\n' > nodiag.reg
-          xvfb-run regedit nodiag.reg
-          xvfb-run -a -- make WITH_LTO=true -j $(nproc)
+          make WITH_LTO=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -307,7 +301,7 @@ jobs:
           sudo dpkg -i kxstudio-repos_10.0.3_all.deb
           sudo apt-get update -qq
           # build-deps
-          sudo apt-get install -yqq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev xvfb
+          sudo apt-get install -yqq libasound2-dev libcairo2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
           # extra for vcv deps
           sudo apt-get install -yqq libxi-dev libxinerama-dev
           # runtime testing
@@ -320,7 +314,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: "true"
         run: |
           make features
-          xvfb-run -a -- make NOOPT=true SKIP_STRIPPING=true -j $(nproc)
+          make NOOPT=true SKIP_STRIPPING=true -j $(nproc)
       - name: Validate LV2 ttl syntax
         run: |
           lv2_validate \
@@ -329,16 +323,16 @@ jobs:
               /usr/lib/lv2/kx-control-input-port-change-request.lv2/*.ttl \
               /usr/lib/lv2/kx-programs.lv2/*.ttl \
               ./bin/*.lv2/*.ttl
-      #- name: Validate LV2 metadata and binaries
-        #env:
-          #LIBGL_ALWAYS_SOFTWARE: "true"
-        #run: |
-          #export LV2_PATH=/tmp/lv2-path
-          #mkdir ${LV2_PATH}
-          #cp -r bin/*.lv2 \
-              #/usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,instance-access,midi,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 \
-              #${LV2_PATH}
-          #xvfb-run lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
+      - name: Validate LV2 metadata and binaries
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "true"
+        run: |
+          export LV2_PATH=/tmp/lv2-path
+          mkdir ${LV2_PATH}
+          cp -r bin/*.lv2 \
+              /usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,instance-access,midi,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 \
+              ${LV2_PATH}
+          lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
       - name: Test LV2 plugin
         env:
           LIBGL_ALWAYS_SOFTWARE: "true"
@@ -346,7 +340,7 @@ jobs:
             export LV2_PATH=/tmp/lv2-path
             for p in $(lv2ls); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
-                    xvfb-run valgrind \
+                    valgrind \
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
@@ -359,7 +353,7 @@ jobs:
         run: |
             for p in $(ls bin/ | grep vst.so); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
-                    xvfb-run valgrind \
+                    valgrind \
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
@@ -372,7 +366,7 @@ jobs:
         run: |
             for p in $(ls bin/ | grep vst3); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
-                    xvfb-run valgrind \
+                    valgrind \
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \

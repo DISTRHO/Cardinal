@@ -379,7 +379,9 @@ public:
         context->event = new rack::widget::EventState;
         context->scene = new rack::app::Scene;
         context->event->rootWidget = context->scene;
-        context->window = new rack::window::Window;
+
+        if (! isDummyInstance())
+            context->window = new rack::window::Window;
 
         context->patch->loadTemplate();
         context->scene->rackScroll->reset();
