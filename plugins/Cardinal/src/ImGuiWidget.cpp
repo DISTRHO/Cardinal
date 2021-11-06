@@ -30,7 +30,6 @@ struct ImGuiWidget::PrivateData {
     {
         IMGUI_CHECKVERSION();
         context = ImGui::CreateContext();
-        ImGui::SetCurrentContext(context);
 
         ImGuiIO& io(ImGui::GetIO());
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -74,26 +73,36 @@ struct ImGuiWidget::PrivateData {
         io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
         io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
         io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
-
-        ImGui_ImplOpenGL2_Init();
     }
 
     ~PrivateData()
     {
-        ImGui::SetCurrentContext(context);
-        ImGui_ImplOpenGL2_Shutdown();
         ImGui::DestroyContext(context);
     }
 };
 
 ImGuiWidget::ImGuiWidget()
-    : imData(new PrivateData())
-{
-}
+    : imData(new PrivateData()) {}
 
 ImGuiWidget::~ImGuiWidget()
 {
     delete imData;
+}
+
+void ImGuiWidget::onContextCreate(const ContextCreateEvent& e)
+{
+    OpenGlWidget::onContextCreate(e);
+
+    ImGui::SetCurrentContext(imData->context);
+    ImGui_ImplOpenGL2_Init();
+}
+
+void ImGuiWidget::onContextDestroy(const ContextDestroyEvent& e)
+{
+    ImGui::SetCurrentContext(imData->context);
+    ImGui_ImplOpenGL2_Shutdown();
+
+    OpenGlWidget::onContextDestroy(e);
 }
 
 void ImGuiWidget::drawFramebuffer()
@@ -195,27 +204,29 @@ void ImGuiWidget::onButton(const ButtonEvent& e)
 
 void ImGuiWidget::onSelectKey(const SelectKeyEvent& e)
 {
+    if (e.key < 0 || e.key >= IM_ARRAYSIZE(ImGuiIO::KeysDown))
+        return;
+
     ImGui::SetCurrentContext(imData->context);
 
     ImGuiIO& io(ImGui::GetIO());
+
+    switch (e.action)
+    {
+    case GLFW_PRESS:
+        io.KeysDown[e.key] = true;
+        break;
+    case GLFW_RELEASE:
+        io.KeysDown[e.key] = false;
+        break;
+    default:
+        return;
+    }
 
     io.KeyCtrl  = e.mods & GLFW_MOD_CTRL;
     io.KeyShift = e.mods & GLFW_MOD_SHIFT;
     io.KeyAlt   = e.mods & GLFW_MOD_ALT;
     io.KeySuper = e.mods & GLFW_MOD_SUPER;
-
-    if (e.key >= 0 && e.key < IM_ARRAYSIZE(io.KeysDown))
-    {
-        switch (e.action)
-        {
-        case GLFW_PRESS:
-            io.KeysDown[e.key] = true;
-            break;
-        case GLFW_RELEASE:
-            io.KeysDown[e.key] = false;
-            break;
-        }
-    }
 
     if (io.WantCaptureKeyboard)
         e.consume(this);

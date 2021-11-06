@@ -66,6 +66,9 @@ static const char* host_ui_open_file(NativeHostHandle handle, bool isDir, const 
 static const char* host_ui_save_file(NativeHostHandle handle, bool isDir, const char* title, const char* filter);
 static intptr_t host_dispatcher(NativeHostHandle handle, NativeHostDispatcherOpcode opcode, int32_t index, intptr_t value, void* ptr, float opt);
 
+static void ildaeilParameterChangeForUI(void* ui, uint32_t index, float value);
+static const char* ildaeilOpenFileForUI(void* ui, bool isDir, const char* title, const char* filter);
+
 // --------------------------------------------------------------------------------------------------------------------
 
 struct IldaeilModule : Module {
@@ -94,6 +97,8 @@ struct IldaeilModule : Module {
 
     mutable NativeTimeInfo fCarlaTimeInfo;
     // mutable water::MemoryOutputStream fLastProjectState;
+
+    void* fUI = nullptr;
 
     float audioDataIn1[BUFFER_SIZE];
     float audioDataIn2[BUFFER_SIZE];
@@ -279,7 +284,7 @@ static bool host_write_midi_event(const NativeHostHandle handle, const NativeMid
 
 static void host_ui_parameter_changed(const NativeHostHandle handle, const uint32_t index, const float value)
 {
-    // ildaeilParameterChangeForUI(static_cast<IldaeilModule*>(handle)->fUI, index, value);
+    ildaeilParameterChangeForUI(static_cast<IldaeilModule*>(handle)->fUI, index, value);
 }
 
 static void host_ui_midi_program_changed(NativeHostHandle handle, uint8_t channel, uint32_t bank, uint32_t program)
@@ -299,8 +304,7 @@ static void host_ui_closed(NativeHostHandle handle)
 
 static const char* host_ui_open_file(const NativeHostHandle handle, const bool isDir, const char* const title, const char* const filter)
 {
-    // return ildaeilOpenFileForUI(static_cast<IldaeilModule*>(handle)->fUI, isDir, title, filter);
-    return nullptr;
+    return ildaeilOpenFileForUI(static_cast<IldaeilModule*>(handle)->fUI, isDir, title, filter);
 }
 
 static const char* host_ui_save_file(NativeHostHandle, bool, const char*, const char*)
@@ -316,7 +320,7 @@ static intptr_t host_dispatcher(const NativeHostHandle handle, const NativeHostD
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct IldaeilWidget : ImGuiWidget, public Thread {
+struct IldaeilWidget : ImGuiWidget, Thread {
     static constexpr const uint kButtonHeight = 20;
 
     struct PluginInfoCache {
@@ -432,15 +436,15 @@ struct IldaeilWidget : ImGuiWidget, public Thread {
             fDrawingState = kDrawingPluginPendingFromInit;
             fPluginHasCustomUI = hints & PLUGIN_HAS_CUSTOM_UI;
         }
+
+        module->fUI = this;
     }
 
     ~IldaeilWidget() override
     {
         if (module != nullptr && module->fCarlaHostHandle != nullptr)
         {
-            /*
             module->fUI = nullptr;
-            */
             carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, "0");
         }
 
@@ -473,15 +477,15 @@ struct IldaeilWidget : ImGuiWidget, public Thread {
         }
     }
 
-    /*
     const char* openFileFromDSP(const bool isDir, const char* const title, const char* const filter)
     {
+        /*
         Window::FileBrowserOptions opts;
         opts.title = title;
         getWindow().openFileBrowser(opts);
+        */
         return nullptr;
     }
-    */
 
     void showPluginUI(const CarlaHostHandle handle)
     {
@@ -618,8 +622,10 @@ struct IldaeilWidget : ImGuiWidget, public Thread {
         return false;
     }
 
-    void onContextCreate(const ContextCreateEvent&) override
+    void onContextCreate(const ContextCreateEvent& e) override
     {
+        ImGuiWidget::onContextCreate(e);
+
         /*
         if (module == nullptr || module->fCarlaHostHandle == nullptr)
             return;
@@ -632,9 +638,11 @@ struct IldaeilWidget : ImGuiWidget, public Thread {
         carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, winIdStr);
     }
 
-    void onContextDestroy(const ContextDestroyEvent&) override
+    void onContextDestroy(const ContextDestroyEvent& e) override
     {
         carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, "0");
+
+        ImGuiWidget::onContextDestroy(e);
     }
 
     void step() override
@@ -1090,6 +1098,22 @@ struct IldaeilWidget : ImGuiWidget, public Thread {
 
 // --------------------------------------------------------------------------------------------------------------------
 
+static void ildaeilParameterChangeForUI(void* const ui, const uint32_t index, const float value)
+{
+    DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
+
+    static_cast<IldaeilWidget*>(ui)->changeParameterFromDSP(index, value);
+}
+
+static const char* ildaeilOpenFileForUI(void* const ui, const bool isDir, const char* const title, const char* const filter)
+{
+    DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr, nullptr);
+
+    return static_cast<IldaeilWidget*>(ui)->openFileFromDSP(isDir, title, filter);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 struct IldaeilModuleWidget : ModuleWidget {
     IldaeilWidget* ildaeilWidget = nullptr;
 
@@ -1098,7 +1122,8 @@ struct IldaeilModuleWidget : ModuleWidget {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/glBars.svg")));
 
-        ildaeilWidget = new IldaeilWidget(module, reinterpret_cast<CardinalPluginContext*>(APP)->nativeWindowId);
+        ildaeilWidget = new IldaeilWidget(static_cast<IldaeilModule*>(module),
+                                          reinterpret_cast<CardinalPluginContext*>(APP)->nativeWindowId);
         ildaeilWidget->box.pos = Vec(2 * RACK_GRID_WIDTH, 0);
         ildaeilWidget->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH, box.size.y);
         addChild(ildaeilWidget);

@@ -34,6 +34,10 @@ struct ImGuiWidget : OpenGlWidget {
         ImGui::ShowDemoWindow();
     }
 
+protected:
+    void onContextCreate(const ContextCreateEvent& e) override;
+    void onContextDestroy(const ContextDestroyEvent& e) override;
+
 private:
     void drawFramebuffer() override;
     void onHover(const HoverEvent& e) override;
