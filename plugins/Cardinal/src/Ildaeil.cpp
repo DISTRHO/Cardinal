@@ -401,8 +401,8 @@ struct IldaeilWidget : ImGuiWidget, public Thread {
 
     IldaeilModule* const module;
 
-    IldaeilWidget(IldaeilModule* const m, const float w, const float h, const uintptr_t nativeWindowId)
-        : ImGuiWidget(w, h),
+    IldaeilWidget(IldaeilModule* const m, const uintptr_t nativeWindowId)
+        : ImGuiWidget(),
           module(m)
     {
         if (module == nullptr || module->fCarlaHostHandle == nullptr)
@@ -1098,8 +1098,7 @@ struct IldaeilModuleWidget : ModuleWidget {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/glBars.svg")));
 
-        ildaeilWidget = new IldaeilWidget(module, box.size.x - 2 * RACK_GRID_WIDTH, box.size.y,
-                                          reinterpret_cast<CardinalPluginContext*>(APP)->nativeWindowId);
+        ildaeilWidget = new IldaeilWidget(module, reinterpret_cast<CardinalPluginContext*>(APP)->nativeWindowId);
         ildaeilWidget->box.pos = Vec(2 * RACK_GRID_WIDTH, 0);
         ildaeilWidget->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH, box.size.y);
         addChild(ildaeilWidget);

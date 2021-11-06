@@ -24,7 +24,7 @@ struct ImGuiWidget : OpenGlWidget {
     struct PrivateData;
     PrivateData* const imData;
 
-    ImGuiWidget(float width, float height);
+    ImGuiWidget();
     ~ImGuiWidget() override;
 
     virtual void drawImGui()
@@ -38,6 +38,7 @@ private:
     void drawFramebuffer() override;
     void onHover(const HoverEvent& e) override;
     void onDragHover(const DragHoverEvent& e) override;
+    void onDragLeave(const DragLeaveEvent& e) override;
     void onHoverScroll(const HoverScrollEvent& e) override;
     void onButton(const ButtonEvent& e) override;
     void onSelectKey(const SelectKeyEvent& e) override;

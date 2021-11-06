@@ -26,7 +26,7 @@
 struct ImGuiWidget::PrivateData {
     ImGuiContext* context;
 
-    PrivateData(const float width, const float height, const double scaleFactor = 1.0)
+    PrivateData(const double scaleFactor = 1.0)
     {
         IMGUI_CHECKVERSION();
         context = ImGui::CreateContext();
@@ -34,14 +34,12 @@ struct ImGuiWidget::PrivateData {
 
         ImGuiIO& io(ImGui::GetIO());
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-        io.DisplaySize.x = width;
-        io.DisplaySize.y = height;
-        // not needed, we handle this ourselves
-        // io.DisplayFramebufferScale = ImVec2(scaleFactor, scaleFactor);
         io.IniFilename = nullptr;
 
+        /*
         ImGuiStyle& style(ImGui::GetStyle());
         style.ScaleAllSizes(scaleFactor);
+        */
 
 #ifndef DGL_NO_SHARED_RESOURCES
         using namespace dpf_resources;
@@ -54,30 +52,28 @@ struct ImGuiWidget::PrivateData {
         io.Fonts->Build();
 #endif
 
-        io.KeyMap[ImGuiKey_Tab] = '\t';
-        /*
-        io.KeyMap[ImGuiKey_LeftArrow] = 0xff + kKeyLeft - kKeyF1;
-        io.KeyMap[ImGuiKey_RightArrow] = 0xff + kKeyRight - kKeyF1;
-        io.KeyMap[ImGuiKey_UpArrow] = 0xff + kKeyUp - kKeyF1;
-        io.KeyMap[ImGuiKey_DownArrow] = 0xff + kKeyDown - kKeyF1;
-        io.KeyMap[ImGuiKey_PageUp] = 0xff + kKeyPageUp - kKeyF1;
-        io.KeyMap[ImGuiKey_PageDown] = 0xff + kKeyPageDown - kKeyF1;
-        io.KeyMap[ImGuiKey_Home] = 0xff + kKeyHome - kKeyF1;
-        io.KeyMap[ImGuiKey_End] = 0xff + kKeyEnd - kKeyF1;
-        io.KeyMap[ImGuiKey_Insert] = 0xff + kKeyInsert - kKeyF1;
-        io.KeyMap[ImGuiKey_Delete] = kKeyDelete;
-        io.KeyMap[ImGuiKey_Backspace] = kKeyBackspace;
-        */
-        io.KeyMap[ImGuiKey_Space] = ' ';
-        io.KeyMap[ImGuiKey_Enter] = '\r';
-        io.KeyMap[ImGuiKey_Escape] = '\e';
-        // io.KeyMap[ImGuiKey_KeyPadEnter] = '\n';
-        io.KeyMap[ImGuiKey_A] = 'a';
-        io.KeyMap[ImGuiKey_C] = 'c';
-        io.KeyMap[ImGuiKey_V] = 'v';
-        io.KeyMap[ImGuiKey_X] = 'x';
-        io.KeyMap[ImGuiKey_Y] = 'y';
-        io.KeyMap[ImGuiKey_Z] = 'z';
+        io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
+        io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
+        io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
+        io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
+        io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
+        io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
+        io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
+        io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
+        io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
+        io.KeyMap[ImGuiKey_Insert] = GLFW_KEY_INSERT;
+        io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
+        io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
+        io.KeyMap[ImGuiKey_Space] = GLFW_KEY_SPACE;
+        io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
+        io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
+        io.KeyMap[ImGuiKey_KeyPadEnter] = GLFW_KEY_KP_ENTER;
+        io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
+        io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
+        io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
+        io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
+        io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
+        io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
         ImGui_ImplOpenGL2_Init();
     }
@@ -90,8 +86,8 @@ struct ImGuiWidget::PrivateData {
     }
 };
 
-ImGuiWidget::ImGuiWidget(const float width, const float height)
-    : imData(new PrivateData(width, height))
+ImGuiWidget::ImGuiWidget()
+    : imData(new PrivateData())
 {
 }
 
@@ -102,16 +98,16 @@ ImGuiWidget::~ImGuiWidget()
 
 void ImGuiWidget::drawFramebuffer()
 {
-//     const math::Vec fbSize = getFramebufferSize();
-//     glMatrixMode(GL_PROJECTION);
-//     glLoadIdentity();
-//     glOrtho(0.0, fbSize.x, fbSize.y, 0.0, 0.0, 1.0);
-//     glViewport(0.0, 0.0, fbSize.x, fbSize.y);
-//     glMatrixMode(GL_MODELVIEW);
-//     glLoadIdentity();
-//     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    const math::Vec fbSize = getFramebufferSize();
 
     ImGui::SetCurrentContext(imData->context);
+    ImGuiIO& io(ImGui::GetIO());
+
+    io.DisplayFramebufferScale = ImVec2(fbSize.x / box.size.x, fbSize.y / box.size.y);
+    io.DisplaySize = ImVec2(box.size.x, box.size.y);
+
+    // TODO io.DeltaTime
+
     ImGui_ImplOpenGL2_NewFrame();
     ImGui::NewFrame();
 
@@ -120,13 +116,7 @@ void ImGuiWidget::drawFramebuffer()
     ImGui::Render();
 
     if (ImDrawData* const data = ImGui::GetDrawData())
-    {
-        // data->DisplayPos.x = -imData->getDisplayX();
-        // data->DisplayPos.y = imData->getDisplayY();
-        data->DisplayPos.x = 0;
-        data->DisplayPos.y = 0;
         ImGui_ImplOpenGL2_RenderDrawData(data);
-    }
 }
 
 void ImGuiWidget::onHover(const HoverEvent& e)
@@ -136,7 +126,6 @@ void ImGuiWidget::onHover(const HoverEvent& e)
     ImGuiIO& io(ImGui::GetIO());
     io.MousePos.x = e.pos.x + e.mouseDelta.x;
     io.MousePos.y = e.pos.y + e.mouseDelta.y;
-
 }
 
 void ImGuiWidget::onDragHover(const DragHoverEvent& e)
@@ -146,6 +135,18 @@ void ImGuiWidget::onDragHover(const DragHoverEvent& e)
     ImGuiIO& io(ImGui::GetIO());
     io.MousePos.x = e.pos.x + e.mouseDelta.x;
     io.MousePos.y = e.pos.y + e.mouseDelta.y;
+}
+
+void ImGuiWidget::onDragLeave(const DragLeaveEvent& e)
+{
+    ImGui::SetCurrentContext(imData->context);
+
+    // FIXME this is not the correct event..
+    ImGuiIO& io(ImGui::GetIO());
+    io.MouseDown[0] = io.MouseDown[1] = io.MouseDown[2] = false;
+
+    if (io.WantCaptureMouse)
+        e.consume(this);
 }
 
 void ImGuiWidget::onHoverScroll(const HoverScrollEvent& e)
@@ -171,12 +172,16 @@ void ImGuiWidget::onButton(const ButtonEvent& e)
     case GLFW_MOUSE_BUTTON_LEFT:
         io.MouseDown[0] = e.action == GLFW_PRESS;
         break;
+    /* Don't capture these, let Cardinal handle it instead
     case GLFW_MOUSE_BUTTON_MIDDLE:
         io.MouseDown[1] = e.action == GLFW_PRESS;
         break;
     case GLFW_MOUSE_BUTTON_RIGHT:
         io.MouseDown[2] = e.action == GLFW_PRESS;
         break;
+    */
+    default:
+        return;
     }
 
     io.KeyCtrl  = e.mods & GLFW_MOD_CTRL;
@@ -199,16 +204,18 @@ void ImGuiWidget::onSelectKey(const SelectKeyEvent& e)
     io.KeyAlt   = e.mods & GLFW_MOD_ALT;
     io.KeySuper = e.mods & GLFW_MOD_SUPER;
 
-    // printf("onSelectKey %i %i\n", e.key, e.scancode);
-
-    // d_stdout("onKeyboard %u %u", event.key, event.keycode);
-
-    /*
-    if (event.key <= kKeyDelete)
-        io.KeysDown[event.key] = event.press;
-    else if (event.key >= kKeyF1 && event.key <= kKeyPause)
-        io.KeysDown[0xff + event.key - kKeyF1] = event.press;
-    */
+    if (e.key >= 0 && e.key < IM_ARRAYSIZE(io.KeysDown))
+    {
+        switch (e.action)
+        {
+        case GLFW_PRESS:
+            io.KeysDown[e.key] = true;
+            break;
+        case GLFW_RELEASE:
+            io.KeysDown[e.key] = false;
+            break;
+        }
+    }
 
     if (io.WantCaptureKeyboard)
         e.consume(this);
@@ -219,24 +226,7 @@ void ImGuiWidget::onSelectText(const SelectTextEvent& e)
     ImGui::SetCurrentContext(imData->context);
 
     ImGuiIO& io(ImGui::GetIO());
-
-    switch (e.codepoint)
-    {
-      /*
-    case kKeyBackspace:
-    case kKeyDelete:
-      */
-    case '\e':
-    case '\n':
-    case '\r':
-    case '\t':
-        break;
-    default:
-        // d_stdout("input %u %u %lu '%s'", event.keycode, event.character, std::strlen(event.string), event.string);
-        char character[2] = { (char)e.codepoint, 0 };
-        io.AddInputCharactersUTF8(character);
-        break;
-    }
+    io.AddInputCharacter(e.codepoint);
 
     if (io.WantCaptureKeyboard)
         e.consume(this);
