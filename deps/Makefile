@@ -127,7 +127,7 @@ DEP_MAKE += MACHINE=$(MACHINE)$(MACHINE_SUFFIX)
 $(DEP_PATH)/lib/%.a:
 	$(DEP_MAKE) -C $(DEP_PATH) lib/$*.a
 
-# skip libarchive shared lib and ensure libzstd is enabled
+# libarchive: skip shared lib and ensure libzstd is enabled
 $(DEP_PATH)/lib/libarchive.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
 
 $(DEP_PATH)/lib/libarchive_static.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
@@ -141,12 +141,20 @@ $(DEP_PATH)/libarchive-3.4.3/.stamp-patched:
 	sed -i -e "s/TARGETS archive archive_static/TARGETS archive_static/" $(DEP_PATH)/libarchive-3.4.3/libarchive/CMakeLists.txt
 	touch $@
 
-# skip libsamplerate tests
+# libsamplerate: skip tests, fails to build in some systems and are not needed or wanted anyway
 $(DEP_PATH)/lib/libsamplerate.a: $(DEP_PATH)/libsamplerate-0.1.9/.stamp-patched
 
 $(DEP_PATH)/libsamplerate-0.1.9/.stamp-patched:
 	$(DEP_MAKE) -C $(DEP_PATH) libsamplerate-0.1.9
 	sed -i -e "s/src doc examples tests/src/" $(DEP_PATH)/libsamplerate-0.1.9/Makefile.in
+	touch $@
+
+# libspeexdsp: hide symbols
+$(DEP_PATH)/lib/libspeexdsp.a: $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched
+
+$(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched:
+	$(DEP_MAKE) -C $(DEP_PATH) speexdsp-SpeexDSP-1.2rc3
+	sed -i -e "s/#pragma GCC visibility push/#error we dont want this/" $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/configure
 	touch $@
 
 # zstd cmake is borked, see https://github.com/facebook/zstd/issues/1401
