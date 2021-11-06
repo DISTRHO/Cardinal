@@ -155,7 +155,7 @@ BASE_FLAGS += -DHEADLESS
 endif
 
 ifeq ($(WITH_LTO),true)
-BASE_FLAGS += -fno-strict-aliasing -flto
+BASE_FLAGS += -fno-strict-aliasing -flto -ffat-lto-objects
 endif
 
 BUILD_C_FLAGS += -std=gnu11
@@ -191,7 +191,7 @@ EXTRA_LIBS += $(shell pkg-config --libs jansson libarchive samplerate speexdsp)
 endif
 
 ifeq ($(WITH_LTO),true)
-LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
+LINK_FLAGS += -fno-strict-aliasing -flto -ffat-lto-objects -fwhole-program -Werror=odr -Werror=lto-type-mismatch
 endif
 
 # --------------------------------------------------------------

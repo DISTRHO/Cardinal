@@ -235,7 +235,7 @@ jobs:
           WINEDLLOVERRIDES: "mscoree,mshtml="
         run: |
           make features
-          make WITH_LTO=true -j $(nproc)
+          make -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -269,7 +269,7 @@ jobs:
           WINEDLLOVERRIDES: "mscoree,mshtml="
         run: |
           make features
-          make WITH_LTO=true -j $(nproc)
+          make -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"

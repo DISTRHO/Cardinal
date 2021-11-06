@@ -62,7 +62,7 @@ BASE_FLAGS += -DHEADLESS
 endif
 
 ifeq ($(WITH_LTO),true)
-BASE_FLAGS += -fno-strict-aliasing -flto
+BASE_FLAGS += -fno-strict-aliasing -flto -ffat-lto-objects
 endif
 
 BUILD_C_FLAGS += -std=gnu11
