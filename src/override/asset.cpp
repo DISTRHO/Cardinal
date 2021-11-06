@@ -16,6 +16,7 @@
  */
 
 #include <asset.hpp>
+#include <string.hpp>
 #include <system.hpp>
 #include <plugin/Plugin.hpp>
 
@@ -49,6 +50,9 @@ std::string user(std::string filename) {
 
 // get system resource, trimming "res/" prefix if we are loaded as a plugin bundle
 std::string system(std::string filename) {
+    if (string::endsWith(filename, "ComponentLibrary/ScrewSilver.svg")) {
+        filename = filename.substr(0, filename.size()-32) + "ComponentLibrary/ScrewBlack.svg";
+    }
     return system::join(systemDir, bundlePath.empty() ? filename : trim(filename));
 }
 

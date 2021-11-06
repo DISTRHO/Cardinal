@@ -152,16 +152,15 @@ static const struct {
         "Fundamental/Scope.svg",
         {"path33887","path33891","path33893","path33889"}
     },
-    /* These 2 do not have logos on them?
+    // These 2 do not have logos on them
     {
         "Fundamental/SequentialSwitch1.svg",
-        {"_______","_______","_______","_______"}
+        {nullptr,nullptr,nullptr,nullptr}
     },
     {
         "Fundamental/SequentialSwitch2.svg",
-        {"_______","_______","_______","_______"}
+        {nullptr,nullptr,nullptr,nullptr}
     },
-    */
     {
         "Fundamental/Split.svg",
         {"path29999","path30003","path29997","path30001"}
@@ -174,16 +173,15 @@ static const struct {
         "Fundamental/Unity.svg",
         {"path21219","path21223","path21217","path21221"}
     },
-    /* These 2 do not have logos on them?
+    // These 2 also do not have logos on them
     {
         "Fundamental/VCA-1.svg",
-        {"_______","_______","_______","_______"}
+        {nullptr,nullptr,nullptr,nullptr}
     },
     {
         "Fundamental/VCA.svg",
-        {"_______","_______","_______","_______"}
+        {nullptr,nullptr,nullptr,nullptr}
     },
-    */
     {
         "Fundamental/VCF.svg",
         {"path25239","path25243","path25245","path25241"}
@@ -208,7 +206,7 @@ static const struct {
 
 static void removeShape(NSVGimage* const handle, const char* const id)
 {
-    for (NSVGshape *shape = handle->shapes, *old = nullptr; shape; old = shape, shape = shape->next)
+    for (NSVGshape *shape = handle->shapes, *old = nullptr; shape != nullptr; old = shape, shape = shape->next)
     {
         if (strcmp(shape->id, id) != 0)
             continue;
@@ -220,6 +218,31 @@ static void removeShape(NSVGimage* const handle, const char* const id)
 
         nsvg__deletePaths(shape->paths);
         free(shape);
+        break;
+    }
+}
+
+static void invertPaint(NSVGpaint& paint)
+{
+    if (paint.type != NSVG_PAINT_COLOR)
+        return;
+
+    switch (paint.color)
+    {
+    // scope (do nothing)
+    case 0x40ffffff:
+    case 0xff2b281e:
+        break;
+    // pure black (convert to not quite pure white)
+    case 0xff000000:
+        paint.color = 0xffd0d0d0;
+        break;
+    // all others (direct invert)
+    default:
+        paint.color = (paint.color & 0xff000000)
+                    | (0xff0000 - (paint.color & 0xff0000))
+                    | (0xff00 - (paint.color & 0xff00))
+                    | (0xff - (paint.color & 0xff));
         break;
     }
 }
@@ -243,11 +266,20 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
 
             if (std::strncmp(filename + (filenamelen-filterlen), pathToFilterOut, filterlen) == 0)
             {
-                puts("Removing CC-ND deadlock from file...");
-                removeShape(handle, pathsToFilterOut[i].shapes[0]);
-                removeShape(handle, pathsToFilterOut[i].shapes[1]);
-                removeShape(handle, pathsToFilterOut[i].shapes[2]);
-                removeShape(handle, pathsToFilterOut[i].shapes[3]);
+                if (pathsToFilterOut[i].shapes[0] != nullptr)
+                {
+                    puts("Removing CC-ND deadlock from file...");
+                    removeShape(handle, pathsToFilterOut[i].shapes[0]);
+                    removeShape(handle, pathsToFilterOut[i].shapes[1]);
+                    removeShape(handle, pathsToFilterOut[i].shapes[2]);
+                    removeShape(handle, pathsToFilterOut[i].shapes[3]);
+                }
+
+                for (NSVGshape* shape = handle->shapes; shape != nullptr; shape = shape->next)
+                {
+                    invertPaint(shape->fill);
+                    invertPaint(shape->stroke);
+                }
             }
         }
 
