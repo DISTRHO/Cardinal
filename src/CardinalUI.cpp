@@ -98,7 +98,10 @@ public:
           fContext(getRackContextFromPlugin(getPluginInstancePointer())),
           fResizeHandle(this)
     {
-        fContext->nativeWindowId = getWindow().getNativeWindowHandle();
+        Window& window(getWindow());
+
+        window.setIgnoringKeyRepeat(true);
+        fContext->nativeWindowId = window.getNativeWindowHandle();
 
         if (isResizable())
             fResizeHandle.hide();
@@ -115,7 +118,7 @@ public:
         if (fContext->scene->menuBar != nullptr)
             fContext->scene->removeChild(fContext->scene->menuBar);
 
-        fContext->scene->menuBar = rack::app::createMenuBar(getWindow(), getApp().isStandalone());
+        fContext->scene->menuBar = rack::app::createMenuBar(window, getApp().isStandalone());
         fContext->scene->addChildBelow(fContext->scene->menuBar, fContext->scene->rackScroll);
 
         fContext->window->step();
