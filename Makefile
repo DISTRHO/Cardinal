@@ -16,6 +16,17 @@ DESTDIR ?=
 SYSDEPS ?= false
 
 # --------------------------------------------------------------
+# Carla config
+
+CARLA_EXTRA_ARGS = \
+	HAVE_FFMPEG=false \
+	HAVE_FLUIDSYNTH=false \
+	HAVE_LIBMAGIC=false \
+	HAVE_SNDFILE=false \
+	USING_JUCE=false \
+	USING_JUCE_GUI_EXTRA=false
+
+# --------------------------------------------------------------
 # Check for system-wide dependencies
 
 ifeq ($(SYSDEPS),true)
@@ -60,10 +71,10 @@ endif
 # --------------------------------------------------------------
 
 cardinal: carla deps dgl plugins
-	$(MAKE) all -C src
+	$(MAKE) all -C src $(CARLA_EXTRA_ARGS)
 
 carla:
-	$(MAKE) -C carla plugin \
+	$(MAKE) plugin -C carla $(CARLA_EXTRA_ARGS) \
 		CAN_GENERATE_LV2_TTL=false \
 		STATIC_PLUGIN_TARGET=true
 
