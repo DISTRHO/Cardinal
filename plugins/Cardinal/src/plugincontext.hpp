@@ -33,8 +33,10 @@ struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize;
     double sampleRate;
     float parameters[kModuleParameters];
-    bool playing, reset;
-    int32_t bar, beat, beatsPerBar;
+    bool playing, reset, bbtValid;
+    int32_t bar, beat, beatsPerBar, beatType;
+    uint64_t frame;
+    double barStartTick, beatsPerMinute;
     double tick, tickClock, ticksPerBeat, ticksPerClock, ticksPerFrame;
     uintptr_t nativeWindowId;
     Plugin* const plugin;

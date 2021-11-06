@@ -16,6 +16,7 @@
  */
 
 #include "ImGuiWidget.hpp"
+#include "DistrhoUtils.hpp"
 
 #ifndef DGL_NO_SHARED_RESOURCES
 # include "../../../dpf/dgl/src/Resources.hpp"
@@ -24,12 +25,14 @@
 #include "DearImGui/imgui_impl_opengl2.h"
 
 struct ImGuiWidget::PrivateData {
-    ImGuiContext* context;
+    ImGuiContext* context = nullptr;
+    bool created = false;
 
     PrivateData(const double scaleFactor = 1.0)
     {
         IMGUI_CHECKVERSION();
         context = ImGui::CreateContext();
+        ImGui::SetCurrentContext(context);
 
         ImGuiIO& io(ImGui::GetIO());
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -77,6 +80,13 @@ struct ImGuiWidget::PrivateData {
 
     ~PrivateData()
     {
+        // this should not happen
+        if (created)
+        {
+            ImGui::SetCurrentContext(context);
+            ImGui_ImplOpenGL2_Shutdown();
+        }
+
         ImGui::DestroyContext(context);
     }
 };
@@ -92,15 +102,21 @@ ImGuiWidget::~ImGuiWidget()
 void ImGuiWidget::onContextCreate(const ContextCreateEvent& e)
 {
     OpenGlWidget::onContextCreate(e);
+    DISTRHO_SAFE_ASSERT_RETURN(!imData->created,);
 
     ImGui::SetCurrentContext(imData->context);
     ImGui_ImplOpenGL2_Init();
+    imData->created = true;
 }
 
 void ImGuiWidget::onContextDestroy(const ContextDestroyEvent& e)
 {
-    ImGui::SetCurrentContext(imData->context);
-    ImGui_ImplOpenGL2_Shutdown();
+    if (imData->created)
+    {
+        ImGui::SetCurrentContext(imData->context);
+        ImGui_ImplOpenGL2_Shutdown();
+        imData->created = false;
+    }
 
     OpenGlWidget::onContextDestroy(e);
 }
@@ -114,6 +130,12 @@ void ImGuiWidget::drawFramebuffer()
 
     io.DisplayFramebufferScale = ImVec2(fbSize.x / box.size.x, fbSize.y / box.size.y);
     io.DisplaySize = ImVec2(box.size.x, box.size.y);
+
+    if (!imData->created)
+    {
+        ImGui_ImplOpenGL2_Init();
+        imData->created = true;
+    }
 
     // TODO io.DeltaTime
 

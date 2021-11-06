@@ -89,6 +89,8 @@ struct IldaeilModule : Module {
         NUM_LIGHTS
     };
 
+    CardinalPluginContext* const pcontext;
+
     const NativePluginDescriptor* fCarlaPluginDescriptor = nullptr;
     NativePluginHandle fCarlaPluginHandle = nullptr;
 
@@ -107,6 +109,7 @@ struct IldaeilModule : Module {
     unsigned audioDataFill = 0;
 
     IldaeilModule()
+        : pcontext(reinterpret_cast<CardinalPluginContext*>(APP))
     {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
@@ -172,19 +175,19 @@ struct IldaeilModule : Module {
 
     const NativeTimeInfo* hostGetTimeInfo() const noexcept
     {
-        if (CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP))
+        if (pcontext != nullptr)
         {
             fCarlaTimeInfo.playing = pcontext->playing;
-            // fCarlaTimeInfo.frame = timePos.frame;
-            // fCarlaTimeInfo.bbt.valid = timePos.bbt.valid;
+            fCarlaTimeInfo.frame = pcontext->frame;
+            fCarlaTimeInfo.bbt.valid = pcontext->bbtValid;
             fCarlaTimeInfo.bbt.bar = pcontext->bar;
             fCarlaTimeInfo.bbt.beat = pcontext->beat;
             fCarlaTimeInfo.bbt.tick = pcontext->tick;
-            // fCarlaTimeInfo.bbt.barStartTick = timePos.bbt.barStartTick;
+            fCarlaTimeInfo.bbt.barStartTick = pcontext->barStartTick;
             fCarlaTimeInfo.bbt.beatsPerBar = pcontext->beatsPerBar;
-            // fCarlaTimeInfo.bbt.beatType = timePos.bbt.beatType;
+            fCarlaTimeInfo.bbt.beatType = pcontext->beatType;
             fCarlaTimeInfo.bbt.ticksPerBeat = pcontext->ticksPerBeat;
-            // fCarlaTimeInfo.bbt.beatsPerMinute = timePos.bbt.beatsPerMinute;
+            fCarlaTimeInfo.bbt.beatsPerMinute = pcontext->beatsPerMinute;
         }
 
         return &fCarlaTimeInfo;
@@ -405,7 +408,7 @@ struct IldaeilWidget : ImGuiWidget, Thread {
 
     IldaeilModule* const module;
 
-    IldaeilWidget(IldaeilModule* const m, const uintptr_t nativeWindowId)
+    IldaeilWidget(IldaeilModule* const m)
         : ImGuiWidget(),
           module(m)
     {
@@ -424,7 +427,7 @@ struct IldaeilWidget : ImGuiWidget, Thread {
         const CarlaHostHandle handle = module->fCarlaHostHandle;
 
         char winIdStr[24];
-        std::snprintf(winIdStr, sizeof(winIdStr), "%lx", (ulong)nativeWindowId);
+        std::snprintf(winIdStr, sizeof(winIdStr), "%lx", (ulong)module->pcontext->nativeWindowId);
         carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, winIdStr);
         /*
         carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_UI_SCALE, getScaleFactor()*1000, nullptr);
@@ -626,21 +629,18 @@ struct IldaeilWidget : ImGuiWidget, Thread {
     {
         ImGuiWidget::onContextCreate(e);
 
-        /*
-        if (module == nullptr || module->fCarlaHostHandle == nullptr)
+        if (module == nullptr || module->pcontext == nullptr || module->fCarlaHostHandle == nullptr)
             return;
-        */
-
-        const uintptr_t nativeWindowId = reinterpret_cast<CardinalPluginContext*>(APP)->nativeWindowId;
 
         char winIdStr[24];
-        std::snprintf(winIdStr, sizeof(winIdStr), "%lx", (ulong)nativeWindowId);
+        std::snprintf(winIdStr, sizeof(winIdStr), "%lx", (ulong)module->pcontext->nativeWindowId);
         carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, winIdStr);
     }
 
     void onContextDestroy(const ContextDestroyEvent& e) override
     {
-        carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, "0");
+        if (module != nullptr && module->fCarlaHostHandle != nullptr)
+            carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, "0");
 
         ImGuiWidget::onContextDestroy(e);
     }
@@ -1122,11 +1122,13 @@ struct IldaeilModuleWidget : ModuleWidget {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/glBars.svg")));
 
-        ildaeilWidget = new IldaeilWidget(static_cast<IldaeilModule*>(module),
-                                          reinterpret_cast<CardinalPluginContext*>(APP)->nativeWindowId);
-        ildaeilWidget->box.pos = Vec(2 * RACK_GRID_WIDTH, 0);
-        ildaeilWidget->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH, box.size.y);
-        addChild(ildaeilWidget);
+        if (module != nullptr && module->pcontext != nullptr)
+        {
+            ildaeilWidget = new IldaeilWidget(module);
+            ildaeilWidget->box.pos = Vec(2 * RACK_GRID_WIDTH, 0);
+            ildaeilWidget->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH, box.size.y);
+            addChild(ildaeilWidget);
+        }
 
         addChild(createWidget<ScrewSilver>(Vec(0, 0)));
         addChild(createWidget<ScrewSilver>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));

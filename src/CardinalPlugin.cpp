@@ -818,6 +818,8 @@ protected:
         {
             const TimePosition& timePos(getTimePosition());
             context->playing = timePos.playing;
+            context->bbtValid = timePos.bbt.valid;
+            context->frame = timePos.frame;
 
             if (timePos.bbt.valid)
             {
@@ -827,6 +829,9 @@ protected:
                 context->bar = timePos.bbt.bar;
                 context->beat = timePos.bbt.beat;
                 context->beatsPerBar = timePos.bbt.beatsPerBar;
+                context->beatType = timePos.bbt.beatType;
+                context->barStartTick = timePos.bbt.barStartTick;
+                context->beatsPerMinute = timePos.bbt.beatsPerMinute;
                 context->tick = timePos.bbt.tick;
                 context->ticksPerBeat = timePos.bbt.ticksPerBeat;
                 context->ticksPerClock = timePos.bbt.ticksPerBeat / timePos.bbt.beatType;
