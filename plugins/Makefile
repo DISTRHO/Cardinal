@@ -532,6 +532,7 @@ BASE_FLAGS += -I../src/Rack/dep/pffft
 BASE_FLAGS += -pthread
 
 ifneq ($(SYSDEPS),true)
+BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 BASE_FLAGS += -I../src/Rack/dep/include
 endif
 

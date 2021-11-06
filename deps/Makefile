@@ -15,6 +15,7 @@ include ../dpf/Makefile.base.mk
 # --------------------------------------------------------------
 # custom build flags
 
+BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat
 BASE_FLAGS += -pthread
@@ -39,13 +40,13 @@ BUILD_CXX_FLAGS += -fno-finite-math-only
 
 ifeq ($(CPU_AARCH64),true)
 ARCH_NAME = aarch64
-MACHINE = x86_64-bring-forth-the-rack
+MACHINE = x86_64-the-rack
 else ifeq ($(CPU_ARM64),true)
 ARCH_NAME = arm64
-MACHINE = x86_64-bring-forth-the-rack
+MACHINE = x86_64-the-rack
 else ifeq ($(CPU_ARM),true)
 ARCH_NAME = arm
-MACHINE = i686-bring-forth-the-rack
+MACHINE = i686-the-rack
 else
 MACHINE = $(TARGET_MACHINE)
 endif

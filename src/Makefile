@@ -38,6 +38,7 @@ BASE_FLAGS += -IRack/include
 ifeq ($(SYSDEPS),true)
 BASE_FLAGS += $(shell pkg-config --cflags jansson libarchive samplerate speexdsp)
 else
+BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 BASE_FLAGS += -IRack/dep/include
 endif
 BASE_FLAGS += -IRack/dep/filesystem/include
