@@ -70,10 +70,8 @@ struct ImGuiWidget::PrivateData {
         */
         io.KeyMap[ImGuiKey_Space] = ' ';
         io.KeyMap[ImGuiKey_Enter] = '\r';
-        /*
-        io.KeyMap[ImGuiKey_Escape] = kKeyEscape;
+        io.KeyMap[ImGuiKey_Escape] = '\e';
         // io.KeyMap[ImGuiKey_KeyPadEnter] = '\n';
-        */
         io.KeyMap[ImGuiKey_A] = 'a';
         io.KeyMap[ImGuiKey_C] = 'c';
         io.KeyMap[ImGuiKey_V] = 'v';
@@ -201,7 +199,7 @@ void ImGuiWidget::onSelectKey(const SelectKeyEvent& e)
     io.KeyAlt   = e.mods & GLFW_MOD_ALT;
     io.KeySuper = e.mods & GLFW_MOD_SUPER;
 
-    printf("onSelectKey %i %i\n", e.key, e.scancode);
+    // printf("onSelectKey %i %i\n", e.key, e.scancode);
 
     // d_stdout("onKeyboard %u %u", event.key, event.keycode);
 
@@ -226,9 +224,9 @@ void ImGuiWidget::onSelectText(const SelectTextEvent& e)
     {
       /*
     case kKeyBackspace:
-    case kKeyEscape:
     case kKeyDelete:
       */
+    case '\e':
     case '\n':
     case '\r':
     case '\t':
