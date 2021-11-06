@@ -406,6 +406,7 @@ public:
 
         {
             const ScopedContext sc(this);
+            context->patch->clear();
             delete context;
         }
 
