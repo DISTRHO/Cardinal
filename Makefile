@@ -59,7 +59,7 @@ endif
 
 # --------------------------------------------------------------
 
-cardinal: deps dgl plugins
+cardinal: carla deps dgl plugins
 	$(MAKE) all -C src
 
 carla:
@@ -96,6 +96,7 @@ endif
 # --------------------------------------------------------------
 
 clean:
+	$(MAKE) distclean -C carla
 	$(MAKE) clean -C deps
 	$(MAKE) clean -C dpf/dgl
 	$(MAKE) clean -C dpf/utils/lv2-ttl-generator

@@ -66,9 +66,6 @@ static const char* host_ui_open_file(NativeHostHandle handle, bool isDir, const 
 static const char* host_ui_save_file(NativeHostHandle handle, bool isDir, const char* title, const char* filter);
 static intptr_t host_dispatcher(NativeHostHandle handle, NativeHostDispatcherOpcode opcode, int32_t index, intptr_t value, void* ptr, float opt);
 
-static void ildaeilParameterChangeForUI(void* ui, uint32_t index, float value);
-static const char* ildaeilOpenFileForUI(void* ui, bool isDir, const char* title, const char* filter);
-
 // --------------------------------------------------------------------------------------------------------------------
 
 struct IldaeilModule : Module {
@@ -285,11 +282,6 @@ static bool host_write_midi_event(const NativeHostHandle handle, const NativeMid
     return false;
 }
 
-static void host_ui_parameter_changed(const NativeHostHandle handle, const uint32_t index, const float value)
-{
-    ildaeilParameterChangeForUI(static_cast<IldaeilModule*>(handle)->fUI, index, value);
-}
-
 static void host_ui_midi_program_changed(NativeHostHandle handle, uint8_t channel, uint32_t bank, uint32_t program)
 {
     d_stdout("%s %p %u %u %u", __FUNCTION__, handle, channel, bank, program);
@@ -303,11 +295,6 @@ static void host_ui_custom_data_changed(NativeHostHandle handle, const char* key
 static void host_ui_closed(NativeHostHandle handle)
 {
     d_stdout("%s %p", __FUNCTION__, handle);
-}
-
-static const char* host_ui_open_file(const NativeHostHandle handle, const bool isDir, const char* const title, const char* const filter)
-{
-    return ildaeilOpenFileForUI(static_cast<IldaeilModule*>(handle)->fUI, isDir, title, filter);
 }
 
 static const char* host_ui_save_file(NativeHostHandle, bool, const char*, const char*)
@@ -480,14 +467,13 @@ struct IldaeilWidget : ImGuiWidget, Thread {
         }
     }
 
-    const char* openFileFromDSP(const bool isDir, const char* const title, const char* const filter)
+    void openFileFromDSP(const bool isDir, const char* const title, const char* const filter)
     {
         /*
         Window::FileBrowserOptions opts;
         opts.title = title;
         getWindow().openFileBrowser(opts);
         */
-        return nullptr;
     }
 
     void showPluginUI(const CarlaHostHandle handle)
@@ -1098,18 +1084,19 @@ struct IldaeilWidget : ImGuiWidget, Thread {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void ildaeilParameterChangeForUI(void* const ui, const uint32_t index, const float value)
+static void host_ui_parameter_changed(const NativeHostHandle handle, const uint32_t index, const float value)
 {
-    DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
-
-    static_cast<IldaeilWidget*>(ui)->changeParameterFromDSP(index, value);
+    if (IldaeilWidget* const ui = static_cast<IldaeilWidget*>(static_cast<IldaeilModule*>(handle)->fUI))
+        ui->changeParameterFromDSP(index, value);
 }
 
-static const char* ildaeilOpenFileForUI(void* const ui, const bool isDir, const char* const title, const char* const filter)
+static const char* host_ui_open_file(const NativeHostHandle handle,
+                                     const bool isDir, const char* const title, const char* const filter)
 {
-    DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr, nullptr);
+    if (IldaeilWidget* const ui = static_cast<IldaeilWidget*>(static_cast<IldaeilModule*>(handle)->fUI))
+        ui->openFileFromDSP(isDir, title, filter);
 
-    return static_cast<IldaeilWidget*>(ui)->openFileFromDSP(isDir, title, filter);
+    return nullptr;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
