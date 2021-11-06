@@ -26,6 +26,11 @@
 #include "water/streams/MemoryOutputStream.h"
 #include "water/xml/XmlDocument.h"
 
+extern "C" {
+// private method that takes ownership, we can use it to avoid superfulous allocations
+json_t *jsonp_stringn_nocheck_own(const char* value, size_t len);
+}
+
 #define BUFFER_SIZE 128
 
 // generates a warning if this is defined as anything else
@@ -219,6 +224,34 @@ struct IldaeilModule : Module {
         }
 
         return 0;
+    }
+
+    json_t* dataToJson() override
+    {
+        if (fCarlaHostHandle == nullptr)
+            return nullptr;
+
+        CarlaEngine* const engine = carla_get_engine_from_handle(fCarlaHostHandle);
+
+        water::MemoryOutputStream projectState;
+        engine->saveProjectInternal(projectState);
+
+        const size_t dataSize = projectState.getDataSize();
+        return jsonp_stringn_nocheck_own(static_cast<const char*>(projectState.getDataAndRelease()), dataSize);
+    }
+
+    void dataFromJson(json_t* const rootJ) override
+    {
+        if (fCarlaHostHandle == nullptr)
+            return;
+
+        const char* const projectState = json_string_value(rootJ);
+        DISTRHO_SAFE_ASSERT_RETURN(projectState != nullptr,);
+
+        CarlaEngine* const engine = carla_get_engine_from_handle(fCarlaHostHandle);
+
+        water::XmlDocument xml(projectState);
+        engine->loadProjectInternal(xml, true);
     }
 
     void process(const ProcessArgs&) override
