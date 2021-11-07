@@ -409,6 +409,18 @@ static bool invertPaint(NSVGpaint& paint, const char* const svgFileToInvert = nu
     case 0xff303030:
     case 0xff362c23:
     case 0xff40352c:
+    case 0xff5735d9:
+    case 0xff5935d8:
+    case 0xff5c26d9:
+    case 0xff6140db:
+    case 0xffa09400:
+    case 0xffa19400:
+    case 0xffa7a100:
+    case 0xffa8a200:
+    case 0xffaba102:
+    case 0xff22a5e9:
+    case 0xff6140da:
+    case 0xff119ee6:
         return false;
     // pure black (convert to not quite pure white)
     case 0xff000000:
@@ -496,6 +508,11 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
 
             return handle;
         }
+
+        // Special case for AmalgamatedHarmonics background color
+        if (handle->shapes != nullptr && handle->shapes->fill.color == 0xff000000)
+            if (std::strstr(filename, "/AmalgamatedHarmonics/") != nullptr)
+                handle->shapes->fill.color = 0xff191919;
 
         return handle;
     }
