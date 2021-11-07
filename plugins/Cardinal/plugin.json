@@ -41,6 +41,15 @@
       ]
     },
     {
+      "slug": "Carla",
+      "disabled": false,
+      "name": "Carla Plugin Host",
+      "description": "A modular plugin host within Cardinal",
+      "tags": [
+        "Utility"
+      ]
+    },
+    {
       "slug": "Ildaeil",
       "disabled": false,
       "name": "Ildaeil Plugin Host",

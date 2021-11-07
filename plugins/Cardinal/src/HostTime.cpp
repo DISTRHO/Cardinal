@@ -53,8 +53,9 @@ struct HostTime : Module {
         if (CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP))
         {
             const bool playing = pcontext->playing;
+            const bool playingWithBBT = playing && pcontext->bbtValid;
 
-            if (playing)
+            if (playingWithBBT)
             {
                 if (pcontext->tick == 0.0)
                 {
@@ -95,8 +96,12 @@ struct HostTime : Module {
             const bool hasBar = pulseBar.process(args.sampleTime);
             const bool hasBeat = pulseBeat.process(args.sampleTime);
             const bool hasClock = pulseClock.process(args.sampleTime);
-            const float beatPhase = pcontext->ticksPerBeat > 0.0 ? pcontext->tick / pcontext->ticksPerBeat : 0.0;
-            const float barPhase = pcontext->beatsPerBar > 0 ? ((float) (pcontext->beat - 1) + beatPhase) / pcontext->beatsPerBar : 0.0;
+            const float beatPhase = playingWithBBT && pcontext->ticksPerBeat > 0.0
+                                  ? pcontext->tick / pcontext->ticksPerBeat
+                                  : 0.0f;
+            const float barPhase = playingWithBBT && pcontext->beatsPerBar > 0
+                                 ? ((float) (pcontext->beat - 1) + beatPhase) / pcontext->beatsPerBar
+                                 : 0.0f;
 
             lights[kHostTimeRolling].setBrightness(playing ? 1.0f : 0.0f);
             lights[kHostTimeReset].setBrightnessSmooth(hasReset ? 1.0f : 0.0f, args.sampleTime * 0.5f);
@@ -155,10 +160,10 @@ struct HostTimeWidget : ModuleWidget {
         const float y = startY + offset * padding;
         nvgBeginPath(vg);
         nvgRoundedRect(vg, startX - 1.0f, y - 2.0f, box.size.x - (startX + 1) * 2, 28.0f, 4);
-        nvgFillColor(vg, nvgRGBA(0xda, 0xda, 0xda, 0xf0));
+        nvgFillColor(vg, nvgRGB(0xd0, 0xd0, 0xd0));
         nvgFill(vg);
-        nvgStrokeColor(vg, nvgRGBA(0x4a, 0x4a, 0x4a, 0xc0));
-        nvgStroke(vg);
+//         nvgStrokeColor(vg, nvgRGBA(0x4a, 0x4a, 0x4a, 0xc0));
+//         nvgStroke(vg);
         nvgBeginPath(vg);
         nvgFillColor(vg, color::BLACK);
         nvgText(vg, startX + 36, y + 16, text, nullptr);

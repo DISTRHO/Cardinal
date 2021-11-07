@@ -296,8 +296,9 @@ static uint32_t host_get_buffer_size(const NativeHostHandle handle)
 
 static double host_get_sample_rate(const NativeHostHandle handle)
 {
-    // TODO
-    return 48000; // static_cast<IldaeilModule*>(handle)->getSampleRate();
+    CardinalPluginContext* const pcontext = static_cast<IldaeilModule*>(handle)->pcontext;
+    DISTRHO_SAFE_ASSERT_RETURN(pcontext != nullptr, 48000.0);
+    return pcontext->sampleRate;
 }
 
 static bool host_is_offline(NativeHostHandle)
@@ -1140,7 +1141,7 @@ struct IldaeilModuleWidget : ModuleWidget {
     IldaeilModuleWidget(IldaeilModule* const module)
     {
         setModule(module);
-        setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/glBars.svg")));
+        setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Ildaeil.svg")));
 
         if (module != nullptr && module->pcontext != nullptr)
         {

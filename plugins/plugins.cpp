@@ -405,6 +405,7 @@ static void initStatic__Cardinal()
     const StaticPluginLoader spl(p, "Cardinal");
     if (spl.ok())
     {
+        p->addModel(modelCarla);
         p->addModel(modelGlBars);
         p->addModel(modelIldaeil);
         p->addModel(modelHostParameters);

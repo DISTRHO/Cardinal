@@ -27,6 +27,7 @@ using namespace rack;
 
 extern Plugin* pluginInstance;
 
+extern Model* modelCarla;
 extern Model* modelGlBars;
 extern Model* modelIldaeil;
 extern Model* modelHostParameters;

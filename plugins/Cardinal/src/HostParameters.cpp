@@ -123,10 +123,8 @@ struct HostParametersWidget : ModuleWidget {
             const float y = startY + int(i % 6) * paddingV;
             nvgBeginPath(args.vg);
             nvgRoundedRect(args.vg, x - 1.0f, y - 19.0f, paddingH - 4.0f, paddingV - 4.0f, 4);
-            nvgFillColor(args.vg, nvgRGBA(0xda, 0xda, 0xda, 0xf0));
+            nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
             nvgFill(args.vg);
-            nvgStrokeColor(args.vg, nvgRGBA(0x4a, 0x4a, 0x4a, 0xc0));
-            nvgStroke(args.vg);
 
             if (text[1]++ == '9')
             {
