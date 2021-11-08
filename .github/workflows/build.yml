@@ -184,10 +184,8 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libasound2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libjansson-dev libsamplerate0-dev libspeexdsp-dev
-      - name: Build linux x86_64 (debug)
-        env:
-          LDFLAGS: -static-libgcc -static-libstdc++
+          sudo apt-get install -yqq libasound2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libjansson-dev libsamplerate0-dev libspeexdsp-dev
+      - name: Build linux x86_64 (sysdeps)
         run: |
           make features
           make SYSDEPS=true -j $(nproc)
