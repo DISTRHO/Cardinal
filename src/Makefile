@@ -36,6 +36,7 @@ BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat
 BASE_FLAGS += -IRack/include
 ifeq ($(SYSDEPS),true)
+BASE_FLAGS += -DCARDINAL_SYSDEPS
 BASE_FLAGS += $(shell pkg-config --cflags jansson libarchive samplerate speexdsp)
 else
 BASE_FLAGS += -DZSTDLIB_VISIBILITY=

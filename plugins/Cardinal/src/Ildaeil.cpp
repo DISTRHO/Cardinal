@@ -26,10 +26,12 @@
 #include "water/streams/MemoryOutputStream.h"
 #include "water/xml/XmlDocument.h"
 
-extern "C" {
+#ifndef CARDINAL_SYSDEPS
 // private method that takes ownership, we can use it to avoid superfulous allocations
+extern "C" {
 json_t *jsonp_stringn_nocheck_own(const char* value, size_t len);
 }
+#endif
 
 #define BUFFER_SIZE 128
 
@@ -237,7 +239,11 @@ struct IldaeilModule : Module {
         engine->saveProjectInternal(projectState);
 
         const size_t dataSize = projectState.getDataSize();
+#ifndef CARDINAL_SYSDEPS
         return jsonp_stringn_nocheck_own(static_cast<const char*>(projectState.getDataAndRelease()), dataSize);
+#else
+        return json_stringn(static_cast<const char*>(projectState.getData()), dataSize);
+#endif
     }
 
     void dataFromJson(json_t* const rootJ) override

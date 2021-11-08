@@ -531,7 +531,9 @@ BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
 BASE_FLAGS += -pthread
 
-ifneq ($(SYSDEPS),true)
+ifeq ($(SYSDEPS),true)
+BASE_FLAGS += -DCARDINAL_SYSDEPS
+else
 BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 BASE_FLAGS += -I../src/Rack/dep/include
 endif
