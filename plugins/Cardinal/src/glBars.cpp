@@ -82,17 +82,12 @@ struct glBarsRendererWidget : OpenGlWidget {
         glBars->state.Render();
     }
 };
-#endif
 
 struct glBarsWidget : ModuleWidget {
-#ifndef HEADLESS
     glBarsRendererWidget* const glBarsRenderer;
-#endif
 
     glBarsWidget(glBarsModule* const module)
-#ifndef HEADLESS
         : glBarsRenderer(new glBarsRendererWidget(module))
-#endif
     {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/glBars.svg")));
@@ -102,14 +97,15 @@ struct glBarsWidget : ModuleWidget {
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-#ifndef HEADLESS
         glBarsRenderer->box.pos = Vec(2 * RACK_GRID_WIDTH, 0);
         glBarsRenderer->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH, box.size.y);
         addChild(glBarsRenderer);
-#endif
 
         addInput(createInput<PJ301MPort>(Vec(3, 54), module, glBarsModule::IN1_INPUT));
     }
 };
+#else
+typedef ModuleWidget glBarsWidget;
+#endif
 
 Model* modelGlBars = createModel<glBarsModule, glBarsWidget>("glBars");

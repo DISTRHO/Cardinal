@@ -65,6 +65,13 @@ ifneq ($(HAVE_XRANDR),true)
 $(warning Xrandr dependency not installed/available)
 endif
 
+else
+
+CARLA_EXTRA_ARGS += HAVE_OPENGL=false
+CARLA_EXTRA_ARGS += HAVE_X11=false
+CARLA_EXTRA_ARGS += HAVE_XEXT=false
+CARLA_EXTRA_ARGS += HAVE_XRANDR=false
+
 endif
 endif
 

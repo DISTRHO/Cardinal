@@ -15,10 +15,13 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#include "ImGuiWidget.hpp"
 #include "plugincontext.hpp"
-#include "extra/ScopedPointer.hpp"
-#include "extra/Thread.hpp"
+
+#ifndef HEADLESS
+# include "ImGuiWidget.hpp"
+# include "extra/ScopedPointer.hpp"
+# include "extra/Thread.hpp"
+#endif
 
 #include "CarlaNativePlugin.h"
 #include "CarlaBackendUtils.hpp"
@@ -350,6 +353,7 @@ static intptr_t host_dispatcher(const NativeHostHandle handle, const NativeHostD
 
 // --------------------------------------------------------------------------------------------------------------------
 
+#ifndef HEADLESS
 struct IldaeilWidget : ImGuiWidget, Thread {
     static constexpr const uint kButtonHeight = 20;
 
@@ -1168,6 +1172,11 @@ struct IldaeilModuleWidget : ModuleWidget {
         addOutput(createOutput<PJ301MPort>(Vec(3, 54 + 90), module, IldaeilModule::OUTPUT2));
     }
 };
+#else
+static void host_ui_parameter_changed(NativeHostHandle, uint32_t, float) {}
+static const char* host_ui_open_file(NativeHostHandle, bool, const char*, const char*) { return nullptr; }
+typedef ModuleWidget IldaeilModuleWidget;
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 

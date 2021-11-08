@@ -175,6 +175,21 @@ jobs:
           path: |
             *.tar.gz
 
+  linux-x86_64-headless:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -yqq libasound2-dev libgl1-mesa-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+      - name: Build linux x86_64 (headless)
+        run: |
+          make features
+          make HEADLESS=true -j $(nproc)
+
   linux-x86_64-sysdeps:
     runs-on: ubuntu-20.04
     steps:

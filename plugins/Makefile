@@ -177,8 +177,16 @@ PLUGIN_FILES = plugins.cpp
 # --------------------------------------------------------------
 # Cardinal (built-in)
 
-PLUGIN_FILES += $(wildcard Cardinal/src/*.cpp)
-PLUGIN_FILES += $(wildcard Cardinal/src/*/*.cpp)
+PLUGIN_FILES += Cardinal/src/Carla.cpp
+PLUGIN_FILES += Cardinal/src/glBars.cpp
+PLUGIN_FILES += Cardinal/src/HostParameters.cpp
+PLUGIN_FILES += Cardinal/src/HostTime.cpp
+PLUGIN_FILES += Cardinal/src/Ildaeil.cpp
+
+ifneq ($(HEADLESS),true)
+PLUGIN_FILES += Cardinal/src/ImGuiWidget.cpp
+PLUGIN_FILES += $(wildcard Cardinal/src/DearImGui/*.cpp)
+endif
 
 ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------
