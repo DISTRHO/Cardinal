@@ -355,6 +355,8 @@ jobs:
                     /usr/lib/carla/carla-bridge-native lv2 "" ${p} 1>/dev/null; \
             done
       - name: Test VST2 plugin
+        env:
+          CARLA_DO_NOT_USE_JUCE_FOR_VST2: 1
         run: |
             for p in $(ls bin/*.vst/*.so); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
