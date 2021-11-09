@@ -144,8 +144,15 @@ BASE_FLAGS += -I../Rack/dep/nanosvg/src
 BASE_FLAGS += -I../Rack/dep/oui-blendish
 BASE_FLAGS += -pthread
 
+ifeq ($(HEADLESS),true)
+BASE_FLAGS += -DHEADLESS
+endif
+
 ifeq ($(WASM),true)
 BASE_FLAGS += -DNANOVG_GLES2=1
+BASE_FLAGS += -msse -msse2 -msse3 -msimd128
+else
+BASE_FLAGS += -pthread
 endif
 
 ifeq ($(WINDOWS),true)
@@ -153,10 +160,6 @@ BASE_FLAGS += -D_USE_MATH_DEFINES
 BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
 BASE_FLAGS += -I../../include/mingw-compat
 BASE_FLAGS += -I../../include/mingw-std-threads
-endif
-
-ifeq ($(HEADLESS),true)
-BASE_FLAGS += -DHEADLESS
 endif
 
 ifeq ($(WITH_LTO),true)

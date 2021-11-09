@@ -527,6 +527,13 @@ BASE_FLAGS += -I../dpf/distrho
 BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat
 
+ifeq ($(SYSDEPS),true)
+BASE_FLAGS += -DCARDINAL_SYSDEPS
+else
+BASE_FLAGS += -DZSTDLIB_VISIBILITY=
+BASE_FLAGS += -I../src/Rack/dep/include
+endif
+
 BASE_FLAGS += -I../src
 BASE_FLAGS += -I../src/Rack/include
 BASE_FLAGS += -I../src/Rack/include/dsp
@@ -537,17 +544,17 @@ BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
 BASE_FLAGS += -I../src/Rack/dep/osdialog
 BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
-BASE_FLAGS += -pthread
 
-ifeq ($(SYSDEPS),true)
-BASE_FLAGS += -DCARDINAL_SYSDEPS
-else
-BASE_FLAGS += -DZSTDLIB_VISIBILITY=
-BASE_FLAGS += -I../src/Rack/dep/include
+ifeq ($(HEADLESS),true)
+BASE_FLAGS += -DHEADLESS
 endif
+
 
 ifeq ($(WASM),true)
 BASE_FLAGS += -DNANOVG_GLES2=1
+BASE_FLAGS += -msse -msse2 -msse3 -msimd128
+else
+BASE_FLAGS += -pthread
 endif
 
 ifeq ($(WINDOWS),true)
@@ -555,10 +562,6 @@ BASE_FLAGS += -D_USE_MATH_DEFINES
 BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
 BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
-endif
-
-ifeq ($(HEADLESS),true)
-BASE_FLAGS += -DHEADLESS
 endif
 
 ifeq ($(NOPLUGINS),true)

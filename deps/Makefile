@@ -18,7 +18,12 @@ include ../dpf/Makefile.base.mk
 BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat
+
+ifeq ($(WASM),true)
+BASE_FLAGS += -msse -msse2 -msse3 -msimd128
+else
 BASE_FLAGS += -pthread
+endif
 
 ifeq ($(WINDOWS),true)
 BASE_FLAGS += -D_USE_MATH_DEFINES

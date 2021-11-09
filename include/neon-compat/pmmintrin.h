@@ -17,7 +17,7 @@
 
 #pragma once
 
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__) || defined(__EMSCRIPTEN__)
 # include_next <pmmintrin.h>
 #else
 # include "../sse2neon/sse2neon.h"
