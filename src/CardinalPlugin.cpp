@@ -510,6 +510,8 @@ protected:
     {
 #if DISTRHO_PLUGIN_IS_SYNTH
         return "CardinalSynth";
+#elif DISTRHO_PLUGIN_NUM_INPUTS == 2
+        return "CardinalFX";
 #else
         return "Cardinal";
 #endif
@@ -546,6 +548,8 @@ protected:
     {
 #if DISTRHO_PLUGIN_IS_SYNTH
         return d_cconst('d', 'C', 'n', 'S');
+#elif DISTRHO_PLUGIN_NUM_INPUTS == 2
+        return d_cconst('d', 'C', 'n', 'F');
 #else
         return d_cconst('d', 'C', 'd', 'n');
 #endif
@@ -553,6 +557,17 @@ protected:
 
    /* --------------------------------------------------------------------------------------------------------
     * Init */
+
+    void initAudioPort(const bool input, uint32_t index, AudioPort& port) override
+    {
+        if (index >= 2)
+        {
+            port.hints = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange;
+            index -= 2;
+        }
+
+        CardinalBasePlugin::initAudioPort(input, index, port);
+    }
 
     void initParameter(const uint32_t index, Parameter& parameter) override
     {
@@ -769,11 +784,11 @@ protected:
 
     void activate() override
     {
-        const uint32_t bufferSize = getBufferSize() * DISTRHO_PLUGIN_NUM_OUTPUTS;
-        fAudioBufferOut = new float[bufferSize];
+        const uint32_t bufferSize = getBufferSize();
+        fAudioBufferOut = new float[bufferSize * DISTRHO_PLUGIN_NUM_OUTPUTS];
 #if DISTRHO_PLUGIN_NUM_INPUTS != 0
-        fAudioBufferIn = new float[bufferSize];
-        std::memset(fAudioBufferIn, 0, sizeof(float)*bufferSize);
+        fAudioBufferIn = new float[bufferSize * DISTRHO_PLUGIN_NUM_INPUTS];
+        std::memset(fAudioBufferIn, 0, sizeof(float)*bufferSize * DISTRHO_PLUGIN_NUM_INPUTS);
 #endif
 
         fPreviousFrame = 0;
@@ -856,7 +871,7 @@ protected:
                 fAudioBufferIn[j++] = inputs[0][i];
                 fAudioBufferIn[j++] = inputs[1][i];
             }
-            fCurrentAudioDevice->processInput(fAudioBufferIn, DISTRHO_PLUGIN_NUM_INPUTS, frames);
+            fCurrentAudioDevice->processInput(fAudioBufferIn, 2, frames);
 #endif
         }
 
@@ -864,8 +879,8 @@ protected:
 
         if (fCurrentAudioDevice != nullptr)
         {
-            std::memset(fAudioBufferOut, 0, sizeof(float)*frames*DISTRHO_PLUGIN_NUM_OUTPUTS);
-            fCurrentAudioDevice->processOutput(fAudioBufferOut, DISTRHO_PLUGIN_NUM_OUTPUTS, frames);
+            std::memset(fAudioBufferOut, 0, sizeof(float)*frames*2);
+            fCurrentAudioDevice->processOutput(fAudioBufferOut, 2, frames);
 
             for (uint32_t i=0, j=0; i<frames; ++i)
             {

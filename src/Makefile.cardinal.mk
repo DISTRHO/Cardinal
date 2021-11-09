@@ -226,13 +226,11 @@ endif
 BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 
 # --------------------------------------------------------------
-# Enable all possible plugin types
-
-all: jack lv2 vst2 vst3 resources
-
-# --------------------------------------------------------------
+# Enable all possible plugin types and setup resources
 
 ifeq ($(NAME),Cardinal)
+
+all: jack lv2 resources
 
 CORE_RESOURCES = $(filter-out icon.png,$(subst ../Rack/res/,,$(wildcard ../Rack/res/*))) template.vcv
 
@@ -245,6 +243,8 @@ endif
 PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.vst3/Contents/Resources/%)
 
 else
+
+all: jack lv2 vst2 vst3 resources
 
 PLUGIN_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/resources
 ifeq ($(MACOS),true)

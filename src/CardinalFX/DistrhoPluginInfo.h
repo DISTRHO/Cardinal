@@ -20,7 +20,7 @@
 
 #define DISTRHO_PLUGIN_BRAND "DISTRHO"
 #define DISTRHO_PLUGIN_NAME  "Cardinal"
-#define DISTRHO_PLUGIN_URI   "https://distrho.kx.studio/plugins/cardinal"
+#define DISTRHO_PLUGIN_URI   "https://distrho.kx.studio/plugins/cardinal#fx"
 
 #ifdef HEADLESS
 #define DISTRHO_PLUGIN_HAS_UI             0
@@ -30,8 +30,8 @@
 #define DISTRHO_UI_USE_NANOVG             1
 #define DISTRHO_UI_USER_RESIZABLE         1
 #endif
-#define DISTRHO_PLUGIN_NUM_INPUTS         12
-#define DISTRHO_PLUGIN_NUM_OUTPUTS        12
+#define DISTRHO_PLUGIN_NUM_INPUTS         2
+#define DISTRHO_PLUGIN_NUM_OUTPUTS        2
 #define DISTRHO_PLUGIN_WANT_MIDI_INPUT    1
 #define DISTRHO_PLUGIN_WANT_MIDI_OUTPUT   1
 #define DISTRHO_PLUGIN_WANT_FULL_STATE    1
