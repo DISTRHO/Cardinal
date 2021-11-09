@@ -50,8 +50,8 @@ endif
 # Check for X11+OpenGL dependencies (unless headless build)
 
 ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
-ifneq ($(HEADLESS),true)
 ifneq ($(WASM),true)
+ifneq ($(HEADLESS),true)
 
 ifneq ($(HAVE_OPENGL),true)
 $(error X11 dependency not installed/available)
