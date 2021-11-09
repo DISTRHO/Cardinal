@@ -131,16 +131,19 @@ TARGET = rack.a
 
 all: $(TARGET)
 	$(MAKE) -C Cardinal
+	$(MAKE) -C CardinalFX
 	$(MAKE) -C CardinalSynth
 
 resources:
 	$(MAKE) resources -C Cardinal
+	$(MAKE) resources -C CardinalFX
 	$(MAKE) resources -C CardinalSynth
 
 clean:
 	rm -f $(TARGET)
 	rm -rf $(BUILD_DIR)
 	$(MAKE) clean -C Cardinal
+	$(MAKE) clean -C CardinalFX
 	$(MAKE) clean -C CardinalSynth
 
 # --------------------------------------------------------------
