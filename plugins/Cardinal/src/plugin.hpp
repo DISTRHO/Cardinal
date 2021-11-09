@@ -29,6 +29,7 @@ extern Plugin* pluginInstance;
 
 extern Model* modelCarla;
 extern Model* modelGlBars;
-extern Model* modelIldaeil;
+extern Model* modelHostCV;
 extern Model* modelHostParameters;
 extern Model* modelHostTime;
+extern Model* modelIldaeil;

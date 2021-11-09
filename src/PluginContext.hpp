@@ -40,12 +40,15 @@ struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize;
     double sampleRate;
     float parameters[kModuleParameters];
-    bool playing, reset, bbtValid;
+    bool playing, reset, bbtValid, loadedHostCV;
     int32_t bar, beat, beatsPerBar, beatType;
     uint64_t frame;
     double barStartTick, beatsPerMinute;
     double tick, tickClock, ticksPerBeat, ticksPerClock, ticksPerFrame;
     uintptr_t nativeWindowId;
+    uint32_t dataFrame;
+    const float** dataIns;
+    float** dataOuts;
     Plugin* const plugin;
 
     CardinalPluginContext(Plugin* const p)
@@ -54,6 +57,7 @@ struct CardinalPluginContext : rack::Context {
           playing(false),
           reset(false),
           bbtValid(false),
+          loadedHostCV(false),
           bar(1),
           beat(1),
           beatsPerBar(4),
@@ -67,6 +71,9 @@ struct CardinalPluginContext : rack::Context {
           ticksPerClock(0.0),
           ticksPerFrame(0.0),
           nativeWindowId(0),
+          dataFrame(0),
+          dataIns(nullptr),
+          dataOuts(nullptr),
           plugin(p)
     {
         std::memset(parameters, 0, sizeof(parameters));

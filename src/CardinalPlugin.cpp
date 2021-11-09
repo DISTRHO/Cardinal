@@ -875,6 +875,12 @@ protected:
 #endif
         }
 
+#if DISTRHO_PLUGIN_NUM_OUTPUTS != 2
+        context->dataFrame = 0;
+        context->dataIns = inputs;
+        context->dataOuts = outputs;
+#endif
+
         context->engine->stepBlock(frames);
 
         if (fCurrentAudioDevice != nullptr)

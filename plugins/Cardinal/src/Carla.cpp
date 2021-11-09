@@ -424,14 +424,6 @@ struct CarlaModuleWidget : ModuleWidget {
         }
     }
 
-    void drawTextLine(NVGcontext* const vg, const uint offset, const char* const text)
-    {
-        const float y = startY + offset * padding;
-        nvgBeginPath(vg);
-        nvgFillColor(vg, color::WHITE);
-        nvgText(vg, middleX, y + 16, text, nullptr);
-    }
-
     void onContextCreate(const ContextCreateEvent& e) override
     {
         ModuleWidget::onContextCreate(e);
@@ -454,6 +446,14 @@ struct CarlaModuleWidget : ModuleWidget {
         }
 
         ModuleWidget::onContextDestroy(e);
+    }
+
+    void drawTextLine(NVGcontext* const vg, const uint offset, const char* const text)
+    {
+        const float y = startY + offset * padding;
+        nvgBeginPath(vg);
+        nvgFillColor(vg, color::WHITE);
+        nvgText(vg, middleX, y + 16, text, nullptr);
     }
 
     void draw(const DrawArgs& args) override
@@ -511,18 +511,18 @@ struct CarlaModuleWidget : ModuleWidget {
             [=]() {showUI();}
         ));
 
-        menu->addChild(createCheckMenuItem("Bipolar Inputs", "",
+        menu->addChild(createCheckMenuItem("Bipolar CV Inputs", "",
             [=]() {return module->params[CarlaModule::BIPOLAR_INPUTS].getValue() > 0.1f;},
             [=]() {module->params[CarlaModule::BIPOLAR_INPUTS].setValue(1.0f - module->params[CarlaModule::BIPOLAR_INPUTS].getValue());}
         ));
 
-        menu->addChild(createCheckMenuItem("Bipolar Outputs", "",
+        menu->addChild(createCheckMenuItem("Bipolar CV Outputs", "",
             [=]() {return module->params[CarlaModule::BIPOLAR_OUTPUTS].getValue() > 0.1f;},
             [=]() {module->params[CarlaModule::BIPOLAR_OUTPUTS].setValue(1.0f - module->params[CarlaModule::BIPOLAR_OUTPUTS].getValue());}
         ));
     }
 
-    void onDoubleClick(const DoubleClickEvent& e)
+    void onDoubleClick(const DoubleClickEvent& e) override
     {
         e.consume(this);
         showUI();

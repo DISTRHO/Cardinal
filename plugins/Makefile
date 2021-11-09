@@ -179,6 +179,7 @@ PLUGIN_FILES = plugins.cpp
 
 PLUGIN_FILES += Cardinal/src/Carla.cpp
 PLUGIN_FILES += Cardinal/src/glBars.cpp
+PLUGIN_FILES += Cardinal/src/HostCV.cpp
 PLUGIN_FILES += Cardinal/src/HostParameters.cpp
 PLUGIN_FILES += Cardinal/src/HostTime.cpp
 PLUGIN_FILES += Cardinal/src/Ildaeil.cpp

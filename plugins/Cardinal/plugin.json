@@ -14,10 +14,19 @@
   "modules":
   [
     {
+      "slug": "HostCV",
+      "disabled": false,
+      "name": "Host CV",
+      "description": "Exposes host-provided CV ports in a module",
+      "tags": [
+        "Utility"
+      ]
+    },
+    {
       "slug": "HostParameters",
       "disabled": false,
       "name": "Host Parameters",
-      "description": "Exposes host-controlled plugin parameters as module",
+      "description": "Exposes host-controlled plugin parameters in a module",
       "tags": [
         "Utility"
       ]
@@ -26,7 +35,7 @@
       "slug": "HostTime",
       "disabled": false,
       "name": "Host Time",
-      "description": "Exposes host-provided timing information as module",
+      "description": "Exposes host-provided time/transport information in a module",
       "tags": [
         "Utility"
       ]
@@ -53,7 +62,7 @@
       "slug": "Ildaeil",
       "disabled": false,
       "name": "Ildaeil Plugin Host",
-      "description": "A plugin host within Cardinal for loading any FX",
+      "description": "A mini plugin host within Cardinal for loading any FX",
       "tags": [
         "Utility"
       ]

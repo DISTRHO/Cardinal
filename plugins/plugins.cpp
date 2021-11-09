@@ -407,9 +407,10 @@ static void initStatic__Cardinal()
     {
         p->addModel(modelCarla);
         p->addModel(modelGlBars);
-        p->addModel(modelIldaeil);
+        p->addModel(modelHostCV);
         p->addModel(modelHostParameters);
         p->addModel(modelHostTime);
+        p->addModel(modelIldaeil);
     }
 }
 
