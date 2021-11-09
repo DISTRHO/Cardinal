@@ -546,6 +546,10 @@ BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 BASE_FLAGS += -I../src/Rack/dep/include
 endif
 
+ifeq ($(WASM),true)
+BASE_FLAGS += -DNANOVG_GLES2=1
+endif
+
 ifeq ($(WINDOWS),true)
 BASE_FLAGS += -D_USE_MATH_DEFINES
 BASE_FLAGS += -DWIN32_LEAN_AND_MEAN

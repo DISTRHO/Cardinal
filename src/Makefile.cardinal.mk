@@ -144,6 +144,10 @@ BASE_FLAGS += -I../Rack/dep/nanosvg/src
 BASE_FLAGS += -I../Rack/dep/oui-blendish
 BASE_FLAGS += -pthread
 
+ifeq ($(WASM),true)
+BASE_FLAGS += -DNANOVG_GLES2=1
+endif
+
 ifeq ($(WINDOWS),true)
 BASE_FLAGS += -D_USE_MATH_DEFINES
 BASE_FLAGS += -DWIN32_LEAN_AND_MEAN

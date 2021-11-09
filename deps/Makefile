@@ -47,6 +47,8 @@ MACHINE = x86_64-the-rack
 else ifeq ($(CPU_ARM),true)
 ARCH_NAME = arm
 MACHINE = i686-the-rack
+else ifeq ($(WASM),true)
+MACHINE = i686-wasm
 else
 MACHINE = $(TARGET_MACHINE)
 endif

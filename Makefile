@@ -51,6 +51,7 @@ endif
 
 ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
 ifneq ($(HEADLESS),true)
+ifneq ($(WASM),true)
 
 ifneq ($(HAVE_OPENGL),true)
 $(error X11 dependency not installed/available)
@@ -72,6 +73,7 @@ CARLA_EXTRA_ARGS += HAVE_X11=false
 CARLA_EXTRA_ARGS += HAVE_XEXT=false
 CARLA_EXTRA_ARGS += HAVE_XRANDR=false
 
+endif
 endif
 endif
 
