@@ -23,8 +23,10 @@ USE_NAMESPACE_DISTRHO;
 
 struct HostCV : Module {
     enum ParamIds {
-        BIPOLAR_INPUTS,
-        BIPOLAR_OUTPUTS,
+        BIPOLAR_INPUTS_1_5,
+        BIPOLAR_INPUTS_6_10,
+        BIPOLAR_OUTPUTS_1_5,
+        BIPOLAR_OUTPUTS_6_10,
         NUM_PARAMS
     };
     enum InputIds {
@@ -40,8 +42,10 @@ struct HostCV : Module {
     HostCV()
     {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-        configParam<SwitchQuantity>(BIPOLAR_INPUTS, 0.f, 1.f, 1.f, "Bipolar Inputs")->randomizeEnabled = false;
-        configParam<SwitchQuantity>(BIPOLAR_OUTPUTS, 0.f, 1.f, 1.f, "Bipolar Outputs")->randomizeEnabled = false;
+        configParam<SwitchQuantity>(BIPOLAR_INPUTS_1_5, 0.f, 1.f, 0.f, "Bipolar Inputs 1-5")->randomizeEnabled = false;
+        configParam<SwitchQuantity>(BIPOLAR_INPUTS_6_10, 0.f, 1.f, 0.f, "Bipolar Inputs 6-10")->randomizeEnabled = false;
+        configParam<SwitchQuantity>(BIPOLAR_OUTPUTS_1_5, 0.f, 1.f, 0.f, "Bipolar Outputs 1-5")->randomizeEnabled = false;
+        configParam<SwitchQuantity>(BIPOLAR_OUTPUTS_6_10, 0.f, 1.f, 0.f, "Bipolar Outputs 6-10")->randomizeEnabled = false;
 
         CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP);
 
@@ -73,13 +77,24 @@ struct HostCV : Module {
                 return;
 
             const uint32_t dataFrame = pcontext->dataFrame++;
-            const float inputOffset = params[BIPOLAR_INPUTS].getValue() > 0.1f ? 5.0f : 0.0f;
-            const float outputOffset = params[BIPOLAR_OUTPUTS].getValue() > 0.1f ? 5.0f : 0.0f;
+            float inputOffset, outputOffset;
 
-            for (int i=0; i<10; ++i)
+            inputOffset = params[BIPOLAR_INPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
+            outputOffset = params[BIPOLAR_OUTPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
+
+            for (int i=0; i<5; ++i)
             {
-                outputs[i].setVoltage(dataIns[i+2][dataFrame] - inputOffset);
-                dataOuts[i+2][dataFrame] = inputs[i].getVoltage() + outputOffset;
+                outputs[i].setVoltage(dataIns[i+2][dataFrame] - outputOffset);
+                dataOuts[i+2][dataFrame] = inputs[i].getVoltage() + inputOffset;
+            }
+
+            inputOffset = params[BIPOLAR_INPUTS_6_10].getValue() > 0.1f ? 5.0f : 0.0f;
+            outputOffset = params[BIPOLAR_OUTPUTS_6_10].getValue() > 0.1f ? 5.0f : 0.0f;
+
+            for (int i=5; i<10; ++i)
+            {
+                outputs[i].setVoltage(dataIns[i+2][dataFrame] - outputOffset);
+                dataOuts[i+2][dataFrame] = inputs[i].getVoltage() + inputOffset;
             }
         }
     }
@@ -153,14 +168,24 @@ struct HostCVWidget : ModuleWidget {
     {
         menu->addChild(new ui::MenuSeparator);
 
-        menu->addChild(createCheckMenuItem("Bipolar Inputs", "",
-            [=]() {return module->params[HostCV::BIPOLAR_INPUTS].getValue() > 0.1f;},
-            [=]() {module->params[HostCV::BIPOLAR_INPUTS].setValue(1.0f - module->params[HostCV::BIPOLAR_INPUTS].getValue());}
+        menu->addChild(createCheckMenuItem("Bipolar Inputs 1-5", "",
+            [=]() {return module->params[HostCV::BIPOLAR_INPUTS_1_5].getValue() > 0.1f;},
+            [=]() {module->params[HostCV::BIPOLAR_INPUTS_1_5].setValue(1.0f - module->params[HostCV::BIPOLAR_INPUTS_1_5].getValue());}
         ));
 
-        menu->addChild(createCheckMenuItem("Bipolar Outputs", "",
-            [=]() {return module->params[HostCV::BIPOLAR_OUTPUTS].getValue() > 0.1f;},
-            [=]() {module->params[HostCV::BIPOLAR_OUTPUTS].setValue(1.0f - module->params[HostCV::BIPOLAR_OUTPUTS].getValue());}
+        menu->addChild(createCheckMenuItem("Bipolar Inputs 6-10", "",
+            [=]() {return module->params[HostCV::BIPOLAR_INPUTS_6_10].getValue() > 0.1f;},
+            [=]() {module->params[HostCV::BIPOLAR_INPUTS_6_10].setValue(1.0f - module->params[HostCV::BIPOLAR_INPUTS_6_10].getValue());}
+        ));
+
+        menu->addChild(createCheckMenuItem("Bipolar Outputs 1-5", "",
+            [=]() {return module->params[HostCV::BIPOLAR_OUTPUTS_1_5].getValue() > 0.1f;},
+            [=]() {module->params[HostCV::BIPOLAR_OUTPUTS_1_5].setValue(1.0f - module->params[HostCV::BIPOLAR_OUTPUTS_1_5].getValue());}
+        ));
+
+        menu->addChild(createCheckMenuItem("Bipolar Outputs 6-10", "",
+            [=]() {return module->params[HostCV::BIPOLAR_OUTPUTS_6_10].getValue() > 0.1f;},
+            [=]() {module->params[HostCV::BIPOLAR_OUTPUTS_6_10].setValue(1.0f - module->params[HostCV::BIPOLAR_OUTPUTS_6_10].getValue());}
         ));
     }
 };
