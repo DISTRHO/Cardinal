@@ -12,7 +12,7 @@
 	url = https://github.com/DLTcollab/sse2neon.git
 [submodule "plugins/Fundamental"]
 	path = plugins/Fundamental
-	url = https://github.com/VCVRack/Fundamental.git
+	url = https://github.com/CardinalModules/Fundamental.git
 [submodule "plugins/Befaco"]
 	path = plugins/Befaco
 	url = https://github.com/VCVRack/Befaco.git
