@@ -249,6 +249,34 @@ extern Model *modelBassMaster;
 extern Model *modelBassMasterJr;
 extern Model *modelShapeMaster;
 
+// mscHack
+/* NOTE too much noise in original include, do this a different way
+// #include "mscHack/src/mscHack.hpp"
+*/
+extern Model *modelCompressor;
+extern Model *modelSynthDrums;
+extern Model *modelSEQ_6x32x16;
+extern Model *modelMasterClockx8;
+extern Model *modelMasterClockx4;
+extern Model *modelSEQ_Envelope_8;
+extern Model *modelSeq_Triad2;
+extern Model *modelARP700;
+extern Model *modelMix_24_4_4;
+extern Model *modelMix_16_4_4;
+extern Model *modelMix_9_3_4;
+extern Model *modelMix_4_0_4;
+extern Model *modelASAF8;
+extern Model *modelPingPong;
+extern Model *modelStepDelay;
+extern Model *modelOsc_3Ch;
+extern Model *modelDronez;
+extern Model *modelMorze;
+extern Model *modelWindz;
+extern Model *modelLorenz;
+extern Model *modelAlienz;
+extern Model *modelOSC_WaveMorph_3;
+extern Model *modelMaude_221;
+
 // rackwindows
 #include "rackwindows/src/plugin.hpp"
 
@@ -288,6 +316,7 @@ Plugin* pluginInstance__GrandeModular;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__JW;
 extern Plugin* pluginInstance__MindMeld;
+extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
@@ -1048,6 +1077,40 @@ static void initStatic__MindMeld()
     }
 }
 
+static void initStatic__mscHack()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__mscHack = p;
+
+    const StaticPluginLoader spl(p, "mscHack");
+    if (spl.ok())
+    {
+        p->addModel(modelCompressor);
+        p->addModel(modelSynthDrums);
+        p->addModel(modelSEQ_6x32x16);
+        p->addModel(modelMasterClockx4);
+        //p->addModel(modelMasterClockx8);  
+        p->addModel(modelSEQ_Envelope_8);
+        p->addModel(modelSeq_Triad2);
+        p->addModel(modelARP700);
+        p->addModel(modelMix_4_0_4);
+        p->addModel(modelMix_9_3_4);
+        p->addModel(modelMix_16_4_4);
+        p->addModel(modelMix_24_4_4);
+        p->addModel(modelASAF8);
+        p->addModel(modelPingPong);
+        p->addModel(modelStepDelay);
+        p->addModel(modelOsc_3Ch);
+        p->addModel(modelDronez);
+        p->addModel(modelMorze);
+        p->addModel(modelWindz);
+        p->addModel(modelLorenz);
+        p->addModel(modelAlienz);
+        p->addModel(modelOSC_WaveMorph_3);
+        p->addModel(modelMaude_221);
+    }
+}
+
 static void initStatic__rackwindows()
 {
     Plugin* const p = new Plugin;
@@ -1137,6 +1200,7 @@ void initStaticPlugins()
     initStatic__ImpromptuModular();
     initStatic__JW();
     initStatic__MindMeld();
+    initStatic__mscHack();
     initStatic__rackwindows();
     initStatic__ValleyAudio();
     initStatic__ZetaCarinaeModules();
