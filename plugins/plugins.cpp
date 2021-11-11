@@ -36,6 +36,9 @@
 #undef modelADSR
 #undef modelVCA
 
+// Atelier
+#include "Atelier/src/plugin.hpp"
+
 // AudibleInstruments
 #include "AudibleInstruments/src/plugin.hpp"
 
@@ -276,6 +279,7 @@ Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__AS;
+Plugin* pluginInstance__Atelier;
 Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
@@ -522,6 +526,18 @@ static void initStatic__AS()
         p->addModel(modelBlankPanelSpecial);
 #undef modelADSR
 #undef modelVCA
+    }
+}
+
+static void initStatic__Atelier()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Atelier = p;
+
+    const StaticPluginLoader spl(p, "Atelier");
+    if (spl.ok())
+    {
+        p->addModel(modelPalette);
     }
 }
 
@@ -1125,6 +1141,7 @@ void initStaticPlugins()
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__AS();
+    initStatic__Atelier();
     initStatic__AudibleInstruments();
     initStatic__Befaco();
     initStatic__Bidoo();

@@ -214,6 +214,22 @@ PLUGIN_FILES += AS/freeverb/revmodel.cpp
 AS_CUSTOM = ADSR LabelDisplayWidget LowFrequencyOscillator VCA allpass comb revmodel
 
 # --------------------------------------------------------------
+# Atelier
+
+PLUGIN_FILES += Atelier/src/Palette.cpp
+PLUGIN_FILES += Atelier/eurorack/stmlib/dsp/atan.cc
+PLUGIN_FILES += Atelier/eurorack/stmlib/dsp/units.cc
+PLUGIN_FILES += Atelier/eurorack/stmlib/utils/random.cc
+PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/*.cc)
+PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/engine/*.cc)
+PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/speech/*.cc)
+PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/physical_modelling/*.cc)
+PLUGIN_FILES += Atelier/eurorack/plaits/resources.cc
+
+# modules/types which are present in other plugins
+ATELIER_CUSTOM = plaits stmlib
+
+# --------------------------------------------------------------
 # AudibleInstruments
 
 PLUGIN_FILES += $(filter-out AudibleInstruments/src/plugin.cpp,$(wildcard AudibleInstruments/src/*.cpp))
@@ -722,6 +738,16 @@ $(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(AS_CUSTOM),$(call custom_module_names,$(m),AS)) \
 		-DpluginInstance=pluginInstance__AS
+
+$(BUILD_DIR)/Atelier/%.o: Atelier/%
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ATELIER_CUSTOM),$(call custom_module_names,$(m),Atelier)) \
+		-DpluginInstance=pluginInstance__Atelier \
+		-DTEST \
+		-IAtelier/eurorack \
+		-Wno-unused-local-typedefs
 
 $(BUILD_DIR)/AudibleInstruments/%.cc.o: AudibleInstruments/%.cc
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

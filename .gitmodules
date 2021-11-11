@@ -67,3 +67,6 @@
 [submodule "carla"]
 	path = carla
 	url = https://github.com/falkTX/Carla.git
+[submodule "plugins/Atelier"]
+	path = plugins/Atelier
+	url = git@github.com:Xenakios/Atelier.git
