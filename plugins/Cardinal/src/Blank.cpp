@@ -40,9 +40,11 @@ struct CardinalBlankImage : OpaqueWidget {
     int imageId = -2;
     int imageWidth = 0;
     int imageHeight = 0;
+    bool hasModule;
 
-    CardinalBlankImage(const math::Vec& size) {
+    CardinalBlankImage(const math::Vec& size, const bool hasModule) {
         box.size = size;
+        this->hasModule = hasModule;
     }
 
     /*
@@ -65,15 +67,16 @@ struct CardinalBlankImage : OpaqueWidget {
 
         if (imageId != -1 && imageWidth != 0 && imageHeight != 0)
         {
+            const float pixelRatio = hasModule ? APP->window->pixelRatio : 1.0f;
             const float boxscale = std::min(box.size.x / imageWidth, box.size.y / imageHeight);
-            const float imgHeight = imageHeight * boxscale;
+            const float imgHeight = (imageHeight / pixelRatio) * boxscale;
             nvgBeginPath(args.vg);
             nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
             nvgFillPaint(args.vg, nvgImagePattern(args.vg,
                                                   0,
-                                                  box.size.y * 0.5 - imgHeight * 0.5f,
-                                                  box.size.x,
-                                                  imageHeight * boxscale, 0, imageId, 1.0f));
+                                                  (box.size.y / pixelRatio) * 0.5f - imgHeight * 0.5f,
+                                                  box.size.x / pixelRatio,
+                                                  imgHeight, 0, imageId, 1.0f));
             nvgFill(args.vg);
         }
 
@@ -93,7 +96,7 @@ struct CardinalBlankWidget : ModuleWidget {
 
         FramebufferWidget* const fbWidget = new FramebufferWidget;
         fbWidget->oversample = 2.0;
-        fbWidget->addChild(new CardinalBlankImage(box.size));
+        fbWidget->addChild(new CardinalBlankImage(box.size, module != nullptr));
         addChild(fbWidget);
     }
 
