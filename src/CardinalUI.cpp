@@ -20,6 +20,8 @@
 #include <helpers.hpp>
 #include <patch.hpp>
 #include <settings.hpp>
+#include <string.hpp>
+#include <system.hpp>
 #include <ui/Button.hpp>
 #include <ui/MenuItem.hpp>
 #include <ui/MenuSeparator.hpp>
@@ -30,7 +32,7 @@
 #endif
 
 #include <Application.hpp>
-#include "DistrhoUI.hpp"
+#include "AsyncDialog.hpp"
 #include "PluginContext.hpp"
 #include "WindowParameters.hpp"
 #include "ResizeHandle.hpp"
@@ -42,7 +44,7 @@ GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
 
 namespace rack {
 namespace app {
-    widget::Widget* createMenuBar(Window& window, bool isStandalone);
+    widget::Widget* createMenuBar(CardinalBaseUI* const ui, bool isStandalone);
 }
 namespace window {
     void WindowSetPluginUI(Window* window, DISTRHO_NAMESPACE::UI* ui);
@@ -54,14 +56,9 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
-CardinalPluginContext* getRackContextFromPlugin(void* ptr);
-
-// -----------------------------------------------------------------------------------------------------------
-
-class CardinalUI : public UI,
+class CardinalUI : public CardinalBaseUI,
                    public WindowParametersCallback
 {
-    CardinalPluginContext* const fContext;
     rack::math::Vec fLastMousePos;
     ResizeHandle fResizeHandle;
     WindowParameters fWindowParameters;
@@ -70,14 +67,14 @@ class CardinalUI : public UI,
         CardinalPluginContext* const context;
 
         ScopedContext(CardinalUI* const ui)
-            : context(ui->fContext)
+            : context(ui->context)
         {
             rack::contextSet(context);
             WindowParametersRestore(context->window);
         }
 
         ScopedContext(CardinalUI* const ui, const int mods)
-            : context(ui->fContext)
+            : context(ui->context)
         {
             rack::contextSet(context);
             rack::window::WindowSetMods(context->window, mods);
@@ -94,14 +91,13 @@ class CardinalUI : public UI,
 
 public:
     CardinalUI()
-        : UI(1228, 666),
-          fContext(getRackContextFromPlugin(getPluginInstancePointer())),
+        : CardinalBaseUI(1228, 666),
           fResizeHandle(this)
     {
         Window& window(getWindow());
 
         window.setIgnoringKeyRepeat(true);
-        fContext->nativeWindowId = window.getNativeWindowHandle();
+        context->nativeWindowId = window.getNativeWindowHandle();
 
         if (isResizable())
             fResizeHandle.hide();
@@ -111,32 +107,32 @@ public:
         if (scaleFactor != 1)
             setSize(1228 * scaleFactor, 666 * scaleFactor);
 
-        rack::contextSet(fContext);
+        rack::contextSet(context);
 
-        rack::window::WindowSetPluginUI(fContext->window, this);
+        rack::window::WindowSetPluginUI(context->window, this);
 
-        if (fContext->scene->menuBar != nullptr)
-            fContext->scene->removeChild(fContext->scene->menuBar);
+        if (context->scene->menuBar != nullptr)
+            context->scene->removeChild(context->scene->menuBar);
 
-        fContext->scene->menuBar = rack::app::createMenuBar(window, getApp().isStandalone());
-        fContext->scene->addChildBelow(fContext->scene->menuBar, fContext->scene->rackScroll);
+        context->scene->menuBar = rack::app::createMenuBar(this, getApp().isStandalone());
+        context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
 
-        fContext->window->step();
+        context->window->step();
 
         rack::contextSet(nullptr);
 
-        WindowParametersSetCallback(fContext->window, this);
+        WindowParametersSetCallback(context->window, this);
     }
 
     ~CardinalUI() override
     {
-        rack::contextSet(fContext);
+        rack::contextSet(context);
 
-        rack::widget::Widget* const menuBar = fContext->scene->menuBar;
-        fContext->scene->menuBar = nullptr;
-        fContext->scene->removeChild(menuBar);
+        rack::widget::Widget* const menuBar = context->scene->menuBar;
+        context->scene->menuBar = nullptr;
+        context->scene->removeChild(menuBar);
 
-        rack::window::WindowSetPluginUI(fContext->window, nullptr);
+        rack::window::WindowSetPluginUI(context->window, nullptr);
 
         rack::contextSet(nullptr);
     }
@@ -144,7 +140,7 @@ public:
     void onNanoDisplay() override
     {
         const ScopedContext sc(this);
-        fContext->window->step();
+        context->window->step();
     }
 
     void uiIdle() override
@@ -268,7 +264,7 @@ protected:
             return;
         }
 
-        WindowParametersSetValues(fContext->window, fWindowParameters);
+        WindowParametersSetValues(context->window, fWindowParameters);
     }
 
     void stateChanged(const char* key, const char* value) override
@@ -378,7 +374,7 @@ protected:
         */
 
         const ScopedContext sc(this, mods);
-        return fContext->event->handleButton(fLastMousePos, button, action, mods);
+        return context->event->handleButton(fLastMousePos, button, action, mods);
     }
 
     bool onMotion(const MotionEvent& ev) override
@@ -389,7 +385,7 @@ protected:
         fLastMousePos = mousePos;
 
         const ScopedContext sc(this, glfwMods(ev.mod));
-        return fContext->event->handleHover(mousePos, mouseDelta);
+        return context->event->handleHover(mousePos, mouseDelta);
     }
 
     bool onScroll(const ScrollEvent& ev) override
@@ -402,7 +398,7 @@ protected:
 #endif
 
         const ScopedContext sc(this, glfwMods(ev.mod));
-        return fContext->event->handleScroll(fLastMousePos, scrollDelta);
+        return context->event->handleScroll(fLastMousePos, scrollDelta);
     }
 
     bool onCharacterInput(const CharacterInputEvent& ev) override
@@ -411,7 +407,7 @@ protected:
             return false;
 
         const ScopedContext sc(this, glfwMods(ev.mod));
-        return fContext->event->handleText(fLastMousePos, ev.character);
+        return context->event->handleText(fLastMousePos, ev.character);
     }
 
     bool onKeyboard(const KeyboardEvent& ev) override
@@ -486,15 +482,15 @@ protected:
         }
 
         const ScopedContext sc(this, mods);
-        return fContext->event->handleKey(fLastMousePos, key, ev.keycode, action, mods);
+        return context->event->handleKey(fLastMousePos, key, ev.keycode, action, mods);
     }
 
     void onResize(const ResizeEvent& ev) override
     {
         UI::onResize(ev);
 
-        if (fContext->window != nullptr)
-            fContext->window->setSize(rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
+        if (context->window != nullptr)
+            context->window->setSize(rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
 
         const double scaleFactor = getScaleFactor();
         char sizeString[64];
@@ -509,7 +505,7 @@ protected:
             return;
 
         const ScopedContext sc(this, 0);
-        fContext->event->handleLeave();
+        context->event->handleLeave();
     }
 
     void uiFileBrowserSelected(const char* const filename) override
@@ -517,9 +513,38 @@ protected:
         if (filename == nullptr)
             return;
 
-        rack::contextSet(fContext);
-        WindowParametersRestore(fContext->window);
-        fContext->patch->loadAction(filename);
+        rack::contextSet(context);
+        WindowParametersRestore(context->window);
+
+        std::string sfilename = filename;
+
+        if (saving)
+        {
+            if (rack::system::getExtension(sfilename) != ".vcv")
+                sfilename += ".vcv";
+
+            try {
+                context->patch->save(sfilename);
+            }
+            catch (rack::Exception& e) {
+                std::string message = rack::string::f("Could not save patch: %s", e.what());
+                asyncDialog::create(message.c_str());
+                return;
+            }
+        }
+        else
+        {
+            try {
+                context->patch->load(sfilename);
+            } catch (rack::Exception& e) {
+		        std::string message = rack::string::f("Could not load patch: %s", e.what());
+                asyncDialog::create(message.c_str());
+                return;
+            }
+        }
+
+        context->patch->path = sfilename;
+        context->history->setSaved();
     }
 
 #if 0

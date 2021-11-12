@@ -22,6 +22,7 @@
 namespace asyncDialog
 {
 
+void create(const char* message);
 void create(const char* message, std::function<void()> action);
 
 }

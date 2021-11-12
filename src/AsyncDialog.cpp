@@ -34,42 +34,34 @@ using namespace rack::widget;
 
 struct AsyncDialog : OpaqueWidget
 {
+	static const constexpr float margin = 10;
+	static const constexpr float buttonWidth = 100;
+
 	SequentialLayout* layout;
 	SequentialLayout* contentLayout;
 	SequentialLayout* buttonLayout;
 	Label* label;
 
+	AsyncDialog(const char* const message)
+    {
+		setup(message);
+
+		struct AsyncDismissButton : Button {
+			AsyncDialog* dialog;
+			void onAction(const ActionEvent& e) override {
+				dialog->getParent()->requestDelete();
+			}
+		};
+		AsyncDismissButton* const dismissButton = new AsyncDismissButton;
+		dismissButton->box.size.x = buttonWidth;
+		dismissButton->text = "Dismiss";
+		dismissButton->dialog = this;
+		buttonLayout->addChild(dismissButton);
+	}
+
 	AsyncDialog(const char* const message, const std::function<void()> action)
     {
-		box.size = math::Vec(400, 120);
-		const float margin = 10;
-		const float buttonWidth = 100;
-
-		layout = new SequentialLayout;
-		layout->box.pos = math::Vec(0, 0);
-		layout->box.size = box.size;
-		layout->orientation = SequentialLayout::VERTICAL_ORIENTATION;
-		layout->margin = math::Vec(margin, margin);
-		layout->spacing = math::Vec(margin, margin);
-		layout->wrap = false;
-		addChild(layout);
-
-		contentLayout = new SequentialLayout;
-		contentLayout->spacing = math::Vec(margin, margin);
-		layout->addChild(contentLayout);
-
-		buttonLayout = new SequentialLayout;
-	    buttonLayout->alignment = SequentialLayout::CENTER_ALIGNMENT;
-		buttonLayout->box.size = box.size;
-		buttonLayout->spacing = math::Vec(margin, margin);
-		layout->addChild(buttonLayout);
-
-		label = new Label;
-		label->box.size.x = box.size.x - 2*margin;
-		label->box.size.y = box.size.y - 2*margin - 40;
-		label->fontSize = 16;
-		label->text = message;
-		contentLayout->addChild(label);
+		setup(message);
 
 		struct AsyncCancelButton : Button {
 			AsyncDialog* dialog;
@@ -99,6 +91,37 @@ struct AsyncDialog : OpaqueWidget
 		buttonLayout->addChild(okButton);
 	}
 
+	void setup(const char* const message)
+	{
+		box.size = math::Vec(400, 120);
+
+		layout = new SequentialLayout;
+		layout->box.pos = math::Vec(0, 0);
+		layout->box.size = box.size;
+		layout->orientation = SequentialLayout::VERTICAL_ORIENTATION;
+		layout->margin = math::Vec(margin, margin);
+		layout->spacing = math::Vec(margin, margin);
+		layout->wrap = false;
+		addChild(layout);
+
+		contentLayout = new SequentialLayout;
+		contentLayout->spacing = math::Vec(margin, margin);
+		layout->addChild(contentLayout);
+
+		buttonLayout = new SequentialLayout;
+	    buttonLayout->alignment = SequentialLayout::CENTER_ALIGNMENT;
+		buttonLayout->box.size = box.size;
+		buttonLayout->spacing = math::Vec(margin, margin);
+		layout->addChild(buttonLayout);
+
+		label = new Label;
+		label->box.size.x = box.size.x - 2*margin;
+		label->box.size.y = box.size.y - 2*margin - 40;
+		label->fontSize = 16;
+		label->text = message;
+		contentLayout->addChild(label);
+	}
+
 	void step() override
     {
 		OpaqueWidget::step();
@@ -113,6 +136,17 @@ struct AsyncDialog : OpaqueWidget
 	}
 };
 
+void create(const char* const message)
+{
+	MenuOverlay* const overlay = new MenuOverlay;
+	overlay->bgColor = nvgRGBAf(0, 0, 0, 0.33);
+
+	AsyncDialog* const dialog = new AsyncDialog(message);
+	overlay->addChild(dialog);
+
+	APP->scene->addChild(overlay);
+}
+
 void create(const char* const message, const std::function<void()> action)
 {
 	MenuOverlay* const overlay = new MenuOverlay;
@@ -121,7 +155,7 @@ void create(const char* const message, const std::function<void()> action)
 	AsyncDialog* const dialog = new AsyncDialog(message, action);
 	overlay->addChild(dialog);
 
-    APP->scene->addChild(overlay);
+	APP->scene->addChild(overlay);
 }
 
 }

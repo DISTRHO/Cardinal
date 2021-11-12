@@ -28,6 +28,10 @@
 #include "DistrhoPlugin.hpp"
 #include "extra/Mutex.hpp"
 
+#ifndef HEADLESS
+# include "DistrhoUI.hpp"
+#endif
+
 START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
@@ -86,6 +90,8 @@ struct CardinalAudioDevice;
 struct CardinalMidiInputDevice;
 struct CardinalMidiOutputDevice;
 
+CardinalPluginContext* getRackContextFromPlugin(void* ptr);
+
 class CardinalBasePlugin : public Plugin {
 public:
     CardinalPluginContext* const context;
@@ -104,6 +110,18 @@ public:
     virtual bool clearAudioDevice(CardinalAudioDevice* dev) noexcept = 0;
     virtual bool clearMidiInputDevice(CardinalMidiInputDevice* dev) noexcept = 0;
     virtual bool clearMidiOutputDevice(CardinalMidiOutputDevice* dev) noexcept = 0;
+};
+
+class CardinalBaseUI : public UI {
+public:
+    CardinalPluginContext* const context;
+    bool saving;
+
+    CardinalBaseUI(const uint width, const uint height)
+        : UI(width, height),
+          context(getRackContextFromPlugin(getPluginInstancePointer())),
+          saving(false) {}
+    ~CardinalBaseUI() override {}
 };
 
 // -----------------------------------------------------------------------------------------------------------

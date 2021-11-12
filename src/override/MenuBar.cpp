@@ -108,8 +108,29 @@ static void promptClear(const char* const message, const std::function<void()> a
 	asyncDialog::create(message, action);
 }
 
+static std::string homeDir()
+{
+#ifdef ARCH_WIN
+	if (const char* const userprofile = getenv("USERPROFILE"))
+	{
+		return userprofile;
+	}
+	else if (const char* const homedrive = getenv("HOMEDRIVE"))
+	{
+		if (const char* const homepath = getenv("HOMEPATH"))
+			return system::join(homedrive, homepath);
+	}
+#else
+	if (struct passwd* const pwd = getpwuid(getuid()))
+		return pwd->pw_dir;
+	else if (const char* const home = getenv("HOME"))
+		return home;
+#endif
+	return {};
+}
+
 struct FileButton : MenuButton {
-	Window& window;
+	CardinalBaseUI* const ui;
 	const bool isStandalone;
 
 #ifdef HAVE_LIBLO
@@ -133,8 +154,8 @@ struct FileButton : MenuButton {
 	}
 #endif
 
-	FileButton(Window& win, const bool standalone)
-		: MenuButton(), window(win), isStandalone(standalone) {}
+	FileButton(CardinalBaseUI* const ui2, const bool standalone)
+		: MenuButton(), ui(ui2), isStandalone(standalone) {}
 
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
@@ -153,49 +174,30 @@ struct FileButton : MenuButton {
 			promptClear("The current patch is unsaved. Clear it and open a new patch?", [this]() {
 				std::string dir;
 				if (! APP->patch->path.empty())
-				{
 					dir = system::getDirectory(APP->patch->path);
-				}
 				else
-				{
-					// find home directory
-#ifdef ARCH_WIN
-					if (const char* const userprofile = getenv("USERPROFILE"))
-					{
-						dir = userprofile;
-					}
-					else if (const char* const homedrive = getenv("HOMEDRIVE"))
-					{
-						if (const char* const homepath = getenv("HOMEPATH"))
-							dir = system::join(homedrive, homepath);
-					}
-#else
-					if (struct passwd* const pwd = getpwuid(getuid()))
-						dir = pwd->pw_dir;
-					else if (const char* const home = getenv("HOME"))
-						dir = home;
-#endif
-				}
+					dir = homeDir();
 
 				Window::FileBrowserOptions opts;
 				opts.startDir = dir.c_str();
-				window.openFileBrowser(opts);
+				opts.saving = ui->saving = false;
+				ui->openFileBrowser(opts);
 			});
 		}));
 
-		/*
-		menu->addChild(createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
-			APP->patch->saveDialog();
-		}));
+		menu->addChild(createMenuItem("Export...", RACK_MOD_CTRL_NAME "+Shift+S", [this]() {
+			// see APP->patch->saveAsDialog();
+			std::string dir;
+			if (! APP->patch->path.empty())
+				dir = system::getDirectory(APP->patch->path);
+			else
+				dir = homeDir();
 
-		menu->addChild(createMenuItem("Save as", RACK_MOD_CTRL_NAME "+Shift+S", []() {
-			APP->patch->saveAsDialog();
+			Window::FileBrowserOptions opts;
+			opts.startDir = dir.c_str();
+			opts.saving = ui->saving = true;
+			ui->openFileBrowser(opts);
 		}));
-
-		menu->addChild(createMenuItem("Save template", "", []() {
-			APP->patch->saveTemplateDialog();
-		}));
-		*/
 
 #ifdef HAVE_LIBLO
 		if (oscServer == nullptr || !oscConnected) {
@@ -680,7 +682,7 @@ struct MenuBar : widget::OpaqueWidget {
 	// CardinalPluginContext* const context;
 	MeterLabel* meterLabel;
 
-	MenuBar(Window& window, const bool isStandalone)
+	MenuBar(CardinalBaseUI* const ui, const bool isStandalone)
 		: widget::OpaqueWidget()
 		// : context(ctx)
     {
@@ -692,7 +694,7 @@ struct MenuBar : widget::OpaqueWidget {
 		layout->spacing = math::Vec(0, 0);
 		addChild(layout);
 
-		FileButton* fileButton = new FileButton(window, isStandalone);
+		FileButton* fileButton = new FileButton(ui, isStandalone);
 		fileButton->text = "File";
 		layout->addChild(fileButton);
 
@@ -745,8 +747,8 @@ widget::Widget* createMenuBar() {
 	return new widget::Widget;
 }
 
-widget::Widget* createMenuBar(Window& window, const bool isStandalone) {
-	menuBar::MenuBar* menuBar = new menuBar::MenuBar(window, isStandalone);
+widget::Widget* createMenuBar(CardinalBaseUI* const ui, const bool isStandalone) {
+	menuBar::MenuBar* menuBar = new menuBar::MenuBar(ui, isStandalone);
 	return menuBar;
 }
 
