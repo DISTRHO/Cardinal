@@ -121,10 +121,10 @@ static std::string homeDir()
 			return system::join(homedrive, homepath);
 	}
 #else
-	if (struct passwd* const pwd = getpwuid(getuid()))
-		return pwd->pw_dir;
-	else if (const char* const home = getenv("HOME"))
+	if (const char* const home = getenv("HOME"))
 		return home;
+	else if (struct passwd* const pwd = getpwuid(getuid()))
+		return pwd->pw_dir;
 #endif
 	return {};
 }
