@@ -439,6 +439,7 @@ static void initStatic__Cardinal()
     if (spl.ok())
     {
         p->addModel(modelCarla);
+        p->addModel(modelCardinalBlank);
         p->addModel(modelGlBars);
         p->addModel(modelHostCV);
         p->addModel(modelHostParameters);

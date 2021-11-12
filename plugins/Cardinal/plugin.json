@@ -50,6 +50,15 @@
       ]
     },
     {
+      "slug": "Blank",
+      "disabled": false,
+      "name": "Blank",
+      "description": "Cardinal's own blank panel",
+      "tags": [
+        "Visual"
+      ]
+    },
+    {
       "slug": "Carla",
       "disabled": false,
       "name": "Carla Plugin Host",

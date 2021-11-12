@@ -177,6 +177,7 @@ PLUGIN_FILES = plugins.cpp
 # --------------------------------------------------------------
 # Cardinal (built-in)
 
+PLUGIN_FILES += Cardinal/src/Blank.cpp
 PLUGIN_FILES += Cardinal/src/Carla.cpp
 PLUGIN_FILES += Cardinal/src/glBars.cpp
 PLUGIN_FILES += Cardinal/src/HostCV.cpp
