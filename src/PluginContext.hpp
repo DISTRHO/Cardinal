@@ -112,6 +112,7 @@ public:
     virtual bool clearMidiOutputDevice(CardinalMidiOutputDevice* dev) noexcept = 0;
 };
 
+#ifndef HEADLESS
 class CardinalBaseUI : public UI {
 public:
     CardinalPluginContext* const context;
@@ -123,6 +124,7 @@ public:
           saving(false) {}
     ~CardinalBaseUI() override {}
 };
+#endif
 
 // -----------------------------------------------------------------------------------------------------------
 
