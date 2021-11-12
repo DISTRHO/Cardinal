@@ -117,6 +117,12 @@ public:
         context->scene->menuBar = rack::app::createMenuBar(this, getApp().isStandalone());
         context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
 
+        // hide "Browse VCV Library" button
+        rack::widget::Widget* const browser = context->scene->browser->children.back();
+        rack::widget::Widget* const headerLayout = browser->children.front();
+        rack::widget::Widget* const libraryButton = headerLayout->children.back();
+        libraryButton->hide();
+
         context->window->step();
 
         rack::contextSet(nullptr);
