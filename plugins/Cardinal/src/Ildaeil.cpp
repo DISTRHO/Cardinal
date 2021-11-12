@@ -162,6 +162,9 @@ struct IldaeilModule : Module {
         carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/usr/share/carla/resources");
 #endif
 
+        if (const char* const path = std::getenv("LV2_PATH"))
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PLUGIN_PATH, PLUGIN_LV2, path);
+
         fCarlaPluginDescriptor->dispatcher(fCarlaPluginHandle, NATIVE_PLUGIN_OPCODE_HOST_USES_EMBED,
                                            0, 0, nullptr, 0.0f);
 
@@ -711,12 +714,20 @@ struct IldaeilWidget : ImGuiWidget, Thread {
 
     void run() override
     {
-        /*
-        // TESTING
-        const char* const path = "/home/falktx/bin/reaper_linux_x86_64/REAPER/InstallData/Effects";
+        const char* path;
 
-        carla_set_engine_option(fPlugin->fCarlaHostHandle, ENGINE_OPTION_PLUGIN_PATH, fPluginType, path);
-        */
+        switch (fPluginType)
+        {
+        case PLUGIN_LV2:
+            path = std::getenv("LV2_PATH");
+            break;
+        default:
+            path = nullptr;
+            break;
+        }
+
+        if (path != nullptr)
+            carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_PLUGIN_PATH, fPluginType, path);
 
         if (const uint count = carla_get_cached_plugin_count(fPluginType, nullptr))
         {
