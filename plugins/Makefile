@@ -438,6 +438,9 @@ MINDMELD_CUSTOM = printNote
 
 PLUGIN_FILES += $(wildcard mscHack/src/*.cpp)
 
+# modules/types which are present in other plugins
+MSCHACK_CUSTOM_PER_FILE = MAIN_SYNC_CLOCK FILTER_PARAM_STRUCT OSC_PARAM_STRUCT PHRASE_CHANGE_STRUCT
+
 # --------------------------------------------------------------
 # rackwindows
 
@@ -909,7 +912,8 @@ $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),JW)) \
+		$(foreach m,$(MSCHACK_CUSTOM),$(call custom_module_names,$(m),mscHack)) \
+		$(foreach m,$(MSCHACK_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),mscHack_$(shell basename $*))) \
 		-DthePlugin=pluginInstance__mscHack \
 		-Dinit=init__mscHack
 

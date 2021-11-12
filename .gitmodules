@@ -72,4 +72,4 @@
 	url = git@github.com:Xenakios/Atelier.git
 [submodule "plugins/mscHack"]
 	path = plugins/mscHack
-	url = https://github.com/mschack/VCV-Rack-Plugins.git
+	url = https://github.com/CardinalModules/mscHack.git
