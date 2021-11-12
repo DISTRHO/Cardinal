@@ -8,9 +8,6 @@ VultModulesFree           61804.0 (not opensource?)
 
 NYSTHI                    58494.0 (not opensource?)
 
-DrumKit                   58468.0
-https://github.com/SVModular/DrumKit
-
 ML_modules                55847.0
 https://github.com/martin-lueders/ML_modules/
 
@@ -18,16 +15,27 @@ FrozenWasteland           53690.0
 https://github.com/almostEric/FrozenWasteland/
 
 ArableInstruments         48756.0
+https://github.com/adbrant/ArableInstruments/
+
 squinkylabs-plug1         48682.0
+https://github.com/squinkylabs/SquinkyVCV
+
 SonusModular              45245.0
-LindenbergResearch        43959.0
+https://gitlab.com/sonusdept/sonusmodular
+
+LindenbergResearch        43959.0 (not opensource?)
 
 Geodesics                 42761.0
 https://github.com/MarcBoule/Geodesics
 
 mscHack                   42316.0
+https://github.com/mschack/VCV-Rack-Plugins/
+
 BaconMusic                42095.0
+https://github.com/baconpaul/BaconPlugs/
+
 HetrickCV                 42077.0
+https://github.com/mhetrick/hetrickcv
 
 Alikins                   41798.0
 https://github.com/alikins/Alikins-rack-plugins

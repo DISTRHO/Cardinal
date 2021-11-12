@@ -434,6 +434,11 @@ PLUGIN_FILES += $(wildcard MindMeldModular/src/Utilities/*.cpp)
 MINDMELD_CUSTOM = printNote
 
 # --------------------------------------------------------------
+# mscHack
+
+PLUGIN_FILES += $(wildcard mscHack/src/*.cpp)
+
+# --------------------------------------------------------------
 # rackwindows
 
 PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/src/*.cpp))
@@ -899,6 +904,14 @@ $(BUILD_DIR)/MindMeldModular/MindMeldModular.cpp.o: MindMeldModular/src/MindMeld
 		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),JW)) \
 		-DpluginInstance=pluginInstance__MindMeld \
 		-Dinit=init__MindMeld
+
+$(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),JW)) \
+		-DthePlugin=pluginInstance__mscHack \
+		-Dinit=init__mscHack
 
 $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
