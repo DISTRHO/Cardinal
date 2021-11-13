@@ -69,7 +69,7 @@
 	url = https://github.com/falkTX/Carla.git
 [submodule "plugins/Atelier"]
 	path = plugins/Atelier
-	url = git@github.com:Xenakios/Atelier.git
+	url = https://github.com/Xenakios/Atelier.git
 [submodule "plugins/mscHack"]
 	path = plugins/mscHack
 	url = https://github.com/CardinalModules/mscHack.git
