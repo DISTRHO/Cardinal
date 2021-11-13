@@ -54,6 +54,9 @@ struct CardinalPluginContext : rack::Context {
     const float** dataIns;
     float** dataOuts;
     Plugin* const plugin;
+#ifndef HEADLESS
+    UI* ui;
+#endif
 
     CardinalPluginContext(Plugin* const p)
         : bufferSize(p->getBufferSize()),
@@ -79,9 +82,17 @@ struct CardinalPluginContext : rack::Context {
           dataIns(nullptr),
           dataOuts(nullptr),
           plugin(p)
+#ifndef HEADLESS
+        , ui(nullptr)
+#endif
     {
         std::memset(parameters, 0, sizeof(parameters));
     }
+
+#ifndef HEADLESS
+    bool addIdleCallback(IdleCallback* cb);
+    void removeIdleCallback(IdleCallback* cb);
+#endif
 };
 
 // -----------------------------------------------------------------------------------------------------------
@@ -121,8 +132,14 @@ public:
     CardinalBaseUI(const uint width, const uint height)
         : UI(width, height),
           context(getRackContextFromPlugin(getPluginInstancePointer())),
-          saving(false) {}
-    ~CardinalBaseUI() override {}
+          saving(false)
+    {
+        context->ui = this;
+    }
+    ~CardinalBaseUI() override
+    {
+        context->ui = nullptr;
+    }
 };
 #endif
 

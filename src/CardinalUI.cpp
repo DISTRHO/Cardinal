@@ -56,6 +56,25 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
+bool CardinalPluginContext::addIdleCallback(IdleCallback* const cb)
+{
+    if (ui == nullptr)
+        return false;
+
+    ui->addIdleCallback(cb);
+    return true;
+}
+
+void CardinalPluginContext::removeIdleCallback(IdleCallback* const cb)
+{
+    if (ui == nullptr)
+        return;
+
+    ui->removeIdleCallback(cb);
+}
+
+// -----------------------------------------------------------------------------------------------------------
+
 class CardinalUI : public CardinalBaseUI,
                    public WindowParametersCallback
 {

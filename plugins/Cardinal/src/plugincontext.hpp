@@ -20,6 +20,10 @@
 #include "plugin.hpp"
 #include "DistrhoUtils.hpp"
 
+#ifndef HEADLESS
+# include "dgl/Base.hpp"
+#endif
+
 // -----------------------------------------------------------------------------------------------------------
 // from PluginContext.hpp
 
@@ -44,6 +48,10 @@ struct CardinalPluginContext : rack::Context {
     float** dataOuts;
     Plugin* const plugin;
     CardinalPluginContext(Plugin* const p);
+#ifndef HEADLESS
+    bool addIdleCallback(IdleCallback* cb);
+    void removeIdleCallback(IdleCallback* cb);
+#endif
 };
 
 END_NAMESPACE_DISTRHO

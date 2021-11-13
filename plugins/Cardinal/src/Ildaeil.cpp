@@ -357,7 +357,7 @@ static intptr_t host_dispatcher(const NativeHostHandle handle, const NativeHostD
 // --------------------------------------------------------------------------------------------------------------------
 
 #ifndef HEADLESS
-struct IldaeilWidget : ImGuiWidget, Thread {
+struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
     static constexpr const uint kButtonHeight = 20;
 
     struct PluginInfoCache {
@@ -440,13 +440,14 @@ struct IldaeilWidget : ImGuiWidget, Thread {
 
     String fPopupError;
 
+    bool idleCallbackActive = false;
     IldaeilModule* const module;
 
     IldaeilWidget(IldaeilModule* const m)
         : ImGuiWidget(),
           module(m)
     {
-        if (module == nullptr || module->fCarlaHostHandle == nullptr)
+        if (module->fCarlaHostHandle == nullptr)
         {
             fDrawingState = kDrawingErrorInit;
             fPopupError = "Ildaeil backend failed to init properly, cannot continue.";
@@ -460,13 +461,6 @@ struct IldaeilWidget : ImGuiWidget, Thread {
 
         const CarlaHostHandle handle = module->fCarlaHostHandle;
 
-        char winIdStr[24];
-        std::snprintf(winIdStr, sizeof(winIdStr), "%lx", (ulong)module->pcontext->nativeWindowId);
-        carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, winIdStr);
-        /*
-        carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_UI_SCALE, getScaleFactor()*1000, nullptr);
-        */
-
         if (carla_get_current_plugin_count(handle) != 0)
         {
             const uint hints = carla_get_plugin_info(handle, 0)->hints;
@@ -479,10 +473,12 @@ struct IldaeilWidget : ImGuiWidget, Thread {
 
     ~IldaeilWidget() override
     {
-        if (module != nullptr && module->fCarlaHostHandle != nullptr)
+        if (module->fCarlaHostHandle != nullptr)
         {
             module->fUI = nullptr;
             carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, "0");
+
+            module->pcontext->removeIdleCallback(this);
         }
 
         if (isThreadRunning())
@@ -661,28 +657,66 @@ struct IldaeilWidget : ImGuiWidget, Thread {
     void onContextCreate(const ContextCreateEvent& e) override
     {
         ImGuiWidget::onContextCreate(e);
-
-        if (module == nullptr || module->pcontext == nullptr || module->fCarlaHostHandle == nullptr)
-            return;
-
-        char winIdStr[24];
-        std::snprintf(winIdStr, sizeof(winIdStr), "%lx", (ulong)module->pcontext->nativeWindowId);
-        carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, winIdStr);
+        widgetCreated();
     }
 
     void onContextDestroy(const ContextDestroyEvent& e) override
     {
-        if (module != nullptr && module->fCarlaHostHandle != nullptr)
-            carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, "0");
-
+        widgetDestroyed();
         ImGuiWidget::onContextDestroy(e);
     }
 
-    void step() override
+    void onAdd(const AddEvent& e) override
     {
-        ImGuiWidget::step();
-        setDirty(true);
+        ImGuiWidget::onAdd(e);
+        widgetCreated();
+    }
 
+    void onRemove(const RemoveEvent& e) override
+    {
+        widgetDestroyed();
+        ImGuiWidget::onRemove(e);
+    }
+
+    void widgetCreated()
+    {
+        if (const CarlaHostHandle handle = module->fCarlaHostHandle)
+        {
+            CardinalPluginContext* const pcontext = module->pcontext;
+
+            char winIdStr[24];
+            std::snprintf(winIdStr, sizeof(winIdStr), "%llx", (ulonglong)pcontext->nativeWindowId);
+
+            module->fCarlaHostDescriptor.uiParentId = pcontext->nativeWindowId;
+            carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, winIdStr);
+
+            if (pcontext->window != nullptr)
+                carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_UI_SCALE, pcontext->window->pixelRatio*1000, nullptr);
+
+            if (! idleCallbackActive)
+                idleCallbackActive = pcontext->addIdleCallback(this);
+        }
+    }
+
+    void widgetDestroyed()
+    {
+        if (const CarlaHostHandle handle = module->fCarlaHostHandle)
+        {
+            CardinalPluginContext* const pcontext = module->pcontext;
+
+            module->fCarlaHostDescriptor.uiParentId = 0;
+            carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, "0");
+
+            if (idleCallbackActive)
+            {
+                idleCallbackActive = false;
+                pcontext->removeIdleCallback(this);
+            }
+        }
+    }
+
+    void idleCallback() override
+    {
         switch (fDrawingState)
         {
         case kDrawingInit:

@@ -366,7 +366,7 @@ static intptr_t host_dispatcher(const NativeHostHandle handle, const NativeHostD
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct CarlaModuleWidget : ModuleWidget {
+struct CarlaModuleWidget : ModuleWidget, IdleCallback {
     static constexpr const float startX_In = 14.0f;
     static constexpr const float startX_Out = 96.0f;
     static constexpr const float startY = 74.0f;
@@ -374,6 +374,7 @@ struct CarlaModuleWidget : ModuleWidget {
     static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.25f;
 
     CarlaModule* const module;
+    bool idleCallbackActive = false;
     bool visible = false;
 
     CarlaModuleWidget(CarlaModule* const m)
@@ -393,21 +394,6 @@ struct CarlaModuleWidget : ModuleWidget {
 
         for (uint i=0; i<CarlaModule::NUM_OUTPUTS; ++i)
             addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * i), module, i));
-
-        if (module != nullptr && module->fCarlaHostHandle != nullptr)
-        {
-            const CarlaHostHandle handle = module->fCarlaHostHandle;
-
-            char winIdStr[24];
-            std::snprintf(winIdStr, sizeof(winIdStr), "%lx", (ulong)module->pcontext->nativeWindowId);
-            carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, winIdStr);
-            module->fCarlaHostDescriptor.uiParentId = module->pcontext->nativeWindowId;
-            /*
-            carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_UI_SCALE, getScaleFactor()*1000, nullptr);
-            */
-
-            module->fUI = this;
-        }
     }
 
     ~CarlaModuleWidget() override
@@ -427,25 +413,80 @@ struct CarlaModuleWidget : ModuleWidget {
     void onContextCreate(const ContextCreateEvent& e) override
     {
         ModuleWidget::onContextCreate(e);
-
-        if (module == nullptr || module->pcontext == nullptr || module->fCarlaHostHandle == nullptr)
-            return;
-
-        char winIdStr[24];
-        std::snprintf(winIdStr, sizeof(winIdStr), "%lx", (ulong)module->pcontext->nativeWindowId);
-        carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, winIdStr);
-        module->fCarlaHostDescriptor.uiParentId = module->pcontext->nativeWindowId;
+        widgetCreated();
     }
 
     void onContextDestroy(const ContextDestroyEvent& e) override
     {
-        if (module != nullptr && module->fCarlaHostHandle != nullptr)
+        widgetDestroyed();
+        ModuleWidget::onContextDestroy(e);
+    }
+
+    void onAdd(const AddEvent& e) override
+    {
+        ModuleWidget::onAdd(e);
+        widgetCreated();
+    }
+
+    void onRemove(const RemoveEvent& e) override
+    {
+        widgetDestroyed();
+        ModuleWidget::onRemove(e);
+    }
+
+    void widgetCreated()
+    {
+        if (module == nullptr || module->pcontext == nullptr || module->fCarlaHostHandle == nullptr)
+            return;
+
+        const CarlaHostHandle handle = module->fCarlaHostHandle;
+        CardinalPluginContext* const pcontext = module->pcontext;
+
+        char winIdStr[24];
+        std::snprintf(winIdStr, sizeof(winIdStr), "%llx", (ulonglong)pcontext->nativeWindowId);
+
+        module->fCarlaHostDescriptor.uiParentId = pcontext->nativeWindowId;
+        carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, winIdStr);
+
+        if (pcontext->window != nullptr)
+            carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_UI_SCALE, pcontext->window->pixelRatio*1000, nullptr);
+
+        if (! idleCallbackActive)
+            idleCallbackActive = pcontext->addIdleCallback(this);
+
+        module->fUI = this;
+    }
+
+    void widgetDestroyed()
+    {
+        if (module == nullptr || module->pcontext == nullptr || module->fCarlaHostHandle == nullptr)
+            return;
+
+        const CarlaHostHandle handle = module->fCarlaHostHandle;
+        CardinalPluginContext* const pcontext = module->pcontext;
+
+        module->fUI = nullptr;
+
+        if (visible)
         {
-            module->fCarlaHostDescriptor.uiParentId = 0;
-            carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, "0");
+            visible = false;
+            module->fCarlaPluginDescriptor->ui_show(module->fCarlaPluginHandle, false);
         }
 
-        ModuleWidget::onContextDestroy(e);
+        if (idleCallbackActive)
+        {
+            idleCallbackActive = false;
+            pcontext->removeIdleCallback(this);
+        }
+
+        module->fCarlaHostDescriptor.uiParentId = 0;
+        carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, "0");
+    }
+
+    void idleCallback() override
+    {
+        if (module != nullptr && module->fCarlaHostHandle != nullptr && visible)
+            module->fCarlaPluginDescriptor->ui_idle(module->fCarlaPluginHandle);
     }
 
     void drawTextLine(NVGcontext* const vg, const uint offset, const char* const text)
@@ -486,14 +527,6 @@ struct CarlaModuleWidget : ModuleWidget {
         drawTextLine(args.vg, 9, "CV 8");
 
         ModuleWidget::draw(args);
-    }
-
-    void step() override
-    {
-        if (module != nullptr && module->fCarlaHostHandle != nullptr && visible)
-            module->fCarlaPluginDescriptor->ui_idle(module->fCarlaPluginHandle);
-
-        ModuleWidget::step();
     }
 
     void showUI()
