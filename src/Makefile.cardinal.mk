@@ -228,65 +228,73 @@ BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 # --------------------------------------------------------------
 # Enable all possible plugin types and setup resources
 
-ifeq ($(NAME),Cardinal)
+ifeq ($(NAME),CardinalFX)
 
-all: jack lv2 resources
+all: jack vst2 lv2 resources
 
 CORE_RESOURCES = $(filter-out icon.png,$(subst ../Rack/res/,,$(wildcard ../Rack/res/*))) template.vcv
 
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.lv2/resources/%)
+PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/CardinalFX.lv2/resources/%)
 ifeq ($(MACOS),true)
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.vst/Contents/Resources/%)
+PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/CardinalFX.vst/Contents/Resources/%)
 else
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.vst/resources/%)
+PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/CardinalFX.vst/resources/%)
 endif
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.vst3/Contents/Resources/%)
+PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/CardinalFX.vst3/Contents/Resources/%)
 
+else # CardinalFX
+
+ifeq ($(NAME),Cardinal)
+all: jack lv2 vst3 resources
 else
-
 all: jack lv2 vst2 vst3 resources
+endif
 
 PLUGIN_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/resources
+PLUGIN_RESOURCES += $(TARGET_DIR)/$(NAME).vst3/Contents/Resources
+
+# Cardinal (full) is not available as VST2 due to lack of CV ports
+ifneq ($(NAME),Cardinal)
 ifeq ($(MACOS),true)
 PLUGIN_RESOURCES += $(TARGET_DIR)/$(NAME).vst/Contents/Resources
 else
 PLUGIN_RESOURCES += $(TARGET_DIR)/$(NAME).vst/resources
 endif
-PLUGIN_RESOURCES += $(TARGET_DIR)/$(NAME).vst3/Contents/Resources
-
 endif
+
+endif # CardinalFX
 
 # --------------------------------------------------------------
 
 resources: $(PLUGIN_RESOURCES)
 
-ifneq ($(NAME),Cardinal)
+ifneq ($(NAME),CardinalFX)
 lv2: resources
 vst2: resources
 vst3: resources
-$(TARGET_DIR)/$(NAME).%: $(TARGET_DIR)/Cardinal.%
+$(TARGET_DIR)/$(NAME).%: $(TARGET_DIR)/CardinalFX.%
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
 endif
 
-$(TARGET_DIR)/Cardinal.%/template.vcv: ../template.vcv
+$(TARGET_DIR)/CardinalFX.%/template.vcv: ../template.vcv
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
 
-$(TARGET_DIR)/Cardinal.lv2/resources/%: ../Rack/res/%
+$(TARGET_DIR)/CardinalFX.lv2/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
 
-$(TARGET_DIR)/Cardinal.vst/resources/%: ../Rack/res/%
+$(TARGET_DIR)/CardinalFX.vst/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
 
-$(TARGET_DIR)/Cardinal.vst/Contents/Resources/%: ../Rack/res/%
+$(TARGET_DIR)/CardinalFX.vst/Contents/Resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
 
-$(TARGET_DIR)/Cardinal.vst3/Contents/Resources/%: ../Rack/res/%
+$(TARGET_DIR)/CardinalFX.vst3/Contents/Resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
 
 # --------------------------------------------------------------

@@ -130,9 +130,9 @@ BASE_FLAGS += -Wno-unused-variable
 TARGET = rack.a
 
 all: $(TARGET)
-	$(MAKE) -C Cardinal
 	$(MAKE) -C CardinalFX
 	$(MAKE) -C CardinalSynth
+	$(MAKE) -C Cardinal
 
 resources:
 	$(MAKE) resources -C Cardinal

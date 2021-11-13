@@ -629,57 +629,57 @@ else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 endif
 
-PLUGIN_RESOURCES  = ../bin/Cardinal.lv2/resources/PluginManifests/Core.json
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/%)
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
+PLUGIN_RESOURCES  = ../bin/CardinalFX.lv2/resources/PluginManifests/Core.json
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/%)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
 ifeq ($(MACOS),true)
-PLUGIN_RESOURCES += ../bin/Cardinal.vst/Contents/Resources/PluginManifests/Core.json
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst/Contents/Resources/%)
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst/Contents/Resources/PluginManifests/%.json)
+PLUGIN_RESOURCES += ../bin/CardinalFX.vst/Contents/Resources/PluginManifests/Core.json
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/%)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json)
 else
-PLUGIN_RESOURCES += ../bin/Cardinal.vst/resources/PluginManifests/Core.json
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst/resources/%)
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst/resources/PluginManifests/%.json)
+PLUGIN_RESOURCES += ../bin/CardinalFX.vst/resources/PluginManifests/Core.json
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/resources/%)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/resources/PluginManifests/%.json)
 endif
-PLUGIN_RESOURCES += ../bin/Cardinal.vst3/Contents/Resources/PluginManifests/Core.json
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst3/Contents/Resources/%)
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst3/Contents/Resources/PluginManifests/%.json)
+PLUGIN_RESOURCES += ../bin/CardinalFX.vst3/Contents/Resources/PluginManifests/Core.json
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst3/Contents/Resources/%)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst3/Contents/Resources/PluginManifests/%.json)
 
 resources: $(PLUGIN_RESOURCES)
 
-../bin/Cardinal.%/Core.json: Core.json
+../bin/CardinalFX.%/Core.json: Core.json
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 
-../bin/Cardinal.lv2/resources/%: %/res
+../bin/CardinalFX.lv2/resources/%: %/res
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 
-../bin/Cardinal.vst/resources/%: %/res
+../bin/CardinalFX.vst/resources/%: %/res
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 
-../bin/Cardinal.vst/Contents/Resources/%: %/res
+../bin/CardinalFX.vst/Contents/Resources/%: %/res
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 
-../bin/Cardinal.vst3/Contents/Resources/%: %/res
+../bin/CardinalFX.vst3/Contents/Resources/%: %/res
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 
-../bin/Cardinal.lv2/resources/PluginManifests/%.json: %/plugin.json
+../bin/CardinalFX.lv2/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 
-../bin/Cardinal.vst/resources/PluginManifests/%.json: %/plugin.json
+../bin/CardinalFX.vst/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 
-../bin/Cardinal.vst/Contents/Resources/PluginManifests/%.json: %/plugin.json
+../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 
-../bin/Cardinal.vst3/Contents/Resources/PluginManifests/%.json: %/plugin.json
+../bin/CardinalFX.vst3/Contents/Resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 
