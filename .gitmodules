@@ -18,7 +18,7 @@
 	url = https://github.com/VCVRack/Befaco.git
 [submodule "plugins/AudibleInstruments"]
 	path = plugins/AudibleInstruments
-	url = https://github.com/VCVRack/AudibleInstruments.git
+	url = https://github.com/CardinalModules/AudibleInstruments.git
 [submodule "plugins/AnimatedCircuits"]
 	path = plugins/AnimatedCircuits
 	url = https://github.com/CardinalModules/AnimatedCircuits.git
@@ -42,7 +42,7 @@
 	url = https://github.com/jeremywen/JW-Modules.git
 [submodule "plugins/rackwindows"]
 	path = plugins/rackwindows
-	url = https://github.com/n0jo/rackwindows.git
+	url = https://github.com/CardinalModules/rackwindows.git
 [submodule "plugins/AS"]
 	path = plugins/AS
 	url = https://github.com/AScustomWorks/AS.git
@@ -60,7 +60,7 @@
 	url = https://github.com/MarcBoule/MindMeldModular.git
 [submodule "plugins/ValleyAudio"]
 	path = plugins/ValleyAudio
-	url = https://github.com/ValleyAudio/ValleyRackFree.git
+	url = https://github.com/CardinalModules/ValleyAudio.git
 [submodule "plugins/DrumKit"]
 	path = plugins/DrumKit
 	url = https://github.com/SVModular/DrumKit.git

@@ -746,7 +746,8 @@ $(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(AS_CUSTOM),$(call custom_module_names,$(m),AS)) \
-		-DpluginInstance=pluginInstance__AS
+		-DpluginInstance=pluginInstance__AS \
+		-Wno-unused-private-field
 
 $(BUILD_DIR)/Atelier/%.o: Atelier/%
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -756,19 +757,10 @@ $(BUILD_DIR)/Atelier/%.o: Atelier/%
 		-DpluginInstance=pluginInstance__Atelier \
 		-DTEST \
 		-IAtelier/eurorack \
+		-Wno-sign-compare \
 		-Wno-unused-local-typedefs
 
-$(BUILD_DIR)/AudibleInstruments/%.cc.o: AudibleInstruments/%.cc
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(AUDIBLEINSTRUMENTS_CUSTOM),$(call custom_module_names,$(m),AudibleInstruments)) \
-		-DpluginInstance=pluginInstance__AudibleInstruments \
-		-DTEST \
-		-IAudibleInstruments/eurorack \
-		-Wno-unused-local-typedefs
-
-$(BUILD_DIR)/AudibleInstruments/%.cpp.o: AudibleInstruments/%.cpp
+$(BUILD_DIR)/AudibleInstruments/%.o: AudibleInstruments/%
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
@@ -792,7 +784,8 @@ $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
 		$(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) \
 		$(foreach m,$(BIDOO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bidoo_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__Bidoo \
-		-IBidoo/src/dep/gverb/include
+		-IBidoo/src/dep/gverb/include \
+		-Wno-sign-compare
 
 $(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -829,7 +822,8 @@ $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(DRUMKIT_CUSTOM),$(call custom_module_names,$(m),DrumKit)) \
 		-DpluginInstance=pluginInstance__DrumKit \
-		-Dinit=init__DrumKit
+		-Dinit=init__DrumKit \
+		-Wno-sign-compare
 
 $(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -845,19 +839,14 @@ $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
 		-DpluginInstance=pluginInstance__Fundamental
 
-$(BUILD_DIR)/Fundamental-workaround/%.cpp.o: Fundamental-workaround/%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
-		-DpluginInstance=pluginInstance__Fundamental 
-
 $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(GRANDEMODULAR_CUSTOM),$(call custom_module_names,$(m),GrandeModular)) \
-		-DpluginInstance=pluginInstance__GrandeModular
+		-DpluginInstance=pluginInstance__GrandeModular \
+		-Wno-missing-braces \
+		-Wno-self-assign
 
 $(BUILD_DIR)/ImpromptuModular/%.cpp.o: ImpromptuModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -916,14 +905,16 @@ $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 		$(foreach m,$(MSCHACK_CUSTOM),$(call custom_module_names,$(m),mscHack)) \
 		$(foreach m,$(MSCHACK_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),mscHack_$(shell basename $*))) \
 		-DthePlugin=pluginInstance__mscHack \
-		-Dinit=init__mscHack
+		-Dinit=init__mscHack \
+		-Wno-non-c-typedef-for-linkage
 
 $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(RACKWINDOWS_CUSTOM),$(call custom_module_names,$(m),rackwindows)) \
-		-DpluginInstance=pluginInstance__rackwindows
+		-DpluginInstance=pluginInstance__rackwindows \
+		-Wno-sign-compare
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -932,7 +923,8 @@ $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 		$(foreach m,$(VALLEYAUDIO_CUSTOM),$(call custom_module_names,$(m),ValleyAudio)) \
 		$(foreach m,$(VALLEYAUDIO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ValleyAudio_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__ValleyAudio \
-		-DSTDIO_OVERRIDE=ValleyAudio
+		-DSTDIO_OVERRIDE=ValleyAudio \
+		-Wno-sign-compare
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
