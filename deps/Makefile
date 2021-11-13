@@ -33,8 +33,8 @@ BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
 ifeq ($(WITH_LTO),true)
-BASE_FLAGS += -fno-strict-aliasing -flto -ffat-lto-objects
-LINK_FLAGS += -fno-strict-aliasing -flto -ffat-lto-objects -Werror=odr -Werror=lto-type-mismatch
+BASE_FLAGS += -fno-strict-aliasing -flto
+LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
 endif
 
 BUILD_C_FLAGS += -fno-finite-math-only

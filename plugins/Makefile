@@ -594,7 +594,7 @@ BASE_FLAGS += -DNOPLUGINS
 endif
 
 ifeq ($(WITH_LTO),true)
-BASE_FLAGS += -fno-strict-aliasing -flto -ffat-lto-objects
+BASE_FLAGS += -fno-strict-aliasing -flto
 endif
 
 BUILD_C_FLAGS += -std=gnu11

@@ -163,7 +163,7 @@ BASE_FLAGS += -I../../include/mingw-std-threads
 endif
 
 ifeq ($(WITH_LTO),true)
-BASE_FLAGS += -fno-strict-aliasing -flto -ffat-lto-objects
+BASE_FLAGS += -fno-strict-aliasing -flto
 endif
 
 BUILD_C_FLAGS += -std=gnu11
@@ -199,7 +199,7 @@ EXTRA_LIBS += $(shell pkg-config --libs jansson libarchive samplerate speexdsp)
 endif
 
 ifeq ($(WITH_LTO),true)
-LINK_FLAGS += -fno-strict-aliasing -flto -ffat-lto-objects -fwhole-program -Werror=odr -Werror=lto-type-mismatch
+LINK_FLAGS += -fno-strict-aliasing -flto -fwhole-program -Werror=odr -Werror=lto-type-mismatch
 endif
 
 # --------------------------------------------------------------
