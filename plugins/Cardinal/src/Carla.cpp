@@ -366,6 +366,7 @@ static intptr_t host_dispatcher(const NativeHostHandle handle, const NativeHostD
 
 // --------------------------------------------------------------------------------------------------------------------
 
+#ifndef HEADLESS
 struct CarlaModuleWidget : ModuleWidget, IdleCallback {
     static constexpr const float startX_In = 14.0f;
     static constexpr const float startX_Out = 96.0f;
@@ -562,13 +563,18 @@ struct CarlaModuleWidget : ModuleWidget, IdleCallback {
     }
 };
 
-// --------------------------------------------------------------------------------------------------------------------
-
 static void host_ui_closed(NativeHostHandle handle)
 {
     if (CarlaModuleWidget* const ui = static_cast<CarlaModuleWidget*>(static_cast<CarlaModule*>(handle)->fUI))
         ui->visible = false;
 }
+#else
+static void host_ui_closed(handle) {}
+typedef ModuleWidget CarlaModuleWidget;
+#endif
+
+
+// --------------------------------------------------------------------------------------------------------------------
 
 static void host_ui_parameter_changed(const NativeHostHandle handle, const uint32_t index, const float value)
 {
