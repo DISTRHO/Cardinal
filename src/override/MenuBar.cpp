@@ -162,14 +162,14 @@ struct FileButton : MenuButton {
 		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
-		menu->addChild(createMenuItem("New", RACK_MOD_CTRL_NAME "+N", []() {
+		menu->addChild(createMenuItem("New", ""/*RACK_MOD_CTRL_NAME "+N"*/, []() {
 			// see APP->patch->loadTemplateDialog();
 			promptClear("The current patch is unsaved. Clear it and start a new patch?", []() {
 				APP->patch->loadTemplate();
 			});
 		}));
 
-		menu->addChild(createMenuItem("Import...", RACK_MOD_CTRL_NAME "+O", [this]() {
+		menu->addChild(createMenuItem("Open / Import...", ""/*RACK_MOD_CTRL_NAME "+O"*/, [this]() {
 			// see APP->patch->loadDialog();
 			promptClear("The current patch is unsaved. Clear it and open a new patch?", [this]() {
 				std::string dir;
@@ -185,7 +185,11 @@ struct FileButton : MenuButton {
 			});
 		}));
 
-		menu->addChild(createMenuItem("Export...", RACK_MOD_CTRL_NAME "+Shift+S", [this]() {
+		menu->addChild(createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
+			APP->patch->saveDialog();
+		}, APP->patch->path.empty()));
+
+		menu->addChild(createMenuItem("Save as / Export...", ""/*RACK_MOD_CTRL_NAME "+Shift+S"*/, [this]() {
 			// see APP->patch->saveAsDialog();
 			std::string dir;
 			if (! APP->patch->path.empty())
@@ -233,7 +237,7 @@ struct FileButton : MenuButton {
 		}
 #endif
 
-		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
+		menu->addChild(createMenuItem("Revert", ""/*RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O"*/, []() {
 			// APP->patch->revertDialog();
 			if (APP->patch->path.empty())
 				return;

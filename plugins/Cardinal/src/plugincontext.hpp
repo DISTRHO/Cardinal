@@ -32,6 +32,7 @@ START_NAMESPACE_DISTRHO
 static constexpr const uint32_t kModuleParameters = 24;
 
 class Plugin;
+class UI;
 
 struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize;
@@ -47,6 +48,9 @@ struct CardinalPluginContext : rack::Context {
     const float** dataIns;
     float** dataOuts;
     Plugin* const plugin;
+#ifndef HEADLESS
+    UI* ui;
+#endif
     CardinalPluginContext(Plugin* const p);
 #ifndef HEADLESS
     bool addIdleCallback(IdleCallback* cb);

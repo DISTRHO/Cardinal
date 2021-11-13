@@ -37,10 +37,108 @@
 #include "WindowParameters.hpp"
 #include "ResizeHandle.hpp"
 
-GLFWAPI const char* glfwGetClipboardString(GLFWwindow* window) { return nullptr; }
-GLFWAPI void glfwSetClipboardString(GLFWwindow* window, const char*) {}
-GLFWAPI const char* glfwGetKeyName(int key, int scancode) { return nullptr; }
-GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
+GLFWAPI const char* glfwGetClipboardString(GLFWwindow*) { return nullptr; }
+GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char*) {}
+GLFWAPI int glfwGetKeyScancode(int) { return 0; }
+
+GLFWAPI const char* glfwGetKeyName(const int key, int)
+{
+    switch (key)
+    {
+    case '\"': return "\"";
+    case '\'': return "\'";
+    case '\\': return "\\";
+    case ' ': return " ";
+    case '!': return "!";
+    case '#': return "#";
+    case '$': return "$";
+    case '%': return "%";
+    case '&': return "&";
+    case '(': return "(";
+    case ')': return ")";
+    case '*': return "*";
+    case '+': return "+";
+    case ',': return ",";
+    case '-': return "-";
+    case '.': return ".";
+    case '/': return "/";
+    case '0': return "0";
+    case '1': return "1";
+    case '2': return "2";
+    case '3': return "3";
+    case '4': return "4";
+    case '5': return "5";
+    case '6': return "6";
+    case '7': return "7";
+    case '8': return "8";
+    case '9': return "9";
+    case ':': return ":";
+    case ';': return ";";
+    case '<': return "<";
+    case '=': return "=";
+    case '>': return ">";
+    case '?': return "?";
+    case '@': return "@";
+    case 'A': return "A";
+    case 'B': return "B";
+    case 'C': return "C";
+    case 'D': return "D";
+    case 'E': return "E";
+    case 'F': return "F";
+    case 'G': return "G";
+    case 'H': return "H";
+    case 'I': return "I";
+    case 'J': return "J";
+    case 'K': return "K";
+    case 'L': return "L";
+    case 'M': return "M";
+    case 'N': return "N";
+    case 'O': return "O";
+    case 'P': return "P";
+    case 'Q': return "Q";
+    case 'R': return "R";
+    case 'S': return "S";
+    case 'T': return "T";
+    case 'U': return "U";
+    case 'V': return "V";
+    case 'W': return "W";
+    case 'X': return "X";
+    case 'Y': return "Y";
+    case 'Z': return "Z";
+    case '[': return "[";
+    case ']': return "]";
+    case '^': return "^";
+    case '_': return "_";
+    case '`': return "`";
+    case 'a': return "a";
+    case 'b': return "b";
+    case 'c': return "c";
+    case 'd': return "d";
+    case 'e': return "e";
+    case 'f': return "f";
+    case 'g': return "g";
+    case 'h': return "h";
+    case 'i': return "i";
+    case 'j': return "j";
+    case 'k': return "k";
+    case 'l': return "l";
+    case 'm': return "m";
+    case 'n': return "n";
+    case 'o': return "o";
+    case 'p': return "p";
+    case 'q': return "q";
+    case 'r': return "r";
+    case 's': return "s";
+    case 't': return "t";
+    case 'u': return "u";
+    case 'v': return "v";
+    case 'w': return "w";
+    case 'x': return "x";
+    case 'y': return "y";
+    case 'z': return "z";
+    default: return nullptr;
+    }
+}
 
 namespace rack {
 namespace app {
@@ -343,45 +441,21 @@ protected:
         const int mods = glfwMods(ev.mod);
 
         int button;
+
+        switch (ev.button)
+        {
+        case 1: button = GLFW_MOUSE_BUTTON_LEFT;   break;
 #ifdef DISTRHO_OS_MAC
-        switch (ev.button)
-        {
-        case 1:
-            button = GLFW_MOUSE_BUTTON_LEFT;
-            break;
-        case 2:
-            button = GLFW_MOUSE_BUTTON_RIGHT;
-            break;
-        case 3:
-            button = GLFW_MOUSE_BUTTON_MIDDLE;
-            break;
-        default:
-            button = 0;
-            break;
-        }
+        case 2: button = GLFW_MOUSE_BUTTON_RIGHT;  break;
+        case 3: button = GLFW_MOUSE_BUTTON_MIDDLE; break;
 #else
-        switch (ev.button)
-        {
-        case 1:
-            button = GLFW_MOUSE_BUTTON_LEFT;
-            break;
-        case 2:
-            button = GLFW_MOUSE_BUTTON_MIDDLE;
-            break;
-        case 3:
-            button = GLFW_MOUSE_BUTTON_RIGHT;
-            break;
-//         case 4:
-//             button = GLFW_MOUSE_WHEELUP;
-//             break;
-//         case 5:
-//             button = GLFW_MOUSE_WHEELDOWN;
-//             break;
+        case 2: button = GLFW_MOUSE_BUTTON_MIDDLE; break;
+        case 3: button = GLFW_MOUSE_BUTTON_RIGHT;  break;
+#endif
         default:
-            button = 0;
+            button = ev.button;
             break;
         }
-#endif
 
         /*
         #if defined ARCH_MAC
@@ -422,7 +496,8 @@ protected:
         scrollDelta = scrollDelta.mult(50.0);
 #endif
 
-        const ScopedContext sc(this, glfwMods(ev.mod));
+        const int mods = glfwMods(ev.mod);
+        const ScopedContext sc(this, mods);
         return context->event->handleScroll(fLastMousePos, scrollDelta);
     }
 
@@ -431,7 +506,8 @@ protected:
         if (ev.character <= ' ' || ev.character >= kKeyDelete)
             return false;
 
-        const ScopedContext sc(this, glfwMods(ev.mod));
+        const int mods = glfwMods(ev.mod);
+        const ScopedContext sc(this, mods);
         return context->event->handleText(fLastMousePos, ev.character);
     }
 
@@ -562,7 +638,7 @@ protected:
             try {
                 context->patch->load(sfilename);
             } catch (rack::Exception& e) {
-		        std::string message = rack::string::f("Could not load patch: %s", e.what());
+                std::string message = rack::string::f("Could not load patch: %s", e.what());
                 asyncDialog::create(message.c_str());
                 return;
             }
