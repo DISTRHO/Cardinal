@@ -569,7 +569,7 @@ static void host_ui_closed(NativeHostHandle handle)
         ui->visible = false;
 }
 #else
-static void host_ui_closed(handle) {}
+static void host_ui_closed(NativeHostHandle) {}
 typedef ModuleWidget CarlaModuleWidget;
 #endif
 
