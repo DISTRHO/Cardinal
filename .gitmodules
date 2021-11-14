@@ -54,7 +54,7 @@
 	url = https://github.com/jhoar/AmalgamatedHarmonics.git
 [submodule "plugins/cf"]
 	path = plugins/cf
-	url = https://github.com/cfoulc/cf.git
+	url = https://github.com/CardinalModules/cf.git
 [submodule "plugins/MindMeldModular"]
 	path = plugins/MindMeldModular
 	url = https://github.com/MarcBoule/MindMeldModular.git

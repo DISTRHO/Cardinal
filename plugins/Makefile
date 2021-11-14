@@ -768,6 +768,7 @@ $(BUILD_DIR)/AudibleInstruments/%.o: AudibleInstruments/%
 		-DpluginInstance=pluginInstance__AudibleInstruments \
 		-DTEST \
 		-IAudibleInstruments/eurorack \
+		-Wno-class-memaccess \
 		-Wno-unused-local-typedefs
 
 $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
@@ -814,7 +815,8 @@ $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
-		-DpluginInstance=pluginInstance__cf
+		-DpluginInstance=pluginInstance__cf \
+		-Wno-misleading-indentation
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -881,7 +883,10 @@ $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 		$(foreach m,$(JW_CUSTOM),$(call custom_module_names,$(m),JW)) \
 		-DpluginInstance=pluginInstance__JW \
 		-IJW-Modules/src \
-		-IJW-Modules/lib/oscpack
+		-IJW-Modules/lib/oscpack \
+		-Wno-misleading-indentation \
+		-Wno-unused-but-set-variable \
+		-Wno-unused-result
 
 $(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -906,7 +911,9 @@ $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 		$(foreach m,$(MSCHACK_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),mscHack_$(shell basename $*))) \
 		-DthePlugin=pluginInstance__mscHack \
 		-Dinit=init__mscHack \
-		-Wno-non-c-typedef-for-linkage
+		-Wno-class-memaccess \
+		-Wno-non-c-typedef-for-linkage \
+		-Wno-unused-but-set-variable
 
 $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -914,6 +921,7 @@ $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(RACKWINDOWS_CUSTOM),$(call custom_module_names,$(m),rackwindows)) \
 		-DpluginInstance=pluginInstance__rackwindows \
+		-Wno-implicit-fallthrough \
 		-Wno-sign-compare
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
@@ -924,7 +932,8 @@ $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 		$(foreach m,$(VALLEYAUDIO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ValleyAudio_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__ValleyAudio \
 		-DSTDIO_OVERRIDE=ValleyAudio \
-		-Wno-sign-compare
+		-Wno-sign-compare \
+		-Wno-unused-but-set-variable
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

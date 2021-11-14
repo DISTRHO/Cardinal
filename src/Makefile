@@ -119,9 +119,11 @@ RACK_FILES += $(filter-out $(IGNORED_FILES),$(wildcard Rack/src/*.cpp))
 RACK_FILES += $(filter-out $(IGNORED_FILES), $(wildcard Rack/src/*/*.cpp))
 
 # --------------------------------------------------------------
-# FIXME lots of warnings from VCV side
+# lots of warnings from VCV side
 
+BASE_FLAGS += -Wno-unused-but-set-variable
 BASE_FLAGS += -Wno-unused-parameter
+BASE_FLAGS += -Wno-unused-result
 BASE_FLAGS += -Wno-unused-variable
 
 # --------------------------------------------------------------
