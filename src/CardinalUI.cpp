@@ -251,6 +251,8 @@ public:
     {
         rack::contextSet(context);
 
+        context->nativeWindowId = 0;
+
         rack::widget::Widget* const menuBar = context->scene->menuBar;
         context->scene->menuBar = nullptr;
         context->scene->removeChild(menuBar);

@@ -602,13 +602,16 @@ BUILD_C_FLAGS += -fno-finite-math-only
 BUILD_CXX_FLAGS += -fno-finite-math-only
 
 # --------------------------------------------------------------
-# FIXME lots of warnings from VCV side
+# lots of warnings from VCV side
 
 BASE_FLAGS += -Wno-unused-parameter
 BASE_FLAGS += -Wno-unused-variable
 
-# also lots of plugins not updated to v2 yet
+# --------------------------------------------------------------
+# also from plugins
+
 BASE_FLAGS += -Wno-deprecated-declarations
+BASE_FLAGS += -Wno-unknown-warning-option
 
 # --------------------------------------------------------------
 # Build targets
