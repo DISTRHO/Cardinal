@@ -134,10 +134,19 @@ install:
 	install -d $(DESTDIR)$(PREFIX)/share/Cardinal
 
 	cp -rL bin/Cardinal.lv2  $(DESTDIR)$(PREFIX)/lib/lv2/
-	cp -rL bin/Cardinal.vst  $(DESTDIR)$(PREFIX)/lib/vst/
 	cp -rL bin/Cardinal.vst3 $(DESTDIR)$(PREFIX)/lib/vst3/
 
+	cp -rL bin/CardinalFX.lv2  $(DESTDIR)$(PREFIX)/lib/lv2/
+	cp -rL bin/CardinalFX.vst  $(DESTDIR)$(PREFIX)/lib/vst/
+	cp -rL bin/CardinalFX.vst3 $(DESTDIR)$(PREFIX)/lib/vst3/
+
+	cp -rL bin/CardinalSynth.lv2  $(DESTDIR)$(PREFIX)/lib/lv2/
+	cp -rL bin/CardinalSynth.vst  $(DESTDIR)$(PREFIX)/lib/vst/
+	cp -rL bin/CardinalSynth.vst3 $(DESTDIR)$(PREFIX)/lib/vst3/
+
 	install -m 755 bin/Cardinal$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 bin/CardinalFX$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 bin/CardinalSynth$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
 	cp -rL bin/Cardinal.lv2/resources/* $(DESTDIR)$(PREFIX)/share/Cardinal/
 
 # --------------------------------------------------------------

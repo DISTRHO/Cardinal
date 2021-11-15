@@ -213,12 +213,12 @@ struct IldaeilModule : Module {
     enum InputIds {
         INPUT1,
         INPUT2,
-		PITCH_INPUT,
-		GATE_INPUT,
-		VEL_INPUT,
-		AFT_INPUT,
-		PW_INPUT,
-		MW_INPUT,
+        PITCH_INPUT,
+        GATE_INPUT,
+        VEL_INPUT,
+        AFT_INPUT,
+        PW_INPUT,
+        MW_INPUT,
         NUM_INPUTS
     };
     enum OutputIds {
@@ -260,12 +260,12 @@ struct IldaeilModule : Module {
             configInput(i, name);
             configOutput(i, name);
         }
-		configInput(PITCH_INPUT, "Pitch (1V/oct)");
-		configInput(GATE_INPUT, "Gate");
-		configInput(VEL_INPUT, "Velocity");
-		configInput(AFT_INPUT, "Aftertouch");
-		configInput(PW_INPUT, "Pitch wheel");
-		configInput(MW_INPUT, "Mod wheel");
+        configInput(PITCH_INPUT, "Pitch (1V/oct)");
+        configInput(GATE_INPUT, "Gate");
+        configInput(VEL_INPUT, "Velocity");
+        configInput(AFT_INPUT, "Aftertouch");
+        configInput(PW_INPUT, "Pitch wheel");
+        configInput(MW_INPUT, "Mod wheel");
 
         std::memset(audioDataOut1, 0, sizeof(audioDataOut1));
         std::memset(audioDataOut2, 0, sizeof(audioDataOut2));
@@ -429,22 +429,22 @@ struct IldaeilModule : Module {
         outputs[OUTPUT1].setVoltage(audioDataOut1[i] * 10.0f);
         outputs[OUTPUT2].setVoltage(audioDataOut2[i] * 10.0f);
 
-		midiGenerator.setFrame(i);
+        midiGenerator.setFrame(i);
 
-		for (int c = 0; c < inputs[PITCH_INPUT].getChannels(); c++) {
-			int vel = (int) std::round(inputs[VEL_INPUT].getNormalPolyVoltage(10.f * 100 / 127, c) / 10.f * 127);
-			vel = clamp(vel, 0, 127);
-			midiGenerator.setVelocity(vel, c);
+        for (int c = 0; c < inputs[PITCH_INPUT].getChannels(); c++) {
+            int vel = (int) std::round(inputs[VEL_INPUT].getNormalPolyVoltage(10.f * 100 / 127, c) / 10.f * 127);
+            vel = clamp(vel, 0, 127);
+            midiGenerator.setVelocity(vel, c);
 
-			int note = (int) std::round(inputs[PITCH_INPUT].getVoltage(c) * 12.f + 60.f);
-			note = clamp(note, 0, 127);
-			bool gate = inputs[GATE_INPUT].getPolyVoltage(c) >= 1.f;
-			midiGenerator.setNoteGate(note, gate, c);
+            int note = (int) std::round(inputs[PITCH_INPUT].getVoltage(c) * 12.f + 60.f);
+            note = clamp(note, 0, 127);
+            bool gate = inputs[GATE_INPUT].getPolyVoltage(c) >= 1.f;
+            midiGenerator.setNoteGate(note, gate, c);
 
-			int aft = (int) std::round(inputs[AFT_INPUT].getPolyVoltage(c) / 10.f * 127);
-			aft = clamp(aft, 0, 127);
-			midiGenerator.setKeyPressure(aft, c);
-		}
+            int aft = (int) std::round(inputs[AFT_INPUT].getPolyVoltage(c) / 10.f * 127);
+            aft = clamp(aft, 0, 127);
+            midiGenerator.setKeyPressure(aft, c);
+        }
 
         int pw = (int) std::round((inputs[PW_INPUT].getVoltage() + 5.f) / 10.f * 0x4000);
         pw = clamp(pw, 0, 0x3fff);
@@ -464,10 +464,10 @@ struct IldaeilModule : Module {
         }
     }
 
-	void onReset() override
+    void onReset() override
     {
-		midiGenerator.reset();
-	}
+        midiGenerator.reset();
+    }
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override
     {
