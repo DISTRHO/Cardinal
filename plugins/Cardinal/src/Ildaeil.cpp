@@ -241,6 +241,7 @@ struct IldaeilModule : Module {
     mutable NativeTimeInfo fCarlaTimeInfo;
 
     void* fUI = nullptr;
+    Mutex fPluginLoadMutex;
 
     float audioDataIn1[BUFFER_SIZE];
     float audioDataIn2[BUFFER_SIZE];
@@ -414,6 +415,7 @@ struct IldaeilModule : Module {
         CarlaEngine* const engine = carla_get_engine_from_handle(fCarlaHostHandle);
 
         water::XmlDocument xml(projectState);
+        const MutexLocker cml(fPluginLoadMutex);
         engine->loadProjectInternal(xml, true);
     }
 
@@ -635,10 +637,12 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
     bool idleCallbackActive = false;
     IldaeilModule* const module;
+    Mutex& fPluginLoadMutex;
 
     IldaeilWidget(IldaeilModule* const m)
         : ImGuiWidget(),
-          module(m)
+          module(m),
+          fPluginLoadMutex(m->fPluginLoadMutex)
     {
         if (module->fCarlaHostHandle == nullptr)
         {
@@ -828,6 +832,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
         carla_set_engine_option(handle, ENGINE_OPTION_PREFER_PLUGIN_BRIDGES, fPluginWillRunInBridgeMode, nullptr);
 
+        const MutexLocker cml(fPluginLoadMutex);
+
         if (carla_add_plugin(handle, BINARY_NATIVE, fPluginType, nullptr, nullptr,
                              label, 0, 0x0, PLUGIN_OPTIONS_NULL))
         {
@@ -1007,6 +1013,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
         if (path != nullptr)
             carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_PLUGIN_PATH, pluginType, path);
+
+        const MutexLocker cml(fPluginLoadMutex);
 
         if (const uint count = carla_get_cached_plugin_count(pluginType, path))
         {
