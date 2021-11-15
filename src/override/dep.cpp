@@ -19,7 +19,7 @@
 #include <cstring>
 
 // fix blendish build, missing symbol in debug mode
-#ifdef DEBUG
+#ifndef NDEBUG
 extern "C" {
 float bnd_clamp(float v, float mn, float mx) {
     return (v > mx)?mx:(v < mn)?mn:v;
@@ -28,7 +28,7 @@ float bnd_clamp(float v, float mn, float mx) {
 #endif
 
 // fix bogaudio build, another missing symbol
-#ifdef DEBUG
+#ifndef NDEBUG
 namespace bogaudio {
 struct FollowerBase {
     static float efGainMaxDecibelsDebug;
