@@ -121,6 +121,7 @@ RACK_FILES += $(filter-out $(IGNORED_FILES), $(wildcard Rack/src/*/*.cpp))
 # --------------------------------------------------------------
 # lots of warnings from VCV side
 
+BASE_FLAGS += -Wno-unknown-warning-option
 BASE_FLAGS += -Wno-unused-but-set-variable
 BASE_FLAGS += -Wno-unused-parameter
 BASE_FLAGS += -Wno-unused-result

@@ -41,6 +41,7 @@
 #include <random.hpp>
 #include <patch.hpp>
 #include <plugin.hpp>
+#include <helpers.hpp>
 
 #ifdef NDEBUG
 # undef DEBUG
@@ -585,6 +586,9 @@ void Engine::removeModule_NoLock(Module* module) {
 			m->rightExpander.module = NULL;
 		}
 	}
+	// Remove from widgets cache
+	if (auto* const helper = reinterpret_cast<CardinalPluginModelHelper*>(module->model))
+		helper->clearCachedModuleWidget(module);
 	// Remove module
 	internal->modulesCache.erase(module->id);
 	internal->modules.erase(it);
@@ -981,8 +985,14 @@ void Engine::fromJson(json_t* rootJ) {
 		}
 
 		// Create module
-		Module* module = model->createModule();
-		DISTRHO_SAFE_ASSERT_RETURN(module,);
+		Module* const module = model->createModule();
+		DISTRHO_SAFE_ASSERT_CONTINUE(module != nullptr);
+
+		// Create the widget too, needed by a few modules
+		auto* const helper = reinterpret_cast<CardinalPluginModelHelper*>(model);
+		DISTRHO_SAFE_ASSERT_CONTINUE(helper != nullptr);
+
+		helper->createCachedModuleWidget(module);
 
 		try {
 			// This doesn't need a lock because the Module is not added to the Engine yet.

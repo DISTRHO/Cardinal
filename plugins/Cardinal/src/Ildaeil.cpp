@@ -31,6 +31,8 @@
 # include "ImGuiWidget.hpp"
 # include "extra/ScopedPointer.hpp"
 # include "extra/Thread.hpp"
+#else
+# include "extra/Mutex.hpp"
 #endif
 
 #include "CarlaNativePlugin.h"
@@ -674,15 +676,15 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
     {
         if (module->fCarlaHostHandle != nullptr)
         {
-            module->fUI = nullptr;
+            if (idleCallbackActive)
+                module->pcontext->removeIdleCallback(this);
 
             if (fPluginRunning)
                 carla_show_custom_ui(module->fCarlaHostHandle, 0, false);
 
             carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, "0");
 
-            if (idleCallbackActive)
-                module->pcontext->removeIdleCallback(this);
+            module->fUI = nullptr;
         }
 
         if (isThreadRunning())
