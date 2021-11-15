@@ -208,6 +208,8 @@ static intptr_t host_dispatcher(NativeHostHandle handle, NativeHostDispatcherOpc
 
 // --------------------------------------------------------------------------------------------------------------------
 
+static Mutex sPluginInfoLoadMutex;
+
 struct IldaeilModule : Module {
     enum ParamIds {
         NUM_PARAMS
@@ -243,7 +245,6 @@ struct IldaeilModule : Module {
     mutable NativeTimeInfo fCarlaTimeInfo;
 
     void* fUI = nullptr;
-    Mutex fPluginLoadMutex;
 
     float audioDataIn1[BUFFER_SIZE];
     float audioDataIn2[BUFFER_SIZE];
@@ -417,7 +418,7 @@ struct IldaeilModule : Module {
         CarlaEngine* const engine = carla_get_engine_from_handle(fCarlaHostHandle);
 
         water::XmlDocument xml(projectState);
-        const MutexLocker cml(fPluginLoadMutex);
+        const MutexLocker cml(sPluginInfoLoadMutex);
         engine->loadProjectInternal(xml, true);
     }
 
@@ -641,12 +642,10 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
     bool idleCallbackActive = false;
     IldaeilModule* const module;
-    Mutex& fPluginLoadMutex;
 
     IldaeilWidget(IldaeilModule* const m)
         : ImGuiWidget(),
-          module(m),
-          fPluginLoadMutex(m->fPluginLoadMutex)
+          module(m)
     {
         if (module->fCarlaHostHandle == nullptr)
         {
@@ -836,7 +835,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
         carla_set_engine_option(handle, ENGINE_OPTION_PREFER_PLUGIN_BRIDGES, fPluginWillRunInBridgeMode, nullptr);
 
-        const MutexLocker cml(fPluginLoadMutex);
+        const MutexLocker cml(sPluginInfoLoadMutex);
 
         if (carla_add_plugin(handle, BINARY_NATIVE, fPluginType, nullptr, nullptr,
                              label, 0, 0x0, PLUGIN_OPTIONS_NULL))
@@ -1018,7 +1017,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         if (path != nullptr)
             carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_PLUGIN_PATH, pluginType, path);
 
-        const MutexLocker cml(fPluginLoadMutex);
+        const MutexLocker cml(sPluginInfoLoadMutex);
 
         if (const uint count = carla_get_cached_plugin_count(pluginType, path))
         {
@@ -1432,12 +1431,12 @@ struct IldaeilModuleWidget : ModuleWidget {
         addOutput(createOutput<PJ301MPort>(Vec(3, 54 + 60), module, IldaeilModule::OUTPUT1));
         addOutput(createOutput<PJ301MPort>(Vec(3, 54 + 90), module, IldaeilModule::OUTPUT2));
 
-        addOutput(createInput<PJ301MPort>(Vec(3, 54 + 135), module, IldaeilModule::PITCH_INPUT));
-        addOutput(createInput<PJ301MPort>(Vec(3, 54 + 165), module, IldaeilModule::GATE_INPUT));
-        addOutput(createInput<PJ301MPort>(Vec(3, 54 + 195), module, IldaeilModule::VEL_INPUT));
-        addOutput(createInput<PJ301MPort>(Vec(3, 54 + 225), module, IldaeilModule::AFT_INPUT));
-        addOutput(createInput<PJ301MPort>(Vec(3, 54 + 255), module, IldaeilModule::PW_INPUT));
-        addOutput(createInput<PJ301MPort>(Vec(3, 54 + 285), module, IldaeilModule::MW_INPUT));
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 135), module, IldaeilModule::PITCH_INPUT));
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 165), module, IldaeilModule::GATE_INPUT));
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 195), module, IldaeilModule::VEL_INPUT));
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 225), module, IldaeilModule::AFT_INPUT));
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 255), module, IldaeilModule::PW_INPUT));
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 285), module, IldaeilModule::MW_INPUT));
     }
 
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IldaeilModuleWidget)

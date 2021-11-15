@@ -558,6 +558,10 @@ void Engine::removeModule_NoLock(Module* module) {
 	// Check that the module actually exists
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
 	DISTRHO_SAFE_ASSERT_RETURN(it != internal->modules.end(),);
+	// Remove from widgets cache
+	CardinalPluginModelHelper* const helper = dynamic_cast<CardinalPluginModelHelper*>(module->model);
+	DISTRHO_SAFE_ASSERT_RETURN(helper != nullptr,);
+	helper->removeCachedModuleWidget(module);
 	// Dispatch RemoveEvent
 	Module::RemoveEvent eRemove;
 	module->onRemove(eRemove);
@@ -586,9 +590,6 @@ void Engine::removeModule_NoLock(Module* module) {
 			m->rightExpander.module = NULL;
 		}
 	}
-	// Remove from widgets cache
-	if (auto* const helper = reinterpret_cast<CardinalPluginModelHelper*>(module->model))
-		helper->clearCachedModuleWidget(module);
 	// Remove module
 	internal->modulesCache.erase(module->id);
 	internal->modules.erase(it);
@@ -989,10 +990,11 @@ void Engine::fromJson(json_t* rootJ) {
 		DISTRHO_SAFE_ASSERT_CONTINUE(module != nullptr);
 
 		// Create the widget too, needed by a few modules
-		auto* const helper = reinterpret_cast<CardinalPluginModelHelper*>(model);
+		CardinalPluginModelHelper* const helper = dynamic_cast<CardinalPluginModelHelper*>(model);
 		DISTRHO_SAFE_ASSERT_CONTINUE(helper != nullptr);
 
-		helper->createCachedModuleWidget(module);
+		app::ModuleWidget* const moduleWidget = helper->createModuleWidgetFromEngineLoad(module);
+		DISTRHO_SAFE_ASSERT_CONTINUE(moduleWidget != nullptr);
 
 		try {
 			// This doesn't need a lock because the Module is not added to the Engine yet.
@@ -1009,6 +1011,7 @@ void Engine::fromJson(json_t* rootJ) {
 		catch (Exception& e) {
 			WARN("Cannot load module: %s", e.what());
 			// APP->patch->log(e.what());
+			helper->removeCachedModuleWidget(module);
 			delete module;
 			continue;
 		}

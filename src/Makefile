@@ -50,6 +50,10 @@ BASE_FLAGS += -IRack/dep/osdialog
 BASE_FLAGS += -IRack/dep/oui-blendish
 BASE_FLAGS += -IRack/dep/pffft
 
+ifeq ($(DEBUG),true)
+BASE_FLAGS += -UDEBUG
+endif
+
 ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
 endif

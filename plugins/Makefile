@@ -570,10 +570,13 @@ BASE_FLAGS += -I../src/Rack/dep/osdialog
 BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
 
+ifeq ($(DEBUG),true)
+BASE_FLAGS += -UDEBUG
+endif
+
 ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
 endif
-
 
 ifeq ($(WASM),true)
 BASE_FLAGS += -DNANOVG_GLES2=1
@@ -611,7 +614,10 @@ BASE_FLAGS += -Wno-unused-variable
 # also from plugins
 
 BASE_FLAGS += -Wno-deprecated-declarations
+
+ifeq ($(MACOS),true)
 BASE_FLAGS += -Wno-unknown-warning-option
+endif
 
 # --------------------------------------------------------------
 # Build targets

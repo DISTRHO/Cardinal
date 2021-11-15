@@ -32,67 +32,88 @@
 
 #include <unordered_map>
 
+#include "DistrhoUtils.hpp"
+
 namespace rack {
 
-struct CardinalPluginModelHelper {
-    virtual ~CardinalPluginModelHelper() {}
-    virtual void createCachedModuleWidget(rack::engine::Module* m) = 0;
-    virtual void clearCachedModuleWidget(rack::engine::Module* m) = 0;
+struct CardinalPluginModelHelper : plugin::Model {
+    virtual app::ModuleWidget* createModuleWidgetFromEngineLoad(engine::Module* m) = 0;
+    virtual void removeCachedModuleWidget(engine::Module* m) = 0;
 };
 
 template <class TModule, class TModuleWidget>
-struct CardinalPluginModel : plugin::Model, CardinalPluginModelHelper
+struct CardinalPluginModel : CardinalPluginModelHelper
 {
-    std::unordered_map<rack::engine::Module*, app::ModuleWidget*> widgets;
+    std::unordered_map<engine::Module*, TModuleWidget*> widgets;
+    std::unordered_map<engine::Module*, bool> widgetNeedsDeletion;
 
-    rack::engine::Module* createModule() override
+    engine::Module* createModule() override
     {
         engine::Module* const m = new TModule;
         m->model = this;
         return m;
     }
 
-    app::ModuleWidget* createModuleWidget(rack::engine::Module* const m) override
+    app::ModuleWidget* createModuleWidget(engine::Module* const m) override
     {
-        TModule* tm = NULL;
-        if (m) {
-            assert(m->model == this);
+        TModule* tm = nullptr;
+        if (m)
+        {
+            DISTRHO_SAFE_ASSERT_RETURN(m->model == this, nullptr);
             if (widgets.find(m) != widgets.end())
+            {
+                widgetNeedsDeletion[m] = false;
                 return widgets[m];
+            }
             tm = dynamic_cast<TModule*>(m);
         }
-        app::ModuleWidget* mw = new TModuleWidget(tm);
-        mw->setModel(this);
-        return mw;
+        app::ModuleWidget* const tmw = new TModuleWidget(tm);
+        tmw->setModel(this);
+        return tmw;
     }
 
-    void createCachedModuleWidget(rack::engine::Module* const m) override
+    app::ModuleWidget* createModuleWidgetFromEngineLoad(engine::Module* const m) override
     {
-        assert(m != nullptr); if (m == nullptr) return;
-        assert(m->model == this); if (m->model != this) return;
+        DISTRHO_SAFE_ASSERT_RETURN(m != nullptr, nullptr);
+        DISTRHO_SAFE_ASSERT_RETURN(m->model == this, nullptr);
+
         TModule* const tm = dynamic_cast<TModule*>(m);
-        TModuleWidget* const mw = new TModuleWidget(tm);
-        mw->setModel(this);
-        widgets[m] = mw;
+        DISTRHO_SAFE_ASSERT_RETURN(tm != nullptr, nullptr);
+
+        TModuleWidget* const tmw = new TModuleWidget(tm);
+        tmw->setModel(this);
+
+        widgets[m] = tmw;
+        widgetNeedsDeletion[m] = true;
+        return tmw;
     }
 
-    void clearCachedModuleWidget(rack::engine::Module* const m) override
+    void removeCachedModuleWidget(engine::Module* const m) override
     {
-        assert(m != nullptr); if (m == nullptr) return;
-        assert(m->model == this); if (m->model != this) return;
+        DISTRHO_SAFE_ASSERT_RETURN(m != nullptr,);
+        DISTRHO_SAFE_ASSERT_RETURN(m->model == this,);
+
+        if (widgets.find(m) == widgets.end())
+            return;
+
+        if (widgetNeedsDeletion[m])
+            delete widgets[m];
+
         widgets.erase(m);
+        widgetNeedsDeletion.erase(m);
     }
 };
 
 template <class TModule, class TModuleWidget>
 CardinalPluginModel<TModule, TModuleWidget>* createModel(std::string slug)
 {
-	CardinalPluginModel<TModule, TModuleWidget>* const o = new CardinalPluginModel<TModule, TModuleWidget>();
-	o->slug = slug;
-	return o;
+    CardinalPluginModel<TModule, TModuleWidget>* const o = new CardinalPluginModel<TModule, TModuleWidget>();
+    o->slug = slug;
+    return o;
 }
 
 }
 
 #define createModel createModelOldVCV
 #include_next "helpers.hpp"
+#undef createModel
