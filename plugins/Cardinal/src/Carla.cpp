@@ -310,6 +310,8 @@ struct CarlaModule : Module {
                                            0, 0, nullptr, e.sampleRate);
         fCarlaPluginDescriptor->activate(fCarlaPluginHandle);
     }
+
+    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CarlaModule)
 };
 
 static_assert((int)CarlaModule::NUM_INPUTS == (int)CarlaModule::NUM_OUTPUTS, "inputs must match outputs");
@@ -561,6 +563,8 @@ struct CarlaModuleWidget : ModuleWidget, IdleCallback {
         e.consume(this);
         showUI();
     }
+
+    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CarlaModuleWidget)
 };
 
 static void host_ui_closed(NativeHostHandle handle)

@@ -483,6 +483,8 @@ struct IldaeilModule : Module {
                                            0, 0, nullptr, e.sampleRate);
         fCarlaPluginDescriptor->activate(fCarlaPluginHandle);
     }
+
+    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IldaeilModule)
 };
 
 // -----------------------------------------------------------------------------------------------------------
@@ -1381,6 +1383,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
         ImGui::End();
     }
+
+    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IldaeilWidget)
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1435,6 +1439,8 @@ struct IldaeilModuleWidget : ModuleWidget {
         addOutput(createInput<PJ301MPort>(Vec(3, 54 + 255), module, IldaeilModule::PW_INPUT));
         addOutput(createInput<PJ301MPort>(Vec(3, 54 + 285), module, IldaeilModule::MW_INPUT));
     }
+
+    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IldaeilModuleWidget)
 };
 #else
 static void host_ui_parameter_changed(NativeHostHandle, uint32_t, float) {}
