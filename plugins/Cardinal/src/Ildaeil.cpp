@@ -205,6 +205,7 @@ static void host_ui_closed(NativeHostHandle handle);
 static const char* host_ui_open_file(NativeHostHandle handle, bool isDir, const char* title, const char* filter);
 static const char* host_ui_save_file(NativeHostHandle handle, bool isDir, const char* title, const char* filter);
 static intptr_t host_dispatcher(NativeHostHandle handle, NativeHostDispatcherOpcode opcode, int32_t index, intptr_t value, void* ptr, float opt);
+static void projectLoadedFromDSP(void* ui);
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -418,8 +419,13 @@ struct IldaeilModule : Module {
         CarlaEngine* const engine = carla_get_engine_from_handle(fCarlaHostHandle);
 
         water::XmlDocument xml(projectState);
-        const MutexLocker cml(sPluginInfoLoadMutex);
-        engine->loadProjectInternal(xml, true);
+
+        {
+            const MutexLocker cml(sPluginInfoLoadMutex);
+            engine->loadProjectInternal(xml, true);
+        }
+
+        projectLoadedFromDSP(fUI);
     }
 
     void process(const ProcessArgs& args) override
@@ -617,6 +623,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         kIdleInit,
         kIdleInitPluginAlreadyLoaded,
         kIdleLoadSelectedPlugin,
+        kIdlePluginLoadedFromDSP,
         kIdleResetPlugin,
         kIdleShowCustomUI,
         kIdleHidePluginUI,
@@ -660,15 +667,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         ImGuiStyle& style(ImGui::GetStyle());
         style.FrameRounding = 4;
 
-        const CarlaHostHandle handle = module->fCarlaHostHandle;
-
-        if (carla_get_current_plugin_count(handle) != 0)
-        {
-            const uint hints = carla_get_plugin_info(handle, 0)->hints;
+        if (checkIfPluginIsLoaded())
             fIdleState = kIdleInitPluginAlreadyLoaded;
-            fPluginRunning = true;
-            fPluginHasCustomUI = hints & PLUGIN_HAS_CUSTOM_UI;
-        }
 
         module->fUI = this;
     }
@@ -694,6 +694,28 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         fPluginGenericUI = nullptr;
 
         delete[] fPlugins;
+    }
+
+    bool checkIfPluginIsLoaded()
+    {
+        const CarlaHostHandle handle = module->fCarlaHostHandle;
+
+        if (carla_get_current_plugin_count(handle) != 0)
+        {
+            const uint hints = carla_get_plugin_info(handle, 0)->hints;
+
+            fPluginRunning = true;
+            fPluginHasCustomUI = hints & PLUGIN_HAS_CUSTOM_UI;
+            return true;
+        }
+
+        return false;
+    }
+
+    void projectLoadedFromDSP()
+    {
+        if (checkIfPluginIsLoaded())
+            fIdleState = kIdlePluginLoadedFromDSP;
     }
 
     void changeParameterFromDSP(const uint32_t index, const float value)
@@ -931,6 +953,11 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             fIdleState = kIdleNothing;
             createOrUpdatePluginGenericUI(handle);
             startThread();
+            break;
+
+        case kIdlePluginLoadedFromDSP:
+            fIdleState = kIdleNothing;
+            createOrUpdatePluginGenericUI(handle);
             break;
 
         case kIdleLoadSelectedPlugin:
@@ -1401,6 +1428,12 @@ static const char* host_ui_open_file(const NativeHostHandle handle,
         ui->openFileFromDSP(isDir, title, filter);
 
     return nullptr;
+}
+
+static void projectLoadedFromDSP(void* const ui)
+{
+    if (IldaeilWidget* const uiw = static_cast<IldaeilWidget*>(ui))
+        uiw->projectLoadedFromDSP();
 }
 
 // --------------------------------------------------------------------------------------------------------------------
