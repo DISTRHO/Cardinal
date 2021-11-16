@@ -299,9 +299,7 @@ class CardinalPlugin : public CardinalBasePlugin
 {
     SharedResourcePointer<Initializer> fInitializer;
 
-#if DISTRHO_PLUGIN_NUM_INPUTS != 0
     float* fAudioBufferIn;
-#endif
     float* fAudioBufferOut;
     std::string fAutosavePath;
     String fWindowSize;
@@ -321,9 +319,7 @@ public:
     CardinalPlugin()
         : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, 2),
           fInitializer(this),
-#if DISTRHO_PLUGIN_NUM_INPUTS != 0
           fAudioBufferIn(nullptr),
-#endif
           fAudioBufferOut(nullptr),
           fIsActive(false),
           fCurrentAudioDevice(nullptr),
@@ -786,10 +782,10 @@ protected:
     {
         const uint32_t bufferSize = getBufferSize();
         fAudioBufferOut = new float[bufferSize * DISTRHO_PLUGIN_NUM_OUTPUTS];
-#if DISTRHO_PLUGIN_NUM_INPUTS != 0
-        fAudioBufferIn = new float[bufferSize * DISTRHO_PLUGIN_NUM_INPUTS];
-        std::memset(fAudioBufferIn, 0, sizeof(float)*bufferSize * DISTRHO_PLUGIN_NUM_INPUTS);
-#endif
+
+        const uint32_t numInputs = std::max(1, DISTRHO_PLUGIN_NUM_INPUTS);
+        fAudioBufferIn = new float[bufferSize * numInputs];
+        std::memset(fAudioBufferIn, 0, sizeof(float)*bufferSize * numInputs);
 
         fPreviousFrame = 0;
 
@@ -818,10 +814,8 @@ protected:
 
         delete[] fAudioBufferOut;
         fAudioBufferOut = nullptr;
-#if DISTRHO_PLUGIN_NUM_INPUTS != 0
         delete[] fAudioBufferIn;
         fAudioBufferIn = nullptr;
-#endif
     }
 
     void run(const float** const inputs, float** const outputs, const uint32_t frames,
@@ -872,6 +866,9 @@ protected:
                 fAudioBufferIn[j++] = inputs[1][i];
             }
             fCurrentAudioDevice->processInput(fAudioBufferIn, 2, frames);
+#else
+            std::memset(fAudioBufferIn, 0, sizeof(float)*frames);
+            fCurrentAudioDevice->processInput(fAudioBufferIn, 1, frames);
 #endif
         }
 
