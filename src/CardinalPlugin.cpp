@@ -24,6 +24,7 @@
 #include <settings.hpp>
 #include <system.hpp>
 
+#include <app/Browser.hpp>
 #include <app/Scene.hpp>
 #include <engine/Engine.hpp>
 #include <ui/common.hpp>
@@ -149,13 +150,16 @@ struct Initializer
         }
 
         INFO("Initializing audio driver");
-        rack::audio::addDriver(0, new CardinalAudioDriver);
+        audio::addDriver(0, new CardinalAudioDriver);
 
         INFO("Initializing midi driver");
-        rack::midi::addDriver(0, new CardinalMidiDriver);
+        midi::addDriver(0, new CardinalMidiDriver);
 
         INFO("Initializing plugins");
         plugin::initStaticPlugins();
+
+        INFO("Initializing plugin browser DB");
+        app::browserInit();
 
 #ifdef HAVE_LIBLO
         INFO("Initializing OSC Remote control");
