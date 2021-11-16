@@ -1477,6 +1477,7 @@ struct IldaeilModuleWidget : ModuleWidget {
 #else
 static void host_ui_parameter_changed(NativeHostHandle, uint32_t, float) {}
 static const char* host_ui_open_file(NativeHostHandle, bool, const char*, const char*) { return nullptr; }
+static void projectLoadedFromDSP(void*) {}
 typedef ModuleWidget IldaeilModuleWidget;
 #endif
 
