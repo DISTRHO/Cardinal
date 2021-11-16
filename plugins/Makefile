@@ -4,6 +4,10 @@
 # Created by falkTX
 #
 
+# FIXME items for v2:
+# Bidoo includes <system.hpp>, PRIVATE workaround
+# ImpromptuModular setNextCableColor
+
 # --------------------------------------------------------------
 # Build config
 
@@ -794,6 +798,7 @@ $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
 		$(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) \
 		$(foreach m,$(BIDOO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bidoo_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__Bidoo \
+		-DPRIVATE= \
 		-IBidoo/src/dep/gverb/include \
 		-Wno-sign-compare
 
@@ -866,6 +871,7 @@ $(BUILD_DIR)/ImpromptuModular/%.cpp.o: ImpromptuModular/%.cpp
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ImpromptuModular_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
+		-DsetNextCableColor=isComplete \
 		-Dinit=init__ImpromptuModular
 
 $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cpp

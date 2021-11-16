@@ -127,6 +127,8 @@ else
 BASE_FLAGS += -DARCH_LIN
 endif
 
+BASE_FLAGS += -DPRIVATE=
+
 BASE_FLAGS += -I..
 BASE_FLAGS += -I../../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../../include

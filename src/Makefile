@@ -30,6 +30,8 @@ else
 BASE_FLAGS += -DARCH_LIN
 endif
 
+BASE_FLAGS += -DPRIVATE=
+
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
 BASE_FLAGS += -I../include
@@ -125,11 +127,14 @@ RACK_FILES += $(filter-out $(IGNORED_FILES), $(wildcard Rack/src/*/*.cpp))
 # --------------------------------------------------------------
 # lots of warnings from VCV side
 
-BASE_FLAGS += -Wno-unknown-warning-option
 BASE_FLAGS += -Wno-unused-but-set-variable
 BASE_FLAGS += -Wno-unused-parameter
 BASE_FLAGS += -Wno-unused-result
 BASE_FLAGS += -Wno-unused-variable
+
+ifeq ($(MACOS),true)
+BASE_FLAGS += -Wno-unknown-warning-option
+endif
 
 # --------------------------------------------------------------
 # Build targets
@@ -172,6 +177,11 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
+
+$(BUILD_DIR)/Core/%.cpp.o: Core/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -UPRIVATE -c -o $@
 
 # --------------------------------------------------------------
 

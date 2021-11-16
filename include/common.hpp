@@ -17,6 +17,10 @@
 
 #pragma once
 
+#ifdef PRIVATE
+# define PRIVATE_WAS_DEFINED
+#endif
+
 #include_next "common.hpp"
 
 // Make binary resources work the same no matter the OS
@@ -29,3 +33,9 @@
 #define BINARY_START(sym) ((const void*) sym)
 #define BINARY_END(sym) ((const void*) sym + sym##_len)
 #define BINARY_SIZE(sym) (sym##_len)
+
+#if defined(PRIVATE) && !defined(PRIVATE_WAS_DEFINED)
+# undef PRIVATE
+#endif
+
+#undef PRIVATE_WAS_DEFINED
