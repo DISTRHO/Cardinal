@@ -650,6 +650,9 @@ static void initStatic__Bidoo()
         p->addModel(modelMU);
         p->addModel(modelCHUTE);
         p->addModel(modelLOURDE);
+        p->addModel(modelDILEMO);
+        p->addModel(modelLAMBDA);
+        p->addModel(modelBANCAU);
         p->addModel(modelACNE);
         p->addModel(modelMS);
         p->addModel(modelDUKE);
@@ -657,6 +660,7 @@ static void initStatic__Bidoo()
         p->addModel(modelPILOT);
         p->addModel(modelHUITRE);
         p->addModel(modelOUAIVE);
+        p->addModel(modelEDSAROS);
         p->addModel(modelPOUPRE);
         p->addModel(modelMAGMA);
         p->addModel(modelOAI);

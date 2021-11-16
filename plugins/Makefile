@@ -350,6 +350,7 @@ PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
+PLUGIN_FILES += $(wildcard Bidoo/src/dep/resampler/*.cpp)
 
 # modules/types which are present in other plugins
 BIDOO_CUSTOM = LadderFilter $(DRWAV)
@@ -799,19 +800,9 @@ $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
 		$(foreach m,$(BIDOO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bidoo_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__Bidoo \
 		-IBidoo/src/dep/gverb/include \
-		-Wno-sign-compare
-
-# FIXME -DPRIVATE=extern shouldn't be here
-$(BUILD_DIR)/Bidoo/src/dep/%.cpp.o: Bidoo/src/dep/%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) \
-		$(foreach m,$(BIDOO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bidoo_$(shell basename $*))) \
-		-DpluginInstance=pluginInstance__Bidoo \
-		-DPRIVATE=extern \
-		-IBidoo/src/dep/gverb/include \
-		-Wno-sign-compare
+		-Wno-ignored-qualifiers \
+		-Wno-sign-compare \
+		-Wno-unused-function
 
 $(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
