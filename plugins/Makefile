@@ -404,7 +404,8 @@ PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModul
 # ImpromptuModular
 
 PLUGIN_FILES += $(wildcard ImpromptuModular/src/*.cpp)
-PLUGIN_FILES += $(wildcard ImpromptuModular/src/comp/*.cpp)
+PLUGIN_FILES += $(filter-out ImpromptuModular/src/comp/PanelTheme.cpp,$(wildcard ImpromptuModular/src/comp/*.cpp))
+PLUGIN_FILES += ImpromptuModularDark/PanelTheme.cpp
 
 # modules/types which are present in other plugins
 IMPROMPTUMODULAR_CUSTOM = RefreshCounter
@@ -872,27 +873,18 @@ $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
-		-DStepAttributes=StepAttributesKernel
-
-$(BUILD_DIR)/ImpromptuModular/src/comp/Components.cpp.o: ImpromptuModular/src/comp/Components.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
-		-DpluginInstance=pluginInstance__ImpromptuModular \
-		-DsaveDarkAsDefault=ImpromptuModularIgnore1 \
-		-DloadDarkAsDefault=ImpromptuModularIgonre2
+		-DStepAttributes=StepAttributesKernel \
 
 # FIXME -DsetNextCableColor=isComplete shouldn't be here
-$(BUILD_DIR)/ImpromptuModular/%.cpp.o: ImpromptuModular/%.cpp
+$(BUILD_DIR)/ImpromptuModular%.cpp.o: ImpromptuModular%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ImpromptuModular_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
-		-DsetNextCableColor=isComplete \
-		-Dinit=init__ImpromptuModular
+		-Dinit=init__ImpromptuModular \
+		-DsetNextCableColor=isComplete
 
 $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

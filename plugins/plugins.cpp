@@ -295,8 +295,6 @@ extern Model *modelMaude_221;
 // stuff that reads config files, we dont want that
 int loadConsoleType() { return 0; }
 int loadDirectOutMode() { return 0; }
-bool loadDarkAsDefault() { return true; }
-bool loadQuality() { return false; }
 void saveConsoleType(int) {}
 void saveDarkAsDefault(bool) {}
 void saveDirectOutMode(bool) {}
