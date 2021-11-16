@@ -798,6 +798,17 @@ $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
 		$(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) \
 		$(foreach m,$(BIDOO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bidoo_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__Bidoo \
+		-IBidoo/src/dep/gverb/include \
+		-Wno-sign-compare
+
+# FIXME -DPRIVATE= shouldn't be here
+$(BUILD_DIR)/Bidoo/src/dep/%.cpp.o: Bidoo/src/dep/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) \
+		$(foreach m,$(BIDOO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bidoo_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__Bidoo \
 		-DPRIVATE= \
 		-IBidoo/src/dep/gverb/include \
 		-Wno-sign-compare
@@ -864,6 +875,7 @@ $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 		-Wno-missing-braces \
 		-Wno-self-assign
 
+# FIXME -DsetNextCableColor=isComplete shouldn't be here
 $(BUILD_DIR)/ImpromptuModular/%.cpp.o: ImpromptuModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
