@@ -801,7 +801,7 @@ $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
 		-IBidoo/src/dep/gverb/include \
 		-Wno-sign-compare
 
-# FIXME -DPRIVATE= shouldn't be here
+# FIXME -DPRIVATE=extern shouldn't be here
 $(BUILD_DIR)/Bidoo/src/dep/%.cpp.o: Bidoo/src/dep/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -809,7 +809,7 @@ $(BUILD_DIR)/Bidoo/src/dep/%.cpp.o: Bidoo/src/dep/%.cpp
 		$(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) \
 		$(foreach m,$(BIDOO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bidoo_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__Bidoo \
-		-DPRIVATE= \
+		-DPRIVATE=extern \
 		-IBidoo/src/dep/gverb/include \
 		-Wno-sign-compare
 
