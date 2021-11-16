@@ -804,17 +804,6 @@ $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
 		-Wno-sign-compare \
 		-Wno-unused-function
 
-$(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(BOGAUDIO_CUSTOM),$(call custom_module_names,$(m),Bogaudio)) \
-		$(foreach m,$(BOGAUDIO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bogaudio_$(shell basename $*))) \
-		-DpluginInstance=pluginInstance__BogaudioModules \
-		-DRACK_SIMD=1 \
-		-IBogaudioModules/lib \
-		-IBogaudioModules/src/dsp
-
 $(BUILD_DIR)/BogaudioModules/src/follower_base.cpp.o: BogaudioModules/src/follower_base.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -822,6 +811,17 @@ $(BUILD_DIR)/BogaudioModules/src/follower_base.cpp.o: BogaudioModules/src/follow
 		$(foreach m,$(BOGAUDIO_CUSTOM),$(call custom_module_names,$(m),Bogaudio)) \
 		-DpluginInstance=pluginInstance__BogaudioModules \
 		-DefGainMaxDecibels=efGainMaxDecibelsDebug \
+		-DRACK_SIMD=1 \
+		-IBogaudioModules/lib \
+		-IBogaudioModules/src/dsp
+
+$(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(BOGAUDIO_CUSTOM),$(call custom_module_names,$(m),Bogaudio)) \
+		$(foreach m,$(BOGAUDIO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bogaudio_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__BogaudioModules \
 		-DRACK_SIMD=1 \
 		-IBogaudioModules/lib \
 		-IBogaudioModules/src/dsp
@@ -866,17 +866,6 @@ $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 		-Wno-missing-braces \
 		-Wno-self-assign
 
-# FIXME -DsetNextCableColor=isComplete shouldn't be here
-$(BUILD_DIR)/ImpromptuModular/%.cpp.o: ImpromptuModular/%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
-		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ImpromptuModular_$(shell basename $*))) \
-		-DpluginInstance=pluginInstance__ImpromptuModular \
-		-DsetNextCableColor=isComplete \
-		-Dinit=init__ImpromptuModular
-
 $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -894,6 +883,17 @@ $(BUILD_DIR)/ImpromptuModular/src/comp/Components.cpp.o: ImpromptuModular/src/co
 		-DsaveDarkAsDefault=ImpromptuModularIgnore1 \
 		-DloadDarkAsDefault=ImpromptuModularIgonre2
 
+# FIXME -DsetNextCableColor=isComplete shouldn't be here
+$(BUILD_DIR)/ImpromptuModular/%.cpp.o: ImpromptuModular/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
+		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ImpromptuModular_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__ImpromptuModular \
+		-DsetNextCableColor=isComplete \
+		-Dinit=init__ImpromptuModular
+
 $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -906,13 +906,6 @@ $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 		-Wno-unused-but-set-variable \
 		-Wno-unused-result
 
-$(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),JW)) \
-		-DpluginInstance=pluginInstance__MindMeld
-
 $(BUILD_DIR)/MindMeldModular/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -920,6 +913,13 @@ $(BUILD_DIR)/MindMeldModular/MindMeldModular.cpp.o: MindMeldModular/src/MindMeld
 		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),JW)) \
 		-DpluginInstance=pluginInstance__MindMeld \
 		-Dinit=init__MindMeld
+
+$(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),JW)) \
+		-DpluginInstance=pluginInstance__MindMeld
 
 $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
