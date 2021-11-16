@@ -67,7 +67,7 @@
         "midi": {
           "driver": 0,
           "deviceName": "Cardinal",
-          "channel": -1
+          "channel": 0
         }
       },
       "pos": [

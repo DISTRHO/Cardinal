@@ -359,7 +359,6 @@ void Engine::stepBlock(int frames) {
 	double startTime = system::getTime();
 
 	ReadLock lock(internal->mutex);
-
 	// Configure thread
 	random::init();
 
@@ -611,6 +610,11 @@ bool Engine::hasModule(Module* module) {
 
 Module* Engine::getModule(int64_t moduleId) {
 	ReadLock lock(internal->mutex);
+	return getModule_NoLock(moduleId);
+}
+
+
+Module* Engine::getModule_NoLock(int64_t moduleId) {
 	auto it = internal->modulesCache.find(moduleId);
 	if (it == internal->modulesCache.end())
 		return NULL;
@@ -886,6 +890,11 @@ void Engine::removeParamHandle_NoLock(ParamHandle* paramHandle) {
 
 ParamHandle* Engine::getParamHandle(int64_t moduleId, int paramId) {
 	ReadLock lock(internal->mutex);
+	return getParamHandle_NoLock(moduleId, paramId);
+}
+
+
+ParamHandle* Engine::getParamHandle_NoLock(int64_t moduleId, int paramId) {
 	auto it = internal->paramHandlesCache.find(std::make_tuple(moduleId, paramId));
 	if (it == internal->paramHandlesCache.end())
 		return NULL;
@@ -899,7 +908,12 @@ ParamHandle* Engine::getParamHandle(Module* module, int paramId) {
 
 
 void Engine::updateParamHandle(ParamHandle* paramHandle, int64_t moduleId, int paramId, bool overwrite) {
-	ReadLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
+	updateParamHandle_NoLock(paramHandle, moduleId, paramId, overwrite);
+}
+
+
+void Engine::updateParamHandle_NoLock(ParamHandle* paramHandle, int64_t moduleId, int paramId, bool overwrite) {
 	// Check that it exists
 	auto it = internal->paramHandles.find(paramHandle);
 	DISTRHO_SAFE_ASSERT_RETURN(it != internal->paramHandles.end(),);
@@ -912,8 +926,7 @@ void Engine::updateParamHandle(ParamHandle* paramHandle, int64_t moduleId, int p
 
 	if (paramHandle->moduleId >= 0) {
 		// Replace old ParamHandle, or reset the current ParamHandle
-		// TODO Maybe call getParamHandle_NoLock()?
-		ParamHandle* oldParamHandle = getParamHandle(moduleId, paramId);
+		ParamHandle* oldParamHandle = getParamHandle_NoLock(moduleId, paramId);
 		if (oldParamHandle) {
 			if (overwrite) {
 				oldParamHandle->moduleId = -1;
@@ -930,8 +943,7 @@ void Engine::updateParamHandle(ParamHandle* paramHandle, int64_t moduleId, int p
 
 	// Set module pointer if the above block didn't reset it
 	if (paramHandle->moduleId >= 0) {
-		// TODO Maybe call getModule_NoLock()?
-		paramHandle->module = getModule(paramHandle->moduleId);
+		paramHandle->module = getModule_NoLock(paramHandle->moduleId);
 	}
 
 	Engine_refreshParamHandleCache(this);

@@ -397,6 +397,11 @@ void Window::step() {
 }
 
 
+void Window::activateContext() {
+    // glfwMakeContextCurrent(win);
+}
+
+
 void Window::screenshot(const std::string&) {
 }
 

@@ -15,7 +15,8 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#include <plugin.hpp>
+#include "rack.hpp"
+#include "plugin.hpp"
 
 #include "DistrhoUtils.hpp"
 
@@ -335,16 +336,16 @@ std::string pluginPath(const std::string& dirname);
 
 // core plugins
 namespace core {
-extern Model* modelAudioInterface;
-extern Model* modelAudioInterface2;
-extern Model* modelAudioInterface16;
+extern Model* modelAudio2;
+extern Model* modelAudio8;
+extern Model* modelAudio16;
 extern Model* modelMIDI_CV;
-extern Model* modelMIDI_CC;
+extern Model* modelMIDICC_CV;
 extern Model* modelMIDI_Gate;
-extern Model* modelMIDI_Map;
+extern Model* modelMIDIMap;
 extern Model* modelCV_MIDI;
-extern Model* modelCV_CC;
-extern Model* modelCV_Gate;
+extern Model* modelCV_MIDICC;
+extern Model* modelGate_MIDI;
 extern Model* modelBlank;
 extern Model* modelNotes;
 }
@@ -415,16 +416,16 @@ static void initStatic__Core()
     const StaticPluginLoader spl(p, "Core");
     if (spl.ok())
     {
-        p->addModel(rack::core::modelAudioInterface);
-        p->addModel(rack::core::modelAudioInterface2);
-        p->addModel(rack::core::modelAudioInterface16);
+        p->addModel(rack::core::modelAudio2);
+        p->addModel(rack::core::modelAudio8);
+        p->addModel(rack::core::modelAudio16);
         p->addModel(rack::core::modelMIDI_CV);
-        p->addModel(rack::core::modelMIDI_CC);
+        p->addModel(rack::core::modelMIDICC_CV);
         p->addModel(rack::core::modelMIDI_Gate);
-        p->addModel(rack::core::modelMIDI_Map);
+        p->addModel(rack::core::modelMIDIMap);
         p->addModel(rack::core::modelCV_MIDI);
-        p->addModel(rack::core::modelCV_CC);
-        p->addModel(rack::core::modelCV_Gate);
+        p->addModel(rack::core::modelCV_MIDICC);
+        p->addModel(rack::core::modelGate_MIDI);
         p->addModel(rack::core::modelBlank);
         p->addModel(rack::core::modelNotes);
     }

@@ -53,11 +53,11 @@ const std::string APP_EDITION_NAME = "Audio Plugin";
 const std::string APP_VERSION_MAJOR = "2";
 const std::string APP_VERSION = "2.0";
 #if defined(ARCH_WIN)
-const std::string APP_ARCH = "win";
+const std::string APP_OS = "win";
 #elif defined(ARCH_MAC)
-const std::string APP_ARCH = "mac";
+const std::string APP_OS = "mac";
 #else
-const std::string APP_ARCH = "lin";
+const std::string APP_OS = "lin";
 #endif
 const std::string API_URL = "";
 

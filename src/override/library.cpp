@@ -31,15 +31,16 @@ std::string updateSlug;
 float updateProgress = 0.f;
 bool isSyncing = false;
 bool restartRequested = false;
+bool refreshRequested = false;
 
 void checkAppUpdate() {}
 void checkUpdates() {}
 bool hasUpdates() { return false; }
 bool isAppUpdateAvailable() { return false; }
 bool isLoggedIn() { return false; }
-void logIn(const std::string&, const std::string&) {}
+void logIn(std::string, std::string) {}
 void logOut() {}
-void syncUpdate(const std::string&) {}
+void syncUpdate(std::string) {}
 void syncUpdates() {}
 
 }
