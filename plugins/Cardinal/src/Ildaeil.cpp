@@ -578,7 +578,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             char* name;
             char* format;
             uint32_t rindex;
-            bool boolean, bvalue, log;
+            bool boolean, bvalue, log, readonly;
             float min, max, power;
             Parameter()
                 : name(nullptr),
@@ -587,6 +587,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                   boolean(false),
                   bvalue(false),
                   log(false),
+                  readonly(false),
                   min(0.0f),
                   max(1.0f) {}
             ~Parameter()
@@ -639,6 +640,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
     int fPluginSelected = -1;
     bool fPluginScanningFinished = false;
     bool fPluginHasCustomUI = false;
+    bool fPluginHasOutputParameters = false;
     bool fPluginRunning = false;
     bool fPluginWillRunInBridgeMode = false;
     PluginInfoCache* fPlugins = nullptr;
@@ -785,6 +787,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         title += info->maker;
         ui->title = title.getAndReleaseBuffer();
 
+        fPluginHasOutputParameters = false;
+
         const uint32_t pcount = ui->parameterCount = carla_get_parameter_count(handle, 0);
 
         // make count of valid parameters
@@ -792,13 +796,14 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         {
             const ParameterData* const pdata = carla_get_parameter_data(handle, 0, i);
 
-            if (pdata->type != PARAMETER_INPUT ||
-                (pdata->hints & PARAMETER_IS_ENABLED) == 0x0 ||
-                (pdata->hints & PARAMETER_IS_READ_ONLY) != 0x0)
+            if ((pdata->hints & PARAMETER_IS_ENABLED) == 0x0)
             {
                 --ui->parameterCount;
                 continue;
             }
+
+            if (pdata->type == PARAMETER_OUTPUT)
+                fPluginHasOutputParameters = true;
         }
 
         ui->parameters = new PluginGenericUI::Parameter[ui->parameterCount];
@@ -809,9 +814,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         {
             const ParameterData* const pdata = carla_get_parameter_data(handle, 0, i);
 
-            if (pdata->type != PARAMETER_INPUT ||
-                (pdata->hints & PARAMETER_IS_ENABLED) == 0x0 ||
-                (pdata->hints & PARAMETER_IS_READ_ONLY) != 0x0)
+            if ((pdata->hints & PARAMETER_IS_ENABLED) == 0x0)
                 continue;
 
             const CarlaParameterInfo* const pinfo = carla_get_parameter_info(handle, 0, i);
@@ -832,8 +835,10 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             param.rindex = i;
             param.boolean = pdata->hints & PARAMETER_IS_BOOLEAN;
             param.log = pdata->hints & PARAMETER_IS_LOGARITHMIC;
+            param.readonly = pdata->type != PARAMETER_INPUT || (pdata->hints & PARAMETER_IS_READ_ONLY);
             param.min = pranges->min;
             param.max = pranges->max;
+
             ui->values[j] = carla_get_current_parameter_value(handle, 0, i);
 
             if (param.boolean)
@@ -969,6 +974,12 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
             fileBrowserClose(fileBrowserHandle);
             fileBrowserHandle = nullptr;
+        }
+
+        if (fDrawingState == kDrawingPluginGenericUI && fPluginGenericUI != nullptr && fPluginHasOutputParameters)
+        {
+            updatePluginGenericUI(handle);
+            setDirty(true);
         }
 
         switch (fIdleState)
@@ -1266,6 +1277,14 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             for (uint32_t i=0; i < ui->parameterCount; ++i)
             {
                 PluginGenericUI::Parameter& param(ui->parameters[i]);
+
+                if (param.readonly)
+                {
+                    ImGui::BeginDisabled();
+                    ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.format, ImGuiSliderFlags_NoInput);
+                    ImGui::EndDisabled();
+                    continue;
+                }
 
                 if (param.boolean)
                 {
