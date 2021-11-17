@@ -22,9 +22,12 @@ CARLA_EXTRA_ARGS = \
 	HAVE_FFMPEG=false \
 	HAVE_FLUIDSYNTH=false \
 	HAVE_LIBMAGIC=false \
-	HAVE_SNDFILE=false \
-	USING_JUCE=false \
-	USING_JUCE_GUI_EXTRA=false
+	HAVE_SNDFILE=false
+
+ifneq ($(MACOS),true)
+CARLA_EXTRA_ARGS += USING_JUCE=false
+CARLA_EXTRA_ARGS += USING_JUCE_GUI_EXTRA=false
+endif
 
 # --------------------------------------------------------------
 # Check for system-wide dependencies
