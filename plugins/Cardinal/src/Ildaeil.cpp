@@ -29,6 +29,7 @@
 
 #ifndef HEADLESS
 # include "ImGuiWidget.hpp"
+# include "extra/FileBrowserDialog.hpp"
 # include "extra/ScopedPointer.hpp"
 # include "extra/Thread.hpp"
 #else
@@ -649,6 +650,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
     String fPopupError;
 
+    FileBrowserHandle fileBrowserHandle = nullptr;
+
     bool idleCallbackActive = false;
     IldaeilModule* const module;
 
@@ -680,7 +683,12 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         if (module->fCarlaHostHandle != nullptr)
         {
             if (idleCallbackActive)
+            {
                 module->pcontext->removeIdleCallback(this);
+
+                if (fileBrowserHandle != nullptr)
+                    fileBrowserClose(fileBrowserHandle);
+            }
 
             if (fPluginRunning)
                 carla_show_custom_ui(module->fCarlaHostHandle, 0, false);
@@ -741,13 +749,17 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         setDirty(true);
     }
 
-    void openFileFromDSP(const bool isDir, const char* const title, const char* const filter)
+    void openFileFromDSP(bool /* isDir */, const char* const title, const char* /* filter */)
     {
-        /*
-        Window::FileBrowserOptions opts;
+        DISTRHO_SAFE_ASSERT_RETURN(idleCallbackActive,);
+        DISTRHO_SAFE_ASSERT_RETURN(fPluginType == PLUGIN_INTERNAL,);
+
+        CardinalPluginContext* const pcontext = module->pcontext;
+
+        // FIXME isEmbed
+        FileBrowserOptions opts;
         opts.title = title;
-        getWindow().openFileBrowser(opts);
-        */
+        fileBrowserHandle = fileBrowserCreate(true, pcontext->nativeWindowId, pcontext->window->pixelRatio, opts);
     }
 
     void createOrUpdatePluginGenericUI(const CarlaHostHandle handle)
@@ -935,6 +947,12 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             {
                 idleCallbackActive = false;
                 pcontext->removeIdleCallback(this);
+
+                if (fileBrowserHandle != nullptr)
+                {
+                    fileBrowserClose(fileBrowserHandle);
+                    fileBrowserHandle = nullptr;
+                }
             }
         }
     }
@@ -943,6 +961,15 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
     {
         const CarlaHostHandle handle = module->fCarlaHostHandle;
         DISTRHO_SAFE_ASSERT_RETURN(handle != nullptr,);
+
+        if (fileBrowserHandle != nullptr && fileBrowserIdle(fileBrowserHandle))
+        {
+            if (const char* const path = fileBrowserGetPath(fileBrowserHandle))
+                carla_set_custom_data(handle, 0, CUSTOM_DATA_TYPE_STRING, "file", path);
+
+            fileBrowserClose(fileBrowserHandle);
+            fileBrowserHandle = nullptr;
+        }
 
         switch (fIdleState)
         {
@@ -1079,7 +1106,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                     continue;
                 if (info->audioIns != 0 && info->audioIns != 2)
                     continue;
-                if (info->audioOuts != 0 && info->audioOuts != 2)
+                if (info->audioOuts > 2)
                     continue;
 
                 j = fPluginCount;
