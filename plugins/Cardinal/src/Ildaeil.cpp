@@ -628,12 +628,14 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         kIdleShowCustomUI,
         kIdleHidePluginUI,
         kIdleGiveIdleToUI,
+        kIdleChangePluginType,
         kIdleNothing
     } fIdleState = kIdleInit;
 
     PluginType fPluginType = PLUGIN_LV2;
+    PluginType fNextPluginType = fPluginType;
     uint fPluginCount = 0;
-    uint fPluginSelected = false;
+    int fPluginSelected = -1;
     bool fPluginScanningFinished = false;
     bool fPluginHasCustomUI = false;
     bool fPluginRunning = false;
@@ -984,6 +986,15 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             module->fCarlaPluginDescriptor->ui_idle(module->fCarlaPluginHandle);
             break;
 
+        case kIdleChangePluginType:
+            fIdleState = kIdleNothing;
+            fPluginSelected = -1;
+            if (isThreadRunning())
+                stopThread(-1);
+            fPluginType = fNextPluginType;
+            startThread();
+            break;
+
         case kIdleNothing:
             break;
         }
@@ -991,6 +1002,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
     void loadSelectedPlugin(const CarlaHostHandle handle)
     {
+        DISTRHO_SAFE_ASSERT_RETURN(fPluginSelected >= 0,);
+
         const PluginInfoCache& info(fPlugins[fPluginSelected]);
 
         const char* label = nullptr;
@@ -1283,6 +1296,14 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
     void drawPluginList()
     {
+        static const char* pluginTypes[] = {
+            getPluginTypeAsString(PLUGIN_INTERNAL),
+            getPluginTypeAsString(PLUGIN_LV2),
+           #ifdef DISTRHO_OS_MAC
+            getPluginTypeAsString(PLUGIN_AU),
+           #endif
+        };
+
         setupMainWindowPos();
 
         if (ImGui::Begin("Plugin List", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize))
@@ -1315,19 +1336,60 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                 ImGui::SetKeyboardFocusHere();
             }
 
-            if (ImGui::InputText("", fPluginSearchString, sizeof(fPluginSearchString)-1, ImGuiInputTextFlags_CharsNoBlank|ImGuiInputTextFlags_AutoSelectAll))
+            if (ImGui::InputText("", fPluginSearchString, sizeof(fPluginSearchString)-1,
+                                 ImGuiInputTextFlags_CharsNoBlank|ImGuiInputTextFlags_AutoSelectAll))
                 fPluginSearchActive = true;
+
+            ImGui::SameLine();
+            ImGui::PushItemWidth(-1.0f);
+
+            int current;
+            switch (fPluginType)
+            {
+            case PLUGIN_LV2:
+                current = 1;
+                break;
+           #ifdef DISTRHO_OS_MAC
+            case PLUGIN_AU:
+                current = 2;
+                break;
+           #endif
+            default:
+                current = 0;
+                break;
+            }
+
+            if (ImGui::Combo("", &current, pluginTypes, ARRAY_SIZE(pluginTypes)))
+            {
+                fIdleState = kIdleChangePluginType;
+                switch (current)
+                {
+                case 0:
+                    fNextPluginType = PLUGIN_INTERNAL;
+                    break;
+                case 1:
+                    fNextPluginType = PLUGIN_LV2;
+                    break;
+               #ifdef DISTRHO_OS_MAC
+                case 2:
+                    fNextPluginType = PLUGIN_AU;
+                    break;
+               #endif
+                }
+            }
 
             if (ImGui::IsKeyDown(ImGuiKey_Escape))
                 fPluginSearchActive = false;
 
-            ImGui::BeginDisabled(!fPluginScanningFinished);
+            ImGui::BeginDisabled(!fPluginScanningFinished || fPluginSelected < 0);
 
             if (ImGui::Button("Load Plugin"))
                 fIdleState = kIdleLoadSelectedPlugin;
 
             ImGui::SameLine();
             ImGui::Checkbox("Run in bridge mode", &fPluginWillRunInBridgeMode);
+
+            ImGui::EndDisabled();
 
             if (fPluginRunning)
             {
@@ -1336,8 +1398,6 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                 if (ImGui::Button("Cancel"))
                     fDrawingState = kDrawingPluginGenericUI;
             }
-
-            ImGui::EndDisabled();
 
             if (ImGui::BeginChild("pluginlistwindow"))
             {
@@ -1348,8 +1408,9 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                     switch (fPluginType)
                     {
                     case PLUGIN_INTERNAL:
-                    // case PLUGIN_JSFX:
+                    case PLUGIN_AU:
                     case PLUGIN_SFZ:
+                    // case PLUGIN_JSFX:
                         ImGui::TableSetupColumn("Name");
                         ImGui::TableSetupColumn("Label");
                         ImGui::TableHeadersRow();
@@ -1370,7 +1431,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                         if (search != nullptr && ildaeil::strcasestr(info.name, search) == nullptr)
                             continue;
 
-                        bool selected = fPluginSelected == i;
+                        bool selected = fPluginSelected >= 0 && static_cast<uint>(fPluginSelected) == i;
 
                         switch (fPluginType)
                         {
