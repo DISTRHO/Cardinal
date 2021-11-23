@@ -203,6 +203,7 @@ void setupSamples();
 /* NOTE too much noise in original include, do this a different way
 // #include "ImpromptuModular/src/ImpromptuModular.hpp"
 */
+extern Model *modelAdaptiveQuantizer;
 extern Model *modelBigButtonSeq;
 extern Model *modelBigButtonSeq2;
 extern Model *modelChordKey;
@@ -1002,6 +1003,7 @@ static void initStatic__ImpromptuModular()
     const StaticPluginLoader spl(p, "ImpromptuModular");
     if (spl.ok())
     {
+        p->addModel(modelAdaptiveQuantizer);
         p->addModel(modelBigButtonSeq);
         p->addModel(modelBigButtonSeq2);
         p->addModel(modelChordKey);

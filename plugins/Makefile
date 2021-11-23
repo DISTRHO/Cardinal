@@ -4,10 +4,6 @@
 # Created by falkTX
 #
 
-# FIXME items for v2:
-# Bidoo includes <system.hpp>, PRIVATE workaround
-# ImpromptuModular setNextCableColor
-
 # --------------------------------------------------------------
 # Build config
 
@@ -350,7 +346,7 @@ PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
-PLUGIN_FILES += $(wildcard Bidoo/src/dep/resampler/*.cpp)
+PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/src/dep/resampler/*.cpp))
 
 # modules/types which are present in other plugins
 BIDOO_CUSTOM = LadderFilter $(DRWAV)
@@ -875,7 +871,6 @@ $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cp
 		-DpluginInstance=pluginInstance__ImpromptuModular \
 		-DStepAttributes=StepAttributesKernel \
 
-# FIXME -DsetNextCableColor=isComplete shouldn't be here
 $(BUILD_DIR)/ImpromptuModular%.cpp.o: ImpromptuModular%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -884,7 +879,7 @@ $(BUILD_DIR)/ImpromptuModular%.cpp.o: ImpromptuModular%.cpp
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ImpromptuModular_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
 		-Dinit=init__ImpromptuModular \
-		-DsetNextCableColor=isComplete
+		-Wno-format-truncation
 
 $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -922,6 +917,7 @@ $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 		-DthePlugin=pluginInstance__mscHack \
 		-Dinit=init__mscHack \
 		-Wno-class-memaccess \
+		-Wno-format-overflow \
 		-Wno-non-c-typedef-for-linkage \
 		-Wno-unused-but-set-variable
 

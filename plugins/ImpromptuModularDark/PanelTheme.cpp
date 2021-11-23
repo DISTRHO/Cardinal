@@ -15,6 +15,11 @@ void loadThemeAndContrastFromDefault(int* panelTheme, float* panelContrast) {
 }
 
 
+bool isDark(int*) {
+	return true;
+}
+
+
 void createPanelThemeMenu(ui::Menu*, int*, float*, SvgPanel*) {}
 
 
@@ -51,6 +56,6 @@ void InverterWidget::draw(const DrawArgs& args) {
 		nvgFill(args.vg);
 		nvgClosePath(args.vg);
 		// nvgRestore(args.vg);
-	}			
+	}
 }
 

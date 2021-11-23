@@ -37,7 +37,6 @@
 #include <ui/SequentialLayout.hpp>
 #include <ui/Slider.hpp>
 #include <ui/TextField.hpp>
-#include <ui/PasswordField.hpp>
 #include <ui/ProgressBar.hpp>
 #include <ui/Label.hpp>
 #include <engine/Engine.hpp>

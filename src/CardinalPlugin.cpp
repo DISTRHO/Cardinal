@@ -578,7 +578,7 @@ protected:
             parameter.symbol = "param_";
             parameter.symbol += String(index + 1);
             parameter.unit = "v";
-            parameter.hints = kParameterIsAutomable;
+            parameter.hints = kParameterIsAutomatable;
             parameter.ranges.def = 0.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 10.0f;
@@ -590,7 +590,7 @@ protected:
         case kWindowParameterShowTooltips:
             parameter.name = "Show tooltips";
             parameter.symbol = "tooltips";
-            parameter.hints = kParameterIsAutomable|kParameterIsInteger|kParameterIsBoolean;
+            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
             parameter.ranges.def = 1.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 1.0f;
@@ -599,7 +599,7 @@ protected:
             parameter.name = "Cable opacity";
             parameter.symbol = "cableOpacity";
             parameter.unit = "%";
-            parameter.hints = kParameterIsAutomable;
+            parameter.hints = kParameterIsAutomatable;
             parameter.ranges.def = 50.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 100.0f;
@@ -608,7 +608,7 @@ protected:
             parameter.name = "Cable tension";
             parameter.symbol = "cableTension";
             parameter.unit = "%";
-            parameter.hints = kParameterIsAutomable;
+            parameter.hints = kParameterIsAutomatable;
             parameter.ranges.def = 50.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 100.0f;
@@ -617,7 +617,7 @@ protected:
             parameter.name = "Room brightness";
             parameter.symbol = "rackBrightness";
             parameter.unit = "%";
-            parameter.hints = kParameterIsAutomable;
+            parameter.hints = kParameterIsAutomatable;
             parameter.ranges.def = 100.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 100.0f;
@@ -626,7 +626,7 @@ protected:
             parameter.name = "Light Bloom";
             parameter.symbol = "haloBrightness";
             parameter.unit = "%";
-            parameter.hints = kParameterIsAutomable;
+            parameter.hints = kParameterIsAutomatable;
             parameter.ranges.def = 25.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 100.0f;
@@ -634,7 +634,7 @@ protected:
         case kWindowParameterKnobMode:
             parameter.name = "Knob mode";
             parameter.symbol = "knobMode";
-            parameter.hints = kParameterIsAutomable|kParameterIsInteger;
+            parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
             parameter.ranges.def = 0.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 2.0f;
@@ -651,7 +651,7 @@ protected:
         case kWindowParameterWheelKnobControl:
             parameter.name = "Scroll wheel knob control";
             parameter.symbol = "knobScroll";
-            parameter.hints = kParameterIsAutomable|kParameterIsInteger|kParameterIsBoolean;
+            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
             parameter.ranges.def = 0.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 1.0f;
@@ -659,7 +659,7 @@ protected:
         case kWindowParameterWheelSensitivity:
             parameter.name = "Scroll wheel knob sensitivity";
             parameter.symbol = "knobScrollSensitivity";
-            parameter.hints = kParameterIsAutomable|kParameterIsLogarithmic;
+            parameter.hints = kParameterIsAutomatable|kParameterIsLogarithmic;
             parameter.ranges.def = 1.0f;
             parameter.ranges.min = 0.1f;
             parameter.ranges.max = 10.0f;
@@ -667,7 +667,7 @@ protected:
         case kWindowParameterLockModulePositions:
             parameter.name = "Lock module positions";
             parameter.symbol = "lockModules";
-            parameter.hints = kParameterIsAutomable|kParameterIsInteger|kParameterIsBoolean;
+            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
             parameter.ranges.def = 0.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 1.0f;
