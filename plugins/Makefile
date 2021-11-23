@@ -32,8 +32,10 @@ DRWAV += drwav_alaw_to_s16
 DRWAV += drwav_alaw_to_s32
 DRWAV += drwav_close
 DRWAV += drwav_close
+DRWAV += drwav_container
 DRWAV += drwav_data_chunk_size_riff
 DRWAV += drwav_data_chunk_size_w64
+DRWAV += drwav_data_format
 DRWAV += drwav_f32_to_s16
 DRWAV += drwav_f32_to_s32
 DRWAV += drwav_f64_to_f32
@@ -349,9 +351,8 @@ PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
 PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/src/dep/resampler/*.cpp))
 
 # modules/types which are present in other plugins
-BIDOO_CUSTOM = LadderFilter $(DRWAV)
+BIDOO_CUSTOM = ChannelDisplay LadderFilter $(DRWAV)
 BIDOO_CUSTOM_PER_FILE = channel channel filterType
-# randomize
 
 # --------------------------------------------------------------
 # BogaudioModules
