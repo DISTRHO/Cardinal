@@ -19,10 +19,6 @@
 
 #pragma once
 
-#ifdef NDEBUG
-# undef DEBUG
-#endif
-
 /* Check OS */
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 # define DISTRHO_OS_WINDOWS 1
