@@ -33,9 +33,11 @@
 // AS
 #define modelADSR modelASADSR
 #define modelVCA modelASVCA
+#define YellowRedLight ASYellowRedLight
 #include "AS/src/AS.hpp"
 #undef modelADSR
 #undef modelVCA
+#undef YellowRedLight
 
 // Atelier
 #include "Atelier/src/plugin.hpp"
@@ -45,8 +47,10 @@
 
 // Befaco
 #define modelADSR modelBefacoADSR
+#define modelMixer modelBefacoMixer
 #include "Befaco/src/plugin.hpp"
 #undef modelADSR
+#undef modelMixer
 
 // Bidoo
 #include "Bidoo/src/plugin.hpp"
@@ -611,6 +615,7 @@ static void initStatic__Befaco()
     if (spl.ok())
     {
 #define modelADSR modelBefacoADSR
+#define modelMixer modelBefacoMixer
         p->addModel(modelEvenVCO);
         p->addModel(modelRampage);
         p->addModel(modelABC);
@@ -629,6 +634,7 @@ static void initStatic__Befaco()
         p->addModel(modelMuxlicer);
         p->addModel(modelMex);
 #undef modelADSR
+#undef modelMixer
     }
 }
 
@@ -950,6 +956,7 @@ static void initStatic__Fundamental()
         p->addModel(modelLFO2);
         p->addModel(modelDelay);
         p->addModel(modelADSR);
+        p->addModel(modelMixer);
         p->addModel(modelVCMixer);
         p->addModel(model_8vert);
         p->addModel(modelUnity);
@@ -968,6 +975,17 @@ static void initStatic__Fundamental()
         p->addModel(modelMidSide);
         p->addModel(modelNoise);
         p->addModel(modelRandom);
+
+        // show all plugins, helping those familiar with v1 Rack modules
+        if (json_t* const modules = json_object_get(spl.rootJ, "modules"))
+        {
+            size_t i;
+            json_t* v;
+            json_array_foreach(modules, i, v)
+            {
+                json_object_set(v, "hidden", json_false());
+            }
+        }
     }
 }
 

@@ -9,6 +9,10 @@
 
 
 
+void writeThemeAndContrastAsDefault() {}
+void readThemeAndContrastFromDefault() {}
+
+
 void loadThemeAndContrastFromDefault(int* panelTheme, float* panelContrast) {
 	*panelTheme = 1;
 	*panelContrast = panelContrastDefault;

@@ -28,9 +28,6 @@ LindenbergResearch        43959.0 (not opensource?)
 Geodesics                 42761.0
 https://github.com/MarcBoule/Geodesics
 
-mscHack                   42316.0
-https://github.com/mschack/VCV-Rack-Plugins/
-
 BaconMusic                42095.0
 https://github.com/baconpaul/BaconPlugs/
 

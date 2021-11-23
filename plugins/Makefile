@@ -212,7 +212,7 @@ PLUGIN_FILES += $(filter-out AS/src/AS.cpp,$(wildcard AS/src/*.cpp))
 PLUGIN_FILES += AS/freeverb/revmodel.cpp
 
 # modules/types which are present in other plugins
-AS_CUSTOM = ADSR LabelDisplayWidget LowFrequencyOscillator VCA allpass comb revmodel
+AS_CUSTOM = ADSR LabelDisplayWidget LowFrequencyOscillator VCA YellowRedLight allpass comb revmodel
 
 # --------------------------------------------------------------
 # Atelier
@@ -336,7 +336,7 @@ PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
 PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 
 # modules/types which are present in other plugins
-BEFACO_CUSTOM = ADSR
+BEFACO_CUSTOM = ADSR Mixer
 
 # --------------------------------------------------------------
 # Bidoo
@@ -390,6 +390,10 @@ PLUGIN_FILES += ESeries/src/E340.cpp
 # Fundamental
 
 PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
+PLUGIN_FILES += Fundamental/src/dr_wav.c
+
+# modules/types which are present in other plugins
+FUNDAMENTAL_CUSTOM = $(DRWAV)
 
 # --------------------------------------------------------------
 # GrandeModular
@@ -522,7 +526,7 @@ PLUGIN_BINARIES += ValleyAudio/src/VOX_MACH.bin
 PLUGIN_BINARIES += ValleyAudio/src/XFADE.bin
 
 # modules/types which are present in other plugins
-VALLEYAUDIO_CUSTOM = $(DRWAV)
+VALLEYAUDIO_CUSTOM = $(DRWAV) DigitalDisplay
 VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 
 # --------------------------------------------------------------
@@ -846,6 +850,13 @@ $(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ESERIES_CUSTOM),$(call custom_module_names,$(m),ESeries)) \
 		-DpluginInstance=pluginInstance__ESeries
+
+$(BUILD_DIR)/Fundamental/%.c.o: Fundamental/%.c
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@ \
+		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
+		-DpluginInstance=pluginInstance__Fundamental
 
 $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

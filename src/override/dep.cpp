@@ -46,7 +46,7 @@ float FollowerBase::efGainMaxDecibelsDebug = 12.0f;
 // Custom Cardinal filtering
 static const struct {
     const char* const filename;
-    const char* shapes[4];
+    const char* shapes[8];
 } pathsToFilterOut[] = {
     {
         "/Core/Audio2.svg",
@@ -149,95 +149,114 @@ static const struct {
     },
     {
         "/Fundamental/8vert.svg",
-        {"path69642","path69646","path69640","path69644"}
+        {"path17","path21","circle15","path19"}
     },
     {
         "/Fundamental/ADSR.svg",
-        {"path33693","path33697","path33699","path33695"}
+        {"path12","path16","circle18","path14"}
     },
     {
         "/Fundamental/Delay.svg",
-        {"path25369","path25373","path25375","path25371"}
+        {"path14","path18","circle20","path16"}
     },
     {
-        "/Fundamental/LFO-1.svg",
-        {"path35889","path35893","path35895","path35891"}
-    },
-    {
-        "/Fundamental/LFO-2.svg",
-        {"path36131","path36135","path36137","path36133"}
+        "/Fundamental/LFO.svg",
+        {"path14","path18","circle20","path16"}
     },
     {
         "/Fundamental/Merge.svg",
-        {"path29991","path29995","path29989","path29993"}
+        {"path16","path20","circle14","path18",
+         "path26","path30","circle24","path28"}
     },
     {
         "/Fundamental/MidSide.svg",
-        {"path44181","path44185","path44179","path44183"}
+        {"path23","path27","circle21","path25",
+         "path33","path37","circle31","path35"}
+    },
+    {
+        "/Fundamental/Mixer.svg",
+        {"path14","path18","circle12","path16"}
     },
     {
         "/Fundamental/Mutes.svg",
-        {"path21613","path21617","path21611","path21615"}
+        {"path17","path21","circle15","path19"}
     },
     {
         "/Fundamental/Noise.svg",
-        {"path105594","path105598","path105592","path105596"}
+        {"path14","path18","circle12","path16"}
     },
     {
         "/Fundamental/Octave.svg",
-        {"path38471","path38475","path38469","path38473"}
+        {"path14","path18","circle12","path16"}
     },
     {
         "/Fundamental/Pulses.svg",
-        {"path46241","path46245","path46239","path46243"}
+        {"path14","path18","circle12","path16"}
     },
     {
         "/Fundamental/Quantizer.svg",
-        {"path38549","path38553","path38547","path38551"}
+        {"path14","path18","circle12","path16"}
     },
     {
         "/Fundamental/Random.svg",
-        {"path89732","path89736","path89730","path89734"}
-    },
-    {
-        "/Fundamental/SEQ3.svg",
-        {"path35687","path35691","path35693","path35689"}
+        {"path58","path62","circle64","path60"}
     },
     {
         "/Fundamental/Scope.svg",
-        {"path33887","path33891","path33893","path33889"}
+        {"path14","path18","circle20","path16"}
+    },
+    {
+        "/Fundamental/SEQ3.svg",
+        {"path16","path20","circle22","path18"}
+    },
+    {
+        "/Fundamental/SequentialSwitch1.svg",
+        {"path17","path21","circle15","path19"}
+    },
+    {
+        "/Fundamental/SequentialSwitch2.svg",
+        {"path17","path21","circle15","path19"}
     },
     {
         "/Fundamental/Split.svg",
-        {"path29999","path30003","path29997","path30001"}
+        {"path18","path22","circle16","path20",
+         "path28","path32","circle26","path30"}
     },
     {
         "/Fundamental/Sum.svg",
-        {"path10913","path10917","path10911","path10915"}
+        {"path24","path28","circle22","path26"}
     },
     {
         "/Fundamental/Unity.svg",
         {"path21219","path21223","path21217","path21221"}
     },
     {
+        "/Fundamental/VCA-1.svg",
+        {"path16","path20","circle14","path18"}
+    },
+    {
         "/Fundamental/VCF.svg",
-        {"path25239","path25243","path25245","path25241"}
+        {"path12","path16","circle18","path14"}
     },
     {
         "/Fundamental/VCMixer.svg",
-        {"path125839","path125843","path125845","path125841"}
+        {"path12","path16","circle18","path14"}
     },
     {
-        "/Fundamental/VCO-1.svg",
-        {"path33533","path33537","path33539","path33535"}
-    },
-    {
-        "/Fundamental/VCO-2.svg",
-        {"path37557","path37561","path37563","path37559"}
+        "/Fundamental/VCO.svg",
+        {"path14","path18","circle20","path16"}
     },
     {
         "/Fundamental/Viz.svg",
-        {"path41769","path41773","path41767","path41771"}
+        {"path14","path18","circle12","path16"}
+    },
+    {
+        "/Fundamental/WTLFO.svg",
+        {"path12","path16","circle18","path14"}
+    },
+    {
+        "/Fundamental/WTVCO.svg",
+        {"path12","path16","circle18","path14"}
     },
 };
 static const struct {
@@ -352,9 +371,6 @@ static const struct {
     { "/DrumKit/Snare.svg", {}, -1 },
     { "/DrumKit/Tomi.svg", {}, -1 },
     { "/ESeries/E340.svg", {}, -1 },
-    { "/Fundamental/SequentialSwitch1.svg", {}, -1 },
-    { "/Fundamental/SequentialSwitch2.svg", {}, -1 },
-    { "/Fundamental/VCA-1.svg", {}, -1 },
     { "/Fundamental/VCA.svg", {}, -1 },
     { "/JW-Modules/Add5.svg", {}, -1 },
     { "/JW-Modules/BlankPanel1hp.svg", {}, -1 },
@@ -380,8 +396,11 @@ static const struct {
     { "/JW-Modules/XYPad.svg", {}, -1 },
 };
 
-static void removeShape(NSVGimage* const handle, const char* const id)
+static inline void removeShape(NSVGimage* const handle, const char* const id)
 {
+    if (id == nullptr)
+        return;
+
     for (NSVGshape *shape = handle->shapes, *old = nullptr; shape != nullptr; old = shape, shape = shape->next)
     {
         if (std::strcmp(shape->id, id) != 0)
@@ -394,11 +413,13 @@ static void removeShape(NSVGimage* const handle, const char* const id)
 
         nsvg__deletePaths(shape->paths);
         free(shape);
-        break;
+        return;
     }
+
+    printf("NOTICE: failed to find '%s' shape to remove\n", id);
 }
 
-static bool invertPaint(NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
+static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
 {
     // Special case for DrumKit background grandient
     if (paint.type == NSVG_PAINT_LINEAR_GRADIENT && svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/DrumKit/", 9) == 0)
@@ -519,6 +540,10 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             removeShape(handle, pathsToFilterOut[i].shapes[1]);
             removeShape(handle, pathsToFilterOut[i].shapes[2]);
             removeShape(handle, pathsToFilterOut[i].shapes[3]);
+            removeShape(handle, pathsToFilterOut[i].shapes[4]);
+            removeShape(handle, pathsToFilterOut[i].shapes[5]);
+            removeShape(handle, pathsToFilterOut[i].shapes[6]);
+            removeShape(handle, pathsToFilterOut[i].shapes[7]);
 
             for (NSVGshape* shape = handle->shapes; shape != nullptr; shape = shape->next)
             {

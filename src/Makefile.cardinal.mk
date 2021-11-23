@@ -40,6 +40,8 @@ CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/rtmempool.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/sfzero.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/water.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/zita-resampler.a
+
+ifeq ($(MACOS),true)
 ifeq ($(USING_JUCE),true)
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/juce_audio_basics.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/juce_audio_processors.a
@@ -52,6 +54,8 @@ ifeq ($(USING_JUCE_GUI_EXTRA),true)
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/juce_gui_extra.a
 endif
 endif
+endif
+
 # ifneq ($(MACOS),true)
 # CARLA_EXTRA_LIBS += -Wl,--no-whole-archive -Wl,--end-group
 # endif
