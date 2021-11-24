@@ -536,6 +536,16 @@ VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCarinaeModules/src/*.cpp))
 
 # --------------------------------------------------------------
+# ZZC
+
+PLUGIN_FILES += $(filter-out ZZC/src/ZZC.cpp,$(wildcard ZZC/src/*.cpp))
+PLUGIN_FILES += ZZC/src/dsp/Wavetable.cpp
+PLUGIN_FILES += ZZC/src/filetypes/WavSupport.cpp
+
+# modules/types which are present in other plugins
+ZZC_CUSTOM = Clock LowFrequencyOscillator
+
+# --------------------------------------------------------------
 
 endif # !NOPLUGINS
 
@@ -959,6 +969,13 @@ $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ZETACARINAE_CUSTOM),$(call custom_module_names,$(m),ZetaCarinae)) \
 		-DpluginInstance=pluginInstance__ZetaCarinaeModules
+
+$(BUILD_DIR)/ZZC/%.cpp.o: ZZC/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ZZC_CUSTOM),$(call custom_module_names,$(m),ZZC)) \
+		-DpluginInstance=pluginInstance__ZZC
 
 # --------------------------------------------------------------
 

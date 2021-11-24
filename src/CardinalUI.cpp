@@ -41,6 +41,15 @@ GLFWAPI const char* glfwGetClipboardString(GLFWwindow*) { return nullptr; }
 GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char*) {}
 GLFWAPI int glfwGetKeyScancode(int) { return 0; }
 
+GLFWAPI double glfwGetTime(void)
+{
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+    DISTRHO_SAFE_ASSERT_RETURN(context != nullptr, 0.0);
+    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr, 0.0);
+
+    return context->ui->getApp().getTime();
+}
+
 GLFWAPI const char* glfwGetKeyName(const int key, int)
 {
     switch (key)
