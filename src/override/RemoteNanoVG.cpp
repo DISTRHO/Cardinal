@@ -55,6 +55,7 @@ GLFWAPI const char* glfwGetClipboardString(GLFWwindow* window) { return nullptr;
 GLFWAPI void glfwSetClipboardString(GLFWwindow* window, const char*) {}
 GLFWAPI const char* glfwGetKeyName(int key, int scancode) { return nullptr; }
 GLFWAPI int glfwGetKeyScancode(int key) { return 0; }
+GLFWAPI double glfwGetTime(void) { return 0.0; }
 
 }
 
