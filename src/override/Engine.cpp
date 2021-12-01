@@ -143,13 +143,13 @@ struct Engine::Internal {
 };
 
 
-static void Engine_updateExpander(Engine* that, Module* module, bool side) {
+static void Engine_updateExpander_NoLock(Engine* that, Module* module, bool side) {
 	Module::Expander& expander = side ? module->rightExpander : module->leftExpander;
 	Module* oldExpanderModule = expander.module;
 
 	if (expander.moduleId >= 0) {
 		if (!expander.module || expander.module->id != expander.moduleId) {
-			expander.module = that->getModule(expander.moduleId);
+			expander.module = that->getModule_NoLock(expander.moduleId);
 		}
 	}
 	else {
@@ -368,8 +368,8 @@ void Engine::stepBlock(int frames) {
 
 	// Update expander pointers
 	for (Module* module : internal->modules) {
-		Engine_updateExpander(this, module, false);
-		Engine_updateExpander(this, module, true);
+		Engine_updateExpander_NoLock(this, module, false);
+		Engine_updateExpander_NoLock(this, module, true);
 	}
 
 	// Step individual frames
@@ -538,6 +538,11 @@ void Engine::addModule(Module* module) {
 	// Dispatch AddEvent
 	Module::AddEvent eAdd;
 	module->onAdd(eAdd);
+	// Dispatch SampleRateChangeEvent
+	Module::SampleRateChangeEvent eSrc;
+	eSrc.sampleRate = internal->sampleRate;
+	eSrc.sampleTime = internal->sampleTime;
+	module->onSampleRateChange(eSrc);
 	// Update ParamHandles' module pointers
 	for (ParamHandle* paramHandle : internal->paramHandles) {
 		if (paramHandle->moduleId == module->id)
@@ -676,6 +681,13 @@ json_t* Engine::moduleToJson(Module* module) {
 void Engine::moduleFromJson(Module* module, json_t* rootJ) {
 	WriteLock lock(internal->mutex);
 	module->fromJson(rootJ);
+}
+
+
+void Engine::prepareSaveModule(Module* module) {
+	ReadLock lock(internal->mutex);
+	Module::SaveEvent e;
+	module->onSave(e);
 }
 
 
