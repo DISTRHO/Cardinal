@@ -788,7 +788,8 @@ $(BUILD_DIR)/AriaModules/%.cpp.o: AriaModules/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ARIA_CUSTOM),$(call custom_module_names,$(m),Aria)) \
-		-DpluginInstance=pluginInstance__Aria
+		-DpluginInstance=pluginInstance__Aria \
+		-Wno-cast-function-type
 
 $(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
