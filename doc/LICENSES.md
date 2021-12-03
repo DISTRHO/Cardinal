@@ -16,12 +16,14 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | AS                    | MIT                   | |
 | Amalgamated Harmonics | BSD-3-Clause          | |
 | Animated Circuits     | BSD-3-Clause          | |
+| Aria Salvatrice       | GPL-3.0-or-later      | |
 | Atelier               | GPL-3.0-only          | GPLv3+ change request https://github.com/Xenakios/Atelier/issues/18 |
 | Audible Instruments   | GPL-3.0-or-later      | |
 | Befaco                | GPL-3.0-or-later      | |
 | Bidoo                 | GPL-3.0-only          | GPLv3+ change request https://github.com/sebastien-bouffier/Bidoo/issues/186 |
 | Bogaudio              | GPL-3.0-or-later      | |
 | Cardinal              | GPL-3.0-or-later      | |
+| cf                    | BSD-3-Clause          | Internal Cardinal-only modules |
 | DrumKit               | CC0-1.0               | |
 | E-Series              | GPL-3.0-or-later      | |
 | Fundamental           | GPL-3.0-or-later      | |
@@ -29,10 +31,9 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Impromptu             | GPL-3.0-or-later      | |
 | JW-Modules            | BSD-3-Clause          | |
 | MindMeld              | GPL-3.0-or-later      | |
-| Valley                | GPL-3.0-or-later      | |
-| ZZC                   | GPL-3.0-only          | GPLv3+ change request https://github.com/zezic/ZZC/issues/86 |
-| ZetaCarinae           | GPL-3.0-or-later      | |
-| cf                    | BSD-3-Clause          | |
 | mscHack               | BSD-3-Clause          | |
 | Rackwindows           | MIT                   | |
 | repelzen              | GPL-3.0-or-later      | |
+| Valley                | GPL-3.0-or-later      | |
+| ZZC                   | GPL-3.0-only          | GPLv3+ change request https://github.com/zezic/ZZC/issues/86 |
+| ZetaCarinae           | GPL-3.0-or-later      | |
