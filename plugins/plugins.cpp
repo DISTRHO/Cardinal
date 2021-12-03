@@ -49,9 +49,6 @@ extern Model *modelDarius;
 extern Model *modelSolomon4;
 extern Model *modelSolomon8;
 extern Model *modelSolomon16;
-extern Model *modelArcane;
-extern Model *modelAtout;
-extern Model *modelAleister;
 extern Model *modelPsychopump;
 extern Model *modelPokies4;
 extern Model *modelGrabby;
@@ -595,9 +592,6 @@ static void initStatic__Aria()
         p->addModel(modelSolomon4);
         p->addModel(modelSolomon8);
         p->addModel(modelSolomon16);
-        p->addModel(modelArcane);
-        p->addModel(modelAtout);
-        p->addModel(modelAleister);
         p->addModel(modelPsychopump);
         p->addModel(modelPokies4);
         p->addModel(modelGrabby);
@@ -605,8 +599,12 @@ static void initStatic__Aria()
         p->addModel(modelUndular);
         p->addModel(modelBlank);
 #undef modelBlank
-        // NOTE disabled in Cardinal due to curl usage
-        // TODO finalize this
+        // NOTE disabled in Cardinal due to online requirement
+        spl.removeModule("Arcane");
+        spl.removeModule("Atout");
+        spl.removeModule("Aleister");
+
+        // TODO build quickjs
         spl.removeModule("Qqqq");
         spl.removeModule("Quack");
         spl.removeModule("Q");
