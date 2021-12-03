@@ -91,7 +91,9 @@ carla:
 		STATIC_PLUGIN_TARGET=true
 
 deps:
-ifneq ($(SYSDEPS),true)
+ifeq ($(SYSDEPS),true)
+	$(MAKE) quickjs -C deps
+else
 	$(MAKE) all -C deps
 endif
 

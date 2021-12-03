@@ -120,6 +120,8 @@ CONFIGURE += ac_cv_host=$(TARGET_MACHINE)
 
 DEP_MAKE  = $(MAKE)
 DEP_MAKE += ARCH_NAME=$(ARCH_NAME)
+DEP_MAKE += CC=$(CC)
+DEP_MAKE += CXX=$(CXX)
 DEP_MAKE += CFLAGS="$(BUILD_C_FLAGS)"
 DEP_MAKE += CXXFLAGS="$(BUILD_CXX_FLAGS)"
 DEP_MAKE += LDFLAGS="$(LINK_FLAGS)"
@@ -237,5 +239,7 @@ clean:
 	rm -rf $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3
 	rm -rf $(DEP_PATH)/zstd-1.4.5
 	rm -rf $(DEP_PATH)/QuickJS
+
+quickjs: $(DEP_PATH)/lib/libquickjs.a
 
 # --------------------------------------------------------------
