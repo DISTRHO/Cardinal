@@ -289,6 +289,15 @@ extern Model *modelMaude_221;
 // rackwindows
 #include "rackwindows/src/plugin.hpp"
 
+// repelzen
+#define modelBlank modelrepelzenBlank
+#define modelMixer modelrepelzenMixer
+#define tanh_pade repelzentanh_pade
+#include "repelzen/src/repelzen.hpp"
+#undef modelBlank
+#undef modelMixer
+#undef tanh_pade
+
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
 
@@ -334,6 +343,7 @@ Plugin* pluginInstance__JW;
 extern Plugin* pluginInstance__MindMeld;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__rackwindows;
+Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
 Plugin* pluginInstance__ZZC;
@@ -1190,6 +1200,27 @@ static void initStatic__rackwindows()
     }
 }
 
+static void initStatic__repelzen()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__repelzen = p;
+
+    const StaticPluginLoader spl(p, "repelzen");
+    if (spl.ok())
+    {
+#define modelBlank modelrepelzenBlank
+#define modelMixer modelrepelzenMixer
+        p->addModel(modelBlank);
+        p->addModel(modelBurst);
+        p->addModel(modelFolder);
+        p->addModel(modelErwin);
+        p->addModel(modelWerner);
+        p->addModel(modelMixer);
+#undef modelBlank
+#undef modelMixer
+    }
+}
+
 static void initStatic__ValleyAudio()
 {
     Plugin* const p = new Plugin;
@@ -1274,6 +1305,7 @@ void initStaticPlugins()
     initStatic__MindMeld();
     initStatic__mscHack();
     initStatic__rackwindows();
+    initStatic__repelzen();
     initStatic__ValleyAudio();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();

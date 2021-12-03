@@ -455,6 +455,14 @@ MSCHACK_CUSTOM_PER_FILE = MAIN_SYNC_CLOCK FILTER_STRUCT FILTER_PARAM_STRUCT OSC_
 PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/src/*.cpp))
 
 # --------------------------------------------------------------
+# repelzen
+
+PLUGIN_FILES += $(filter-out repelzen/src/repelzen.cpp,$(wildcard repelzen/src/*.cpp))
+
+# modules/types which are present in other plugins
+REPELZEN_CUSTOM = Blank Mixer tanh_pade
+
+# --------------------------------------------------------------
 # ValleyAudio
 
 PLUGIN_FILES += $(filter-out ValleyAudio/src/Valley.cpp,$(wildcard ValleyAudio/src/*.cpp))
@@ -951,6 +959,13 @@ $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 		-DpluginInstance=pluginInstance__rackwindows \
 		-Wno-implicit-fallthrough \
 		-Wno-sign-compare
+
+$(BUILD_DIR)/repelzen/%.cpp.o: repelzen/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(REPELZEN_CUSTOM),$(call custom_module_names,$(m),repelzen)) \
+		-DpluginInstance=pluginInstance__repelzen
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

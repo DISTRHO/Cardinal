@@ -76,3 +76,6 @@
 [submodule "plugins/ZZC"]
 	path = plugins/ZZC
 	url = https://github.com/zezic/ZZC.git
+[submodule "plugins/repelzen"]
+	path = plugins/repelzen
+	url = https://github.com/wiqid/repelzen.git
