@@ -30,6 +30,36 @@
 // AnimatedCircuits
 #include "AnimatedCircuits/src/plugin.hpp"
 
+// Aria
+/* NOTE too much noise in original include, do this a different way
+// #include "AriaModules/src/plugin.hpp"
+*/
+#define modelBlank modelAriaBlank
+extern Model *modelSplort;
+extern Model *modelSmerge;
+extern Model *modelSpleet;
+extern Model *modelSwerge;
+extern Model *modelSplirge;
+// extern Model *modelSrot;
+extern Model *modelQqqq;
+extern Model *modelQuack;
+extern Model *modelQ;
+extern Model *modelQuale;
+extern Model *modelDarius;
+extern Model *modelSolomon4;
+extern Model *modelSolomon8;
+extern Model *modelSolomon16;
+extern Model *modelArcane;
+extern Model *modelAtout;
+extern Model *modelAleister;
+extern Model *modelPsychopump;
+extern Model *modelPokies4;
+extern Model *modelGrabby;
+extern Model *modelRotatoes4;
+extern Model *modelUndular;
+extern Model *modelBlank;
+#undef modelBlank
+
 // AS
 #define modelADSR modelASADSR
 #define modelVCA modelASVCA
@@ -327,6 +357,7 @@ Plugin* pluginInstance__Cardinal;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
+Plugin* pluginInstance__Aria;
 Plugin* pluginInstance__AS;
 Plugin* pluginInstance__Atelier;
 Plugin* pluginInstance__AudibleInstruments;
@@ -429,6 +460,29 @@ struct StaticPluginLoader {
     {
         return rootJ != nullptr;
     }
+
+    void removeModule(const char* const slugToRemove) const noexcept
+    {
+        json_t* const modules = json_object_get(rootJ, "modules");
+        DISTRHO_SAFE_ASSERT_RETURN(modules != nullptr,);
+
+        size_t i;
+        json_t* v;
+        json_array_foreach(modules, i, v)
+        {
+            if (json_t* const slug = json_object_get(v, "slug"))
+            {
+                if (const char* const value = json_string_value(slug))
+                {
+                    if (std::strcmp(value, slugToRemove) == 0)
+                    {
+                        json_array_remove(modules, i);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 };
 
 static void initStatic__Core()
@@ -513,6 +567,50 @@ static void initStatic__AnimatedCircuits()
     if (spl.ok())
     {
         p->addModel(model_AC_Folding);
+    }
+}
+
+static void initStatic__Aria()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Aria = p;
+
+    const StaticPluginLoader spl(p, "AriaModules");
+    if (spl.ok())
+    {
+#define modelBlank modelAriaBlank
+        p->addModel(modelSplort);
+        p->addModel(modelSmerge);
+        p->addModel(modelSpleet);
+        p->addModel(modelSwerge);
+        p->addModel(modelSplirge);
+        // p->addModel(modelSrot);
+        /* TODO needs quickjs
+        p->addModel(modelQqqq);
+        p->addModel(modelQuack);
+        p->addModel(modelQ);
+        p->addModel(modelQuale);
+        */
+        p->addModel(modelDarius);
+        p->addModel(modelSolomon4);
+        p->addModel(modelSolomon8);
+        p->addModel(modelSolomon16);
+        p->addModel(modelArcane);
+        p->addModel(modelAtout);
+        p->addModel(modelAleister);
+        p->addModel(modelPsychopump);
+        p->addModel(modelPokies4);
+        p->addModel(modelGrabby);
+        p->addModel(modelRotatoes4);
+        p->addModel(modelUndular);
+        p->addModel(modelBlank);
+#undef modelBlank
+        // NOTE disabled in Cardinal due to curl usage
+        // TODO finalize this
+        spl.removeModule("Qqqq");
+        spl.removeModule("Quack");
+        spl.removeModule("Q");
+        spl.removeModule("Quale");
     }
 }
 
@@ -711,27 +809,7 @@ static void initStatic__Bidoo()
 
         // NOTE disabled in Cardinal due to curl usage
         // p->addModel(modelANTN);
-
-        // intentionally remove known bad plugin
-        if (json_t* const modules = json_object_get(spl.rootJ, "modules"))
-        {
-            size_t i;
-            json_t* v;
-            json_array_foreach(modules, i, v)
-            {
-                if (json_t* const slug = json_object_get(v, "slug"))
-                {
-                    if (const char* const value = json_string_value(slug))
-                    {
-                        if (std::strcmp(value, "antN") == 0)
-                        {
-                            json_array_remove(modules, i);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+        spl.removeModule("antN");
     }
 }
 
@@ -1289,6 +1367,7 @@ void initStaticPlugins()
 #ifndef NOPLUGINS
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
+    initStatic__Aria();
     initStatic__AS();
     initStatic__Atelier();
     initStatic__AudibleInstruments();
