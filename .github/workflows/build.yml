@@ -250,7 +250,7 @@ jobs:
           CXX: i686-w64-mingw32-g++
           EXE_WRAPPER: wine
           PKG_CONFIG: "false"
-          WINEARCH: "win32"
+          #WINEARCH: "win32"
           WINEDEBUG: "-all"
           WINEDLLOVERRIDES: "mscoree,mshtml="
         run: |
