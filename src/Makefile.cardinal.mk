@@ -96,6 +96,7 @@ RACK_EXTRA_LIBS += ../rack.a
 
 ifneq ($(SYSDEPS),true)
 RACK_EXTRA_LIBS += ../Rack/dep/lib/libjansson.a
+RACK_EXTRA_LIBS += ../Rack/dep/lib/libquickjs.a
 RACK_EXTRA_LIBS += ../Rack/dep/lib/libsamplerate.a
 RACK_EXTRA_LIBS += ../Rack/dep/lib/libspeexdsp.a
 ifeq ($(WINDOWS),true)

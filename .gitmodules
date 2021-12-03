@@ -79,3 +79,6 @@
 [submodule "plugins/repelzen"]
 	path = plugins/repelzen
 	url = https://github.com/wiqid/repelzen.git
+[submodule "plugins/AriaModules"]
+	path = plugins/AriaModules
+	url = https://github.com/CardinalModules/AriaModules.git

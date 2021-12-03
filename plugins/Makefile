@@ -208,6 +208,14 @@ AMALGAMATEDHARMONICS_CUSTOM += bogaudio
 PLUGIN_FILES += $(wildcard AnimatedCircuits/src/Folding/*.cpp)
 
 # --------------------------------------------------------------
+# Aria
+
+PLUGIN_FILES += $(filter-out AriaModules/src/Arcane.cpp AriaModules/src/plugin.cpp,$(wildcard AriaModules/src/*.cpp))
+
+# modules/types which are present in other plugins
+ARIA_CUSTOM = Blank
+
+# --------------------------------------------------------------
 # AS
 
 PLUGIN_FILES += $(filter-out AS/src/AS.cpp,$(wildcard AS/src/*.cpp))
@@ -774,6 +782,13 @@ $(BUILD_DIR)/AnimatedCircuits/%.cpp.o: AnimatedCircuits/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ANIMATEDCIRCUITS_CUSTOM),$(call custom_module_names,$(m),AnimatedCircuits)) \
 		-DpluginInstance=pluginInstance__AnimatedCircuits
+
+$(BUILD_DIR)/AriaModules/%.cpp.o: AriaModules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ARIA_CUSTOM),$(call custom_module_names,$(m),Aria)) \
+		-DpluginInstance=pluginInstance__Aria
 
 $(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
