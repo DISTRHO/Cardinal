@@ -16,10 +16,10 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | AS                    | MIT                   | |
 | Amalgamated Harmonics | BSD-3-Clause          | |
 | Animated Circuits     | BSD-3-Clause          | |
-| Atelier               | GPL-3.0-only          | Incompatible! Either changes to GPLv3+ or is kicked out |
+| Atelier               | GPL-3.0-only          | GPLv3+ change request https://github.com/Xenakios/Atelier/issues/18 |
 | Audible Instruments   | GPL-3.0-or-later      | |
 | Befaco                | GPL-3.0-or-later      | |
-| Bidoo                 | GPL-3.0-only          | Incompatible! Either changes to GPLv3+ or is kicked out |
+| Bidoo                 | GPL-3.0-only          | GPLv3+ change request https://github.com/sebastien-bouffier/Bidoo/issues/186 |
 | Bogaudio              | GPL-3.0-or-later      | |
 | Cardinal              | GPL-3.0-or-later      | |
 | DrumKit               | CC0-1.0               | |
