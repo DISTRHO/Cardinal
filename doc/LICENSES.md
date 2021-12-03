@@ -16,19 +16,19 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | AS                    | MIT                   | |
 | Amalgamated Harmonics | BSD-3-Clause          | |
 | Animated Circuits     | BSD-3-Clause          | |
-| Atelier               | GPL-3.0-only          | |
+| Atelier               | GPL-3.0-only          | Incompatible! Either changes to GPLv3+ or is kicked out |
 | Audible Instruments   | GPL-3.0-or-later      | |
 | Befaco                | GPL-3.0-or-later      | |
-| Bidoo                 | GPL-3.0-only          | |
+| Bidoo                 | GPL-3.0-only          | Incompatible! Either changes to GPLv3+ or is kicked out |
 | Bogaudio              | GPL-3.0-or-later      | |
 | Cardinal              | GPL-3.0-or-later      | |
 | DrumKit               | CC0-1.0               | |
 | E-Series              | GPL-3.0-or-later      | |
 | Fundamental           | GPL-3.0-or-later      | |
 | Grande                | GPL-3.0-or-later      | |
-| Impromptu             | GPL-3.0-only          | GPLv3+ change request https://github.com/MarcBoule/Geodesics/issues/4 |
+| Impromptu             | GPL-3.0-or-later      | |
 | JW-Modules            | BSD-3-Clause          | |
-| MindMeld              | GPL-3.0-only          | GPLv3+ change request https://github.com/MarcBoule/Geodesics/issues/4 |
+| MindMeld              | GPL-3.0-or-later      | |
 | Valley                | GPL-3.0-or-later      | |
 | ZZC                   | GPL-3.0-only          | GPLv3+ change request https://github.com/zezic/ZZC/issues/86 |
 | ZetaCarinae           | GPL-3.0-or-later      | |
