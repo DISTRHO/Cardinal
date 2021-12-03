@@ -589,12 +589,12 @@ ifeq ($(SYSDEPS),true)
 BASE_FLAGS += -DCARDINAL_SYSDEPS
 else
 BASE_FLAGS += -DZSTDLIB_VISIBILITY=
-BASE_FLAGS += -I../src/Rack/dep/include
 endif
 
 BASE_FLAGS += -I../src
 BASE_FLAGS += -I../src/Rack/include
 BASE_FLAGS += -I../src/Rack/include/dsp
+BASE_FLAGS += -I../src/Rack/dep/include
 # # BASE_FLAGS += -I../src/Rack/dep/filesystem/include
 # # BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
 BASE_FLAGS += -I../src/Rack/dep/glfw/include
