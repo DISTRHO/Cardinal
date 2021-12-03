@@ -210,9 +210,7 @@ PLUGIN_FILES += $(wildcard AnimatedCircuits/src/Folding/*.cpp)
 # --------------------------------------------------------------
 # Aria
 
-ARIA_TODO = Qqqq
-
-PLUGIN_FILES += $(filter-out AriaModules/src/Arcane.cpp AriaModules/src/plugin.cpp $(ARIA_TODO:%=AriaModules/src/%.cpp),$(wildcard AriaModules/src/*.cpp))
+PLUGIN_FILES += $(filter-out AriaModules/src/Arcane.cpp AriaModules/src/plugin.cpp,$(wildcard AriaModules/src/*.cpp))
 
 # modules/types which are present in other plugins
 ARIA_CUSTOM = Blank

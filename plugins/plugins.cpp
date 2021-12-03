@@ -582,12 +582,10 @@ static void initStatic__Aria()
         p->addModel(modelSwerge);
         p->addModel(modelSplirge);
         // p->addModel(modelSrot);
-        /* TODO needs quickjs
         p->addModel(modelQqqq);
         p->addModel(modelQuack);
         p->addModel(modelQ);
         p->addModel(modelQuale);
-        */
         p->addModel(modelDarius);
         p->addModel(modelSolomon4);
         p->addModel(modelSolomon8);
@@ -603,12 +601,6 @@ static void initStatic__Aria()
         spl.removeModule("Arcane");
         spl.removeModule("Atout");
         spl.removeModule("Aleister");
-
-        // TODO build quickjs
-        spl.removeModule("Qqqq");
-        spl.removeModule("Quack");
-        spl.removeModule("Q");
-        spl.removeModule("Quale");
     }
 }
 

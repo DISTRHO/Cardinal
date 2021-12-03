@@ -130,7 +130,7 @@ DEP_MAKE += DEP_MAC_SDK_FLAGS=
 DEP_MAKE += MACHINE=$(MACHINE)$(MACHINE_SUFFIX)
 
 # --------------------------------------------------------------
-# VCV internal dependencies target
+# Rack internal dependencies target
 
 $(DEP_PATH)/lib/%.a:
 	$(DEP_MAKE) -C $(DEP_PATH) lib/$*.a
@@ -177,9 +177,39 @@ $(DEP_PATH)/zstd-1.4.5/.stamp-patched:
 	touch $@
 
 # --------------------------------------------------------------
+# QuickJS target, needed for AriaModules
+
+QUICKJS_MAKE_FLAGS  = CFLAGS="$(BUILD_C_FLAGS) -D_GNU_SOURCE -DCONFIG_VERSION='\"Cardinal\"' -w"
+QUICKJS_MAKE_FLAGS += PROGS=libquickjs.a
+
+ifeq ($(WITH_LTO),true)
+QUICKJS_MAKE_FLAGS += CONFIG_LTO=y
+else
+QUICKJS_MAKE_FLAGS += CONFIG_LTO=n
+endif
+
+ifeq ($(WINDOWS),true)
+QUICKJS_MAKE_FLAGS += CONFIG_WIN32=y
+else ifeq ($(MACOS),true)
+QUICKJS_MAKE_FLAGS += CONFIG_DARWIN=y
+endif
+
+$(DEP_PATH)/lib/libquickjs.a: $(DEP_PATH)/QuickJS
+	$(DEP_MAKE) $(QUICKJS_MAKE_FLAGS) -C $(DEP_PATH)/QuickJS
+	install -d $(DEP_PATH)/include
+	install -d $(DEP_PATH)/lib
+	install -m644 $(DEP_PATH)/QuickJS/libquickjs.a $@
+	install -m644 $(DEP_PATH)/QuickJS/quickjs.h $(DEP_PATH)/include/quickjs.h
+
+$(DEP_PATH)/QuickJS:
+	git clone "https://github.com/JerrySievert/QuickJS.git" $(DEP_PATH)/QuickJS
+	git -C $(DEP_PATH)/QuickJS checkout b70d5344013836544631c361ae20569b978176c9
+
+# --------------------------------------------------------------
 # Build targets
 
 TARGETS += $(DEP_PATH)/lib/libjansson.a
+TARGETS += $(DEP_PATH)/lib/libquickjs.a
 TARGETS += $(DEP_PATH)/lib/libsamplerate.a
 TARGETS += $(DEP_PATH)/lib/libspeexdsp.a
 
@@ -206,5 +236,6 @@ clean:
 	rm -rf $(DEP_PATH)/libsamplerate-0.1.9
 	rm -rf $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3
 	rm -rf $(DEP_PATH)/zstd-1.4.5
+	rm -rf $(DEP_PATH)/QuickJS
 
 # --------------------------------------------------------------
