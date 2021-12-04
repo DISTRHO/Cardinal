@@ -44,7 +44,7 @@ enum WindowParameterList {
 
 struct WindowParameters {
     float cableOpacity = 0.5f;
-    float cableTension = 0.5f;
+    float cableTension = 0.75f;
     float rackBrightness = 1.0f;
     float haloBrightness = 0.25f;
     float knobScrollSensitivity = 0.001f;

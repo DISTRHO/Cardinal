@@ -333,7 +333,7 @@ public:
     {
         fWindowParameters[kWindowParameterShowTooltips] = 1.0f;
         fWindowParameters[kWindowParameterCableOpacity] = 50.0f;
-        fWindowParameters[kWindowParameterCableTension] = 100.0f;
+        fWindowParameters[kWindowParameterCableTension] = 75.0f;
         fWindowParameters[kWindowParameterRackBrightness] = 100.0f;
         fWindowParameters[kWindowParameterHaloBrightness] = 25.0f;
         fWindowParameters[kWindowParameterKnobMode] = 0.0f;
@@ -609,7 +609,7 @@ protected:
             parameter.symbol = "cableTension";
             parameter.unit = "%";
             parameter.hints = kParameterIsAutomatable;
-            parameter.ranges.def = 100.0f;
+            parameter.ranges.def = 75.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 100.0f;
             break;
