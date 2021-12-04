@@ -20,7 +20,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Atelier               | GPL-3.0-only          | GPLv3+ change request https://github.com/Xenakios/Atelier/issues/18 |
 | Audible Instruments   | GPL-3.0-or-later      | |
 | Befaco                | GPL-3.0-or-later      | |
-| Bidoo                 | GPL-3.0-only          | GPLv3+ change request https://github.com/sebastien-bouffier/Bidoo/issues/186 |
+| Bidoo                 | GPL-3.0-or-later      | |
 | Bogaudio              | GPL-3.0-or-later      | |
 | Cardinal              | GPL-3.0-or-later      | Internal Cardinal-only modules |
 | cf                    | BSD-3-Clause          | |

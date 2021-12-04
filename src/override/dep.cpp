@@ -327,6 +327,7 @@ static const struct {
     { "/Bidoo/RABBIT.svg", {}, -1 },
     { "/Bidoo/REI.svg", {}, -1 },
     { "/Bidoo/SIGMA.svg", {}, -1 },
+    { "/Bidoo/SPORE.svg", {}, -1 },
     { "/Bidoo/TIARE.svg", {}, -1 },
     { "/Bidoo/TOCANTE.svg", {"rect843"}, -1 },
     { "/Bidoo/VOID.svg", {}, -1 },

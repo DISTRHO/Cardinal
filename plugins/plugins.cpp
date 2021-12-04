@@ -789,6 +789,7 @@ static void initStatic__Bidoo()
         p->addModel(modelZINC);
         p->addModel(modelFREIN);
         p->addModel(modelHCTIP);
+        p->addModel(modelSPORE);
         p->addModel(modelDFUZE);
         p->addModel(modelREI);
         p->addModel(modelRABBIT);

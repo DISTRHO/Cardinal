@@ -56,7 +56,7 @@ At the moment the following 3rd-party modules are provided:
 - Atelier (*)
 - Audible Instruments
 - Befaco
-- Bidoo (*)
+- Bidoo
 - Bogaudio
 - cf
 - DrumKit
