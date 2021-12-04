@@ -6,13 +6,24 @@
 
 This is a [DPF-based](https://github.com/DISTRHO/DPF/) plugin wrapper around [VCV Rack](https://github.com/VCVRack/Rack/),
 using its code directly instead of forking the project.  
-The target is to have a proper, self-contained, fully free and open-source plugin version of Rack.  
+The target is to have a **proper, self-contained, fully free and open-source plugin version of Rack**.  
 See [project overview](doc/OVERVIEW.md) document for an overview on how the project source code is structured.
+
+Cardinal contains Rack, some 3rd-party modules and a few internal utilities all in a single binary.  
+It does not load external modules and does not connect to the official Rack library/store.
 
 Because it is using DPF, Cardinal already supports LV2 and VST2 with an extra JACK standalone mode if self-compiled.  
 A VST3 version is in progress, already part of the build but still experimental.
 
 **The project should be considered in alpha state at the moment.**
+
+## Screenshot
+
+Because people will ask for it. It is, well... Rack.  
+But a couple of modules background's have their colors flipped, because damn we want proper dark mode!
+
+![screenshot1](doc/Screenshot1.png "Screenshot1")
+![screenshot2](doc/Screenshot2.png "Screenshot2")
 
 ## Current status
 
@@ -28,6 +39,55 @@ Currently the following features are known NOT to work:
 
 If you want to try this out early, checkout the GitHub actions tab.  
 There is absolutely no warranty, use at your own risk and all that...
+
+## License
+
+Cardinal is licensed under GPLv3+, see [LICENSE](LICENSE) for more details.  
+An overview of the included code and linked submodules can be seen [here](doc/LICENSES.md).
+
+## Included modules
+
+At the moment the following 3rd-party modules are provided:
+
+- AS
+- Amalgamated Harmonics
+- Animated Circuits
+- Aria Salvatrice
+- Atelier (*)
+- Audible Instruments
+- Befaco
+- Bidoo (*)
+- Bogaudio
+- cf
+- DrumKit
+- E-Series
+- Fundamental
+- Grande
+- Impromptu
+- JW-Modules
+- MindMeld
+- mscHack
+- Rackwindows
+- repelzen
+- Valley
+- ZZC (*)
+- ZetaCarinae
+
+(*) Might be removed soon due to license conflicts
+
+Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.
+
+### Restrictions
+
+Being an open-source project, all included 3rd-party modules must be opensource and have a GPLv3+ compatible license.  
+*GPLv3-only modules are not allowed*.
+
+Special care also needs to be taken with artwork licensing.  
+Cardinal allows the use of CC-NC because how prevalent it is across many Rack modules, but it should be avoided if possible.  
+Also, unless the module is really essential, CC-ND will is not allowed.
+
+Dependencies should be kept at a minimum, as otherwise it quickly grows the complexity of the build.  
+Online access (such as phone-home) is not allowed.
 
 ## Why
 
