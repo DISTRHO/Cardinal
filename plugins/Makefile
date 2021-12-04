@@ -381,6 +381,14 @@ BOGAUDIO_CUSTOM = ADSR BlueNoiseGenerator LFO Noise VCA VCO VCF
 BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 
 # --------------------------------------------------------------
+# ChowDSP
+
+PLUGIN_FILES += ChowDSP/src/plugin.cpp
+PLUGIN_FILES += $(wildcard ChowDSP/src/*/*.cpp)
+PLUGIN_FILES += $(wildcard ChowDSP/src/*/*/*.cpp)
+PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
+
+# --------------------------------------------------------------
 # cf
 
 PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
@@ -488,7 +496,7 @@ PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/s
 PLUGIN_FILES += $(filter-out repelzen/src/repelzen.cpp,$(wildcard repelzen/src/*.cpp))
 
 # modules/types which are present in other plugins
-REPELZEN_CUSTOM = Blank Mixer tanh_pade
+REPELZEN_CUSTOM = Blank Mixer Werner tanh_pade
 
 # --------------------------------------------------------------
 # sonusmodular
@@ -906,6 +914,18 @@ $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
 		-DpluginInstance=pluginInstance__cf \
 		-Wno-misleading-indentation
+
+$(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(CHOWDSP_CUSTOM),$(call custom_module_names,$(m),ChowDSP)) \
+		-DpluginInstance=pluginInstance__ChowDSP \
+		-Dinit=init__ChowDSP \
+		-DUSE_EIGEN \
+		-IChowDSP/lib \
+		-IChowDSP/lib/chowdsp_utils/DSP/WDF \
+		-Wno-deprecated-copy
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

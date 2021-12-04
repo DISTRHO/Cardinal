@@ -224,6 +224,9 @@ extern Model *modelBlank;
 // cf
 #include "cf/src/plugin.hpp"
 
+// ChowDSP
+#include "ChowDSP/src/plugin.hpp"
+
 // DrumKit
 #include "DrumKit/src/DrumKit.hpp"
 void setupSamples();
@@ -332,10 +335,12 @@ extern Model *modelMaude_221;
 // repelzen
 #define modelBlank modelrepelzenBlank
 #define modelMixer modelrepelzenMixer
+#define modelWerner modelrepelzenWerner
 #define tanh_pade repelzentanh_pade
 #include "repelzen/src/repelzen.hpp"
 #undef modelBlank
 #undef modelMixer
+#undef modelWerner
 #undef tanh_pade
 
 // sonusmodular
@@ -379,6 +384,7 @@ Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__cf;
+extern Plugin* pluginInstance__ChowDSP;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__FehlerFabrik;
@@ -1044,6 +1050,33 @@ static void initStatic__cf()
     }
 }
 
+static void initStatic__ChowDSP()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__ChowDSP = p;
+
+    const StaticPluginLoader spl(p, "ChowDSP");
+    if (spl.ok())
+    {
+        p->addModel(modelChowTape);
+        p->addModel(modelChowPhaserFeedback);
+        p->addModel(modelChowPhaserMod);
+        p->addModel(modelChowFDN);
+        p->addModel(modelChowRNN);
+        p->addModel(modelChowModal);
+        p->addModel(modelChowDer);
+        p->addModel(modelWarp);
+        p->addModel(modelWerner);
+        p->addModel(modelCredit);
+        p->addModel(modelChowPulse);
+        p->addModel(modelChowTapeCompression);
+        p->addModel(modelChowTapeChew);
+        p->addModel(modelChowTapeDegrade);
+        p->addModel(modelChowTapeLoss);
+        p->addModel(modelChowChorus);
+    }
+}
+
 static void initStatic__DrumKit()
 {
     Plugin* const p = new Plugin;
@@ -1369,6 +1402,7 @@ static void initStatic__repelzen()
     {
 #define modelBlank modelrepelzenBlank
 #define modelMixer modelrepelzenMixer
+#define modelWerner modelrepelzenWerner
         p->addModel(modelBlank);
         p->addModel(modelBurst);
         p->addModel(modelFolder);
@@ -1377,6 +1411,7 @@ static void initStatic__repelzen()
         p->addModel(modelMixer);
 #undef modelBlank
 #undef modelMixer
+#undef modelWerner
     }
 }
 
@@ -1495,6 +1530,7 @@ void initStaticPlugins()
     initStatic__Bidoo();
     initStatic__BogaudioModules();
     initStatic__cf();
+    initStatic__ChowDSP();
     initStatic__DrumKit();
     initStatic__ESeries();
     initStatic__FehlerFabrik();

@@ -84,6 +84,7 @@ At the moment the following 3rd-party modules are provided:
 - Bidoo
 - Bogaudio
 - cf
+- ChowDSP
 - DrumKit
 - E-Series
 - Fehler Fabrik

@@ -94,3 +94,6 @@
 [submodule "plugins/Mog"]
 	path = plugins/Mog
 	url = https://github.com/CardinalModules/Mog-VCV.git
+[submodule "plugins/ChowDSP"]
+	path = plugins/ChowDSP
+	url = https://github.com/jatinchowdhury18/ChowDSP-VCV.git

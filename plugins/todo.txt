@@ -1,6 +1,6 @@
 List of plugins still to add, sorted by popularity
 
-- TODO, see list at https://github.com/VCVRack/library/tree/v1/repos
+- TODO, see list at https://github.com/VCVRack/library/tree/v2/repos
 
 Grayscale                 74754.0 (not opensource?)
 
@@ -20,16 +20,10 @@ https://github.com/adbrant/ArableInstruments/
 squinkylabs-plug1         48682.0
 https://github.com/squinkylabs/SquinkyVCV
 
-SonusModular              45245.0
-https://gitlab.com/sonusdept/sonusmodular
-
 LindenbergResearch        43959.0 (not opensource?)
 
 Geodesics                 42761.0
 https://github.com/MarcBoule/Geodesics
-
-BaconMusic                42095.0
-https://github.com/baconpaul/BaconPlugs/
 
 HetrickCV                 42077.0
 https://github.com/mhetrick/hetrickcv
