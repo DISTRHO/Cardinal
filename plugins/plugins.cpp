@@ -226,6 +226,9 @@ extern Model *modelBlank;
 
 // ChowDSP
 #include "ChowDSP/src/plugin.hpp"
+#define init initChowDSP
+#include "ChowDSP/src/plugin.cpp"
+#undef init
 
 // DrumKit
 #include "DrumKit/src/DrumKit.hpp"
@@ -239,6 +242,14 @@ void setupSamples();
 
 // Fundamental
 #include "Fundamental/src/plugin.hpp"
+
+// GlueTheGiant
+#include "GlueTheGiant/src/plugin.hpp"
+bool audition_mixer = false;
+bool audition_depot = false;
+int gtg_default_theme = 1;
+int loadGtgPluginDefault(const char*, int) { return 1; }
+void saveGtgPluginDefault(const char*, int) {}
 
 // GrandeModular
 #include "GrandeModular/src/plugin.hpp"
@@ -384,12 +395,13 @@ Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__cf;
-extern Plugin* pluginInstance__ChowDSP;
+Plugin* pluginInstance__ChowDSP;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__FehlerFabrik;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
+Plugin* pluginInstance__GlueTheGiant;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__JW;
 extern Plugin* pluginInstance__MindMeld;
@@ -1187,6 +1199,26 @@ static void initStatic__Fundamental()
     }
 }
 
+static void initStatic__GlueTheGiant()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__GlueTheGiant = p;
+
+    const StaticPluginLoader spl(p, "GlueTheGiant");
+    if (spl.ok())
+    {
+        p->addModel(modelGigBus);
+        p->addModel(modelMiniBus);
+        p->addModel(modelSchoolBus);
+        p->addModel(modelMetroCityBus);
+        p->addModel(modelBusDepot);
+        p->addModel(modelBusRoute);
+        p->addModel(modelRoad);
+        p->addModel(modelEnterBus);
+        p->addModel(modelExitBus);
+    }
+}
+
 static void initStatic__GrandeModular()
 {
     Plugin* const p = new Plugin;
@@ -1535,6 +1567,7 @@ void initStaticPlugins()
     initStatic__ESeries();
     initStatic__FehlerFabrik();
     initStatic__Fundamental();
+    initStatic__GlueTheGiant();
     initStatic__GrandeModular();
     initStatic__ImpromptuModular();
     initStatic__JW();

@@ -50,15 +50,29 @@ std::string user(std::string filename) {
 
 // get system resource, trimming "res/" prefix if we are loaded as a plugin bundle
 std::string system(std::string filename) {
-    if (string::endsWith(filename, "ComponentLibrary/ScrewSilver.svg")) {
-        filename = filename.substr(0, filename.size()-32) + "ComponentLibrary/ScrewBlack.svg";
-    }
+    if (string::endsWith(filename, "/ComponentLibrary/ScrewSilver.svg"))
+        filename = filename.substr(0, filename.size()-10) + "Black.svg";
     return system::join(systemDir, bundlePath.empty() ? filename : trim(filename));
 }
 
 // get plugin resource, also trims "res/" as needed
 std::string plugin(plugin::Plugin* plugin, std::string filename) {
     DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, {});
+    if (plugin->slug == "GlueTheGiant")
+    {
+        if (filename == "res/BusDepot.svg"
+         || filename == "res/BusRoute.svg"
+         || filename == "res/EnterBus.svg"
+         || filename == "res/ExitBus.svg"
+         || filename == "res/GigBus.svg"
+         || filename == "res/MetroCityBus.svg"
+         || filename == "res/MiniBus.svg"
+         || filename == "res/Road.svg"
+         || filename == "res/SchoolBus.svg")
+        {
+            filename = filename.substr(0, filename.size()-4) + "_Night.svg";
+        }
+    }
     return system::join(plugin->path, trim(filename));
 }
 

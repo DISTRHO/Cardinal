@@ -97,3 +97,6 @@
 [submodule "plugins/ChowDSP"]
 	path = plugins/ChowDSP
 	url = https://github.com/jatinchowdhury18/ChowDSP-VCV.git
+[submodule "plugins/GlueTheGiant"]
+	path = plugins/GlueTheGiant
+	url = https://github.com/gluethegiant/gtg-rack.git

@@ -383,7 +383,6 @@ BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 # --------------------------------------------------------------
 # ChowDSP
 
-PLUGIN_FILES += ChowDSP/src/plugin.cpp
 PLUGIN_FILES += $(wildcard ChowDSP/src/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/src/*/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
@@ -425,6 +424,11 @@ PLUGIN_FILES += Fundamental/src/dr_wav.c
 
 # modules/types which are present in other plugins
 FUNDAMENTAL_CUSTOM = $(DRWAV)
+
+# --------------------------------------------------------------
+# GlueTheGiant
+
+PLUGIN_FILES += $(filter-out GlueTheGiant/src/plugin.cpp,$(wildcard GlueTheGiant/src/*.cpp))
 
 # --------------------------------------------------------------
 # GrandeModular
@@ -921,7 +925,6 @@ $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(CHOWDSP_CUSTOM),$(call custom_module_names,$(m),ChowDSP)) \
 		-DpluginInstance=pluginInstance__ChowDSP \
-		-Dinit=init__ChowDSP \
 		-DUSE_EIGEN \
 		-IChowDSP/lib \
 		-IChowDSP/lib/chowdsp_utils/DSP/WDF \
@@ -963,6 +966,22 @@ $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
 		-DpluginInstance=pluginInstance__Fundamental
+
+$(BUILD_DIR)/GlueTheGiant/%.cpp.o: GlueTheGiant/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(GLUETHEGIANT_CUSTOM),$(call custom_module_names,$(m),GlueTheGiant)) \
+		-DpluginInstance=pluginInstance__GlueTheGiant
+
+$(BUILD_DIR)/GlueTheGiant/src/gtgComponents.cpp.o: GlueTheGiant/src/gtgComponents.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(GLUETHEGIANT_CUSTOM),$(call custom_module_names,$(m),GlueTheGiant)) \
+		-DpluginInstance=pluginInstance__GlueTheGiant \
+		-DloadGtgPluginDefault=ignoredGlueTheGiant1 \
+		-DsaveGtgPluginDefault=ignoredGlueTheGiant2
 
 $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

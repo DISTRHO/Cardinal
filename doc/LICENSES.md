@@ -29,6 +29,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | E-Series              | GPL-3.0-or-later      | |
 | Fehler Fabrik         | GPL-3.0-or-later      | |
 | Fundamental           | GPL-3.0-or-later      | |
+| Glue the Giant        | GPL-3.0-or-later      | |
 | Grande                | GPL-3.0-or-later      | |
 | Impromptu             | GPL-3.0-or-later      | |
 | JW-Modules            | BSD-3-Clause          | |

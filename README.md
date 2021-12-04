@@ -89,6 +89,7 @@ At the moment the following 3rd-party modules are provided:
 - E-Series
 - Fehler Fabrik
 - Fundamental
+- Glue the Giant
 - Grande
 - Impromptu
 - JW-Modules
