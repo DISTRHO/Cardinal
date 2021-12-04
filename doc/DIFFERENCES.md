@@ -42,4 +42,4 @@ Additionally, Cardinal contains the following built-in modules not present in th
  * Ildaeil Host
  * Host Parameters (24 host-exposed parameters as CV sources)
  * Host Time (play, reset, bar, beat, tick, bar-phase and beat-phase CV sources)
- * Host CV (for the CV IO variant, allows direct CV access to/from the DAW)
+ * Host CV (for the Raw-CV plugin variant, allows direct CV access to/from the DAW)
