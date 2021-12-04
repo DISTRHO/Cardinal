@@ -407,6 +407,8 @@ PLUGIN_FILES += ESeries/src/E340.cpp
 
 PLUGIN_FILES += $(filter-out FehlerFabrik/src/plugin.cpp,$(wildcard FehlerFabrik/src/*.cpp))
 
+FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter
+
 # --------------------------------------------------------------
 # Fundamental
 

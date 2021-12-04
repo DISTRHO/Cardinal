@@ -27,19 +27,19 @@ All variants have 2 audio outputs and MIDI support.
 
 ### Main
 
-This variant provides 2 audio inputs and outputs and 8 CV inputs and outputs.  
+This variant provides 2 audio inputs and outputs and 10 CV inputs and outputs.  
 
 NOTE: Due to VST2 format not supporting CV ports, this variant is not available for VST2.
 
 ### Synth
 
-This variant provides 2 audio inputs and outputs, no CV ports.  
-Plugin type is tagged as "instrument".
+This variant provides 2 audio outputs but no audio inputs or CV ports.  
+Plugin type is set as "instrument".
 
 ### FX
 
-This variant provides 2 audio inputs and outputs, no CV ports.  
-Plugin type is tagged as regular "effect".
+This variant provides 2 audio inputs and outputs, but no CV ports.  
+Plugin type is set as regular "effect".
 
 ## Screenshots
 
