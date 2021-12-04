@@ -295,6 +295,9 @@ extern Model *modelBassMaster;
 extern Model *modelBassMasterJr;
 extern Model *modelShapeMaster;
 
+// Mog
+#include "Mog/src/plugin.hpp"
+
 // mscHack
 /* NOTE too much noise in original include, do this a different way
 // #include "mscHack/src/mscHack.hpp"
@@ -384,6 +387,7 @@ Plugin* pluginInstance__GrandeModular;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__JW;
 extern Plugin* pluginInstance__MindMeld;
+Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
@@ -1278,6 +1282,19 @@ static void initStatic__MindMeld()
     }
 }
 
+static void initStatic__Mog()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Mog = p;
+
+    const StaticPluginLoader spl(p, "Mog");
+    if (spl.ok())
+    {
+        p->addModel(modelNetwork);
+        p->addModel(modelNexus);
+    }
+}
+
 static void initStatic__mscHack()
 {
     Plugin* const p = new Plugin;
@@ -1486,6 +1503,7 @@ void initStaticPlugins()
     initStatic__ImpromptuModular();
     initStatic__JW();
     initStatic__MindMeld();
+    initStatic__Mog();
     initStatic__mscHack();
     initStatic__rackwindows();
     initStatic__repelzen();

@@ -462,6 +462,12 @@ PLUGIN_FILES += $(wildcard MindMeldModular/src/Utilities/*.cpp)
 MINDMELD_CUSTOM = printNote
 
 # --------------------------------------------------------------
+# Mog
+
+PLUGIN_FILES += Mog/src/Network.cpp
+PLUGIN_FILES += Mog/src/Nexus.cpp
+
+# --------------------------------------------------------------
 # mscHack
 
 PLUGIN_FILES += $(wildcard mscHack/src/*.cpp)
@@ -979,7 +985,7 @@ $(BUILD_DIR)/MindMeldModular/MindMeldModular.cpp.o: MindMeldModular/src/MindMeld
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),JW)) \
+		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),MindMeld)) \
 		-DpluginInstance=pluginInstance__MindMeld \
 		-Dinit=init__MindMeld
 
@@ -987,8 +993,15 @@ $(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),JW)) \
+		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),MindMeld)) \
 		-DpluginInstance=pluginInstance__MindMeld
+
+$(BUILD_DIR)/Mog/%.cpp.o: Mog/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MOG_CUSTOM),$(call custom_module_names,$(m),Mog)) \
+		-DpluginInstance=pluginInstance__Mog
 
 $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

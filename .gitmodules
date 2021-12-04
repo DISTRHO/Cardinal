@@ -91,3 +91,6 @@
 [submodule "plugins/sonusmodular"]
 	path = plugins/sonusmodular
 	url = https://gitlab.com/sonusdept/sonusmodular.git
+[submodule "plugins/Mog"]
+	path = plugins/Mog
+	url = https://github.com/CardinalModules/Mog-VCV.git

@@ -68,6 +68,7 @@ At the moment the following 3rd-party modules are provided:
 - Impromptu
 - JW-Modules
 - MindMeld
+- Mog
 - mscHack
 - Rackwindows
 - repelzen

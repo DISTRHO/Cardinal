@@ -33,6 +33,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Impromptu             | GPL-3.0-or-later      | |
 | JW-Modules            | BSD-3-Clause          | |
 | MindMeld              | GPL-3.0-or-later      | |
+| Mog                   | CC0-1.0               | |
 | mscHack               | BSD-3-Clause          | |
 | Rackwindows           | MIT                   | |
 | repelzen              | GPL-3.0-or-later      | |
