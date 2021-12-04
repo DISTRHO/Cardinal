@@ -483,6 +483,11 @@ PLUGIN_FILES += $(filter-out repelzen/src/repelzen.cpp,$(wildcard repelzen/src/*
 REPELZEN_CUSTOM = Blank Mixer tanh_pade
 
 # --------------------------------------------------------------
+# sonusmodular
+
+PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular,$(wildcard sonusmodular/src/*.cpp))
+
+# --------------------------------------------------------------
 # ValleyAudio
 
 PLUGIN_FILES += $(filter-out ValleyAudio/src/Valley.cpp,$(wildcard ValleyAudio/src/*.cpp))
@@ -1013,6 +1018,13 @@ $(BUILD_DIR)/repelzen/%.cpp.o: repelzen/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(REPELZEN_CUSTOM),$(call custom_module_names,$(m),repelzen)) \
 		-DpluginInstance=pluginInstance__repelzen
+
+$(BUILD_DIR)/sonusmodular/%.cpp.o: sonusmodular/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(SONUSMODULAR_CUSTOM),$(call custom_module_names,$(m),sonusmodular)) \
+		-DpluginInstance=pluginInstance__sonusmodular
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

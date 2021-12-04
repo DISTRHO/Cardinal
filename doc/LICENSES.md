@@ -36,6 +36,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | mscHack               | BSD-3-Clause          | |
 | Rackwindows           | MIT                   | |
 | repelzen              | GPL-3.0-or-later      | |
+| Sonus Modular         | GPL-3.0-or-later      | |
 | Valley                | GPL-3.0-or-later      | |
 | ZZC                   | GPL-3.0-only          | GPLv3+ change request https://github.com/zezic/ZZC/issues/86 |
 | ZetaCarinae           | GPL-3.0-or-later      | |

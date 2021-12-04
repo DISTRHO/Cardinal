@@ -335,6 +335,9 @@ extern Model *modelMaude_221;
 #undef modelMixer
 #undef tanh_pade
 
+// sonusmodular
+#include "sonusmodular/src/sonusmodular.hpp"
+
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
 
@@ -384,6 +387,7 @@ extern Plugin* pluginInstance__MindMeld;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
+Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
 Plugin* pluginInstance__ZZC;
@@ -1359,6 +1363,44 @@ static void initStatic__repelzen()
     }
 }
 
+static void initStatic__sonusmodular()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__sonusmodular = p;
+
+    const StaticPluginLoader spl(p, "sonusmodular");
+    if (spl.ok())
+    {
+        p->addModel(modelAddiction);
+        p->addModel(modelBitter);
+        p->addModel(modelBymidside);
+        p->addModel(modelCampione);
+        p->addModel(modelChainsaw);
+        p->addModel(modelCtrl);
+        p->addModel(modelDeathcrush);
+        p->addModel(modelFraction);
+        p->addModel(modelHarmony);
+        p->addModel(modelLadrone);
+        p->addModel(modelLuppolo);
+        p->addModel(modelLuppolo3);
+        p->addModel(modelMicromacro);
+        p->addModel(modelMrcheb);
+        p->addModel(modelMultimulti);
+        p->addModel(modelNeurosc);
+        p->addModel(modelOktagon);
+        p->addModel(modelOsculum);
+        p->addModel(modelParamath);
+        p->addModel(modelPiconoise);
+        p->addModel(modelPith);
+        p->addModel(modelPusher);
+        p->addModel(modelRingo);
+        p->addModel(modelScramblase);
+        p->addModel(modelTropicana);
+        p->addModel(modelTwoff);
+        p->addModel(modelYabp);
+    }
+}
+
 static void initStatic__ValleyAudio()
 {
     Plugin* const p = new Plugin;
@@ -1447,6 +1489,7 @@ void initStaticPlugins()
     initStatic__mscHack();
     initStatic__rackwindows();
     initStatic__repelzen();
+    initStatic__sonusmodular();
     initStatic__ValleyAudio();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();

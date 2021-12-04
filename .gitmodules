@@ -88,3 +88,6 @@
 [submodule "plugins/FehlerFabrik"]
 	path = plugins/FehlerFabrik
 	url = https://github.com/RCameron93/FehlerFabrik.git
+[submodule "plugins/sonusmodular"]
+	path = plugins/sonusmodular
+	url = https://gitlab.com/sonusdept/sonusmodular.git

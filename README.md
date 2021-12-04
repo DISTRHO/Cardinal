@@ -71,6 +71,7 @@ At the moment the following 3rd-party modules are provided:
 - mscHack
 - Rackwindows
 - repelzen
+- Sonus Modular
 - Valley
 - ZZC (*)
 - ZetaCarinae
