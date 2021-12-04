@@ -62,6 +62,7 @@ At the moment the following 3rd-party modules are provided:
 - cf
 - DrumKit
 - E-Series
+- Fehler Fabrik
 - Fundamental
 - Grande
 - Impromptu

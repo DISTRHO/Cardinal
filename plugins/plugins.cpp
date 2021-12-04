@@ -231,6 +231,9 @@ void setupSamples();
 // ESeries
 #include "ESeries/src/plugin.hpp"
 
+// FehlerFabrik
+#include "FehlerFabrik/src/plugin.hpp"
+
 // Fundamental
 #include "Fundamental/src/plugin.hpp"
 
@@ -372,6 +375,7 @@ Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__cf;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__ESeries;
+Plugin* pluginInstance__FehlerFabrik;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
 extern Plugin* pluginInstance__ImpromptuModular;
@@ -1068,6 +1072,30 @@ static void initStatic__ESeries()
     }
 }
 
+static void initStatic__FehlerFabrik()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__FehlerFabrik = p;
+
+    const StaticPluginLoader spl(p, "FehlerFabrik");
+    if (spl.ok())
+    {
+        p->addModel(modelPSIOP);
+        p->addModel(modelPlanck);
+        p->addModel(modelLuigi);
+        p->addModel(modelAspect);
+        p->addModel(modelMonte);
+        p->addModel(modelArpanet);
+        p->addModel(modelSigma);
+        p->addModel(modelFax);
+        p->addModel(modelRasoir);
+        p->addModel(modelChi);
+        p->addModel(modelNova);
+        p->addModel(modelLilt);
+        p->addModel(modelBotzinger);
+    }
+}
+
 static void initStatic__Fundamental()
 {
     Plugin* const p = new Plugin;
@@ -1410,6 +1438,7 @@ void initStaticPlugins()
     initStatic__cf();
     initStatic__DrumKit();
     initStatic__ESeries();
+    initStatic__FehlerFabrik();
     initStatic__Fundamental();
     initStatic__GrandeModular();
     initStatic__ImpromptuModular();

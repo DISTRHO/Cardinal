@@ -403,6 +403,11 @@ DRUMKIT_CUSTOM = ADSR Envelope LowFrequencyOscillator
 PLUGIN_FILES += ESeries/src/E340.cpp
 
 # --------------------------------------------------------------
+# FehlerFabrik
+
+PLUGIN_FILES += $(filter-out FehlerFabrik/src/plugin.cpp,$(wildcard FehlerFabrik/src/*.cpp))
+
+# --------------------------------------------------------------
 # Fundamental
 
 PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
@@ -904,6 +909,13 @@ $(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ESERIES_CUSTOM),$(call custom_module_names,$(m),ESeries)) \
 		-DpluginInstance=pluginInstance__ESeries
+
+$(BUILD_DIR)/FehlerFabrik/%.cpp.o: FehlerFabrik/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(FEHLERFABRIK_CUSTOM),$(call custom_module_names,$(m),FehlerFabrik)) \
+		-DpluginInstance=pluginInstance__FehlerFabrik
 
 $(BUILD_DIR)/Fundamental/%.c.o: Fundamental/%.c
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
