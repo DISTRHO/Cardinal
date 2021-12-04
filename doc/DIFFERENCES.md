@@ -25,9 +25,9 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 | Plugin in VST3 format          | No                        | WIP                             | |
 | Multi-threaded engine          | Yes                       | No, uses host audio thread      | Intentional in Cardinal, for removing jitter |
 | Supports ARM systems           | No                        | Yes                             | This means Apple M1 too yes |
-| Synth plugin variant           | Yes, 16 ins, 16 outs      | Yes, 2 ins, 2 outs              | |
-| FX plugin variant              | Yes, 16 ins, 16 outs      | Yes, 2 ins, 2 outs              | |
-| Raw-CV plugin variant          | No, unsupported           | Yes, 2 audio IO + 8 CV IO       | Not possible in VST2 format |
+| Synth plugin variant           | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
+| FX plugin variant              | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
+| Raw-CV plugin variant          | Unsupported               | 2 audio IO + 8 CV IO            | Available in JACK, LV2 and VST3 formats, not possible in VST2 |
 | Arbitrary parameter automation | Yes                       | No                              | Unsupported in Cardinal, tricky to do for many plugin formats at once |
 | Integrated plugin host         | No, Host payed separately | Yes, using Carla or Ildaeil     | Currently work-in-progress in Cardinal |
 | v1 module compatibility        | No                        | No, but with less restrictions  | Modules can load resources at any point |
