@@ -251,7 +251,7 @@ jobs:
           EXE_WRAPPER: wine
           PKG_CONFIG: "false"
           #WINEARCH: "win32"
-          WINEDEBUG: "-all"
+          #WINEDEBUG: "-all"
           WINEDLLOVERRIDES: "mscoree,mshtml="
         run: |
           make features
