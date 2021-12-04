@@ -340,6 +340,13 @@ PLUGIN_FILES += AudibleInstruments/eurorack/streams/vactrol.cc
 PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
 
 # --------------------------------------------------------------
+# BaconPlugs
+
+PLUGIN_FILES += $(filter-out BaconPlugs/src/BaconPlugs.cpp,$(wildcard BaconPlugs/src/*.cpp))
+PLUGIN_FILES += $(wildcard BaconPlugs/libs/midifile/src/*.cpp)
+PLUGIN_FILES += $(wildcard BaconPlugs/libs/open303-code/Source/DSPCode/*.cpp)
+
+# --------------------------------------------------------------
 # Befaco
 
 PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
@@ -820,6 +827,18 @@ $(BUILD_DIR)/AudibleInstruments/%.o: AudibleInstruments/%
 		-IAudibleInstruments/eurorack \
 		-Wno-class-memaccess \
 		-Wno-unused-local-typedefs
+
+$(BUILD_DIR)/BaconPlugs/%.cpp.o: BaconPlugs/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(BACON_CUSTOM),$(call custom_module_names,$(m),BaconPlugs)) \
+		-DpluginInstance=pluginInstance__Bacon \
+		-DDARK_BACON \
+		-IBaconPlugs/libs/midifile/include \
+		-IBaconPlugs/libs/open303-code/Source/DSPCode \
+		-Wno-array-bounds \
+		-Wno-strict-aliasing
 
 $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

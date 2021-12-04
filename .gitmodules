@@ -82,3 +82,6 @@
 [submodule "plugins/AriaModules"]
 	path = plugins/AriaModules
 	url = https://github.com/CardinalModules/AriaModules.git
+[submodule "plugins/BaconPlugs"]
+	path = plugins/BaconPlugs
+	url = https://github.com/CardinalModules/BaconPlugs.git

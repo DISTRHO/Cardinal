@@ -72,6 +72,13 @@ extern Model *modelBlank;
 // AudibleInstruments
 #include "AudibleInstruments/src/plugin.hpp"
 
+// BaconPlugs
+#define INCLUDE_COMPONENTS_HPP
+#include "BaconPlugs/src/BaconPlugs.hpp"
+#undef INCLUDE_COMPONENTS_HPP
+#undef SCREW_WIDTH
+#undef RACK_HEIGHT
+
 // Befaco
 #define modelADSR modelBefacoADSR
 #define modelMixer modelBefacoMixer
@@ -358,6 +365,7 @@ Plugin* pluginInstance__Aria;
 Plugin* pluginInstance__AS;
 Plugin* pluginInstance__Atelier;
 Plugin* pluginInstance__AudibleInstruments;
+Plugin* pluginInstance__Bacon;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
@@ -710,6 +718,39 @@ static void initStatic__AudibleInstruments()
         p->addModel(modelRipples);
         p->addModel(modelShelves);
         p->addModel(modelStreams);
+    }
+}
+
+static void initStatic__Bacon()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Bacon = p;
+
+    const StaticPluginLoader spl(p, "BaconPlugs");
+    if (spl.ok())
+    {
+        p->addModel(modelHarMoNee);
+        p->addModel(modelGlissinator);
+        p->addModel(modelPolyGnome);
+        p->addModel(modelQuantEyes);
+        p->addModel(modelSampleDelay);
+#ifdef BUILD_SORTACHORUS
+        p->addModel(modelSortaChorus);
+#endif
+        p->addModel(modelChipNoise);
+        p->addModel(modelChipWaves);
+        p->addModel(modelChipYourWave);
+        p->addModel(modelOpen303);
+#ifdef BUILD_GENERICLSFR
+        p->addModel(modelGenericLFSR);
+#endif
+        p->addModel(modelKarplusStrongPoly);
+        p->addModel(modelALingADing);
+        p->addModel(modelBitulator);
+#ifdef BUILD_PHASER
+        p->addModel(modelPhaser);
+#endif
+        p->addModel(modelPolyGenerator);
     }
 }
 
@@ -1362,6 +1403,7 @@ void initStaticPlugins()
     initStatic__AS();
     initStatic__Atelier();
     initStatic__AudibleInstruments();
+    initStatic__Bacon();
     initStatic__Befaco();
     initStatic__Bidoo();
     initStatic__BogaudioModules();
