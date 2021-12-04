@@ -5,15 +5,15 @@ so developers and interested third-parties can have an easier time contributing 
 
 On the root folder the following directories can be seen;
 
- * [carla](##carla)
- * [deps](##deps)
- * [doc](##doc)
- * [dpf](##dpf)
- * [include](##include)
- * [lv2export](##lv2export)
- * [patches](##patches)
- * [plugins](##plugins)
- * [src](##src)
+ * [carla](#carla)
+ * [deps](#deps)
+ * [doc](#doc)
+ * [dpf](#dpf)
+ * [include](#include)
+ * [lv2export](#lv2export)
+ * [patches](#patches)
+ * [plugins](#plugins)
+ * [src](#src)
 
 Going through one by one in alphebetical order we have...
 
