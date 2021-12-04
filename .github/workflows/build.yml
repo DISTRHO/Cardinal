@@ -243,7 +243,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -y binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 libwine:i386 wine32:i386 wine-stable:i386
+          sudo apt-get install -y binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 libfaudio0:i386 libglib2.0-0:i386 libgstreamer-plugins-base1.0-0:i386 libgstreamer1.0-0:i386 libwine:i386 wine32:i386 wine-stable:i386
       - name: Build win32 cross-compiled
         env:
           CC: i686-w64-mingw32-gcc
