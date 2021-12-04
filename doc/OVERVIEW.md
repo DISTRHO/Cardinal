@@ -5,66 +5,66 @@ so developers and interested third-parties can have an easier time contributing 
 
 On the root folder the following directories can be seen;
 
- * carla
- * deps
- * doc
- * dpf
- * include
- * lv2export
- * patches
- * plugins
- * src
+ * [carla](##carla)
+ * [deps](##deps)
+ * [doc](##doc)
+ * [dpf](##dpf)
+ * [include](##include)
+ * [lv2export](##lv2export)
+ * [patches](##patches)
+ * [plugins](##plugins)
+ * [src](##src)
 
 Going through one by one in alphebetical order we have...
 
-## CARLA
+## carla
 
 This directory contains the source code for Carla, a modular plugin host created by falkTX, the same author of Cardinal, DPF and many other projects.  
 Cardinal uses Carla as the base for all internal plugin hosting.  
 Being GPLv2+ the code license is compatible with Cardinal's GPLv3+.
 
-## DEPS
+## deps
 
 3rd-party libraries build setup.  
 No actual code is hosted here, only a Makefile with steps for fetching source code and build it.  
 It basically overrides Rack's `dep.mk` things for a proper static build, and supporting more platforms.
 
-## DOC
+## doc
 
 Here you find several files (like this one you are reading now) describing the Cardinal project.  
 It is intentionally not using something like GitHub Wiki so that rehosting does not lose any information.  
 Also allows for offline hosting and reading.
 
-## DPF
+## dpf
 
 This directory contains the source code for DPF, the plugin framework used by Cardinal that handles all the complex parts of plugin format support.  
 Implementing new plugin formats will be done here.
 
-## INCLUDE
+## include
 
 This directory contains special header files needed to build the original Rack code as required by Cardinal.  
 These headers are included before the official Rack ones, allowing us to override some implementation details.
 
 Additionally a few compatiblity headers are present, helping compile the code for more targets than officially supported in Rack.
 
-## LV2EXPORT
+## lv2export
 
 An experiment for building individual Rack modules directly as LV2 plugins.  
 Only quick&dirty hacks so far, nothing interesting to see here yet.
 
-## PATCHES
+## patches
 
 Public domain or CC0 licensed Rack patches, suitable for use in Cardinal.  
 Must be stored as plain text files (not zstd compressed) so they play nicely with git.
 
-## PLUGINS
+## plugins
 
 Module/Plugin related code and build setup.  
 Only Cardinal internal modules are hosted here, everything else uses a git submodule reference.
 
 See https://github.com/DISTRHO/Cardinal/discussions/28 for how to add more modules yourself.
 
-## SRC
+## src
 
 The main code for Cardinal, where the magic happens.  
 There are quite a few files here, so let's describe them in detail.
