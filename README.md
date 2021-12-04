@@ -17,6 +17,30 @@ A VST3 version is in progress, already part of the build but still experimental.
 
 **The project should be considered in alpha state at the moment.**
 
+## Plugin variants
+
+Cardinal provides 3 plugin variants - "main", Synth and FX.  
+They are all equivalent in performance and behaviour, with only the IO and metadata that changes.  
+This is because some hosts are very strict on which plugins are allowed as instruments vs FX, so separate variants of the same plugin are needed.
+
+All variants have 2 audio outputs and MIDI support.
+
+### Main
+
+This variant provides 2 audio inputs and outputs and 8 CV inputs and outputs.  
+
+NOTE: Due to VST2 format not supporting CV ports, this variant is not available for VST2.
+
+### Synth
+
+This variant provides 2 audio inputs and outputs, no CV ports.  
+Plugin type is tagged as "instrument".
+
+### FX
+
+This variant provides 2 audio inputs and outputs, no CV ports.  
+Plugin type is tagged as regular "effect".
+
 ## Screenshots
 
 Because people will ask for it. It is, well... Rack.  
