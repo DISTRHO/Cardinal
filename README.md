@@ -17,7 +17,7 @@ A VST3 version is in progress, already part of the build but still experimental.
 
 **The project should be considered in alpha state at the moment.**
 
-## Screenshot
+## Screenshots
 
 Because people will ask for it. It is, well... Rack.  
 But a couple of modules background's have their colors flipped, because damn we want proper dark mode!
@@ -79,12 +79,12 @@ Additionally Cardinal provides its own modules for DAW/Host automation, time pos
 
 ### Restrictions
 
-Being an open-source project, all included 3rd-party modules must be opensource and have a GPLv3+ compatible license.  
+Being an open-source project, all included 3rd-party modules must be opensource and have a GPLv3+ compatible license.
 *GPLv3-only modules are not allowed*.
 
 Special care also needs to be taken with artwork licensing.  
 Cardinal allows the use of CC-NC because how prevalent it is across many Rack modules, but it should be avoided if possible.  
-Also, unless the module is really essential, CC-ND will is not allowed.
+Also, unless the module is really essential, CC-ND is not allowed.
 
 Dependencies should be kept at a minimum, as otherwise it quickly grows the complexity of the build.  
 Online access (such as phone-home) is not allowed.
