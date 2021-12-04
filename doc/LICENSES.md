@@ -19,6 +19,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Aria Salvatrice       | GPL-3.0-or-later      | |
 | Atelier               | GPL-3.0-only          | GPLv3+ change request https://github.com/Xenakios/Atelier/issues/18 |
 | Audible Instruments   | GPL-3.0-or-later      | |
+| Bacon Music           | GPL-3.0-or-later      | |
 | Befaco                | GPL-3.0-or-later      | |
 | Bidoo                 | GPL-3.0-or-later      | |
 | Bogaudio              | GPL-3.0-or-later      | |
