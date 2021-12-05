@@ -305,15 +305,16 @@ extern Model *modelWriteSeq64;
 extern Model *modelBlankPanel;
 
 // HetrickCV
-#define modelASR modelhetrickcvASR
-#define modelBlankPanel modelhetrickcvBlankPanel
+#define modelASR modelHetrickCVASR
+#define modelBlankPanel modelHetrickCVBlankPanel
+#define modelFlipFlop modelHetrickCVFlipFlop
 extern Model *modelTwoToFour;
 extern Model *modelAnalogToDigital;
-// extern Model *modelASR;
+extern Model *modelASR;
 extern Model *modelBinaryGate;
 extern Model *modelBinaryNoise;
 extern Model *modelBitshift;
-// extern Model *modelBlankPanel;
+extern Model *modelBlankPanel;
 extern Model *modelBoolean3;
 extern Model *modelChaos1Op;
 extern Model *modelChaos2Op;
@@ -344,6 +345,7 @@ extern Model *modelWaveshape;
 extern Model *modelXYToPolar;
 #undef modelASR
 #undef modelBlankPanel
+#undef modelFlipFlop
 
 // JW-Modules
 #define modelQuantizer modelJWQuantizer
@@ -1309,15 +1311,16 @@ static void initStatic__HetrickCV()
     const StaticPluginLoader spl(p, "HetrickCV");
     if (spl.ok())
     {
-#define modelASR modelhetrickcvASR
-#define modelBlankPanel modelhetrickcvBlankPanel
+#define modelASR modelHetrickCVASR
+#define modelBlankPanel modelHetrickCVBlankPanel
+#define modelFlipFlop modelHetrickCVFlipFlop
         p->addModel(modelTwoToFour);
         p->addModel(modelAnalogToDigital);
-        // p->addModel(modelASR);
+        p->addModel(modelASR);
         p->addModel(modelBinaryGate);
         p->addModel(modelBinaryNoise);
         p->addModel(modelBitshift);
-        // p->addModel(modelBlankPanel);
+        p->addModel(modelBlankPanel);
         p->addModel(modelBoolean3);
         p->addModel(modelChaos1Op);
         p->addModel(modelChaos2Op);
@@ -1348,6 +1351,7 @@ static void initStatic__HetrickCV()
         p->addModel(modelXYToPolar);
 #undef modelASR
 #undef modelBlankPanel
+#undef modelFlipFlop
     }
 }
 
