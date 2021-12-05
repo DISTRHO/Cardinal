@@ -61,7 +61,7 @@ Currently the following features are known NOT to work:
 
 ### Current builds
 
-If you want to try this out early, checkout the GitHub actions tab.  
+If you want to try this out early, checkout the [GitHub actions tab](https://github.com/DISTRHO/Cardinal/actions/workflows/build.yml).  
 There is absolutely no warranty, use at your own risk and all that...
 
 ## License
