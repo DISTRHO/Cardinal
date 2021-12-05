@@ -547,6 +547,7 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
     case 0xff22a5e9:
     case 0xff6140da:
     case 0xff119ee6:
+    case 0xff2432ed:
         return false;
     // pure black (convert to not quite pure white)
     case 0xff000000:
