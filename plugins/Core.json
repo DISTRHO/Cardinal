@@ -1,16 +1,16 @@
 {
   "slug": "Core",
-  "name": "VCV Core",
-  "version": "2.0.0",
+  "name": "Cardinal Core",
+  "version": "2.0.1",
   "license": "GPL-3.0-or-later",
-  "author": "VCV",
-  "brand": "VCV",
+  "author": "Vortico",
+  "brand": "Vortico",
   "authorEmail": "support@vcvrack.com",
   "authorUrl": "https://vcvrack.com/",
   "manualUrl": "https://vcvrack.com/manual/Core",
   "sourceUrl": "https://github.com/VCVRack/Rack",
   "changelogUrl": "https://github.com/VCVRack/Rack/blob/v2/CHANGELOG.md",
-  "description": "Necessary modules built into VCV Rack",
+  "description": "Necessary modules built into Cardinal",
   "modules": [
     {
       "slug": "AudioInterface2",

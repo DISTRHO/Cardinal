@@ -81,7 +81,7 @@ std::string pluginManifest(const std::string& dirname) {
     if (bundlePath.empty())
     {
         if (dirname == "Core")
-            return system::join(systemDir, "Core.json");
+            return system::join(systemDir, "..", "..", "plugins", "Core.json");
         return system::join(systemDir, "..", "..", "plugins", dirname, "plugin.json");
     }
     return system::join(bundlePath, dirname + ".json");

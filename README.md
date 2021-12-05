@@ -91,6 +91,7 @@ At the moment the following 3rd-party modules are provided:
 - Fundamental
 - Glue the Giant
 - Grande
+- HetrickCV
 - Impromptu
 - JW-Modules
 - MindMeld
@@ -132,7 +133,7 @@ While Rack tries to mitigate this as much as possible, crashes due to conflictin
 On the other side, Cardinal redefines class and function names as needed to avoid as many conflicts as possible.
 
 Support for ARM and non-mainstream platforms (for example BSD) has also always been missing from the official Rack since the start.  
-While we can patch the Rack free version to support these, same can't be done with VCV Rack Pro with it being a closed-source product.  
+While we can patch the Rack free version to support these, same can't be done with Rack Pro with it being a closed-source product.  
 The online library/store only supports a very specific set of platforms too,
 so non-supported platforms would need any 3rd-party modules to be manually compiled to make them usable.
 

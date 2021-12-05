@@ -1,6 +1,6 @@
 # RACK PRO VS CARDINAL DIFFERENCES
 
-This document describes the differences between VCV Rack Pro plugin and Cardinal.  
+This document describes the differences between Rack Pro plugin and Cardinal.  
 It is not possible to know all the internal details of the official plugin due to it not being open-source,
 so more technical details are best-guesses based on its behaviour.
 
@@ -12,7 +12,7 @@ Online access is also not allowed.
 
 Bellow follows a list of features comparing the official plugin to Cardinal.
 
-| Feature                        | VCV Rack Pro              | Cardinal                        | Additional notes |
+| Feature                        | Rack Pro                  | Cardinal                        | Additional notes |
 |--------------------------------|---------------------------|---------------------------------|------------------|
 | Open-Source                    | No                        | Yes                             | |
 | Free (of cost)                 | No                        | Yes                             | |

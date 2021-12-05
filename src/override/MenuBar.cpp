@@ -618,11 +618,7 @@ struct HelpButton : MenuButton {
 		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
-		menu->addChild(createMenuItem("Tips", "", [=]() {
-			APP->scene->addChild(tipWindowCreate());
-		}));
-
-		menu->addChild(createMenuItem("VCV User manual", "F1", [=]() {
+		menu->addChild(createMenuItem("Rack User manual", "F1", [=]() {
 			system::openBrowser("https://vcvrack.com/manual/");
 		}));
 
@@ -634,7 +630,7 @@ struct HelpButton : MenuButton {
 
 		menu->addChild(createMenuLabel(APP_EDITION + " " + APP_EDITION_NAME));
 
-		menu->addChild(createMenuLabel("VCVRack " + APP_VERSION + " Compatible"));
+		menu->addChild(createMenuLabel("Rack " + APP_VERSION + " Compatible"));
 	}
 };
 
