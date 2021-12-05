@@ -2,9 +2,9 @@
 
 ## CODE LICENSE / BINARY
 
-While Cardinal itself is licensed under GPLv3+, some modules/plugins used by it are not.  
+While Cardinal itself is licensed under GPLv3+, some modules/plugins used by it are not.
 And since Cardinal builds the entire Rack and modules as a static library,
-the more restrictive of the **code licenses** will apply to the final binary.  
+the more restrictive of the **code licenses** will apply to the final binary.
 
 Bellow follows a list of all code licenses used in Cardinal and linked submodules.
 
@@ -31,6 +31,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Fundamental           | GPL-3.0-or-later      | |
 | Glue the Giant        | GPL-3.0-or-later      | |
 | Grande                | GPL-3.0-or-later      | |
+| HetrickCV             | CC0-1.0               | |
 | Impromptu             | GPL-3.0-or-later      | |
 | JW-Modules            | BSD-3-Clause          | |
 | MindMeld              | GPL-3.0-or-later      | |
