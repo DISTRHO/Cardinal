@@ -18,7 +18,6 @@
 #pragma once
 
 /* On mingw stdio functions like printf are not inline, and thus get defined every time they are used.
- * Its <cstdio> also does `#undef printf` which invalidates our macros :(
  * We go through a few steps to ensure unique symbol names.
  */
 #ifdef STDIO_OVERRIDE
@@ -32,23 +31,6 @@
 
 // step 2: inlude <stdio.h> which will use our prefixed names
 # include <stdio.h>
-
-// step 3: undef and define dummy functions required for <cstdio> (it uses `using ::printf` syntax)
-# undef printf
-static inline void printf() {}
-
-// step 4: we can safely include <cstdio> now
-# include_next <cstdio>
-
-// step 5: define the same macros as in step 1
-# define printf STDIO_OVERRIDE_MACRO(STDIO_OVERRIDE, printf)
-
-// step 6: place the macro prefixed names in std namespace
-/*
-namespace std {
-    using ::printf;
-}
-*/
 
 #else // STDIO_OVERRIDE
 
