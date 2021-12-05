@@ -657,7 +657,6 @@ endif
 
 ifeq ($(WINDOWS),true)
 BASE_FLAGS += -D_USE_MATH_DEFINES
-BASE_FLAGS += -D__STDC_FORMAT_MACROS
 BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
 BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
@@ -793,7 +792,7 @@ $(BUILD_DIR)/%.bin.o: $(BUILD_DIR)/%.bin.c
 $(BUILD_DIR)/plugins.cpp.o: plugins.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -IBogaudioModules/lib -IBogaudioModules/src/dsp -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
 
 $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

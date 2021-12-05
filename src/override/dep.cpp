@@ -15,6 +15,8 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
+#define STDIO_OVERRIDE Rackdep
+
 #include <cstdio>
 #include <cstring>
 

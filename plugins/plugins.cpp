@@ -106,114 +106,130 @@ extern Model *modelBlank;
 #define modelVCA modelBogaudioVCA
 #define modelVCF modelBogaudioVCF
 #define modelVCO modelBogaudioVCO
-#include "BogaudioModules/src/AD.hpp"
-#include "BogaudioModules/src/Additator.hpp"
-#include "BogaudioModules/src/AddrSeqX.hpp"
-#include "BogaudioModules/src/ADSR.hpp"
-#include "BogaudioModules/src/AMRM.hpp"
-#include "BogaudioModules/src/Analyzer.hpp"
-#include "BogaudioModules/src/AnalyzerXL.hpp"
-#include "BogaudioModules/src/Assign.hpp"
-#include "BogaudioModules/src/ASR.hpp"
-#include "BogaudioModules/src/Arp.hpp"
-#include "BogaudioModules/src/Blank3.hpp"
-#include "BogaudioModules/src/Blank6.hpp"
-#include "BogaudioModules/src/Bool.hpp"
-#include "BogaudioModules/src/Chirp.hpp"
-#include "BogaudioModules/src/Clpr.hpp"
-#include "BogaudioModules/src/Cmp.hpp"
-#include "BogaudioModules/src/CmpDist.hpp"
-#include "BogaudioModules/src/CVD.hpp"
-#include "BogaudioModules/src/DADSRH.hpp"
-#include "BogaudioModules/src/DADSRHPlus.hpp"
-#include "BogaudioModules/src/Detune.hpp"
-#include "BogaudioModules/src/DGate.hpp"
-#include "BogaudioModules/src/Edge.hpp"
-#include "BogaudioModules/src/EightFO.hpp"
-#include "BogaudioModules/src/EightOne.hpp"
-#include "BogaudioModules/src/EQ.hpp"
-#include "BogaudioModules/src/EQS.hpp"
-#include "BogaudioModules/src/FFB.hpp"
-#include "BogaudioModules/src/FlipFlop.hpp"
-#include "BogaudioModules/src/FMOp.hpp"
-#include "BogaudioModules/src/Follow.hpp"
-#include "BogaudioModules/src/FourFO.hpp"
-#include "BogaudioModules/src/FourMan.hpp"
-#include "BogaudioModules/src/Inv.hpp"
-#include "BogaudioModules/src/LFO.hpp"
-#include "BogaudioModules/src/Lgsw.hpp"
-#include "BogaudioModules/src/LLFO.hpp"
-#include "BogaudioModules/src/LLPG.hpp"
-#include "BogaudioModules/src/Lmtr.hpp"
-#include "BogaudioModules/src/LPG.hpp"
-#include "BogaudioModules/src/LVCF.hpp"
-#include "BogaudioModules/src/LVCO.hpp"
-#include "BogaudioModules/src/Manual.hpp"
-#include "BogaudioModules/src/Matrix18.hpp"
-#include "BogaudioModules/src/Matrix44.hpp"
-#include "BogaudioModules/src/Matrix81.hpp"
-#include "BogaudioModules/src/Matrix88.hpp"
-#include "BogaudioModules/src/Matrix88Cv.hpp"
-#include "BogaudioModules/src/Matrix88M.hpp"
-#include "BogaudioModules/src/MegaGate.hpp"
-#include "BogaudioModules/src/Mix1.hpp"
-#include "BogaudioModules/src/Mix2.hpp"
-#include "BogaudioModules/src/Mix4.hpp"
-#include "BogaudioModules/src/Mix4x.hpp"
-#include "BogaudioModules/src/Mix8x.hpp"
-#include "BogaudioModules/src/Mono.hpp"
-#include "BogaudioModules/src/Mult.hpp"
-#include "BogaudioModules/src/Mumix.hpp"
-#include "BogaudioModules/src/Mute8.hpp"
-#include "BogaudioModules/src/Noise.hpp"
-#include "BogaudioModules/src/Nsgt.hpp"
-#include "BogaudioModules/src/Offset.hpp"
-#include "BogaudioModules/src/OneEight.hpp"
-#include "BogaudioModules/src/Pan.hpp"
-#include "BogaudioModules/src/PEQ.hpp"
-#include "BogaudioModules/src/PEQ6.hpp"
-#include "BogaudioModules/src/PEQ6XF.hpp"
-#include "BogaudioModules/src/PEQ14.hpp"
-#include "BogaudioModules/src/PEQ14XF.hpp"
-#include "BogaudioModules/src/Pgmr.hpp"
-#include "BogaudioModules/src/PgmrX.hpp"
-#include "BogaudioModules/src/PolyCon16.hpp"
-#include "BogaudioModules/src/PolyCon8.hpp"
-#include "BogaudioModules/src/PolyMult.hpp"
-#include "BogaudioModules/src/PolyOff16.hpp"
-#include "BogaudioModules/src/PolyOff8.hpp"
-#include "BogaudioModules/src/Pressor.hpp"
-#include "BogaudioModules/src/Pulse.hpp"
-#include "BogaudioModules/src/Ranalyzer.hpp"
-#include "BogaudioModules/src/Reftone.hpp"
-#include "BogaudioModules/src/RGate.hpp"
-#include "BogaudioModules/src/SampleHold.hpp"
-#include "BogaudioModules/src/Shaper.hpp"
-#include "BogaudioModules/src/ShaperPlus.hpp"
-#include "BogaudioModules/src/Sine.hpp"
-#include "BogaudioModules/src/Slew.hpp"
-#include "BogaudioModules/src/Stack.hpp"
-#include "BogaudioModules/src/Sums.hpp"
-#include "BogaudioModules/src/Switch.hpp"
-#include "BogaudioModules/src/Switch1616.hpp"
-#include "BogaudioModules/src/Switch18.hpp"
-#include "BogaudioModules/src/Switch44.hpp"
-#include "BogaudioModules/src/Switch81.hpp"
-#include "BogaudioModules/src/Switch88.hpp"
-#include "BogaudioModules/src/UMix.hpp"
-#include "BogaudioModules/src/Unison.hpp"
-#include "BogaudioModules/src/VCA.hpp"
-#include "BogaudioModules/src/VCAmp.hpp"
-#include "BogaudioModules/src/VCF.hpp"
-#include "BogaudioModules/src/VCM.hpp"
-#include "BogaudioModules/src/VCO.hpp"
-#include "BogaudioModules/src/Velo.hpp"
-#include "BogaudioModules/src/Vish.hpp"
-#include "BogaudioModules/src/VU.hpp"
-#include "BogaudioModules/src/Walk.hpp"
-#include "BogaudioModules/src/Walk2.hpp"
-#include "BogaudioModules/src/XCO.hpp"
-#include "BogaudioModules/src/XFade.hpp"
+extern Model *modelVCO;
+extern Model *modelLVCO;
+extern Model *modelSine;
+extern Model *modelPulse;
+extern Model *modelXCO;
+extern Model *modelAdditator;
+extern Model *modelFMOp;
+extern Model *modelChirp;
+extern Model *modelLFO;
+extern Model *modelLLFO;
+extern Model *modelFourFO;
+extern Model *modelEightFO;
+extern Model *modelVCF;
+extern Model *modelLVCF;
+extern Model *modelFFB;
+extern Model *modelEQ;
+extern Model *modelEQS;
+extern Model *modelLPG;
+extern Model *modelLLPG;
+extern Model *modelMegaGate;
+extern Model *modelPEQ;
+extern Model *modelPEQ6;
+extern Model *modelPEQ6XF;
+extern Model *modelPEQ14;
+extern Model *modelPEQ14XF;
+extern Model *modelDADSRH;
+extern Model *modelDADSRHPlus;
+extern Model *modelShaper;
+extern Model *modelShaperPlus;
+extern Model *modelAD;
+extern Model *modelASR;
+extern Model *modelADSR;
+extern Model *modelVish;
+extern Model *modelFollow;
+extern Model *modelDGate;
+extern Model *modelRGate;
+extern Model *modelEdge;
+extern Model *modelNoise;
+extern Model *modelSampleHold;
+extern Model *modelWalk2;
+extern Model *modelWalk;
+extern Model *modelMix8;
+extern Model *modelMix8x;
+extern Model *modelMix4;
+extern Model *modelMix4x;
+extern Model *modelMix2;
+extern Model *modelMix1;
+extern Model *modelVCM;
+extern Model *modelMute8;
+extern Model *modelPan;
+extern Model *modelXFade;
+extern Model *modelVCA;
+extern Model *modelVCAmp;
+extern Model *modelVelo;
+extern Model *modelUMix;
+extern Model *modelMumix;
+extern Model *modelMatrix81;
+extern Model *modelMatrix18;
+extern Model *modelMatrix44;
+extern Model *modelMatrix44Cvm;
+extern Model *modelMatrix88;
+extern Model *modelMatrix88Cv;
+extern Model *modelMatrix88M;
+extern Model *modelSwitch81;
+extern Model *modelSwitch18;
+extern Model *modelSwitch44;
+extern Model *modelSwitch88;
+extern Model *modelSwitch1616;
+extern Model *modelAMRM;
+extern Model *modelPressor;
+extern Model *modelClpr;
+extern Model *modelLmtr;
+extern Model *modelNsgt;
+extern Model *modelCmpDist;
+extern Model *modelOneEight;
+extern Model *modelEightOne;
+extern Model *modelAddrSeq;
+extern Model *modelAddrSeqX;
+extern Model *modelPgmr;
+extern Model *modelPgmrX;
+extern Model *modelVU;
+extern Model *modelAnalyzer;
+extern Model *modelAnalyzerXL;
+extern Model *modelRanalyzer;
+extern Model *modelDetune;
+extern Model *modelStack;
+extern Model *modelReftone;
+extern Model *modelMono;
+extern Model *modelArp;
+extern Model *modelAssign;
+extern Model *modelUnison;
+extern Model *modelPolyCon8;
+extern Model *modelPolyCon16;
+extern Model *modelPolyOff8;
+extern Model *modelPolyOff16;
+extern Model *modelPolyMult;
+extern Model *modelBool;
+extern Model *modelCmp;
+extern Model *modelCVD;
+extern Model *modelFlipFlop;
+extern Model *modelInv;
+extern Model *modelManual;
+extern Model *modelFourMan;
+extern Model *modelMult;
+extern Model *modelOffset;
+extern Model *modelSlew;
+extern Model *modelSums;
+extern Model *modelSwitch;
+extern Model *modelLgsw;
+extern Model *modelBlank3;
+extern Model *modelBlank6;
+#ifdef EXPERIMENTAL
+extern Model *modelLag;
+extern Model *modelPEQ14XR;
+extern Model *modelPEQ14XV;
+#endif
+#ifdef TEST
+extern Model *modelTest;
+extern Model *modelTest2;
+extern Model *modelTestExpanderBase;
+extern Model *modelTestExpanderExtension;
+extern Model *modelTestGl;
+extern Model *modelTestVCF;
+#endif
 #undef modelADSR
 #undef modelLFO
 #undef modelNoise
