@@ -84,7 +84,7 @@ struct CarlaModule : Module {
     NativeHostDescriptor fCarlaHostDescriptor = {};
     CarlaHostHandle fCarlaHostHandle = nullptr;
 
-    mutable NativeTimeInfo fCarlaTimeInfo;
+    NativeTimeInfo fCarlaTimeInfo;
 
     void* fUI = nullptr;
 
@@ -93,6 +93,7 @@ struct CarlaModule : Module {
     float* dataInPtr[NUM_INPUTS];
     float* dataOutPtr[NUM_OUTPUTS];
     unsigned audioDataFill = 0;
+    int64_t lastBlockFrame = -1;
     std::string patchStorage;
 
     CarlaModule()
@@ -185,21 +186,6 @@ struct CarlaModule : Module {
 
     const NativeTimeInfo* hostGetTimeInfo() const noexcept
     {
-        if (pcontext != nullptr)
-        {
-            fCarlaTimeInfo.playing = pcontext->playing;
-            fCarlaTimeInfo.frame = pcontext->frame;
-            fCarlaTimeInfo.bbt.valid = pcontext->bbtValid;
-            fCarlaTimeInfo.bbt.bar = pcontext->bar;
-            fCarlaTimeInfo.bbt.beat = pcontext->beat;
-            fCarlaTimeInfo.bbt.tick = pcontext->tick;
-            fCarlaTimeInfo.bbt.barStartTick = pcontext->barStartTick;
-            fCarlaTimeInfo.bbt.beatsPerBar = pcontext->beatsPerBar;
-            fCarlaTimeInfo.bbt.beatType = pcontext->beatType;
-            fCarlaTimeInfo.bbt.ticksPerBeat = pcontext->ticksPerBeat;
-            fCarlaTimeInfo.bbt.beatsPerMinute = pcontext->beatsPerMinute;
-        }
-
         return &fCarlaTimeInfo;
     }
 
@@ -273,7 +259,7 @@ struct CarlaModule : Module {
         patchStorage = getPatchStorageDirectory();
     }
 
-    void process(const ProcessArgs&) override
+    void process(const ProcessArgs& args) override
     {
         if (fCarlaPluginHandle == nullptr)
             return;
@@ -295,6 +281,59 @@ struct CarlaModule : Module {
 
         if (audioDataFill == BUFFER_SIZE)
         {
+            const int64_t blockFrame = pcontext->engine->getBlockFrame();
+
+            // Update time position if running a new audio block
+            if (lastBlockFrame != blockFrame)
+            {
+                lastBlockFrame = blockFrame;
+                fCarlaTimeInfo.playing = pcontext->playing;
+                fCarlaTimeInfo.frame = pcontext->frame;
+                fCarlaTimeInfo.bbt.valid = pcontext->bbtValid;
+                fCarlaTimeInfo.bbt.bar = pcontext->bar;
+                fCarlaTimeInfo.bbt.beat = pcontext->beat;
+                fCarlaTimeInfo.bbt.tick = pcontext->tick;
+                fCarlaTimeInfo.bbt.barStartTick = pcontext->barStartTick;
+                fCarlaTimeInfo.bbt.beatsPerBar = pcontext->beatsPerBar;
+                fCarlaTimeInfo.bbt.beatType = pcontext->beatType;
+                fCarlaTimeInfo.bbt.ticksPerBeat = pcontext->ticksPerBeat;
+                fCarlaTimeInfo.bbt.beatsPerMinute = pcontext->beatsPerMinute;
+            }
+            // or advance time by BUFFER_SIZE frames if still under the same audio block
+            else if (fCarlaTimeInfo.playing)
+            {
+                fCarlaTimeInfo.frame += BUFFER_SIZE;
+
+                // adjust BBT as well
+                if (fCarlaTimeInfo.bbt.valid)
+                {
+                    const double samplesPerTick = 60.0 * args.sampleRate
+                                                / fCarlaTimeInfo.bbt.beatsPerMinute
+                                                / fCarlaTimeInfo.bbt.ticksPerBeat;
+
+                    int32_t newBar = fCarlaTimeInfo.bbt.bar;
+                    int32_t newBeat = fCarlaTimeInfo.bbt.beat;
+                    double newTick = fCarlaTimeInfo.bbt.tick + samplesPerTick * BUFFER_SIZE;
+
+                    while (newTick > pcontext->ticksPerBeat)
+                    {
+                        newTick -= pcontext->ticksPerBeat;
+
+                        if (++fCarlaTimeInfo.bbt.beat > pcontext->beatsPerBar)
+                        {
+                            fCarlaTimeInfo.bbt.beat = 1;
+
+                            if (++newBar)
+                                fCarlaTimeInfo.bbt.barStartTick += pcontext->beatsPerBar * pcontext->ticksPerBeat;
+                        }
+                    }
+
+                    fCarlaTimeInfo.bbt.bar = newBar;
+                    fCarlaTimeInfo.bbt.beat = newBeat;
+                    fCarlaTimeInfo.bbt.tick = newTick;
+                }
+            }
+
             audioDataFill = 0;
             fCarlaPluginDescriptor->process(fCarlaPluginHandle, dataInPtr, dataOutPtr, BUFFER_SIZE, nullptr, 0);
         }
