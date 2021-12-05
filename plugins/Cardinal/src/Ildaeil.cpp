@@ -32,6 +32,7 @@
 # include "extra/FileBrowserDialog.hpp"
 # include "extra/ScopedPointer.hpp"
 # include "extra/Thread.hpp"
+# include "../../src/extra/SharedResourcePointer.hpp"
 #else
 # include "extra/Mutex.hpp"
 #endif
@@ -212,6 +213,13 @@ static void projectLoadedFromDSP(void* ui);
 
 static Mutex sPluginInfoLoadMutex;
 
+#ifndef HEADLESS
+struct JuceInitializer {
+    JuceInitializer() { carla_juce_init(); }
+    ~JuceInitializer() { carla_juce_cleanup(); }
+};
+#endif
+
 struct IldaeilModule : Module {
     enum ParamIds {
         NUM_PARAMS
@@ -235,6 +243,10 @@ struct IldaeilModule : Module {
     enum LightIds {
         NUM_LIGHTS
     };
+
+#ifndef HEADLESS
+    SharedResourcePointer<JuceInitializer> juceInitializer;
+#endif
 
     CardinalPluginContext* const pcontext;
 
@@ -936,7 +948,6 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
             if (! idleCallbackActive)
             {
-                carla_juce_init();
                 idleCallbackActive = pcontext->addIdleCallback(this);
             }
         }
@@ -955,7 +966,6 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             {
                 idleCallbackActive = false;
                 pcontext->removeIdleCallback(this);
-                carla_juce_cleanup();
 
                 if (fileBrowserHandle != nullptr)
                 {
@@ -1097,15 +1107,19 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
         const MutexLocker cml(sPluginInfoLoadMutex);
 
-        if (const uint count = carla_get_cached_plugin_count(fPluginType, path))
+        d_stdout("Will scan plugins now...");
+        const uint count = carla_get_cached_plugin_count(fPluginType, path);
+        d_stdout("Scanning found %u plugins", count);
+
+        if (fDrawingState == kDrawingLoading)
+        {
+            fDrawingState = kDrawingPluginList;
+            fPluginSearchFirstShow = true;
+        }
+
+        if (count != 0)
         {
             fPlugins = new PluginInfoCache[count];
-
-            if (fDrawingState == kDrawingLoading)
-            {
-                fDrawingState = kDrawingPluginList;
-                fPluginSearchFirstShow = true;
-            }
 
             for (uint i=0, j; i < count && ! shouldThreadExit(); ++i)
             {
