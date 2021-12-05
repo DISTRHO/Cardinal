@@ -288,6 +288,9 @@ extern Model *modelWriteSeq32;
 extern Model *modelWriteSeq64;
 extern Model *modelBlankPanel;
 
+// HetrickCV
+#include "HetrickCV/src/HetrickCV.hpp"
+
 // JW-Modules
 #define modelQuantizer modelJWQuantizer
 #include "JW-Modules/src/JWModules.hpp"
@@ -402,6 +405,7 @@ Plugin* pluginInstance__FehlerFabrik;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__GlueTheGiant;
+Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__JW;
 extern Plugin* pluginInstance__MindMeld;
@@ -1243,6 +1247,52 @@ static void initStatic__GrandeModular()
     }
 }
 
+static void initStatic__HetrickCV()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__HetrickCV = p;
+
+    const StaticPluginLoader spl(p, "HetrickCV");
+    if (spl.ok())
+    {
+        p->addModel(modelTwoToFour);
+        p->addModel(modelAnalogToDigital);
+        p->addModel(modelASR);
+        p->addModel(modelBinaryGate);
+        p->addModel(modelBinaryNoise);
+        p->addModel(modelBitshift);
+        p->addModel(modelBlankPanel);
+        p->addModel(modelBoolean3);
+        p->addModel(modelChaos1Op);
+        p->addModel(modelChaos2Op);
+        p->addModel(modelChaos3Op);
+        p->addModel(modelChaoticAttractors);
+        p->addModel(modelClockedNoise);
+        p->addModel(modelComparator);
+        p->addModel(modelContrast);
+        p->addModel(modelCrackle);
+        p->addModel(modelDataCompander);
+        p->addModel(modelDelta);
+        p->addModel(modelDigitalToAnalog);
+        p->addModel(modelDust);
+        p->addModel(modelExponent);
+        p->addModel(modelFBSineChaos);
+        p->addModel(modelFlipFlop);
+        p->addModel(modelFlipPan);
+        p->addModel(modelGateJunction);
+        p->addModel(modelGingerbread);
+        p->addModel(modelLogicCombine);
+        p->addModel(modelMidSide);
+        p->addModel(modelMinMax);
+        p->addModel(modelRandomGates);
+        p->addModel(modelRotator);
+        p->addModel(modelRungler);
+        p->addModel(modelScanner);
+        p->addModel(modelWaveshape);
+        p->addModel(modelXYToPolar);
+    }
+}
+
 static void initStatic__ImpromptuModular()
 {
     Plugin* const p = new Plugin;
@@ -1372,7 +1422,7 @@ static void initStatic__mscHack()
         p->addModel(modelSynthDrums);
         p->addModel(modelSEQ_6x32x16);
         p->addModel(modelMasterClockx4);
-        //p->addModel(modelMasterClockx8);  
+        //p->addModel(modelMasterClockx8);
         p->addModel(modelSEQ_Envelope_8);
         p->addModel(modelSeq_Triad2);
         p->addModel(modelARP700);
@@ -1569,6 +1619,7 @@ void initStaticPlugins()
     initStatic__Fundamental();
     initStatic__GlueTheGiant();
     initStatic__GrandeModular();
+    initStatic__HetrickCV();
     initStatic__ImpromptuModular();
     initStatic__JW();
     initStatic__MindMeld();

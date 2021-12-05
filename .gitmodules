@@ -100,3 +100,6 @@
 [submodule "plugins/GlueTheGiant"]
 	path = plugins/GlueTheGiant
 	url = https://github.com/gluethegiant/gtg-rack.git
+[submodule "plugins/HetrickCV"]
+	path = plugins/HetrickCV
+	url = https://github.com/mhetrick/hetrickcv.git
