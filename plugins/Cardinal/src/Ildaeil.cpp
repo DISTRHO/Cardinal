@@ -553,7 +553,7 @@ static intptr_t host_dispatcher(const NativeHostHandle handle, const NativeHostD
 // --------------------------------------------------------------------------------------------------------------------
 
 #ifndef HEADLESS
-struct IldaeilWidget : ImGuiWidget, IdleCallback /* , Thread */ {
+struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
     static constexpr const uint kButtonHeight = 20;
 
     struct PluginInfoCache {
@@ -631,15 +631,12 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback /* , Thread */ {
         kIdleHidePluginUI,
         kIdleGiveIdleToUI,
         kIdleChangePluginType,
-        kIdlePluginScanning,
         kIdleNothing
     } fIdleState = kIdleInit;
 
     PluginType fPluginType = PLUGIN_LV2;
     PluginType fNextPluginType = fPluginType;
     uint fPluginCount = 0;
-    uint fPluginScanStep = 0;
-    uint fPluginScanMax = 0;
     int fPluginSelected = -1;
     bool fPluginScanningFinished = false;
     bool fPluginHasCustomUI = false;
@@ -702,6 +699,9 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback /* , Thread */ {
 
             module->fUI = nullptr;
         }
+
+        if (isThreadRunning())
+            stopThread(-1);
 
         fPluginGenericUI = nullptr;
 
@@ -991,12 +991,14 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback /* , Thread */ {
         switch (fIdleState)
         {
         case kIdleInit:
-            scanStart();
+            fIdleState = kIdleNothing;
+            startThread();
             break;
 
         case kIdleInitPluginAlreadyLoaded:
+            fIdleState = kIdleNothing;
             createOrUpdatePluginGenericUI(handle);
-            scanStart();
+            startThread();
             break;
 
         case kIdlePluginLoadedFromDSP:
@@ -1029,13 +1031,12 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback /* , Thread */ {
             break;
 
         case kIdleChangePluginType:
+            fIdleState = kIdleNothing;
             fPluginSelected = -1;
+            if (isThreadRunning())
+                stopThread(-1);
             fPluginType = fNextPluginType;
-            scanStart();
-            break;
-
-        case kIdlePluginScanning:
-            scanStep();
+            startThread();
             break;
 
         case kIdleNothing:
@@ -1075,15 +1076,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback /* , Thread */ {
         loadPlugin(handle, label);
     }
 
-    /*
-    void uiFileBrowserSelected(const char* const filename) override
-    {
-        if (fPlugin != nullptr && fPlugin->fCarlaHostHandle != nullptr && filename != nullptr)
-            carla_set_custom_data(fPlugin->fCarlaHostHandle, 0, CUSTOM_DATA_TYPE_STRING, "file", filename);
-    }
-    */
-
-    void scanStart()
+    void run() override
     {
         const char* path;
         switch (fPluginType)
@@ -1099,61 +1092,44 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback /* , Thread */ {
         if (path != nullptr)
             carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_PLUGIN_PATH, fPluginType, path);
 
-        fPluginCount = fPluginScanStep = 0;
-        
-        {
-            const MutexLocker cml(sPluginInfoLoadMutex);
-            fPluginScanMax = carla_get_cached_plugin_count(fPluginType, path);
-        }
-
+        fPluginCount = 0;
         delete[] fPlugins;
 
-        if (fPluginScanMax != 0)
+        const MutexLocker cml(sPluginInfoLoadMutex);
+
+        if (const uint count = carla_get_cached_plugin_count(fPluginType, path))
         {
-            fPlugins = new PluginInfoCache[fPluginScanMax];
-            fIdleState = kIdlePluginScanning;
+            fPlugins = new PluginInfoCache[count];
+
+            if (fDrawingState == kDrawingLoading)
+            {
+                fDrawingState = kDrawingPluginList;
+                fPluginSearchFirstShow = true;
+            }
+
+            for (uint i=0, j; i < count && ! shouldThreadExit(); ++i)
+            {
+                const CarlaCachedPluginInfo* const info = carla_get_cached_plugin_info(fPluginType, i);
+                DISTRHO_SAFE_ASSERT_CONTINUE(info != nullptr);
+
+                if (! info->valid)
+                    continue;
+                if (info->audioIns != 0 && info->audioIns != 2)
+                    continue;
+
+                j = fPluginCount;
+                fPlugins[j].name = strdup(info->name);
+                fPlugins[j].label = strdup(info->label);
+                ++fPluginCount;
+            }
         }
         else
         {
             fPlugins = nullptr;
+        }
+
+        if (! shouldThreadExit())
             fPluginScanningFinished = true;
-            fIdleState = kIdleNothing;
-        }
-
-        if (fDrawingState == kDrawingLoading)
-        {
-            fDrawingState = kDrawingPluginList;
-            fPluginSearchFirstShow = true;
-        }
-    }
-
-    void scanStep()
-    {
-        for (uint i = 0, j; i < 10 && fPluginScanStep < fPluginScanMax; ++i, ++fPluginScanStep)
-        {
-            const CarlaCachedPluginInfo* info;          
-            {
-                const MutexLocker cml(sPluginInfoLoadMutex);
-                info = carla_get_cached_plugin_info(fPluginType, fPluginScanStep);
-            }
-            DISTRHO_SAFE_ASSERT_CONTINUE(info != nullptr);
-
-            if (! info->valid)
-                continue;
-            if (info->audioIns != 0 && info->audioIns != 2)
-                continue;
-
-            j = fPluginCount;
-            fPlugins[j].name = strdup(info->name);
-            fPlugins[j].label = strdup(info->label);
-            ++fPluginCount;
-        }
-
-        if (fPluginScanStep == fPluginScanMax)
-        {
-            fPluginScanningFinished = true;
-            fIdleState = kIdleNothing;
-        }
     }
 
     void drawImGui() override
@@ -1362,9 +1338,6 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback /* , Thread */ {
         static const char* pluginTypes[] = {
             getPluginTypeAsString(PLUGIN_INTERNAL),
             getPluginTypeAsString(PLUGIN_LV2),
-           #ifdef DISTRHO_OS_MAC
-            getPluginTypeAsString(PLUGIN_AU),
-           #endif
         };
 
         setupMainWindowPos();
@@ -1412,11 +1385,6 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback /* , Thread */ {
             case PLUGIN_LV2:
                 current = 1;
                 break;
-           #ifdef DISTRHO_OS_MAC
-            case PLUGIN_AU:
-                current = 2;
-                break;
-           #endif
             default:
                 current = 0;
                 break;
@@ -1433,11 +1401,6 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback /* , Thread */ {
                 case 1:
                     fNextPluginType = PLUGIN_LV2;
                     break;
-               #ifdef DISTRHO_OS_MAC
-                case 2:
-                    fNextPluginType = PLUGIN_AU;
-                    break;
-               #endif
                 }
             }
 

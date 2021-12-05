@@ -801,7 +801,7 @@ $(BUILD_DIR)/%.bin.o: $(BUILD_DIR)/%.bin.c
 $(BUILD_DIR)/plugins.cpp.o: plugins.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -IBogaudioModules/lib -IBogaudioModules/src/dsp -c -o $@
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
 
 $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
