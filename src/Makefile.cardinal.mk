@@ -167,10 +167,6 @@ BASE_FLAGS += -I../../include/mingw-compat
 BASE_FLAGS += -I../../include/mingw-std-threads
 endif
 
-ifeq ($(WITH_LTO),true)
-BASE_FLAGS += -fno-strict-aliasing -flto
-endif
-
 BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only
 BUILD_CXX_FLAGS += -fno-finite-math-only
@@ -204,7 +200,6 @@ EXTRA_LIBS += $(shell pkg-config --libs jansson libarchive samplerate speexdsp)
 endif
 
 ifeq ($(WITH_LTO),true)
-LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
 # false positive
 LINK_FLAGS += -Wno-alloc-size-larger-than
 ifneq ($(SYSDEPS),true)

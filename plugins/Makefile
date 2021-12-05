@@ -678,10 +678,6 @@ ifeq ($(NOPLUGINS),true)
 BASE_FLAGS += -DNOPLUGINS
 endif
 
-ifeq ($(WITH_LTO),true)
-BASE_FLAGS += -fno-strict-aliasing -flto
-endif
-
 BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only
 BUILD_CXX_FLAGS += -fno-finite-math-only
@@ -811,6 +807,11 @@ $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		-DpluginInstance=pluginInstance__Cardinal \
+		-Dstbrp_context=stbrp_context_cardinal \
+		-Dstbrp_coord=stbrp_coord_cardinal \
+		-Dstbtt_fontinfo=stbtt_fontinfo_cardinal \
+		-Dstbrp_node=stbrp_node_cardinal \
+		-Dstbrp_rect=stbrp_rect_cardinal \
 		-DREAL_BUILD \
 		-DSTATIC_PLUGIN_TARGET \
 		-I../carla/source/backend \
