@@ -304,6 +304,51 @@ extern Model *modelWriteSeq32;
 extern Model *modelWriteSeq64;
 extern Model *modelBlankPanel;
 
+// HetrickCV
+#define modelASR modelHetrickCVASR
+#define modelBlankPanel modelHetrickCVBlankPanel
+#define modelFlipFlop modelHetrickCVFlipFlop
+#define modelMidSide modelHetrickCVMidSide
+extern Model *modelTwoToFour;
+extern Model *modelAnalogToDigital;
+extern Model *modelASR;
+extern Model *modelBinaryGate;
+extern Model *modelBinaryNoise;
+extern Model *modelBitshift;
+extern Model *modelBlankPanel;
+extern Model *modelBoolean3;
+extern Model *modelChaos1Op;
+extern Model *modelChaos2Op;
+extern Model *modelChaos3Op;
+extern Model *modelChaoticAttractors;
+extern Model *modelClockedNoise;
+extern Model *modelComparator;
+extern Model *modelContrast;
+extern Model *modelCrackle;
+extern Model *modelDataCompander;
+extern Model *modelDelta;
+extern Model *modelDigitalToAnalog;
+extern Model *modelDust;
+extern Model *modelExponent;
+extern Model *modelFBSineChaos;
+extern Model *modelFlipFlop;
+extern Model *modelFlipPan;
+extern Model *modelGateJunction;
+extern Model *modelGingerbread;
+extern Model *modelLogicCombine;
+extern Model *modelMidSide;
+extern Model *modelMinMax;
+extern Model *modelRandomGates;
+extern Model *modelRotator;
+extern Model *modelRungler;
+extern Model *modelScanner;
+extern Model *modelWaveshape;
+extern Model *modelXYToPolar;
+#undef modelASR
+#undef modelBlankPanel
+#undef modelFlipFlop
+#undef modelMidSide
+
 // JW-Modules
 #define modelQuantizer modelJWQuantizer
 #include "JW-Modules/src/JWModules.hpp"
@@ -418,6 +463,7 @@ Plugin* pluginInstance__FehlerFabrik;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__GlueTheGiant;
+Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__JW;
 extern Plugin* pluginInstance__MindMeld;
@@ -1259,6 +1305,60 @@ static void initStatic__GrandeModular()
     }
 }
 
+static void initStatic__HetrickCV()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__HetrickCV = p;
+
+    const StaticPluginLoader spl(p, "HetrickCV");
+    if (spl.ok())
+    {
+#define modelASR modelHetrickCVASR
+#define modelBlankPanel modelHetrickCVBlankPanel
+#define modelFlipFlop modelHetrickCVFlipFlop
+#define modelMidSide modelHetrickCVMidSide
+        p->addModel(modelTwoToFour);
+        p->addModel(modelAnalogToDigital);
+        p->addModel(modelASR);
+        p->addModel(modelBinaryGate);
+        p->addModel(modelBinaryNoise);
+        p->addModel(modelBitshift);
+        p->addModel(modelBlankPanel);
+        p->addModel(modelBoolean3);
+        p->addModel(modelChaos1Op);
+        p->addModel(modelChaos2Op);
+        p->addModel(modelChaos3Op);
+        p->addModel(modelChaoticAttractors);
+        p->addModel(modelClockedNoise);
+        p->addModel(modelComparator);
+        p->addModel(modelContrast);
+        p->addModel(modelCrackle);
+        p->addModel(modelDataCompander);
+        p->addModel(modelDelta);
+        p->addModel(modelDigitalToAnalog);
+        p->addModel(modelDust);
+        p->addModel(modelExponent);
+        p->addModel(modelFBSineChaos);
+        p->addModel(modelFlipFlop);
+        p->addModel(modelFlipPan);
+        p->addModel(modelGateJunction);
+        p->addModel(modelGingerbread);
+        p->addModel(modelLogicCombine);
+        p->addModel(modelMidSide);
+        p->addModel(modelMinMax);
+        p->addModel(modelRandomGates);
+        p->addModel(modelRotator);
+        p->addModel(modelRungler);
+        p->addModel(modelScanner);
+        p->addModel(modelWaveshape);
+        p->addModel(modelXYToPolar);
+#undef modelASR
+#undef modelBlankPanel
+#undef modelFlipFlop
+#undef modelMidSide
+    }
+}
+
 static void initStatic__ImpromptuModular()
 {
     Plugin* const p = new Plugin;
@@ -1388,7 +1488,7 @@ static void initStatic__mscHack()
         p->addModel(modelSynthDrums);
         p->addModel(modelSEQ_6x32x16);
         p->addModel(modelMasterClockx4);
-        //p->addModel(modelMasterClockx8);  
+        //p->addModel(modelMasterClockx8);
         p->addModel(modelSEQ_Envelope_8);
         p->addModel(modelSeq_Triad2);
         p->addModel(modelARP700);
@@ -1585,6 +1685,7 @@ void initStaticPlugins()
     initStatic__Fundamental();
     initStatic__GlueTheGiant();
     initStatic__GrandeModular();
+    initStatic__HetrickCV();
     initStatic__ImpromptuModular();
     initStatic__JW();
     initStatic__MindMeld();

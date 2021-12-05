@@ -31,6 +31,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Fundamental           | GPL-3.0-or-later      | |
 | Glue the Giant        | GPL-3.0-or-later      | |
 | Grande                | GPL-3.0-or-later      | |
+| HetrickCV             | CC0-1.0               | |
 | Impromptu             | GPL-3.0-or-later      | |
 | JW-Modules            | BSD-3-Clause          | |
 | MindMeld              | GPL-3.0-or-later      | |

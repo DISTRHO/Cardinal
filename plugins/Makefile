@@ -436,6 +436,18 @@ PLUGIN_FILES += $(filter-out GlueTheGiant/src/plugin.cpp,$(wildcard GlueTheGiant
 PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModular/src/*.cpp))
 
 # --------------------------------------------------------------
+# HetrickCV
+
+PLUGIN_FILES += $(wildcard HetrickCV/src/*.cpp)
+PLUGIN_FILES += $(wildcard HetrickCV/src/DSP/*.cpp)
+PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/arr.cpp)
+PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/Domain.cpp)
+PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/scl.cpp)
+
+# modules/types which are present in other plugins
+HETRICKCV_CUSTOM = ASR BlankPanel FlipFlop MidSide
+
+# --------------------------------------------------------------
 # ImpromptuModular
 
 PLUGIN_FILES += $(wildcard ImpromptuModular/src/*.cpp)
@@ -991,6 +1003,15 @@ $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 		-DpluginInstance=pluginInstance__GrandeModular \
 		-Wno-missing-braces \
 		-Wno-self-assign
+
+$(BUILD_DIR)/HetrickCV/%.cpp.o: HetrickCV/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(HETRICKCV_CUSTOM),$(call custom_module_names,$(m),HetrickCV)) \
+		-DpluginInstance=pluginInstance__HetrickCV \
+		-IHetrickCV/Gamma \
+		-Wno-unused-but-set-variable
 
 $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
