@@ -26,15 +26,10 @@
 # define STDIO_OVERRIDE_HELPER(NS, SEP, FN) NS ## SEP ## FN
 # define STDIO_OVERRIDE_MACRO(NS, FN) STDIO_OVERRIDE_HELPER(NS, _, FN)
 
-// step 1: prefix the needed stdio functions
+// prefix the needed stdio functions
 # define printf STDIO_OVERRIDE_MACRO(STDIO_OVERRIDE, printf)
 
-// step 2: inlude <stdio.h> which will use our prefixed names
-# include <stdio.h>
-
-#else // STDIO_OVERRIDE
-
-// if STDIO_OVERRIDE is not defined, we have nothing to do
-# include_next <cstdio>
-
 #endif // STDIO_OVERRIDE
+
+// now just include the real stdio.h
+#include_next <stdio.h>
