@@ -445,7 +445,7 @@ PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/Domain.cpp)
 PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/scl.cpp)
 
 # modules/types which are present in other plugins
-HETRICKCV_CUSTOM = ASR BlankPanel FlipFlop MidSide
+HETRICKCV_CUSTOM = ASR BlankPanel FlipFlop MidSide MinMax
 
 # --------------------------------------------------------------
 # ImpromptuModular
@@ -1010,6 +1010,7 @@ $(BUILD_DIR)/HetrickCV/%.cpp.o: HetrickCV/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(HETRICKCV_CUSTOM),$(call custom_module_names,$(m),HetrickCV)) \
 		-DpluginInstance=pluginInstance__HetrickCV \
+		-DSTDIO_OVERRIDE=HetrickCV \
 		-IHetrickCV/Gamma \
 		-Wno-unused-but-set-variable
 

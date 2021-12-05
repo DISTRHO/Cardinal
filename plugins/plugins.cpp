@@ -309,6 +309,7 @@ extern Model *modelBlankPanel;
 #define modelBlankPanel modelHetrickCVBlankPanel
 #define modelFlipFlop modelHetrickCVFlipFlop
 #define modelMidSide modelHetrickCVMidSide
+#define modelMinMax modelHetrickCVMinMax
 extern Model *modelTwoToFour;
 extern Model *modelAnalogToDigital;
 extern Model *modelASR;
@@ -348,6 +349,7 @@ extern Model *modelXYToPolar;
 #undef modelBlankPanel
 #undef modelFlipFlop
 #undef modelMidSide
+#undef modelMinMax
 
 // JW-Modules
 #define modelQuantizer modelJWQuantizer
@@ -1317,6 +1319,7 @@ static void initStatic__HetrickCV()
 #define modelBlankPanel modelHetrickCVBlankPanel
 #define modelFlipFlop modelHetrickCVFlipFlop
 #define modelMidSide modelHetrickCVMidSide
+#define modelMinMax modelHetrickCVMinMax
         p->addModel(modelTwoToFour);
         p->addModel(modelAnalogToDigital);
         p->addModel(modelASR);
@@ -1356,6 +1359,7 @@ static void initStatic__HetrickCV()
 #undef modelBlankPanel
 #undef modelFlipFlop
 #undef modelMidSide
+#undef modelMinMax
     }
 }
 
