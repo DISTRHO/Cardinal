@@ -438,7 +438,7 @@ PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModul
 # --------------------------------------------------------------
 # HetrickCV
 
-PLUGIN_FILES += $(wildcard HetrickCV/src/*.cpp)
+PLUGIN_FILES += $(filter-out HetrikCV/src/HetrickCV.cpp,$(wildcard HetrickCV/src/*.cpp))
 PLUGIN_FILES += $(wildcard HetrickCV/src/DSP/*.cpp)
 PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/arr.cpp)
 PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/Domain.cpp)

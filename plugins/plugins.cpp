@@ -289,7 +289,45 @@ extern Model *modelWriteSeq64;
 extern Model *modelBlankPanel;
 
 // HetrickCV
-#include "HetrickCV/src/HetrickCV.hpp"
+#define modelASR modelhetrickcvASR
+#define modelBlankPanel modelhetrickcvBlankPanel
+extern Model *modelTwoToFour;
+extern Model *modelAnalogToDigital;
+// extern Model *modelASR;
+extern Model *modelBinaryGate;
+extern Model *modelBinaryNoise;
+extern Model *modelBitshift;
+// extern Model *modelBlankPanel;
+extern Model *modelBoolean3;
+extern Model *modelChaos1Op;
+extern Model *modelChaos2Op;
+extern Model *modelChaos3Op;
+extern Model *modelChaoticAttractors;
+extern Model *modelClockedNoise;
+extern Model *modelComparator;
+extern Model *modelContrast;
+extern Model *modelCrackle;
+extern Model *modelDataCompander;
+extern Model *modelDelta;
+extern Model *modelDigitalToAnalog;
+extern Model *modelDust;
+extern Model *modelExponent;
+extern Model *modelFBSineChaos;
+extern Model *modelFlipFlop;
+extern Model *modelFlipPan;
+extern Model *modelGateJunction;
+extern Model *modelGingerbread;
+extern Model *modelLogicCombine;
+extern Model *modelMidSide;
+extern Model *modelMinMax;
+extern Model *modelRandomGates;
+extern Model *modelRotator;
+extern Model *modelRungler;
+extern Model *modelScanner;
+extern Model *modelWaveshape;
+extern Model *modelXYToPolar;
+#undef modelASR
+#undef modelBlankPanel
 
 // JW-Modules
 #define modelQuantizer modelJWQuantizer
@@ -1255,13 +1293,15 @@ static void initStatic__HetrickCV()
     const StaticPluginLoader spl(p, "HetrickCV");
     if (spl.ok())
     {
+#define modelASR modelhetrickcvASR
+#define modelBlankPanel modelhetrickcvBlankPanel
         p->addModel(modelTwoToFour);
         p->addModel(modelAnalogToDigital);
-        p->addModel(modelASR);
+        // p->addModel(modelASR);
         p->addModel(modelBinaryGate);
         p->addModel(modelBinaryNoise);
         p->addModel(modelBitshift);
-        p->addModel(modelBlankPanel);
+        // p->addModel(modelBlankPanel);
         p->addModel(modelBoolean3);
         p->addModel(modelChaos1Op);
         p->addModel(modelChaos2Op);
@@ -1290,6 +1330,8 @@ static void initStatic__HetrickCV()
         p->addModel(modelScanner);
         p->addModel(modelWaveshape);
         p->addModel(modelXYToPolar);
+#undef modelASR
+#undef modelBlankPanel
     }
 }
 
