@@ -77,7 +77,7 @@ At the moment the following 3rd-party modules are provided:
 - Amalgamated Harmonics
 - Animated Circuits
 - Aria Salvatrice
-- Atelier (*)
+- Atelier
 - Audible Instruments
 - Bacon Music
 - Befaco
