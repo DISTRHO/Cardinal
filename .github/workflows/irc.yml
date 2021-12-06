@@ -15,6 +15,6 @@ jobs:
       - name: IRC notification
         uses: Gottox/irc-message-action@v2
         with:
-          channel: '#kxstudio'
-          nickname: kxstudio-bot
+          channel: '#cardinal'
+          nickname: github-event-bot
           message: ${{ steps.message.outputs.message }}

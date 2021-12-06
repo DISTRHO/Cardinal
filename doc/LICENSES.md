@@ -56,7 +56,7 @@ So all uncertainties need to be resolved ASAP.
 | Name                                                | License(s)       | Additional notes |
 |-----------------------------------------------------|------------------|------------------|
 | plugins/AmalgamatedHarmonics/res/*                  | BSD-3-Clause     | No artwork specific license provided |
-| plugins/AmalgamatedHarmonics/res/ComponentLibrary/* |                  | |
+| plugins/AmalgamatedHarmonics/res/ComponentLibrary/* | CC-BY-NC-4.0     | |
 | plugins/AmalgamatedHarmonics/res/DSEG*.ttf          | OFL-1.1-RFN      | |
 | plugins/AmalgamatedHarmonics/res/EurostileBold.ttf  | ??               | https://docs.microsoft.com/en-us/typography/font-list/eurostile |
 | plugins/AmalgamatedHarmonics/res/Roboto-Light.ttf   | Apache-2.0       | |
