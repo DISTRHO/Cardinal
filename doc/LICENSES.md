@@ -47,31 +47,62 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 ## ARTWORK / PANEL LICENSES
 
 Bellow follows a list of all licenses related to **artwork and module panels**, sorted by file name.  
+Licenses were retrieved from the official project's LICENSE, README or related files.  
 When * is used, it is meant as wildcard of all files, with potential exceptions mentioned afterwards.  
 When a license is uncertain, ?? is used.
+
+The sentence "used and distributed with permission" refers to the original project.  
+Since Cardinal does not modify these files, it is assume their usage is permitted as well.
 
 Note: The "final" version of Cardinal MUST NOT be released with unclear licenses!  
 So all uncertainties need to be resolved ASAP.
 
-| Name                                                | License(s)       | Additional notes |
-|-----------------------------------------------------|------------------|------------------|
-| plugins/AmalgamatedHarmonics/res/*                  | BSD-3-Clause     | No artwork specific license provided |
-| plugins/AmalgamatedHarmonics/res/ComponentLibrary/* | CC-BY-NC-4.0     | |
-| plugins/AmalgamatedHarmonics/res/DSEG*.ttf          | OFL-1.1-RFN      | |
-| plugins/AmalgamatedHarmonics/res/EurostileBold.ttf  | ??               | https://docs.microsoft.com/en-us/typography/font-list/eurostile |
-| plugins/AmalgamatedHarmonics/res/Roboto-Light.ttf   | Apache-2.0       | |
-| plugins/AnimatedCircuits/res/*                      | BSD-3-Clause     | No artwork specific license provided |
-| plugins/AriaModules/res/*                           | CC-BY-SA-4.0     | |
-| plugins/AriaModules/res/Arcane/*                    | CC-BY-NC-SA-3.0  | Unused in Cardinal |
-| plugins/AriaModules/res/components/*                | WTFPL            | |
-| plugins/AriaModules/res/dseg/*                      | OFL-1.1-RFN      | |
-| ..etc TODO | | |
-| plugins/Cardinal/*                                  | CC0-1.0          | |
-| plugins/Cardinal/res/Miku/Miku.png                  | CC-BY-NC-3.0     | https://piapro.net/intl/en_for_creators.html |
-| plugins/ZetaCarinaeModules/res/*                    | GPL-3.0-or-later | No artwork specific license provided |
-| src/Rack/res/ComponentLibrary/*                     | CC-BY-NC-4.0     | |
-| src/Rack/res/Core/*                                 | CC-BY-NC-ND-4.0  | |
-| src/Rack/res/fonts/DejaVuSans.ttf                   | Bitstream-Vera   | |
-| src/Rack/res/fonts/DSEG*.ttf                        | OFL-1.1-RFN      | |
-| src/Rack/res/fonts/Nunito-Bold.ttf                  | OFL-1.1-RFN      | |
-| src/Rack/res/fonts/ShareTechMono-Regular.ttf        | OFL-1.1-RFN      | |
+### Plugins
+
+Below is a list of artwork licenses from plugins
+
+| Name                                    | License(s)       | Additional notes |
+|-----------------------------------------|------------------|------------------|
+| AmalgamatedHarmonics/*                  | BSD-3-Clause     | No artwork specific license provided |
+| AmalgamatedHarmonics/ComponentLibrary/* | CC-BY-NC-4.0     | |
+| AmalgamatedHarmonics/DSEG*.ttf          | OFL-1.1-RFN      | |
+| AmalgamatedHarmonics/EurostileBold.ttf  | ??               | https://github.com/jhoar/AmalgamatedHarmonics/issues/48 |
+| AmalgamatedHarmonics/Roboto-Light.ttf   | Apache-2.0       | |
+| AnimatedCircuits/*                      | BSD-3-Clause     | No artwork specific license provided |
+| AriaModules/*                           | CC-BY-SA-4.0     | |
+| AriaModules/Arcane/*                    | CC-BY-NC-SA-3.0  | Unused in Cardinal |
+| AriaModules/components/*                | WTFPL            | |
+| AriaModules/dseg/*                      | OFL-1.1-RFN      | |
+| AriaModules/lcd/Fixed_v01/*             | Custom           | See [LICENSE.txt](../plugins/AriaModules/res/lcd/Fixed_v01/LICENSE.txt) |
+| AriaModules/lcd/piano/*                 | WTFPL            | |
+| AriaModules/signature/*                 | Custom           | Removal required if modifying other files without author's permission |
+| AS/*                                    | Custom           | Derivative works may not use the AS logo or panel graphics including custom component graphics (knobs, switches, screws, caps,etc.) |
+| Atelier/*                               | Custom           | Copyright © Emilie Gillet, used and distributed with permission |
+| AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, used and distributed with permission |
+| BaconPlugs/*                            | GPL-3.0-or-later | No artwork specific license provided |
+| BaconPlugs/midi/*                       | CC-BY-SA-3.0-DE  | |
+| BaconPlugs/midi/beeth/*                 | ??               | Taken from http://www.jsbach.net/ |
+| BaconPlugs/1f953.svg                    | CC-BY-4.0        | |
+| BaconPlugs/Keypunch029.json             | OFL-1.1          | |
+| Befaco/components/*                     | CC-BY-NC-4.0     | |
+| Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission |
+| Bidoo/*                                 | GPL-3.0-or-later | No artwork specific license provided |
+| BogaudioModules/*                       | CC-BY-SA-4.0     | |
+| Cardinal/*                              | CC0-1.0          | |
+| Cardinal/Miku/Miku.png                  | CC-BY-NC-3.0     | https://piapro.net/intl/en_for_creators.html |
+| ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided |
+
+TODO: From everything after Cardinal
+
+### Rack
+
+Below is a list of artwork licenses from Rack
+
+| Name                            | License(s)       |
+|---------------------------------|------------------|
+| ComponentLibrary/*              | CC-BY-NC-4.0     |
+| Core/*                          | CC-BY-NC-ND-4.0  |
+| fonts/DejaVuSans.ttf            | Bitstream-Vera   |
+| fonts/DSEG*.ttf                 | OFL-1.1-RFN      |
+| fonts/Nunito-Bold.ttf           | OFL-1.1-RFN      |
+| fonts/ShareTechMono-Regular.ttf | OFL-1.1-RFN      |
