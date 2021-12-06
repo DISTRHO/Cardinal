@@ -52,7 +52,7 @@ When * is used, it is meant as wildcard of all files, with potential exceptions 
 When a license is uncertain, ?? is used.
 
 The sentence "used and distributed with permission" refers to the original project.  
-Since Cardinal does not modify these files, it is assume their usage is permitted as well.
+Since Cardinal does not modify these files, it is assumed their usage is permitted as well.
 
 Note: The "final" version of Cardinal MUST NOT be released with unclear licenses!  
 So all uncertainties need to be resolved ASAP.
@@ -92,7 +92,7 @@ Below is a list of artwork licenses from plugins
 | Cardinal/Miku/Miku.png                  | CC-BY-NC-3.0     | https://piapro.net/intl/en_for_creators.html |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided |
 
-TODO: From everything after Cardinal
+TODO: Everything after Cardinal
 
 ### Rack
 
