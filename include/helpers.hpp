@@ -119,6 +119,3 @@ CardinalPluginModel<TModule, TModuleWidget>* createModel(std::string slug)
 #define createModel createModelOldVCV
 #include_next "helpers.hpp"
 #undef createModel
-
-// this is defined by Windows headers, conflicts with Bidoo VOID module name
-#undef VOID
