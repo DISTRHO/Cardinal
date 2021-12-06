@@ -60,9 +60,16 @@ static const math::Vec minWindowSize = math::Vec(640, 480);
 
 void Font::loadFile(const std::string& filename, NVGcontext* vg) {
 	this->vg = vg;
-	handle = nvgCreateFont(vg, filename.c_str(), filename.c_str());
-	if (handle < 0)
+	std::string name = system::getStem(filename);
+	size_t size;
+	// Transfer ownership of font data to font object
+	uint8_t* data = system::readFile(filename, &size);
+	// Don't use nvgCreateFont because it doesn't properly handle UTF-8 filenames on Windows.
+	handle = nvgCreateFontMem(vg, name.c_str(), data, size, 0);
+	if (handle < 0) {
+		std::free(data);
 		throw Exception("Failed to load font %s", filename.c_str());
+	}
 	INFO("Loaded font %s", filename.c_str());
 }
 
@@ -79,7 +86,9 @@ std::shared_ptr<Font> Font::load(const std::string& filename) {
 
 void Image::loadFile(const std::string& filename, NVGcontext* vg) {
 	this->vg = vg;
-	handle = nvgCreateImage(vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+	std::vector<uint8_t> data = system::readFile(filename);
+	// Don't use nvgCreateImage because it doesn't properly handle UTF-8 filenames on Windows.
+	handle = nvgCreateImageMem(vg, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY, data.data(), data.size());
 	if (handle <= 0)
 		throw Exception("Failed to load image %s", filename.c_str());
 	INFO("Loaded image %s", filename.c_str());

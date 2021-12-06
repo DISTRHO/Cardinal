@@ -64,6 +64,11 @@ Currently the following features are known NOT to work:
 If you want to try this out early, checkout the [GitHub actions tab](https://github.com/DISTRHO/Cardinal/actions/workflows/build.yml).  
 There is absolutely no warranty, use at your own risk and all that...
 
+### Community chat
+
+Currently we are all on #cardinal IRC room in irc.libera.chat server.  
+Come join us in your favorite IRC client or through a Matrix bridge.
+
 ## License
 
 Cardinal is licensed under GPLv3+, see [LICENSE](LICENSE) for more details.  

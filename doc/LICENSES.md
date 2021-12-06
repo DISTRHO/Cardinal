@@ -77,7 +77,7 @@ Below is a list of artwork licenses from plugins
 | AriaModules/lcd/piano/*                 | WTFPL            | |
 | AriaModules/signature/*                 | Custom           | Removal required if modifying other files without author's permission |
 | AS/*                                    | Custom           | Derivative works may not use the AS logo or panel graphics including custom component graphics (knobs, switches, screws, caps,etc.) |
-| Atelier/*                               | Custom           | Copyright © Emilie Gillet, used and distributed with permission |
+| Atelier/*                               | Custom           | copyright © Pyer 2020, used and distributed with permission |
 | AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, used and distributed with permission |
 | BaconPlugs/*                            | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/midi/*                       | CC-BY-SA-3.0-DE  | |
