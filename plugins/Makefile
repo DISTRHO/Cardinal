@@ -474,6 +474,14 @@ endif
 JW_CUSTOM = PlayHead Quantizer
 
 # --------------------------------------------------------------
+# LyraeModules
+
+PLUGIN_FILES += $(filter-out LyraeModules/src/plugin.cpp,$(wildcard LyraeModules/src/*.cpp))
+
+# modules/types which are present in other plugins
+LYRAE_CUSTOM = Delta
+
+# --------------------------------------------------------------
 # MindMeld
 
 PLUGIN_FILES += $(wildcard MindMeldModular/src/*.cpp)
@@ -1044,6 +1052,13 @@ $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 		-Wno-misleading-indentation \
 		-Wno-unused-but-set-variable \
 		-Wno-unused-result
+
+$(BUILD_DIR)/LyraeModules/%.cpp.o: LyraeModules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(LYRAE_CUSTOM),$(call custom_module_names,$(m),Lyrae)) \
+		-DpluginInstance=pluginInstance__Lyrae
 
 $(BUILD_DIR)/MindMeldModular/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

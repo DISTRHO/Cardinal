@@ -103,3 +103,6 @@
 [submodule "plugins/HetrickCV"]
 	path = plugins/HetrickCV
 	url = https://github.com/mhetrick/hetrickcv.git
+[submodule "plugins/LyraeModules"]
+	path = plugins/LyraeModules
+	url = https://github.com/VegaDeftwing/LyraeModules.git

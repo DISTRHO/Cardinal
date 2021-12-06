@@ -94,6 +94,7 @@ At the moment the following 3rd-party modules are provided:
 - HetrickCV
 - Impromptu
 - JW-Modules
+- LyraeModules
 - MindMeld
 - Mog
 - mscHack

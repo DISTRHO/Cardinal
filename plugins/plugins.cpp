@@ -356,6 +356,19 @@ extern Model *modelXYToPolar;
 #include "JW-Modules/src/JWModules.hpp"
 #undef modelQuantizer
 
+// LyraeModules
+/* NOTE too much noise in original include, do this a different way
+// #include "LyraeModules/src/plugin.hpp"
+*/
+#define modelDelta modelLyraeDelta
+extern Model* modelSulafat;
+extern Model* modelGamma;
+extern Model* modelDelta;
+extern Model* modelVega;
+extern Model* modelBD383238;
+extern Model* modelZeta;
+#undef modelDelta
+
 // MindMeldModular
 /* NOTE too much noise in original include, do this a different way
 // #include "MindMeldModular/src/MindMeldModular.hpp"
@@ -468,6 +481,7 @@ Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__JW;
+Plugin* pluginInstance__Lyrae;
 extern Plugin* pluginInstance__MindMeld;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
@@ -1445,6 +1459,25 @@ static void initStatic__JW()
     }
 }
 
+static void initStatic__Lyrae()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Lyrae = p;
+
+    const StaticPluginLoader spl(p, "LyraeModules");
+    if (spl.ok())
+    {
+#define modelDelta modelLyraeDelta
+        p->addModel(modelSulafat);
+        p->addModel(modelGamma);
+        p->addModel(modelDelta);
+        p->addModel(modelVega);
+        p->addModel(modelBD383238);
+        p->addModel(modelZeta);
+#undef modelDelta
+    }
+}
+
 static void initStatic__MindMeld()
 {
     Plugin* const p = new Plugin;
@@ -1692,6 +1725,7 @@ void initStaticPlugins()
     initStatic__HetrickCV();
     initStatic__ImpromptuModular();
     initStatic__JW();
+    initStatic__Lyrae();
     initStatic__MindMeld();
     initStatic__Mog();
     initStatic__mscHack();
