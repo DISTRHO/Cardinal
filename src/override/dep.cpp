@@ -440,6 +440,12 @@ static const struct {
     { "/JW-Modules/Trigs.svg", {}, -1 },
     { "/JW-Modules/WavHeadPanel.svg", {}, -1 },
     { "/JW-Modules/XYPad.svg", {}, -1 },
+    { "/LittleUtils/Bias_Semitone.svg", {}, -1 },
+    { "/LittleUtils/ButtonModule.svg", {}, -1 },
+    { "/LittleUtils/MulDiv.svg", {}, -1 },
+    { "/LittleUtils/PulseGenerator.svg", {}, -1 },
+    { "/LittleUtils/TeleportIn.svg", {}, -1 },
+    { "/LittleUtils/TeleportOut.svg", {}, -1 },
 };
 
 static inline void removeShape(NSVGimage* const handle, const char* const id)
@@ -548,6 +554,7 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
     case 0xff6140da:
     case 0xff119ee6:
     case 0xff2432ed:
+    case 0xff0095fe:
         return false;
     // pure black (convert to not quite pure white)
     case 0xff000000:
