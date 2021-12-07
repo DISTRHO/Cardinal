@@ -100,18 +100,6 @@
         30,
         0
       ]
-    },
-    {
-      "id": 6,
-      "plugin": "Cardinal",
-      "model": "Ildaeil",
-      "version": "2.0",
-      "params": [],
-      "leftModuleId": 4,
-      "pos": [
-        38,
-        0
-      ]
     }
   ],
   "cables": [],
