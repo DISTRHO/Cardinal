@@ -106,3 +106,6 @@
 [submodule "plugins/LyraeModules"]
 	path = plugins/LyraeModules
 	url = https://github.com/VegaDeftwing/LyraeModules.git
+[submodule "plugins/LittleUtils"]
+	path = plugins/LittleUtils
+	url = https://github.com/mgunyho/Little-Utils.git

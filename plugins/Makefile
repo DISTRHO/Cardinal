@@ -474,6 +474,11 @@ endif
 JW_CUSTOM = PlayHead Quantizer
 
 # --------------------------------------------------------------
+# LittleUtils
+
+PLUGIN_FILES += $(filter-out LittleUtils/src/plugin.cpp,$(wildcard LittleUtils/src/*.cpp))
+
+# --------------------------------------------------------------
 # LyraeModules
 
 PLUGIN_FILES += $(filter-out LyraeModules/src/plugin.cpp,$(wildcard LyraeModules/src/*.cpp))
@@ -1052,6 +1057,13 @@ $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 		-Wno-misleading-indentation \
 		-Wno-unused-but-set-variable \
 		-Wno-unused-result
+
+$(BUILD_DIR)/LittleUtils/%.cpp.o: LittleUtils/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(LITTLEUTILS_CUSTOM),$(call custom_module_names,$(m),LittleUtils)) \
+		-DpluginInstance=pluginInstance__LittleUtils
 
 $(BUILD_DIR)/LyraeModules/%.cpp.o: LyraeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

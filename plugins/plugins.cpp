@@ -356,6 +356,9 @@ extern Model *modelXYToPolar;
 #include "JW-Modules/src/JWModules.hpp"
 #undef modelQuantizer
 
+// LittleUtils
+#include "LittleUtils/src/plugin.hpp"
+
 // LyraeModules
 /* NOTE too much noise in original include, do this a different way
 // #include "LyraeModules/src/plugin.hpp"
@@ -481,6 +484,7 @@ Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__JW;
+Plugin* pluginInstance__LittleUtils;
 Plugin* pluginInstance__Lyrae;
 extern Plugin* pluginInstance__MindMeld;
 Plugin* pluginInstance__Mog;
@@ -1459,6 +1463,23 @@ static void initStatic__JW()
     }
 }
 
+static void initStatic__LittleUtils()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__LittleUtils = p;
+
+    const StaticPluginLoader spl(p, "LittleUtils");
+    if (spl.ok())
+    {
+        p->addModel(modelButtonModule);
+        p->addModel(modelPulseGenerator);
+        p->addModel(modelBias_Semitone);
+        p->addModel(modelMulDiv);
+        p->addModel(modelTeleportInModule);
+        p->addModel(modelTeleportOutModule);
+    }
+}
+
 static void initStatic__Lyrae()
 {
     Plugin* const p = new Plugin;
@@ -1725,6 +1746,7 @@ void initStaticPlugins()
     initStatic__HetrickCV();
     initStatic__ImpromptuModular();
     initStatic__JW();
+    initStatic__LittleUtils();
     initStatic__Lyrae();
     initStatic__MindMeld();
     initStatic__Mog();
