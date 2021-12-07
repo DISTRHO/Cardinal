@@ -478,6 +478,9 @@ JW_CUSTOM = PlayHead Quantizer
 
 PLUGIN_FILES += $(filter-out LittleUtils/src/plugin.cpp,$(wildcard LittleUtils/src/*.cpp))
 
+# modules/types which are present in other plugins
+LITTLEUTILS_CUSTOM = MsDisplayWidget
+
 # --------------------------------------------------------------
 # LyraeModules
 

@@ -99,6 +99,7 @@ At the moment the following 3rd-party modules are provided:
 - HetrickCV
 - Impromptu
 - JW-Modules
+- Little Utils
 - LyraeModules
 - MindMeld
 - Mog

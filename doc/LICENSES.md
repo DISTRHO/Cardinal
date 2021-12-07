@@ -34,6 +34,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | HetrickCV             | CC0-1.0               | |
 | Impromptu             | GPL-3.0-or-later      | |
 | JW-Modules            | BSD-3-Clause          | |
+| Little Utils          | MIT                   | |
 | LyraeModules          | GPL-3.0-or-later      | |
 | MindMeld              | GPL-3.0-or-later      | |
 | Mog                   | CC0-1.0               | |
@@ -91,6 +92,8 @@ Below is a list of artwork licenses from plugins
 | BogaudioModules/*                       | CC-BY-SA-4.0     | |
 | Cardinal/*                              | CC0-1.0          | |
 | Cardinal/Miku/Miku.png                  | CC-BY-NC-3.0     | https://piapro.net/intl/en_for_creators.html |
+| LittleUtils/*                           | MIT              | No artwork specific license provided |
+| LittleUtils/ComponentLibrary/*          | CC-BY-NC-4.0     | |
 | LyraeModules/*                          | CC-BY-NC-SA-4.0  | |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided |
 
