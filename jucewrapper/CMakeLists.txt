@@ -13,16 +13,28 @@ juce_add_plugin(CardinalFX
     EDITOR_WANTS_KEYBOARD_FOCUS TRUE
     PLUGIN_MANUFACTURER_CODE Dstr
     PLUGIN_CODE dCnF
-    FORMATS AU
+    FORMATS VST3 AU
     PRODUCT_NAME "CardinalFX")
 
 target_sources(CardinalFX
     PRIVATE
-        Source/CardinalWrapper.cpp)
+        CardinalWrapper.cpp)
+
+target_include_directories(CardinalFX
+    PRIVATE
+        .
+        ../dpf/distrho)
 
 target_compile_definitions(CardinalFX
     PUBLIC
+        JUCE_USE_CURL=0
         JUCE_WEB_BROWSER=0)
+
+target_link_options(CardinalFX
+    PRIVATE
+        "-l/Shared/Personal/FOSS/GIT/DISTRHO/DISTRHO_Cardinal/bin/CardinalFX.so"
+        "-Wl,-rpath,."
+)
 
 target_link_libraries(CardinalFX
     PRIVATE
