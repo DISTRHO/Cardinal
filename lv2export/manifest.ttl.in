@@ -3,5 +3,5 @@
 
 <urn:cardinal:chow:chorus>
     a lv2:Plugin ;
-    lv2:binary <plugins.dylib> ;
+    lv2:binary <plugins@LIB_EXT@> ;
     rdfs:seeAlso <chow-chorus.ttl> .

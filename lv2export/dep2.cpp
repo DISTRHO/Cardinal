@@ -15,29 +15,17 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
+#define PRIVATE
+#include <common.hpp>
+
+#undef PRIVATE
 #include <rack.hpp>
-#include <context.hpp>
 
 using namespace rack;
 
 namespace rack {
 namespace settings {
 bool cpuMeter = false;
-}
-Context::~Context() {
-}
-static thread_local Context* threadContext;
-Context* contextGet() {
-	DISTRHO_SAFE_ASSERT(threadContext != nullptr);
-	return threadContext;
-}
-// Apple's clang incorrectly compiles this function when -O2 or higher is enabled.
-#ifdef ARCH_MAC
-__attribute__((optnone))
-#endif
-void contextSet(Context* const context) {
-	// DISTRHO_SAFE_ASSERT(threadContext == nullptr);
-	threadContext = context;
 }
 Exception::Exception(const char* format, ...)
 {

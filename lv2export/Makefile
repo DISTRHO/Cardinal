@@ -22,7 +22,7 @@ include ../dpf/Makefile.base.mk
 
 BUILD_DIR = ../build/lv2export
 
-# BASE_FLAGS += -DHEADLESS
+BASE_FLAGS += -DHEADLESS
 BASE_FLAGS += -DPRIVATE=
 
 ifeq ($(MACOS),true)
@@ -34,6 +34,7 @@ BASE_FLAGS += -DARCH_LIN
 endif
 
 BASE_FLAGS += -fno-finite-math-only
+BASE_FLAGS += -I../dpf/dgl
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
 BASE_FLAGS += -I../include
@@ -100,8 +101,10 @@ endif
 # Build files
 
 # BUILD_FILES += test.cpp
-BUILD_FILES  = dep.cpp
+# BUILD_FILES  = dep.cpp
 BUILD_FILES += dep2.cpp
+BUILD_FILES += ../src/override/context.cpp
+BUILD_FILES += ../src/override/RemoteNanoVG.cpp
 BUILD_FILES += ../src/Rack/src/logger.cpp
 BUILD_FILES += ../src/Rack/src/random.cpp
 BUILD_FILES += ../src/Rack/src/string.cpp
@@ -115,9 +118,15 @@ BUILD_FILES += ../src/Rack/dep/pffft/pffft.c
 BUILD_FILES += ../src/Rack/dep/pffft/fftpack.c
 
 BUILD_OBJS  = $(BUILD_FILES:%=$(BUILD_DIR)/%.o)
-BUILD_OBJS += $(BUILD_DIR)/lv2plugin/chowdsp-chorus.o
 
-EXTRA_LIBS  = ../plugins/plugins.a
+# ChowDSP Chorus
+BUILD_OBJS += $(BUILD_DIR)/lv2plugin/chowdsp-chorus.o
+BUILD_OBJS += $(BUILD_DIR)/plugin/ChowDSP/ChowChorus/ChowChorus.cpp.o
+BUILD_OBJS += $(BUILD_DIR)/plugin/ChowDSP/ChowChorus/BBDDelayLine.cpp.o
+BUILD_OBJS += $(BUILD_DIR)/plugin/ChowDSP/shared/SineWave.cpp.o
+BUILD_OBJS += $(BUILD_DIR)/plugin/ChowDSP/plugin.cpp.o
+
+# EXTRA_LIBS  = ../plugins/plugins.a
 
 ifneq ($(SYSDEPS),true)
 EXTRA_LIBS += ../src/Rack/dep/lib/libjansson.a
@@ -138,6 +147,9 @@ TARGETS  = ../bin/CardinalModules.lv2/manifest.ttl
 TARGETS += ../bin/CardinalModules.lv2/plugins$(LIB_EXT)
 
 all: $(TARGETS)
+
+clean:
+	rm -f $(TARGETS) $(BUILD_OBJS)
 
 # --------------------------------------------------------------
 # Build commands
@@ -162,10 +174,18 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
 
+# --------------------------------------------------------------
+
 $(BUILD_DIR)/lv2plugin/chowdsp-chorus.o: lv2plugin.cpp
 	-@mkdir -p "$(shell dirname $@)"
 	@echo "Compiling $< (ChowDSP Chorus)"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -UPRIVATE -c -o $@ \
 		-DPLUGIN_INSTANCE=pluginInstance__ChowDSP \
 		-DPLUGIN_MODEL=modelChowChorus \
-		-DPLUGIN_URI='"modelChowChorus"'
+		-DPLUGIN_URI='"urn:cardinal:chow:chorus"'
+
+$(BUILD_DIR)/plugin/ChowDSP/%.o: ../plugins/ChowDSP/src/%
+	-@mkdir -p "$(shell dirname $@)"
+	@echo "Compiling $< (ChowDSP Chorus)"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -UPRIVATE -c -o $@ \
+		-DpluginInstance=pluginInstance__ChowDSP

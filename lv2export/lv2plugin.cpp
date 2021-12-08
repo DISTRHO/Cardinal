@@ -27,8 +27,11 @@
 # error PLUGIN_URI undefined
 #endif
 
+#define PRIVATE
+#include <common.hpp>
+#include <engine/Engine.hpp>
+
 #undef PRIVATE
-// #include <common.hpp>
 #include <rack.hpp>
 
 #include "src/lv2/buf-size.h"
@@ -39,10 +42,34 @@
 using namespace rack;
 
 extern Model* PLUGIN_MODEL;
-Plugin* PLUGIN_INSTANCE;
+extern Plugin* PLUGIN_INSTANCE;
 
 namespace rack {
+namespace engine {
+
+struct Engine::Internal {
+    float sampleRate;
+};
+
+Engine::Engine()
+{
+    internal = new Internal;
+}
+
+Engine::~Engine()
+{
+    delete internal;
+}
+
+float Engine::getSampleRate()
+{
+    return internal->sampleRate;
+}
+
+}
+
 namespace plugin {
+
 void Plugin::addModel(Model* model)
 {
 	// Check that the model is not added to a plugin already
@@ -55,6 +82,7 @@ Model* modelFromJson(json_t* moduleJ) {
     return nullptr;
 }
 std::vector<Plugin*> plugins;
+
 } // namespace plugin
 } // namespace rack
 
@@ -69,6 +97,10 @@ struct PluginLv2 {
     PluginLv2(double sr)
     {
         // FIXME shared instance for these 2
+        Context* const context = new Context;
+        context->engine = new Engine;
+        context->engine->internal->sampleRate = sr;
+        contextSet(context);
         plugin = new Plugin;
         PLUGIN_INSTANCE = plugin;
 
@@ -87,6 +119,9 @@ struct PluginLv2 {
             module->inputs[i].channels = 1;
         for (int i=numOutputs; --i >=0;)
             module->outputs[i].channels = 1;
+
+        d_stdout("Loaded %s :: %i inputs, %i outputs, %i params and %i lights",
+                 PLUGIN_URI, numInputs, numOutputs, numParams, numLights);
     }
 
     PluginLv2()
@@ -96,6 +131,7 @@ struct PluginLv2 {
 
         // FIXME shared instance for this
         delete plugin;
+        delete contextGet();
     }
 
     void lv2_connect_port(const uint32_t port, void* const dataLocation)
@@ -120,17 +156,17 @@ struct PluginLv2 {
         };
 
         for (int i=numParams; --i >=0;)
-            module->params[i].setValue(*static_cast<float*>(ports[numInputs+numOutputs+i]));
+            module->params[i].setValue(*static_cast<float*>(ports[numInputs+numOutputs+i]) * 0.1f); // FIXME?
 
         for (uint32_t s=0; s<sampleCount; ++s)
         {
             for (int i=numInputs; --i >=0;)
-                module->inputs[i].setVoltage(static_cast<float*>(ports[i])[s] * 10.0f);
+                module->inputs[i].setVoltage(static_cast<const float*>(ports[i])[s] * 5.0f);
 
             module->doProcess(args);
 
             for (int i=numOutputs; --i >=0;)
-                static_cast<float*>(ports[numInputs+i])[s] = module->outputs[i].getVoltage() * 0.1f;
+                static_cast<float*>(ports[numInputs+i])[s] = module->outputs[i].getVoltage() * 0.2f;
 
             ++args.frame;
         }
