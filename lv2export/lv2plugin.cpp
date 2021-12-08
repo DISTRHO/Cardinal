@@ -15,54 +15,33 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
+#ifndef PLUGIN_INSTANCE
+# error PLUGIN_INSTANCE undefined
+#endif
+
+#ifndef PLUGIN_MODEL
+# error PLUGIN_MODEL undefined
+#endif
+
+#ifndef PLUGIN_URI
+# error PLUGIN_URI undefined
+#endif
+
+#undef PRIVATE
+// #include <common.hpp>
+#include <rack.hpp>
+
 #include "src/lv2/buf-size.h"
 #include "src/lv2/options.h"
-#include <rack.hpp>
-#include <context.hpp>
 
 #include "DistrhoUtils.hpp"
 
 using namespace rack;
 
-extern Model* modelSpringReverb;
-Plugin* pluginInstance__Befaco;
+extern Model* PLUGIN_MODEL;
+Plugin* PLUGIN_INSTANCE;
 
 namespace rack {
-namespace settings {
-bool cpuMeter = false;
-}
-Context::~Context() {
-}
-static thread_local Context* threadContext;
-Context* contextGet() {
-	DISTRHO_SAFE_ASSERT(threadContext != nullptr);
-	return threadContext;
-}
-// Apple's clang incorrectly compiles this function when -O2 or higher is enabled.
-#ifdef ARCH_MAC
-__attribute__((optnone))
-#endif
-void contextSet(Context* const context) {
-	// DISTRHO_SAFE_ASSERT(threadContext == nullptr);
-	threadContext = context;
-}
-Exception::Exception(const char* format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    msg = string::fV(format, args);
-    va_end(args);
-}
-namespace asset {
-std::string plugin(plugin::Plugin* plugin, std::string filename) { return {}; }
-std::string system(std::string filename) { return {}; }
-}
-namespace engine {
-float Engine::getParamValue(Module* module, int paramId) { return 0.0f; }
-float Engine::getParamSmoothValue(Module* module, int paramId) { return 0.0f; }
-void Engine::setParamValue(Module* module, int paramId, float value) {}
-void Engine::setParamSmoothValue(Module* module, int paramId, float value) {}
-}
 namespace plugin {
 void Plugin::addModel(Model* model)
 {
@@ -84,30 +63,49 @@ struct PluginLv2 {
     engine::Module* module;
     float sampleRate;
     int frameCount = 0;
-
-    void* ports[11];
+    int numInputs, numOutputs, numParams, numLights;
+    void** ports;
 
     PluginLv2(double sr)
     {
-        sampleRate = sr;
+        // FIXME shared instance for these 2
         plugin = new Plugin;
-        pluginInstance__Befaco = plugin;
-        plugin->addModel(modelSpringReverb);
-        module = modelSpringReverb->createModule();
+        PLUGIN_INSTANCE = plugin;
 
-        // FIXME we need to detect if something is connected
-        // module->inputs[0].channels = 1;
-        // module->inputs[1].channels = 1;
-        module->inputs[2].channels = 1;
-        module->inputs[3].channels = 1;
-        module->inputs[4].channels = 1;
-        module->outputs[0].channels = 1;
-        module->outputs[1].channels = 1;
+        sampleRate = sr;
+        plugin->addModel(PLUGIN_MODEL);
+        module = PLUGIN_MODEL->createModule();
+
+        numInputs = module->getNumInputs();
+        numOutputs = module->getNumOutputs();
+        numParams = module->getNumParams();
+        numLights = module->getNumLights();
+        ports = new void*[numInputs+numOutputs+numParams+numLights];
+
+        // FIXME for CV ports we need to detect if something is connected
+        for (int i=numInputs; --i >=0;)
+            module->inputs[i].channels = 1;
+        for (int i=numOutputs; --i >=0;)
+            module->outputs[i].channels = 1;
+    }
+
+    PluginLv2()
+    {
+        delete[] ports;
+        delete module;
+
+        // FIXME shared instance for this
+        delete plugin;
     }
 
     void lv2_connect_port(const uint32_t port, void* const dataLocation)
     {
         ports[port] = dataLocation;
+    }
+
+    void lv2_activate()
+    {
+        module->onReset();
     }
 
     void lv2_run(const uint32_t sampleCount)
@@ -121,40 +119,24 @@ struct PluginLv2 {
             frameCount
         };
 
-        // const float* CV1_INPUT = (float*)ports[0];
-        // const float* CV2_INPUT = (float*)ports[1];
-        const float* IN1_INPUT = (float*)ports[2];
-        const float* IN2_INPUT = (float*)ports[3];
-        const float* MIX_CV_INPUT = (float*)ports[4];
-        float* MIX_OUTPUT = (float*)ports[5];
-        float* WET_OUTPUT = (float*)ports[6];
+        for (int i=numParams; --i >=0;)
+            module->params[i].setValue(*static_cast<float*>(ports[numInputs+numOutputs+i]));
 
-        const float drywet = *(float*)ports[7] * 0.01f;
-        const float lvl1 = *(float*)ports[8] * 0.01f;
-        const float lvl2 = *(float*)ports[9] * 0.01f;
-        const float hpf = *(float*)ports[10];
-
-        module->params[0].setValue(drywet);
-        module->params[1].setValue(lvl1);
-        module->params[2].setValue(lvl2);
-        module->params[3].setValue(hpf);
-
-        for (uint32_t i=0; i<sampleCount; ++i)
+        for (uint32_t s=0; s<sampleCount; ++s)
         {
-            // module->inputs[0].setVoltage(CV1_INPUT[i]);
-            // module->inputs[1].setVoltage(CV2_INPUT[i]);
-            module->inputs[2].setVoltage(IN1_INPUT[i] * 10);
-            module->inputs[3].setVoltage(IN2_INPUT[i] * 10);
-            module->inputs[4].setVoltage(MIX_CV_INPUT[i]);
+            for (int i=numInputs; --i >=0;)
+                module->inputs[i].setVoltage(static_cast<float*>(ports[i])[s] * 10.0f);
+
             module->doProcess(args);
-            MIX_OUTPUT[i] = module->outputs[0].getVoltage() * 0.1f;
-            WET_OUTPUT[i] = module->outputs[1].getVoltage() * 0.1f;
+
+            for (int i=numOutputs; --i >=0;)
+                static_cast<float*>(ports[numInputs+i])[s] = module->outputs[i].getVoltage() * 0.1f;
+
             ++args.frame;
         }
 
         frameCount += sampleCount;
     }
-
 };
 
 static LV2_Handle lv2_instantiate(const LV2_Descriptor*, double sampleRate, const char* bundlePath, const LV2_Feature* const* features)
@@ -173,6 +155,7 @@ static void lv2_connect_port(LV2_Handle instance, uint32_t port, void* dataLocat
 
 static void lv2_activate(LV2_Handle instance)
 {
+    instancePtr->lv2_activate();
 }
 
 static void lv2_run(LV2_Handle instance, uint32_t sampleCount)
@@ -201,7 +184,7 @@ static const void* lv2_extension_data(const char* uri)
 // -----------------------------------------------------------------------
 
 static const LV2_Descriptor sLv2Descriptor = {
-    "urn:Cardinal:Befaco",
+    PLUGIN_URI,
     lv2_instantiate,
     lv2_connect_port,
     lv2_activate,

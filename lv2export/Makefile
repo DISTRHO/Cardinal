@@ -12,11 +12,6 @@ DESTDIR ?=
 SYSDEPS ?= false
 
 # --------------------------------------------------------------
-# List of modules to build, based on their C++ model name
-
-MODULES += SpringReverb
-
-# --------------------------------------------------------------
 # Import base definitions
 
 USE_NANOVG_FBO = true
@@ -26,6 +21,9 @@ include ../dpf/Makefile.base.mk
 # Build setup
 
 BUILD_DIR = ../build/lv2export
+
+# BASE_FLAGS += -DHEADLESS
+BASE_FLAGS += -DPRIVATE=
 
 ifeq ($(MACOS),true)
 BASE_FLAGS += -DARCH_MAC
@@ -42,8 +40,10 @@ BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat
 BASE_FLAGS += -I../src/Rack/include
 ifeq ($(SYSDEPS),true)
+BASE_FLAGS += -DCARDINAL_SYSDEPS
 BASE_FLAGS += $(shell pkg-config --cflags jansson libarchive samplerate speexdsp)
 else
+BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 BASE_FLAGS += -I../src/Rack/dep/include
 endif
 BASE_FLAGS += -I../src/Rack/dep/filesystem/include
@@ -62,19 +62,17 @@ BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
-ifeq ($(HEADLESS),true)
-BASE_FLAGS += -DHEADLESS
-endif
-
-ifeq ($(WITH_LTO),true)
-BASE_FLAGS += -fno-strict-aliasing -flto
-endif
-
 # --------------------------------------------------------------
-# FIXME lots of warnings from VCV side
+# lots of warnings from VCV side
 
+BASE_FLAGS += -Wno-unused-but-set-variable
 BASE_FLAGS += -Wno-unused-parameter
+BASE_FLAGS += -Wno-unused-result
 BASE_FLAGS += -Wno-unused-variable
+
+ifeq ($(MACOS),true)
+BASE_FLAGS += -Wno-unknown-warning-option
+endif
 
 # --------------------------------------------------------------
 # extra linker flags
@@ -98,16 +96,11 @@ ifeq ($(SYSDEPS),true)
 EXTRA_LIBS += $(shell pkg-config --libs jansson libarchive samplerate speexdsp)
 endif
 
-ifeq ($(WITH_LTO),true)
-LINK_FLAGS += -fno-strict-aliasing -flto -Werror=odr -Werror=lto-type-mismatch
-endif
-
 # --------------------------------------------------------------
-# Build targets
+# Build files
 
-BUILD_FILES  = lv2plugin.cpp
-BUILD_FILES += test.cpp
-BUILD_FILES += dep.cpp
+# BUILD_FILES += test.cpp
+BUILD_FILES  = dep.cpp
 BUILD_FILES += dep2.cpp
 BUILD_FILES += ../src/Rack/src/logger.cpp
 BUILD_FILES += ../src/Rack/src/random.cpp
@@ -118,14 +111,11 @@ BUILD_FILES += ../src/Rack/src/Quantity.cpp
 BUILD_FILES += ../src/Rack/src/engine/Module.cpp
 BUILD_FILES += ../src/Rack/src/engine/ParamQuantity.cpp
 BUILD_FILES += ../src/Rack/src/engine/PortInfo.cpp
-ifneq ($(SYSDEPS),true)
 BUILD_FILES += ../src/Rack/dep/pffft/pffft.c
 BUILD_FILES += ../src/Rack/dep/pffft/fftpack.c
-endif
 
-TARGETS = test$(APP_EXT) lv2plugin$(LIB_EXT)
-
-all: $(TARGETS)
+BUILD_OBJS  = $(BUILD_FILES:%=$(BUILD_DIR)/%.o)
+BUILD_OBJS += $(BUILD_DIR)/lv2plugin/chowdsp-chorus.o
 
 EXTRA_LIBS  = ../plugins/plugins.a
 
@@ -142,18 +132,23 @@ EXTRA_LIBS += ../src/Rack/dep/lib/libzstd.a
 endif
 
 # --------------------------------------------------------------
+# Build targets
+
+TARGETS  = ../bin/CardinalModules.lv2/manifest.ttl
+TARGETS += ../bin/CardinalModules.lv2/plugins$(LIB_EXT)
+
+all: $(TARGETS)
+
+# --------------------------------------------------------------
 # Build commands
 
-# OBJS = $(BUILD_FILES:%=$(BUILD_DIR)/%.o)
-
-FILES1 = $(filter-out lv2plugin.cpp,$(BUILD_FILES))
-FILES2 = $(filter-out test.cpp,$(BUILD_FILES))
-
-test$(APP_EXT): $(FILES1:%=$(BUILD_DIR)/%.o)
+../bin/CardinalModules.lv2/manifest.ttl: manifest.ttl.in
 	-@mkdir -p $(shell dirname $@)
-	$(CXX) $^ $(BUILD_CXX_FLAGS) $(LINK_FLAGS) $(EXTRA_LIBS) -o $@
+	sed -e "s/@LIB_EXT@/$(LIB_EXT)/" $< > $@
+	# FIXME wildcard install
+	install -m 644 lv2ttl/* ../bin/CardinalModules.lv2/
 
-lv2plugin$(LIB_EXT): $(FILES2:%=$(BUILD_DIR)/%.o)
+../bin/CardinalModules.lv2/plugins$(LIB_EXT): $(BUILD_OBJS)
 	-@mkdir -p $(shell dirname $@)
 	$(CXX) $^ $(BUILD_CXX_FLAGS) $(LINK_FLAGS) $(EXTRA_LIBS) $(SHARED) -o $@
 
@@ -166,3 +161,11 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
+
+$(BUILD_DIR)/lv2plugin/chowdsp-chorus.o: lv2plugin.cpp
+	-@mkdir -p "$(shell dirname $@)"
+	@echo "Compiling $< (ChowDSP Chorus)"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -UPRIVATE -c -o $@ \
+		-DPLUGIN_INSTANCE=pluginInstance__ChowDSP \
+		-DPLUGIN_MODEL=modelChowChorus \
+		-DPLUGIN_URI='"modelChowChorus"'

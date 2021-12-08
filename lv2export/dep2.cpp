@@ -16,8 +16,47 @@
  */
 
 #include <rack.hpp>
+#include <context.hpp>
 
 using namespace rack;
+
+namespace rack {
+namespace settings {
+bool cpuMeter = false;
+}
+Context::~Context() {
+}
+static thread_local Context* threadContext;
+Context* contextGet() {
+	DISTRHO_SAFE_ASSERT(threadContext != nullptr);
+	return threadContext;
+}
+// Apple's clang incorrectly compiles this function when -O2 or higher is enabled.
+#ifdef ARCH_MAC
+__attribute__((optnone))
+#endif
+void contextSet(Context* const context) {
+	// DISTRHO_SAFE_ASSERT(threadContext == nullptr);
+	threadContext = context;
+}
+Exception::Exception(const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    msg = string::fV(format, args);
+    va_end(args);
+}
+namespace asset {
+std::string plugin(plugin::Plugin* plugin, std::string filename) { return {}; }
+std::string system(std::string filename) { return {}; }
+}
+namespace engine {
+float Engine::getParamValue(Module* module, int paramId) { return 0.0f; }
+float Engine::getParamSmoothValue(Module* module, int paramId) { return 0.0f; }
+void Engine::setParamValue(Module* module, int paramId, float value) {}
+void Engine::setParamSmoothValue(Module* module, int paramId, float value) {}
+}
+}
 
 namespace rack {
 namespace app {

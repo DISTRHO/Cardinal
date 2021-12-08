@@ -1,7 +1,7 @@
 @prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-<urn:Cardinal:Befaco>
+<urn:cardinal:chow:chorus>
     a lv2:Plugin ;
-    lv2:binary <lv2plugin.dylib> ;
-    rdfs:seeAlso <lv2plugin.ttl> .
+    lv2:binary <plugins.dylib> ;
+    rdfs:seeAlso <chow-chorus.ttl> .
