@@ -313,18 +313,18 @@ struct CarlaModule : Module {
 
                     int32_t newBar = fCarlaTimeInfo.bbt.bar;
                     int32_t newBeat = fCarlaTimeInfo.bbt.beat;
-                    double newTick = fCarlaTimeInfo.bbt.tick + samplesPerTick * BUFFER_SIZE;
+                    double newTick = fCarlaTimeInfo.bbt.tick + (double)BUFFER_SIZE / samplesPerTick;
 
-                    while (newTick > pcontext->ticksPerBeat)
+                    while (newTick >= fCarlaTimeInfo.bbt.ticksPerBeat)
                     {
-                        newTick -= pcontext->ticksPerBeat;
+                        newTick -= fCarlaTimeInfo.bbt.ticksPerBeat;
 
-                        if (++fCarlaTimeInfo.bbt.beat > pcontext->beatsPerBar)
+                        if (++newBeat > fCarlaTimeInfo.bbt.beatsPerBar)
                         {
-                            fCarlaTimeInfo.bbt.beat = 1;
+                            newBeat = 1;
 
-                            if (++newBar)
-                                fCarlaTimeInfo.bbt.barStartTick += pcontext->beatsPerBar * pcontext->ticksPerBeat;
+                            ++newBar;
+                            fCarlaTimeInfo.bbt.barStartTick += fCarlaTimeInfo.bbt.beatsPerBar * fCarlaTimeInfo.bbt.ticksPerBeat;
                         }
                     }
 
