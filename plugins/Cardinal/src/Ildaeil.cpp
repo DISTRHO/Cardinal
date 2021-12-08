@@ -805,7 +805,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
     void openFileFromDSP(bool /* isDir */, const char* const title, const char* /* filter */)
     {
         DISTRHO_SAFE_ASSERT_RETURN(idleCallbackActive,);
-        DISTRHO_SAFE_ASSERT_RETURN(fPluginType == PLUGIN_INTERNAL,);
+        DISTRHO_SAFE_ASSERT_RETURN(fPluginType == PLUGIN_INTERNAL || fPluginType == PLUGIN_LV2,);
 
         CardinalPluginContext* const pcontext = module->pcontext;
 
@@ -1025,7 +1025,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         if (fileBrowserHandle != nullptr && fileBrowserIdle(fileBrowserHandle))
         {
             if (const char* const path = fileBrowserGetPath(fileBrowserHandle))
-                carla_set_custom_data(handle, 0, CUSTOM_DATA_TYPE_STRING, "file", path);
+                carla_set_custom_data(handle, 0, CUSTOM_DATA_TYPE_PATH, "file", path);
 
             fileBrowserClose(fileBrowserHandle);
             fileBrowserHandle = nullptr;
