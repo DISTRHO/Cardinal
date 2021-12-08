@@ -60,8 +60,6 @@ endif
 # CARLA_EXTRA_LIBS += -Wl,--no-whole-archive -Wl,--end-group
 # endif
 
-STATIC_CARLA_PLUGIN_LIBS += $(CARLA_EXTRA_LIBS)
-
 # FIXME patch fluidsynth package
 ifeq ($(WINDOWS),true)
 STATIC_CARLA_PLUGIN_LIBS += -ldsound -lwinmm
@@ -109,8 +107,8 @@ endif
 
 # --------------------------------------------------------------
 
-EXTRA_DEPENDENCIES = $(CARLA_EXTRA_LIBS) $(RACK_EXTRA_LIBS)
-EXTRA_LIBS = $(STATIC_CARLA_PLUGIN_LIBS) $(RACK_EXTRA_LIBS)
+EXTRA_DEPENDENCIES = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS)
+EXTRA_LIBS = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS) $(STATIC_CARLA_PLUGIN_LIBS)
 
 # --------------------------------------------------------------
 # Do some magic
