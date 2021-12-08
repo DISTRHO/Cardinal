@@ -514,7 +514,7 @@ protected:
 
     bool onCharacterInput(const CharacterInputEvent& ev) override
     {
-        if (ev.character <= ' ' || ev.character >= kKeyDelete)
+        if (ev.character < ' ' || ev.character >= kKeyDelete)
             return false;
 
         const int mods = glfwMods(ev.mod);

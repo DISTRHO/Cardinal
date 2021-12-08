@@ -215,7 +215,7 @@ void ImGuiWidget::onButton(const ButtonEvent& e)
         return;
     }
 
-    io.KeyCtrl  = e.mods & GLFW_MOD_CTRL;
+    io.KeyCtrl  = e.mods & GLFW_MOD_CONTROL;
     io.KeyShift = e.mods & GLFW_MOD_SHIFT;
     io.KeyAlt   = e.mods & GLFW_MOD_ALT;
     io.KeySuper = e.mods & GLFW_MOD_SUPER;
@@ -245,7 +245,7 @@ void ImGuiWidget::onSelectKey(const SelectKeyEvent& e)
         return;
     }
 
-    io.KeyCtrl  = e.mods & GLFW_MOD_CTRL;
+    io.KeyCtrl  = e.mods & GLFW_MOD_CONTROL;
     io.KeyShift = e.mods & GLFW_MOD_SHIFT;
     io.KeyAlt   = e.mods & GLFW_MOD_ALT;
     io.KeySuper = e.mods & GLFW_MOD_SUPER;
