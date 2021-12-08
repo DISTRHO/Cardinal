@@ -524,7 +524,7 @@ PLUGIN_FILES += $(filter-out Prism/src/plugin.cpp, $(wildcard Prism/src/*.cpp))
 PLUGIN_FILES += $(wildcard Prism/src/scales/*.cpp)
 
 # modules/types which are present in other plugins
-PRISM_CUSTOM = bogaudio
+PRISM_CUSTOM = bogaudio Scale FilterSetting
 
 # --------------------------------------------------------------
 # rackwindows
