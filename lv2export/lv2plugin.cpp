@@ -87,6 +87,7 @@ std::vector<Plugin*> plugins;
 } // namespace rack
 
 struct PluginLv2 {
+    Context* context;
     Plugin* plugin;
     engine::Module* module;
     float sampleRate;
@@ -97,7 +98,7 @@ struct PluginLv2 {
     PluginLv2(double sr)
     {
         // FIXME shared instance for these 2
-        Context* const context = new Context;
+        context = new Context;
         context->engine = new Engine;
         context->engine->internal->sampleRate = sr;
         contextSet(context);
@@ -126,12 +127,14 @@ struct PluginLv2 {
 
     PluginLv2()
     {
+        contextSet(context);
+
         delete[] ports;
         delete module;
 
         // FIXME shared instance for this
         delete plugin;
-        delete contextGet();
+        delete context;
     }
 
     void lv2_connect_port(const uint32_t port, void* const dataLocation)
@@ -141,6 +144,7 @@ struct PluginLv2 {
 
     void lv2_activate()
     {
+        contextSet(context);
         module->onReset();
     }
 
@@ -148,6 +152,8 @@ struct PluginLv2 {
     {
         if (sampleCount == 0)
             return;
+
+        contextSet(context);
 
         Module::ProcessArgs args = {
             sampleRate,

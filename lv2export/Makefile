@@ -34,7 +34,7 @@ BASE_FLAGS += -DARCH_LIN
 endif
 
 BASE_FLAGS += -fno-finite-math-only
-BASE_FLAGS += -I../dpf/dgl
+# BASE_FLAGS += -I../dpf/dgl
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
 BASE_FLAGS += -I../include
@@ -189,3 +189,9 @@ $(BUILD_DIR)/plugin/ChowDSP/%.o: ../plugins/ChowDSP/src/%
 	@echo "Compiling $< (ChowDSP Chorus)"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -UPRIVATE -c -o $@ \
 		-DpluginInstance=pluginInstance__ChowDSP
+
+# --------------------------------------------------------------
+
+-include $(BUILD_OBJS:%.o=%.d)
+
+# --------------------------------------------------------------

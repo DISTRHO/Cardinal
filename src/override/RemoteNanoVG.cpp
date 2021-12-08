@@ -19,7 +19,7 @@
 #include "OpenGL.hpp"
 #endif
 
-#include "src/nanovg/nanovg.h"
+#include "nanovg.h"
 
 #ifdef HEADLESS
 struct NVGLUframebuffer;
@@ -29,8 +29,8 @@ void nvgluDeleteFramebuffer(NVGLUframebuffer* fb) {}
 #else
 # define NANOVG_GLES2_IMPLEMENTATION
 # define NANOVG_FBO_VALID 1
-# include "src/nanovg/nanovg_gl.h"
-# include "src/nanovg/nanovg_gl_utils.h"
+# include "nanovg_gl.h"
+# include "nanovg_gl_utils.h"
 #endif
 
 #if defined(__GNUC__) && (__GNUC__ >= 6)
@@ -39,7 +39,7 @@ void nvgluDeleteFramebuffer(NVGLUframebuffer* fb) {}
 # pragma GCC diagnostic ignored "-Wshift-negative-value"
 #endif
 
-#include "src/nanovg/nanovg.c"
+#include "nanovg.c"
 
 #if defined(__GNUC__) && (__GNUC__ >= 6)
 # pragma GCC diagnostic pop
