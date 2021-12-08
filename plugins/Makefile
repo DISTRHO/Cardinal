@@ -518,6 +518,15 @@ PLUGIN_FILES += $(wildcard mscHack/src/*.cpp)
 MSCHACK_CUSTOM_PER_FILE = MAIN_SYNC_CLOCK FILTER_STRUCT FILTER_PARAM_STRUCT OSC_PARAM_STRUCT PHRASE_CHANGE_STRUCT
 
 # --------------------------------------------------------------
+# Prism
+
+PLUGIN_FILES += $(filter-out Prism/src/plugin.cpp, $(wildcard Prism/src/*.cpp))
+PLUGIN_FILES += $(wildcard Prism/src/scales/*.cpp)
+
+# modules/types which are present in other plugins
+PRISM_CUSTOM = bogaudio
+
+# --------------------------------------------------------------
 # rackwindows
 
 PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/src/*.cpp))
@@ -1122,6 +1131,13 @@ $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 		-Wno-format-overflow \
 		-Wno-non-c-typedef-for-linkage \
 		-Wno-unused-but-set-variable
+
+$(BUILD_DIR)/Prism/%.cpp.o: Prism/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(PRISM_CUSTOM),$(call custom_module_names,$(m),Prism)) \
+		-DpluginInstance=pluginInstance__Prism \
 
 $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

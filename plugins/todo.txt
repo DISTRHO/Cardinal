@@ -25,9 +25,6 @@ LindenbergResearch        43959.0 (not opensource?)
 Geodesics                 42761.0
 https://github.com/MarcBoule/Geodesics
 
-HetrickCV                 42077.0
-https://github.com/mhetrick/hetrickcv
-
 Alikins                   41798.0
 https://github.com/alikins/Alikins-rack-plugins
 
