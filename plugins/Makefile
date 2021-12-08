@@ -1049,6 +1049,19 @@ $(BUILD_DIR)/ImpromptuModular%.cpp.o: ImpromptuModular%.cpp
 		-Dinit=init__ImpromptuModular \
 		-Wno-format-truncation
 
+$(BUILD_DIR)/JW-Modules/src/WavHead.cpp.o: JW-Modules/src/WavHead.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(JW_CUSTOM),$(call custom_module_names,$(m),JW)) \
+		-DpluginInstance=pluginInstance__JW \
+		-D'nvgRGB(r,g,b)=nvgRGBblank(r,g,b)' \
+		-IJW-Modules/src \
+		-IJW-Modules/lib/oscpack \
+		-Wno-misleading-indentation \
+		-Wno-unused-but-set-variable \
+		-Wno-unused-result
+
 $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"

@@ -20,6 +20,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include "nanovg.h"
+
 // fix blendish build, missing symbol in debug mode
 #ifndef NDEBUG
 extern "C" {
@@ -38,6 +40,14 @@ struct FollowerBase {
 float FollowerBase::efGainMaxDecibelsDebug = 12.0f;
 }
 #endif
+
+// Special nvgRGB for blank panels
+extern "C" {
+NVGcolor nvgRGBblank(unsigned char, unsigned char, unsigned char)
+{
+    return nvgRGB(0x20, 0x20, 0x20);
+}
+}
 
 // Compile those nice implementation-in-header little libraries
 #define NANOSVG_IMPLEMENTATION
