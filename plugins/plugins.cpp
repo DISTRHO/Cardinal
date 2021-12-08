@@ -419,6 +419,9 @@ extern Model *modelAlienz;
 extern Model *modelOSC_WaveMorph_3;
 extern Model *modelMaude_221;
 
+// Prism
+# include "Prism/src/plugin.hpp"
+
 // rackwindows
 #include "rackwindows/src/plugin.hpp"
 
@@ -489,6 +492,7 @@ Plugin* pluginInstance__Lyrae;
 extern Plugin* pluginInstance__MindMeld;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
+Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
@@ -1568,6 +1572,20 @@ static void initStatic__mscHack()
     }
 }
 
+static void initStatic__Prism()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Prism = p;
+
+    const StaticPluginLoader spl(p, "Prism");
+    if (spl.ok())
+    {
+        p->addModel(modelRainbow);
+        p->addModel(modelRainbowScaleExpander);
+        p->addModel(modelDroplet);
+    }
+}
+
 static void initStatic__rackwindows()
 {
     Plugin* const p = new Plugin;
@@ -1751,6 +1769,7 @@ void initStaticPlugins()
     initStatic__MindMeld();
     initStatic__Mog();
     initStatic__mscHack();
+    initStatic__Prism();
     initStatic__rackwindows();
     initStatic__repelzen();
     initStatic__sonusmodular();
