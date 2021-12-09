@@ -1169,6 +1169,24 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                     continue;
                 if (info->audioIns != 0 && info->audioIns != 2)
                     continue;
+                if (info->midiIns != 0 && info->midiIns != 1)
+                    continue;
+                if (info->midiOuts != 0 && info->midiOuts != 1)
+                    continue;
+
+                if (fPluginType == PLUGIN_INTERNAL)
+                {
+                    if (std::strcmp(info->label, "audiogain_s") == 0)
+                        continue;
+                    if (std::strcmp(info->label, "cv2audio") == 0)
+                        continue;
+                    if (std::strcmp(info->label, "lfo") == 0)
+                        continue;
+                    if (std::strcmp(info->label, "midi2cv") == 0)
+                        continue;
+                    if (std::strcmp(info->label, "midithrough") == 0)
+                        continue;
+                }
 
                 j = fPluginCount;
                 fPlugins[j].name = strdup(info->name);
