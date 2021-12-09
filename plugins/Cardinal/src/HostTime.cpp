@@ -42,7 +42,7 @@ struct HostTime : Module {
     {
         config(NUM_PARAMS, NUM_INPUTS, kHostTimeCount, kHostTimeCount);
 
-        CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP);
+        CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
 
         if (pcontext == nullptr)
             throw rack::Exception("Plugin context is null.");
@@ -50,7 +50,7 @@ struct HostTime : Module {
 
     void process(const ProcessArgs& args) override
     {
-        if (CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP))
+        if (CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
         {
             const bool playing = pcontext->playing;
             const bool playingWithBBT = playing && pcontext->bbtValid;

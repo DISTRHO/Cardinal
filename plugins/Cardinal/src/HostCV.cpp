@@ -47,7 +47,7 @@ struct HostCV : Module {
         configParam<SwitchQuantity>(BIPOLAR_OUTPUTS_1_5, 0.f, 1.f, 0.f, "Bipolar Outputs 1-5")->randomizeEnabled = false;
         configParam<SwitchQuantity>(BIPOLAR_OUTPUTS_6_10, 0.f, 1.f, 0.f, "Bipolar Outputs 6-10")->randomizeEnabled = false;
 
-        CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP);
+        CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
 
         if (pcontext == nullptr)
             throw rack::Exception("Plugin context is null.");
@@ -60,7 +60,7 @@ struct HostCV : Module {
 
     ~HostCV() override
     {
-        CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP);
+        CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
         DISTRHO_SAFE_ASSERT_RETURN(pcontext != nullptr,);
 
         pcontext->loadedHostCV = false;
@@ -68,7 +68,7 @@ struct HostCV : Module {
 
     void process(const ProcessArgs&) override
     {
-        if (CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP))
+        if (CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
         {
             const float** dataIns = pcontext->dataIns;
             float** dataOuts = pcontext->dataOuts;

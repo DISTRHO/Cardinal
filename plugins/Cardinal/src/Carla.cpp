@@ -97,7 +97,7 @@ struct CarlaModule : Module {
     std::string patchStorage;
 
     CarlaModule()
-        : pcontext(reinterpret_cast<CardinalPluginContext*>(APP))
+        : pcontext(static_cast<CardinalPluginContext*>(APP))
     {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
         configParam<SwitchQuantity>(BIPOLAR_INPUTS, 0.f, 1.f, 1.f, "Bipolar CV Inputs")->randomizeEnabled = false;

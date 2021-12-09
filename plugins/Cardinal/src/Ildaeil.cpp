@@ -270,7 +270,7 @@ struct IldaeilModule : Module {
     IldaeilMidiGenerator midiGenerator;
 
     IldaeilModule()
-        : pcontext(reinterpret_cast<CardinalPluginContext*>(APP))
+        : pcontext(static_cast<CardinalPluginContext*>(APP))
     {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
         for (uint i=0; i<2; ++i)

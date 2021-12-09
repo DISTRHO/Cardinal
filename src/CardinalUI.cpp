@@ -37,9 +37,37 @@
 #include "WindowParameters.hpp"
 #include "ResizeHandle.hpp"
 
-GLFWAPI const char* glfwGetClipboardString(GLFWwindow*) { return nullptr; }
-GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char*) {}
 GLFWAPI int glfwGetKeyScancode(int) { return 0; }
+
+GLFWAPI const char* glfwGetClipboardString(GLFWwindow*)
+{
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+    DISTRHO_SAFE_ASSERT_RETURN(context != nullptr, nullptr);
+    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr, nullptr);
+
+    const char* mimeType = nullptr;
+    size_t dataSize = 0;
+
+    if (const void* const clipboard = context->ui->getClipboard(mimeType, dataSize))
+    {
+        if (mimeType == nullptr || std::strcmp(mimeType, "text/plain") != 0)
+            return nullptr;
+        return static_cast<const char*>(clipboard);
+    }
+
+    return nullptr;
+}
+
+GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char* const text)
+{
+    DISTRHO_SAFE_ASSERT_RETURN(text != nullptr,);
+
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+    DISTRHO_SAFE_ASSERT_RETURN(context != nullptr,);
+    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr,);
+
+    context->ui->setClipboard(nullptr, text, std::strlen(text)+1);
+}
 
 GLFWAPI double glfwGetTime(void)
 {
