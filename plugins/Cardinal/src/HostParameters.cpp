@@ -81,6 +81,20 @@ struct HostParameters : Module {
     }
 };
 
+#ifndef HEADLESS
+struct CardinalParameterPJ301MPort : PJ301MPort {
+	void onDragStart(const DragStartEvent& e) override {
+        if (CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP))
+            handleHostParameterDrag(pcontext, portId, true);
+        PJ301MPort::onDragStart(e);
+    }
+	void onDragEnd(const DragEndEvent& e) override {
+        if (CardinalPluginContext* const pcontext = reinterpret_cast<CardinalPluginContext*>(APP))
+            handleHostParameterDrag(pcontext, portId, false);
+        PJ301MPort::onDragEnd(e);
+    }
+};
+
 struct HostParametersWidget : ModuleWidget {
     static constexpr const float startX = 10.0f;
     static constexpr const float startY = 90.0f;
@@ -101,7 +115,7 @@ struct HostParametersWidget : ModuleWidget {
         {
             const float x = startX + int(i / 6) * paddingH;
             const float y = startY + int(i % 6) * paddingV;
-            addOutput(createOutput<PJ301MPort>(Vec(x, y), module, i));
+            addOutput(createOutput<CardinalParameterPJ301MPort>(Vec(x, y), module, i));
         }
     }
 
@@ -139,5 +153,9 @@ struct HostParametersWidget : ModuleWidget {
         ModuleWidget::draw(args);
     }
 };
+#else
+typedef ModuleWidget HostParametersWidget;
+#endif
+
 
 Model* modelHostParameters = createModel<HostParameters, HostParametersWidget>("HostParameters");

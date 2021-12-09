@@ -180,6 +180,21 @@ void CardinalPluginContext::removeIdleCallback(IdleCallback* const cb)
     ui->removeIdleCallback(cb);
 }
 
+void handleHostParameterDrag(CardinalPluginContext* pcontext, uint index, bool started)
+{
+    DISTRHO_SAFE_ASSERT_RETURN(pcontext->ui != nullptr,);
+
+    if (started)
+    {
+        pcontext->ui->editParameter(index, true);
+        pcontext->ui->setParameterValue(index, pcontext->parameters[index]);
+    }
+    else
+    {
+        pcontext->ui->editParameter(index, false);
+    }
+}
+
 // -----------------------------------------------------------------------------------------------------------
 
 class CardinalUI : public CardinalBaseUI,

@@ -60,6 +60,10 @@ struct CardinalPluginContext : rack::Context {
 #endif
 };
 
+#ifndef HEADLESS
+void handleHostParameterDrag(CardinalPluginContext* pcontext, uint index, bool started);
+#endif
+
 END_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
