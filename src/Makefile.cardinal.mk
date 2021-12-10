@@ -16,6 +16,10 @@ SYSDEPS ?= false
 # --------------------------------------------------------------
 # Carla stuff
 
+ifneq ($(DEBUG),true)
+EXTERNAL_PLUGINS = true
+endif
+
 CWD = ../../carla/source
 include $(CWD)/Makefile.deps.mk
 
