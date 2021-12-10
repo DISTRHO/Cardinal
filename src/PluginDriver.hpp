@@ -211,44 +211,70 @@ struct CardinalMidiInputDevice : rack::midi::InputDevice
 struct CardinalMidiOutputDevice : rack::midi::OutputDevice
 {
     CardinalBasePlugin* const fPlugin;
-    MidiEvent fQueue[128];
-    Mutex fQueueMutex;
-    uint8_t fQueueIndex;
 
     CardinalMidiOutputDevice(CardinalBasePlugin* const plugin)
-        : fPlugin(plugin),
-          fQueueIndex(0) {}
+        : fPlugin(plugin) {}
 
     std::string getName() override
     {
         return "Cardinal";
     }
 
-    void processMessages()
-    {
-        const MutexLocker cml(fQueueMutex);
-
-        for (uint8_t i=0; i<fQueueIndex; ++i)
-            fPlugin->writeMidiEvent(fQueue[i]);
-
-        fQueueIndex = 0;
-    }
-
     void sendMessage(const rack::midi::Message& message) override
     {
-        if (message.bytes.size() < 3) // FIXME
-            return;
-        if ((message.bytes[0] & 0xf0) == 0xf0)
-            return;
-        if (fQueueIndex == 128)
-            return;
+        const size_t size = message.bytes.size();
+        DISTRHO_SAFE_ASSERT_RETURN(size > 0,);
 
-        const MutexLocker cml(fQueueMutex);
-
-        MidiEvent& event(fQueue[fQueueIndex++]);
+        MidiEvent event;
         event.frame = message.frame < 0 ? 0 : (message.frame - fPlugin->context->engine->getBlockFrame());
-        event.size = 3; // FIXME
+
+        switch (message.bytes[0] & 0xF0)
+        {
+        case 0x80:
+        case 0x90:
+        case 0xA0:
+        case 0xB0:
+        case 0xE0:
+            event.size = 3;
+            break;
+        case 0xC0:
+        case 0xD0:
+            event.size = 2;
+            break;
+        case 0xF0:
+            switch (message.bytes[0] & 0x0F)
+            {
+            case 0x0:
+            case 0x4:
+            case 0x5:
+            case 0x7:
+            case 0x9:
+            case 0xD:
+                // unsupported
+                return;
+            case 0x1:
+            case 0x2:
+            case 0x3:
+            case 0xE:
+                event.size = 3;
+                break;
+            case 0x6:
+            case 0x8:
+            case 0xA:
+            case 0xB:
+            case 0xC:
+            case 0xF:
+                event.size = 1;
+                break;
+            }
+            break;
+        }
+
+        DISTRHO_SAFE_ASSERT_RETURN(size >= event.size,);
+
         std::memcpy(event.data, message.bytes.data(), event.size);
+
+        fPlugin->writeMidiEvent(event);
     }
 };
 
@@ -301,12 +327,8 @@ struct CardinalMidiDriver : rack::midi::Driver
         CardinalBasePlugin* const plugin = reinterpret_cast<CardinalBasePlugin*>(pluginContext->plugin);
         DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, nullptr);
 
-        if (! plugin->canAssignMidiInputDevice())
-            throw rack::Exception("Plugin driver only allows one midi input device to be used simultaneously");
-
         CardinalMidiInputDevice* const device = new CardinalMidiInputDevice(plugin);
         device->subscribe(input);
-
         plugin->assignMidiInputDevice(device);
         return device;
     }
@@ -319,12 +341,8 @@ struct CardinalMidiDriver : rack::midi::Driver
         CardinalBasePlugin* const plugin = reinterpret_cast<CardinalBasePlugin*>(pluginContext->plugin);
         DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, nullptr);
 
-        if (! plugin->canAssignMidiOutputDevice())
-            throw rack::Exception("Plugin driver only allows one midi output device to be used simultaneously");
-
         CardinalMidiOutputDevice* const device = new CardinalMidiOutputDevice(plugin);
         device->subscribe(output);
-
         plugin->assignMidiOutputDevice(device);
         return device;
     }
@@ -340,11 +358,9 @@ struct CardinalMidiDriver : rack::midi::Driver
         CardinalBasePlugin* const plugin = reinterpret_cast<CardinalBasePlugin*>(pluginContext->plugin);
         DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr,);
 
-        if (plugin->clearMidiInputDevice(device))
-        {
-            device->unsubscribe(input);
-            delete device;
-        }
+        plugin->clearMidiInputDevice(device);
+        device->unsubscribe(input);
+        delete device;
     }
 
     void unsubscribeOutput(int, rack::midi::Output* const output) override
@@ -358,11 +374,9 @@ struct CardinalMidiDriver : rack::midi::Driver
         CardinalBasePlugin* const plugin = reinterpret_cast<CardinalBasePlugin*>(pluginContext->plugin);
         DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr,);
 
-        if (plugin->clearMidiOutputDevice(device))
-        {
-            device->unsubscribe(output);
-            delete device;
-        }
+        plugin->clearMidiOutputDevice(device);
+        device->unsubscribe(output);
+        delete device;
     }
 };
 
