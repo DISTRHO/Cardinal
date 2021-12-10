@@ -28,3 +28,13 @@ There are a few build flags to know about, use them as `FLAG=true` or `false`:
 * `DEBUG=true` to enable debugging
 * `NOPLUGINS=true` to only build the Cardinal Core plugins for audio and Midi I/O and the fancy blank panel
 * `WITH_LTO=true` to enable Link Time Optimization, this significantly increases the build time
+* `SKIP_STRIPPING=true` to disable stripping the binaries if you don't need a full debug
+
+
+#### Keeping up to date
+
+Things are evolving quickly in Cardinal! To keep your local copy up to date with the changes, do:  
+```
+git pull
+git submodule update --init --recursive
+```
