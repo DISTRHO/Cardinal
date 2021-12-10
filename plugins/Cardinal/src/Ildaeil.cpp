@@ -1445,7 +1445,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                 ImGui::SetKeyboardFocusHere();
             }
 
-            if (ImGui::InputText("", fPluginSearchString, sizeof(fPluginSearchString)-1,
+            if (ImGui::InputText("##pluginsearch", fPluginSearchString, sizeof(fPluginSearchString)-1,
                                  ImGuiInputTextFlags_CharsNoBlank|ImGuiInputTextFlags_AutoSelectAll))
                 fPluginSearchActive = true;
 
@@ -1463,7 +1463,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                 break;
             }
 
-            if (ImGui::Combo("", &current, pluginTypes, ARRAY_SIZE(pluginTypes)))
+            if (ImGui::Combo("##plugintypes", &current, pluginTypes, ARRAY_SIZE(pluginTypes)))
             {
                 fIdleState = kIdleChangePluginType;
                 switch (current)
