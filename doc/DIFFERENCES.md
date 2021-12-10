@@ -38,8 +38,10 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 
 Additionally, Cardinal contains the following built-in modules not present in the official plugin or standalone:
 
+ * Animated Circuits (never updated to v2)
  * Aria Salvatrice modules (except Arcane related modules, due to their online requirement)
  * Mog (never updated to v2)
+ * mscHack (never updated to v2)
  * Carla Plugin Host
  * Ildaeil Host
  * Host Parameters (24 host-exposed parameters as CV sources)
