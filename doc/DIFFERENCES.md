@@ -20,11 +20,12 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 | Contains internal modules      | Core only                 | Everything is internal          | |
 | Loads external modules         | Yes                       | No                              | |
 | Supports commercial modules    | Yes                       | No                              | |
+| Supports physical devices      | Yes                       | No                              | Audio + MIDI only through the DAW/Host or via JACK in standalone |
 | Plugin in LV2 format           | No                        | Yes                             | |
 | Plugin in VST2 format          | Yes                       | Yes                             | |
 | Plugin in VST3 format          | No                        | WIP                             | |
 | Multi-threaded engine          | Yes                       | No, uses host audio thread      | Intentional in Cardinal, for removing jitter |
-| Supports ARM systems           | No                        | Yes                             | Yes, This means Apple M1 too |
+| Supports ARM systems           | No                        | Yes                             | This means Apple M1 too, yes |
 | Synth plugin variant           | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
 | FX plugin variant              | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
 | Raw-CV plugin variant          | Unsupported               | 2 audio IO + 10 CV IO           | Available in JACK, LV2 and VST3 formats, not possible in VST2 |
@@ -37,8 +38,10 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 
 Additionally, Cardinal contains the following built-in modules not present in the official plugin or standalone:
 
+ * Animated Circuits (never updated to v2)
  * Aria Salvatrice modules (except Arcane related modules, due to their online requirement)
  * Mog (never updated to v2)
+ * mscHack (never updated to v2)
  * Carla Plugin Host
  * Ildaeil Host
  * Host Parameters (24 host-exposed parameters as CV sources)

@@ -117,14 +117,12 @@ public:
     ~CardinalBasePlugin() override {}
     virtual bool isActive() const noexcept = 0;
     virtual bool canAssignAudioDevice() const noexcept = 0;
-    virtual bool canAssignMidiInputDevice() const noexcept = 0;
-    virtual bool canAssignMidiOutputDevice() const noexcept = 0;
+    virtual bool clearAudioDevice(CardinalAudioDevice* dev) noexcept = 0;
     virtual void assignAudioDevice(CardinalAudioDevice* dev) noexcept = 0;
     virtual void assignMidiInputDevice(CardinalMidiInputDevice* dev) noexcept = 0;
     virtual void assignMidiOutputDevice(CardinalMidiOutputDevice* dev) noexcept = 0;
-    virtual bool clearAudioDevice(CardinalAudioDevice* dev) noexcept = 0;
-    virtual bool clearMidiInputDevice(CardinalMidiInputDevice* dev) noexcept = 0;
-    virtual bool clearMidiOutputDevice(CardinalMidiOutputDevice* dev) noexcept = 0;
+    virtual void clearMidiInputDevice(CardinalMidiInputDevice* dev) noexcept = 0;
+    virtual void clearMidiOutputDevice(CardinalMidiOutputDevice* dev) noexcept = 0;
 };
 
 #ifndef HEADLESS

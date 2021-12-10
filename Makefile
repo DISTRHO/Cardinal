@@ -19,11 +19,14 @@ SYSDEPS ?= false
 # Carla config
 
 CARLA_EXTRA_ARGS = \
-	EXTERNAL_PLUGINS=true \
 	HAVE_FFMPEG=false \
 	HAVE_FLUIDSYNTH=false \
 	HAVE_LIBMAGIC=false \
 	HAVE_SNDFILE=false
+
+ifneq ($(DEBUG),true)
+CARLA_EXTRA_ARGS += EXTERNAL_PLUGINS=true
+endif
 
 # ifneq ($(MACOS),true)
 CARLA_EXTRA_ARGS += USING_JUCE=false

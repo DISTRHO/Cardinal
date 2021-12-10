@@ -311,8 +311,8 @@ class CardinalPlugin : public CardinalBasePlugin
     // for base/context handling
     bool fIsActive;
     CardinalAudioDevice* fCurrentAudioDevice;
-    CardinalMidiInputDevice* fCurrentMidiInput;
-    CardinalMidiOutputDevice* fCurrentMidiOutput;
+    CardinalMidiInputDevice** fCurrentMidiInputs;
+    CardinalMidiOutputDevice** fCurrentMidiOutputs;
     uint64_t fPreviousFrame;
     Mutex fDeviceMutex;
 
@@ -327,8 +327,8 @@ public:
           fAudioBufferOut(nullptr),
           fIsActive(false),
           fCurrentAudioDevice(nullptr),
-          fCurrentMidiInput(nullptr),
-          fCurrentMidiOutput(nullptr),
+          fCurrentMidiInputs(nullptr),
+          fCurrentMidiOutputs(nullptr),
           fPreviousFrame(0)
     {
         fWindowParameters[kWindowParameterShowTooltips] = 1.0f;
@@ -398,16 +398,18 @@ public:
 #endif
 
         {
-            const MutexLocker cml(fDeviceMutex);
-            fCurrentAudioDevice = nullptr;
-            fCurrentMidiInput = nullptr;
-            fCurrentMidiOutput = nullptr;
-        }
-
-        {
             const ScopedContext sc(this);
             context->patch->clear();
             delete context;
+        }
+
+        {
+            const MutexLocker cml(fDeviceMutex);
+            fCurrentAudioDevice = nullptr;
+            delete[] fCurrentMidiInputs;
+            fCurrentMidiInputs = nullptr;
+            delete[] fCurrentMidiOutputs;
+            fCurrentMidiOutputs = nullptr;
         }
 
         if (! fAutosavePath.empty())
@@ -434,40 +436,12 @@ protected:
         return fCurrentAudioDevice == nullptr;
     }
 
-    bool canAssignMidiInputDevice() const noexcept override
-    {
-        const MutexLocker cml(fDeviceMutex);
-        return fCurrentMidiInput == nullptr;
-    }
-
-    bool canAssignMidiOutputDevice() const noexcept override
-    {
-        const MutexLocker cml(fDeviceMutex);
-        return fCurrentMidiOutput == nullptr;
-    }
-
     void assignAudioDevice(CardinalAudioDevice* const dev) noexcept override
     {
         DISTRHO_SAFE_ASSERT_RETURN(fCurrentAudioDevice == nullptr,);
 
         const MutexLocker cml(fDeviceMutex);
         fCurrentAudioDevice = dev;
-    }
-
-    void assignMidiInputDevice(CardinalMidiInputDevice* const dev) noexcept override
-    {
-        DISTRHO_SAFE_ASSERT_RETURN(fCurrentMidiInput == nullptr,);
-
-        const MutexLocker cml(fDeviceMutex);
-        fCurrentMidiInput = dev;
-    }
-
-    void assignMidiOutputDevice(CardinalMidiOutputDevice* const dev) noexcept override
-    {
-        DISTRHO_SAFE_ASSERT_RETURN(fCurrentMidiOutput == nullptr,);
-
-        const MutexLocker cml(fDeviceMutex);
-        fCurrentMidiOutput = dev;
     }
 
     bool clearAudioDevice(CardinalAudioDevice* const dev) noexcept override
@@ -481,26 +455,96 @@ protected:
         return true;
     }
 
-    bool clearMidiInputDevice(CardinalMidiInputDevice* const dev) noexcept override
+    void assignMidiInputDevice(CardinalMidiInputDevice* const dev) noexcept override
     {
-        const MutexLocker cml(fDeviceMutex);
+        CardinalMidiInputDevice** const oldDevs = fCurrentMidiInputs;
 
-        if (fCurrentMidiInput != dev)
-            return false;
+        uint numDevs = 0;
+        if (oldDevs != nullptr)
+        {
+            while (oldDevs[numDevs] != nullptr)
+                ++numDevs;
+        }
 
-        fCurrentMidiInput = nullptr;
-        return true;
+        CardinalMidiInputDevice** const newDevs = new CardinalMidiInputDevice*[numDevs + 2];
+
+        for (uint i=0; i<numDevs; ++i)
+            newDevs[i] = oldDevs[i];
+
+        newDevs[numDevs+0] = dev;
+        newDevs[numDevs+1] = nullptr;
+
+        {
+            const MutexLocker cml(fDeviceMutex);
+            fCurrentMidiInputs = newDevs;
+        }
+
+        delete[] oldDevs;
     }
 
-    bool clearMidiOutputDevice(CardinalMidiOutputDevice* const dev) noexcept override
+    void assignMidiOutputDevice(CardinalMidiOutputDevice* const dev) noexcept override
+    {
+        CardinalMidiOutputDevice** const oldDevs = fCurrentMidiOutputs;
+
+        uint numDevs = 0;
+        if (oldDevs != nullptr)
+        {
+            while (oldDevs[numDevs] != nullptr)
+                ++numDevs;
+        }
+
+        CardinalMidiOutputDevice** const newDevs = new CardinalMidiOutputDevice*[numDevs + 2];
+
+        for (uint i=0; i<numDevs; ++i)
+            newDevs[i] = oldDevs[i];
+
+        newDevs[numDevs+0] = dev;
+        newDevs[numDevs+1] = nullptr;
+
+        {
+            const MutexLocker cml(fDeviceMutex);
+            fCurrentMidiOutputs = newDevs;
+        }
+
+        delete[] oldDevs;
+    }
+
+    void clearMidiInputDevice(CardinalMidiInputDevice* const dev) noexcept override
     {
         const MutexLocker cml(fDeviceMutex);
 
-        if (fCurrentMidiOutput != dev)
-            return false;
+        CardinalMidiInputDevice** const inputs = fCurrentMidiInputs;
+        DISTRHO_SAFE_ASSERT_RETURN(inputs != nullptr,);
 
-        fCurrentMidiOutput = nullptr;
-        return true;
+        for (uint i=0; inputs[i] != nullptr; ++i)
+        {
+            CardinalMidiInputDevice* const input = inputs[i];
+            if (input != dev)
+                continue;
+            for (; inputs[i+1] != nullptr; ++i)
+                inputs[i] = inputs[i+1];
+            inputs[i] = nullptr;
+            break;
+        }
+    }
+
+    void clearMidiOutputDevice(CardinalMidiOutputDevice* const dev) noexcept override
+    {
+        const MutexLocker cml(fDeviceMutex);
+
+        CardinalMidiOutputDevice** const outputs = fCurrentMidiOutputs;
+        DISTRHO_SAFE_ASSERT_RETURN(outputs != nullptr,);
+
+        for (uint i=0; outputs[i] != nullptr; ++i)
+        {
+            CardinalMidiOutputDevice* const output = outputs[i];
+            if (output != dev)
+                continue;
+            for (; outputs[i+1] != nullptr; ++i)
+                outputs[i] = outputs[i+1];
+            outputs[i] = nullptr;
+            break;
+        }
     }
 
    /* --------------------------------------------------------------------------------------------------------
@@ -858,8 +902,11 @@ protected:
             fPreviousFrame = timePos.frame;
         }
 
-        if (fCurrentMidiInput != nullptr)
-            fCurrentMidiInput->handleMessagesFromHost(midiEvents, midiEventCount);
+        if (CardinalMidiInputDevice** inputs = fCurrentMidiInputs)
+        {
+            for (;*inputs != nullptr; ++inputs)
+                (*inputs)->handleMessagesFromHost(midiEvents, midiEventCount);
+        }
 
         if (fCurrentAudioDevice != nullptr)
         {
@@ -900,9 +947,6 @@ protected:
             std::memset(outputs[0], 0, sizeof(float)*frames);
             std::memset(outputs[1], 0, sizeof(float)*frames);
         }
-
-        if (fCurrentMidiOutput != nullptr)
-            fCurrentMidiOutput->processMessages();
     }
 
     void bufferSizeChanged(const uint32_t newBufferSize) override
