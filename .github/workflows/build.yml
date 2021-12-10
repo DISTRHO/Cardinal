@@ -241,6 +241,7 @@ jobs:
           submodules: recursive
       - name: Set up dependencies
         run: |
+          sudo add-apt-repository -y ppa:cybermax-dexter/mingw-w64-backport
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
           sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386
@@ -250,9 +251,9 @@ jobs:
           CXX: i686-w64-mingw32-g++
           EXE_WRAPPER: wine
           PKG_CONFIG: "false"
-          #WINEARCH: "win32"
-          #WINEDEBUG: "-all"
-          #WINEDLLOVERRIDES: "mscoree,mshtml="
+          WINEARCH: "win32"
+          WINEDEBUG: "-all"
+          WINEDLLOVERRIDES: "mscoree,mshtml="
         run: |
           make features
           make -j $(nproc)
