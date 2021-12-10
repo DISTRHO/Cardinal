@@ -19,15 +19,16 @@ SYSDEPS ?= false
 # Carla config
 
 CARLA_EXTRA_ARGS = \
+	EXTERNAL_PLUGINS=true \
 	HAVE_FFMPEG=false \
 	HAVE_FLUIDSYNTH=false \
 	HAVE_LIBMAGIC=false \
 	HAVE_SNDFILE=false
 
-ifneq ($(MACOS),true)
+# ifneq ($(MACOS),true)
 CARLA_EXTRA_ARGS += USING_JUCE=false
 CARLA_EXTRA_ARGS += USING_JUCE_GUI_EXTRA=false
-endif
+# endif
 
 # --------------------------------------------------------------
 # Check for system-wide dependencies

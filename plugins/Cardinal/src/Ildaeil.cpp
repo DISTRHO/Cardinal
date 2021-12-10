@@ -1186,6 +1186,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                         continue;
                     if (std::strcmp(info->label, "midithrough") == 0)
                         continue;
+                    if (std::strcmp(info->label, "3bandsplitter") == 0)
+                        continue;
                 }
 
                 j = fPluginCount;
