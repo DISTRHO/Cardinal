@@ -253,6 +253,9 @@ void setupSamples();
 // ESeries
 #include "ESeries/src/plugin.hpp"
 
+// Extratone
+#include "Extratone/src/plugin.hpp"
+
 // FehlerFabrik
 #include "FehlerFabrik/src/plugin.hpp"
 
@@ -480,6 +483,7 @@ Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__ESeries;
+Plugin* pluginInstance__Extratone;
 Plugin* pluginInstance__FehlerFabrik;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
@@ -1211,6 +1215,30 @@ static void initStatic__ESeries()
     }
 }
 
+static void initStatic__Extratone()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Extratone = p;
+
+    const StaticPluginLoader spl(p, "Extratone");
+    if (spl.ok())
+    {
+        p->addModel(modelModulo);
+        p->addModel(modelMesoglea);
+        p->addModel(modelMesoglea2);
+        p->addModel(modelOpabinia);
+        p->addModel(modelSplitterburst);
+        p->addModel(modelPuzzlebox);
+        p->addModel(modelDarwinism);
+        // p->addModel(modelHalluciMemory);
+        p->addModel(modelIchneumonid);
+        p->addModel(modelMeganeura);
+        p->addModel(modelPureneura);
+        p->addModel(modelMesohyl);
+        p->addModel(modelXtrtnBlank);
+    }
+}
+
 static void initStatic__FehlerFabrik()
 {
     Plugin* const p = new Plugin;
@@ -1757,6 +1785,7 @@ void initStaticPlugins()
     initStatic__ChowDSP();
     initStatic__DrumKit();
     initStatic__ESeries();
+    initStatic__Extratone();
     initStatic__FehlerFabrik();
     initStatic__Fundamental();
     initStatic__GlueTheGiant();
