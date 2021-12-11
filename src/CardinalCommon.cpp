@@ -36,6 +36,7 @@
 #include <string.hpp>
 #include <system.hpp>
 #include <app/Scene.hpp>
+#include <window/Window.hpp>
 
 #ifdef NDEBUG
 # undef DEBUG
@@ -50,6 +51,7 @@
 namespace patchUtils
 {
 
+#ifndef HEADLESS
 static void promptClear(const char* const message, const std::function<void()> action)
 {
     if (APP->history->isSaved() || APP->scene->rack->hasModules())
@@ -60,7 +62,7 @@ static void promptClear(const char* const message, const std::function<void()> a
 
 static std::string homeDir()
 {
-#ifdef ARCH_WIN
+# ifdef ARCH_WIN
     if (const char* const userprofile = getenv("USERPROFILE"))
     {
         return userprofile;
@@ -70,19 +72,21 @@ static std::string homeDir()
         if (const char* const homepath = getenv("HOMEPATH"))
             return system::join(homedrive, homepath);
     }
-#else
+# else
     if (const char* const home = getenv("HOME"))
         return home;
     else if (struct passwd* const pwd = getpwuid(getuid()))
         return pwd->pw_dir;
-#endif
+# endif
     return {};
 }
+#endif
 
 using namespace rack;
 
 void loadDialog()
 {
+#ifndef HEADLESS
     promptClear("The current patch is unsaved. Clear it and open a new patch?", []() {
         std::string dir;
         if (! APP->patch->path.empty())
@@ -101,33 +105,41 @@ void loadDialog()
         opts.saving = ui->saving = false;
         ui->openFileBrowser(opts);
     });
+#endif
 }
 
 void loadPathDialog(const std::string& path)
 {
+#ifndef HEADLESS
     promptClear("The current patch is unsaved. Clear it and open the new patch?", [path]() {
         APP->patch->loadAction(path);
     });
+#endif
 }
 
 void loadTemplateDialog()
 {
+#ifndef HEADLESS
     promptClear("The current patch is unsaved. Clear it and start a new patch?", []() {
         APP->patch->loadTemplate();
     });
+#endif
 }
 
 void revertDialog()
 {
+#ifndef HEADLESS
     if (APP->patch->path.empty())
         return;
     promptClear("Revert patch to the last saved state?", []{
         APP->patch->loadAction(APP->patch->path);
     });
+#endif
 }
 
 void saveDialog(const std::string& path)
 {
+#ifndef HEADLESS
     if (path.empty()) {
         return;
     }
@@ -142,10 +154,12 @@ void saveDialog(const std::string& path)
         asyncDialog::create(string::f("Could not save patch: %s", e.what()).c_str());
         return;
     }
+#endif
 }
 
 void saveAsDialog()
 {
+#ifndef HEADLESS
     std::string dir;
     if (! APP->patch->path.empty())
         dir = system::getDirectory(APP->patch->path);
@@ -162,6 +176,54 @@ void saveAsDialog()
     opts.startDir = dir.c_str();
     opts.saving = ui->saving = true;
     ui->openFileBrowser(opts);
+#endif
 }
 
+}
+
+void async_dialog_filebrowser(const bool saving,
+                              const char* const startDir,
+                              const char* const title,
+                              const std::function<void(char* path)> action)
+{
+#ifndef HEADLESS
+    CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
+    DISTRHO_SAFE_ASSERT_RETURN(pcontext != nullptr,);
+
+    CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(pcontext->ui);
+    DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
+
+    // only 1 dialog possible at a time
+    DISTRHO_SAFE_ASSERT_RETURN(ui->filebrowserhandle == nullptr,);
+
+    FileBrowserOptions opts;
+    opts.saving = saving;
+    opts.startDir = startDir;
+    opts.title = title;
+
+    ui->filebrowseraction = action;
+    ui->filebrowserhandle = fileBrowserCreate(true, pcontext->nativeWindowId, pcontext->window->pixelRatio, opts);
+#endif
+}
+
+void async_dialog_message(const char* const message)
+{
+#ifndef HEADLESS
+    asyncDialog::create(message);
+#endif
+}
+
+void async_dialog_message(const char* const message, const std::function<void()> action)
+{
+#ifndef HEADLESS
+    asyncDialog::create(message, action);
+#endif
+}
+
+void async_dialog_text_input(const char* const message, const char* const text,
+                             const std::function<void(char* newText)> action)
+{
+#ifndef HEADLESS
+    asyncDialog::textInput(message, text, action);
+#endif
 }

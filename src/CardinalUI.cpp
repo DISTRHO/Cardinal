@@ -322,6 +322,20 @@ public:
 
     void uiIdle() override
     {
+        if (filebrowserhandle != nullptr && fileBrowserIdle(filebrowserhandle))
+        {
+            {
+                const char* const path = fileBrowserGetPath(filebrowserhandle);
+
+                const ScopedContext sc(this);
+                filebrowseraction(path != nullptr ? strdup(path) : nullptr);
+            }
+
+            fileBrowserClose(filebrowserhandle);
+            filebrowseraction = nullptr;
+            filebrowserhandle = nullptr;
+        }
+
         repaint();
     }
 

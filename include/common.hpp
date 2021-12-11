@@ -39,3 +39,23 @@
 #endif
 
 #undef PRIVATE_WAS_DEFINED
+
+// Cardinal specific API
+#include <functional>
+#define USING_CARDINAL_NOT_RACK
+
+// opens a file browser, startDir and title can be null
+// action is always triggered on close (path can be null), must be freed if not null
+void async_dialog_filebrowser(bool saving, const char* startDir, const char* title,
+                              std::function<void(char* path)> action);
+
+// opens a message dialog with only an "ok" button
+void async_dialog_message(const char* message);
+
+// opens a message dialog with "ok" and "cancel" buttons
+// action is triggered if user presses "ok"
+void async_dialog_message(const char* message, std::function<void()> action);
+
+// opens a text input dialog, message and text can be null
+// action is always triggered on close (newText can be null), must be freed if not null
+void async_dialog_text_input(const char* message, const char* text, std::function<void(char* newText)> action);

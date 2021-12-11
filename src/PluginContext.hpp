@@ -30,6 +30,7 @@
 
 #ifndef HEADLESS
 # include "DistrhoUI.hpp"
+# include "extra/FileBrowserDialog.hpp"
 #endif
 
 START_NAMESPACE_DISTRHO
@@ -131,15 +132,25 @@ public:
     CardinalPluginContext* const context;
     bool saving;
 
+    // for 3rd party modules
+    std::function<void(char* path)> filebrowseraction;
+    FileBrowserHandle filebrowserhandle;
+
     CardinalBaseUI(const uint width, const uint height)
         : UI(width, height),
           context(getRackContextFromPlugin(getPluginInstancePointer())),
-          saving(false)
+          saving(false),
+          filebrowseraction(),
+          filebrowserhandle(nullptr)
     {
         context->ui = this;
     }
+
     ~CardinalBaseUI() override
     {
+        if (filebrowserhandle != nullptr)
+            fileBrowserClose(filebrowserhandle);
+
         context->ui = nullptr;
     }
 };
