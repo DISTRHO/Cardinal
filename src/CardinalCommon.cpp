@@ -15,6 +15,16 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
+/**
+ * This file is partially based on VCVRack's patch.cpp
+ * Copyright (C) 2016-2021 VCV.
+ *
+ * This program is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ */
+
 #include "CardinalCommon.hpp"
 
 #include "AsyncDialog.hpp"
@@ -42,31 +52,31 @@ namespace patchUtils
 
 static void promptClear(const char* const message, const std::function<void()> action)
 {
-	if (APP->history->isSaved() || APP->scene->rack->hasModules())
-		return action();
+    if (APP->history->isSaved() || APP->scene->rack->hasModules())
+        return action();
 
-	asyncDialog::create(message, action);
+    asyncDialog::create(message, action);
 }
 
 static std::string homeDir()
 {
 #ifdef ARCH_WIN
-	if (const char* const userprofile = getenv("USERPROFILE"))
-	{
-		return userprofile;
-	}
-	else if (const char* const homedrive = getenv("HOMEDRIVE"))
-	{
-		if (const char* const homepath = getenv("HOMEPATH"))
-			return system::join(homedrive, homepath);
-	}
+    if (const char* const userprofile = getenv("USERPROFILE"))
+    {
+        return userprofile;
+    }
+    else if (const char* const homedrive = getenv("HOMEDRIVE"))
+    {
+        if (const char* const homepath = getenv("HOMEPATH"))
+            return system::join(homedrive, homepath);
+    }
 #else
-	if (const char* const home = getenv("HOME"))
-		return home;
-	else if (struct passwd* const pwd = getpwuid(getuid()))
-		return pwd->pw_dir;
+    if (const char* const home = getenv("HOME"))
+        return home;
+    else if (struct passwd* const pwd = getpwuid(getuid()))
+        return pwd->pw_dir;
 #endif
-	return {};
+    return {};
 }
 
 using namespace rack;
