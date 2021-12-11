@@ -51,6 +51,8 @@
 namespace patchUtils
 {
 
+using namespace rack;
+
 #ifndef HEADLESS
 static void promptClear(const char* const message, const std::function<void()> action)
 {
@@ -81,8 +83,6 @@ static std::string homeDir()
     return {};
 }
 #endif
-
-using namespace rack;
 
 void loadDialog()
 {
