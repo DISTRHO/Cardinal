@@ -128,7 +128,8 @@ jobs:
           submodules: recursive
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1
-        key: linux-x86_64
+        with:
+          key: linux-x86_64
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
@@ -222,7 +223,8 @@ jobs:
           sudo xcode-select -s "/Applications/Xcode_12.3.app"
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1
-        key: macOS-universal
+        with:
+          key: macOS-universal
       - name: Build macOS universal
         env:
           CFLAGS: -arch x86_64 -arch arm64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_12 -mmacosx-version-min=10.12 -mtune=generic -msse -msse2
