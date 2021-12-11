@@ -410,6 +410,11 @@ DRUMKIT_CUSTOM = ADSR Envelope LowFrequencyOscillator
 PLUGIN_FILES += ESeries/src/E340.cpp
 
 # --------------------------------------------------------------
+# Extratone
+
+PLUGIN_FILES += $(filter-out Extratone/src/plugin.cpp,$(wildcard Extratone/src/*.cpp))
+
+# --------------------------------------------------------------
 # FehlerFabrik
 
 PLUGIN_FILES += $(filter-out FehlerFabrik/src/plugin.cpp,$(wildcard FehlerFabrik/src/*.cpp))
@@ -983,6 +988,13 @@ $(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ESERIES_CUSTOM),$(call custom_module_names,$(m),ESeries)) \
 		-DpluginInstance=pluginInstance__ESeries
+
+$(BUILD_DIR)/Extratone/src/%.cpp.o: Extratone/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(EXTRATONE_CUSTOM),$(call custom_module_names,$(m),Extratone)) \
+		-DpluginInstance=pluginInstance__Extratone
 
 $(BUILD_DIR)/FehlerFabrik/%.cpp.o: FehlerFabrik/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
