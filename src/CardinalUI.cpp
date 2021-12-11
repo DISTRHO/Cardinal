@@ -179,7 +179,7 @@ GLFWAPI const char* glfwGetKeyName(const int key, int)
 
 namespace rack {
 namespace app {
-    widget::Widget* createMenuBar(CardinalBaseUI* const ui, bool isStandalone);
+    widget::Widget* createMenuBar(bool isStandalone);
 }
 namespace window {
     void WindowSetPluginUI(Window* window, DISTRHO_NAMESPACE::UI* ui);
@@ -283,7 +283,7 @@ public:
         if (context->scene->menuBar != nullptr)
             context->scene->removeChild(context->scene->menuBar);
 
-        context->scene->menuBar = rack::app::createMenuBar(this, getApp().isStandalone());
+        context->scene->menuBar = rack::app::createMenuBar(getApp().isStandalone());
         context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
 
         // hide "Browse VCV Library" button

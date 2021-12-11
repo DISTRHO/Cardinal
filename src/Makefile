@@ -88,6 +88,8 @@ BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
 
 RACK_FILES += AsyncDialog.cpp
 RACK_FILES += override/Engine.cpp
+RACK_FILES += override/MenuBar.cpp
+RACK_FILES += override/Scene.cpp
 RACK_FILES += override/asset.cpp
 RACK_FILES += override/context.cpp
 RACK_FILES += override/dep.cpp
@@ -112,6 +114,7 @@ IGNORED_FILES += Rack/src/network.cpp
 IGNORED_FILES += Rack/src/rtaudio.cpp
 IGNORED_FILES += Rack/src/rtmidi.cpp
 IGNORED_FILES += Rack/src/app/MenuBar.cpp
+IGNORED_FILES += Rack/src/app/Scene.cpp
 IGNORED_FILES += Rack/src/engine/Engine.cpp
 IGNORED_FILES += Rack/src/window/Window.cpp
 

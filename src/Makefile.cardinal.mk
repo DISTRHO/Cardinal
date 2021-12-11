@@ -80,6 +80,7 @@ include ../../dpf/Makefile.base.mk
 # Files to build (DPF stuff)
 
 FILES_DSP  = CardinalPlugin.cpp
+FILES_DSP += CardinalCommon.cpp
 FILES_DSP += common.cpp
 
 ifeq ($(HEADLESS),true)
@@ -87,7 +88,6 @@ FILES_DSP += RemoteNanoVG.cpp
 FILES_DSP += RemoteWindow.cpp
 else
 FILES_UI  = CardinalUI.cpp
-FILES_UI += MenuBar.cpp
 FILES_UI += Window.cpp
 endif
 

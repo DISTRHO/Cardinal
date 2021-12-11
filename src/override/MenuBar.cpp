@@ -50,23 +50,11 @@
 #include <patch.hpp>
 #include <library.hpp>
 
-#ifdef NDEBUG
-# undef DEBUG
-#endif
-
-// for finding home dir
-#ifndef ARCH_WIN
-# include <pwd.h>
-# include <unistd.h>
-#endif
-
 #ifdef HAVE_LIBLO
 # include <lo/lo.h>
 #endif
 
-#include <Window.hpp>
-#include "../AsyncDialog.hpp"
-#include "../PluginContext.hpp"
+#include "../CardinalCommon.hpp"
 
 // #define REMOTE_HOST "localhost"
 #define REMOTE_HOST "192.168.51.1"
@@ -99,37 +87,7 @@ struct MenuButton : ui::Button {
 ////////////////////
 
 
-static void promptClear(const char* const message, const std::function<void()> action)
-{
-	if (APP->history->isSaved() || APP->scene->rack->hasModules())
-		return action();
-
-	asyncDialog::create(message, action);
-}
-
-static std::string homeDir()
-{
-#ifdef ARCH_WIN
-	if (const char* const userprofile = getenv("USERPROFILE"))
-	{
-		return userprofile;
-	}
-	else if (const char* const homedrive = getenv("HOMEDRIVE"))
-	{
-		if (const char* const homepath = getenv("HOMEPATH"))
-			return system::join(homedrive, homepath);
-	}
-#else
-	if (const char* const home = getenv("HOME"))
-		return home;
-	else if (struct passwd* const pwd = getpwuid(getuid()))
-		return pwd->pw_dir;
-#endif
-	return {};
-}
-
 struct FileButton : MenuButton {
-	CardinalBaseUI* const ui;
 	const bool isStandalone;
 
 #ifdef HAVE_LIBLO
@@ -153,53 +111,29 @@ struct FileButton : MenuButton {
 	}
 #endif
 
-	FileButton(CardinalBaseUI* const ui2, const bool standalone)
-		: MenuButton(), ui(ui2), isStandalone(standalone) {}
+	FileButton(const bool standalone)
+		: MenuButton(),  isStandalone(standalone) {}
 
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
-		menu->addChild(createMenuItem("New", ""/*RACK_MOD_CTRL_NAME "+N"*/, []() {
-			// see APP->patch->loadTemplateDialog();
-			promptClear("The current patch is unsaved. Clear it and start a new patch?", []() {
-				APP->patch->loadTemplate();
-			});
+		menu->addChild(createMenuItem("New", RACK_MOD_CTRL_NAME "+N", []() {
+			patchUtils::loadTemplateDialog();
 		}));
 
-		menu->addChild(createMenuItem("Open / Import...", ""/*RACK_MOD_CTRL_NAME "+O"*/, [this]() {
-			// see APP->patch->loadDialog();
-			promptClear("The current patch is unsaved. Clear it and open a new patch?", [this]() {
-				std::string dir;
-				if (! APP->patch->path.empty())
-					dir = system::getDirectory(APP->patch->path);
-				else
-					dir = homeDir();
-
-				Window::FileBrowserOptions opts;
-				opts.startDir = dir.c_str();
-				opts.saving = ui->saving = false;
-				ui->openFileBrowser(opts);
-			});
+		menu->addChild(createMenuItem("Open / Import...", RACK_MOD_CTRL_NAME "+O", []() {
+			patchUtils::loadDialog();
 		}));
 
 		menu->addChild(createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
-			APP->patch->saveDialog();
+			// NOTE: will do nothing if path is empty, intentionally
+			patchUtils::saveDialog(APP->patch->path);
 		}, APP->patch->path.empty()));
 
-		menu->addChild(createMenuItem("Save as / Export...", ""/*RACK_MOD_CTRL_NAME "+Shift+S"*/, [this]() {
-			// see APP->patch->saveAsDialog();
-			std::string dir;
-			if (! APP->patch->path.empty())
-				dir = system::getDirectory(APP->patch->path);
-			else
-				dir = homeDir();
-
-			Window::FileBrowserOptions opts;
-			opts.startDir = dir.c_str();
-			opts.saving = ui->saving = true;
-			ui->openFileBrowser(opts);
+		menu->addChild(createMenuItem("Save as / Export...", RACK_MOD_CTRL_NAME "+Shift+S", []() {
+			patchUtils::saveAsDialog();
 		}));
 
 #ifdef HAVE_LIBLO
@@ -236,13 +170,8 @@ struct FileButton : MenuButton {
 		}
 #endif
 
-		menu->addChild(createMenuItem("Revert", ""/*RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O"*/, []() {
-			// APP->patch->revertDialog();
-			if (APP->patch->path.empty())
-				return;
-			promptClear("Revert patch to the last saved state?", []{
-				APP->patch->loadAction(APP->patch->path);
-			});
+		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
+			patchUtils::revertDialog();
 		}, APP->patch->path.empty()));
 
 		if (isStandalone) {
@@ -678,10 +607,9 @@ struct MeterLabel : ui::Label {
 
 
 struct MenuBar : widget::OpaqueWidget {
-	// CardinalPluginContext* const context;
 	MeterLabel* meterLabel;
 
-	MenuBar(CardinalBaseUI* const ui, const bool isStandalone)
+	MenuBar(const bool isStandalone)
 		: widget::OpaqueWidget()
 		// : context(ctx)
     {
@@ -693,7 +621,7 @@ struct MenuBar : widget::OpaqueWidget {
 		layout->spacing = math::Vec(0, 0);
 		addChild(layout);
 
-		FileButton* fileButton = new FileButton(ui, isStandalone);
+		FileButton* fileButton = new FileButton(isStandalone);
 		fileButton->text = "File";
 		layout->addChild(fileButton);
 
@@ -746,8 +674,8 @@ widget::Widget* createMenuBar() {
 	return new widget::Widget;
 }
 
-widget::Widget* createMenuBar(CardinalBaseUI* const ui, const bool isStandalone) {
-	menuBar::MenuBar* menuBar = new menuBar::MenuBar(ui, isStandalone);
+widget::Widget* createMenuBar(const bool isStandalone) {
+	menuBar::MenuBar* menuBar = new menuBar::MenuBar(isStandalone);
 	return menuBar;
 }
 
