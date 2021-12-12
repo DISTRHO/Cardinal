@@ -276,6 +276,9 @@ static const struct {
     const char* shapeIdsToIgnore[5];
     const int shapeNumberToIgnore;
 } svgFilesToInvert[] = {
+    { "/21kHz/Panels/D_Inf.svg", {}, -1 },
+    { "/21kHz/Panels/PalmLoop.svg", {}, -1 },
+    { "/21kHz/Panels/TachyonEntangler.svg", {}, -1 },
     { "/AnimatedCircuits/FoldingLight.svg", {}, -1 },
     { "/AnimatedCircuits/Knob_Black_Light_21.svg", {}, -1 },
     { "/AudibleInstruments/Blinds.svg", {}, -1 },
@@ -565,6 +568,8 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
     case 0xff119ee6:
     case 0xff2432ed:
     case 0xff0095fe:
+    case 0xff4d9a4d:
+    case 0xff4d4d9a:
         return false;
     // pure black (convert to not quite pure white)
     case 0xff000000:
