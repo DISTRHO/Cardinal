@@ -194,6 +194,11 @@ endif
 
 ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------
+# 21kHz
+
+PLUGIN_FILES += $(filter-out 21kHz/src/21kHz.cpp,$(wildcard 21kHz/src/*.cpp))
+
+# --------------------------------------------------------------
 # AmalgamatedHarmonics
 
 PLUGIN_FILES += $(filter-out AmalgamatedHarmonics/src/AH.cpp,$(wildcard AmalgamatedHarmonics/src/*.cpp))
@@ -859,6 +864,13 @@ $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 		-I../carla/source/includes \
 		-I../carla/source/modules \
 		-I../carla/source/utils
+
+$(BUILD_DIR)/21kHz/%.cpp.o: 21kHz/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(21KHZ_CUSTOM),$(call custom_module_names,$(m),21kHz)) \
+		-DpluginInstance=pluginInstance__21kHz
 
 $(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

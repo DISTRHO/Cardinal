@@ -78,6 +78,7 @@ An overview of the included code and linked submodules can be seen [here](doc/LI
 
 At the moment the following 3rd-party modules are provided:
 
+- 21kHz
 - AS
 - Amalgamated Harmonics
 - Animated Circuits
@@ -99,6 +100,7 @@ At the moment the following 3rd-party modules are provided:
 - HetrickCV
 - Impromptu
 - JW-Modules
+- LifeFormModular
 - Little Utils
 - LyraeModules
 - MindMeld
@@ -109,8 +111,6 @@ At the moment the following 3rd-party modules are provided:
 - Sonus Modular
 - Valley
 - ZetaCarinae
-
-(*) Might be removed soon due to license conflicts
 
 Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.
 

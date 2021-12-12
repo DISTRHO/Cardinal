@@ -115,3 +115,6 @@
 [submodule "plugins/LifeFormModular"]
 	path = plugins/LifeFormModular
 	url = https://github.com/SteveRussell33/LifeFormModular.git
+[submodule "plugins/21kHz"]
+	path = plugins/21kHz
+	url = https://github.com/netboy3/21kHz-rack-plugins.git

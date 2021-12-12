@@ -24,6 +24,9 @@
 #include "Cardinal/src/plugin.hpp"
 
 #ifndef NOPLUGINS
+// 21kHz
+#include "21kHz/src/21kHz.hpp"
+
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
@@ -487,6 +490,7 @@ void saveHighQualityAsDefault(bool) {}
 // plugin instances
 Plugin* pluginInstance__Cardinal;
 #ifndef NOPLUGINS
+Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
@@ -670,6 +674,20 @@ static void initStatic__Cardinal()
 }
 
 #ifndef NOPLUGINS
+static void initStatic__21kHz()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__21kHz = p;
+
+    const StaticPluginLoader spl(p, "21kHz");
+    if (spl.ok())
+    {
+        p->addModel(modelPalmLoop);
+        p->addModel(modelD_Inf);
+        p->addModel(modelTachyonEntangler);
+    }
+}
+
 static void initStatic__AmalgamatedHarmonics()
 {
     Plugin* const p = new Plugin;
@@ -1814,6 +1832,7 @@ void initStaticPlugins()
     initStatic__Core();
     initStatic__Cardinal();
 #ifndef NOPLUGINS
+    initStatic__21kHz();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__Aria();

@@ -13,6 +13,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Carla                 | GPL-2.0-or-later      | Used as plugin host within Cardinal|
 | DPF                   | ISC, GPL-2.0-or-later | Used as the plugin framework, VST2 binary GPLv2+ licensed |
 | Rack                  | GPL-3.0-or-later      | The actual Rack code, internal dependencies are compatible with GPLv3+ |
+| 21kHz                 | MIT                   | |
 | AS                    | MIT                   | |
 | Amalgamated Harmonics | BSD-3-Clause          | |
 | Animated Circuits     | BSD-3-Clause          | |
@@ -35,6 +36,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | HetrickCV             | CC0-1.0               | |
 | Impromptu             | GPL-3.0-or-later      | |
 | JW-Modules            | BSD-3-Clause          | |
+| LifeFormModular       | MIT                   | |
 | Little Utils          | MIT                   | |
 | LyraeModules          | GPL-3.0-or-later      | |
 | MindMeld              | GPL-3.0-or-later      | |
@@ -45,7 +47,6 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | repelzen              | GPL-3.0-or-later      | |
 | Sonus Modular         | GPL-3.0-or-later      | |
 | Valley                | GPL-3.0-or-later      | |
-| ZZC                   | GPL-3.0-only          | GPLv3+ change request https://github.com/zezic/ZZC/issues/86 |
 | ZetaCarinae           | GPL-3.0-or-later      | |
 
 ## ARTWORK / PANEL LICENSES
