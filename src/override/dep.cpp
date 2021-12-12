@@ -22,15 +22,6 @@
 
 #include "nanovg.h"
 
-// fix blendish build, missing symbol in debug mode
-#ifndef NDEBUG
-extern "C" {
-float bnd_clamp(float v, float mn, float mx) {
-    return (v > mx)?mx:(v < mn)?mn:v;
-}
-}
-#endif
-
 // fix bogaudio build, another missing symbol
 #ifndef NDEBUG
 namespace bogaudio {
