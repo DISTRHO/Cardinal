@@ -647,6 +647,7 @@ static void initStatic__Cardinal()
         p->addModel(modelHostParameters);
         p->addModel(modelHostTime);
         p->addModel(modelIldaeil);
+        p->addModel(modelIldaeilExpIn8);
     }
 }
 

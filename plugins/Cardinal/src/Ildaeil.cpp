@@ -244,6 +244,9 @@ struct IldaeilModule : Module {
         NUM_LIGHTS
     };
 
+    // Expander
+    float leftMessages[2][8] = {};// messages from expander
+
 #ifndef HEADLESS
     SharedResourcePointer<JuceInitializer> juceInitializer;
 #endif
@@ -273,6 +276,16 @@ struct IldaeilModule : Module {
         : pcontext(static_cast<CardinalPluginContext*>(APP))
     {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+
+        leftExpander.producerMessage = leftMessages[0];
+        leftExpander.consumerMessage = leftMessages[1];
+
+        // must init those that have no-connect info to non-connected, or else mother may read 0.0 init value if ever refresh limiters make it such that after a connection of expander the mother reads before the first pass through the expander's writing code, and this may do something undesired (ex: change track in Foundry on expander connected while track CV jack is empty) (comment originally in GateSeq64 by Marc Boulé)
+        for (uint i = 0; i < 8; ++i)
+        {
+            leftMessages[1][i] = std::numeric_limits<float>::quiet_NaN();
+        }
+
         for (uint i=0; i<2; ++i)
         {
             const char name[] = { 'A','u','d','i','o',' ','#',static_cast<char>('0'+i+1),'\0' };
@@ -1029,6 +1042,20 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
             fileBrowserClose(fileBrowserHandle);
             fileBrowserHandle = nullptr;
+        }
+
+        if (fPluginGenericUI != nullptr && module->fCarlaHostHandle != nullptr) {
+            bool expanderPresent = (module->leftExpander.module && module->leftExpander.module->model == modelIldaeilExpIn8);
+            float *messagesFromExpander = (float*)module->leftExpander.consumerMessage;// could be invalid pointer when !expanderPresent, so read it only when expanderPresent
+            if (expanderPresent) {
+                for (uint i = 0; i < 8; i++) {
+                    if (i < fPluginGenericUI->parameterCount && module->leftExpander.module->inputs[i].isConnected()) {
+                        float scaled_param = (messagesFromExpander[i] + 10.0) * (fPluginGenericUI->parameters[i].max - fPluginGenericUI->parameters[i].min) / (20.0 + fPluginGenericUI->parameters[i].min);
+                        fPluginGenericUI->values[i] = scaled_param;
+                        carla_set_parameter_value(module->fCarlaHostHandle, 0, 0, scaled_param);
+                    }
+                }
+            }
         }
 
         if (fDrawingState == kDrawingPluginGenericUI && fPluginGenericUI != nullptr && fPluginHasOutputParameters)
