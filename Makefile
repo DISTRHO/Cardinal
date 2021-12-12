@@ -106,7 +106,7 @@ endif
 
 dgl:
 ifneq ($(HEADLESS),true)
-	$(MAKE) -C dpf/dgl opengl USE_NANOVG_FBO=true
+	$(MAKE) -C dpf/dgl opengl NVG_DISABLE_SKIPPING_WHITESPACE=true USE_NANOVG_FBO=true
 endif
 
 plugins: deps

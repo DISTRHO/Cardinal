@@ -39,7 +39,6 @@
 #include <ui/MenuSeparator.hpp>
 #include <asset.hpp>
 #include <context.hpp>
-#include <helpers.hpp>
 #include <system.hpp>
 
 namespace rack {
