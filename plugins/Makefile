@@ -223,6 +223,7 @@ PLUGIN_FILES += AS/freeverb/revmodel.cpp
 
 # modules/types which are present in other plugins
 AS_CUSTOM = ADSR LabelDisplayWidget LowFrequencyOscillator VCA YellowRedLight allpass comb revmodel
+AS_CUSTOM_PER_FILE = NumberDisplayWidget
 
 # --------------------------------------------------------------
 # Atelier
@@ -479,6 +480,14 @@ endif
 JW_CUSTOM = PlayHead Quantizer
 
 # --------------------------------------------------------------
+# LifeFormModular
+
+PLUGIN_FILES += $(filter-out LifeFormModular/src/plugin.cpp,$(wildcard LifeFormModular/src/*.cpp))
+
+# modules/types which are present in other plugins
+LIFEFORMMODULAR_CUSTOM = IO MS __ct_base __ct_comp
+
+# --------------------------------------------------------------
 # LittleUtils
 
 PLUGIN_FILES += $(filter-out LittleUtils/src/plugin.cpp,$(wildcard LittleUtils/src/*.cpp))
@@ -529,8 +538,8 @@ PLUGIN_FILES += $(filter-out Prism/src/plugin.cpp, $(wildcard Prism/src/*.cpp))
 PLUGIN_FILES += $(wildcard Prism/src/scales/*.cpp)
 
 # modules/types which are present in other plugins
-PRISM_CUSTOM = bogaudio FilterSetting Scale
-PRISM_CUSTOM_PER_FILE = PrismFilterSetting
+PRISM_CUSTOM = bogaudio Filter FilterSetting Inputs Scale
+# PRISM_CUSTOM_PER_FILE = PrismFilterSetting
 
 # --------------------------------------------------------------
 # rackwindows
@@ -878,6 +887,7 @@ $(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(AS_CUSTOM),$(call custom_module_names,$(m),AS)) \
+		$(foreach m,$(AS_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),AS_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__AS \
 		-Wno-unused-private-field
 
@@ -1096,6 +1106,13 @@ $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 		-Wno-misleading-indentation \
 		-Wno-unused-but-set-variable \
 		-Wno-unused-result
+
+$(BUILD_DIR)/LifeFormModular/%.cpp.o: LifeFormModular/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(LIFEFORMMODULAR_CUSTOM),$(call custom_module_names,$(m),LifeFormModular)) \
+		-DpluginInstance=pluginInstance__LifeFormModular
 
 $(BUILD_DIR)/LittleUtils/%.cpp.o: LittleUtils/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

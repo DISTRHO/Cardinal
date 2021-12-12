@@ -112,3 +112,6 @@
 [submodule "plugins/Extratone"]
 	path = plugins/Extratone
 	url = https://github.com/EaterOfSheep/Extratone.git
+[submodule "plugins/LifeFormModular"]
+	path = plugins/LifeFormModular
+	url = https://github.com/SteveRussell33/LifeFormModular.git

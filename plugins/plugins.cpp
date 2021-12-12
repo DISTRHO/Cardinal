@@ -35,26 +35,26 @@
 // #include "AriaModules/src/plugin.hpp"
 */
 #define modelBlank modelAriaBlank
-extern Model *modelSplort;
-extern Model *modelSmerge;
-extern Model *modelSpleet;
-extern Model *modelSwerge;
-extern Model *modelSplirge;
-// extern Model *modelSrot;
-extern Model *modelQqqq;
-extern Model *modelQuack;
-extern Model *modelQ;
-extern Model *modelQuale;
-extern Model *modelDarius;
-extern Model *modelSolomon4;
-extern Model *modelSolomon8;
-extern Model *modelSolomon16;
-extern Model *modelPsychopump;
-extern Model *modelPokies4;
-extern Model *modelGrabby;
-extern Model *modelRotatoes4;
-extern Model *modelUndular;
-extern Model *modelBlank;
+extern Model* modelSplort;
+extern Model* modelSmerge;
+extern Model* modelSpleet;
+extern Model* modelSwerge;
+extern Model* modelSplirge;
+// extern Model* modelSrot;
+extern Model* modelQqqq;
+extern Model* modelQuack;
+extern Model* modelQ;
+extern Model* modelQuale;
+extern Model* modelDarius;
+extern Model* modelSolomon4;
+extern Model* modelSolomon8;
+extern Model* modelSolomon16;
+extern Model* modelPsychopump;
+extern Model* modelPokies4;
+extern Model* modelGrabby;
+extern Model* modelRotatoes4;
+extern Model* modelUndular;
+extern Model* modelBlank;
 #undef modelBlank
 
 // AS
@@ -106,129 +106,129 @@ extern Model *modelBlank;
 #define modelVCA modelBogaudioVCA
 #define modelVCF modelBogaudioVCF
 #define modelVCO modelBogaudioVCO
-extern Model *modelVCO;
-extern Model *modelLVCO;
-extern Model *modelSine;
-extern Model *modelPulse;
-extern Model *modelXCO;
-extern Model *modelAdditator;
-extern Model *modelFMOp;
-extern Model *modelChirp;
-extern Model *modelLFO;
-extern Model *modelLLFO;
-extern Model *modelFourFO;
-extern Model *modelEightFO;
-extern Model *modelVCF;
-extern Model *modelLVCF;
-extern Model *modelFFB;
-extern Model *modelEQ;
-extern Model *modelEQS;
-extern Model *modelLPG;
-extern Model *modelLLPG;
-extern Model *modelMegaGate;
-extern Model *modelPEQ;
-extern Model *modelPEQ6;
-extern Model *modelPEQ6XF;
-extern Model *modelPEQ14;
-extern Model *modelPEQ14XF;
-extern Model *modelDADSRH;
-extern Model *modelDADSRHPlus;
-extern Model *modelShaper;
-extern Model *modelShaperPlus;
-extern Model *modelAD;
-extern Model *modelASR;
-extern Model *modelADSR;
-extern Model *modelVish;
-extern Model *modelFollow;
-extern Model *modelDGate;
-extern Model *modelRGate;
-extern Model *modelEdge;
-extern Model *modelNoise;
-extern Model *modelSampleHold;
-extern Model *modelWalk2;
-extern Model *modelWalk;
-extern Model *modelMix8;
-extern Model *modelMix8x;
-extern Model *modelMix4;
-extern Model *modelMix4x;
-extern Model *modelMix2;
-extern Model *modelMix1;
-extern Model *modelVCM;
-extern Model *modelMute8;
-extern Model *modelPan;
-extern Model *modelXFade;
-extern Model *modelVCA;
-extern Model *modelVCAmp;
-extern Model *modelVelo;
-extern Model *modelUMix;
-extern Model *modelMumix;
-extern Model *modelMatrix81;
-extern Model *modelMatrix18;
-extern Model *modelMatrix44;
-extern Model *modelMatrix44Cvm;
-extern Model *modelMatrix88;
-extern Model *modelMatrix88Cv;
-extern Model *modelMatrix88M;
-extern Model *modelSwitch81;
-extern Model *modelSwitch18;
-extern Model *modelSwitch44;
-extern Model *modelSwitch88;
-extern Model *modelSwitch1616;
-extern Model *modelAMRM;
-extern Model *modelPressor;
-extern Model *modelClpr;
-extern Model *modelLmtr;
-extern Model *modelNsgt;
-extern Model *modelCmpDist;
-extern Model *modelOneEight;
-extern Model *modelEightOne;
-extern Model *modelAddrSeq;
-extern Model *modelAddrSeqX;
-extern Model *modelPgmr;
-extern Model *modelPgmrX;
-extern Model *modelVU;
-extern Model *modelAnalyzer;
-extern Model *modelAnalyzerXL;
-extern Model *modelRanalyzer;
-extern Model *modelDetune;
-extern Model *modelStack;
-extern Model *modelReftone;
-extern Model *modelMono;
-extern Model *modelArp;
-extern Model *modelAssign;
-extern Model *modelUnison;
-extern Model *modelPolyCon8;
-extern Model *modelPolyCon16;
-extern Model *modelPolyOff8;
-extern Model *modelPolyOff16;
-extern Model *modelPolyMult;
-extern Model *modelBool;
-extern Model *modelCmp;
-extern Model *modelCVD;
-extern Model *modelFlipFlop;
-extern Model *modelInv;
-extern Model *modelManual;
-extern Model *modelFourMan;
-extern Model *modelMult;
-extern Model *modelOffset;
-extern Model *modelSlew;
-extern Model *modelSums;
-extern Model *modelSwitch;
-extern Model *modelLgsw;
-extern Model *modelBlank3;
-extern Model *modelBlank6;
+extern Model* modelVCO;
+extern Model* modelLVCO;
+extern Model* modelSine;
+extern Model* modelPulse;
+extern Model* modelXCO;
+extern Model* modelAdditator;
+extern Model* modelFMOp;
+extern Model* modelChirp;
+extern Model* modelLFO;
+extern Model* modelLLFO;
+extern Model* modelFourFO;
+extern Model* modelEightFO;
+extern Model* modelVCF;
+extern Model* modelLVCF;
+extern Model* modelFFB;
+extern Model* modelEQ;
+extern Model* modelEQS;
+extern Model* modelLPG;
+extern Model* modelLLPG;
+extern Model* modelMegaGate;
+extern Model* modelPEQ;
+extern Model* modelPEQ6;
+extern Model* modelPEQ6XF;
+extern Model* modelPEQ14;
+extern Model* modelPEQ14XF;
+extern Model* modelDADSRH;
+extern Model* modelDADSRHPlus;
+extern Model* modelShaper;
+extern Model* modelShaperPlus;
+extern Model* modelAD;
+extern Model* modelASR;
+extern Model* modelADSR;
+extern Model* modelVish;
+extern Model* modelFollow;
+extern Model* modelDGate;
+extern Model* modelRGate;
+extern Model* modelEdge;
+extern Model* modelNoise;
+extern Model* modelSampleHold;
+extern Model* modelWalk2;
+extern Model* modelWalk;
+extern Model* modelMix8;
+extern Model* modelMix8x;
+extern Model* modelMix4;
+extern Model* modelMix4x;
+extern Model* modelMix2;
+extern Model* modelMix1;
+extern Model* modelVCM;
+extern Model* modelMute8;
+extern Model* modelPan;
+extern Model* modelXFade;
+extern Model* modelVCA;
+extern Model* modelVCAmp;
+extern Model* modelVelo;
+extern Model* modelUMix;
+extern Model* modelMumix;
+extern Model* modelMatrix81;
+extern Model* modelMatrix18;
+extern Model* modelMatrix44;
+extern Model* modelMatrix44Cvm;
+extern Model* modelMatrix88;
+extern Model* modelMatrix88Cv;
+extern Model* modelMatrix88M;
+extern Model* modelSwitch81;
+extern Model* modelSwitch18;
+extern Model* modelSwitch44;
+extern Model* modelSwitch88;
+extern Model* modelSwitch1616;
+extern Model* modelAMRM;
+extern Model* modelPressor;
+extern Model* modelClpr;
+extern Model* modelLmtr;
+extern Model* modelNsgt;
+extern Model* modelCmpDist;
+extern Model* modelOneEight;
+extern Model* modelEightOne;
+extern Model* modelAddrSeq;
+extern Model* modelAddrSeqX;
+extern Model* modelPgmr;
+extern Model* modelPgmrX;
+extern Model* modelVU;
+extern Model* modelAnalyzer;
+extern Model* modelAnalyzerXL;
+extern Model* modelRanalyzer;
+extern Model* modelDetune;
+extern Model* modelStack;
+extern Model* modelReftone;
+extern Model* modelMono;
+extern Model* modelArp;
+extern Model* modelAssign;
+extern Model* modelUnison;
+extern Model* modelPolyCon8;
+extern Model* modelPolyCon16;
+extern Model* modelPolyOff8;
+extern Model* modelPolyOff16;
+extern Model* modelPolyMult;
+extern Model* modelBool;
+extern Model* modelCmp;
+extern Model* modelCVD;
+extern Model* modelFlipFlop;
+extern Model* modelInv;
+extern Model* modelManual;
+extern Model* modelFourMan;
+extern Model* modelMult;
+extern Model* modelOffset;
+extern Model* modelSlew;
+extern Model* modelSums;
+extern Model* modelSwitch;
+extern Model* modelLgsw;
+extern Model* modelBlank3;
+extern Model* modelBlank6;
 #ifdef EXPERIMENTAL
-extern Model *modelLag;
-extern Model *modelPEQ14XR;
-extern Model *modelPEQ14XV;
+extern Model* modelLag;
+extern Model* modelPEQ14XR;
+extern Model* modelPEQ14XV;
 #endif
 #ifdef TEST
-extern Model *modelTest;
-extern Model *modelTest2;
-extern Model *modelTestExpanderBase;
-extern Model *modelTestExpanderExtension;
-extern Model *modelTestGl;
-extern Model *modelTestVCF;
+extern Model* modelTest;
+extern Model* modelTest2;
+extern Model* modelTestExpanderBase;
+extern Model* modelTestExpanderExtension;
+extern Model* modelTestGl;
+extern Model* modelTestVCF;
 #endif
 #undef modelADSR
 #undef modelLFO
@@ -277,35 +277,35 @@ void saveGtgPluginDefault(const char*, int) {}
 /* NOTE too much noise in original include, do this a different way
 // #include "ImpromptuModular/src/ImpromptuModular.hpp"
 */
-extern Model *modelAdaptiveQuantizer;
-extern Model *modelBigButtonSeq;
-extern Model *modelBigButtonSeq2;
-extern Model *modelChordKey;
-extern Model *modelChordKeyExpander;
-extern Model *modelClocked;
-extern Model *modelClockedExpander;
-extern Model *modelClkd;
-extern Model *modelCvPad;
-extern Model *modelFoundry;
-extern Model *modelFoundryExpander;
-extern Model *modelFourView;
-extern Model *modelGateSeq64;
-extern Model *modelGateSeq64Expander;
-extern Model *modelHotkey;
-extern Model *modelPart;
-extern Model *modelPhraseSeq16;
-extern Model *modelPhraseSeq32;
-extern Model *modelPhraseSeqExpander;
-extern Model *modelProbKey;
-// extern Model *modelProbKeyExpander;
-extern Model *modelSemiModularSynth;
-extern Model *modelTact;
-extern Model *modelTact1;
-extern Model *modelTactG;
-extern Model *modelTwelveKey;
-extern Model *modelWriteSeq32;
-extern Model *modelWriteSeq64;
-extern Model *modelBlankPanel;
+extern Model* modelAdaptiveQuantizer;
+extern Model* modelBigButtonSeq;
+extern Model* modelBigButtonSeq2;
+extern Model* modelChordKey;
+extern Model* modelChordKeyExpander;
+extern Model* modelClocked;
+extern Model* modelClockedExpander;
+extern Model* modelClkd;
+extern Model* modelCvPad;
+extern Model* modelFoundry;
+extern Model* modelFoundryExpander;
+extern Model* modelFourView;
+extern Model* modelGateSeq64;
+extern Model* modelGateSeq64Expander;
+extern Model* modelHotkey;
+extern Model* modelPart;
+extern Model* modelPhraseSeq16;
+extern Model* modelPhraseSeq32;
+extern Model* modelPhraseSeqExpander;
+extern Model* modelProbKey;
+// extern Model* modelProbKeyExpander;
+extern Model* modelSemiModularSynth;
+extern Model* modelTact;
+extern Model* modelTact1;
+extern Model* modelTactG;
+extern Model* modelTwelveKey;
+extern Model* modelWriteSeq32;
+extern Model* modelWriteSeq64;
+extern Model* modelBlankPanel;
 
 // HetrickCV
 #define modelASR modelHetrickCVASR
@@ -313,41 +313,41 @@ extern Model *modelBlankPanel;
 #define modelFlipFlop modelHetrickCVFlipFlop
 #define modelMidSide modelHetrickCVMidSide
 #define modelMinMax modelHetrickCVMinMax
-extern Model *modelTwoToFour;
-extern Model *modelAnalogToDigital;
-extern Model *modelASR;
-extern Model *modelBinaryGate;
-extern Model *modelBinaryNoise;
-extern Model *modelBitshift;
-extern Model *modelBlankPanel;
-extern Model *modelBoolean3;
-extern Model *modelChaos1Op;
-extern Model *modelChaos2Op;
-extern Model *modelChaos3Op;
-extern Model *modelChaoticAttractors;
-extern Model *modelClockedNoise;
-extern Model *modelComparator;
-extern Model *modelContrast;
-extern Model *modelCrackle;
-extern Model *modelDataCompander;
-extern Model *modelDelta;
-extern Model *modelDigitalToAnalog;
-extern Model *modelDust;
-extern Model *modelExponent;
-extern Model *modelFBSineChaos;
-extern Model *modelFlipFlop;
-extern Model *modelFlipPan;
-extern Model *modelGateJunction;
-extern Model *modelGingerbread;
-extern Model *modelLogicCombine;
-extern Model *modelMidSide;
-extern Model *modelMinMax;
-extern Model *modelRandomGates;
-extern Model *modelRotator;
-extern Model *modelRungler;
-extern Model *modelScanner;
-extern Model *modelWaveshape;
-extern Model *modelXYToPolar;
+extern Model* modelTwoToFour;
+extern Model* modelAnalogToDigital;
+extern Model* modelASR;
+extern Model* modelBinaryGate;
+extern Model* modelBinaryNoise;
+extern Model* modelBitshift;
+extern Model* modelBlankPanel;
+extern Model* modelBoolean3;
+extern Model* modelChaos1Op;
+extern Model* modelChaos2Op;
+extern Model* modelChaos3Op;
+extern Model* modelChaoticAttractors;
+extern Model* modelClockedNoise;
+extern Model* modelComparator;
+extern Model* modelContrast;
+extern Model* modelCrackle;
+extern Model* modelDataCompander;
+extern Model* modelDelta;
+extern Model* modelDigitalToAnalog;
+extern Model* modelDust;
+extern Model* modelExponent;
+extern Model* modelFBSineChaos;
+extern Model* modelFlipFlop;
+extern Model* modelFlipPan;
+extern Model* modelGateJunction;
+extern Model* modelGingerbread;
+extern Model* modelLogicCombine;
+extern Model* modelMidSide;
+extern Model* modelMinMax;
+extern Model* modelRandomGates;
+extern Model* modelRotator;
+extern Model* modelRungler;
+extern Model* modelScanner;
+extern Model* modelWaveshape;
+extern Model* modelXYToPolar;
 #undef modelASR
 #undef modelBlankPanel
 #undef modelFlipFlop
@@ -358,6 +358,24 @@ extern Model *modelXYToPolar;
 #define modelQuantizer modelJWQuantizer
 #include "JW-Modules/src/JWModules.hpp"
 #undef modelQuantizer
+
+// LifeFormModular
+/* NOTE too much noise in original include, do this a different way
+// #include "LifeFormModular/src/plugin.hpp"
+*/
+extern Model* modelTimeDiktat;
+extern Model* modelSequenceModeler;
+extern Model* modelPitchDiktat;
+extern Model* modelPitchIntegrator;
+extern Model* modelBurstIntegrator;
+extern Model* modelQuadModulator;
+extern Model* modelImpulseControl;
+extern Model* modelQuadSteppedOffset;
+extern Model* modelPercussiveVibration;
+extern Model* modelQuadUtility;
+extern Model* modelAdditiveVibration;
+extern Model* modelComplexOsc;
+extern Model* modelDriftgen;
 
 // LittleUtils
 #include "LittleUtils/src/plugin.hpp"
@@ -379,17 +397,17 @@ extern Model* modelZeta;
 /* NOTE too much noise in original include, do this a different way
 // #include "MindMeldModular/src/MindMeldModular.hpp"
 */
-extern Model *modelMixMasterJr;
-extern Model *modelAuxExpanderJr;
-extern Model *modelMixMaster;
-extern Model *modelAuxExpander;
-extern Model *modelMeld;
-extern Model *modelUnmeld;
-extern Model *modelEqMaster;
-extern Model *modelEqExpander;
-extern Model *modelBassMaster;
-extern Model *modelBassMasterJr;
-extern Model *modelShapeMaster;
+extern Model* modelMixMasterJr;
+extern Model* modelAuxExpanderJr;
+extern Model* modelMixMaster;
+extern Model* modelAuxExpander;
+extern Model* modelMeld;
+extern Model* modelUnmeld;
+extern Model* modelEqMaster;
+extern Model* modelEqExpander;
+extern Model* modelBassMaster;
+extern Model* modelBassMasterJr;
+extern Model* modelShapeMaster;
 
 // Mog
 #include "Mog/src/plugin.hpp"
@@ -398,29 +416,29 @@ extern Model *modelShapeMaster;
 /* NOTE too much noise in original include, do this a different way
 // #include "mscHack/src/mscHack.hpp"
 */
-extern Model *modelCompressor;
-extern Model *modelSynthDrums;
-extern Model *modelSEQ_6x32x16;
-extern Model *modelMasterClockx8;
-extern Model *modelMasterClockx4;
-extern Model *modelSEQ_Envelope_8;
-extern Model *modelSeq_Triad2;
-extern Model *modelARP700;
-extern Model *modelMix_24_4_4;
-extern Model *modelMix_16_4_4;
-extern Model *modelMix_9_3_4;
-extern Model *modelMix_4_0_4;
-extern Model *modelASAF8;
-extern Model *modelPingPong;
-extern Model *modelStepDelay;
-extern Model *modelOsc_3Ch;
-extern Model *modelDronez;
-extern Model *modelMorze;
-extern Model *modelWindz;
-extern Model *modelLorenz;
-extern Model *modelAlienz;
-extern Model *modelOSC_WaveMorph_3;
-extern Model *modelMaude_221;
+extern Model* modelCompressor;
+extern Model* modelSynthDrums;
+extern Model* modelSEQ_6x32x16;
+extern Model* modelMasterClockx8;
+extern Model* modelMasterClockx4;
+extern Model* modelSEQ_Envelope_8;
+extern Model* modelSeq_Triad2;
+extern Model* modelARP700;
+extern Model* modelMix_24_4_4;
+extern Model* modelMix_16_4_4;
+extern Model* modelMix_9_3_4;
+extern Model* modelMix_4_0_4;
+extern Model* modelASAF8;
+extern Model* modelPingPong;
+extern Model* modelStepDelay;
+extern Model* modelOsc_3Ch;
+extern Model* modelDronez;
+extern Model* modelMorze;
+extern Model* modelWindz;
+extern Model* modelLorenz;
+extern Model* modelAlienz;
+extern Model* modelOSC_WaveMorph_3;
+extern Model* modelMaude_221;
 
 // Prism
 # include "Prism/src/plugin.hpp"
@@ -491,6 +509,7 @@ Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__JW;
+Plugin* pluginInstance__LifeFormModular;
 Plugin* pluginInstance__LittleUtils;
 Plugin* pluginInstance__Lyrae;
 extern Plugin* pluginInstance__MindMeld;
@@ -1495,6 +1514,30 @@ static void initStatic__JW()
     }
 }
 
+static void initStatic__LifeFormModular()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__LifeFormModular= p;
+
+    const StaticPluginLoader spl(p, "LifeFormModular");
+    if (spl.ok())
+    {
+        p->addModel(modelTimeDiktat);
+        p->addModel(modelSequenceModeler);
+        p->addModel(modelPitchDiktat);
+        p->addModel(modelPitchIntegrator);
+        p->addModel(modelBurstIntegrator);
+        p->addModel(modelQuadModulator);
+        p->addModel(modelImpulseControl);
+        p->addModel(modelQuadSteppedOffset);
+        p->addModel(modelPercussiveVibration);
+        p->addModel(modelQuadUtility);
+        p->addModel(modelAdditiveVibration);
+        p->addModel(modelComplexOsc);
+        p->addModel(modelDriftgen);
+    }
+}
+
 static void initStatic__LittleUtils()
 {
     Plugin* const p = new Plugin;
@@ -1793,6 +1836,7 @@ void initStaticPlugins()
     initStatic__HetrickCV();
     initStatic__ImpromptuModular();
     initStatic__JW();
+    initStatic__LifeFormModular();
     initStatic__LittleUtils();
     initStatic__Lyrae();
     initStatic__MindMeld();
