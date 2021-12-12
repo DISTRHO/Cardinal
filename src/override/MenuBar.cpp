@@ -235,7 +235,7 @@ struct EditButton : MenuButton {
 
 		menu->addChild(new ui::MenuSeparator);
 
-		APP->scene->rack->appendSelectionContextMenu(menu);
+		patchUtils::appendSelectionContextMenu(menu);
 	}
 };
 

@@ -19,6 +19,13 @@
 
 #pragma once
 
+namespace rack
+{
+namespace ui {
+struct Menu;
+}
+}
+
 namespace patchUtils
 {
 
@@ -28,5 +35,6 @@ void loadTemplateDialog();
 void revertDialog();
 void saveDialog(const std::string& path);
 void saveAsDialog();
+void appendSelectionContextMenu(rack::ui::Menu* menu);
 
 }

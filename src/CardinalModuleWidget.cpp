@@ -31,9 +31,12 @@
 #include <plugin/Model.hpp>
 #undef ModuleWidget
 
+#include "CardinalCommon.hpp"
+
 #include <app/Scene.hpp>
 #include <engine/Engine.hpp>
 #include <ui/MenuSeparator.hpp>
+#include <asset.hpp>
 #include <context.hpp>
 #include <helpers.hpp>
 #include <system.hpp>
@@ -133,31 +136,31 @@ static void CardinalModuleWidget__createContextMenu(ModuleWidget* const w,
     menu->addChild(createMenuLabel(model->plugin->brand));
 
     // Info
-    menu->addChild(createSubmenuItem("Info", "", [=](ui::Menu* menu) {
+    menu->addChild(createSubmenuItem("Info", "", [model](ui::Menu* menu) {
         model->appendContextMenu(menu);
     }));
 
     // Preset
-    menu->addChild(createSubmenuItem("Preset", "", [=](ui::Menu* menu) {
-        menu->addChild(createMenuItem("Copy", RACK_MOD_CTRL_NAME "+C", [=]() {
+    menu->addChild(createSubmenuItem("Preset", "", [weakThis](ui::Menu* menu) {
+        menu->addChild(createMenuItem("Copy", RACK_MOD_CTRL_NAME "+C", [weakThis]() {
             if (!weakThis)
                 return;
             weakThis->copyClipboard();
         }));
 
-        menu->addChild(createMenuItem("Paste", RACK_MOD_CTRL_NAME "+V", [=]() {
+        menu->addChild(createMenuItem("Paste", RACK_MOD_CTRL_NAME "+V", [weakThis]() {
             if (!weakThis)
                 return;
             weakThis->pasteClipboardAction();
         }));
 
-        menu->addChild(createMenuItem("Open", "", [=]() {
+        menu->addChild(createMenuItem("Open", "", [weakThis]() {
             if (!weakThis)
                 return;
             CardinalModuleWidget__loadDialog(weakThis);
         }));
 
-        menu->addChild(createMenuItem("Save as", "", [=]() {
+        menu->addChild(createMenuItem("Save as", "", [weakThis]() {
             if (!weakThis)
                 return;
             CardinalModuleWidget__saveDialog(weakThis);
@@ -177,21 +180,21 @@ static void CardinalModuleWidget__createContextMenu(ModuleWidget* const w,
     }));
 
     // Initialize
-    menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [=]() {
+    menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [weakThis]() {
         if (!weakThis)
             return;
         weakThis->resetAction();
     }));
 
     // Randomize
-    menu->addChild(createMenuItem("Randomize", RACK_MOD_CTRL_NAME "+R", [=]() {
+    menu->addChild(createMenuItem("Randomize", RACK_MOD_CTRL_NAME "+R", [weakThis]() {
         if (!weakThis)
             return;
         weakThis->randomizeAction();
     }));
 
     // Disconnect cables
-    menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [=]() {
+    menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [weakThis]() {
         if (!weakThis)
             return;
         weakThis->disconnectAction();
@@ -202,34 +205,78 @@ static void CardinalModuleWidget__createContextMenu(ModuleWidget* const w,
     bool bypassed = module && module->isBypassed();
     if (bypassed)
         bypassText += " " CHECKMARK_STRING;
-    menu->addChild(createMenuItem("Bypass", bypassText, [=]() {
+    menu->addChild(createMenuItem("Bypass", bypassText, [weakThis, bypassed]() {
         if (!weakThis)
             return;
         weakThis->bypassAction(!bypassed);
     }));
 
     // Duplicate
-    menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
+    menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [weakThis]() {
         if (!weakThis)
             return;
         weakThis->cloneAction(false);
     }));
 
     // Duplicate with cables
-    menu->addChild(createMenuItem("└ with cables", RACK_MOD_SHIFT_NAME "+" RACK_MOD_CTRL_NAME "+D", [=]() {
+    menu->addChild(createMenuItem("└ with cables", RACK_MOD_SHIFT_NAME "+" RACK_MOD_CTRL_NAME "+D", [weakThis]() {
         if (!weakThis)
             return;
         weakThis->cloneAction(true);
     }));
 
     // Delete
-    menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
+    menu->addChild(createMenuItem("Delete", "Backspace/Delete", [weakThis]() {
         if (!weakThis)
             return;
         weakThis->removeAction();
     }, false, true));
 
     w->appendContextMenu(menu);
+}
+
+static void CardinalModuleWidget__loadSelectionDialog(RackWidget* const w)
+{
+    std::string selectionDir = asset::user("selections");
+    system::createDirectories(selectionDir);
+
+    async_dialog_filebrowser(false, selectionDir.c_str(), "Import selection", [w](char* pathC) {
+        if (!pathC) {
+            // No path selected
+            return;
+        }
+
+        try {
+            w->loadSelection(pathC);
+        }
+        catch (Exception& e) {
+            async_dialog_message(e.what());
+        }
+
+        std::free(pathC);
+    });
+}
+
+static void CardinalModuleWidget__saveSelectionDialog(RackWidget* const w)
+{
+    std::string selectionDir = asset::user("selections");
+    system::createDirectories(selectionDir);
+
+    async_dialog_filebrowser(true, selectionDir.c_str(), "Save selection as", [w](char* pathC) {
+        if (!pathC) {
+            // No path selected
+            return;
+        }
+
+        std::string path = pathC;
+        std::free(pathC);
+
+        // Automatically append .vcvs extension
+        if (system::getExtension(path) != ".vcvs")
+            path += ".vcvs";
+
+        w->saveSelection(path);
+    });
 }
 
 void CardinalModuleWidget::onButton(const ButtonEvent& e)
@@ -239,8 +286,7 @@ void CardinalModuleWidget::onButton(const ButtonEvent& e)
     if (selected) {
         if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
             ui::Menu* menu = createMenu();
-            // TODO customize this one too
-            APP->scene->rack->appendSelectionContextMenu(menu);
+            patchUtils::appendSelectionContextMenu(menu);
         }
 
         e.consume(this);
@@ -269,4 +315,90 @@ void CardinalModuleWidget::onButton(const ButtonEvent& e)
 }
 
 }
+}
+
+namespace patchUtils
+{
+
+using namespace rack;
+
+void appendSelectionContextMenu(ui::Menu* const menu)
+{
+    app::RackWidget* const w = APP->scene->rack;
+
+    int n = w->getSelected().size();
+    menu->addChild(createMenuLabel(string::f("%d selected %s", n, n == 1 ? "module" : "modules")));
+
+    // Enable alwaysConsume of menu items if the number of selected modules changes
+
+    // Select all
+    menu->addChild(createMenuItem("Select all", RACK_MOD_CTRL_NAME "+A", [w]() {
+        w->selectAll();
+    }, false, true));
+
+    // Deselect
+    menu->addChild(createMenuItem("Deselect", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+A", [w]() {
+        w->deselectAll();
+    }, n == 0, true));
+
+    // Copy
+    menu->addChild(createMenuItem("Copy", RACK_MOD_CTRL_NAME "+C", [w]() {
+        w->copyClipboardSelection();
+    }, n == 0));
+
+    // Paste
+    menu->addChild(createMenuItem("Paste", RACK_MOD_CTRL_NAME "+V", [w]() {
+        w->pasteClipboardAction();
+    }, false, true));
+
+    // Load
+    menu->addChild(createMenuItem("Import selection", "", [w]() {
+        CardinalModuleWidget__loadSelectionDialog(w);
+    }, false, true));
+
+    // Save
+    menu->addChild(createMenuItem("Save selection as", "", [w]() {
+        CardinalModuleWidget__saveSelectionDialog(w);
+    }, n == 0));
+
+    // Initialize
+    menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [w]() {
+        w->resetSelectionAction();
+    }, n == 0));
+
+    // Randomize
+    menu->addChild(createMenuItem("Randomize", RACK_MOD_CTRL_NAME "+R", [w]() {
+        w->randomizeSelectionAction();
+    }, n == 0));
+
+    // Disconnect cables
+    menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [w]() {
+        w->disconnectSelectionAction();
+    }, n == 0));
+
+    // Bypass
+    std::string bypassText = RACK_MOD_CTRL_NAME "+E";
+    bool bypassed = (n > 0) && w->isSelectionBypassed();
+    if (bypassed)
+        bypassText += " " CHECKMARK_STRING;
+    menu->addChild(createMenuItem("Bypass", bypassText, [w, bypassed]() {
+        w->bypassSelectionAction(!bypassed);
+    }, n == 0, true));
+
+    // Duplicate
+    menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [w]() {
+        w->cloneSelectionAction(false);
+    }, n == 0));
+
+    // Duplicate with cables
+    menu->addChild(createMenuItem("└ with cables", RACK_MOD_SHIFT_NAME "+" RACK_MOD_CTRL_NAME "+D", [w]() {
+        w->cloneSelectionAction(true);
+    }, n == 0));
+
+    // Delete
+    menu->addChild(createMenuItem("Delete", "Backspace/Delete", [w]() {
+        w->deleteSelectionAction();
+    }, n == 0, true));
+}
+
 }
