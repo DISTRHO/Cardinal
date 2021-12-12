@@ -87,6 +87,7 @@ BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
 # Rack files to build
 
 RACK_FILES += AsyncDialog.cpp
+RACK_FILES += CardinalModuleWidget.cpp
 RACK_FILES += override/Engine.cpp
 RACK_FILES += override/MenuBar.cpp
 RACK_FILES += override/Scene.cpp

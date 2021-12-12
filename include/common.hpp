@@ -17,6 +17,7 @@
 
 #pragma once
 
+// check if PRIVATE is defined already before including any headers
 #ifdef PRIVATE
 # define PRIVATE_WAS_DEFINED
 #endif
@@ -34,10 +35,12 @@
 #define BINARY_END(sym) ((const void*) sym + sym##_len)
 #define BINARY_SIZE(sym) (sym##_len)
 
+// undefine PRIVATE if needed
 #if defined(PRIVATE) && !defined(PRIVATE_WAS_DEFINED)
 # undef PRIVATE
 #endif
 
+// and also our flag
 #undef PRIVATE_WAS_DEFINED
 
 // Cardinal specific API
