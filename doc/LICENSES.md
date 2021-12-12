@@ -48,6 +48,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Sonus Modular         | GPL-3.0-or-later      | |
 | Valley                | GPL-3.0-or-later      | |
 | ZetaCarinae           | GPL-3.0-or-later      | |
+| ZZC                   | GPL-3.0-or-later      | |
 
 ## ARTWORK / PANEL LICENSES
 
