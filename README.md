@@ -108,7 +108,6 @@ At the moment the following 3rd-party modules are provided:
 - repelzen
 - Sonus Modular
 - Valley
-- ZZC (*)
 - ZetaCarinae
 
 (*) Might be removed soon due to license conflicts

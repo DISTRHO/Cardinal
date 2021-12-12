@@ -73,9 +73,6 @@
 [submodule "plugins/mscHack"]
 	path = plugins/mscHack
 	url = https://github.com/CardinalModules/mscHack.git
-[submodule "plugins/ZZC"]
-	path = plugins/ZZC
-	url = https://github.com/zezic/ZZC.git
 [submodule "plugins/repelzen"]
 	path = plugins/repelzen
 	url = https://github.com/wiqid/repelzen.git
