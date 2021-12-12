@@ -110,6 +110,7 @@ At the moment the following 3rd-party modules are provided:
 - repelzen
 - Sonus Modular
 - Valley
+- ZZC (*)
 - ZetaCarinae
 
 Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.
