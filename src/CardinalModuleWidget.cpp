@@ -29,6 +29,7 @@
 #include <app/ModuleWidget.hpp>
 #include <app/RackWidget.hpp>
 #include <plugin/Model.hpp>
+#include <helpers.hpp>
 #undef ModuleWidget
 
 #include "CardinalCommon.hpp"
