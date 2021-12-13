@@ -1396,9 +1396,16 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                 }
                 else
                 {
+                    bool expanderPresent = (module->leftExpander.module && module->leftExpander.module->model == modelIldaeilExpIn8);
+                    const bool disabled = expanderPresent && (i < 8) && (module->leftExpander.module->inputs[i].isConnected());
+                    if (disabled)
+                        ImGui::BeginDisabled();
                     const bool ret = param.log
                                    ? ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.format, 2.0f)
                                    : ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.format);
+                    if (disabled)
+                        ImGui::EndDisabled();
+                    
                     if (ret)
                     {
                         if (ImGui::IsItemActivated())
