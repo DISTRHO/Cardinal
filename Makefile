@@ -18,14 +18,23 @@ SYSDEPS ?= false
 # --------------------------------------------------------------
 # Carla config
 
+ifeq ($(SYSDEPS),true)
+CAN_USE_CARLA_DEPS = true
+else ifeq ($(WITH_PAWPAW),true)
+CAN_USE_CARLA_DEPS = true
+endif
+
 CARLA_EXTRA_ARGS = \
 	HAVE_FFMPEG=false \
-	HAVE_FLUIDSYNTH=false \
-	HAVE_LIBMAGIC=false \
-	HAVE_SNDFILE=false \
 	HAVE_PROJECTM=false \
 	HAVE_ZYN_DEPS=false \
 	HAVE_ZYN_UI_DEPS=false
+
+ifneq ($(CAN_USE_CARLA_DEPS),true)
+CARLA_EXTRA_ARGS += HAVE_FLUIDSYNTH=false
+CARLA_EXTRA_ARGS += HAVE_LIBMAGIC=false
+CARLA_EXTRA_ARGS += HAVE_SNDFILE=false
+endif
 
 ifneq ($(DEBUG),true)
 CARLA_EXTRA_ARGS += EXTERNAL_PLUGINS=true
