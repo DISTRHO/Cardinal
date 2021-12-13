@@ -284,12 +284,11 @@ jobs:
           ccache --set-config=compression=true
       - name: Fix up Xcode
         run: |
-          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*
           sudo xcode-select -s "/Applications/Xcode_12.3.app"
       - name: Build extra dependencies
         run: |
-          export PATH="/usr/lib/ccache:${PATH}"
+          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           cd dep/PawPaw && ./bootstrap-common.sh macos-universal
       - name: Build macOS universal
         env:
@@ -298,6 +297,7 @@ jobs:
           LDFLAGS: -arch x86_64 -arch arm64 -mmacosx-version-min=10.12
           PKG_CONFIG_PATH: ~/PawPawBuilds/targets/macos-universal/lib/pkgconfig
         run: |
+          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           make features
           make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(sysctl -n hw.logicalcpu)
           ./dpf/utils/package-osx-bundles.sh
@@ -332,6 +332,7 @@ jobs:
           sudo apt-get install -yqq ccache
           ccache --set-config=cache_dir=${HOME}/.cache
           ccache --set-config=compression=true
+      - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           cd dep/PawPaw && ./bootstrap-common.sh linux-win32
