@@ -335,7 +335,7 @@ jobs:
       - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd deps/PawPaw && ./bootstrap-common.sh linux-win32
+          cd deps/PawPaw && ./bootstrap-common.sh win32
       - name: Build win32 cross-compiled
         env:
           CC: i686-w64-mingw32-gcc
