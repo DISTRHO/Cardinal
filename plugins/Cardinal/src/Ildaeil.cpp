@@ -1052,7 +1052,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                     if (i < fPluginGenericUI->parameterCount && module->leftExpander.module->inputs[i].isConnected()) {
                         float scaled_param = (messagesFromExpander[i] + 10.0) * (fPluginGenericUI->parameters[i].max - fPluginGenericUI->parameters[i].min) / (20.0 + fPluginGenericUI->parameters[i].min);
                         fPluginGenericUI->values[i] = scaled_param;
-                        carla_set_parameter_value(module->fCarlaHostHandle, 0, 0, scaled_param);
+                        carla_set_parameter_value(module->fCarlaHostHandle, 0, i, scaled_param);
                     }
                 }
             }
