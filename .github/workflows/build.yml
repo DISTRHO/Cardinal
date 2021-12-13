@@ -41,7 +41,7 @@ jobs:
       - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd dep/PawPaw && ./bootstrap-common.sh linux-aarch64
+          cd deps/PawPaw && ./bootstrap-common.sh linux-aarch64
       - name: Build linux arm64 cross-compiled
         env:
           CC: aarch64-linux-gnu-gcc
@@ -92,7 +92,7 @@ jobs:
       - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd dep/PawPaw && ./bootstrap-common.sh linux-armhf
+          cd deps/PawPaw && ./bootstrap-common.sh linux-armhf
       - name: Build linux armhf cross-compiled
         env:
           CC: arm-linux-gnueabihf-gcc
@@ -139,7 +139,7 @@ jobs:
       - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd dep/PawPaw && ./bootstrap-common.sh linux-i686
+          cd deps/PawPaw && ./bootstrap-common.sh linux-i686
       - name: Build linux i686
         env:
           CC: i686-linux-gnu-gcc
@@ -187,7 +187,7 @@ jobs:
       - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd dep/PawPaw && ./bootstrap-common.sh linux
+          cd deps/PawPaw && ./bootstrap-common.sh linux
       - name: Build linux x86_64
         env:
           LDFLAGS: -static-libgcc -static-libstdc++
@@ -289,7 +289,7 @@ jobs:
       - name: Build extra dependencies
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          cd dep/PawPaw && ./bootstrap-common.sh macos-universal
+          cd deps/PawPaw && ./bootstrap-common.sh macos-universal
       - name: Build macOS universal
         env:
           CFLAGS: -arch x86_64 -arch arm64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_12 -mmacosx-version-min=10.12 -mtune=generic -msse -msse2
@@ -335,7 +335,7 @@ jobs:
       - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd dep/PawPaw && ./bootstrap-common.sh linux-win32
+          cd deps/PawPaw && ./bootstrap-common.sh linux-win32
       - name: Build win32 cross-compiled
         env:
           CC: i686-w64-mingw32-gcc
@@ -385,7 +385,7 @@ jobs:
       - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd dep/PawPaw && ./bootstrap-common.sh win64
+          cd deps/PawPaw && ./bootstrap-common.sh win64
       - name: Build win64 cross-compiled
         env:
           CC: x86_64-w64-mingw32-gcc
