@@ -10,7 +10,7 @@ on:
 env:
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
-  LIBGL_ALWAYS_SOFTWARE: "true"
+  LIBGL_ALWAYS_SOFTWARE: 'true'
 
 jobs:
   linux-arm64:
@@ -39,19 +39,17 @@ jobs:
           ccache --set-config=cache_dir=${HOME}/.cache
           ccache --set-config=compression=true
       - name: Build extra dependencies
+        env: |
+          PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd deps/PawPaw && ./bootstrap-common.sh linux-aarch64
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64
       - name: Build linux arm64 cross-compiled
-        env:
-          CC: aarch64-linux-gnu-gcc
-          CXX: aarch64-linux-gnu-g++
-          LDFLAGS: -static-libgcc -static-libstdc++
-          PKG_CONFIG_PATH: "/usr/lib/aarch64-linux-gnu/pkgconfig:~/PawPawBuilds/targets/linux-aarch64/lib/pkgconfig"
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
+          pushd deps/PawPaw; source local.env linux-aarch64; popd
           make features
-          make WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -90,19 +88,17 @@ jobs:
           ccache --set-config=cache_dir=${HOME}/.cache
           ccache --set-config=compression=true
       - name: Build extra dependencies
+        env: |
+          PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd deps/PawPaw && ./bootstrap-common.sh linux-armhf
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-armhf
       - name: Build linux armhf cross-compiled
-        env:
-          CC: arm-linux-gnueabihf-gcc
-          CXX: arm-linux-gnueabihf-g++
-          LDFLAGS: -static-libgcc -static-libstdc++
-          PKG_CONFIG_PATH: "/usr/lib/arm-linux-gnueabihf/pkgconfig:~/PawPawBuilds/targets/linux-armhf/lib/pkgconfig"
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
+          pushd deps/PawPaw; source local.env linux-armhf; popd
           make features
-          make WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -137,21 +133,17 @@ jobs:
           ccache --set-config=cache_dir=${HOME}/.cache
           ccache --set-config=compression=true
       - name: Build extra dependencies
+        env: |
+          PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd deps/PawPaw && ./bootstrap-common.sh linux-i686
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-i686
       - name: Build linux i686
-        env:
-          CC: i686-linux-gnu-gcc
-          CXX: i686-linux-gnu-g++
-          CFLAGS: -m32
-          CXXFLAGS: -m32
-          LDFLAGS: -m32 -static-libgcc -static-libstdc++
-          PKG_CONFIG_PATH: "/usr/lib/i386-linux-gnu/pkgconfig:~/PawPawBuilds/targets/linux-i686/lib/pkgconfig"
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
+          pushd deps/PawPaw; source local.env linux-i686; popd
           make features
-          make WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -187,15 +179,13 @@ jobs:
       - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd deps/PawPaw && ./bootstrap-common.sh linux
+          ./deps/PawPaw/bootstrap-cardinal.sh linux
       - name: Build linux x86_64
-        env:
-          LDFLAGS: -static-libgcc -static-libstdc++
-          PKG_CONFIG_PATH: "/usr/lib/x86_64-linux-gnu/pkgconfig:~/PawPawBuilds/targets/linux/lib/pkgconfig"
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
+          pushd deps/PawPaw; source local.env linux; popd
           make features
-          make WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -289,15 +279,11 @@ jobs:
       - name: Build extra dependencies
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          cd deps/PawPaw && ./bootstrap-common.sh macos-universal
+          ./deps/PawPaw/bootstrap-cardinal.sh macos-universal
       - name: Build macOS universal
-        env:
-          CFLAGS: -arch x86_64 -arch arm64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_12 -mmacosx-version-min=10.12 -mtune=generic -msse -msse2
-          CXXFLAGS: -arch x86_64 -arch arm64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_12 -mmacosx-version-min=10.12 -mtune=generic -msse -msse2
-          LDFLAGS: -arch x86_64 -arch arm64 -mmacosx-version-min=10.12
-          PKG_CONFIG_PATH: ~/PawPawBuilds/targets/macos-universal/lib/pkgconfig
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
+          pushd deps/PawPaw; source local.env macos-universal; popd
           make features
           make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(sysctl -n hw.logicalcpu)
           ./dpf/utils/package-osx-bundles.sh
@@ -335,21 +321,13 @@ jobs:
       - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd deps/PawPaw && ./bootstrap-common.sh win32
+          ./deps/PawPaw/bootstrap-cardinal.sh win32
       - name: Build win32 cross-compiled
-        env:
-          CC: i686-w64-mingw32-gcc
-          CXX: i686-w64-mingw32-g++
-          EXE_WRAPPER: wine
-          PKG_CONFIG: "false"
-          PKG_CONFIG_PATH: ~/PawPawBuilds/targets/win32/lib/pkgconfig
-          WINEARCH: "win32"
-          WINEDEBUG: "-all"
-          WINEDLLOVERRIDES: "mscoree,mshtml="
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
+          pushd deps/PawPaw; source local.env win32; popd
           make features
-          make WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -385,21 +363,13 @@ jobs:
       - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          cd deps/PawPaw && ./bootstrap-common.sh win64
+          ./deps/PawPaw/bootstrap-cardinal.sh win64
       - name: Build win64 cross-compiled
-        env:
-          CC: x86_64-w64-mingw32-gcc
-          CXX: x86_64-w64-mingw32-g++
-          EXE_WRAPPER: wine
-          PKG_CONFIG: "false"
-          PKG_CONFIG_PATH: ~/PawPawBuilds/targets/win64/lib/pkgconfig
-          WINEARCH: "win64"
-          WINEDEBUG: "-all"
-          WINEDLLOVERRIDES: "mscoree,mshtml="
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
+          pushd deps/PawPaw; source local.env win64; popd
           make features
-          make WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"

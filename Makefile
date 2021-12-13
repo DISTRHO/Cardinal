@@ -73,7 +73,7 @@ ifneq ($(WASM),true)
 ifneq ($(HEADLESS),true)
 
 ifneq ($(HAVE_OPENGL),true)
-$(error X11 dependency not installed/available)
+$(error OpenGL dependency not installed/available)
 endif
 ifneq ($(HAVE_X11),true)
 $(error X11 dependency not installed/available)
