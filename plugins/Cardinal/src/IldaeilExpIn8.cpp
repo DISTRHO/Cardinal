@@ -48,7 +48,7 @@ struct IldaeilExpIn8 : Module {
 		if (ildaeilPresent) {
 			float *messagesToIldaeil = (float*)rightExpander.module->leftExpander.producerMessage;
 			for (int i = 0; i < NUM_INPUTS; i++) {
-				messagesToIldaeil[i] = (inputs[i].isConnected() ? inputs[i].getVoltage() : std::numeric_limits<float>::quiet_NaN());
+				messagesToIldaeil[i] = (inputs[i].isConnected() ? inputs[i].getVoltage() : 0.0);
 			}
 			rightExpander.module->leftExpander.messageFlipRequested = true;
 		}		
