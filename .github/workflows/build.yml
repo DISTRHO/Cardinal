@@ -138,7 +138,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-i686-linux-gnu libdbus-1-dev:i386 libgl1-mesa-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
+          sudo apt-get install -yqq g++-multilib libdbus-1-dev:i386 libgl1-mesa-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
