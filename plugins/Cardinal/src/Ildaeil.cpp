@@ -280,10 +280,9 @@ struct IldaeilModule : Module {
         leftExpander.producerMessage = leftMessages[0];
         leftExpander.consumerMessage = leftMessages[1];
 
-        // must init those that have no-connect info to non-connected, or else mother may read 0.0 init value if ever refresh limiters make it such that after a connection of expander the mother reads before the first pass through the expander's writing code, and this may do something undesired (ex: change track in Foundry on expander connected while track CV jack is empty) (comment originally in GateSeq64 by Marc Boulé)
         for (uint i = 0; i < 8; ++i)
         {
-            leftMessages[1][i] = std::numeric_limits<float>::quiet_NaN();
+            leftMessages[1][i] = 0.0;
         }
 
         for (uint i=0; i<2; ++i)
