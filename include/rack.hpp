@@ -17,12 +17,19 @@
 
 #pragma once
 
-#ifdef BUILDING_PLUGIN_MODULES
-# undef ModuleWidget
-#endif
-
-#include_next <app/RackWidget.hpp>
+#include_next <rack.hpp>
 
 #ifdef BUILDING_PLUGIN_MODULES
+namespace rack {
+namespace app {
+struct CardinalModuleWidget : ModuleWidget {
+    CardinalModuleWidget() : ModuleWidget() {}
+    DEPRECATED CardinalModuleWidget(engine::Module* module) : ModuleWidget() {
+        setModule(module);
+    }
+    void onButton(const ButtonEvent& e) override;
+};
+}
+}
 # define ModuleWidget CardinalModuleWidget
 #endif

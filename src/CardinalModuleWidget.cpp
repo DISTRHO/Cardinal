@@ -25,31 +25,35 @@
  * the License, or (at your option) any later version.
  */
 
-#define BUILDING_PLUGIN_MODULES
-#include <app/ModuleWidget.hpp>
-#include <app/RackWidget.hpp>
-#include <plugin/Model.hpp>
-#include <helpers.hpp>
-#undef ModuleWidget
-
 #include "CardinalCommon.hpp"
 
+#include <app/ModuleWidget.hpp>
+#include <app/RackWidget.hpp>
 #include <app/Scene.hpp>
 #include <engine/Engine.hpp>
 #include <ui/MenuSeparator.hpp>
 #include <asset.hpp>
 #include <context.hpp>
+#include <helpers.hpp>
 #include <system.hpp>
 
 namespace rack {
 namespace app {
 
+struct CardinalModuleWidget : ModuleWidget {
+    CardinalModuleWidget() : ModuleWidget() {}
+    DEPRECATED CardinalModuleWidget(engine::Module* module) : ModuleWidget() {
+        setModule(module);
+    }
+    void onButton(const ButtonEvent& e) override;
+};
+
 struct ModuleWidget::Internal {
     math::Vec dragOffset;
     math::Vec dragRackPos;
-    bool dragEnabled = true;
+    bool dragEnabled;
     math::Vec oldPos;
-    widget::Widget* panel = NULL;
+    widget::Widget* panel;
 };
 
 static void CardinalModuleWidget__loadDialog(ModuleWidget* const w)

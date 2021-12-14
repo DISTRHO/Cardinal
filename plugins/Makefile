@@ -543,8 +543,8 @@ PLUGIN_FILES += $(filter-out Prism/src/plugin.cpp, $(wildcard Prism/src/*.cpp))
 PLUGIN_FILES += $(wildcard Prism/src/scales/*.cpp)
 
 # modules/types which are present in other plugins
-PRISM_CUSTOM = bogaudio Filter FilterSetting Inputs Scale
-# PRISM_CUSTOM_PER_FILE = PrismFilterSetting
+PRISM_CUSTOM = bogaudio Scale
+PRISM_CUSTOM_PER_FILE = Envelope Filter FilterBank FilterSetting Inputs IO LEDRing Levels Q Rotation Tuning
 
 # --------------------------------------------------------------
 # rackwindows
@@ -1084,6 +1084,15 @@ $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cp
 		-DpluginInstance=pluginInstance__ImpromptuModular \
 		-DStepAttributes=StepAttributesKernel \
 
+$(BUILD_DIR)/ImpromptuModular/src/ImpromptuModular.cpp.o: ImpromptuModular/src/ImpromptuModular.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
+		-DpluginInstance=pluginInstance__ImpromptuModular \
+		-Dinit=init__ImpromptuModular \
+		-UBUILDING_PLUGIN_MODULES
+
 $(BUILD_DIR)/ImpromptuModular%.cpp.o: ImpromptuModular%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -1091,7 +1100,6 @@ $(BUILD_DIR)/ImpromptuModular%.cpp.o: ImpromptuModular%.cpp
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ImpromptuModular_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
-		-Dinit=init__ImpromptuModular \
 		-Wno-format-truncation
 
 $(BUILD_DIR)/JW-Modules/src/WavHead.cpp.o: JW-Modules/src/WavHead.cpp
