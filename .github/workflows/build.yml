@@ -10,7 +10,7 @@ on:
 env:
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
-  LIBGL_ALWAYS_SOFTWARE: "true"
+  LIBGL_ALWAYS_SOFTWARE: 'true'
 
 jobs:
   linux-arm64:
@@ -22,7 +22,11 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ~/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-linux-arm64
       - name: Set up dependencies
         run: |
@@ -32,22 +36,24 @@ jobs:
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-aarch64-linux-gnu libgl1-mesa-dev:arm64 liblo-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
+          sudo apt-get install -yqq g++-aarch64-linux-gnu libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=${HOME}/.cache
           ccache --set-config=compression=true
-      - name: Build linux arm64 cross-compiled
+      - name: Build extra dependencies
         env:
-          CC: aarch64-linux-gnu-gcc
-          CXX: aarch64-linux-gnu-g++
-          LDFLAGS: -static-libgcc -static-libstdc++
           PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64
+      - name: Build linux arm64 cross-compiled
+        run: |
+          export PATH="/usr/lib/ccache:${PATH}"
+          pushd deps/PawPaw; source local.env linux-aarch64; popd
           make features
-          make WITH_LTO=true -j $(nproc)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -69,7 +75,11 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ~/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-linux-armhf
       - name: Set up dependencies
         run: |
@@ -79,22 +89,24 @@ jobs:
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-arm-linux-gnueabihf libgl1-mesa-dev:armhf liblo-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static
+          sudo apt-get install -yqq g++-arm-linux-gnueabihf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=${HOME}/.cache
           ccache --set-config=compression=true
-      - name: Build linux armhf cross-compiled
+      - name: Build extra dependencies
         env:
-          CC: arm-linux-gnueabihf-gcc
-          CXX: arm-linux-gnueabihf-g++
-          LDFLAGS: -static-libgcc -static-libstdc++
           PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-armhf
+      - name: Build linux armhf cross-compiled
+        run: |
+          export PATH="/usr/lib/ccache:${PATH}"
+          pushd deps/PawPaw; source local.env linux-armhf; popd
           make features
-          make WITH_LTO=true -j $(nproc)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -107,7 +119,7 @@ jobs:
           path: |
             *.tar.gz
 
-  linux-x86:
+  linux-i686:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -116,39 +128,43 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ~/.cache
-          key: ccache-linux-x86
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
+          key: ccache-linux-i686
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-i686-linux-gnu libgl1-mesa-dev:i386 liblo-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
+          sudo apt-get install -yqq g++-multilib libdbus-1-dev:i386 libgl1-mesa-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=${HOME}/.cache
           ccache --set-config=compression=true
-      - name: Build linux x86
+      - name: Build extra dependencies
         env:
-          CC: i686-linux-gnu-gcc
-          CXX: i686-linux-gnu-g++
-          CFLAGS: -m32
-          CXXFLAGS: -m32
-          LDFLAGS: -m32 -static-libgcc -static-libstdc++
           PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-i686
+      - name: Build linux i686
+        run: |
+          export PATH="/usr/lib/ccache:${PATH}"
+          pushd deps/PawPaw; source local.env linux-i686; popd
           make features
-          make WITH_LTO=true -j $(nproc)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ github.event.repository.name }}-linux-x86-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
             *.tar.gz
 
@@ -161,24 +177,31 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ~/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-linux-x86_64
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=${HOME}/.cache
           ccache --set-config=compression=true
-      - name: Build linux x86_64
-        env:
-          LDFLAGS: -static-libgcc -static-libstdc++
+      - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
+          ./deps/PawPaw/bootstrap-cardinal.sh linux
+      - name: Build linux x86_64
+        run: |
+          export PATH="/usr/lib/ccache:${PATH}"
+          pushd deps/PawPaw; source local.env linux; popd
           make features
-          make WITH_LTO=true -j $(nproc)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -243,7 +266,7 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libjansson-dev libsamplerate0-dev libspeexdsp-dev
+          sudo apt-get install -yqq libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libjansson-dev libsamplerate0-dev libsndfile1-dev libspeexdsp-dev
       - name: Build linux x86_64 (sysdeps)
         run: |
           make features
@@ -258,26 +281,31 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ~/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-win32
       - name: Install ccache
         run: |
           brew install ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=${HOME}/.cache
           ccache --set-config=compression=true
       - name: Fix up Xcode
         run: |
-          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*
           sudo xcode-select -s "/Applications/Xcode_12.3.app"
-      - name: Build macOS universal
-        env:
-          CFLAGS: -arch x86_64 -arch arm64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_12 -mmacosx-version-min=10.12 -mtune=generic -msse -msse2
-          CXXFLAGS: -arch x86_64 -arch arm64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_12 -mmacosx-version-min=10.12 -mtune=generic -msse -msse2
-          LDFLAGS: -arch x86_64 -arch arm64 -mmacosx-version-min=10.12
+      - name: Build extra dependencies
         run: |
+          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
+          ./deps/PawPaw/bootstrap-cardinal.sh macos-universal
+      - name: Build macOS universal
+        run: |
+          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
+          pushd deps/PawPaw; source local.env macos-universal; popd
           make features
-          make NOOPT=true WITH_LTO=true -j $(sysctl -n hw.logicalcpu)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(sysctl -n hw.logicalcpu)
           ./dpf/utils/package-osx-bundles.sh
       - name: Set sha8
         id: slug
@@ -297,7 +325,11 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ~/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-win32
       - name: Set up dependencies
         run: |
@@ -308,21 +340,18 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=${HOME}/.cache
           ccache --set-config=compression=true
-      - name: Build win32 cross-compiled
-        env:
-          CC: i686-w64-mingw32-gcc
-          CXX: i686-w64-mingw32-g++
-          EXE_WRAPPER: wine
-          PKG_CONFIG: "false"
-          WINEARCH: "win32"
-          WINEDEBUG: "-all"
-          WINEDLLOVERRIDES: "mscoree,mshtml="
+      - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
+          ./deps/PawPaw/bootstrap-cardinal.sh win32
+      - name: Build win32 cross-compiled
+        run: |
+          export PATH="/usr/lib/ccache:${PATH}"
+          pushd deps/PawPaw; source local.env win32; popd
           make features
-          make WITH_LTO=true -j $(nproc)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -344,7 +373,11 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ~/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-win64
       - name: Set up dependencies
         run: |
@@ -353,21 +386,18 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=${HOME}/.cache
           ccache --set-config=compression=true
-      - name: Build win64 cross-compiled
-        env:
-          CC: x86_64-w64-mingw32-gcc
-          CXX: x86_64-w64-mingw32-g++
-          EXE_WRAPPER: wine
-          PKG_CONFIG: "false"
-          WINEARCH: "win64"
-          WINEDEBUG: "-all"
-          WINEDLLOVERRIDES: "mscoree,mshtml="
+      - name: Build extra dependencies
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
+          ./deps/PawPaw/bootstrap-cardinal.sh win64
+      - name: Build win64 cross-compiled
+        run: |
+          export PATH="/usr/lib/ccache:${PATH}"
+          pushd deps/PawPaw; source local.env win64; popd
           make features
-          make WITH_LTO=true -j $(nproc)
+          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"

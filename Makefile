@@ -20,9 +20,6 @@ SYSDEPS ?= false
 
 CARLA_EXTRA_ARGS = \
 	HAVE_FFMPEG=false \
-	HAVE_FLUIDSYNTH=false \
-	HAVE_LIBMAGIC=false \
-	HAVE_SNDFILE=false \
 	HAVE_PROJECTM=false \
 	HAVE_ZYN_DEPS=false \
 	HAVE_ZYN_UI_DEPS=false
@@ -64,7 +61,7 @@ ifneq ($(WASM),true)
 ifneq ($(HEADLESS),true)
 
 ifneq ($(HAVE_OPENGL),true)
-$(error X11 dependency not installed/available)
+$(error OpenGL dependency not installed/available)
 endif
 ifneq ($(HAVE_X11),true)
 $(error X11 dependency not installed/available)

@@ -126,6 +126,10 @@ DEP_MAKE += DEP_FLAGS="$(BASE_FLAGS)"
 DEP_MAKE += DEP_MAC_SDK_FLAGS=
 DEP_MAKE += MACHINE=$(MACHINE)$(MACHINE_SUFFIX)
 
+ifeq ($(MACOS),true)
+DEP_MAKE += SHA256SUM="shasum5.28 -a 256"
+endif
+
 # --------------------------------------------------------------
 # Rack internal dependencies target
 
