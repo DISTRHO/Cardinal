@@ -1485,8 +1485,11 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             if (ImGui::Button("Load Plugin"))
                 fIdleState = kIdleLoadSelectedPlugin;
 
-            ImGui::SameLine();
-            ImGui::Checkbox("Run in bridge mode", &fPluginWillRunInBridgeMode);
+            if (fPluginType != PLUGIN_INTERNAL)
+            {
+                ImGui::SameLine();
+                ImGui::Checkbox("Run in bridge mode", &fPluginWillRunInBridgeMode);
+            }
 
             ImGui::EndDisabled();
 
