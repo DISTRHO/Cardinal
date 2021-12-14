@@ -46,9 +46,56 @@ namespace rack {
 namespace app {
 
 
+struct ResizeHandle : widget::OpaqueWidget {
+	void draw(const DrawArgs& args) override {
+		nvgStrokeColor(args.vg, nvgRGBf(1, 1, 1));
+		nvgStrokeWidth(args.vg, 1);
+
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, box.size.x, 0);
+		nvgLineTo(args.vg, 0, box.size.y);
+		nvgStroke(args.vg);
+
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, box.size.x + 5, 0);
+		nvgLineTo(args.vg, 0, box.size.y + 5);
+		nvgStroke(args.vg);
+
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, box.size.x + 10, 0);
+		nvgLineTo(args.vg, 0, box.size.y + 10);
+		nvgStroke(args.vg);
+
+		nvgStrokeColor(args.vg, nvgRGBf(0, 0, 0));
+
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, box.size.x+1, 0);
+		nvgLineTo(args.vg, 0, box.size.y+1);
+		nvgStroke(args.vg);
+
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, box.size.x + 6, 0);
+		nvgLineTo(args.vg, 0, box.size.y + 6);
+		nvgStroke(args.vg);
+
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, box.size.x + 11, 0);
+		nvgLineTo(args.vg, 0, box.size.y + 11);
+		nvgStroke(args.vg);
+	}
+};
+
+
 struct Scene::Internal {
+	ResizeHandle* resizeHandle;
+
 	bool heldArrowKeys[4] = {};
 };
+
+
+void hideResizeHandle(Scene* scene) {
+	scene->internal->resizeHandle->hide();
+}
 
 
 Scene::Scene() {
@@ -65,6 +112,10 @@ Scene::Scene() {
 	browser = browserCreate();
 	browser->hide();
 	addChild(browser);
+
+	internal->resizeHandle = new ResizeHandle;
+	internal->resizeHandle->box.size = math::Vec(16, 16);
+	addChild(internal->resizeHandle);
 }
 
 
@@ -79,6 +130,8 @@ math::Vec Scene::getMousePos() {
 
 
 void Scene::step() {
+	internal->resizeHandle->box.pos = box.size.minus(internal->resizeHandle->box.size);
+
 	// Resize owned descendants
 	menuBar->box.size.x = box.size.x;
 	rackScroll->box.pos.y = menuBar->box.size.y;

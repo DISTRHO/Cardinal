@@ -180,6 +180,7 @@ GLFWAPI const char* glfwGetKeyName(const int key, int)
 namespace rack {
 namespace app {
     widget::Widget* createMenuBar(bool isStandalone);
+    void hideResizeHandle(Scene* scene);
 }
 namespace window {
     void WindowSetPluginUI(Window* window, DISTRHO_NAMESPACE::UI* ui);
@@ -269,12 +270,19 @@ public:
         context->nativeWindowId = window.getNativeWindowHandle();
 
         if (isResizable())
-            fResizeHandle.hide();
+            hideResizeHandle(context->scene);
 
         const double scaleFactor = getScaleFactor();
 
         if (scaleFactor != 1)
+        {
+            setGeometryConstraints(640 * scaleFactor, 480 * scaleFactor);
             setSize(1228 * scaleFactor, 666 * scaleFactor);
+        }
+        else
+        {
+            setGeometryConstraints(640, 480);
+        }
 
         rack::contextSet(context);
 

@@ -53,29 +53,8 @@ public:
 protected:
     void onDisplay() override
     {
-        const GraphicsContext& context(getGraphicsContext());
-        const double lineWidth = 1.0 * getScaleFactor();
-
-#ifdef DGL_OPENGL
-        // glUseProgram(0);
-        glMatrixMode(GL_MODELVIEW);
-#endif
-
-        // draw white lines, 1px wide
-        Color(1.0f, 1.0f, 1.0f).setFor(context);
-        l1.draw(context, lineWidth);
-        l2.draw(context, lineWidth);
-        l3.draw(context, lineWidth);
-
-        // draw black lines, offset by 1px and 1px wide
-        Color(0.0f, 0.0f, 0.0f).setFor(context);
-        Line<double> l1b(l1), l2b(l2), l3b(l3);
-        l1b.moveBy(lineWidth, lineWidth);
-        l2b.moveBy(lineWidth, lineWidth);
-        l3b.moveBy(lineWidth, lineWidth);
-        l1b.draw(context, lineWidth);
-        l2b.draw(context, lineWidth);
-        l3b.draw(context, lineWidth);
+        /* Nothing here, we purposefully avoid drawing anything.
+         * The resize handle is on the plugin UI directly. */
     }
 
     bool onMouse(const MouseEvent& ev) override

@@ -325,6 +325,9 @@ math::Vec Window::getSize() {
 
 void Window::setSize(math::Vec size) {
 	internal->size = size.max(minWindowSize);
+
+	if (DISTRHO_NAMESPACE::UI* const ui = internal->ui)
+		ui->setSize(internal->size.x, internal->size.y);
 }
 
 
