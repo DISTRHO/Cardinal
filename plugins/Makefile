@@ -544,7 +544,6 @@ PLUGIN_FILES += $(wildcard Prism/src/scales/*.cpp)
 
 # modules/types which are present in other plugins
 PRISM_CUSTOM = bogaudio Scale
-PRISM_CUSTOM_PER_FILE = Envelope Filter FilterBank FilterSetting Inputs IO LEDRing Levels Q Rotation Tuning
 
 # --------------------------------------------------------------
 # rackwindows
