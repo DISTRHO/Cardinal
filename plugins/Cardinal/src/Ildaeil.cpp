@@ -445,6 +445,20 @@ struct IldaeilModule : Module {
         if (fCarlaPluginHandle == nullptr)
             return;
 
+        bool expanderPresent = (leftExpander.module && leftExpander.module->model == modelIldaeilExpIn8);
+        float *messagesFromExpander = (float*)leftExpander.consumerMessage;// could be invalid pointer when !expanderPresent, so read it only when expanderPresent
+        if (expanderPresent) {
+            const uint32_t pcount = carla_get_parameter_count(fCarlaHostHandle, 0);
+            for (uint i = 0; i < 8; i++) {
+                if (i < pcount && leftExpander.module->inputs[i].isConnected()) {
+                    const ::ParameterRanges* const pranges = carla_get_parameter_ranges(fCarlaHostHandle, 0, i);
+                    float scaled_param = (messagesFromExpander[i] + 10.0) * (pranges->max - pranges->min) / (20.0 + pranges->min);
+                    carla_set_parameter_value(fCarlaHostHandle, 0, i, scaled_param);
+                    fCarlaHostDescriptor.ui_parameter_changed(this, i, scaled_param);
+                }
+            }
+        }
+
         const unsigned i = audioDataFill++;
 
         audioDataIn1[i] = inputs[INPUT1].getVoltage() * 0.1f;
@@ -1042,20 +1056,6 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
             fileBrowserClose(fileBrowserHandle);
             fileBrowserHandle = nullptr;
-        }
-
-        if (fPluginGenericUI != nullptr && module->fCarlaHostHandle != nullptr) {
-            bool expanderPresent = (module->leftExpander.module && module->leftExpander.module->model == modelIldaeilExpIn8);
-            float *messagesFromExpander = (float*)module->leftExpander.consumerMessage;// could be invalid pointer when !expanderPresent, so read it only when expanderPresent
-            if (expanderPresent) {
-                for (uint i = 0; i < 8; i++) {
-                    if (i < fPluginGenericUI->parameterCount && module->leftExpander.module->inputs[i].isConnected()) {
-                        float scaled_param = (messagesFromExpander[i] + 10.0) * (fPluginGenericUI->parameters[i].max - fPluginGenericUI->parameters[i].min) / (20.0 + fPluginGenericUI->parameters[i].min);
-                        fPluginGenericUI->values[i] = scaled_param;
-                        carla_set_parameter_value(module->fCarlaHostHandle, 0, i, scaled_param);
-                    }
-                }
-            }
         }
 
         if (fDrawingState == kDrawingPluginGenericUI && fPluginGenericUI != nullptr && fPluginHasOutputParameters)
