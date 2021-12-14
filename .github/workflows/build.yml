@@ -22,7 +22,11 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ${HOME}/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-linux-arm64
       - name: Set up dependencies
         run: |
@@ -32,7 +36,7 @@ jobs:
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-aarch64-linux-gnu libgl1-mesa-dev:arm64 liblo-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
+          sudo apt-get install -yqq g++-aarch64-linux-gnu libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 liblo-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
@@ -71,7 +75,11 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ${HOME}/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-linux-armhf
       - name: Set up dependencies
         run: |
@@ -81,7 +89,7 @@ jobs:
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-arm-linux-gnueabihf libgl1-mesa-dev:armhf liblo-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static
+          sudo apt-get install -yqq g++-arm-linux-gnueabihf libdbus-1-dev:armhf libgl1-mesa-dev:armhf liblo-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
@@ -120,13 +128,17 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ${HOME}/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-linux-i686
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-i686-linux-gnu libgl1-mesa-dev:i386 liblo-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
+          sudo apt-get install -yqq g++-i686-linux-gnu libdbus-1-dev:i386 libgl1-mesa-dev:i386 liblo-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
@@ -165,12 +177,16 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ${HOME}/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-linux-x86_64
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
@@ -265,7 +281,11 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ${HOME}/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-win32
       - name: Install ccache
         run: |
@@ -305,7 +325,11 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ${HOME}/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-win32
       - name: Set up dependencies
         run: |
@@ -349,7 +373,11 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v2
         with:
-          path: ${HOME}/.cache
+          path: |
+            ${HOME}/.cache
+            ${HOME}/PawPawBuilds/builds
+            ${HOME}/PawPawBuilds/downloads
+            ${HOME}/PawPawBuilds/targets
           key: ccache-win64
       - name: Set up dependencies
         run: |
