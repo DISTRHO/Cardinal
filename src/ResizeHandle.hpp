@@ -39,6 +39,7 @@ public:
     explicit ResizeHandle(TopLevelWidget* const tlw)
         : TopLevelWidget(tlw->getWindow()),
           handleSize(16),
+          hasCursor(false),
           isResizing(false)
     {
         resetArea();
@@ -120,7 +121,6 @@ protected:
 
 private:
     Rectangle<uint> area;
-    Line<double> l1, l2, l3;
     uint handleSize;
 
     // event handling state
@@ -130,48 +130,23 @@ private:
 
     void recheckCursor(const Point<double>& pos)
     {
-        const bool shouldSetCursor = area.contains(pos);
+        const bool shouldHaveCursor = area.contains(pos);
 
-        if (shouldSetCursor == hasCursor)
+        if (shouldHaveCursor == hasCursor)
             return;
 
-        hasCursor = shouldSetCursor;
-        setCursor(shouldSetCursor ? kMouseCursorDiagonal : kMouseCursorArrow);
+        hasCursor = shouldHaveCursor;
+        setCursor(shouldHaveCursor ? kMouseCursorDiagonal : kMouseCursorArrow);
     }
 
     void resetArea()
     {
         const double scaleFactor = getScaleFactor();
-        const uint margin = 0.0 * scaleFactor;
         const uint size = handleSize * scaleFactor;
 
-        area = Rectangle<uint>(getWidth() - size - margin,
-                               getHeight() - size - margin,
+        area = Rectangle<uint>(getWidth() - size,
+                               getHeight() - size,
                                size, size);
-
-        recreateLines(area.getX(), area.getY(), size);
-    }
-
-    void recreateLines(const uint x, const uint y, const uint size)
-    {
-        uint linesize = size;
-        uint offset = 0;
-
-        // 1st line, full diagonal size
-        l1.setStartPos(x + size, y);
-        l1.setEndPos(x, y + size);
-
-        // 2nd line, bit more to the right and down, cropped
-        offset += size / 3;
-        linesize -= size / 3;
-        l2.setStartPos(x + linesize + offset, y + offset);
-        l2.setEndPos(x + offset, y + linesize + offset);
-
-        // 3rd line, even more right and down
-        offset += size / 3;
-        linesize -= size / 3;
-        l3.setStartPos(x + linesize + offset, y + offset);
-        l3.setEndPos(x + offset, y + linesize + offset);
     }
 
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ResizeHandle)
