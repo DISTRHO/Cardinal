@@ -29,7 +29,8 @@ public:
     explicit ResizeHandle(Window& window)
         : TopLevelWidget(window),
           handleSize(16),
-          resizing(false)
+          hasCursor(false),
+          isResizing(false)
     {
         resetArea();
     }
@@ -38,7 +39,7 @@ public:
     explicit ResizeHandle(TopLevelWidget* const tlw)
         : TopLevelWidget(tlw->getWindow()),
           handleSize(16),
-          resizing(false)
+          isResizing(false)
     {
         resetArea();
     }
@@ -64,15 +65,16 @@ protected:
 
         if (ev.press && area.contains(ev.pos))
         {
-            resizing = true;
+            isResizing = true;
             resizingSize = Size<double>(getWidth(), getHeight());
             lastResizePoint = ev.pos;
             return true;
         }
 
-        if (resizing && ! ev.press)
+        if (isResizing && ! ev.press)
         {
-            resizing = false;
+            isResizing = false;
+            recheckCursor(ev.pos);
             return true;
         }
 
@@ -81,8 +83,11 @@ protected:
 
     bool onMotion(const MotionEvent& ev) override
     {
-        if (! resizing)
+        if (! isResizing)
+        {
+            recheckCursor(ev.pos);
             return false;
+        }
 
         const Size<double> offset(ev.pos.getX() - lastResizePoint.getX(),
                                   ev.pos.getY() - lastResizePoint.getY());
@@ -119,9 +124,20 @@ private:
     uint handleSize;
 
     // event handling state
-    bool resizing;
+    bool hasCursor, isResizing;
     Point<double> lastResizePoint;
     Size<double> resizingSize;
+
+    void recheckCursor(const Point<double>& pos)
+    {
+        const bool shouldSetCursor = area.contains(pos);
+
+        if (shouldSetCursor == hasCursor)
+            return;
+
+        hasCursor = shouldSetCursor;
+        setCursor(shouldSetCursor ? kMouseCursorDiagonal : kMouseCursorArrow);
+    }
 
     void resetArea()
     {
