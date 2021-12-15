@@ -26,6 +26,7 @@
  */
 
 #include "plugincontext.hpp"
+#include "expanders.hpp"
 
 #ifndef HEADLESS
 # include "ImGuiWidget.hpp"
@@ -220,7 +221,7 @@ struct JuceInitializer {
 };
 #endif
 
-struct IldaeilModule : Module {
+struct IldaeilModule : CardinalExpander, Module {
     enum ParamIds {
         NUM_PARAMS
     };
@@ -244,8 +245,22 @@ struct IldaeilModule : Module {
         NUM_LIGHTS
     };
 
-    // Expander
-    float leftMessages[2][8] = {};// messages from expander
+    void sendExpMessage() {}
+
+    void processExpMessage() {
+        float *messagesFromExpander = (float*)leftExpander.consumerMessage;
+        if (carla_get_current_plugin_count(fCarlaHostHandle)) {
+            const uint32_t pcount = carla_get_parameter_count(fCarlaHostHandle, 0);
+            for (uint i = 0; i < 8; i++) {
+                if (i < pcount && leftExpander.module->inputs[i].isConnected()) {
+                    const ::ParameterRanges* const pranges = carla_get_parameter_ranges(fCarlaHostHandle, 0, i);
+                    float scaled_param = (messagesFromExpander[i] + 10.0) * (pranges->max - pranges->min) / (20.0 + pranges->min);
+                    carla_set_parameter_value(fCarlaHostHandle, 0, i, scaled_param);
+                    fCarlaHostDescriptor.ui_parameter_changed(this, i, scaled_param);
+                }
+            }
+        }
+    }
 
 #ifndef HEADLESS
     SharedResourcePointer<JuceInitializer> juceInitializer;
@@ -277,14 +292,6 @@ struct IldaeilModule : Module {
     {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
-        leftExpander.producerMessage = leftMessages[0];
-        leftExpander.consumerMessage = leftMessages[1];
-
-        for (uint i = 0; i < 8; ++i)
-        {
-            leftMessages[1][i] = 0.0;
-        }
-
         for (uint i=0; i<2; ++i)
         {
             const char name[] = { 'A','u','d','i','o',' ','#',static_cast<char>('0'+i+1),'\0' };
@@ -300,6 +307,8 @@ struct IldaeilModule : Module {
 
         std::memset(audioDataOut1, 0, sizeof(audioDataOut1));
         std::memset(audioDataOut2, 0, sizeof(audioDataOut2));
+
+        setupExpanding(this);
 
         fCarlaPluginDescriptor = carla_get_native_rack_plugin();
         DISTRHO_SAFE_ASSERT_RETURN(fCarlaPluginDescriptor != nullptr,);
@@ -444,18 +453,10 @@ struct IldaeilModule : Module {
         if (fCarlaPluginHandle == nullptr)
             return;
 
-        bool expanderPresent = (leftExpander.module && leftExpander.module->model == modelIldaeilExpIn8);
-        float *messagesFromExpander = (float*)leftExpander.consumerMessage;// could be invalid pointer when !expanderPresent, so read it only when expanderPresent
+        bool expanderPresent = (leftExpander.module && isCardinalExpander(leftExpander.module));
         if (expanderPresent) {
-            const uint32_t pcount = carla_get_parameter_count(fCarlaHostHandle, 0);
-            for (uint i = 0; i < 8; i++) {
-                if (i < pcount && leftExpander.module->inputs[i].isConnected()) {
-                    const ::ParameterRanges* const pranges = carla_get_parameter_ranges(fCarlaHostHandle, 0, i);
-                    float scaled_param = (messagesFromExpander[i] + 10.0) * (pranges->max - pranges->min) / (20.0 + pranges->min);
-                    carla_set_parameter_value(fCarlaHostHandle, 0, i, scaled_param);
-                    fCarlaHostDescriptor.ui_parameter_changed(this, i, scaled_param);
-                }
-            }
+            // d_stdout("hm?");
+            processExpMessage();
         }
 
         const unsigned i = audioDataFill++;
@@ -1395,7 +1396,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                 }
                 else
                 {
-                    bool expanderPresent = (module->leftExpander.module && module->leftExpander.module->model == modelIldaeilExpIn8);
+                    bool expanderPresent = (module->leftExpander.module && module->isCardinalExpander(module->leftExpander.module));
                     const bool disabled = expanderPresent && (i < 8) && (module->leftExpander.module->inputs[i].isConnected());
                     if (disabled)
                         ImGui::BeginDisabled();

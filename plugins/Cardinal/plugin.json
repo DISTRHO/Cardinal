@@ -77,10 +77,10 @@
       ]
     },
     {
-      "slug": "IldaeilExpIn8",
+      "slug": "CardinalExpIn8",
       "disabled": false,
-      "name": "Ildaeil Expander Inputs 8",
-      "description": "Expander to add 8 parameters CV inputs to Ildaeil",
+      "name": "Cardinal Expander Inputs 8",
+      "description": "Expander to add 8 parameters CV inputs to Cardinal's plugin hosts",
       "tags": [
         "Expander"
       ]
