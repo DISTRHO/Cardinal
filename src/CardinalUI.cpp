@@ -270,7 +270,10 @@ public:
         context->nativeWindowId = window.getNativeWindowHandle();
 
         if (isResizable())
+        {
+            fResizeHandle.hide();
             hideResizeHandle(context->scene);
+        }
 
         const double scaleFactor = getScaleFactor();
 
