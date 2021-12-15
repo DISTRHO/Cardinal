@@ -560,7 +560,7 @@ protected:
 
     bool onScroll(const ScrollEvent& ev) override
     {
-        rack::math::Vec scrollDelta = rack::math::Vec(ev.delta.getX(), ev.delta.getY());
+        rack::math::Vec scrollDelta = rack::math::Vec(-ev.delta.getX(), ev.delta.getY());
 #ifdef DISTRHO_OS_MAC
         scrollDelta = scrollDelta.mult(10.0);
 #else
