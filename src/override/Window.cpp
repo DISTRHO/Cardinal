@@ -55,7 +55,7 @@ namespace rack {
 namespace window {
 
 
-static const math::Vec minWindowSize = math::Vec(640, 480);
+static const math::Vec minWindowSize = math::Vec(648, 538);
 
 
 void Font::loadFile(const std::string& filename, NVGcontext* vg) {

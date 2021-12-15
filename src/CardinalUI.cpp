@@ -274,7 +274,7 @@ public:
 
         const double scaleFactor = getScaleFactor();
 
-        setGeometryConstraints(640, 480);
+        setGeometryConstraints(648, 538);
 
         if (scaleFactor != 1)
             setSize(1228 * scaleFactor, 666 * scaleFactor);
