@@ -3,7 +3,7 @@ struct CardinalExpander
 {
 	CardinalExpander(){
 	};
-	~CardinalExpander(){};
+	virtual ~CardinalExpander(){};
 
 	bool isCardinalExpandable(Module *x) { return x->model == modelIldaeil || x->model == modelCarla; };
 	bool isCardinalExpander(Module *x) { return x->model == modelCardinalExpIn8; };
