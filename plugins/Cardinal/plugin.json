@@ -75,6 +75,15 @@
       "tags": [
         "Utility"
       ]
+    },
+    {
+      "slug": "CardinalExpIn8",
+      "disabled": false,
+      "name": "Cardinal Expander Inputs 8",
+      "description": "Expander to add 8 parameters CV inputs to Cardinal's plugin hosts",
+      "tags": [
+        "Expander"
+      ]
     }
   ]
 }

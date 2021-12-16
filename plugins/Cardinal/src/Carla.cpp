@@ -16,6 +16,7 @@
  */
 
 #include "plugincontext.hpp"
+#include "expanders.hpp"
 
 #include "CarlaNativePlugin.h"
 #include "CarlaBackendUtils.hpp"
@@ -54,7 +55,7 @@ static intptr_t host_dispatcher(NativeHostHandle handle, NativeHostDispatcherOpc
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct CarlaModule : Module {
+struct CarlaModule : Module, CardinalExpander {
     enum ParamIds {
         BIPOLAR_INPUTS,
         BIPOLAR_OUTPUTS,
@@ -122,6 +123,8 @@ struct CarlaModule : Module {
         }
 
         std::memset(dataOut, 0, sizeof(dataOut));
+
+        setupExpanding(this);
 
         fCarlaPluginDescriptor = carla_get_native_patchbay_cv8_plugin();
         DISTRHO_SAFE_ASSERT_RETURN(fCarlaPluginDescriptor != nullptr,);
@@ -259,10 +262,33 @@ struct CarlaModule : Module {
         patchStorage = getPatchStorageDirectory();
     }
 
+    void sendExpMessage() {}
+
+    void processExpMessage() {
+        // Unimplemented
+        float *messagesFromExpander = (float*)leftExpander.consumerMessage;
+        if (carla_get_current_plugin_count(fCarlaHostHandle)) {
+            const uint32_t pcount = carla_get_parameter_count(fCarlaHostHandle, 0);
+            for (uint i = 0; i < 8; i++) {
+                if (i < pcount && leftExpander.module->inputs[i].isConnected()) {
+                    const ::ParameterRanges* const pranges = carla_get_parameter_ranges(fCarlaHostHandle, 0, i);
+                    float scaled_param = (messagesFromExpander[i] + 10.0) * (pranges->max - pranges->min) / (20.0 + pranges->min);
+                    carla_set_parameter_value(fCarlaHostHandle, 0, i, scaled_param);
+                    fCarlaHostDescriptor.ui_parameter_changed(this, i, scaled_param);
+                }
+            }
+        }
+    }
+
     void process(const ProcessArgs& args) override
     {
         if (fCarlaPluginHandle == nullptr)
             return;
+
+        bool expanderPresent = (leftExpander.module && isCardinalExpander(leftExpander.module));
+        if (expanderPresent) {
+            processExpMessage();
+        }
 
         const float inputOffset = params[BIPOLAR_INPUTS].getValue() > 0.1f ? -5.0f : 0.0f;
         const float outputOffset = params[BIPOLAR_OUTPUTS].getValue() > 0.1f ? -5.0f : 0.0f;
