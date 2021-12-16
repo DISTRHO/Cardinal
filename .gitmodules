@@ -124,3 +124,6 @@
 [submodule "deps/PawPaw"]
 	path = deps/PawPaw
 	url = https://github.com/DISTRHO/PawPaw.git
+[submodule "plugins/LomasModules"]
+	path = plugins/LomasModules
+	url = https://github.com/LomasModules/LomasModules.git

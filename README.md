@@ -102,7 +102,8 @@ At the moment the following 3rd-party modules are provided:
 - JW-Modules
 - LifeFormModular
 - Little Utils
-- LyraeModules
+- Lomas Modules
+- Lyrae Modules
 - MindMeld
 - Mog
 - mscHack

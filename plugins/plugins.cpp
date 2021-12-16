@@ -383,6 +383,10 @@ extern Model* modelDriftgen;
 // LittleUtils
 #include "LittleUtils/src/plugin.hpp"
 
+// LomasModules
+#include "LomasModules/src/plugin.hpp"
+#undef DR_WAV_IMPLEMENTATION
+
 // LyraeModules
 /* NOTE too much noise in original include, do this a different way
 // #include "LyraeModules/src/plugin.hpp"
@@ -515,6 +519,7 @@ extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__JW;
 Plugin* pluginInstance__LifeFormModular;
 Plugin* pluginInstance__LittleUtils;
+Plugin* pluginInstance__Lomas;
 Plugin* pluginInstance__Lyrae;
 extern Plugin* pluginInstance__MindMeld;
 Plugin* pluginInstance__Mog;
@@ -1573,6 +1578,19 @@ static void initStatic__LittleUtils()
     }
 }
 
+static void initStatic__Lomas()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Lomas = p;
+
+    const StaticPluginLoader spl(p, "LomasModules");
+    if (spl.ok())
+    {
+        p->addModel(modelAdvancedSampler);
+        p->addModel(modelGateSequencer);
+    }
+}
+
 static void initStatic__Lyrae()
 {
     Plugin* const p = new Plugin;
@@ -1857,6 +1875,7 @@ void initStaticPlugins()
     initStatic__JW();
     initStatic__LifeFormModular();
     initStatic__LittleUtils();
+    initStatic__Lomas();
     initStatic__Lyrae();
     initStatic__MindMeld();
     initStatic__Mog();

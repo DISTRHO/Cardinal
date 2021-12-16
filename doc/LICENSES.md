@@ -38,7 +38,8 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | JW-Modules            | BSD-3-Clause          | |
 | LifeFormModular       | MIT                   | |
 | Little Utils          | MIT                   | |
-| LyraeModules          | GPL-3.0-or-later      | |
+| Lomas Modules         | GPL-3.0-or-later      | |
+| Lyrae Modules         | GPL-3.0-or-later      | |
 | MindMeld              | GPL-3.0-or-later      | |
 | Mog                   | CC0-1.0               | |
 | mscHack               | BSD-3-Clause          | |

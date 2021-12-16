@@ -501,6 +501,11 @@ PLUGIN_FILES += $(filter-out LittleUtils/src/plugin.cpp,$(wildcard LittleUtils/s
 LITTLEUTILS_CUSTOM = MsDisplayWidget
 
 # --------------------------------------------------------------
+# LomasModules
+
+PLUGIN_FILES += $(filter-out LomasModules/src/plugin.cpp,$(wildcard LomasModules/src/*.cpp))
+
+# --------------------------------------------------------------
 # LyraeModules
 
 PLUGIN_FILES += $(filter-out LyraeModules/src/plugin.cpp,$(wildcard LyraeModules/src/*.cpp))
@@ -1139,6 +1144,13 @@ $(BUILD_DIR)/LittleUtils/%.cpp.o: LittleUtils/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(LITTLEUTILS_CUSTOM),$(call custom_module_names,$(m),LittleUtils)) \
 		-DpluginInstance=pluginInstance__LittleUtils
+
+$(BUILD_DIR)/LomasModules/%.cpp.o: LomasModules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(LOMAS_CUSTOM),$(call custom_module_names,$(m),Lomas)) \
+		-DpluginInstance=pluginInstance__Lomas
 
 $(BUILD_DIR)/LyraeModules/%.cpp.o: LyraeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
