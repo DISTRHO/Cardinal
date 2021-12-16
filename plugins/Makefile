@@ -71,6 +71,12 @@ DRWAV += drwav_mulaw_to_s16
 DRWAV += drwav_mulaw_to_s32
 DRWAV += drwav_open
 DRWAV += drwav_open_and_read_f32
+DRWAV += drwav_open_and_read_file_f32
+DRWAV += drwav_open_and_read_file_s16
+DRWAV += drwav_open_and_read_file_s32
+DRWAV += drwav_open_and_read_memory_f32
+DRWAV += drwav_open_and_read_memory_s16
+DRWAV += drwav_open_and_read_memory_s32
 DRWAV += drwav_open_and_read_pcm_frames_f32
 DRWAV += drwav_open_and_read_pcm_frames_s16
 DRWAV += drwav_open_and_read_pcm_frames_s32
@@ -504,6 +510,9 @@ LITTLEUTILS_CUSTOM = MsDisplayWidget
 # LomasModules
 
 PLUGIN_FILES += $(filter-out LomasModules/src/plugin.cpp,$(wildcard LomasModules/src/*.cpp))
+
+# modules/types which are present in other plugins
+LOMAS_CUSTOM = $(DRWAV)
 
 # --------------------------------------------------------------
 # LyraeModules
