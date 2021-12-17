@@ -25,40 +25,20 @@
 #include "ImGuiTextEditor.hpp"
 #include "DearImGuiColorTextEditor/TextEditor.h"
 
+#include <fstream>
+
 // --------------------------------------------------------------------------------------------------------------------
 
 struct ImGuiTextEditor::PrivateData {
-    ImGuiTextEditor* const self;
     TextEditor editor;
     std::string file;
-
-    explicit PrivateData(ImGuiTextEditor* const s)
-        : self(s)
-    {
-        // https://github.com/BalazsJako/ColorTextEditorDemo/blob/master/main.cpp
-
-        editor.SetLanguageDefinition(TextEditor::LanguageDefinition::CPlusPlus());
-        editor.SetText(""
-        "// Welcome to a real text editor inside Cardinal\n"
-        "\n"
-        "#define I_AM_A_MACRO\n"
-        "\n"
-        "int and_i_am_a_variable;\n"
-        "\n"
-        "/* look ma, a comment! */\n"
-        "int such_highlight_much_wow() { return 1337; }\n"
-        );
-        editor.SetCursorPosition(TextEditor::Coordinates(8, 0));
-    }
-
-    DISTRHO_DECLARE_NON_COPYABLE(PrivateData)
 };
 
 // --------------------------------------------------------------------------------------------------------------------
 
 ImGuiTextEditor::ImGuiTextEditor()
     : ImGuiWidget(),
-      pData(new PrivateData(this)) {}
+      pData(new PrivateData) {}
 
 ImGuiTextEditor::~ImGuiTextEditor()
 {
@@ -67,8 +47,35 @@ ImGuiTextEditor::~ImGuiTextEditor()
 
 // --------------------------------------------------------------------------------------------------------------------
 
+bool ImGuiTextEditor::setFile(const std::string& file)
+{
+    std::ifstream f(file);
+
+    if (! f.good())
+    {
+        pData->file.clear();
+        return false;
+    }
+
+    pData->file = file;
+    pData->editor.SetText(std::string((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>()));
+    return true;
+}
+
+void ImGuiTextEditor::setFileWithKnownText(const std::string& file, const std::string& text)
+{
+    pData->file = file;
+    pData->editor.SetText(text);
+}
+
+std::string ImGuiTextEditor::getFile() const
+{
+    return pData->file;
+}
+
 void ImGuiTextEditor::setText(const std::string& text)
 {
+    pData->file.clear();
     pData->editor.SetText(text);
 }
 
@@ -79,6 +86,7 @@ std::string ImGuiTextEditor::getText() const
 
 void ImGuiTextEditor::setTextLines(const std::vector<std::string>& lines)
 {
+    pData->file.clear();
     pData->editor.SetTextLines(lines);
 }
 

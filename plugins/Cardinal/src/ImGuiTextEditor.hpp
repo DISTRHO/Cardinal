@@ -38,6 +38,10 @@ struct ImGuiTextEditor : ImGuiWidget
     ImGuiTextEditor();
     ~ImGuiTextEditor() override;
 
+    bool setFile(const std::string& file);
+    void setFileWithKnownText(const std::string& file, const std::string& text);
+    std::string getFile() const;
+
    /**
       Methods from internal TextEdit.
     */
