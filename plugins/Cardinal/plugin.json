@@ -75,6 +75,15 @@
       "tags": [
         "Utility"
       ]
+    },
+    {
+      "slug": "TextEditor",
+      "disabled": false,
+      "name": "Text Editor",
+      "description": "A embed text editor inside Cardinal",
+      "tags": [
+        "Utility"
+      ]
     }
   ]
 }

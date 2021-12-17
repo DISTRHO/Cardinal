@@ -192,10 +192,13 @@ PLUGIN_FILES += Cardinal/src/HostCV.cpp
 PLUGIN_FILES += Cardinal/src/HostParameters.cpp
 PLUGIN_FILES += Cardinal/src/HostTime.cpp
 PLUGIN_FILES += Cardinal/src/Ildaeil.cpp
+PLUGIN_FILES += Cardinal/src/TextEditor.cpp
 
 ifneq ($(HEADLESS),true)
 PLUGIN_FILES += Cardinal/src/ImGuiWidget.cpp
+PLUGIN_FILES += Cardinal/src/ImGuiTextEditor.cpp
 PLUGIN_FILES += $(wildcard Cardinal/src/DearImGui/*.cpp)
+PLUGIN_FILES += $(wildcard Cardinal/src/DearImGuiColorTextEditor/*.cpp)
 endif
 
 ifneq ($(NOPLUGINS),true)

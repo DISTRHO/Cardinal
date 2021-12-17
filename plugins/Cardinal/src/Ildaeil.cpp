@@ -722,30 +722,6 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
         std::strcpy(fPluginSearchString, "Search...");
 
-        ImGuiStyle& style(ImGui::GetStyle());
-        style.FrameRounding = 4;
-
-        ImVec4* colors = ImGui::GetStyle().Colors;
-        ImVec4 color_Cardinal = ImVec4(0.76f, 0.11f, 0.22f, 1.00f);
-        ImVec4 color_DimCardinal = ImVec4(171.0 / 255.0, 54.0 / 255.0, 73.0 / 255.0, 1.00f);
-        colors[ImGuiCol_Text]                   = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-        colors[ImGuiCol_TextDisabled]           = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-        colors[ImGuiCol_WindowBg]               = ImVec4(0.101f, 0.101f, 0.101f, 0.94f);
-        colors[ImGuiCol_FrameBg]                = ImVec4(0.20f, 0.21f, 0.22f, 0.54f);
-        colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.40f, 0.40f, 0.40f, 0.40f);
-        colors[ImGuiCol_FrameBgActive]          = ImVec4(0.18f, 0.18f, 0.18f, 0.67f);
-        colors[ImGuiCol_TitleBgActive]          = ImVec4(0.29f, 0.29f, 0.29f, 1.00f);
-        colors[ImGuiCol_CheckMark]              = color_Cardinal;
-        colors[ImGuiCol_SliderGrab]             = color_DimCardinal;
-        colors[ImGuiCol_SliderGrabActive]       = color_Cardinal;
-        colors[ImGuiCol_Button]                 = color_DimCardinal;
-        colors[ImGuiCol_ButtonHovered]          = color_Cardinal;
-        colors[ImGuiCol_ButtonActive]           = color_Cardinal;
-        colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.87f, 0.87f, 0.87f, 0.35f);
-        colors[ImGuiCol_Header]         = ImVec4(0.44f, 0.44f, 0.44f, 0.40f);
-        colors[ImGuiCol_HeaderHovered]         = color_DimCardinal;
-        colors[ImGuiCol_HeaderActive]         = color_Cardinal;
-
         if (checkIfPluginIsLoaded())
             fIdleState = kIdleInitPluginAlreadyLoaded;
 
