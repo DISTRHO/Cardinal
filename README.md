@@ -54,7 +54,6 @@ But a couple of modules background's have their colors flipped, because damn we 
 Most of the features already work, you can assume things work in general except when stated otherwise.  
 Currently the following features are known NOT to work:
 
-- Clock related triggers in built-in MIDI modules [#25](https://github.com/DISTRHO/Cardinal/issues/25)
 - VST3 support incomplete/experimental [#41](https://github.com/DISTRHO/Cardinal/issues/41)
 - Factory (plugin-provided) presets [#58](https://github.com/DISTRHO/Cardinal/issues/58)
 

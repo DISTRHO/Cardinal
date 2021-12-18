@@ -31,7 +31,9 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 | Raw-CV plugin variant          | Unsupported               | 2 audio IO + 10 CV IO           | Available in JACK, LV2 and VST3 formats, not possible in VST2 |
 | Arbitrary parameter automation | Yes                       | No                              | Unsupported in Cardinal, tricky to do for many plugin formats at once |
 | Integrated plugin host         | No, Host payed separately | Yes, using Carla or Ildaeil     | |
-| v1 module compatibility        | No                        | No, but with less restrictions  | Modules can load resources at any point |
+| Host sync/timing               | Using MIDI signals        | Using dedicated module          | |
+| Linux/X11 event handling       | Runs on 2nd thread        | Runs on main/GUI thread         | |
+| v1 module compatibility        | No                        | No, but with less restrictions  | Module widgets can load resources at any point |
 | Online phone-home              | Yes                       | No                              | Online access is strictly forbidden in Cardinal |
 | Proper dark theme              | No, only room brightness  | Yes                             | CC-ND respected by leaving files intact, dark mode applied at runtime |
 | Proper Linux headless mode     | No, always requires X11   | Yes                             | |
