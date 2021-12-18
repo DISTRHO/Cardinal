@@ -178,7 +178,18 @@ struct CardinalMidiInputDevice : rack::midi::InputDevice
         return "Cardinal";
     }
 
-    void handleMessagesFromHost(const MidiEvent* const midiEvents, const uint32_t midiEventCount)
+    inline void handleSingleSimpleMessageFromHost(const MidiEvent& midiEvent)
+    {
+        if (subscribed.size() == 0)
+            return;
+
+        msg.frame = midiEvent.frame;
+        std::memcpy(msg.bytes.data(), midiEvent.data, midiEvent.size);
+
+        onMessage(msg);
+    }
+
+    inline void handleMessagesFromHost(const MidiEvent* const midiEvents, const uint32_t midiEventCount)
     {
         if (subscribed.size() == 0)
             return;

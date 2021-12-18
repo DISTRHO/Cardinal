@@ -866,6 +866,15 @@ protected:
         fAudioBufferIn = nullptr;
     }
 
+    inline void sendSingleSimpleMidiMessage(const MidiEvent& midiEvent)
+    {
+        if (CardinalMidiInputDevice** inputs = fCurrentMidiInputs)
+        {
+            for (;*inputs != nullptr; ++inputs)
+                (*inputs)->handleSingleSimpleMessageFromHost(midiEvent);
+        }
+    }
+
     void run(const float** const inputs, float** const outputs, const uint32_t frames,
              const MidiEvent* const midiEvents, const uint32_t midiEventCount) override
     {
@@ -874,6 +883,32 @@ protected:
 
         {
             const TimePosition& timePos(getTimePosition());
+
+            MidiEvent singleTimeMidiEvent = { 0, 1, { 0, 0, 0, 0 }, nullptr };
+
+            if (timePos.playing)
+            {
+                if (timePos.frame == 0 || fPreviousFrame + frames != timePos.frame)
+                    context->reset = true;
+
+                if (! context->playing)
+                {
+                    if (timePos.frame == 0)
+                    {
+                        singleTimeMidiEvent.data[0] = 0xFA;
+                        sendSingleSimpleMidiMessage(singleTimeMidiEvent);
+                    }
+
+                    singleTimeMidiEvent.data[0] = 0xFB;
+                    sendSingleSimpleMidiMessage(singleTimeMidiEvent);
+                }
+            }
+            else if (context->playing)
+            {
+                singleTimeMidiEvent.data[0] = 0xFC;
+                sendSingleSimpleMidiMessage(singleTimeMidiEvent);
+            }
+
             context->playing = timePos.playing;
             context->bbtValid = timePos.bbt.valid;
             context->frame = timePos.frame;
@@ -895,9 +930,6 @@ protected:
                 context->ticksPerFrame = 1.0 / samplesPerTick;
                 context->tickClock = std::fmod(timePos.bbt.tick, context->ticksPerClock);
             }
-
-            if (timePos.playing && fPreviousFrame + frames != timePos.frame)
-                context->reset = true;
 
             fPreviousFrame = timePos.frame;
         }
