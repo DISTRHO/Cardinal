@@ -36,6 +36,7 @@
 "int such_highlight_much_wow() { return 1337; }\n"
 #define DEFAULT_WIDTH 30
 
+#if 0 // ndef HEADLESS
 // utils
 static const TextEditor::LanguageDefinition& getLangFromString(const std::string& lang)
 {
@@ -57,6 +58,7 @@ static const TextEditor::LanguageDefinition& getLangFromString(const std::string
     static const TextEditor::LanguageDefinition none;
     return none;
 }
+#endif
 
 struct TextEditorModule : Module {
     std::string file;
