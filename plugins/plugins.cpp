@@ -1212,13 +1212,16 @@ static void initStatic__ChowDSP()
         p->addModel(modelChowDer);
         p->addModel(modelWarp);
         p->addModel(modelWerner);
-        p->addModel(modelCredit);
         p->addModel(modelChowPulse);
         p->addModel(modelChowTapeCompression);
         p->addModel(modelChowTapeChew);
         p->addModel(modelChowTapeDegrade);
         p->addModel(modelChowTapeLoss);
         p->addModel(modelChowChorus);
+
+        // Credit crashes on save, see https://github.com/DISTRHO/Cardinal/issues/98
+        // p->addModel(modelCredit);
+        spl.removeModule("Credit");
     }
 }
 
