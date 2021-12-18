@@ -91,6 +91,7 @@ RACK_FILES += CardinalModuleWidget.cpp
 RACK_FILES += override/blendish.c
 RACK_FILES += override/Engine.cpp
 RACK_FILES += override/MenuBar.cpp
+RACK_FILES += override/MIDI_CV.cpp
 RACK_FILES += override/Scene.cpp
 RACK_FILES += override/asset.cpp
 RACK_FILES += override/context.cpp
@@ -116,6 +117,7 @@ IGNORED_FILES += Rack/src/rtaudio.cpp
 IGNORED_FILES += Rack/src/rtmidi.cpp
 IGNORED_FILES += Rack/src/app/MenuBar.cpp
 IGNORED_FILES += Rack/src/app/Scene.cpp
+IGNORED_FILES += Rack/src/core/MIDI_CV.cpp
 IGNORED_FILES += Rack/src/engine/Engine.cpp
 IGNORED_FILES += Rack/src/window/Window.cpp
 
@@ -172,6 +174,11 @@ $(BUILD_DIR)/%.c.o: %.c
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@
+
+$(BUILD_DIR)/override/MIDI_CV.cpp.o: override/MIDI_CV.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -UPRIVATE -c -o $@
 
 $(BUILD_DIR)/Rack/src/core/Blank.cpp.o: Rack/src/core/Blank.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
