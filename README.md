@@ -57,7 +57,6 @@ Currently the following features are known NOT to work:
 - Clock related triggers in built-in MIDI modules [#25](https://github.com/DISTRHO/Cardinal/issues/25)
 - VST3 support incomplete/experimental [#41](https://github.com/DISTRHO/Cardinal/issues/41)
 - Factory (plugin-provided) presets [#58](https://github.com/DISTRHO/Cardinal/issues/58)
-- File dialogs triggered by module right-click menus [#76, in progress](https://github.com/DISTRHO/Cardinal/issues/76)
 
 ### Current builds
 
