@@ -36,30 +36,6 @@
 "int such_highlight_much_wow() { return 1337; }\n"
 #define DEFAULT_WIDTH 30
 
-#if 0 // ndef HEADLESS
-// utils
-static const TextEditor::LanguageDefinition& getLangFromString(const std::string& lang)
-{
-    if (lang == "AngelScript")
-        return TextEditor::LanguageDefinition::AngelScript();
-    if (lang == "C")
-        return TextEditor::LanguageDefinition::C();
-    if (lang == "C++")
-        return TextEditor::LanguageDefinition::CPlusPlus();
-    if (lang == "GLSL")
-        return TextEditor::LanguageDefinition::GLSL();
-    if (lang == "HLSL")
-        return TextEditor::LanguageDefinition::HLSL();
-    if (lang == "Lua")
-        return TextEditor::LanguageDefinition::Lua();
-    if (lang == "SQL")
-        return TextEditor::LanguageDefinition::SQL();
-
-    static const TextEditor::LanguageDefinition none;
-    return none;
-}
-#endif
-
 struct TextEditorModule : Module {
     std::string file;
     std::string lang = DEFAULT_LANG;
@@ -88,8 +64,8 @@ struct TextEditorModule : Module {
         {
             lang = json_string_value(langJ);
 #ifndef HEADLESS
-            // if (ImGuiTextEditor* const widget = widgetPtr)
-               // widget->SetLanguageDefinition(getLangFromString(lang));
+            if (ImGuiTextEditor* const widget = widgetPtr)
+                widget->setLanguageDefinition(lang);
 #endif
         }
 
@@ -148,17 +124,20 @@ struct TextEditorLangSelectItem : MenuItem {
 
     TextEditorLangSelectItem(TextEditorModule* const textEditorModule,
                              ImGuiTextEditor* const textEditorWidget,
-                             const char* const textToUse)
+                             const char* const lang)
         : module(textEditorModule),
           widget(textEditorWidget)
     {
-        text = textToUse;
+        text = lang;
+
+        if (module->lang == lang)
+            rightText = CHECKMARK_STRING;
     }
 
     void onAction(const event::Action &e) override
     {
         module->lang = text;
-        // widget->SetLanguageDefinition(getLangFromString(text));
+        widget->setLanguageDefinition(text);
     }
 };
 
@@ -185,12 +164,12 @@ struct TextEditorLangSelectMenuItem : MenuItem {
           widget(textEditorWidget)
     {
         text = "Syntax Highlight";
+        rightText = RIGHT_ARROW;
     }
 
-    void onAction(const event::Action &e) override
+    Menu* createChildMenu() override
     {
-        // TODO
-        // new TextEditorLangSelectMenu(module, widget);
+        return new TextEditorLangSelectMenu(module, widget);
     }
 };
 
@@ -328,6 +307,7 @@ struct TextEditorModuleWidget : ModuleWidget {
             textEditorModule = module;
             textEditorWidget = new ImGuiTextEditor();
             textEditorWidget->setFileWithKnownText(module->file, module->text);
+            textEditorWidget->setLanguageDefinition(module->lang);
             textEditorWidget->box.pos = Vec(RACK_GRID_WIDTH, 0);
             textEditorWidget->box.size = Vec((module->width - 2) * RACK_GRID_WIDTH, box.size.y);
             addChild(textEditorWidget);
@@ -342,8 +322,7 @@ struct TextEditorModuleWidget : ModuleWidget {
     {
         menu->addChild(new MenuSeparator);
         menu->addChild(new TextEditorLoadFileItem(textEditorModule, textEditorWidget));
-        // TODO
-        // menu->addChild(new TextEditorLangSelectMenuItem(textEditorModule, textEditorWidget));
+        menu->addChild(new TextEditorLangSelectMenuItem(textEditorModule, textEditorWidget));
     }
 
     void step() override

@@ -73,6 +73,28 @@ std::string ImGuiTextEditor::getFile() const
     return pData->file;
 }
 
+void ImGuiTextEditor::setLanguageDefinition(const std::string& lang)
+{
+    if (lang == "AngelScript")
+        return pData->editor.SetLanguageDefinition(TextEditor::LanguageDefinition::AngelScript());
+    if (lang == "C")
+        return pData->editor.SetLanguageDefinition(TextEditor::LanguageDefinition::C());
+    if (lang == "C++")
+        return pData->editor.SetLanguageDefinition(TextEditor::LanguageDefinition::CPlusPlus());
+    if (lang == "GLSL")
+        return pData->editor.SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL());
+    if (lang == "HLSL")
+        return pData->editor.SetLanguageDefinition(TextEditor::LanguageDefinition::HLSL());
+    if (lang == "Lua")
+        return pData->editor.SetLanguageDefinition(TextEditor::LanguageDefinition::Lua());
+    if (lang == "SQL")
+        return pData->editor.SetLanguageDefinition(TextEditor::LanguageDefinition::SQL());
+
+    pData->editor.SetLanguageDefinition(TextEditor::LanguageDefinition());
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 void ImGuiTextEditor::setText(const std::string& text)
 {
     pData->file.clear();

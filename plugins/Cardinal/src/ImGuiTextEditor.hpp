@@ -42,6 +42,8 @@ struct ImGuiTextEditor : ImGuiWidget
     void setFileWithKnownText(const std::string& file, const std::string& text);
     std::string getFile() const;
 
+    void setLanguageDefinition(const std::string& lang);
+
    /**
       Methods from internal TextEdit.
     */
