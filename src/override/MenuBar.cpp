@@ -174,6 +174,14 @@ struct FileButton : MenuButton {
 			patchUtils::revertDialog();
 		}, APP->patch->path.empty()));
 
+		menu->addChild(new ui::MenuSeparator);
+
+		// Load selection
+		menu->addChild(createMenuItem("Import selection", "", [=]() {
+			// APP->scene->rack->loadSelectionDialog();
+			patchUtils::loadSelectionDialog();
+		}, false, true));
+
 		if (isStandalone) {
 			menu->addChild(new ui::MenuSeparator);
 
@@ -325,13 +333,19 @@ struct CableTensionQuantity : Quantity {
 		return settings::cableTension;
 	}
 	float getDefaultValue() override {
-		return 0.5;
+		return 0.75;
+	}
+	float getDisplayValue() override {
+		return getValue() * 100;
+	}
+	void setDisplayValue(float displayValue) override {
+		setValue(displayValue / 100);
 	}
 	std::string getLabel() override {
 		return "Cable tension";
 	}
-	int getDisplayPrecision() override {
-		return 2;
+	std::string getUnit() override {
+		return "%";
 	}
 };
 struct CableTensionSlider : ui::Slider {

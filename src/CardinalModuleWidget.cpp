@@ -239,28 +239,6 @@ static void CardinalModuleWidget__createContextMenu(ModuleWidget* const w,
     w->appendContextMenu(menu);
 }
 
-static void CardinalModuleWidget__loadSelectionDialog(RackWidget* const w)
-{
-    std::string selectionDir = asset::user("selections");
-    system::createDirectories(selectionDir);
-
-    async_dialog_filebrowser(false, selectionDir.c_str(), "Import selection", [w](char* pathC) {
-        if (!pathC) {
-            // No path selected
-            return;
-        }
-
-        try {
-            w->loadSelection(pathC);
-        }
-        catch (Exception& e) {
-            async_dialog_message(e.what());
-        }
-
-        std::free(pathC);
-    });
-}
-
 static void CardinalModuleWidget__saveSelectionDialog(RackWidget* const w)
 {
     std::string selectionDir = asset::user("selections");
@@ -353,11 +331,6 @@ void appendSelectionContextMenu(ui::Menu* const menu)
     // Paste
     menu->addChild(createMenuItem("Paste", RACK_MOD_CTRL_NAME "+V", [w]() {
         w->pasteClipboardAction();
-    }, false, true));
-
-    // Load
-    menu->addChild(createMenuItem("Import selection", "", [w]() {
-        CardinalModuleWidget__loadSelectionDialog(w);
     }, false, true));
 
     // Save

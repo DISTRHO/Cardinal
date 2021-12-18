@@ -31,6 +31,7 @@ namespace patchUtils
 
 void loadDialog();
 void loadPathDialog(const std::string& path);
+void loadSelectionDialog();
 void loadTemplateDialog();
 void revertDialog();
 void saveDialog(const std::string& path);

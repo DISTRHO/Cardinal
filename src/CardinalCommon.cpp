@@ -30,6 +30,7 @@
 #include "AsyncDialog.hpp"
 #include "PluginContext.hpp"
 
+#include <asset.hpp>
 #include <context.hpp>
 #include <history.hpp>
 #include <patch.hpp>
@@ -115,6 +116,30 @@ void loadPathDialog(const std::string& path)
         APP->patch->loadAction(path);
     });
 #endif
+}
+
+void loadSelectionDialog()
+{
+    app::RackWidget* const w = APP->scene->rack;
+
+    std::string selectionDir = asset::user("selections");
+    system::createDirectories(selectionDir);
+
+    async_dialog_filebrowser(false, selectionDir.c_str(), "Import selection", [w](char* pathC) {
+        if (!pathC) {
+            // No path selected
+            return;
+        }
+
+        try {
+            w->loadSelection(pathC);
+        }
+        catch (Exception& e) {
+            async_dialog_message(e.what());
+        }
+
+        std::free(pathC);
+    });
 }
 
 void loadTemplateDialog()
