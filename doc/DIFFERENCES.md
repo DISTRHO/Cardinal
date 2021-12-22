@@ -28,7 +28,7 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 | Supports ARM systems           | No                        | Yes                             | This means Apple M1 too, yes |
 | Synth plugin variant           | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
 | FX plugin variant              | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
-| Raw-CV plugin variant          | Unsupported               | 2 audio IO + 10 CV IO           | Available in JACK, LV2 and VST3 formats, not possible in VST2 |
+| Raw-CV plugin variant          | Unsupported               | 8 audio IO + 10 CV IO           | Available in JACK, LV2 and VST3 formats, not possible in VST2 |
 | Arbitrary parameter automation | Yes                       | No                              | Unsupported in Cardinal, tricky to do for many plugin formats at once |
 | Integrated plugin host         | No, Host payed separately | Yes, using Carla or Ildaeil     | |
 | Host sync/timing               | Using MIDI signals        | Using dedicated module          | |

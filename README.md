@@ -23,11 +23,12 @@ Cardinal provides 3 plugin variants - "main", Synth and FX.
 They are all equivalent in performance and behaviour, with only the IO and metadata that changes.  
 This is because some hosts are very strict on which plugins are allowed as instruments vs FX, so separate variants of the same plugin are needed.
 
-All variants have 2 audio outputs and MIDI support.
+FX and Synth variants both have 2 audio outputs, while "main" has 8.  
+All variants have MIDI input and output support.
 
 ### Main
 
-This variant provides 2 audio inputs and outputs and 10 CV inputs and outputs.  
+This variant provides 8 audio inputs and outputs and 10 CV inputs and outputs.  
 
 NOTE: Due to VST2 format not supporting CV ports, this variant is not available for VST2.
 

@@ -604,10 +604,10 @@ protected:
 
     void initAudioPort(const bool input, uint32_t index, AudioPort& port) override
     {
-        if (index >= 2)
+        if (index >= 8)
         {
             port.hints = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange;
-            index -= 2;
+            index -= 8;
         }
 
         CardinalBasePlugin::initAudioPort(input, index, port);
