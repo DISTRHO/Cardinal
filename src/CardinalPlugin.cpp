@@ -942,20 +942,18 @@ protected:
 
         if (fCurrentAudioDevice != nullptr)
         {
-#if DISTRHO_PLUGIN_NUM_INPUTS != 0
+#if CARDINAL_NUM_AUDIO_INPUTS != 0
             for (uint32_t i=0, j=0; i<frames; ++i)
-            {
-                fAudioBufferIn[j++] = inputs[0][i];
-                fAudioBufferIn[j++] = inputs[1][i];
-            }
-            fCurrentAudioDevice->processInput(fAudioBufferIn, 2, frames);
+                for (uint32_t k=0; k<CARDINAL_NUM_AUDIO_INPUTS; ++k)
+                    fAudioBufferIn[j++] = inputs[k][i];
+            fCurrentAudioDevice->processInput(fAudioBufferIn, CARDINAL_NUM_AUDIO_INPUTS, frames);
 #else
             std::memset(fAudioBufferIn, 0, sizeof(float)*frames);
             fCurrentAudioDevice->processInput(fAudioBufferIn, 1, frames);
 #endif
         }
 
-#if DISTRHO_PLUGIN_NUM_OUTPUTS != 2
+#if CARDINAL_NUM_AUDIO_OUTPUTS != 2
         context->dataFrame = 0;
         context->dataIns = inputs;
         context->dataOuts = outputs;
@@ -965,19 +963,17 @@ protected:
 
         if (fCurrentAudioDevice != nullptr)
         {
-            std::memset(fAudioBufferOut, 0, sizeof(float)*frames*2);
-            fCurrentAudioDevice->processOutput(fAudioBufferOut, 2, frames);
+            std::memset(fAudioBufferOut, 0, sizeof(float)*frames*CARDINAL_NUM_AUDIO_OUTPUTS);
+            fCurrentAudioDevice->processOutput(fAudioBufferOut, CARDINAL_NUM_AUDIO_OUTPUTS, frames);
 
             for (uint32_t i=0, j=0; i<frames; ++i)
-            {
-                outputs[0][i] = fAudioBufferOut[j++];
-                outputs[1][i] = fAudioBufferOut[j++];
-            }
+                for (uint32_t k=0; k<CARDINAL_NUM_AUDIO_OUTPUTS; ++k)
+                    outputs[k][i] = fAudioBufferOut[j++];
         }
         else
         {
-            std::memset(outputs[0], 0, sizeof(float)*frames);
-            std::memset(outputs[1], 0, sizeof(float)*frames);
+            for (uint32_t k=0; k<CARDINAL_NUM_AUDIO_OUTPUTS; ++k)
+                std::memset(outputs[k], 0, sizeof(float)*frames);
         }
     }
 

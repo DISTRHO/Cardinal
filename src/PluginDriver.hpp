@@ -37,20 +37,12 @@ struct CardinalAudioDevice : rack::audio::Device
 
     int getNumInputs() override
     {
-#if DISTRHO_PLUGIN_NUM_INPUTS > 10
-        return DISTRHO_PLUGIN_NUM_INPUTS - 10;
-#else
-        return std::min(2, DISTRHO_PLUGIN_NUM_INPUTS);
-#endif
+        return CARDINAL_NUM_AUDIO_INPUTS;
     }
 
     int getNumOutputs() override
     {
-#if DISTRHO_PLUGIN_NUM_OUTPUTS > 10
-        return DISTRHO_PLUGIN_NUM_OUTPUTS - 10;
-#else
-        return std::min(2, DISTRHO_PLUGIN_NUM_OUTPUTS);
-#endif
+        return CARDINAL_NUM_AUDIO_OUTPUTS;
     }
 
     int getBlockSize() override
@@ -117,20 +109,12 @@ struct CardinalAudioDriver : rack::audio::Driver
 
     int getDeviceNumInputs(int) override
     {
-#if DISTRHO_PLUGIN_NUM_INPUTS > 10
-        return DISTRHO_PLUGIN_NUM_INPUTS - 10;
-#else
-        return std::min(2, DISTRHO_PLUGIN_NUM_INPUTS);
-#endif
+        return CARDINAL_NUM_AUDIO_INPUTS;
     }
 
     int getDeviceNumOutputs(int) override
     {
-#if DISTRHO_PLUGIN_NUM_OUTPUTS > 10
-        return DISTRHO_PLUGIN_NUM_OUTPUTS - 10;
-#else
-        return std::min(2, DISTRHO_PLUGIN_NUM_OUTPUTS);
-#endif
+        return CARDINAL_NUM_AUDIO_OUTPUTS;
     }
 
     rack::audio::Device* subscribe(int, rack::audio::Port* const port) override

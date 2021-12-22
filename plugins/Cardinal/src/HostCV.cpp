@@ -17,6 +17,8 @@
 
 #include "plugincontext.hpp"
 
+#define CARDINAL_AUDIO_IO_OFFSET 8
+
 // -----------------------------------------------------------------------------------------------------------
 
 USE_NAMESPACE_DISTRHO;
@@ -84,8 +86,8 @@ struct HostCV : Module {
 
             for (int i=0; i<5; ++i)
             {
-                outputs[i].setVoltage(dataIns[i+2][dataFrame] - outputOffset);
-                dataOuts[i+2][dataFrame] = inputs[i].getVoltage() + inputOffset;
+                outputs[i].setVoltage(dataIns[i+CARDINAL_AUDIO_IO_OFFSET][dataFrame] - outputOffset);
+                dataOuts[i+CARDINAL_AUDIO_IO_OFFSET][dataFrame] = inputs[i].getVoltage() + inputOffset;
             }
 
             inputOffset = params[BIPOLAR_INPUTS_6_10].getValue() > 0.1f ? 5.0f : 0.0f;
@@ -93,8 +95,8 @@ struct HostCV : Module {
 
             for (int i=5; i<10; ++i)
             {
-                outputs[i].setVoltage(dataIns[i+2][dataFrame] - outputOffset);
-                dataOuts[i+2][dataFrame] = inputs[i].getVoltage() + inputOffset;
+                outputs[i].setVoltage(dataIns[i+CARDINAL_AUDIO_IO_OFFSET][dataFrame] - outputOffset);
+                dataOuts[i+CARDINAL_AUDIO_IO_OFFSET][dataFrame] = inputs[i].getVoltage() + inputOffset;
             }
         }
     }
