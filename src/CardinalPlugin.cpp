@@ -552,9 +552,9 @@ protected:
 
     const char* getLabel() const override
     {
-#if DISTRHO_PLUGIN_IS_SYNTH
+#if CARDINAL_VARIANT_SYNTH
         return "CardinalSynth";
-#elif DISTRHO_PLUGIN_NUM_INPUTS == 2
+#elif CARDINAL_VARIANT_FX
         return "CardinalFX";
 #else
         return "Cardinal";
@@ -590,9 +590,9 @@ protected:
 
     int64_t getUniqueId() const override
     {
-#if DISTRHO_PLUGIN_IS_SYNTH
+#if CARDINAL_VARIANT_SYNTH
         return d_cconst('d', 'C', 'n', 'S');
-#elif DISTRHO_PLUGIN_NUM_INPUTS == 2
+#elif CARDINAL_VARIANT_FX
         return d_cconst('d', 'C', 'n', 'F');
 #else
         return d_cconst('d', 'C', 'd', 'n');
@@ -953,7 +953,7 @@ protected:
 #endif
         }
 
-#if CARDINAL_NUM_AUDIO_OUTPUTS != 2
+#if CARDINAL_VARIANT_MAIN
         context->dataFrame = 0;
         context->dataIns = inputs;
         context->dataOuts = outputs;
