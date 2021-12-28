@@ -32,10 +32,6 @@
 namespace rack {
 namespace core {
 
-static inline void nsvg__deletePaths(NSVGpath* path)
-{
-}
-
 struct MIDI_CVWidget_Cardinal : ModuleWidget
 {
     MIDI_CV* const module;
