@@ -5,6 +5,8 @@
 
 #ifdef WIN32
 # include <windows.h>
+#else
+# include <unistd.h>
 #endif
 
 #include "appDetails.h"
@@ -26,7 +28,7 @@ int sfx_app_autorun_now()
     int i, cmdBufLen = 0;
     char cmdBuf[CMD_BUF_LEN];
 
-    const char* const path = sfx_get_tmp_path(1);
+    const char* const path = sfx_get_tmp_path();
     chdir(path);
 
     strcpy(cmdBuf, path);
@@ -60,13 +62,12 @@ int sfx_app_autorun_now()
 #endif
 }
 
-char* sfx_get_tmp_path(int withAppName)
+char* sfx_get_tmp_path()
 {
 #ifdef WIN32
     GetTempPathA(512 - strlen(DISTRHO_PLUGIN_LABEL), sfx_tmp_path);
 
-    if (withAppName == 1)
-        strcat(sfx_tmp_path, DISTRHO_PLUGIN_LABEL);
+    strcat(sfx_tmp_path, DISTRHO_PLUGIN_LABEL);
 #else
     char* const tmp = getenv("TMP");
 
@@ -75,8 +76,7 @@ char* sfx_get_tmp_path(int withAppName)
     else
         strcpy(sfx_tmp_path, "/tmp");
 
-    if (withAppName == 1)
-        strcat(sfx_tmp_path, "/" DISTRHO_PLUGIN_LABEL);
+    strcat(sfx_tmp_path, "/" DISTRHO_PLUGIN_LABEL);
 #endif
 
     return sfx_tmp_path;

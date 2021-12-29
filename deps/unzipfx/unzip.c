@@ -1338,7 +1338,7 @@ int uz_opts(__G__ pargc, pargv)
     argc = *pargc;
     argv = *pargv;
 
-    uO.exdir = sfx_get_tmp_path(0);
+    uO.exdir = sfx_get_tmp_path();
     uO.overwrite_all = 1;
 
     sfx_app_set_args(argc-1, argv+1);

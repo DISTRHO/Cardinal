@@ -14,6 +14,6 @@
 
 void  sfx_app_set_args(int argc, char** argv);
 int   sfx_app_autorun_now();
-char* sfx_get_tmp_path(int withAppName);
+char* sfx_get_tmp_path();
 
 #endif // __APP_DETAILS_H__
