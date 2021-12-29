@@ -124,6 +124,25 @@ endif
 
 # --------------------------------------------------------------
 
+unzipfx: deps/unzipfx/unzipfx2cat$(APP_EXT) Cardinal.zip
+	cat deps/unzipfx/unzipfx2cat$(APP_EXT) Cardinal.zip > Cardinal
+	chmod +x Cardinal
+
+Cardinal.zip: bin/Cardinal bin/CardinalFX.lv2/resources
+	mkdir -p build/unzipfx
+	ln -sf ../../bin/Cardinal build/unzipfx/Cardinal
+	ln -s ../../bin/CardinalFX.lv2/resources build/unzipfx/resources
+	cd build/unzipfx && \
+		zip -r -9 ../../Cardinal.zip Cardinal resources
+
+deps/unzipfx/unzipfx2cat:
+	make -C deps/unzipfx -f Makefile.linux
+
+deps/unzipfx/unzipfx2cat.exe:
+	make -C deps/unzipfx -f Makefile.win32
+
+# --------------------------------------------------------------
+
 clean:
 	$(MAKE) distclean -C carla
 	$(MAKE) clean -C deps
