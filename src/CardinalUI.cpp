@@ -277,9 +277,9 @@ public:
 
         const double scaleFactor = getScaleFactor();
 
-        setGeometryConstraints(648, 538);
+        setGeometryConstraints(648 * scaleFactor, 538 * scaleFactor);
 
-        if (scaleFactor != 1)
+        if (scaleFactor != 1.0)
             setSize(1228 * scaleFactor, 666 * scaleFactor);
 
         rack::contextSet(context);
