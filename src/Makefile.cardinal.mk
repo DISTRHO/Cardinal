@@ -240,7 +240,7 @@ BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 
 ifeq ($(NAME),CardinalFX)
 
-all: jack lv2 vst2 vst3 resources
+all: lv2 vst2 vst3 resources
 
 CORE_RESOURCES = $(filter-out icon.png,$(subst ../Rack/res/,,$(wildcard ../Rack/res/*))) template.vcv
 
@@ -257,7 +257,7 @@ else # CardinalFX
 ifeq ($(NAME),Cardinal)
 all: jack lv2 vst3 resources
 else
-all: jack lv2 vst2 vst3 resources
+all: lv2 vst2 vst3 resources
 endif
 
 PLUGIN_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/resources
