@@ -53,7 +53,7 @@ jobs:
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-aarch64; popd
           make features
-          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
+          make NOOPT=true SKIP_RTAUDIO_FALLBACK=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
           make unzipfx
       - name: Set sha8
         id: slug
@@ -107,7 +107,7 @@ jobs:
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-armhf; popd
           make features
-          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
+          make NOOPT=true SKIP_RTAUDIO_FALLBACK=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
           make unzipfx
       - name: Set sha8
         id: slug
@@ -157,7 +157,7 @@ jobs:
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-i686; popd
           make features
-          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
+          make NOOPT=true SKIP_RTAUDIO_FALLBACK=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
           make unzipfx
       - name: Set sha8
         id: slug
@@ -204,7 +204,7 @@ jobs:
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux; popd
           make features
-          make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
+          make NOOPT=true SKIP_RTAUDIO_FALLBACK=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
           make unzipfx
       - name: Set sha8
         id: slug
