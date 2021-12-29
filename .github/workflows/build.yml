@@ -8,6 +8,7 @@ on:
     branches:
       - '*'
 env:
+  CACHE_VERSION: 1
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -27,7 +28,7 @@ jobs:
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
-          key: ccache-linux-arm64
+          key: linux-arm64-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture arm64
@@ -81,7 +82,7 @@ jobs:
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
-          key: ccache-linux-armhf
+          key: linux-armhf-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture armhf
@@ -135,7 +136,7 @@ jobs:
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
-          key: ccache-linux-i686
+          key: linux-i686-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture i386
@@ -185,7 +186,7 @@ jobs:
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
-          key: ccache-linux-x86_64
+          key: linux-x86_64-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
@@ -290,7 +291,7 @@ jobs:
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
-          key: ccache-win32
+          key: macos-universal-v${{ env.CACHE_VERSION }}
       - name: Install ccache
         run: |
           brew install ccache
@@ -334,7 +335,7 @@ jobs:
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
-          key: ccache-win32
+          key: win32-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           sudo add-apt-repository -y ppa:cybermax-dexter/mingw-w64-backport
@@ -382,7 +383,7 @@ jobs:
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
-          key: ccache-win64
+          key: win64-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
