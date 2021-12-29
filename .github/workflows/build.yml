@@ -23,10 +23,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ${HOME}/.cache
-            ${HOME}/PawPawBuilds/builds
-            ${HOME}/PawPawBuilds/downloads
-            ${HOME}/PawPawBuilds/targets
+            ~/.cache
+            ~/PawPawBuilds/builds
+            ~/PawPawBuilds/downloads
+            ~/PawPawBuilds/targets
           key: ccache-linux-arm64
       - name: Set up dependencies
         run: |
@@ -40,7 +40,7 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=${HOME}/.cache
+          ccache --set-config=cache_dir=~/.cache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         env:
@@ -77,10 +77,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ${HOME}/.cache
-            ${HOME}/PawPawBuilds/builds
-            ${HOME}/PawPawBuilds/downloads
-            ${HOME}/PawPawBuilds/targets
+            ~/.cache
+            ~/PawPawBuilds/builds
+            ~/PawPawBuilds/downloads
+            ~/PawPawBuilds/targets
           key: ccache-linux-armhf
       - name: Set up dependencies
         run: |
@@ -94,7 +94,7 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=${HOME}/.cache
+          ccache --set-config=cache_dir=~/.cache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         env:
@@ -131,10 +131,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ${HOME}/.cache
-            ${HOME}/PawPawBuilds/builds
-            ${HOME}/PawPawBuilds/downloads
-            ${HOME}/PawPawBuilds/targets
+            ~/.cache
+            ~/PawPawBuilds/builds
+            ~/PawPawBuilds/downloads
+            ~/PawPawBuilds/targets
           key: ccache-linux-i686
       - name: Set up dependencies
         run: |
@@ -144,7 +144,7 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=${HOME}/.cache
+          ccache --set-config=cache_dir=~/.cache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         env:
@@ -181,10 +181,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ${HOME}/.cache
-            ${HOME}/PawPawBuilds/builds
-            ${HOME}/PawPawBuilds/downloads
-            ${HOME}/PawPawBuilds/targets
+            ~/.cache
+            ~/PawPawBuilds/builds
+            ~/PawPawBuilds/downloads
+            ~/PawPawBuilds/targets
           key: ccache-linux-x86_64
       - name: Set up dependencies
         run: |
@@ -193,7 +193,7 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=${HOME}/.cache
+          ccache --set-config=cache_dir=~/.cache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         run: |
@@ -286,15 +286,15 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ${HOME}/.cache
-            ${HOME}/PawPawBuilds/builds
-            ${HOME}/PawPawBuilds/downloads
-            ${HOME}/PawPawBuilds/targets
+            ~/.cache
+            ~/PawPawBuilds/builds
+            ~/PawPawBuilds/downloads
+            ~/PawPawBuilds/targets
           key: ccache-win32
       - name: Install ccache
         run: |
           brew install ccache
-          ccache --set-config=cache_dir=${HOME}/.cache
+          ccache --set-config=cache_dir=~/.cache
           ccache --set-config=compression=true
       - name: Fix up Xcode
         run: |
@@ -330,10 +330,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ${HOME}/.cache
-            ${HOME}/PawPawBuilds/builds
-            ${HOME}/PawPawBuilds/downloads
-            ${HOME}/PawPawBuilds/targets
+            ~/.cache
+            ~/PawPawBuilds/builds
+            ~/PawPawBuilds/downloads
+            ~/PawPawBuilds/targets
           key: ccache-win32
       - name: Set up dependencies
         run: |
@@ -344,7 +344,7 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=${HOME}/.cache
+          ccache --set-config=cache_dir=~/.cache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         run: |
@@ -378,10 +378,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ${HOME}/.cache
-            ${HOME}/PawPawBuilds/builds
-            ${HOME}/PawPawBuilds/downloads
-            ${HOME}/PawPawBuilds/targets
+            ~/.cache
+            ~/PawPawBuilds/builds
+            ~/PawPawBuilds/downloads
+            ~/PawPawBuilds/targets
           key: ccache-win64
       - name: Set up dependencies
         run: |
@@ -390,7 +390,7 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=${HOME}/.cache
+          ccache --set-config=cache_dir=~/.cache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         run: |
