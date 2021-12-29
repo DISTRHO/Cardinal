@@ -1,0 +1,11 @@
+This is a special build of unzip's unzipfx tool, modified to allow full application bundles.
+You get a static linked binary that extracts your files into a temporary location, then executes the main program (defined by you).
+
+Currently working under Linux only, but should be fairly easy to get it into other OSes (unzip itself is already available in many, including Windows, MacOS, Linux and BeOS).
+
+
+To get a static unzipfx application, you do:
+ 1 - create a zip file of your application bundle, with a single parent/root directory (this directory and the main app-name must match)
+ 2 - edit unzipfx/appDetails.h and set SFX_APP_MININAME as the directory name set in step 1
+ 3 - compile this tool using the appropriate makefile (eg: make -f Makefile.linux). That will give you 'unzipfx2cat' binary
+ 4 - concatenate your zip file over the 'unzipfx2cat' binary (eg: cat unzipfx2cat myapp.zip > myapp)

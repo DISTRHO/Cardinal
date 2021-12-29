@@ -1,0 +1,28 @@
+#!/usr/bin/Makefile -f
+
+CC ?= gcc
+
+BUILD_FLAGS  = -DSFX -DLINUX -I. -I.. $(CFLAGS) -O2
+BUILD_FLAGS += -DLARGE_FILE_SUPPORT -DUNICODE_SUPPORT -DUNICODE_WCHAR -DUTF8_MAYBE_NATIVE
+BUILD_FLAGS += -DNO_LCHMOD -DHAVE_DIRENT_H -DHAVE_TERMIOS_H -D_MBCS
+
+LINK_FLAGS   = -static $(LDFLAGS)
+
+OBJ  = crc32.o crypt.o extract.o fileio.o globals.o inflate.o match.o process.o ttyio.o ubz2err.o unzip.o zipinfo.o
+OBJ += unix/unix.o
+OBJ += unzipfx/appDetails.o
+
+# -----------------------------
+
+all: unzipfx2cat
+
+unzipfx2cat: $(OBJ)
+	$(CC) $^ $(LINK_FLAGS) -o $@
+
+clean:
+	rm -f *~ $(OBJ)
+
+# -----------------------------
+
+.c.o:
+	$(CC) $< $(BUILD_FLAGS) -c -o $@

@@ -1,0 +1,33 @@
+#!/usr/bin/Makefile -f
+
+CC ?= gcc
+WINDRES ?= windres
+
+BUILD_FLAGS  = -DSFX -DWIN32 -DWINDOWS -DFORCE_UNIX_OVER_WIN32 -I. -I.. $(CFLAGS) -O2
+BUILD_FLAGS += -DLARGE_FILE_SUPPORT -DUNICODE_SUPPORT -DUNICODE_WCHAR -DUTF8_MAYBE_NATIVE
+BUILD_FLAGS += -DNO_LCHMOD -DHAVE_DIRENT_H -DHAVE_TERMIOS_H -D_MBCS
+
+LINK_FLAGS   = -static -mwindows -lkernel32 -lshell32 $(LDFLAGS)
+
+OBJ  = crc32.o crypt.o extract.o fileio.o globals.o inflate.o match.o process.o ttyio.o ubz2err.o unzip.o zipinfo.o
+OBJ += win32/nt.o win32/win32.o win32/win32i64.o
+OBJ += unzipfx/appDetails.o
+OBJ += icon.o
+
+# -----------------------------
+
+all: unzipfx2cat.exe
+
+unzipfx2cat.exe: $(OBJ)
+	$(CC) $^ $(LINK_FLAGS) -o $@
+
+icon.o: ../../../resources/ico/carla.rc
+	$(WINDRES) -i $< -o $@ -O coff
+
+clean:
+	rm -f *~ $(OBJ)
+
+# -----------------------------
+
+.c.o:
+	$(CC) $< $(BUILD_FLAGS) -c -o $@
