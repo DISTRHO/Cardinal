@@ -552,20 +552,17 @@ protected:
 
     const char* getLabel() const override
     {
-#if CARDINAL_VARIANT_SYNTH
-        return "CardinalSynth";
-#elif CARDINAL_VARIANT_FX
-        return "CardinalFX";
-#else
-        return "Cardinal";
-#endif
+        return DISTRHO_PLUGIN_LABEL;
     }
 
     const char* getDescription() const override
     {
         return ""
-        "Cardinal is an open-source self-contained special plugin version of VCVRack, using DPF.\n"
-        "It is NOT an official VCV project, and it is not affiliated with it in any way.\n";
+        "Cardinal is an open-source plugin wrapper around VCV Rack.\n"
+        "It is NOT an official VCV project, and it is not affiliated with it in any way.\n"
+        "\n"
+        "Cardinal contains Rack, some 3rd-party modules and a few internal utilities all in a single binary.\n"
+        "It does not load external modules and does not connect to the official Rack library/store.\n";
     }
 
     const char* getMaker() const override

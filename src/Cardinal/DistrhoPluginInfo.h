@@ -27,6 +27,7 @@
 
 #define DISTRHO_PLUGIN_BRAND "DISTRHO"
 #define DISTRHO_PLUGIN_NAME  "Cardinal"
+#define DISTRHO_PLUGIN_LABEL "Cardinal"
 #define DISTRHO_PLUGIN_URI   "https://distrho.kx.studio/plugins/cardinal"
 
 #ifdef HEADLESS
