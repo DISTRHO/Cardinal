@@ -41,7 +41,6 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         env:
@@ -53,7 +52,6 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-aarch64; popd
-          ccache --show-config
           make features
           make NOOPT=true SKIP_RTAUDIO_FALLBACK=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
           make unzipfx
@@ -96,7 +94,6 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         env:
@@ -108,7 +105,6 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-armhf; popd
-          ccache --show-config
           make features
           make NOOPT=true SKIP_RTAUDIO_FALLBACK=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
           make unzipfx
@@ -147,7 +143,6 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         env:
@@ -159,7 +154,6 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-i686; popd
-          ccache --show-config
           make features
           make NOOPT=true SKIP_RTAUDIO_FALLBACK=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
           make unzipfx
@@ -197,7 +191,6 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         run: |
@@ -207,7 +200,6 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux; popd
-          ccache --show-config
           make features
           make NOOPT=true SKIP_RTAUDIO_FALLBACK=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
           make unzipfx
@@ -299,7 +291,6 @@ jobs:
       - name: Install ccache
         run: |
           brew install ccache
-          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Fix up Xcode
         run: |
@@ -313,7 +304,6 @@ jobs:
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           pushd deps/PawPaw; source local.env macos-universal; popd
-          ccache --show-config
           make features
           make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(sysctl -n hw.logicalcpu)
           ./dpf/utils/package-osx-bundles.sh
@@ -350,7 +340,6 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         run: |
@@ -360,7 +349,6 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win32; popd
-          ccache --show-config
           make features
           make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
@@ -397,7 +385,6 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         run: |
@@ -407,7 +394,6 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win64; popd
-          ccache --show-config
           make features
           make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
