@@ -497,6 +497,13 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
         return true;
     }
 
+    // Special case for AnimatedCircuits logo
+    if (paint.color == 0xff303030 && svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/AnimatedCircuits/", 18) == 0)
+    {
+        paint.color = 0xffefefef;
+        return true;
+    }
+
     // Special case for JW-Modules colors
     if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/JW-Modules/", 12) == 0)
     {
@@ -561,6 +568,8 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
     case 0xff0095fe:
     case 0xff4d9a4d:
     case 0xff4d4d9a:
+    // AnimatedCircuits FoldingLight.svg
+    case 0xffa0783c:
         return false;
     // pure black (convert to not quite pure white)
     case 0xff000000:
