@@ -8,7 +8,7 @@ on:
     branches:
       - '*'
 env:
-  CACHE_VERSION: 1
+  CACHE_VERSION: 2
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -24,7 +24,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/.cache
+            ~/.ccache
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
@@ -41,7 +41,7 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         env:
@@ -53,6 +53,7 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-aarch64; popd
+          ccache --show-config
           make features
           make NOOPT=true SKIP_RTAUDIO_FALLBACK=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
           make unzipfx
@@ -78,7 +79,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/.cache
+            ~/.ccache
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
@@ -95,7 +96,7 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         env:
@@ -107,6 +108,7 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-armhf; popd
+          ccache --show-config
           make features
           make NOOPT=true SKIP_RTAUDIO_FALLBACK=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
           make unzipfx
@@ -132,7 +134,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/.cache
+            ~/.ccache
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
@@ -145,7 +147,7 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         env:
@@ -157,6 +159,7 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-i686; popd
+          ccache --show-config
           make features
           make NOOPT=true SKIP_RTAUDIO_FALLBACK=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
           make unzipfx
@@ -182,7 +185,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/.cache
+            ~/.ccache
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
@@ -194,7 +197,7 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         run: |
@@ -204,6 +207,7 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux; popd
+          ccache --show-config
           make features
           make NOOPT=true SKIP_RTAUDIO_FALLBACK=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
           make unzipfx
@@ -287,7 +291,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/.cache
+            ~/.ccache
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
@@ -295,7 +299,7 @@ jobs:
       - name: Install ccache
         run: |
           brew install ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Fix up Xcode
         run: |
@@ -309,6 +313,7 @@ jobs:
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           pushd deps/PawPaw; source local.env macos-universal; popd
+          ccache --show-config
           make features
           make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(sysctl -n hw.logicalcpu)
           ./dpf/utils/package-osx-bundles.sh
@@ -331,7 +336,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/.cache
+            ~/.ccache
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
@@ -345,7 +350,7 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         run: |
@@ -355,6 +360,7 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win32; popd
+          ccache --show-config
           make features
           make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
@@ -379,7 +385,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/.cache
+            ~/.ccache
             ~/PawPawBuilds/builds
             ~/PawPawBuilds/downloads
             ~/PawPawBuilds/targets
@@ -391,7 +397,7 @@ jobs:
       - name: Install ccache
         run: |
           sudo apt-get install -yqq ccache
-          ccache --set-config=cache_dir=~/.cache
+          ccache --set-config=cache_dir=~/.ccache
           ccache --set-config=compression=true
       - name: Build extra dependencies
         run: |
@@ -401,6 +407,7 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win64; popd
+          ccache --show-config
           make features
           make NOOPT=true WITH_LTO=true WITH_PAWPAW=true -j $(nproc)
       - name: Set sha8
