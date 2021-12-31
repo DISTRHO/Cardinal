@@ -173,8 +173,6 @@ install:
 	cp -rL bin/CardinalSynth.vst3 $(DESTDIR)$(PREFIX)/lib/vst3/
 
 	install -m 755 bin/Cardinal$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
-	install -m 755 bin/CardinalFX$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
-	install -m 755 bin/CardinalSynth$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
 	cp -rL bin/Cardinal.lv2/resources/* $(DESTDIR)$(PREFIX)/share/Cardinal/
 
 # --------------------------------------------------------------
