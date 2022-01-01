@@ -33,7 +33,6 @@
 #include <atomic>
 #include <tuple>
 #include <pmmintrin.h>
-#include <pthread.h>
 
 #include <engine/Engine.hpp>
 #include <settings.hpp>
@@ -41,6 +40,7 @@
 #include <random.hpp>
 #include <patch.hpp>
 #include <plugin.hpp>
+#include <mutex.hpp>
 #include <helpers.hpp>
 
 #ifdef NDEBUG
@@ -51,55 +51,6 @@
 
 namespace rack {
 namespace engine {
-
-
-/** Allows multiple "reader" threads to obtain a lock simultaneously, but only one "writer" thread.
-This implementation is currently just a wrapper for pthreads, which works on Linux/Mac/.
-This is available in C++17 as std::shared_mutex, but unfortunately we're using C++11.
-*/
-struct ReadWriteMutex {
-	pthread_rwlock_t rwlock;
-
-	ReadWriteMutex() {
-		if (pthread_rwlock_init(&rwlock, nullptr))
-			throw Exception("pthread_rwlock_init failed");
-	}
-	~ReadWriteMutex() {
-		pthread_rwlock_destroy(&rwlock);
-	}
-	void lockReader() {
-		DISTRHO_SAFE_ASSERT_RETURN(pthread_rwlock_rdlock(&rwlock) == 0,);
-	}
-	void unlockReader() {
-		DISTRHO_SAFE_ASSERT_RETURN(pthread_rwlock_unlock(&rwlock) == 0,);
-	}
-	void lockWriter() {
-		DISTRHO_SAFE_ASSERT_RETURN(pthread_rwlock_wrlock(&rwlock) == 0,);
-	}
-	void unlockWriter() {
-		DISTRHO_SAFE_ASSERT_RETURN(pthread_rwlock_unlock(&rwlock) == 0,);
-	}
-};
-
-struct ReadLock {
-	ReadWriteMutex& m;
-	ReadLock(ReadWriteMutex& m) : m(m) {
-		m.lockReader();
-	}
-	~ReadLock() {
-		m.unlockReader();
-	}
-};
-
-struct WriteLock {
-	ReadWriteMutex& m;
-	WriteLock(ReadWriteMutex& m) : m(m) {
-		m.lockWriter();
-	}
-	~WriteLock() {
-		m.unlockWriter();
-	}
-};
 
 
 struct Engine::Internal {
@@ -139,7 +90,7 @@ struct Engine::Internal {
 	Writers lock when mutating the engine's state or stepping the block.
 	Readers lock when using the engine's state.
 	*/
-	ReadWriteMutex mutex;
+	SharedMutex mutex;
 };
 
 
@@ -329,7 +280,7 @@ Engine::~Engine() {
 
 
 void Engine::clear() {
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 	clear_NoLock();
 }
 
@@ -358,7 +309,7 @@ void Engine::stepBlock(int frames) {
 	// Start timer before locking
 	double startTime = system::getTime();
 
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	// Configure thread
 	random::init();
 
@@ -420,7 +371,7 @@ float Engine::getSampleRate() {
 void Engine::setSampleRate(float sampleRate) {
 	if (sampleRate == internal->sampleRate)
 		return;
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 
 	internal->sampleRate = sampleRate;
 	internal->sampleTime = 1.f / sampleRate;
@@ -498,7 +449,7 @@ size_t Engine::getNumModules() {
 
 
 size_t Engine::getModuleIds(int64_t* moduleIds, size_t len) {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	size_t i = 0;
 	for (Module* m : internal->modules) {
 		if (i >= len)
@@ -511,7 +462,7 @@ size_t Engine::getModuleIds(int64_t* moduleIds, size_t len) {
 
 
 std::vector<int64_t> Engine::getModuleIds() {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	std::vector<int64_t> moduleIds;
 	moduleIds.reserve(internal->modules.size());
 	for (Module* m : internal->modules) {
@@ -522,7 +473,7 @@ std::vector<int64_t> Engine::getModuleIds() {
 
 
 void Engine::addModule(Module* module) {
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 	DISTRHO_SAFE_ASSERT_RETURN(module,);
 	// Check that the module is not already added
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
@@ -552,7 +503,7 @@ void Engine::addModule(Module* module) {
 
 
 void Engine::removeModule(Module* module) {
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 	removeModule_NoLock(module);
 }
 
@@ -606,7 +557,7 @@ void Engine::removeModule_NoLock(Module* module) {
 
 
 bool Engine::hasModule(Module* module) {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	// TODO Performance could be improved by searching modulesCache, but more testing would be needed to make sure it's always valid.
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
 	return it != internal->modules.end();
@@ -614,7 +565,7 @@ bool Engine::hasModule(Module* module) {
 
 
 Module* Engine::getModule(int64_t moduleId) {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	return getModule_NoLock(moduleId);
 }
 
@@ -628,7 +579,7 @@ Module* Engine::getModule_NoLock(int64_t moduleId) {
 
 
 void Engine::resetModule(Module* module) {
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 	DISTRHO_SAFE_ASSERT_RETURN(module,);
 
 	Module::ResetEvent eReset;
@@ -637,7 +588,7 @@ void Engine::resetModule(Module* module) {
 
 
 void Engine::randomizeModule(Module* module) {
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 	DISTRHO_SAFE_ASSERT_RETURN(module,);
 
 	Module::RandomizeEvent eRandomize;
@@ -650,7 +601,7 @@ void Engine::bypassModule(Module* module, bool bypassed) {
 	if (module->isBypassed() == bypassed)
 		return;
 
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 
 	// Clear outputs and set to 1 channel
 	for (Output& output : module->outputs) {
@@ -673,26 +624,26 @@ void Engine::bypassModule(Module* module, bool bypassed) {
 
 
 json_t* Engine::moduleToJson(Module* module) {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	return module->toJson();
 }
 
 
 void Engine::moduleFromJson(Module* module, json_t* rootJ) {
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 	module->fromJson(rootJ);
 }
 
 
 void Engine::prepareSaveModule(Module* module) {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	Module::SaveEvent e;
 	module->onSave(e);
 }
 
 
 void Engine::prepareSave() {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	for (Module* module : internal->modules) {
 		Module::SaveEvent e;
 		module->onSave(e);
@@ -706,7 +657,7 @@ size_t Engine::getNumCables() {
 
 
 size_t Engine::getCableIds(int64_t* cableIds, size_t len) {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	size_t i = 0;
 	for (Cable* c : internal->cables) {
 		if (i >= len)
@@ -719,7 +670,7 @@ size_t Engine::getCableIds(int64_t* cableIds, size_t len) {
 
 
 std::vector<int64_t> Engine::getCableIds() {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	std::vector<int64_t> cableIds;
 	cableIds.reserve(internal->cables.size());
 	for (Cable* c : internal->cables) {
@@ -730,7 +681,7 @@ std::vector<int64_t> Engine::getCableIds() {
 
 
 void Engine::addCable(Cable* cable) {
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 	DISTRHO_SAFE_ASSERT_RETURN(cable,);
 	// Check cable properties
 	DISTRHO_SAFE_ASSERT_RETURN(cable->inputModule,);
@@ -775,7 +726,7 @@ void Engine::addCable(Cable* cable) {
 
 
 void Engine::removeCable(Cable* cable) {
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 	removeCable_NoLock(cable);
 }
 
@@ -816,7 +767,7 @@ void Engine::removeCable_NoLock(Cable* cable) {
 
 
 bool Engine::hasCable(Cable* cable) {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	// TODO Performance could be improved by searching cablesCache, but more testing would be needed to make sure it's always valid.
 	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
 	return it != internal->cables.end();
@@ -824,7 +775,7 @@ bool Engine::hasCable(Cable* cable) {
 
 
 Cable* Engine::getCable(int64_t cableId) {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	auto it = internal->cablesCache.find(cableId);
 	if (it == internal->cablesCache.end())
 		return NULL;
@@ -867,7 +818,7 @@ float Engine::getParamSmoothValue(Module* module, int paramId) {
 
 
 void Engine::addParamHandle(ParamHandle* paramHandle) {
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 	// New ParamHandles must be blank.
 	// This means we don't have to refresh the cache.
 	DISTRHO_SAFE_ASSERT_RETURN(paramHandle->moduleId < 0,);
@@ -883,7 +834,7 @@ void Engine::addParamHandle(ParamHandle* paramHandle) {
 
 
 void Engine::removeParamHandle(ParamHandle* paramHandle) {
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 	removeParamHandle_NoLock(paramHandle);
 }
 
@@ -901,7 +852,7 @@ void Engine::removeParamHandle_NoLock(ParamHandle* paramHandle) {
 
 
 ParamHandle* Engine::getParamHandle(int64_t moduleId, int paramId) {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	return getParamHandle_NoLock(moduleId, paramId);
 }
 
@@ -920,7 +871,7 @@ ParamHandle* Engine::getParamHandle(Module* module, int paramId) {
 
 
 void Engine::updateParamHandle(ParamHandle* paramHandle, int64_t moduleId, int paramId, bool overwrite) {
-	WriteLock lock(internal->mutex);
+	std::lock_guard<SharedMutex> lock(internal->mutex);
 	updateParamHandle_NoLock(paramHandle, moduleId, paramId, overwrite);
 }
 
@@ -963,7 +914,7 @@ void Engine::updateParamHandle_NoLock(ParamHandle* paramHandle, int64_t moduleId
 
 
 json_t* Engine::toJson() {
-	ReadLock lock(internal->mutex);
+	SharedLock<SharedMutex> lock(internal->mutex);
 	json_t* rootJ = json_object();
 
 	// modules

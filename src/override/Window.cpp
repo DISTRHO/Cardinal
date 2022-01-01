@@ -143,6 +143,7 @@ struct Window::Internal {
 	std::map<std::string, std::shared_ptr<ImageWithOriginalContext>> imageCache;
 
 	bool fbDirtyOnSubpixelChange = true;
+	int fbCount = 0;
 
 	Internal()
 		: hiddenApp(false),
@@ -343,6 +344,7 @@ void Window::step() {
 	double lastFrameTime = internal->frameTime;
 	internal->frameTime = frameTime;
 	internal->lastFrameDuration = frameTime - lastFrameTime;
+	internal->fbCount = 0;
 	// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
 
 	// Make event handlers and step() have a clean NanoVG context
@@ -512,6 +514,11 @@ std::shared_ptr<Image> Window::loadImage(const std::string& filename) {
 
 bool& Window::fbDirtyOnSubpixelChange() {
 	return internal->fbDirtyOnSubpixelChange;
+}
+
+
+int& Window::fbCount() {
+	return internal->fbCount;
 }
 
 
