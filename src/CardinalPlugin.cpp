@@ -120,9 +120,10 @@ struct Initializer
                 {
                     templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
                 }
-                else
                 // If source code dir does not exist use install target prefix as system dir
+                else
                #endif
+                if (system::exists(CARDINAL_PLUGIN_PREFIX "/share/Cardinal"))
                 {
                     asset::bundlePath = CARDINAL_PLUGIN_PREFIX "/share/Cardinal/PluginManifests";
                     asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/Cardinal";
@@ -142,8 +143,13 @@ struct Initializer
         INFO("User directory: %s", asset::userDir.c_str());
         INFO("Template patch: %s", templatePath.c_str());
 
-        // Check existence of the system res/ directory
-        if (! system::exists(asset::systemDir))
+        // Report to user if something is wrong with the installation
+        if (asset::systemDir.empty())
+        {
+            d_stderr2("Failed to locate Cardinal plugin bundle.\n"
+                      "Install Cardinal with its bundle folder intact and try again.");
+        }
+        else if (! system::exists(asset::systemDir))
         {
             d_stderr2("System directory \"%s\" does not exist.\n"
                       "Make sure Cardinal was downloaded and installed correctly.", asset::systemDir.c_str());

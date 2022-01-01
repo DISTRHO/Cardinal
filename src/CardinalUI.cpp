@@ -16,6 +16,7 @@
  */
 
 #include <app/Scene.hpp>
+#include <asset.hpp>
 #include <context.hpp>
 #include <helpers.hpp>
 #include <patch.hpp>
@@ -297,6 +298,24 @@ public:
         rack::widget::Widget* const headerLayout = browser->children.front();
         rack::widget::Widget* const libraryButton = headerLayout->children.back();
         libraryButton->hide();
+
+        // Report to user if something is wrong with the installation
+        std::string errorMessage;
+
+        if (rack::asset::systemDir.empty())
+        {
+            errorMessage = "Failed to locate Cardinal plugin bundle.\n"
+                           "Install Cardinal with its plugin bundle folder intact and try again.";
+        }
+        else if (! rack::system::exists(rack::asset::systemDir))
+        {
+            errorMessage = rack::string::f("System directory \"%s\" does not exist. "
+                                           "Make sure Cardinal was downloaded and installed correctly.",
+                                           rack::asset::systemDir.c_str());
+        }
+
+        if (! errorMessage.empty())
+            asyncDialog::create(errorMessage.c_str());
 
         context->window->step();
 
