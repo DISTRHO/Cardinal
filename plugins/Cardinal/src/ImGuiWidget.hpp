@@ -34,6 +34,8 @@ struct ImGuiWidget : OpenGlWidget {
         ImGui::ShowDemoWindow();
     }
 
+    float getScaleFactor() const noexcept;
+
 protected:
     void onContextCreate(const ContextCreateEvent& e) override;
     void onContextDestroy(const ContextDestroyEvent& e) override;

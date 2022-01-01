@@ -1267,16 +1267,17 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
     void drawError(const bool open)
     {
+        const float scaleFactor = getScaleFactor();
+
         ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::SetNextWindowSize(ImVec2(box.size.x, box.size.y));
+        ImGui::SetNextWindowSize(ImVec2(box.size.x * scaleFactor, box.size.y * scaleFactor));
 
         const int flags = ImGuiWindowFlags_NoSavedSettings
                         | ImGuiWindowFlags_NoTitleBar
                         | ImGuiWindowFlags_NoResize
                         | ImGuiWindowFlags_NoCollapse
                         | ImGuiWindowFlags_NoScrollbar
-                        | ImGuiWindowFlags_NoScrollWithMouse
-                        | ImGuiWindowFlags_NoCollapse;
+                        | ImGuiWindowFlags_NoScrollWithMouse;
 
         if (ImGui::Begin("Error Window", nullptr, flags))
         {
@@ -1288,7 +1289,6 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                              | ImGuiWindowFlags_NoCollapse
                              | ImGuiWindowFlags_NoScrollbar
                              | ImGuiWindowFlags_NoScrollWithMouse
-                             | ImGuiWindowFlags_NoCollapse
                              | ImGuiWindowFlags_AlwaysAutoResize
                              | ImGuiWindowFlags_AlwaysUseWindowPadding;
 
@@ -1304,18 +1304,18 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
     void drawTopBar()
     {
+        const float scaleFactor = getScaleFactor();
         const float padding = ImGui::GetStyle().WindowPadding.y * 2;
 
         ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::SetNextWindowSize(ImVec2(box.size.x, kButtonHeight + padding));
+        ImGui::SetNextWindowSize(ImVec2(box.size.x * scaleFactor, kButtonHeight * scaleFactor + padding));
 
         const int flags = ImGuiWindowFlags_NoSavedSettings
                         | ImGuiWindowFlags_NoTitleBar
                         | ImGuiWindowFlags_NoResize
                         | ImGuiWindowFlags_NoCollapse
                         | ImGuiWindowFlags_NoScrollbar
-                        | ImGuiWindowFlags_NoScrollWithMouse
-                        | ImGuiWindowFlags_NoCollapse;
+                        | ImGuiWindowFlags_NoScrollWithMouse;
 
         if (ImGui::Begin("Current Plugin", nullptr, flags))
         {
@@ -1344,17 +1344,20 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
     void setupMainWindowPos()
     {
+        const float scaleFactor = getScaleFactor();
+
         float y = 0;
-        float height = box.size.y;
+        float width = box.size.x * scaleFactor;
+        float height = box.size.y * scaleFactor;
 
         if (fDrawingState == kDrawingPluginGenericUI)
         {
-            y = kButtonHeight + ImGui::GetStyle().WindowPadding.y * 2 - 1;
+            y = kButtonHeight * scaleFactor + ImGui::GetStyle().WindowPadding.y * 2 - scaleFactor;
             height -= y;
         }
 
         ImGui::SetNextWindowPos(ImVec2(0, y));
-        ImGui::SetNextWindowSize(ImVec2(box.size.x, height));
+        ImGui::SetNextWindowSize(ImVec2(width, height));
     }
 
     void drawGenericUI()
@@ -1364,9 +1367,12 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         PluginGenericUI* const ui = fPluginGenericUI;
         DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
 
-        // ImGui::SetNextWindowFocus();
+        const int pflags = ImGuiWindowFlags_NoSavedSettings
+                         | ImGuiWindowFlags_NoResize
+                         | ImGuiWindowFlags_NoCollapse
+                         | ImGuiWindowFlags_AlwaysAutoResize;
 
-        if (ImGui::Begin(ui->title, nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoCollapse))
+        if (ImGui::Begin(ui->title, nullptr, pflags))
         {
             const CarlaHostHandle handle = module->fCarlaHostHandle;
 
@@ -1452,9 +1458,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                              | ImGuiWindowFlags_NoCollapse
                              | ImGuiWindowFlags_NoScrollbar
                              | ImGuiWindowFlags_NoScrollWithMouse
-                             | ImGuiWindowFlags_NoCollapse
-                             | ImGuiWindowFlags_AlwaysAutoResize
-                             | ImGuiWindowFlags_AlwaysUseWindowPadding;
+                             | ImGuiWindowFlags_AlwaysAutoResize;
 
             if (ImGui::BeginPopupModal("Plugin Error", nullptr, pflags))
             {
@@ -1643,8 +1647,8 @@ struct IldaeilModuleWidget : ModuleWidget {
         if (module != nullptr && module->pcontext != nullptr)
         {
             ildaeilWidget = new IldaeilWidget(module);
-            ildaeilWidget->box.pos = Vec(2 * RACK_GRID_WIDTH, 0);
-            ildaeilWidget->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH, box.size.y);
+            ildaeilWidget->box.pos = Vec(2 * RACK_GRID_WIDTH, 1);
+            ildaeilWidget->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH - 1, box.size.y - 2);
             addChild(ildaeilWidget);
         }
 

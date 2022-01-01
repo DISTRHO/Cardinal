@@ -27,8 +27,11 @@
 struct ImGuiWidget::PrivateData {
     ImGuiContext* context = nullptr;
     bool created = false;
+    bool fontGenerated = false;
+    float originalScaleFactor = 0.0f;
+    float scaleFactor = 0.0f;
 
-    PrivateData(const double scaleFactor = 1.0)
+    PrivateData()
     {
         IMGUI_CHECKVERSION();
         context = ImGui::CreateContext();
@@ -37,45 +40,6 @@ struct ImGuiWidget::PrivateData {
         ImGuiIO& io(ImGui::GetIO());
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.IniFilename = nullptr;
-
-        ImGuiStyle& style(ImGui::GetStyle());
-        style.FrameRounding = 4;
-        /*
-        style.ScaleAllSizes(scaleFactor);
-        */
-
-        const ImVec4 color_Cardinal(0.76f, 0.11f, 0.22f, 1.00f);
-        const ImVec4 color_DimCardinal(171.0 / 255.0, 54.0 / 255.0, 73.0 / 255.0, 1.00f);
-
-        ImVec4* const colors = style.Colors;
-        colors[ImGuiCol_Text]             = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-        colors[ImGuiCol_TextDisabled]     = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-        colors[ImGuiCol_WindowBg]         = ImVec4(0.101f, 0.101f, 0.101f, 0.94f);
-        colors[ImGuiCol_FrameBg]          = ImVec4(0.20f, 0.21f, 0.22f, 0.54f);
-        colors[ImGuiCol_FrameBgHovered]   = ImVec4(0.40f, 0.40f, 0.40f, 0.40f);
-        colors[ImGuiCol_FrameBgActive]    = ImVec4(0.18f, 0.18f, 0.18f, 0.67f);
-        colors[ImGuiCol_TitleBgActive]    = ImVec4(0.29f, 0.29f, 0.29f, 1.00f);
-        colors[ImGuiCol_CheckMark]        = color_Cardinal;
-        colors[ImGuiCol_SliderGrab]       = color_DimCardinal;
-        colors[ImGuiCol_SliderGrabActive] = color_Cardinal;
-        colors[ImGuiCol_Button]           = color_DimCardinal;
-        colors[ImGuiCol_ButtonHovered]    = color_Cardinal;
-        colors[ImGuiCol_ButtonActive]     = color_Cardinal;
-        colors[ImGuiCol_TextSelectedBg]   = ImVec4(0.87f, 0.87f, 0.87f, 0.35f);
-        colors[ImGuiCol_Header]           = ImVec4(0.44f, 0.44f, 0.44f, 0.40f);
-        colors[ImGuiCol_HeaderHovered]    = color_DimCardinal;
-        colors[ImGuiCol_HeaderActive]     = color_Cardinal;
-
-#ifndef DGL_NO_SHARED_RESOURCES
-        using namespace dpf_resources;
-        ImFontConfig fc;
-        fc.FontDataOwnedByAtlas = false;
-        fc.OversampleH = 1;
-        fc.OversampleV = 1;
-        fc.PixelSnapH = true;
-        io.Fonts->AddFontFromMemoryTTF((void*)dejavusans_ttf, dejavusans_ttf_size, 13.0f * scaleFactor, &fc);
-        io.Fonts->Build();
-#endif
 
         io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
         io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
@@ -112,6 +76,58 @@ struct ImGuiWidget::PrivateData {
 
         ImGui::DestroyContext(context);
     }
+
+    void generateFontIfNeeded()
+    {
+        if (fontGenerated)
+            return;
+
+        DISTRHO_SAFE_ASSERT_RETURN(scaleFactor != 0.0f,);
+
+        fontGenerated = true;
+
+#ifndef DGL_NO_SHARED_RESOURCES
+        ImGuiIO& io(ImGui::GetIO());
+        using namespace dpf_resources;
+        ImFontConfig fc;
+        fc.FontDataOwnedByAtlas = false;
+        fc.OversampleH = 1;
+        fc.OversampleV = 1;
+        fc.PixelSnapH = true;
+        io.Fonts->AddFontFromMemoryTTF((void*)dejavusans_ttf, dejavusans_ttf_size, 13.0f * scaleFactor, &fc);
+        io.Fonts->Build();
+#endif
+    }
+
+    void resetStyle()
+    {
+        ImGuiStyle& style(ImGui::GetStyle());
+
+        style.FrameRounding = 4;
+        style.ScaleAllSizes(scaleFactor);
+
+        const ImVec4 color_Cardinal(0.76f, 0.11f, 0.22f, 1.00f);
+        const ImVec4 color_DimCardinal(171.0 / 255.0, 54.0 / 255.0, 73.0 / 255.0, 1.00f);
+
+        ImVec4* const colors = style.Colors;
+        colors[ImGuiCol_Text]             = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+        colors[ImGuiCol_TextDisabled]     = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+        colors[ImGuiCol_WindowBg]         = ImVec4(0.101f, 0.101f, 0.101f, 0.94f);
+        colors[ImGuiCol_FrameBg]          = ImVec4(0.20f, 0.21f, 0.22f, 0.54f);
+        colors[ImGuiCol_FrameBgHovered]   = ImVec4(0.40f, 0.40f, 0.40f, 0.40f);
+        colors[ImGuiCol_FrameBgActive]    = ImVec4(0.18f, 0.18f, 0.18f, 0.67f);
+        colors[ImGuiCol_TitleBgActive]    = ImVec4(0.29f, 0.29f, 0.29f, 1.00f);
+        colors[ImGuiCol_CheckMark]        = color_Cardinal;
+        colors[ImGuiCol_SliderGrab]       = color_DimCardinal;
+        colors[ImGuiCol_SliderGrabActive] = color_Cardinal;
+        colors[ImGuiCol_Button]           = color_DimCardinal;
+        colors[ImGuiCol_ButtonHovered]    = color_Cardinal;
+        colors[ImGuiCol_ButtonActive]     = color_Cardinal;
+        colors[ImGuiCol_TextSelectedBg]   = ImVec4(0.87f, 0.87f, 0.87f, 0.35f);
+        colors[ImGuiCol_Header]           = ImVec4(0.44f, 0.44f, 0.44f, 0.40f);
+        colors[ImGuiCol_HeaderHovered]    = color_DimCardinal;
+        colors[ImGuiCol_HeaderActive]     = color_Cardinal;
+    }
 };
 
 ImGuiWidget::ImGuiWidget()
@@ -120,6 +136,11 @@ ImGuiWidget::ImGuiWidget()
 ImGuiWidget::~ImGuiWidget()
 {
     delete imData;
+}
+
+float ImGuiWidget::getScaleFactor() const noexcept
+{
+    return imData->scaleFactor;
 }
 
 void ImGuiWidget::onContextCreate(const ContextCreateEvent& e)
@@ -146,13 +167,42 @@ void ImGuiWidget::onContextDestroy(const ContextDestroyEvent& e)
 
 void ImGuiWidget::drawFramebuffer()
 {
-    const math::Vec fbSize = getFramebufferSize();
-
     ImGui::SetCurrentContext(imData->context);
     ImGuiIO& io(ImGui::GetIO());
 
-    io.DisplayFramebufferScale = ImVec2(fbSize.x / box.size.x, fbSize.y / box.size.y);
-    io.DisplaySize = ImVec2(box.size.x, box.size.y);
+    const math::Vec fbSize = getFramebufferSize();
+    const float scaleFactor = APP->window->pixelRatio;
+
+    if (d_isNotEqual(imData->scaleFactor, scaleFactor))
+    {
+        imData->scaleFactor = scaleFactor;
+
+        ImGuiStyle& style(ImGui::GetStyle());
+        new(&style)ImGuiStyle();
+        imData->resetStyle();
+
+        if (! imData->fontGenerated)
+        {
+            imData->originalScaleFactor = scaleFactor;
+            imData->generateFontIfNeeded();
+        }
+        else
+        {
+            io.FontGlobalScale = scaleFactor / imData->originalScaleFactor;
+        }
+    }
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0.0, box.size.x * scaleFactor, box.size.y * scaleFactor, 0.0, -1.0, 1.0);
+    glViewport(0.0, 0.0, fbSize.x, fbSize.y);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    io.DisplaySize = ImVec2(box.size.x * scaleFactor, box.size.y * scaleFactor);
+    io.DisplayFramebufferScale = ImVec2(fbSize.x / (box.size.x * scaleFactor), fbSize.y / (box.size.y * scaleFactor));
 
     if (!imData->created)
     {
@@ -180,6 +230,12 @@ void ImGuiWidget::onHover(const HoverEvent& e)
     ImGuiIO& io(ImGui::GetIO());
     io.MousePos.x = e.pos.x + e.mouseDelta.x;
     io.MousePos.y = e.pos.y + e.mouseDelta.y;
+
+    if (d_isNotEqual(imData->scaleFactor, 1.0f))
+    {
+        io.MousePos.x *= imData->scaleFactor;
+        io.MousePos.y *= imData->scaleFactor;
+    }
 }
 
 void ImGuiWidget::onDragHover(const DragHoverEvent& e)
@@ -189,6 +245,12 @@ void ImGuiWidget::onDragHover(const DragHoverEvent& e)
     ImGuiIO& io(ImGui::GetIO());
     io.MousePos.x = e.pos.x + e.mouseDelta.x;
     io.MousePos.y = e.pos.y + e.mouseDelta.y;
+
+    if (d_isNotEqual(imData->scaleFactor, 1.0f))
+    {
+        io.MousePos.x *= imData->scaleFactor;
+        io.MousePos.y *= imData->scaleFactor;
+    }
 }
 
 void ImGuiWidget::onDragLeave(const DragLeaveEvent& e)
@@ -207,9 +269,18 @@ void ImGuiWidget::onHoverScroll(const HoverScrollEvent& e)
 {
     ImGui::SetCurrentContext(imData->context);
 
+    float deltaX = e.scrollDelta.x;
+    float deltaY = e.scrollDelta.y;
+
+    if (d_isNotEqual(imData->scaleFactor, 1.0f))
+    {
+        deltaX *= imData->scaleFactor;
+        deltaY *= imData->scaleFactor;
+    }
+
     ImGuiIO& io(ImGui::GetIO());
-    io.MouseWheel += e.scrollDelta.y * 0.01f;
-    io.MouseWheelH += e.scrollDelta.x * 0.01f;
+    io.MouseWheel += deltaY * 0.01f;
+    io.MouseWheelH += deltaX * 0.01f;
 
     if (io.WantCaptureMouse)
         e.consume(this);

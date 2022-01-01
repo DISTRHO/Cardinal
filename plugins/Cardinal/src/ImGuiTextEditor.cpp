@@ -131,8 +131,10 @@ std::string ImGuiTextEditor::getCurrentLineText()const
 
 void ImGuiTextEditor::drawImGui()
 {
+    const float scaleFactor = getScaleFactor();
+
     ImGui::SetNextWindowPos(ImVec2(0, 0));
-    ImGui::SetNextWindowSize(ImVec2(box.size.x, box.size.y));
+    ImGui::SetNextWindowSize(ImVec2(box.size.x * scaleFactor, box.size.y * scaleFactor));
 
     if (ImGui::Begin("TextEdit", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize))
     {
