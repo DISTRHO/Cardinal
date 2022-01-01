@@ -8,7 +8,7 @@ on:
     branches:
       - '*'
 env:
-  CACHE_VERSION: 2
+  CACHE_VERSION: 3
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -25,7 +25,8 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            ~/work/Cardinal/Cardinal/build
+            ~/work/Cardinal/Cardinal/build/plugins
+            ~/work/Cardinal/Cardinal/build/rack
           key: linux-arm64-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
@@ -70,7 +71,8 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            ~/work/Cardinal/Cardinal/build
+            ~/work/Cardinal/Cardinal/build/plugins
+            ~/work/Cardinal/Cardinal/build/rack
           key: linux-armhf-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
@@ -115,7 +117,8 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            ~/work/Cardinal/Cardinal/build
+            ~/work/Cardinal/Cardinal/build/plugins
+            ~/work/Cardinal/Cardinal/build/rack
           key: linux-i686-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
@@ -156,7 +159,8 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            ~/work/Cardinal/Cardinal/build
+            ~/work/Cardinal/Cardinal/build/plugins
+            ~/work/Cardinal/Cardinal/build/rack
           key: linux-x86_64-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
@@ -252,7 +256,8 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            ~/work/Cardinal/Cardinal/build
+            ~/work/Cardinal/Cardinal/build/plugins
+            ~/work/Cardinal/Cardinal/build/rack
           key: macos-universal-v${{ env.CACHE_VERSION }}
       - name: Fix up Xcode
         run: |
@@ -287,7 +292,8 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            ~/work/Cardinal/Cardinal/build
+            ~/work/Cardinal/Cardinal/build/plugins
+            ~/work/Cardinal/Cardinal/build/rack
           key: win32-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
@@ -326,7 +332,8 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            ~/work/Cardinal/Cardinal/build
+            ~/work/Cardinal/Cardinal/build/plugins
+            ~/work/Cardinal/Cardinal/build/rack
           key: win64-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
