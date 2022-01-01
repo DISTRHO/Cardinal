@@ -259,6 +259,7 @@ struct IldaeilModule : Module {
     NativeTimeInfo fCarlaTimeInfo;
 
     void* fUI = nullptr;
+    bool canUseBridges = true;
 
     float audioDataIn1[BUFFER_SIZE];
     float audioDataIn2[BUFFER_SIZE];
@@ -320,13 +321,45 @@ struct IldaeilModule : Module {
         fCarlaHostHandle = carla_create_native_plugin_host_handle(fCarlaPluginDescriptor, fCarlaPluginHandle);
         DISTRHO_SAFE_ASSERT_RETURN(fCarlaHostHandle != nullptr,);
 
-#ifdef CARLA_OS_MAC
-        carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/Applications/Carla.app/Contents/MacOS");
-        carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/Applications/Carla.app/Contents/MacOS/resources");
+#if defined(CARLA_OS_MAC)
+        if (system::exists("~/Applications/Carla.app"))
+        {
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "~/Applications/Carla.app/Contents/MacOS");
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "~/Applications/Carla.app/Contents/MacOS/resources");
+        }
+        else if (system::exists("/Applications/Carla.app"))
+        {
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/Applications/Carla.app/Contents/MacOS");
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/Applications/Carla.app/Contents/MacOS/resources");
+        }
+#elif defined(CARLA_OS_WINDOWS)
+        // Carla does not support system-wide install on Windows right now
+        if (false)
+        {
+        }
 #else
-        carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/usr/lib/carla");
-        carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/usr/share/carla/resources");
+        if (system::exists("/usr/local/lib/carla"))
+        {
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/usr/local/lib/carla");
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/usr/local/share/carla/resources");
+        }
+        else if (system::exists("/usr/lib/carla"))
+        {
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/usr/lib/carla");
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/usr/share/carla/resources");
+        }
 #endif
+        else
+        {
+            canUseBridges = false;
+
+            static bool warningShown = false;
+            if (! warningShown)
+            {
+                warningShown = true;
+                async_dialog_message("Carla is not installed on this system, bridged plugins will not work");
+            }
+        }
 
         if (const char* const path = std::getenv("LV2_PATH"))
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PLUGIN_PATH, PLUGIN_LV2, path);
@@ -1482,7 +1515,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             if (ImGui::Button("Load Plugin"))
                 fIdleState = kIdleLoadSelectedPlugin;
 
-            if (fPluginType != PLUGIN_INTERNAL)
+            if (fPluginType != PLUGIN_INTERNAL && module->canUseBridges)
             {
                 ImGui::SameLine();
                 ImGui::Checkbox("Run in bridge mode", &fPluginWillRunInBridgeMode);

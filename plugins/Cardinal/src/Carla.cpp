@@ -121,6 +121,49 @@ struct CarlaModule : Module {
             configOutput(i, name);
         }
 
+        const char* binaryDir = nullptr;
+        const char* resourceDir = nullptr;
+
+#if defined(CARLA_OS_MAC)
+        if (system::exists("~/Applications/Carla.app"))
+        {
+            binaryDir = "~/Applications/Carla.app/Contents/MacOS";
+            resourceDir = "~/Applications/Carla.app/Contents/MacOS/resources";
+        }
+        else if (system::exists("/Applications/Carla.app"))
+        {
+            binaryDir = "/Applications/Carla.app/Contents/MacOS";
+            resourceDir = "/Applications/Carla.app/Contents/MacOS/resources";
+        }
+#elif defined(CARLA_OS_WINDOWS)
+        // Carla does not support system-wide install on Windows right now
+        if (false)
+        {
+        }
+#else
+        if (system::exists("/usr/local/lib/carla"))
+        {
+            binaryDir = "/usr/local/lib/carla";
+            resourceDir = "/usr/local/share/carla/resources";
+        }
+        else if (system::exists("/usr/lib/carla"))
+        {
+            binaryDir = "/usr/lib/carla";
+            resourceDir = "/usr/share/carla/resources";
+        }
+#endif
+
+        if (binaryDir == nullptr)
+        {
+            static bool warningShown = false;
+            if (! warningShown)
+            {
+                warningShown = true;
+                async_dialog_message("Carla is not installed on this system, the Carla module will do nothing");
+            }
+            return;
+        }
+
         std::memset(dataOut, 0, sizeof(dataOut));
 
         fCarlaPluginDescriptor = carla_get_native_patchbay_cv8_plugin();
@@ -130,11 +173,7 @@ struct CarlaModule : Module {
         memset(&fCarlaTimeInfo, 0, sizeof(fCarlaTimeInfo));
 
         fCarlaHostDescriptor.handle = this;
-#ifdef CARLA_OS_MAC
-        fCarlaHostDescriptor.resourceDir = "/Applications/Carla.app/Contents/MacOS/resources";
-#else
-        fCarlaHostDescriptor.resourceDir = "/usr/share/carla/resources";
-#endif
+        fCarlaHostDescriptor.resourceDir = resourceDir;
         fCarlaHostDescriptor.uiName = "Carla";
         fCarlaHostDescriptor.uiParentId = 0;
 
@@ -158,13 +197,8 @@ struct CarlaModule : Module {
         fCarlaHostHandle = carla_create_native_plugin_host_handle(fCarlaPluginDescriptor, fCarlaPluginHandle);
         DISTRHO_SAFE_ASSERT_RETURN(fCarlaHostHandle != nullptr,);
 
-#ifdef CARLA_OS_MAC
-        carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/Applications/Carla.app/Contents/MacOS");
-        carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/Applications/Carla.app/Contents/MacOS/resources");
-#else
-        carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/usr/lib/carla");
-        carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/usr/share/carla/resources");
-#endif
+        carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, binaryDir);
+        carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, resourceDir);
 
         fCarlaPluginDescriptor->dispatcher(fCarlaPluginHandle, NATIVE_PLUGIN_OPCODE_HOST_USES_EMBED,
                                            0, 0, nullptr, 0.0f);
@@ -579,6 +613,9 @@ struct CarlaModuleWidget : ModuleWidget, IdleCallback {
 
     void appendContextMenu(ui::Menu* const menu) override
     {
+        if (module == nullptr || module->pcontext == nullptr || module->fCarlaHostHandle == nullptr)
+            return;
+
         menu->addChild(new ui::MenuSeparator);
 
         menu->addChild(createCheckMenuItem(visible ? "Bring GUI to Front" : "Show GUI", "",
@@ -599,6 +636,9 @@ struct CarlaModuleWidget : ModuleWidget, IdleCallback {
 
     void onDoubleClick(const DoubleClickEvent& e) override
     {
+        if (module == nullptr || module->pcontext == nullptr || module->fCarlaHostHandle == nullptr)
+            return;
+
         e.consume(this);
         showUI();
     }
