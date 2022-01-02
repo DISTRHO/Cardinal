@@ -898,17 +898,17 @@ protected:
                 {
                     if (timePos.frame == 0)
                     {
-                        singleTimeMidiEvent.data[0] = 0xFA;
+                        singleTimeMidiEvent.data[0] = 0xFA; // start
                         sendSingleSimpleMidiMessage(singleTimeMidiEvent);
                     }
 
-                    singleTimeMidiEvent.data[0] = 0xFB;
+                    singleTimeMidiEvent.data[0] = 0xFB; // continue
                     sendSingleSimpleMidiMessage(singleTimeMidiEvent);
                 }
             }
             else if (context->playing)
             {
-                singleTimeMidiEvent.data[0] = 0xFC;
+                singleTimeMidiEvent.data[0] = 0xFC; // stop
                 sendSingleSimpleMidiMessage(singleTimeMidiEvent);
             }
 

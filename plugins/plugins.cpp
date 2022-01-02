@@ -668,6 +668,7 @@ static void initStatic__Cardinal()
     const StaticPluginLoader spl(p, "Cardinal");
     if (spl.ok())
     {
+        p->addModel(modelAudioFile);
         p->addModel(modelCarla);
         p->addModel(modelCardinalBlank);
         p->addModel(modelGlBars);

@@ -59,6 +59,15 @@
       ]
     },
     {
+      "slug": "AudioFile",
+      "disabled": false,
+      "name": "Audio File",
+      "description": "Audio file player as a module",
+      "tags": [
+        "Utility"
+      ]
+    },
+    {
       "slug": "Carla",
       "disabled": false,
       "name": "Carla Plugin Host",

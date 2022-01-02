@@ -27,6 +27,7 @@ using namespace rack;
 
 extern Plugin* pluginInstance;
 
+extern Model* modelAudioFile;
 extern Model* modelCarla;
 extern Model* modelCardinalBlank;
 extern Model* modelGlBars;
