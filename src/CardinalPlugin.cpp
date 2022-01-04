@@ -93,6 +93,26 @@ struct Initializer
         settings::headless = true;
 #endif
 
+        // copied from https://community.vcvrack.com/t/16-colour-cable-palette/15951
+        settings::cableColors = {
+            color::fromHexString("#ff5252"),
+            color::fromHexString("#ff9352"),
+            color::fromHexString("#ffd452"),
+            color::fromHexString("#e8ff52"),
+            color::fromHexString("#a8ff52"),
+            color::fromHexString("#67ff52"),
+            color::fromHexString("#52ff7d"),
+            color::fromHexString("#52ffbe"),
+            color::fromHexString("#52ffff"),
+            color::fromHexString("#52beff"),
+            color::fromHexString("#527dff"),
+            color::fromHexString("#6752ff"),
+            color::fromHexString("#a852ff"),
+            color::fromHexString("#e952ff"),
+            color::fromHexString("#ff52d4"),
+            color::fromHexString("#ff5293"),
+        };
+
         system::init();
         logger::init();
         random::init();
