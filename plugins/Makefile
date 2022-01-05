@@ -426,6 +426,11 @@ DRUMKIT_CUSTOM = ADSR Envelope LowFrequencyOscillator
 PLUGIN_FILES += ESeries/src/E340.cpp
 
 # --------------------------------------------------------------
+# ExpertSleepers-Encoders
+
+PLUGIN_FILES += $(filter-out ExpertSleepers-Encoders/src/Encoders.cpp,$(wildcard ExpertSleepers-Encoders/src/*.cpp))
+
+# --------------------------------------------------------------
 # Extratone
 
 PLUGIN_FILES += $(filter-out Extratone/src/plugin.cpp,$(wildcard Extratone/src/*.cpp))
@@ -1029,6 +1034,13 @@ $(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ESERIES_CUSTOM),$(call custom_module_names,$(m),ESeries)) \
 		-DpluginInstance=pluginInstance__ESeries
+
+$(BUILD_DIR)/ExpertSleepers-Encoders/src/%.cpp.o: ExpertSleepers-Encoders/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(EXPERTSLEEPERS_ENCODERS_CUSTOM),$(call custom_module_names,$(m),ExpertSleepersEncoders)) \
+		-DpluginInstance=pluginInstance__ExpertSleepersEncoders
 
 $(BUILD_DIR)/Extratone/src/%.cpp.o: Extratone/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

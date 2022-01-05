@@ -8,48 +8,49 @@ the more restrictive of the **code licenses** will apply to the final binary.
 
 Bellow follows a list of all code licenses used in Cardinal and linked submodules.
 
-| Name                  | License(s)            | Additional notes |
-|-----------------------|-----------------------|------------------|
-| Carla                 | GPL-2.0-or-later      | Used as plugin host within Cardinal|
-| DPF                   | ISC, GPL-2.0-or-later | Used as the plugin framework, VST2 binary GPLv2+ licensed |
-| Rack                  | GPL-3.0-or-later      | The actual Rack code, internal dependencies are compatible with GPLv3+ |
-| 21kHz                 | MIT                   | |
-| AS                    | MIT                   | |
-| Amalgamated Harmonics | BSD-3-Clause          | |
-| Animated Circuits     | GPL-3.0-or-later      | |
-| Aria Salvatrice       | GPL-3.0-or-later      | |
-| Atelier               | GPL-3.0-or-later      | |
-| Audible Instruments   | GPL-3.0-or-later      | |
-| Bacon Music           | GPL-3.0-or-later      | |
-| Befaco                | GPL-3.0-or-later      | |
-| Bidoo                 | GPL-3.0-or-later      | |
-| Bogaudio              | GPL-3.0-or-later      | |
-| ChowDSP               | GPL-3.0-or-later      | |
-| cf                    | BSD-3-Clause          | |
-| DrumKit               | CC0-1.0               | |
-| E-Series              | GPL-3.0-or-later      | |
-| Extratone             | GPL-3.0-or-later      | |
-| Fehler Fabrik         | GPL-3.0-or-later      | |
-| Fundamental           | GPL-3.0-or-later      | |
-| Glue the Giant        | GPL-3.0-or-later      | |
-| Grande                | GPL-3.0-or-later      | |
-| HetrickCV             | CC0-1.0               | |
-| Impromptu             | GPL-3.0-or-later      | |
-| JW-Modules            | BSD-3-Clause          | |
-| LifeFormModular       | MIT                   | |
-| Little Utils          | MIT                   | |
-| Lomas Modules         | GPL-3.0-or-later      | |
-| Lyrae Modules         | GPL-3.0-or-later      | |
-| MindMeld              | GPL-3.0-or-later      | |
-| Mog                   | CC0-1.0               | |
-| mscHack               | BSD-3-Clause          | |
-| Prism                 | BSD-3-Clause          | |
-| Rackwindows           | MIT                   | |
-| repelzen              | GPL-3.0-or-later      | |
-| Sonus Modular         | GPL-3.0-or-later      | |
-| Valley                | GPL-3.0-or-later      | |
-| ZetaCarinae           | GPL-3.0-or-later      | |
-| ZZC                   | GPL-3.0-or-later      | |
+| Name                    | License(s)            | Additional notes |
+|-------------------------|-----------------------|------------------|
+| Carla                   | GPL-2.0-or-later      | Used as plugin host within Cardinal |
+| DPF                     | ISC, GPL-2.0-or-later | Used as the plugin framework, VST2 binary GPLv2+ licensed |
+| Rack                    | GPL-3.0-or-later      | The actual Rack code, internal dependencies are compatible with GPLv3+ |
+| 21kHz                   | MIT                   | |
+| AS                      | MIT                   | |
+| Amalgamated Harmonics   | BSD-3-Clause          | |
+| Animated Circuits       | GPL-3.0-or-later      | |
+| Aria Salvatrice         | GPL-3.0-or-later      | |
+| Atelier                 | GPL-3.0-or-later      | |
+| Audible Instruments     | GPL-3.0-or-later      | |
+| Bacon Music             | GPL-3.0-or-later      | |
+| Befaco                  | GPL-3.0-or-later      | |
+| Bidoo                   | GPL-3.0-or-later      | |
+| Bogaudio                | GPL-3.0-or-later      | |
+| cf                      | BSD-3-Clause          | |
+| ChowDSP                 | GPL-3.0-or-later      | |
+| DrumKit                 | CC0-1.0               | |
+| E-Series                | GPL-3.0-or-later      | |
+| ExpertSleepers Encoders | MIT                   | |
+| Extratone               | GPL-3.0-or-later      | |
+| Fehler Fabrik           | GPL-3.0-or-later      | |
+| Fundamental             | GPL-3.0-or-later      | |
+| Glue the Giant          | GPL-3.0-or-later      | |
+| Grande                  | GPL-3.0-or-later      | |
+| HetrickCV               | CC0-1.0               | |
+| Impromptu               | GPL-3.0-or-later      | |
+| JW-Modules              | BSD-3-Clause          | |
+| LifeFormModular         | MIT                   | |
+| Little Utils            | MIT                   | |
+| Lomas Modules           | GPL-3.0-or-later      | |
+| Lyrae Modules           | GPL-3.0-or-later      | |
+| MindMeld                | GPL-3.0-or-later      | |
+| Mog                     | CC0-1.0               | |
+| mscHack                 | BSD-3-Clause          | |
+| Prism                   | BSD-3-Clause          | |
+| Rackwindows             | MIT                   | |
+| repelzen                | GPL-3.0-or-later      | |
+| Sonus Modular           | GPL-3.0-or-later      | |
+| Valley                  | GPL-3.0-or-later      | |
+| ZetaCarinae             | GPL-3.0-or-later      | |
+| ZZC                     | GPL-3.0-or-later      | |
 
 ## ARTWORK / PANEL LICENSES
 
@@ -97,12 +98,13 @@ Below is a list of artwork licenses from plugins
 | BogaudioModules/*                       | CC-BY-SA-4.0     | |
 | Cardinal/*                              | CC0-1.0          | |
 | Cardinal/Miku/Miku.png                  | CC-BY-NC-3.0     | https://piapro.net/intl/en_for_creators.html |
+| ExpertSleepers-Encoders/*               | MIT              | No artwork specific license provided |
 | LittleUtils/*                           | MIT              | No artwork specific license provided |
-| LittleUtils/ComponentLibrary/*          | CC-BY-NC-4.0     | |
 | LyraeModules/*                          | CC-BY-NC-SA-4.0  | |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided |
 
 TODO: Everything after Cardinal
+TODO: LittleUtils/fonts/*
 
 ### Rack
 

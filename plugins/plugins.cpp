@@ -256,6 +256,9 @@ void setupSamples();
 // ESeries
 #include "ESeries/src/plugin.hpp"
 
+// ExpertSleepers-Encoders
+#include "ExpertSleepers-Encoders/src/Encoders.hpp"
+
 // Extratone
 #include "Extratone/src/plugin.hpp"
 
@@ -509,6 +512,7 @@ Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__ESeries;
+Plugin* pluginInstance__ExpertSleepersEncoders;
 Plugin* pluginInstance__Extratone;
 Plugin* pluginInstance__FehlerFabrik;
 Plugin* pluginInstance__Fundamental;
@@ -1262,6 +1266,23 @@ static void initStatic__ESeries()
     }
 }
 
+static void initStatic__ExpertSleepersEncoders()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__ExpertSleepersEncoders = p;
+
+    const StaticPluginLoader spl(p, "ExpertSleepers-Encoders");
+    if (spl.ok())
+    {
+        p->addModel(model8GT);
+        p->addModel(model8CV);
+        p->addModel(modelES40);
+        p->addModel(modelES5);
+        p->addModel(modelSMUX);
+        p->addModel(modelCalibrator);
+    }
+}
+
 static void initStatic__Extratone()
 {
     Plugin* const p = new Plugin;
@@ -1870,6 +1891,7 @@ void initStaticPlugins()
     initStatic__ChowDSP();
     initStatic__DrumKit();
     initStatic__ESeries();
+    initStatic__ExpertSleepersEncoders();
     initStatic__Extratone();
     initStatic__FehlerFabrik();
     initStatic__Fundamental();

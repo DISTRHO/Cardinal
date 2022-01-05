@@ -127,3 +127,6 @@
 [submodule "plugins/LomasModules"]
 	path = plugins/LomasModules
 	url = https://github.com/LomasModules/LomasModules.git
+[submodule "plugins/ExpertSleepers-Encoders"]
+	path = plugins/ExpertSleepers-Encoders
+	url = https://github.com/expertsleepersltd/vcvrack-encoders.git

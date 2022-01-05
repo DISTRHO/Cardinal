@@ -92,6 +92,8 @@ At the moment the following 3rd-party modules are provided:
 - ChowDSP
 - DrumKit
 - E-Series
+- ExpertSleepers Encoders
+- Extratone
 - Fehler Fabrik
 - Fundamental
 - Glue the Giant
@@ -106,12 +108,13 @@ At the moment the following 3rd-party modules are provided:
 - MindMeld
 - Mog
 - mscHack
+- Prism
 - Rackwindows
 - repelzen
 - Sonus Modular
 - Valley
-- ZZC
 - ZetaCarinae
+- ZZC
 
 Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.
 
