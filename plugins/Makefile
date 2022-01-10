@@ -973,6 +973,7 @@ $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
 		$(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) \
 		$(foreach m,$(BIDOO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bidoo_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__Bidoo \
+		-DSKIP_MINGW_FORMAT \
 		-IBidoo/src/dep/gverb/include \
 		-Wno-ignored-qualifiers \
 		-Wno-sign-compare \
@@ -986,6 +987,7 @@ $(BUILD_DIR)/BogaudioModules/src/follower_base.cpp.o: BogaudioModules/src/follow
 		-DpluginInstance=pluginInstance__BogaudioModules \
 		-DefGainMaxDecibels=efGainMaxDecibelsDebug \
 		-DRACK_SIMD=1 \
+		-DSKIP_MINGW_FORMAT \
 		-IBogaudioModules/lib \
 		-IBogaudioModules/src/dsp
 
@@ -997,6 +999,7 @@ $(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
 		$(foreach m,$(BOGAUDIO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Bogaudio_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__BogaudioModules \
 		-DRACK_SIMD=1 \
+		-DSKIP_MINGW_FORMAT \
 		-IBogaudioModules/lib \
 		-IBogaudioModules/src/dsp
 
@@ -1015,6 +1018,7 @@ $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 		$(foreach m,$(CHOWDSP_CUSTOM),$(call custom_module_names,$(m),ChowDSP)) \
 		-DpluginInstance=pluginInstance__ChowDSP \
 		-DUSE_EIGEN \
+		-DSKIP_MINGW_FORMAT \
 		-IChowDSP/lib \
 		-IChowDSP/lib/chowdsp_utils/DSP/WDF \
 		-Wno-deprecated-copy

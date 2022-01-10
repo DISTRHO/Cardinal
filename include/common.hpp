@@ -22,6 +22,12 @@
 # define PRIVATE_WAS_DEFINED
 #endif
 
+// use mingw print format
+#if defined(ARCH_WIN) && !defined(SKIP_MINGW_FORMAT)
+# include <regex>
+# define format(f,a,b) format(__MINGW_PRINTF_FORMAT,a,b)
+#endif
+
 #include_next "common.hpp"
 
 // Make binary resources work the same no matter the OS

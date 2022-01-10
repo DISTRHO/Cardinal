@@ -660,13 +660,13 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         uint parameterCount;
         struct Parameter {
             char* name;
-            char* format;
+            char* printformat;
             uint32_t rindex;
             bool boolean, bvalue, log, readonly;
             float min, max, power;
             Parameter()
                 : name(nullptr),
-                  format(nullptr),
+                  printformat(nullptr),
                   rindex(0),
                   boolean(false),
                   bvalue(false),
@@ -677,7 +677,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             ~Parameter()
             {
                 std::free(name);
-                std::free(format);
+                std::free(printformat);
             }
         }* parameters;
         float* values;
@@ -901,18 +901,18 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             const CarlaParameterInfo* const pinfo = carla_get_parameter_info(handle, 0, i);
             const ::ParameterRanges* const pranges = carla_get_parameter_ranges(handle, 0, i);
 
-            String format;
+            String printformat;
 
             if (pdata->hints & PARAMETER_IS_INTEGER)
-                format = "%.0f ";
+                printformat = "%.0f ";
             else
-                format = "%.3f ";
+                printformat = "%.3f ";
 
-            format += pinfo->unit;
+            printformat += pinfo->unit;
 
             PluginGenericUI::Parameter& param(ui->parameters[j]);
             param.name = strdup(pinfo->name);
-            param.format = format.getAndReleaseBuffer();
+            param.printformat = printformat.getAndReleaseBuffer();
             param.rindex = i;
             param.boolean = pdata->hints & PARAMETER_IS_BOOLEAN;
             param.log = pdata->hints & PARAMETER_IS_LOGARITHMIC;
@@ -1383,7 +1383,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                 if (param.readonly)
                 {
                     ImGui::BeginDisabled();
-                    ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.format, ImGuiSliderFlags_NoInput);
+                    ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.printformat, ImGuiSliderFlags_NoInput);
                     ImGui::EndDisabled();
                     continue;
                 }
@@ -1406,8 +1406,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                 else
                 {
                     const bool ret = param.log
-                                   ? ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.format, 2.0f)
-                                   : ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.format);
+                                   ? ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.printformat, 2.0f)
+                                   : ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.printformat);
                     if (ret)
                     {
                         if (ImGui::IsItemActivated())
