@@ -96,17 +96,18 @@ protected:
         resizingSize += offset;
         lastResizePoint = ev.pos;
 
-        // TODO min width, min height
-        const uint minWidth = 16;
-        const uint minHeight = 16;
+        const double scaleFactor = getScaleFactor();
+        const uint minWidth = 648 * scaleFactor;
+        const uint minHeight = 538 * scaleFactor;
 
         if (resizingSize.getWidth() < minWidth)
             resizingSize.setWidth(minWidth);
-        if (resizingSize.getWidth() > 16384)
+        else if (resizingSize.getWidth() > 16384)
             resizingSize.setWidth(16384);
+
         if (resizingSize.getHeight() < minHeight)
             resizingSize.setHeight(minHeight);
-        if (resizingSize.getHeight() > 16384)
+        else if (resizingSize.getHeight() > 16384)
             resizingSize.setHeight(16384);
 
         setSize(resizingSize.getWidth(), resizingSize.getHeight());
