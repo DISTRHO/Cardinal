@@ -22,9 +22,6 @@ https://github.com/squinkylabs/SquinkyVCV
 
 LindenbergResearch        43959.0 (not opensource?)
 
-Geodesics                 42761.0
-https://github.com/MarcBoule/Geodesics
-
 Alikins                   41798.0
 https://github.com/alikins/Alikins-rack-plugins
 

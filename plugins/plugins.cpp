@@ -309,6 +309,9 @@ void setupSamples();
 #include "Fundamental/src/plugin.hpp"
 #endif
 
+// Geodesics
+#include "Geodesics/src/Geodesics.hpp"
+
 // GlueTheGiant
 #include "GlueTheGiant/src/plugin.hpp"
 bool audition_mixer = false;
@@ -568,6 +571,7 @@ Plugin* pluginInstance__FehlerFabrik;
 #ifdef WITH_FUNDAMENTAL
 Plugin* pluginInstance__Fundamental;
 #endif
+extern Plugin* pluginInstance__Geodesics;
 Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__HetrickCV;
@@ -1460,6 +1464,27 @@ static void initStatic__Fundamental()
 }
 #endif
 
+static void initStatic__Geodesics()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Geodesics = p;
+
+    const StaticPluginLoader spl(p, "Geodesics");
+    if (spl.ok())
+    {
+        p->addModel(modelBlackHoles);
+        p->addModel(modelPulsars);
+        p->addModel(modelBranes);
+        p->addModel(modelIons);
+        p->addModel(modelEntropia);
+        p->addModel(modelEnergy);
+        p->addModel(modelTorus);
+        p->addModel(modelFate);
+        p->addModel(modelBlankLogo);
+        p->addModel(modelBlankInfo);
+    }
+}
+
 static void initStatic__GlueTheGiant()
 {
     Plugin* const p = new Plugin;
@@ -2003,6 +2028,7 @@ void initStaticPlugins()
    #ifdef WITH_FUNDAMENTAL
     initStatic__Fundamental();
    #endif
+    initStatic__Geodesics();
     initStatic__GlueTheGiant();
     initStatic__GrandeModular();
     initStatic__HetrickCV();

@@ -29,6 +29,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | ExpertSleepers Encoders | MIT                   | |
 | Extratone               | GPL-3.0-or-later      | |
 | Fehler Fabrik           | GPL-3.0-or-later      | |
+| Geodesics               | GPL-3.0               | (blocker for inclusion right now)  |
 | Glue the Giant          | GPL-3.0-or-later      | |
 | Grande                  | GPL-3.0-or-later      | |
 | HetrickCV               | CC0-1.0               | |
