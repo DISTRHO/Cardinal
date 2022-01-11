@@ -485,6 +485,19 @@ IMPROMPTUMODULAR_CUSTOM = RefreshCounter
 IMPROMPTUMODULAR_CUSTOM_PER_FILE = Clock stepClock
 
 # --------------------------------------------------------------
+# ihtsyn
+
+PLUGIN_FILES += $(filter-out ihtsyn/src/plugin.cpp,$(wildcard ihtsyn/src/*.cpp))
+
+# modules/types which are present in other plugins
+IHTSYN_CUSTOM_PER_FILE  = mv_allpass
+IHTSYN_CUSTOM_PER_FILE += mv_staticallpass4tap
+IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline
+IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline4tap
+IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline8tap
+IHTSYN_CUSTOM_PER_FILE += mv_statevariable
+
+# --------------------------------------------------------------
 # JW-Modules
 
 PLUGIN_FILES += $(filter-out JW-Modules/src/JWModules.cpp,$(wildcard JW-Modules/src/*.cpp))
@@ -1134,6 +1147,14 @@ $(BUILD_DIR)/ImpromptuModular%.cpp.o: ImpromptuModular%.cpp
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ImpromptuModular_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
 		-Wno-format-truncation
+
+$(BUILD_DIR)/ihtsyn/%.cpp.o: ihtsyn/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(IHTSYN_CUSTOM),$(call custom_module_names,$(m),ihtsyn)) \
+		$(foreach m,$(IHTSYN_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ihtsyn_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__ihtsyn
 
 $(BUILD_DIR)/JW-Modules/src/WavHead.cpp.o: JW-Modules/src/WavHead.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

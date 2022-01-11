@@ -100,6 +100,7 @@ At the moment the following 3rd-party modules are provided:
 - Grande
 - HetrickCV
 - Impromptu
+- ihtsyn
 - JW-Modules
 - LifeFormModular
 - Little Utils

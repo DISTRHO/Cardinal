@@ -36,6 +36,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Grande                  | GPL-3.0-or-later      | |
 | HetrickCV               | CC0-1.0               | |
 | Impromptu               | GPL-3.0-or-later      | |
+| ihtsyn                  | GPL-3.0-or-later      | |
 | JW-Modules              | BSD-3-Clause          | |
 | LifeFormModular         | MIT                   | |
 | Little Utils            | MIT                   | |
@@ -99,6 +100,8 @@ Below is a list of artwork licenses from plugins
 | Cardinal/*                              | CC0-1.0          | |
 | Cardinal/Miku/Miku.png                  | CC-BY-NC-3.0     | https://piapro.net/intl/en_for_creators.html |
 | ExpertSleepers-Encoders/*               | MIT              | No artwork specific license provided |
+| ihtsyn/*                                | GPL-3.0-or-later | No artwork specific license provided |
+| ihtsyn/LEDCalculator.ttf                | Custom           | Free for personal use |
 | LittleUtils/*                           | MIT              | No artwork specific license provided |
 | LyraeModules/*                          | CC-BY-NC-SA-4.0  | |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided |

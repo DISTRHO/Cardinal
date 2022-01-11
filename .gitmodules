@@ -130,3 +130,6 @@
 [submodule "plugins/ExpertSleepers-Encoders"]
 	path = plugins/ExpertSleepers-Encoders
 	url = https://github.com/expertsleepersltd/vcvrack-encoders.git
+[submodule "plugins/ihtsyn"]
+	path = plugins/ihtsyn
+	url = https://github.com/nysthi/ihtsyn.git

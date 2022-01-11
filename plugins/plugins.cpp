@@ -279,40 +279,6 @@ void saveGtgPluginDefault(const char*, int) {}
 // GrandeModular
 #include "GrandeModular/src/plugin.hpp"
 
-// ImpromptuModular
-/* NOTE too much noise in original include, do this a different way
-// #include "ImpromptuModular/src/ImpromptuModular.hpp"
-*/
-extern Model* modelAdaptiveQuantizer;
-extern Model* modelBigButtonSeq;
-extern Model* modelBigButtonSeq2;
-extern Model* modelChordKey;
-extern Model* modelChordKeyExpander;
-extern Model* modelClocked;
-extern Model* modelClockedExpander;
-extern Model* modelClkd;
-extern Model* modelCvPad;
-extern Model* modelFoundry;
-extern Model* modelFoundryExpander;
-extern Model* modelFourView;
-extern Model* modelGateSeq64;
-extern Model* modelGateSeq64Expander;
-extern Model* modelHotkey;
-extern Model* modelPart;
-extern Model* modelPhraseSeq16;
-extern Model* modelPhraseSeq32;
-extern Model* modelPhraseSeqExpander;
-extern Model* modelProbKey;
-// extern Model* modelProbKeyExpander;
-extern Model* modelSemiModularSynth;
-extern Model* modelTact;
-extern Model* modelTact1;
-extern Model* modelTactG;
-extern Model* modelTwelveKey;
-extern Model* modelWriteSeq32;
-extern Model* modelWriteSeq64;
-extern Model* modelBlankPanel;
-
 // HetrickCV
 #define modelASR modelHetrickCVASR
 #define modelBlankPanel modelHetrickCVBlankPanel
@@ -359,6 +325,43 @@ extern Model* modelXYToPolar;
 #undef modelFlipFlop
 #undef modelMidSide
 #undef modelMinMax
+
+// ImpromptuModular
+/* NOTE too much noise in original include, do this a different way
+// #include "ImpromptuModular/src/ImpromptuModular.hpp"
+*/
+extern Model* modelAdaptiveQuantizer;
+extern Model* modelBigButtonSeq;
+extern Model* modelBigButtonSeq2;
+extern Model* modelChordKey;
+extern Model* modelChordKeyExpander;
+extern Model* modelClocked;
+extern Model* modelClockedExpander;
+extern Model* modelClkd;
+extern Model* modelCvPad;
+extern Model* modelFoundry;
+extern Model* modelFoundryExpander;
+extern Model* modelFourView;
+extern Model* modelGateSeq64;
+extern Model* modelGateSeq64Expander;
+extern Model* modelHotkey;
+extern Model* modelPart;
+extern Model* modelPhraseSeq16;
+extern Model* modelPhraseSeq32;
+extern Model* modelPhraseSeqExpander;
+extern Model* modelProbKey;
+// extern Model* modelProbKeyExpander;
+extern Model* modelSemiModularSynth;
+extern Model* modelTact;
+extern Model* modelTact1;
+extern Model* modelTactG;
+extern Model* modelTwelveKey;
+extern Model* modelWriteSeq32;
+extern Model* modelWriteSeq64;
+extern Model* modelBlankPanel;
+
+// ihtsyn
+#include "ihtsyn/src/plugin.hpp"
 
 // JW-Modules
 #define modelQuantizer modelJWQuantizer
@@ -520,6 +523,7 @@ Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
+Plugin* pluginInstance__ihtsyn;
 Plugin* pluginInstance__JW;
 Plugin* pluginInstance__LifeFormModular;
 Plugin* pluginInstance__LittleUtils;
@@ -1521,6 +1525,21 @@ static void initStatic__ImpromptuModular()
     }
 }
 
+static void initStatic__ihtsyn()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__ihtsyn = p;
+
+    const StaticPluginLoader spl(p, "ihtsyn");
+    if (spl.ok())
+    {
+        p->addModel(modelPitchMangler);
+        p->addModel(modelTwistedVerb);
+        p->addModel(modelHiVerb);
+        p->addModel(modelMVerb);
+    }
+}
+
 static void initStatic__JW()
 {
     Plugin* const p = new Plugin;
@@ -1899,6 +1918,7 @@ void initStaticPlugins()
     initStatic__GrandeModular();
     initStatic__HetrickCV();
     initStatic__ImpromptuModular();
+    initStatic__ihtsyn();
     initStatic__JW();
     initStatic__LifeFormModular();
     initStatic__LittleUtils();
