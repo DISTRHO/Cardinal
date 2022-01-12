@@ -15,6 +15,10 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
+#ifdef HEADLESS
+# error wrong include
+#endif
+
 #pragma once
 
 #include "DistrhoUtils.hpp"

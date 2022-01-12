@@ -43,9 +43,16 @@
 
 #include "DistrhoPluginUtils.hpp"
 #include "PluginDriver.hpp"
-#include "WindowParameters.hpp"
 #include "extra/Base64.hpp"
 #include "extra/SharedResourcePointer.hpp"
+
+#ifndef HEADLESS
+# include "WindowParameters.hpp"
+static const constexpr uint kCardinalStateCount = 2; // patch, windowSize
+#else
+# define kWindowParameterCount 0
+static const constexpr uint kCardinalStateCount = 1; // patch
+#endif
 
 #define REMOTE_HOST_PORT "2228"
 
@@ -54,7 +61,7 @@ namespace plugin {
     void initStaticPlugins();
     void destroyStaticPlugins();
 }
-#if defined(__MOD_DEVICES__) && !defined(HEADLESS)
+#ifndef HEADLESS
 namespace window {
     void WindowInit(Window* window, DISTRHO_NAMESPACE::Plugin* plugin);
 }
@@ -342,12 +349,14 @@ class CardinalPlugin : public CardinalBasePlugin
     uint64_t fPreviousFrame;
     Mutex fDeviceMutex;
 
+   #ifndef HEADLESS
     // real values, not VCV interpreted ones
     float fWindowParameters[kWindowParameterCount];
+   #endif
 
 public:
     CardinalPlugin()
-        : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, 2),
+        : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, kCardinalStateCount),
           fInitializer(this),
           fAudioBufferIn(nullptr),
           fAudioBufferOut(nullptr),
@@ -357,6 +366,7 @@ public:
           fCurrentMidiOutputs(nullptr),
           fPreviousFrame(0)
     {
+       #ifndef HEADLESS
         fWindowParameters[kWindowParameterShowTooltips] = 1.0f;
         fWindowParameters[kWindowParameterCableOpacity] = 50.0f;
         fWindowParameters[kWindowParameterCableTension] = 75.0f;
@@ -366,6 +376,7 @@ public:
         fWindowParameters[kWindowParameterWheelKnobControl] = 0.0f;
         fWindowParameters[kWindowParameterWheelSensitivity] = 1.0f;
         fWindowParameters[kWindowParameterLockModulePositions] = 0.0f;
+       #endif
 
         // create unique temporary path for this instance
         try {
@@ -652,6 +663,7 @@ protected:
             return;
         }
 
+       #ifndef HEADLESS
         switch (index - kModuleParameters)
         {
         case kWindowParameterShowTooltips:
@@ -740,6 +752,7 @@ protected:
             parameter.ranges.max = 1.0f;
             break;
         }
+       #endif
     }
 
     void initState(const uint32_t index, String& stateKey, String& defaultStateValue) override
@@ -751,9 +764,11 @@ protected:
         case 0:
             stateKey = "patch";
             break;
+       #ifndef HEADLESS
         case 1:
             stateKey = "windowSize";
             break;
+       #endif
         }
     }
 
@@ -765,10 +780,12 @@ protected:
         if (index < kModuleParameters)
             return context->parameters[index];
 
+       #ifndef HEADLESS
         index -= kModuleParameters;
 
         if (index < kWindowParameterCount)
             return fWindowParameters[index];
+       #endif
 
         return 0.0f;
     }
@@ -781,6 +798,7 @@ protected:
             return;
         }
 
+       #ifndef HEADLESS
         index -= kModuleParameters;
 
         if (index < kWindowParameterCount)
@@ -788,12 +806,15 @@ protected:
             fWindowParameters[index] = value;
             return;
         }
+       #endif
     }
 
     String getState(const char* const key) const override
     {
+       #ifndef HEADLESS
         if (std::strcmp(key, "windowSize") == 0)
             return fWindowSize;
+       #endif
 
         if (std::strcmp(key, "patch") != 0)
             return String();
@@ -820,11 +841,13 @@ protected:
 
     void setState(const char* const key, const char* const value) override
     {
+       #ifndef HEADLESS
         if (std::strcmp(key, "windowSize") == 0)
         {
             fWindowSize = value;
             return;
         }
+       #endif
 
         if (std::strcmp(key, "patch") != 0)
             return;
