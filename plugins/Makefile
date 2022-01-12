@@ -186,15 +186,18 @@ PLUGIN_FILES = plugins.cpp
 # --------------------------------------------------------------
 # Cardinal (built-in)
 
-PLUGIN_FILES += Cardinal/src/AudioFile.cpp
 PLUGIN_FILES += Cardinal/src/Blank.cpp
-PLUGIN_FILES += Cardinal/src/Carla.cpp
 PLUGIN_FILES += Cardinal/src/glBars.cpp
 PLUGIN_FILES += Cardinal/src/HostCV.cpp
 PLUGIN_FILES += Cardinal/src/HostParameters.cpp
 PLUGIN_FILES += Cardinal/src/HostTime.cpp
-PLUGIN_FILES += Cardinal/src/Ildaeil.cpp
 PLUGIN_FILES += Cardinal/src/TextEditor.cpp
+
+ifneq ($(STATIC_BUILD),true)
+PLUGIN_FILES += Cardinal/src/AudioFile.cpp
+PLUGIN_FILES += Cardinal/src/Carla.cpp
+PLUGIN_FILES += Cardinal/src/Ildaeil.cpp
+endif
 
 ifneq ($(HEADLESS),true)
 PLUGIN_FILES += Cardinal/src/ImGuiWidget.cpp
@@ -502,13 +505,17 @@ IHTSYN_CUSTOM_PER_FILE += mv_statevariable
 # --------------------------------------------------------------
 # JW-Modules
 
-PLUGIN_FILES += $(filter-out JW-Modules/src/JWModules.cpp,$(wildcard JW-Modules/src/*.cpp))
+PLUGIN_FILES += $(filter-out JW-Modules/src/JWModules.cpp JW-Modules/src/Str1ker.cpp,$(wildcard JW-Modules/src/*.cpp))
+
+ifneq ($(STATIC_BUILD),true)
+PLUGIN_FILES += JW-Modules/src/Str1ker.cpp
 PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/*.cpp)
 PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/osc/*.cpp)
 ifeq ($(WINDOWS),true)
 PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/win32/*.cpp)
 else
 PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/posix/*.cpp)
+endif
 endif
 
 # modules/types which are present in other plugins

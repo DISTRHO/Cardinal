@@ -16,6 +16,8 @@ SYSDEPS ?= false
 # --------------------------------------------------------------
 # Carla stuff
 
+ifneq ($(STATIC_BUILD),true)
+
 ifneq ($(DEBUG),true)
 EXTERNAL_PLUGINS = true
 endif
@@ -69,6 +71,8 @@ CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/zita-resample
 ifeq ($(WINDOWS),true)
 STATIC_CARLA_PLUGIN_LIBS += -ldsound -lwinmm
 endif
+
+endif # STATIC_BUILD
 
 # --------------------------------------------------------------
 # Import base definitions
@@ -187,7 +191,9 @@ BASE_FLAGS += -Wno-unused-variable
 LINK_FLAGS += -pthread
 
 ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
+ifneq ($(STATIC_BUILD),true)
 LINK_FLAGS += -ldl
+endif
 endif
 
 ifeq ($(MACOS),true)

@@ -91,9 +91,11 @@ cardinal: carla deps dgl plugins
 	$(MAKE) all -C src $(CARLA_EXTRA_ARGS)
 
 carla:
+ifneq ($(STATIC_BUILD),true)
 	$(MAKE) static-plugin -C carla $(CARLA_EXTRA_ARGS) \
 		CAN_GENERATE_LV2_TTL=false \
 		STATIC_PLUGIN_TARGET=true
+endif
 
 deps:
 ifeq ($(SYSDEPS),true)

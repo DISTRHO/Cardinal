@@ -676,15 +676,21 @@ static void initStatic__Cardinal()
     const StaticPluginLoader spl(p, "Cardinal");
     if (spl.ok())
     {
-        p->addModel(modelAudioFile);
-        p->addModel(modelCarla);
         p->addModel(modelCardinalBlank);
         p->addModel(modelGlBars);
         p->addModel(modelHostCV);
         p->addModel(modelHostParameters);
         p->addModel(modelHostTime);
-        p->addModel(modelIldaeil);
         p->addModel(modelTextEditor);
+       #ifndef STATIC_BUILD
+        p->addModel(modelAudioFile);
+        p->addModel(modelCarla);
+        p->addModel(modelIldaeil);
+       #else
+        spl.removeModule("AudioFile");
+        spl.removeModule("Carla");
+        spl.removeModule("Ildaeil");
+       #endif
     }
 }
 
@@ -1566,7 +1572,6 @@ static void initStatic__JW()
         p->addModel(modelPatterns);
         p->addModel(modelQuantizer);
         p->addModel(modelSimpleClock);
-        p->addModel(modelStr1ker);
         p->addModel(modelD1v1de);
         p->addModel(modelPres1t);
         p->addModel(modelThingThing);
@@ -1578,6 +1583,11 @@ static void initStatic__JW()
         p->addModel(modelBlankPanelLarge);
         p->addModel(modelCoolBreeze);
         p->addModel(modelPete);
+       #ifndef STATIC_BUILD
+        p->addModel(modelStr1ker);
+       #else
+        spl.removeModule("Str1ker");
+       #endif
 #undef modelQuantizer
     }
 }
