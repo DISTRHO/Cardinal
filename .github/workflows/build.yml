@@ -242,7 +242,7 @@ jobs:
           sudo apt-get install -yqq liblo-dev
       - name: Build linux x86_64 (headless)
         run: |
-          make features
+          make HEADLESS=true features
           make HEADLESS=true -j $(nproc)
 
   linux-x86_64-sysdeps:
