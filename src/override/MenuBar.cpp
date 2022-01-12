@@ -56,10 +56,6 @@
 
 #include "../CardinalCommon.hpp"
 
-// #define REMOTE_HOST "localhost"
-#define REMOTE_HOST "192.168.51.1"
-#define REMOTE_HOST_PORT "2228"
-
 namespace rack {
 namespace app {
 namespace menuBar {
@@ -150,22 +146,8 @@ struct FileButton : MenuButton {
 				lo_address_free(addr);
 			}));
 		} else {
-			menu->addChild(createMenuItem("Deploy to MOD", "", []() {
-				const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
-				DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
-
-				APP->engine->prepareSave();
-				APP->patch->saveAutosave();
-				APP->patch->cleanAutosave();
-				std::vector<uint8_t> data(rack::system::archiveDirectory(APP->patch->autosavePath, 1));
-
-				if (const lo_blob blob = lo_blob_new(data.size(), data.data()))
-				{
-					lo_send(addr, "/load", "b", blob);
-					lo_blob_free(blob);
-				}
-
-				lo_address_free(addr);
+			menu->addChild(createMenuItem("Deploy to MOD", "F7", []() {
+				patchUtils::deployToMOD();
 			}));
 		}
 #endif

@@ -255,6 +255,10 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			settings::cpuMeter ^= true;
 			e.consume(this);
 		}
+		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
+			patchUtils::deployToMOD();
+			e.consume(this);
+		}
 
 		// Module selections
 		if (e.keyName == "a" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {

@@ -56,6 +56,10 @@ ifeq ($(DEBUG),true)
 BASE_FLAGS += -UDEBUG
 endif
 
+ifeq ($(HAVE_LIBLO),true)
+BASE_FLAGS += -DHAVE_LIBLO
+endif
+
 ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
 endif

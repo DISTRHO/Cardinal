@@ -19,6 +19,12 @@
 
 #pragma once
 
+#ifdef HAVE_LIBLO
+// # define REMOTE_HOST "localhost"
+# define REMOTE_HOST "192.168.51.1"
+# define REMOTE_HOST_PORT "2228"
+#endif
+
 namespace rack
 {
 namespace ui {
@@ -37,5 +43,6 @@ void revertDialog();
 void saveDialog(const std::string& path);
 void saveAsDialog();
 void appendSelectionContextMenu(rack::ui::Menu* menu);
+void deployToMOD();
 
 }
