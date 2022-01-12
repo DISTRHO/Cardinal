@@ -20,6 +20,7 @@ SYSDEPS ?= false
 
 CARLA_EXTRA_ARGS = \
 	HAVE_FFMPEG=false \
+	HAVE_FLUIDSYNTH=false \
 	HAVE_PROJECTM=false \
 	HAVE_ZYN_DEPS=false \
 	HAVE_ZYN_UI_DEPS=false
