@@ -297,7 +297,7 @@ jobs:
           path: |
             *-macOS.pkg
 
-  modduox:
+  moddwarf:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -310,7 +310,7 @@ jobs:
             ~/PawPawBuilds
             ~/work/Cardinal/Cardinal/build/plugins
             ~/work/Cardinal/Cardinal/build/rack
-          key: modduox-v${{ env.CACHE_VERSION }}
+          key: moddwarf-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
@@ -327,13 +327,13 @@ jobs:
           sudo apt-get install -yqq g++-aarch64-linux-gnu libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libglib2.0-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
       - name: Build extra dependencies
         env:
-          EXTRA_FLAGS: -mcpu=cortex-a72.cortex-a53 -mtune=cortex-a72.cortex-a53 -mfix-cortex-a53-835769 -mfix-cortex-a53-843419
+          EXTRA_FLAGS: -mcpu=cortex-a35 -mtune=cortex-a35
           PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64
-      - name: Build for modduox
+      - name: Build for moddwarf
         env:
-          EXTRA_FLAGS: -mcpu=cortex-a72.cortex-a53 -mtune=cortex-a72.cortex-a53 -mfix-cortex-a53-835769 -mfix-cortex-a53-843419
+          EXTRA_FLAGS: -mcpu=cortex-a35 -mtune=cortex-a35
         run: |
           pushd deps/PawPaw; source local.env linux-aarch64; popd
           make features
@@ -349,14 +349,15 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
             *.tar.gz
 
   # modduo: -mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -mvectorize-with-neon-quad
+  # modduox: -mcpu=cortex-a72.cortex-a53 -mtune=cortex-a72.cortex-a53 -mfix-cortex-a53-835769 -mfix-cortex-a53-843419
   # moddwarf: -mcpu=cortex-a35 -mtune=cortex-a35
 
   win32:
