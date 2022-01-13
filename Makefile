@@ -54,6 +54,14 @@ endif
 
 endif
 
+ifeq ($(HEADLESS),true)
+
+ifneq ($(shell pkg-config --exists liblo && echo true),true)
+$(error liblo dependency not installed/available)
+endif
+
+endif
+
 # --------------------------------------------------------------
 # Check for X11+OpenGL dependencies (unless headless build)
 
