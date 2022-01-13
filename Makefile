@@ -94,6 +94,40 @@ endif
 endif
 
 # --------------------------------------------------------------
+# MOD builds
+
+MOD_WORKDIR ?= $(HOME)/mod-workdir
+MOD_ENVIRONMENT = AR=${1}/host/usr/bin/${2}-gcc-ar CC=${1}/host/usr/bin/${2}-gcc CPP=${1}/host/usr/bin/${2}-cpp CXX=${1}/host/usr/bin/${2}-g++ LD=${1}/host/usr/bin/${2}-ld PKG_CONFIG=${1}/host/usr/bin/pkg-config STRIP=${1}/host/usr/bin/${2}-strip CFLAGS="-I${1}/staging/usr/include" CPPFLAGS= CXXFLAGS="-I${1}/staging/usr/include" LDFLAGS="-L${1}/staging/usr/lib" \ EXE_WRAPPER="qemu-${3}-static -L ${1}/target" HEADLESS=true NOOPT=true STATIC_BUILD=true
+
+modduo:
+	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduo-static,arm-mod-linux-gnueabihf.static,arm)
+
+modduox:
+	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduox-static,aarch64-mod-linux-gnueabi.static,aarch64)
+
+moddwarf:
+	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/moddwarf,aarch64-mod-linux-gnu,aarch64)
+
+publish:
+	tar -C bin -cz $(subst bin/,,$(wildcard bin/*.lv2)) | base64 | curl -F 'package=@-' http://192.168.51.1/sdk/install && echo
+
+ifneq (,$(findstring modduo-,$(MAKECMDGOALS)))
+$(MAKECMDGOALS):
+	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduo-static,arm-mod-linux-gnueabihf.static,arm) $(subst modduo-,,$(MAKECMDGOALS))
+endif
+
+ifneq (,$(findstring modduox-,$(MAKECMDGOALS)))
+$(MAKECMDGOALS):
+	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduox-static,aarch64-mod-linux-gnueabi.static,aarch64) $(subst modduox-,,$(MAKECMDGOALS))
+endif
+
+ifneq (,$(findstring moddwarf-,$(MAKECMDGOALS)))
+$(MAKECMDGOALS):
+	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/moddwarf,aarch64-mod-linux-gnu,aarch64) $(subst moddwarf-,,$(MAKECMDGOALS))
+endif
+
+# --------------------------------------------------------------
+# Individual targets
 
 cardinal: carla deps dgl plugins
 	$(MAKE) all -C src $(CARLA_EXTRA_ARGS)
@@ -134,6 +168,7 @@ gen:
 endif
 
 # --------------------------------------------------------------
+# Packaging standalone for CI
 
 unzipfx: deps/unzipfx/unzipfx2cat$(APP_EXT) Cardinal.zip
 	cat deps/unzipfx/unzipfx2cat$(APP_EXT) Cardinal.zip > Cardinal
@@ -153,6 +188,7 @@ deps/unzipfx/unzipfx2cat.exe:
 	make -C deps/unzipfx -f Makefile.win32
 
 # --------------------------------------------------------------
+# Clean step
 
 clean:
 	$(MAKE) distclean -C carla
@@ -164,6 +200,7 @@ clean:
 	rm -rf bin build
 
 # --------------------------------------------------------------
+# Install step
 
 install:
 	install -d $(DESTDIR)$(PREFIX)/bin
