@@ -317,7 +317,7 @@ jobs:
         run: |
           git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
           sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
-          $(pwd)/deps/mod-plugin-builder/bootstrap.sh modduox-static toolchain && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduox-static
+          $(pwd)/deps/mod-plugin-builder/bootstrap.sh modduox-static minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduox-static
 
   win32:
     runs-on: ubuntu-20.04
