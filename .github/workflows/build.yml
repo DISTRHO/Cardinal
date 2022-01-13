@@ -297,7 +297,7 @@ jobs:
           path: |
             *-macOS.pkg
 
-  moddwarf:
+  modduox:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -307,58 +307,17 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/PawPawBuilds
-            ~/work/Cardinal/Cardinal/build/plugins
-            ~/work/Cardinal/Cardinal/build/rack
-          key: moddwarf-v${{ env.CACHE_VERSION }}
-      - name: Fix GitHub's mess
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+            ~/mod-workdir
+          key: modduox-static-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
-          sudo dpkg --add-architecture arm64
-          sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-arm64.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-aarch64-linux-gnu libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libglib2.0-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
-      - name: Build extra dependencies
-        env:
-          EXTRA_FLAGS: -mcpu=cortex-a35 -mtune=cortex-a35
-          PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
+          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin
+      - name: Bootstrap toolchain
         run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64
-      - name: Build for moddwarf
-        env:
-          EXTRA_FLAGS: -mcpu=cortex-a35 -mtune=cortex-a35
-        run: |
-          pushd deps/PawPaw; source local.env linux-aarch64; popd
-          make features
-          # fancy dance to skip building Standalone and VSTs
-          make HEADLESS=true NOOPT=true WITH_LTO=true -j $(nproc) carla deps plugins dpf/utils/lv2_ttl_generator
-          make HEADLESS=true NOOPT=true WITH_LTO=true -j $(nproc) -C src rack.a
-          make HEADLESS=true NOOPT=true WITH_LTO=true -j $(nproc) -C src/CardinalFX lv2 resources
-          make HEADLESS=true NOOPT=true WITH_LTO=true -j $(nproc) -C src/CardinalSynth lv2
-          make HEADLESS=true NOOPT=true WITH_LTO=true -j $(nproc) -C plugins resources
-          ./dpf/utils/generate-ttl.sh
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
-
-  # modduo: -mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -mvectorize-with-neon-quad
-  # modduox: -mcpu=cortex-a72.cortex-a53 -mtune=cortex-a72.cortex-a53 -mfix-cortex-a53-835769 -mfix-cortex-a53-843419
-  # moddwarf: -mcpu=cortex-a35 -mtune=cortex-a35
+          git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
+          sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
+          $(pwd)/deps/mod-plugin-builder/bootstrap.sh modduox-static toolchain && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduox-static
 
   win32:
     runs-on: ubuntu-20.04
