@@ -55,13 +55,13 @@ struct CardinalPluginContext : rack::Context {
 #endif
     CardinalPluginContext(Plugin* const p);
 #ifndef HEADLESS
-    bool addIdleCallback(IdleCallback* cb);
-    void removeIdleCallback(IdleCallback* cb);
+    bool addIdleCallback(IdleCallback* cb) const;
+    void removeIdleCallback(IdleCallback* cb) const;
 #endif
 };
 
 #ifndef HEADLESS
-void handleHostParameterDrag(CardinalPluginContext* pcontext, uint index, bool started);
+void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, bool started);
 #endif
 
 END_NAMESPACE_DISTRHO

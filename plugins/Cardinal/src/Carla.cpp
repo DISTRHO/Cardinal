@@ -76,7 +76,7 @@ struct CarlaModule : Module {
         NUM_LIGHTS
     };
 
-    CardinalPluginContext* const pcontext;
+    const CardinalPluginContext* const pcontext;
 
     const NativePluginDescriptor* fCarlaPluginDescriptor = nullptr;
     NativePluginHandle fCarlaPluginHandle = nullptr;
@@ -398,7 +398,7 @@ static uint32_t host_get_buffer_size(const NativeHostHandle handle)
 
 static double host_get_sample_rate(const NativeHostHandle handle)
 {
-    CardinalPluginContext* const pcontext = static_cast<CarlaModule*>(handle)->pcontext;
+    const CardinalPluginContext* const pcontext = static_cast<CarlaModule*>(handle)->pcontext;
     DISTRHO_SAFE_ASSERT_RETURN(pcontext != nullptr, 48000.0);
     return pcontext->sampleRate;
 }
@@ -516,7 +516,7 @@ struct CarlaModuleWidget : ModuleWidget, IdleCallback {
             return;
 
         const CarlaHostHandle handle = module->fCarlaHostHandle;
-        CardinalPluginContext* const pcontext = module->pcontext;
+        const CardinalPluginContext* const pcontext = module->pcontext;
 
         char winIdStr[24];
         std::snprintf(winIdStr, sizeof(winIdStr), "%llx", (ulonglong)pcontext->nativeWindowId);
@@ -539,7 +539,7 @@ struct CarlaModuleWidget : ModuleWidget, IdleCallback {
             return;
 
         const CarlaHostHandle handle = module->fCarlaHostHandle;
-        CardinalPluginContext* const pcontext = module->pcontext;
+        const CardinalPluginContext* const pcontext = module->pcontext;
 
         module->fUI = nullptr;
 

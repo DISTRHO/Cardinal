@@ -930,12 +930,13 @@ protected:
         {
             const TimePosition& timePos(getTimePosition());
 
+            bool reset = false;
             MidiEvent singleTimeMidiEvent = { 0, 1, { 0, 0, 0, 0 }, nullptr };
 
             if (timePos.playing)
             {
                 if (timePos.frame == 0 || fPreviousFrame + frames != timePos.frame)
-                    context->reset = true;
+                    reset = true;
 
                 if (! context->playing)
                 {
@@ -977,6 +978,7 @@ protected:
                 context->tickClock = std::fmod(timePos.bbt.tick, context->ticksPerClock);
             }
 
+            context->reset = reset;
             fPreviousFrame = timePos.frame;
         }
 

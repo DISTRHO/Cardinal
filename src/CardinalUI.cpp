@@ -193,7 +193,7 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
-bool CardinalPluginContext::addIdleCallback(IdleCallback* const cb)
+bool CardinalPluginContext::addIdleCallback(IdleCallback* const cb) const
 {
     if (ui == nullptr)
         return false;
@@ -202,7 +202,7 @@ bool CardinalPluginContext::addIdleCallback(IdleCallback* const cb)
     return true;
 }
 
-void CardinalPluginContext::removeIdleCallback(IdleCallback* const cb)
+void CardinalPluginContext::removeIdleCallback(IdleCallback* const cb) const
 {
     if (ui == nullptr)
         return;
@@ -210,7 +210,7 @@ void CardinalPluginContext::removeIdleCallback(IdleCallback* const cb)
     ui->removeIdleCallback(cb);
 }
 
-void handleHostParameterDrag(CardinalPluginContext* pcontext, uint index, bool started)
+void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, bool started)
 {
     DISTRHO_SAFE_ASSERT_RETURN(pcontext->ui != nullptr,);
 

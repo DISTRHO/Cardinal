@@ -248,7 +248,7 @@ struct IldaeilModule : Module {
     SharedResourcePointer<JuceInitializer> juceInitializer;
 #endif
 
-    CardinalPluginContext* const pcontext;
+    const CardinalPluginContext* const pcontext;
 
     const NativePluginDescriptor* fCarlaPluginDescriptor = nullptr;
     NativePluginHandle fCarlaPluginHandle = nullptr;
@@ -588,7 +588,7 @@ static uint32_t host_get_buffer_size(const NativeHostHandle handle)
 
 static double host_get_sample_rate(const NativeHostHandle handle)
 {
-    CardinalPluginContext* const pcontext = static_cast<IldaeilModule*>(handle)->pcontext;
+    const CardinalPluginContext* const pcontext = static_cast<IldaeilModule*>(handle)->pcontext;
     DISTRHO_SAFE_ASSERT_RETURN(pcontext != nullptr, 48000.0);
     return pcontext->sampleRate;
 }
@@ -837,7 +837,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         DISTRHO_SAFE_ASSERT_RETURN(idleCallbackActive,);
         DISTRHO_SAFE_ASSERT_RETURN(fPluginType == PLUGIN_INTERNAL || fPluginType == PLUGIN_LV2,);
 
-        CardinalPluginContext* const pcontext = module->pcontext;
+        const CardinalPluginContext* const pcontext = module->pcontext;
 
         // FIXME isEmbed
         FileBrowserOptions opts;
@@ -1004,7 +1004,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
     {
         if (const CarlaHostHandle handle = module->fCarlaHostHandle)
         {
-            CardinalPluginContext* const pcontext = module->pcontext;
+            const CardinalPluginContext* const pcontext = module->pcontext;
 
             char winIdStr[24];
             std::snprintf(winIdStr, sizeof(winIdStr), "%llx", (ulonglong)pcontext->nativeWindowId);
@@ -1026,7 +1026,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
     {
         if (const CarlaHostHandle handle = module->fCarlaHostHandle)
         {
-            CardinalPluginContext* const pcontext = module->pcontext;
+            const CardinalPluginContext* const pcontext = module->pcontext;
 
             module->fCarlaHostDescriptor.uiParentId = 0;
             carla_set_engine_option(handle, ENGINE_OPTION_FRONTEND_WIN_ID, 0, "0");

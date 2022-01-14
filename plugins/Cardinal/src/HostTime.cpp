@@ -37,12 +37,21 @@ struct HostTime : Module {
 
     rack::dsp::PulseGenerator pulseReset, pulseBar, pulseBeat, pulseClock;
     float sampleTime = 0.0f;
+    int64_t lastBlockFrame = -1;
+    // cached time values
+    struct {
+        bool reset = true;
+        int32_t bar = 0;
+        int32_t beat = 0;
+        double tick = 0.0;
+        double tickClock = 0.0;
+    } timeInfo;
 
     HostTime()
     {
         config(NUM_PARAMS, NUM_INPUTS, kHostTimeCount, kHostTimeCount);
 
-        CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
+        const CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
 
         if (pcontext == nullptr)
             throw rack::Exception("Plugin context is null.");
@@ -50,44 +59,57 @@ struct HostTime : Module {
 
     void process(const ProcessArgs& args) override
     {
-        if (CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
+        if (const CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
         {
+            const int64_t blockFrame = pcontext->engine->getBlockFrame();
+
+            // Update time position if running a new audio block
+            if (lastBlockFrame != blockFrame)
+            {
+                lastBlockFrame = blockFrame;
+                timeInfo.reset = pcontext->reset;
+                timeInfo.bar = pcontext->bar;
+                timeInfo.beat = pcontext->beat;
+                timeInfo.tick = pcontext->tick;
+                timeInfo.tickClock = pcontext->tickClock;
+            }
+
             const bool playing = pcontext->playing;
             const bool playingWithBBT = playing && pcontext->bbtValid;
 
             if (playingWithBBT)
             {
-                if (pcontext->tick == 0.0)
+                if (timeInfo.tick == 0.0)
                 {
                     pulseReset.trigger();
                     pulseClock.trigger();
                     pulseBeat.trigger();
-                    if (pcontext->beat == 1)
+                    if (timeInfo.beat == 1)
                         pulseBar.trigger();
                 }
 
-                if (pcontext->reset)
+                if (timeInfo.reset)
                 {
-                    pcontext->reset = false;
+                    timeInfo.reset = false;
                     pulseReset.trigger();
                 }
 
-                if ((pcontext->tick += pcontext->ticksPerFrame) >= pcontext->ticksPerBeat)
+                if ((timeInfo.tick += pcontext->ticksPerFrame) >= pcontext->ticksPerBeat)
                 {
-                    pcontext->tick -= pcontext->ticksPerBeat;
+                    timeInfo.tick -= pcontext->ticksPerBeat;
                     pulseBeat.trigger();
 
-                    if (++pcontext->beat > pcontext->beatsPerBar)
+                    if (++timeInfo.beat > pcontext->beatsPerBar)
                     {
-                        pcontext->beat = 1;
-                        ++pcontext->bar;
+                        timeInfo.beat = 1;
+                        ++timeInfo.bar;
                         pulseBar.trigger();
                     }
                 }
 
-                if ((pcontext->tickClock += pcontext->ticksPerFrame) >= pcontext->ticksPerClock)
+                if ((timeInfo.tickClock += pcontext->ticksPerFrame) >= pcontext->ticksPerClock)
                 {
-                    pcontext->tickClock -= pcontext->ticksPerClock;
+                    timeInfo.tickClock -= pcontext->ticksPerClock;
                     pulseClock.trigger();
                 }
             }
@@ -97,10 +119,10 @@ struct HostTime : Module {
             const bool hasBeat = pulseBeat.process(args.sampleTime);
             const bool hasClock = pulseClock.process(args.sampleTime);
             const float beatPhase = playingWithBBT && pcontext->ticksPerBeat > 0.0
-                                  ? pcontext->tick / pcontext->ticksPerBeat
+                                  ? timeInfo.tick / pcontext->ticksPerBeat
                                   : 0.0f;
             const float barPhase = playingWithBBT && pcontext->beatsPerBar > 0
-                                 ? ((float) (pcontext->beat - 1) + beatPhase) / pcontext->beatsPerBar
+                                 ? ((float) (timeInfo.beat - 1) + beatPhase) / pcontext->beatsPerBar
                                  : 0.0f;
 
             lights[kHostTimeRolling].setBrightness(playing ? 1.0f : 0.0f);

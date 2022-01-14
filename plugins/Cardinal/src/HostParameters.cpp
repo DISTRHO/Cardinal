@@ -42,7 +42,7 @@ struct HostParameters : Module {
     {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
-        CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
+        const CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
 
         if (pcontext == nullptr)
             throw rack::Exception("Plugin context is null.");
@@ -57,7 +57,7 @@ struct HostParameters : Module {
 
     void process(const ProcessArgs&) override
     {
-        if (CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
+        if (const CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
         {
             for (uint32_t i=0; i<kModuleParameters; ++i)
                 outputs[i].setVoltage(parameters[i].process(sampleTime, pcontext->parameters[i]));
@@ -66,7 +66,7 @@ struct HostParameters : Module {
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override
     {
-        if (CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
+        if (const CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
         {
             const double fall = 1.0 / (double(pcontext->bufferSize) / e.sampleRate);
 
@@ -84,12 +84,12 @@ struct HostParameters : Module {
 #ifndef HEADLESS
 struct CardinalParameterPJ301MPort : PJ301MPort {
 	void onDragStart(const DragStartEvent& e) override {
-        if (CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
+        if (const CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
             handleHostParameterDrag(pcontext, portId, true);
         PJ301MPort::onDragStart(e);
     }
 	void onDragEnd(const DragEndEvent& e) override {
-        if (CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
+        if (const CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
             handleHostParameterDrag(pcontext, portId, false);
         PJ301MPort::onDragEnd(e);
     }
