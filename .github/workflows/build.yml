@@ -318,17 +318,17 @@ jobs:
           git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
           sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
           $(pwd)/deps/mod-plugin-builder/bootstrap.sh modduo-static minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduo-static
-      - name: Build for modduo
-        run: |
-          CFLAGS="-ffat-lto-objects" CXXFLAGS="-ffat-lto-objects" make modduo HAVE_LIBLO=true HEADLESS=true WITH_LTO=true -j $(nproc)
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
+      #- name: Build for modduo
+        #run: |
+          #CFLAGS="-ffat-lto-objects" CXXFLAGS="-ffat-lto-objects" make modduo HAVE_LIBLO=true HEADLESS=true WITH_LTO=true -j $(nproc)
+      #- name: Pack binaries
+        #run: |
+          #tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
+      #- uses: actions/upload-artifact@v2
+        #with:
+          #name: ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          #path: |
+            #*.tar.gz
 
   modduox:
     runs-on: ubuntu-20.04
@@ -351,17 +351,17 @@ jobs:
           git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
           sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
           $(pwd)/deps/mod-plugin-builder/bootstrap.sh modduox-static minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduox-static
-      - name: Build for modduox
-        run: |
-          CFLAGS="-ffat-lto-objects" CXXFLAGS="-ffat-lto-objects" make modduox HAVE_LIBLO=true HEADLESS=true WITH_LTO=true -j $(nproc)
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
+      #- name: Build for modduox
+        #run: |
+          #CFLAGS="-ffat-lto-objects" CXXFLAGS="-ffat-lto-objects" make modduox HAVE_LIBLO=true HEADLESS=true WITH_LTO=true -j $(nproc)
+      #- name: Pack binaries
+        #run: |
+          #tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
+      #- uses: actions/upload-artifact@v2
+        #with:
+          #name: ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          #path: |
+            #*.tar.gz
 
   moddwarf:
     runs-on: ubuntu-20.04
@@ -384,17 +384,17 @@ jobs:
           git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
           sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
           $(pwd)/deps/mod-plugin-builder/bootstrap.sh moddwarf minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh moddwarf
-      - name: Build for moddwarf
-        run: |
-          CFLAGS="-ffat-lto-objects" CXXFLAGS="-ffat-lto-objects" make moddwarf HAVE_LIBLO=true HEADLESS=true WITH_LTO=true -j $(nproc)
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
+      #- name: Build for moddwarf
+        #run: |
+          #CFLAGS="-ffat-lto-objects" CXXFLAGS="-ffat-lto-objects" make moddwarf HAVE_LIBLO=true HEADLESS=true WITH_LTO=true -j $(nproc)
+      #- name: Pack binaries
+        #run: |
+          #tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
+      #- uses: actions/upload-artifact@v2
+        #with:
+          #name: ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          #path: |
+            #*.tar.gz
 
   win32:
     runs-on: ubuntu-20.04
