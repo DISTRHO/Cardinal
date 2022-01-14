@@ -18,6 +18,12 @@ BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat
 
+ifeq ($(HEADLESS),true)
+ifeq ($(WITH_LTO),true)
+BASE_FLAGS += -ffat-lto-objects
+endif
+endif
+
 ifeq ($(WASM),true)
 BASE_FLAGS += -msse -msse2 -msse3 -msimd128
 else

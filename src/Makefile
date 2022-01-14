@@ -62,6 +62,9 @@ endif
 
 ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
+ifeq ($(WITH_LTO),true)
+BASE_FLAGS += -ffat-lto-objects
+endif
 endif
 
 ifeq ($(WASM),true)
@@ -148,9 +151,13 @@ endif
 TARGET = rack.a
 
 all: $(TARGET)
+ifeq ($(MOD_BUILD),true)
+	$(MAKE) -C CardinalFX lv2 resources
+else
 	$(MAKE) -C CardinalFX
 	$(MAKE) -C CardinalSynth
 	$(MAKE) -C Cardinal
+endif
 
 resources:
 	$(MAKE) resources -C Cardinal
