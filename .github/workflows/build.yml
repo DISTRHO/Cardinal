@@ -323,6 +323,9 @@ jobs:
       - name: Build for modduo
         run: |
           make modduo HEADLESS=true WITH_LTO=true -j $(nproc)
+      - name: Set sha8
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
@@ -358,6 +361,9 @@ jobs:
       - name: Build for modduox
         run: |
           make modduox HEADLESS=true WITH_LTO=true -j $(nproc)
+      - name: Set sha8
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
@@ -393,6 +399,9 @@ jobs:
       - name: Build for moddwarf
         run: |
           make moddwarf HEADLESS=true WITH_LTO=true -j $(nproc)
+      - name: Set sha8
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)

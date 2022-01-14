@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -21,6 +21,11 @@
 #include "dgl/src/nanovg/nanovg.h"
 
 #include "CarlaNativePlugin.h"
+
+#ifndef HEADLESS
+# include "ImGuiWidget.hpp"
+# include "ghc/filesystem.hpp"
+#endif
 
 #define BUFFER_SIZE 128
 
@@ -81,6 +86,8 @@ struct CarlaInternalPluginModule : Module, Thread {
     float* dataOutPtr[NUM_OUTPUTS];
     unsigned audioDataFill = 0;
     int64_t lastBlockFrame = -1;
+    bool fileChanged = false;
+    std::string currentFile;
 
     struct {
         float preview[108];
@@ -316,6 +323,126 @@ static intptr_t host_dispatcher(const NativeHostHandle handle, const NativeHostD
 // --------------------------------------------------------------------------------------------------------------------
 
 #ifndef HEADLESS
+struct AudioFileListWidget : ImGuiWidget {
+    CarlaInternalPluginModule* const module;
+
+    bool showError = false;
+    String errorMessage;
+
+    struct ghcFile { std::string full, base; };
+    std::string currentDirectory;
+    std::vector<ghcFile> currentFiles;
+    size_t selectedFile = (size_t)-1;
+
+    AudioFileListWidget(CarlaInternalPluginModule* const m)
+        : ImGuiWidget(),
+          module(m)
+    {
+        if (module->fileChanged)
+            reloadDir();
+    }
+
+    void drawImGui() override
+    {
+        const float scaleFactor = getScaleFactor();
+
+        const int flags = ImGuiWindowFlags_NoSavedSettings
+                        | ImGuiWindowFlags_NoTitleBar
+                        | ImGuiWindowFlags_NoResize
+                        | ImGuiWindowFlags_NoCollapse
+                        | ImGuiWindowFlags_NoScrollbar
+                        | ImGuiWindowFlags_NoScrollWithMouse;
+
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImVec2(box.size.x * scaleFactor, box.size.y * scaleFactor));
+
+        if (ImGui::Begin("Plugin List", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize))
+        {
+            if (showError)
+            {
+                showError = false;
+                ImGui::OpenPopup("Audio File Error");
+            }
+
+            if (ImGui::BeginPopupModal("Audio File Error", nullptr, flags))
+            {
+                ImGui::TextWrapped("Failed to load audio file, error was:\n%s", errorMessage.buffer());
+
+                ImGui::Separator();
+
+                if (ImGui::Button("Ok"))
+                    ImGui::CloseCurrentPopup();
+
+                ImGui::EndPopup();
+            }
+            else if (ImGui::BeginTable("pluginlist", 1, ImGuiTableFlags_NoSavedSettings))
+            {
+                for (size_t i=0, count=currentFiles.size(); i < count; ++i)
+                {
+                    bool wasSelected = selectedFile == i;
+                    bool selected = wasSelected;
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Selectable(currentFiles[i].base.c_str(), &selected);
+
+                    if (selected && ! wasSelected)
+                    {
+                        selectedFile = i;
+                        module->currentFile = currentFiles[i].full;
+                        module->fCarlaPluginDescriptor->set_custom_data(module->fCarlaPluginHandle, "file", currentFiles[i].full.c_str());
+                    }
+                }
+
+                ImGui::EndTable();
+            }
+        }
+
+        ImGui::End();
+    }
+
+    void step() override
+    {
+        if (module->fileChanged)
+            reloadDir();
+
+        ImGuiWidget::step();
+    }
+
+    void reloadDir()
+    {
+        module->fileChanged = false;
+
+        static constexpr const char* const supportedExtensions[] = {
+       #ifdef HAVE_SNDFILE
+            ".aif",".aifc",".aiff",".au",".bwf",".flac",".htk",".iff",".mat4",".mat5",".oga",".ogg;"
+            ".paf",".pvf",".pvf5",".sd2",".sf",".snd",".svx",".vcc",".w64",".wav",".xi",
+       #endif
+            ".mp3"
+        };
+
+        using namespace ghc::filesystem;
+        currentDirectory = path(module->currentFile).parent_path().string();
+        currentFiles.clear();
+
+        directory_iterator it(currentDirectory);
+        for (directory_iterator itb = begin(it), ite=end(it); itb != ite; ++itb)
+        {
+            if (! itb->is_regular_file())
+                continue;
+            const path filepath = itb->path();
+            const path extension = filepath.extension();
+            for (size_t i=0; i<ARRAY_SIZE(supportedExtensions); ++i)
+            {
+                if (extension.compare(supportedExtensions[i]) == 0)
+                {
+                    currentFiles.push_back({ filepath.string(), filepath.filename().string() });
+                    break;
+                }
+            }
+        }
+    }
+};
+
 struct AudioFileWidget : ModuleWidget {
     static constexpr const float startX_In = 14.0f;
     static constexpr const float startX_Out = 96.0f;
@@ -339,12 +466,22 @@ struct AudioFileWidget : ModuleWidget {
         addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
         addOutput(createOutput<PJ301MPort>(Vec(box.size.x - RACK_GRID_WIDTH * 5/2,
-                                               RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding * 1),
+                                               RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding * 2),
                                            module, 0));
 
         addOutput(createOutput<PJ301MPort>(Vec(box.size.x - RACK_GRID_WIDTH * 5/2,
-                                               RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding * 2),
+                                               RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding * 1),
                                            module, 1));
+        
+        if (m != nullptr)
+        {
+            AudioFileListWidget* const listw = new AudioFileListWidget(m);
+            listw->box.pos.x = 0;
+            listw->box.pos.y = 36;
+            listw->box.size.x = box.size.x;
+            listw->box.size.y = box.size.y / 2 - 20;
+            addChild(listw);
+        }
     }
 
     void draw(const DrawArgs& args) override
@@ -457,6 +594,8 @@ struct AudioFileWidget : ModuleWidget {
                     if (path == nullptr)
                         return;
 
+                    module->currentFile = path;
+                    module->fileChanged = true;
                     module->fCarlaPluginDescriptor->set_custom_data(module->fCarlaPluginHandle, "file", path);
                     std::free(path);
                 });

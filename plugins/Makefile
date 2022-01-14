@@ -734,7 +734,7 @@ BASE_FLAGS += -I../src
 BASE_FLAGS += -I../src/Rack/include
 BASE_FLAGS += -I../src/Rack/include/dsp
 BASE_FLAGS += -I../src/Rack/dep/include
-# # BASE_FLAGS += -I../src/Rack/dep/filesystem/include
+BASE_FLAGS += -I../src/Rack/dep/filesystem/include
 # # BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
 BASE_FLAGS += -I../src/Rack/dep/glfw/include
 BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
@@ -769,6 +769,10 @@ endif
 
 ifeq ($(NOPLUGINS),true)
 BASE_FLAGS += -DNOPLUGINS
+endif
+
+ifeq ($(shell $(PKG_CONFIG) --exists sndfile && echo true),true)
+BASE_FLAGS += -DHAVE_SNDFILE
 endif
 
 BUILD_C_FLAGS += -std=gnu11
