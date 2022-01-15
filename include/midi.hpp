@@ -51,7 +51,9 @@ struct Message {
 	*/
 	int64_t frame = -1;
 
-	Message() {}
+	Message() {
+		bytes.resize(3);
+	}
 
 	int getSize() const {
 		return bytes.size();
