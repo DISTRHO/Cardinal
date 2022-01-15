@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -69,17 +69,25 @@ struct glBarsRendererWidget : OpenGlWidget {
 
     void drawFramebuffer() override {
         math::Vec fbSize = getFramebufferSize();
+
+        glDisable(GL_BLEND);
         glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
         glLoadIdentity();
-        glOrtho(0.0, fbSize.x, fbSize.y, 0.0, 0.0, 1.0);
         glViewport(0.0, 0.0, fbSize.x, fbSize.y);
+        glFrustum(-1, 1, -1, 1, 1.5, 10);
         glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
         glLoadIdentity();
 
-        // glDisable(GL_CULL_FACE);
-        // glDisable(GL_STENCIL_TEST);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
+
         glBars->state.Render();
+
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glEnable(GL_BLEND);
     }
 };
 

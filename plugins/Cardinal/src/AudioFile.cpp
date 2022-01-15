@@ -412,6 +412,9 @@ struct AudioFileListWidget : ImGuiWidget {
     {
         module->fileChanged = false;
 
+        currentFiles.clear();
+        selectedFile = (size_t)-1;
+
         static constexpr const char* const supportedExtensions[] = {
        #ifdef HAVE_SNDFILE
             ".aif",".aifc",".aiff",".au",".bwf",".flac",".htk",".iff",".mat4",".mat5",".oga",".ogg;"
@@ -422,9 +425,9 @@ struct AudioFileListWidget : ImGuiWidget {
 
         using namespace ghc::filesystem;
         currentDirectory = path(module->currentFile).parent_path().string();
-        currentFiles.clear();
 
         directory_iterator it(currentDirectory);
+        size_t index = 0;
         for (directory_iterator itb = begin(it), ite=end(it); itb != ite; ++itb)
         {
             if (! itb->is_regular_file())
@@ -435,7 +438,10 @@ struct AudioFileListWidget : ImGuiWidget {
             {
                 if (extension.compare(supportedExtensions[i]) == 0)
                 {
+                    if (filepath.compare(module->currentFile) == 0)
+                        selectedFile = index;
                     currentFiles.push_back({ filepath.string(), filepath.filename().string() });
+                    ++index;
                     break;
                 }
             }
@@ -472,7 +478,7 @@ struct AudioFileWidget : ModuleWidget {
         addOutput(createOutput<PJ301MPort>(Vec(box.size.x - RACK_GRID_WIDTH * 5/2,
                                                RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding * 1),
                                            module, 1));
-        
+
         if (m != nullptr)
         {
             AudioFileListWidget* const listw = new AudioFileListWidget(m);
