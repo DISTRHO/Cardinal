@@ -108,7 +108,7 @@
 	url = https://github.com/VegaDeftwing/LyraeModules.git
 [submodule "plugins/LittleUtils"]
 	path = plugins/LittleUtils
-	url = https://github.com/CardinalModules/Little-Utils.git
+	url = https://github.com/mgunyho/Little-Utils.git
 [submodule "plugins/Prism"]
 	path = plugins/Prism
 	url = https://github.com/SteveRussell33/Prism.git

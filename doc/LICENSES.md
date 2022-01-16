@@ -14,10 +14,10 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | DPF                     | ISC, GPL-2.0-or-later | Used as the plugin framework, VST2 binary GPLv2+ licensed |
 | Rack                    | GPL-3.0-or-later      | The actual Rack code, internal dependencies are compatible with GPLv3+ |
 | 21kHz                   | MIT                   | |
-| AS                      | MIT                   | |
 | Amalgamated Harmonics   | BSD-3-Clause          | |
 | Animated Circuits       | GPL-3.0-or-later      | |
 | Aria Salvatrice         | GPL-3.0-or-later      | |
+| AS                      | MIT                   | |
 | Atelier                 | GPL-3.0-or-later      | |
 | Audible Instruments     | GPL-3.0-or-later      | |
 | Bacon Music             | GPL-3.0-or-later      | |
@@ -39,7 +39,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | ihtsyn                  | GPL-3.0-or-later      | |
 | JW-Modules              | BSD-3-Clause          | |
 | LifeFormModular         | MIT                   | |
-| Little Utils            | MIT                   | |
+| Little Utils            | EUPL-1.2              | |
 | Lomas Modules           | GPL-3.0-or-later      | |
 | Lyrae Modules           | GPL-3.0-or-later      | |
 | MindMeld                | GPL-3.0-or-later      | |
@@ -72,6 +72,7 @@ Below is a list of artwork licenses from plugins
 
 | Name                                    | License(s)       | Additional notes |
 |-----------------------------------------|------------------|------------------|
+| 21kHz                                   | MIT              | No artwork specific license provided |
 | AmalgamatedHarmonics/*                  | BSD-3-Clause     | No artwork specific license provided |
 | AmalgamatedHarmonics/ComponentLibrary/* | CC-BY-NC-4.0     | |
 | AmalgamatedHarmonics/DSEG*.ttf          | OFL-1.1-RFN      | |
@@ -99,12 +100,40 @@ Below is a list of artwork licenses from plugins
 | BogaudioModules/*                       | CC-BY-SA-4.0     | |
 | Cardinal/*                              | CC0-1.0          | |
 | Cardinal/Miku/Miku.png                  | CC-BY-NC-3.0     | https://piapro.net/intl/en_for_creators.html |
+| ChowDSP                                 | TODO             | |
+| DrumKit                                 | TODO             | |
+| E-Series                                | TODO             | |
 | ExpertSleepers-Encoders/*               | MIT              | No artwork specific license provided |
+| Extratone                               | TODO             | |
+| Fehler Fabrik                           | TODO      | |
+| Fundamental                             | TODO      | |
+| Glue the Giant                          | TODO      | |
+| Grande                                  | TODO      | |
+| HetrickCV                               | TODO      | |
+| Impromptu                               | TODO      | |
 | ihtsyn/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | ihtsyn/LEDCalculator.ttf                | Custom           | Free for personal use |
-| LittleUtils/*                           | MIT              | No artwork specific license provided |
+| JW-Modules                              | TODO             | |
+| LifeFormModular                         | TODO             | |
+| LittleUtils/*                           | EUPL-1.2         | |
+| LittleUtils/fonts/CooperHewitt-*.ttf    | OFL-1.1-RFN      | |
+| LittleUtils/fonts/Overpass-*.ttf        | OFL-1.1-RFN      | |
+| LittleUtils/fonts/RobotoMono-*.ttf      | Apache-2.0       | |
+| Lomas Modules                           | TODO      | |
 | LyraeModules/*                          | CC-BY-NC-SA-4.0  | |
-| ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided |
+| MindMeld                                | TODO      | |
+| Mog                                     | TODO               | |
+| mscHack                                 | TODO          | |
+| Prism                                   | TODO          | |
+| Rackwindows                             | TODO                  | |
+| repelzen                                | TODO      | |
+| sonusmodular/*                          | GPL-3.0-or-later | No artwork specific license provided, see [sonusmodular#14](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
+| ValleyAudio/*                           | GPL-3.0-or-later | No artwork specific license provided, see [ValleyRackFree#73](https://github.com/ValleyAudio/ValleyRackFree/issues/73) |
+| ValleyAudio/din1451alt.ttf              | CC-BY-3.0-DE     | |
+| ValleyAudio/DSEG14Classic-Italic.ttf    | OFL-1.1-RFN      | |
+| ValleyAudio/ShareTechMono-Regular.ttf   | OFL-1.1-RFN      | |
+| ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided, see [ZetaCarinaeModules#8](https://github.com/mhampton/ZetaCarinaeModules/issues/8) |
+| ZZC/*                                   | ??? | See [ZZC#89](https://github.com/zezic/ZZC/issues/89) and [ZZC#90](https://github.com/zezic/ZZC/issues/90) |
 
 TODO: Everything after Cardinal
 TODO: LittleUtils/fonts/*
