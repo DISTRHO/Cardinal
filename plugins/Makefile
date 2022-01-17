@@ -557,7 +557,6 @@ LYRAE_CUSTOM = Delta
 # MindMeld
 
 PLUGIN_FILES += $(wildcard MindMeldModular/src/*.cpp)
-PLUGIN_FILES += $(wildcard MindMeldModular/src/dsp/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/comp/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/EqMaster/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/MixMaster/*.cpp)

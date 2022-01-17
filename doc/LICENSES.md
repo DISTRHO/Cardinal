@@ -119,24 +119,26 @@ Below is a list of artwork licenses from plugins
 | LittleUtils/fonts/CooperHewitt-*.ttf    | OFL-1.1-RFN      | |
 | LittleUtils/fonts/Overpass-*.ttf        | OFL-1.1-RFN      | |
 | LittleUtils/fonts/RobotoMono-*.ttf      | Apache-2.0       | |
-| Lomas Modules                           | TODO      | |
+| LomasModules/*                          | GPL-3.0-or-later | No artwork specific license provided, see [LomasModules#26](https://github.com/LomasModules/LomasModules/issues/26) |
+| LomasModules/Fonts/FiraMono-Bold.ttf    | OFL-1.1-RFN      | |
 | LyraeModules/*                          | CC-BY-NC-SA-4.0  | |
-| MindMeld                                | TODO      | |
-| Mog                                     | TODO               | |
-| mscHack                                 | TODO          | |
-| Prism                                   | TODO          | |
-| Rackwindows                             | TODO                  | |
-| repelzen                                | TODO      | |
+| MindMeld/*                              | CC-BY-NC-ND-4.0  | |
+| MindMeld/fonts/RobotoCondensed-*.ttf    | Apache-2.0       | |
+| Mog/*                                   | CC0-1.0          | No artwork specific license provided |
+| Mog/components/*                        | CC-BY-NC-4.0     | |
+| Mog/Exo2-BoldItalic.ttf                 | OFL-1.1-RFN      | |
+| mscHack/*                               | BSD-3-Clause     | No artwork specific license provided, see [mschack#108](https://github.com/mschack/VCV-Rack-Plugins/issues/108) |
+| Prism/*                                 | CC-BY-SA-4.0     | |
+| Prism/RobotoCondensed-Regular.ttf       | Apache-2.0       | |
+| Rackwindows/*                           | MIT              | Artwork uses same license as code, see [rackwindows#15](https://github.com/n0jo/rackwindows/issues/15) |
+| repelzen/*                              | CC-BY-SA-4.0     | |
 | sonusmodular/*                          | GPL-3.0-or-later | No artwork specific license provided, see [sonusmodular#14](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
 | ValleyAudio/*                           | GPL-3.0-or-later | No artwork specific license provided, see [ValleyRackFree#73](https://github.com/ValleyAudio/ValleyRackFree/issues/73) |
 | ValleyAudio/din1451alt.ttf              | CC-BY-3.0-DE     | |
-| ValleyAudio/DSEG14Classic-Italic.ttf    | OFL-1.1-RFN      | |
-| ValleyAudio/ShareTechMono-Regular.ttf   | OFL-1.1-RFN      | |
+| ValleyAudio/DSEG14Classic-*.ttf         | OFL-1.1-RFN      | |
+| ValleyAudio/ShareTechMono-*.ttf         | OFL-1.1-RFN      | |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided, see [ZetaCarinaeModules#8](https://github.com/mhampton/ZetaCarinaeModules/issues/8) |
 | ZZC/*                                   | ??? | See [ZZC#89](https://github.com/zezic/ZZC/issues/89) and [ZZC#90](https://github.com/zezic/ZZC/issues/90) |
-
-TODO: Everything after Cardinal
-TODO: LittleUtils/fonts/*
 
 ### Rack
 
