@@ -233,6 +233,7 @@ class CardinalUI : public CardinalBaseUI,
     rack::math::Vec fLastMousePos;
     ResizeHandle fResizeHandle;
     WindowParameters fWindowParameters;
+    int fRateLimitStep = 0;
 
     struct ScopedContext {
         CardinalPluginContext* const context;
@@ -361,6 +362,10 @@ public:
             filebrowserhandle = nullptr;
         }
 
+        if (fWindowParameters.rateLimit != 0 && ++fRateLimitStep % (fWindowParameters.rateLimit * 2))
+            return;
+
+        fRateLimitStep = 0;
         repaint();
     }
 
@@ -415,6 +420,10 @@ public:
             break;
         case kWindowParameterLockModulePositions:
             fWindowParameters.lockModules = value > 0.5f;
+            break;
+        case kWindowParameterUpdateRateLimit:
+            fWindowParameters.rateLimit = static_cast<int>(value + 0.5f);
+            fRateLimitStep = 0;
             break;
         default:
             return;
@@ -475,6 +484,10 @@ protected:
             break;
         case kWindowParameterLockModulePositions:
             fWindowParameters.lockModules = value > 0.5f;
+            break;
+        case kWindowParameterUpdateRateLimit:
+            fWindowParameters.rateLimit = static_cast<int>(value + 0.5f);
+            fRateLimitStep = 0;
             break;
         default:
             return;

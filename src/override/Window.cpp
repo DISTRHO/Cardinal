@@ -45,6 +45,7 @@
 
 #include "DistrhoUI.hpp"
 #include "Application.hpp"
+#include "../CardinalCommon.hpp"
 #include "../WindowParameters.hpp"
 
 #ifndef DGL_NO_SHARED_RESOURCES
@@ -138,6 +139,7 @@ struct Window::Internal {
 	double monitorRefreshRate = 60.0; // FIXME
 	double frameTime = 0.0;
 	double lastFrameDuration = 0.0;
+	int currentRateLimit = 0;
 
 	std::map<std::string, std::shared_ptr<FontWithOriginalContext>> fontCache;
 	std::map<std::string, std::shared_ptr<ImageWithOriginalContext>> imageCache;
@@ -593,6 +595,13 @@ void WindowParametersSave(rack::window::Window* const window)
 			window->internal->callback->WindowParametersChanged(kWindowParameterLockModulePositions,
 			                                                    rack::settings::lockModules);
 	}
+	if (window->internal->params.rateLimit != rack::settings::rateLimit)
+	{
+		window->internal->params.rateLimit = rack::settings::rateLimit;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterUpdateRateLimit,
+			                                                    rack::settings::rateLimit);
+	}
 }
 
 void WindowParametersRestore(rack::window::Window* const window)
@@ -606,6 +615,7 @@ void WindowParametersRestore(rack::window::Window* const window)
 	rack::settings::tooltips = window->internal->params.tooltips;
 	rack::settings::knobScroll = window->internal->params.knobScroll;
 	rack::settings::lockModules = window->internal->params.lockModules;
+	rack::settings::rateLimit = window->internal->params.rateLimit;
 }
 
 void WindowParametersSetCallback(rack::window::Window* const window, WindowParametersCallback* const callback)

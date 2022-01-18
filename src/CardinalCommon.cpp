@@ -54,6 +54,12 @@
 # include <unistd.h>
 #endif
 
+namespace rack {
+namespace settings {
+int rateLimit = 0;
+}
+}
+
 namespace patchUtils
 {
 

@@ -507,6 +507,21 @@ struct ViewButton : MenuButton {
 		menu->addChild(knobScrollSensitivitySlider);
 
 		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
+
+		static const std::vector<std::string> rateLimitLabels = {
+			"None",
+			"2x",
+			"4x",
+		};
+		static const std::vector<int> rateLimits = {0, 1, 2};
+		menu->addChild(createSubmenuItem("Update rate limit", rateLimitLabels[settings::rateLimit], [=](ui::Menu* menu) {
+			for (int rateLimit : rateLimits) {
+				menu->addChild(createCheckMenuItem(rateLimitLabels[rateLimit], "",
+					[=]() {return settings::rateLimit == rateLimit;},
+					[=]() {settings::rateLimit = rateLimit;}
+				));
+			}
+		}));
 	}
 };
 

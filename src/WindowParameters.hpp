@@ -43,6 +43,7 @@ enum WindowParameterList {
     kWindowParameterWheelKnobControl,
     kWindowParameterWheelSensitivity,
     kWindowParameterLockModulePositions,
+    kWindowParameterUpdateRateLimit,
     kWindowParameterCount,
 };
 
@@ -56,6 +57,8 @@ struct WindowParameters {
     bool tooltips = true;
     bool knobScroll = false;
     bool lockModules = false;
+    // cardinal specific
+    int rateLimit = 0;
 };
 
 struct WindowParametersCallback {

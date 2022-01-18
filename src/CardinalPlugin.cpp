@@ -376,6 +376,7 @@ public:
         fWindowParameters[kWindowParameterWheelKnobControl] = 0.0f;
         fWindowParameters[kWindowParameterWheelSensitivity] = 1.0f;
         fWindowParameters[kWindowParameterLockModulePositions] = 0.0f;
+        fWindowParameters[kWindowParameterUpdateRateLimit] = 0.0f;
        #endif
 
         // create unique temporary path for this instance
@@ -750,6 +751,23 @@ protected:
             parameter.ranges.def = 0.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 1.0f;
+            break;
+        case kWindowParameterUpdateRateLimit:
+            parameter.name = "Update rate limit";
+            parameter.symbol = "rateLimit";
+            parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 2.0f;
+            parameter.enumValues.count = 3;
+            parameter.enumValues.restrictedMode = true;
+            parameter.enumValues.values = new ParameterEnumerationValue[3];
+            parameter.enumValues.values[0].label = "None";
+            parameter.enumValues.values[0].value = 0.0f;
+            parameter.enumValues.values[1].label = "2x";
+            parameter.enumValues.values[1].value = 1.0f;
+            parameter.enumValues.values[2].label = "4x";
+            parameter.enumValues.values[2].value = 2.0f;
             break;
         }
        #endif
