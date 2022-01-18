@@ -1421,16 +1421,19 @@ static void initStatic__GrandeModular()
     if (spl.ok())
     {
         p->addModel(modelClip);
+        p->addModel(modelMerge8);
         p->addModel(modelMergeSplit4);
         p->addModel(modelMicrotonalChords);
         p->addModel(modelMicrotonalNotes);
         p->addModel(modelNoteMT);
         p->addModel(modelPolyMergeResplit);
+        p->addModel(modelPolySplit);
         p->addModel(modelQuant);
         p->addModel(modelQuantIntervals);
         p->addModel(modelQuantMT);
         p->addModel(modelSampleDelays);
         p->addModel(modelScale);
+        p->addModel(modelSplit8);
         p->addModel(modelTails);
         p->addModel(modelVarSampleDelays);
     }

@@ -7,25 +7,27 @@
 
 #include "../ImpromptuModular/src/comp/PanelTheme.hpp"
 
+NVGcolor SCHEME_RED_IM = SCHEME_RED;
+NVGcolor SCHEME_GREEN_IM = SCHEME_GREEN;
+
 
 
 void writeThemeAndContrastAsDefault() {}
-void readThemeAndContrastFromDefault() {}
 
+void saveThemeAndContrastAsDefault(int, float) {}
 
 void loadThemeAndContrastFromDefault(int* panelTheme, float* panelContrast) {
 	*panelTheme = 1;
 	*panelContrast = panelContrastDefault;
 }
 
-
 bool isDark(int*) {
 	return true;
 }
 
+void readThemeAndContrastFromDefault() {}
 
 void createPanelThemeMenu(ui::Menu*, int*, float*, SvgPanel*) {}
-
 
 void PanelBaseWidget::draw(const DrawArgs& args) {
 	nvgBeginPath(args.vg);

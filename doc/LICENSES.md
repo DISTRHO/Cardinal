@@ -74,10 +74,8 @@ Below is a list of artwork licenses from plugins
 |-----------------------------------------|------------------|------------------|
 | 21kHz                                   | MIT              | No artwork specific license provided |
 | AmalgamatedHarmonics/*                  | BSD-3-Clause     | No artwork specific license provided |
-| AmalgamatedHarmonics/ComponentLibrary/* | CC-BY-NC-4.0     | |
 | AmalgamatedHarmonics/DSEG*.ttf          | OFL-1.1-RFN      | |
-| AmalgamatedHarmonics/EurostileBold.ttf  | ??               | https://github.com/jhoar/AmalgamatedHarmonics/issues/48 |
-| AmalgamatedHarmonics/Roboto-Light.ttf   | Apache-2.0       | |
+| AmalgamatedHarmonics/Roboto*.ttf        | Apache-2.0       | |
 | AnimatedCircuits/*                      | CC-BY-NC-SA-4.0  | |
 | AriaModules/*                           | CC-BY-SA-4.0     | |
 | AriaModules/Arcane/*                    | CC-BY-NC-SA-3.0  | Unused in Cardinal |
@@ -87,6 +85,8 @@ Below is a list of artwork licenses from plugins
 | AriaModules/lcd/piano/*                 | WTFPL            | |
 | AriaModules/signature/*                 | Custom           | Removal required if modifying other files without author's permission |
 | AS/*                                    | Custom           | Copyright 2017, derivative works may not use the AS logo or panel graphics including custom component graphics (knobs, switches, screws, caps,etc.). |
+| AS/saxmono.ttf                          | Custom           | You may download this font, circulate it und use it freely. You may not alter rename, change copyrights or modify this font in any way. |
+| AS/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
 | Atelier/*                               | Custom           | Copyright © Pyer 2020, used and distributed with permission |
 | AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, used and distributed with permission |
 | BaconPlugs/*                            | GPL-3.0-or-later | No artwork specific license provided |
@@ -96,25 +96,32 @@ Below is a list of artwork licenses from plugins
 | BaconPlugs/Keypunch029.json             | OFL-1.1          | |
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
 | Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission |
-| Bidoo/*                                 | GPL-3.0-or-later | No artwork specific license provided |
+| Bidoo/*                                 | CC-BY-NC-ND-4.0  | |
 | BogaudioModules/*                       | CC-BY-SA-4.0     | |
+| BogaudioModules/fonts/audiowide.ttf     | OFL-1.1-RFN      | |
+| BogaudioModules/fonts/inconsolata*.ttf  | OFL-1.1-no-RFN   | |
 | Cardinal/*                              | CC0-1.0          | |
 | Cardinal/Miku/Miku.png                  | CC-BY-NC-3.0     | https://piapro.net/intl/en_for_creators.html |
-| ChowDSP                                 | TODO             | |
-| DrumKit                                 | TODO             | |
-| E-Series                                | TODO             | |
-| ExpertSleepers-Encoders/*               | MIT              | No artwork specific license provided |
-| Extratone                               | TODO             | |
-| Fehler Fabrik                           | TODO      | |
-| Fundamental                             | TODO      | |
-| Glue the Giant                          | TODO      | |
-| Grande                                  | TODO      | |
-| HetrickCV                               | TODO      | |
-| Impromptu                               | TODO      | |
-| ihtsyn/*                                | GPL-3.0-or-later | No artwork specific license provided |
+| ChowDSP/*                               | GPL-3.0-or-later | No artwork specific license provided, see [ChowDSP-VCV#26](https://github.com/jatinchowdhury18/ChowDSP-VCV/issues/26) |
+| ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
+| DrumKit/*                               | CC0-1.0          | |
+| DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
+| E-Series/*                              | Custom           | Copyright © Synthesis Technology, used and distributed with permission |
+| ExpertSleepers-Encoders/*               | MIT              | No artwork specific license provided, see [vcvrack-encoders#3](https://github.com/expertsleepersltd/vcvrack-encoders/issues/3) |
+| Extratone/*                             | GPL-3.0-or-later | No artwork specific license provided, see [Extratone#7](https://github.com/EaterOfSheep/Extratone/issues/7) |
+| FehlerFabrik/*                          | GPL-3.0-or-later | No artwork specific license provided, see [FehlerFabrik#17](https://github.com/RCameron93/FehlerFabrik/issues/17) |
+| Fundamental/*                           | CC-BY-NC-ND-4.0  | |
+| GlueTheGiant/*                          | GPL-3.0-or-later | No artwork specific license provided, see [gtg-rack#10](https://github.com/gluethegiant/gtg-rack/issues/10) |
+| GlueTheGiant/fonts/DSEG7-*              | OFL-1.1-RFN      | |
+| GrandeModular/*                         | CC-BY-NC-ND-4.0  | |
+| HetrickCV/*                             | CC0-1.0          | No artwork specific license provided |
+| ImpromptuModular/*                      | CC-BY-NC-ND-4.0  | |
+| ImpromptuModular/res/comp/complib/*     | CC-BY-NC-4.0     | |
+| ihtsyn/*                                | GPL-3.0-or-later | No artwork specific license provided, author has deleted this repo |
 | ihtsyn/LEDCalculator.ttf                | Custom           | Free for personal use |
-| JW-Modules                              | TODO             | |
-| LifeFormModular                         | TODO             | |
+| JW-Modules/*                            | BSD-3-Clause     | No artwork specific license provided |
+| JW-Modules/DejaVuSansMono.ttf           | Bitstream-Vera   | Unused in Cardinal |
+| LifeFormModular/*                       | MIT              | No artwork specific license provided |
 | LittleUtils/*                           | EUPL-1.2         | |
 | LittleUtils/fonts/CooperHewitt-*.ttf    | OFL-1.1-RFN      | |
 | LittleUtils/fonts/Overpass-*.ttf        | OFL-1.1-RFN      | |
