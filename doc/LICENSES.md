@@ -103,11 +103,11 @@ Below is a list of artwork licenses from plugins
 | BogaudioModules/fonts/inconsolata*.ttf  | OFL-1.1-no-RFN   | |
 | Cardinal/*                              | CC0-1.0          | |
 | Cardinal/Miku/Miku.png                  | CC-BY-NC-3.0     | https://piapro.net/intl/en_for_creators.html |
-| ChowDSP/*                               | GPL-3.0-or-later | Artwork has same license as code, see [ChowDSP-VCV#26](https://github.com/jatinchowdhury18/ChowDSP-VCV/issues/26) |
+| ChowDSP/*                               | GPL-3.0-or-later | |
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
-| E-Series/*                              | Custom           | Copyright © Synthesis Technology, used and distributed with permission, see [LICENSE-PERMISSIONS.md#ESeries](LICENSE-PERMISSIONS.md#ESeries) |
+| E-Series/*                              | Custom           | Copyright © Synthesis Technology, used and distributed with permission, see [LICENSE-PERMISSIONS.md#ESeries](LICENSE-PERMISSIONS.md#eseries-paul-schreiber--synthtech) |
 | ExpertSleepers-Encoders/*               | MIT              | Artwork has same license as code, see [vcvrack-encoders#3](https://github.com/expertsleepersltd/vcvrack-encoders/issues/3) |
 | Extratone/*                             | GPL-3.0-or-later | Artwork has same license as code, see [Extratone#7](https://github.com/EaterOfSheep/Extratone/issues/7) |
 | FehlerFabrik/*                          | GPL-3.0-or-later | No artwork specific license provided, see [FehlerFabrik#17](https://github.com/RCameron93/FehlerFabrik/issues/17) |

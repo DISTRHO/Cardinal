@@ -858,7 +858,7 @@ protected:
         const uint32_t bufferSize = getBufferSize();
         fAudioBufferCopy = new float*[DISTRHO_PLUGIN_NUM_INPUTS];
         for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
-            fAudioBufferCopy[i] = new float[newBufferSize];
+            fAudioBufferCopy[i] = new float[bufferSize];
        #endif
 
         fPreviousFrame = 0;
