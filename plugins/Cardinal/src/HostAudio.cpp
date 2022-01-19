@@ -31,14 +31,14 @@ struct HostAudio : Module {
     int64_t lastBlockFrame = -1;
 
     // for rack core audio module compatibility
-	dsp::RCFilter dcFilters[numIO];
+    dsp::RCFilter dcFilters[numIO];
     bool dcFilterEnabled = (numIO == 2);
 
     HostAudio()
         : pcontext(static_cast<CardinalPluginContext*>(APP)),
           numParams(numIO == 2 ? 1 : 0),
-          numInputs(pcontext->variant == kCardinalVariantSynth ? 0 : std::max(pcontext->variant != kCardinalVariantMain ? 2 : 8, numIO)),
-          numOutputs(std::max(pcontext->variant != kCardinalVariantMain ? 2 : 8, numIO))
+          numInputs(pcontext->variant == kCardinalVariantSynth ? 0 : pcontext->variant == kCardinalVariantMain ? numIO : 2),
+          numOutputs(pcontext->variant == kCardinalVariantMain ? numIO : 2)
     {
         if (pcontext == nullptr)
             throw rack::Exception("Plugin context is null");
@@ -49,9 +49,8 @@ struct HostAudio : Module {
             configParam(0, 0.f, 2.f, 1.f, "Level", " dB", -10, 40);
 
         const float sampleTime = pcontext->engine->getSampleTime();
-        for (int i = 0; i < numIO; i++) {
+        for (int i=0; i<numIO; ++i)
             dcFilters[i].setCutoffFreq(10.f * sampleTime);
-        }
     }
 
     void onReset() override
@@ -61,7 +60,7 @@ struct HostAudio : Module {
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override
     {
-        for (int i = 0; i < numIO; i++)
+        for (int i=0; i<numIO; ++i)
             dcFilters[i].setCutoffFreq(10.f * e.sampleTime);
     }
 
@@ -84,11 +83,14 @@ struct HostAudio : Module {
         const float gain = numParams != 0 ? std::pow(params[0].getValue(), 2.f) : 1.0f;
 
         // from host into cardinal, shows as output plug
-        for (int i=0; i<numInputs; ++i)
-            outputs[i].setVoltage(dataIns[i][k] * 10.0f);
+        if (dataIns != nullptr)
+        {
+            for (int i=0; i<numOutputs; ++i)
+                outputs[i].setVoltage(dataIns[i][k] * 10.0f);
+        }
 
         // from cardinal into host, shows as input plug
-        for (int i=0; i<numOutputs; ++i)
+        for (int i=0; i<numInputs; ++i)
         {
             float v = inputs[i].getVoltageSum() * 0.1f;
 
@@ -147,14 +149,19 @@ struct HostAudioWidget : ModuleWidget {
 
         for (uint i=0; i<numIO; ++i)
             addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * i), m, i));
+
+        if (numIO == 2)
+        {
+            addParam(createParamCentered<RoundLargeBlackKnob>(Vec(middleX, 290.0f), m, 0));
+        }
     }
 
-    void drawTextLine(NVGcontext* const vg, const uint offset, const char* const text)
+    void drawTextLine(NVGcontext* const vg, const float offsetX, const uint posY, const char* const text)
     {
-        const float y = startY + offset * padding;
+        const float y = startY + posY * padding;
         nvgBeginPath(vg);
         nvgFillColor(vg, color::WHITE);
-        nvgText(vg, middleX, y + 16, text, nullptr);
+        nvgText(vg, middleX + offsetX, y + 16, text, nullptr);
     }
 
     void draw(const DrawArgs& args) override
@@ -174,10 +181,18 @@ struct HostAudioWidget : ModuleWidget {
         nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
         nvgFill(args.vg);
 
-        for (int i=0; i<numIO; ++i)
+        if (numIO == 2)
         {
-            char text[] = {'A','u','d','i','o',' ',static_cast<char>('0'+i+1),'\0'};
-            drawTextLine(args.vg, i, text);
+            drawTextLine(args.vg, 3.0f, 0, "Left/Mono");
+            drawTextLine(args.vg, 0.0f, 1, "Right");
+        }
+        else
+        {
+            for (int i=0; i<numIO; ++i)
+            {
+                char text[] = {'A','u','d','i','o',' ',static_cast<char>('0'+i+1),'\0'};
+                drawTextLine(args.vg, 0.0f, i, text);
+            }
         }
 
         ModuleWidget::draw(args);

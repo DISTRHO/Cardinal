@@ -19,7 +19,8 @@
       "manualUrl": "https://vcvrack.com/manual/Core#Audio",
       "tags": [
         "External"
-      ]
+      ],
+      "hidden": true
     },
     {
       "slug": "AudioInterface",
@@ -28,7 +29,8 @@
       "manualUrl": "https://vcvrack.com/manual/Core#Audio",
       "tags": [
         "External"
-      ]
+      ],
+      "hidden": true
     },
     {
       "slug": "AudioInterface16",
