@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -679,6 +679,8 @@ static void initStatic__Cardinal()
     {
         p->addModel(modelCardinalBlank);
         p->addModel(modelGlBars);
+        p->addModel(modelHostAudio2);
+        p->addModel(modelHostAudio8);
         p->addModel(modelHostCV);
         p->addModel(modelHostParameters);
         p->addModel(modelHostTime);

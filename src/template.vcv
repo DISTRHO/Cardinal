@@ -4,8 +4,8 @@
   "modules": [
     {
       "id": 1,
-      "plugin": "Core",
-      "model": "AudioInterface2",
+      "plugin": "Cardinal",
+      "model": "HostAudio2",
       "version": "2.0",
       "params": [
         {
@@ -15,14 +15,6 @@
       ],
       "rightModuleId": 2,
       "data": {
-        "audio": {
-          "driver": 0,
-          "deviceName": "Cardinal",
-          "sampleRate": 48000.0,
-          "blockSize": 512,
-          "inputOffset": 0,
-          "outputOffset": 0
-        },
         "dcFilter": true
       },
       "pos": [

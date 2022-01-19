@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -36,6 +36,7 @@ struct HostParameters : Module {
     };
 
     rack::dsp::SlewLimiter parameters[kModuleParameters];
+    bool parametersConnected[kModuleParameters] = {};
     float sampleTime = 0.0f;
 
     HostParameters()
@@ -60,7 +61,18 @@ struct HostParameters : Module {
         if (const CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
         {
             for (uint32_t i=0; i<kModuleParameters; ++i)
-                outputs[i].setVoltage(parameters[i].process(sampleTime, pcontext->parameters[i]));
+            {
+                const bool connected = outputs[i].isConnected();
+
+                if (parametersConnected[i] != connected)
+                {
+                    parametersConnected[i] = connected;
+                    parameters[i].reset();
+                }
+
+                if (connected)
+                    outputs[i].setVoltage(parameters[i].process(sampleTime, pcontext->parameters[i]));
+            }
         }
     }
 

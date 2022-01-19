@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -39,20 +39,26 @@ START_NAMESPACE_DISTRHO
 
 static constexpr const uint kModuleParameters = 24;
 
+enum CardinalVariant {
+    kCardinalVariantMain,
+    kCardinalVariantFX,
+    kCardinalVariantSynth,
+};
+
 // -----------------------------------------------------------------------------------------------------------
 
 struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize;
     double sampleRate;
     float parameters[kModuleParameters];
-    bool playing, reset, bbtValid, loadedHostCV;
+    CardinalVariant variant;
+    bool playing, reset, bbtValid;
     int32_t bar, beat, beatsPerBar, beatType;
     uint64_t frame;
     double barStartTick, beatsPerMinute;
     double tick, tickClock, ticksPerBeat, ticksPerClock, ticksPerFrame;
     uintptr_t nativeWindowId;
-    uint32_t dataFrame;
-    const float** dataIns;
+    const float* const* dataIns;
     float** dataOuts;
     Plugin* const plugin;
 #ifndef HEADLESS
@@ -62,10 +68,18 @@ struct CardinalPluginContext : rack::Context {
     CardinalPluginContext(Plugin* const p)
         : bufferSize(p->getBufferSize()),
           sampleRate(p->getSampleRate()),
+         #if CARDINAL_VARIANT_MAIN
+          variant(kCardinalVariantMain),
+         #elif CARDINAL_VARIANT_FX
+          variant(kCardinalVariantFX),
+         #elif CARDINAL_VARIANT_SYNTH
+          variant(kCardinalVariantSynth),
+         #else
+          #error cardinal variant not set
+         #endif
           playing(false),
           reset(false),
           bbtValid(false),
-          loadedHostCV(false),
           bar(1),
           beat(1),
           beatsPerBar(4),
@@ -79,7 +93,6 @@ struct CardinalPluginContext : rack::Context {
           ticksPerClock(0.0),
           ticksPerFrame(0.0),
           nativeWindowId(0),
-          dataFrame(0),
           dataIns(nullptr),
           dataOuts(nullptr),
           plugin(p)
@@ -116,10 +129,6 @@ public:
         : Plugin(parameterCount, programCount, stateCount),
           context(new CardinalPluginContext(this)) {}
     ~CardinalBasePlugin() override {}
-    virtual bool isActive() const noexcept = 0;
-    virtual bool canAssignAudioDevice() const noexcept = 0;
-    virtual bool clearAudioDevice(CardinalAudioDevice* dev) noexcept = 0;
-    virtual void assignAudioDevice(CardinalAudioDevice* dev) noexcept = 0;
     virtual void assignMidiInputDevice(CardinalMidiInputDevice* dev) noexcept = 0;
     virtual void assignMidiOutputDevice(CardinalMidiOutputDevice* dev) noexcept = 0;
     virtual void clearMidiInputDevice(CardinalMidiInputDevice* dev) noexcept = 0;

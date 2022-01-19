@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -31,6 +31,8 @@ extern Model* modelAudioFile;
 extern Model* modelCarla;
 extern Model* modelCardinalBlank;
 extern Model* modelGlBars;
+extern Model* modelHostAudio2;
+extern Model* modelHostAudio8;
 extern Model* modelHostCV;
 extern Model* modelHostParameters;
 extern Model* modelHostTime;

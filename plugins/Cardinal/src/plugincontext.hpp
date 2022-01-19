@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -33,6 +33,12 @@ START_NAMESPACE_DISTRHO
 
 static constexpr const uint32_t kModuleParameters = 24;
 
+enum CardinalVariant {
+    kCardinalVariantMain,
+    kCardinalVariantFX,
+    kCardinalVariantSynth,
+};
+
 class Plugin;
 class UI;
 
@@ -40,14 +46,14 @@ struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize;
     double sampleRate;
     float parameters[kModuleParameters];
-    bool playing, reset, bbtValid, loadedHostCV;
+    CardinalVariant variant;
+    bool playing, reset, bbtValid;
     int32_t bar, beat, beatsPerBar, beatType;
     uint64_t frame;
     double barStartTick, beatsPerMinute;
     double tick, tickClock, ticksPerBeat, ticksPerClock, ticksPerFrame;
     uintptr_t nativeWindowId;
-    uint32_t dataFrame;
-    const float** dataIns;
+    const float* const* dataIns;
     float** dataOuts;
     Plugin* const plugin;
 #ifndef HEADLESS

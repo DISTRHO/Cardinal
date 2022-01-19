@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -24,6 +24,10 @@
 USE_NAMESPACE_DISTRHO;
 
 struct HostCV : Module {
+    CardinalPluginContext* const pcontext;
+    int dataFrame = 0;
+    int64_t lastBlockFrame = -1;
+
     enum ParamIds {
         BIPOLAR_INPUTS_1_5,
         BIPOLAR_INPUTS_6_10,
@@ -42,62 +46,54 @@ struct HostCV : Module {
     };
 
     HostCV()
+        : pcontext(static_cast<CardinalPluginContext*>(APP))
     {
+        if (pcontext == nullptr)
+            throw rack::Exception("Plugin context is null");
+
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
         configParam<SwitchQuantity>(BIPOLAR_INPUTS_1_5, 0.f, 1.f, 0.f, "Bipolar Inputs 1-5")->randomizeEnabled = false;
         configParam<SwitchQuantity>(BIPOLAR_INPUTS_6_10, 0.f, 1.f, 0.f, "Bipolar Inputs 6-10")->randomizeEnabled = false;
         configParam<SwitchQuantity>(BIPOLAR_OUTPUTS_1_5, 0.f, 1.f, 0.f, "Bipolar Outputs 1-5")->randomizeEnabled = false;
         configParam<SwitchQuantity>(BIPOLAR_OUTPUTS_6_10, 0.f, 1.f, 0.f, "Bipolar Outputs 6-10")->randomizeEnabled = false;
-
-        CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
-
-        if (pcontext == nullptr)
-            throw rack::Exception("Plugin context is null.");
-
-        if (pcontext->loadedHostCV)
-            throw rack::Exception("Another instance of a Host CV module is already loaded, only one can be used at a time.");
-
-        pcontext->loadedHostCV = true;
-    }
-
-    ~HostCV() override
-    {
-        CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
-        DISTRHO_SAFE_ASSERT_RETURN(pcontext != nullptr,);
-
-        pcontext->loadedHostCV = false;
     }
 
     void process(const ProcessArgs&) override
     {
-        if (CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
+        if (pcontext->variant != kCardinalVariantMain)
+            return;
+
+        const float* const* const dataIns = pcontext->dataIns;
+        float** const dataOuts = pcontext->dataOuts;
+
+        const int64_t blockFrame = pcontext->engine->getBlockFrame();
+
+        if (lastBlockFrame != blockFrame)
         {
-            const float** dataIns = pcontext->dataIns;
-            float** dataOuts = pcontext->dataOuts;
+            dataFrame = 0;
+            lastBlockFrame = blockFrame;
+        }
 
-            if (dataIns == nullptr || dataOuts == nullptr)
-                return;
+        const int k = dataFrame++;
+        DISTRHO_SAFE_ASSERT_RETURN(k < pcontext->engine->getBlockFrames(),);
 
-            const uint32_t dataFrame = pcontext->dataFrame++;
-            float inputOffset, outputOffset;
+        float inputOffset, outputOffset;
+        inputOffset = params[BIPOLAR_INPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
+        outputOffset = params[BIPOLAR_OUTPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
 
-            inputOffset = params[BIPOLAR_INPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
-            outputOffset = params[BIPOLAR_OUTPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
+        for (int i=0; i<5; ++i)
+        {
+            outputs[i].setVoltage(dataIns[i+CARDINAL_AUDIO_IO_OFFSET][k] - outputOffset);
+            dataOuts[i+CARDINAL_AUDIO_IO_OFFSET][k] = inputs[i].getVoltage() + inputOffset;
+        }
 
-            for (int i=0; i<5; ++i)
-            {
-                outputs[i].setVoltage(dataIns[i+CARDINAL_AUDIO_IO_OFFSET][dataFrame] - outputOffset);
-                dataOuts[i+CARDINAL_AUDIO_IO_OFFSET][dataFrame] = inputs[i].getVoltage() + inputOffset;
-            }
+        inputOffset = params[BIPOLAR_INPUTS_6_10].getValue() > 0.1f ? 5.0f : 0.0f;
+        outputOffset = params[BIPOLAR_OUTPUTS_6_10].getValue() > 0.1f ? 5.0f : 0.0f;
 
-            inputOffset = params[BIPOLAR_INPUTS_6_10].getValue() > 0.1f ? 5.0f : 0.0f;
-            outputOffset = params[BIPOLAR_OUTPUTS_6_10].getValue() > 0.1f ? 5.0f : 0.0f;
-
-            for (int i=5; i<10; ++i)
-            {
-                outputs[i].setVoltage(dataIns[i+CARDINAL_AUDIO_IO_OFFSET][dataFrame] - outputOffset);
-                dataOuts[i+CARDINAL_AUDIO_IO_OFFSET][dataFrame] = inputs[i].getVoltage() + inputOffset;
-            }
+        for (int i=5; i<10; ++i)
+        {
+            outputs[i].setVoltage(dataIns[i+CARDINAL_AUDIO_IO_OFFSET][k] - outputOffset);
+            dataOuts[i+CARDINAL_AUDIO_IO_OFFSET][k] = inputs[i].getVoltage() + inputOffset;
         }
     }
 };

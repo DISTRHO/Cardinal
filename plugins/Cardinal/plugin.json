@@ -14,12 +14,28 @@
   "modules":
   [
     {
+      "slug": "HostAudio2",
+      "name": "Audio 2",
+      "description": "Exposes host-provided audio ports in a module",
+      "tags": [
+        "External"
+      ]
+    },
+    {
+      "slug": "HostAudio8",
+      "name": "Audio 8",
+      "description": "Exposes host-provided audio ports in a module",
+      "tags": [
+        "External"
+      ]
+    },
+    {
       "slug": "HostCV",
       "disabled": false,
       "name": "Host CV",
       "description": "Exposes host-provided CV ports in a module",
       "tags": [
-        "Utility"
+        "External"
       ]
     },
     {
@@ -28,7 +44,7 @@
       "name": "Host Parameters",
       "description": "Exposes host-controlled plugin parameters in a module",
       "tags": [
-        "Utility"
+        "External"
       ]
     },
     {
@@ -37,7 +53,7 @@
       "name": "Host Time",
       "description": "Exposes host-provided time/transport information in a module",
       "tags": [
-        "Utility"
+        "External"
       ]
     },
     {

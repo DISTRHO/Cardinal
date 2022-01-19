@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -182,9 +182,6 @@ struct Initializer
                       "Make sure Cardinal was downloaded and installed correctly.", asset::systemDir.c_str());
         }
 
-        INFO("Initializing audio driver");
-        audio::addDriver(0, new CardinalAudioDriver);
-
         INFO("Initializing midi driver");
         midi::addDriver(0, new CardinalMidiDriver);
 
@@ -336,14 +333,11 @@ class CardinalPlugin : public CardinalBasePlugin
 {
     SharedResourcePointer<Initializer> fInitializer;
 
-    float* fAudioBufferIn;
-    float* fAudioBufferOut;
+    float** fAudioBufferCopy;
     std::string fAutosavePath;
     String fWindowSize;
 
     // for base/context handling
-    bool fIsActive;
-    CardinalAudioDevice* fCurrentAudioDevice;
     CardinalMidiInputDevice** fCurrentMidiInputs;
     CardinalMidiOutputDevice** fCurrentMidiOutputs;
     uint64_t fPreviousFrame;
@@ -358,10 +352,7 @@ public:
     CardinalPlugin()
         : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, kCardinalStateCount),
           fInitializer(this),
-          fAudioBufferIn(nullptr),
-          fAudioBufferOut(nullptr),
-          fIsActive(false),
-          fCurrentAudioDevice(nullptr),
+          fAudioBufferCopy(nullptr),
           fCurrentMidiInputs(nullptr),
           fCurrentMidiOutputs(nullptr),
           fPreviousFrame(0)
@@ -443,7 +434,6 @@ public:
 
         {
             const MutexLocker cml(fDeviceMutex);
-            fCurrentAudioDevice = nullptr;
             delete[] fCurrentMidiInputs;
             fCurrentMidiInputs = nullptr;
             delete[] fCurrentMidiOutputs;
@@ -462,36 +452,6 @@ public:
 protected:
    /* --------------------------------------------------------------------------------------------------------
     * Cardinal Base things */
-
-    bool isActive() const noexcept override
-    {
-        return fIsActive;
-    }
-
-    bool canAssignAudioDevice() const noexcept override
-    {
-        const MutexLocker cml(fDeviceMutex);
-        return fCurrentAudioDevice == nullptr;
-    }
-
-    void assignAudioDevice(CardinalAudioDevice* const dev) noexcept override
-    {
-        DISTRHO_SAFE_ASSERT_RETURN(fCurrentAudioDevice == nullptr,);
-
-        const MutexLocker cml(fDeviceMutex);
-        fCurrentAudioDevice = dev;
-    }
-
-    bool clearAudioDevice(CardinalAudioDevice* const dev) noexcept override
-    {
-        const MutexLocker cml(fDeviceMutex);
-
-        if (fCurrentAudioDevice != dev)
-            return false;
-
-        fCurrentAudioDevice = nullptr;
-        return true;
-    }
 
     void assignMidiInputDevice(CardinalMidiInputDevice* const dev) noexcept override
     {
@@ -625,13 +585,15 @@ protected:
 
     int64_t getUniqueId() const override
     {
-#if CARDINAL_VARIANT_SYNTH
-        return d_cconst('d', 'C', 'n', 'S');
-#elif CARDINAL_VARIANT_FX
-        return d_cconst('d', 'C', 'n', 'F');
-#else
+       #if CARDINAL_VARIANT_MAIN
         return d_cconst('d', 'C', 'd', 'n');
-#endif
+       #elif CARDINAL_VARIANT_FX
+        return d_cconst('d', 'C', 'n', 'F');
+       #elif CARDINAL_VARIANT_SYNTH
+        return d_cconst('d', 'C', 'n', 'S');
+       #else
+        #error cardinal variant not set
+       #endif
     }
 
    /* --------------------------------------------------------------------------------------------------------
@@ -892,42 +854,25 @@ protected:
 
     void activate() override
     {
+       #if DISTRHO_PLUGIN_NUM_INPUTS != 0
         const uint32_t bufferSize = getBufferSize();
-        fAudioBufferOut = new float[bufferSize * DISTRHO_PLUGIN_NUM_OUTPUTS];
-
-        const uint32_t numInputs = std::max(1, DISTRHO_PLUGIN_NUM_INPUTS);
-        fAudioBufferIn = new float[bufferSize * numInputs];
-        std::memset(fAudioBufferIn, 0, sizeof(float)*bufferSize * numInputs);
+        fAudioBufferCopy = new float*[DISTRHO_PLUGIN_NUM_INPUTS];
+        for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
+            fAudioBufferCopy[i] = new float[newBufferSize];
+       #endif
 
         fPreviousFrame = 0;
-
-        {
-            const MutexLocker cml(fDeviceMutex);
-
-            if (fCurrentAudioDevice != nullptr)
-            {
-                rack::contextSet(context);
-                fCurrentAudioDevice->onStartStream();
-            }
-        }
     }
 
     void deactivate() override
     {
+        if (fAudioBufferCopy != nullptr)
         {
-            const MutexLocker cml(fDeviceMutex);
-
-            if (fCurrentAudioDevice != nullptr)
-            {
-                rack::contextSet(context);
-                fCurrentAudioDevice->onStopStream();
-            }
+            for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
+                delete[] fAudioBufferCopy[i];
+            delete[] fAudioBufferCopy;
+            fAudioBufferCopy = nullptr;
         }
-
-        delete[] fAudioBufferOut;
-        fAudioBufferOut = nullptr;
-        delete[] fAudioBufferIn;
-        fAudioBufferIn = nullptr;
     }
 
     inline void sendSingleSimpleMidiMessage(const MidiEvent& midiEvent)
@@ -1006,41 +951,26 @@ protected:
                 (*inputs)->handleMessagesFromHost(midiEvents, midiEventCount);
         }
 
-        if (fCurrentAudioDevice != nullptr)
+        // separate buffers, use them
+        if (inputs != outputs && (inputs == nullptr || inputs[0] != outputs[0]))
         {
-#if CARDINAL_NUM_AUDIO_INPUTS != 0
-            for (uint32_t i=0, j=0; i<frames; ++i)
-                for (uint32_t k=0; k<CARDINAL_NUM_AUDIO_INPUTS; ++k)
-                    fAudioBufferIn[j++] = inputs[k][i];
-            fCurrentAudioDevice->processInput(fAudioBufferIn, CARDINAL_NUM_AUDIO_INPUTS, frames);
-#else
-            std::memset(fAudioBufferIn, 0, sizeof(float)*frames);
-            fCurrentAudioDevice->processInput(fAudioBufferIn, 1, frames);
-#endif
+            context->dataIns = inputs;
+            context->dataOuts = outputs;
         }
-
-#if CARDINAL_VARIANT_MAIN
-        context->dataFrame = 0;
-        context->dataIns = inputs;
-        context->dataOuts = outputs;
-#endif
-
-        context->engine->stepBlock(frames);
-
-        if (fCurrentAudioDevice != nullptr)
-        {
-            std::memset(fAudioBufferOut, 0, sizeof(float)*frames*CARDINAL_NUM_AUDIO_OUTPUTS);
-            fCurrentAudioDevice->processOutput(fAudioBufferOut, CARDINAL_NUM_AUDIO_OUTPUTS, frames);
-
-            for (uint32_t i=0, j=0; i<frames; ++i)
-                for (uint32_t k=0; k<CARDINAL_NUM_AUDIO_OUTPUTS; ++k)
-                    outputs[k][i] = fAudioBufferOut[j++];
-        }
+        // inline processing, use a safe copy
         else
         {
-            for (uint32_t k=0; k<CARDINAL_NUM_AUDIO_OUTPUTS; ++k)
-                std::memset(outputs[k], 0, sizeof(float)*frames);
+            for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
+                std::memcpy(fAudioBufferCopy[i], inputs[i], sizeof(float)*frames);
+
+            context->dataIns = fAudioBufferCopy;
+            context->dataOuts = outputs;
         }
+
+        for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
+            std::memset(outputs[i], 0, sizeof(float)*frames);
+
+        context->engine->stepBlock(frames);
     }
 
     void bufferSizeChanged(const uint32_t newBufferSize) override
