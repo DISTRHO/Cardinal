@@ -61,7 +61,8 @@ When * is used, it is meant as wildcard of all files, with potential exceptions 
 When a license is uncertain, ??? is used.
 
 The sentence "used and distributed with permission" refers to the original project.  
-Since Cardinal does not modify these files, it is assumed their usage is permitted as well.
+Since Cardinal does not modify these files, it is assumed their usage is permitted as well.  
+In any case, Cardinal authors are in the process of asking permission to reuse the same contents.
 
 Note: The "final" version of Cardinal MUST NOT be released with unclear licenses!  
 So all uncertainties need to be resolved ASAP.
@@ -102,12 +103,12 @@ Below is a list of artwork licenses from plugins
 | BogaudioModules/fonts/inconsolata*.ttf  | OFL-1.1-no-RFN   | |
 | Cardinal/*                              | CC0-1.0          | |
 | Cardinal/Miku/Miku.png                  | CC-BY-NC-3.0     | https://piapro.net/intl/en_for_creators.html |
-| ChowDSP/*                               | GPL-3.0-or-later | No artwork specific license provided, see [ChowDSP-VCV#26](https://github.com/jatinchowdhury18/ChowDSP-VCV/issues/26) |
+| ChowDSP/*                               | GPL-3.0-or-later | Artwork has same license as code, see [ChowDSP-VCV#26](https://github.com/jatinchowdhury18/ChowDSP-VCV/issues/26) |
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
-| E-Series/*                              | Custom           | Copyright © Synthesis Technology, used and distributed with permission |
-| ExpertSleepers-Encoders/*               | MIT              | No artwork specific license provided, see [vcvrack-encoders#3](https://github.com/expertsleepersltd/vcvrack-encoders/issues/3) |
+| E-Series/*                              | Custom           | Copyright © Synthesis Technology, used and distributed with permission, see [LICENSE-PERMISSIONS.md#ESeries](LICENSE-PERMISSIONS.md#ESeries) |
+| ExpertSleepers-Encoders/*               | MIT              | Artwork has same license as code, see [vcvrack-encoders#3](https://github.com/expertsleepersltd/vcvrack-encoders/issues/3) |
 | Extratone/*                             | GPL-3.0-or-later | Artwork has same license as code, see [Extratone#7](https://github.com/EaterOfSheep/Extratone/issues/7) |
 | FehlerFabrik/*                          | GPL-3.0-or-later | No artwork specific license provided, see [FehlerFabrik#17](https://github.com/RCameron93/FehlerFabrik/issues/17) |
 | Fundamental/*                           | CC-BY-NC-ND-4.0  | |
@@ -146,6 +147,11 @@ Below is a list of artwork licenses from plugins
 | ValleyAudio/ShareTechMono-*.ttf         | OFL-1.1-RFN      | |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided, see [ZetaCarinaeModules#8](https://github.com/mhampton/ZetaCarinaeModules/issues/8) |
 | ZZC/*                                   | ??? | See [ZZC#89](https://github.com/zezic/ZZC/issues/89) and [ZZC#90](https://github.com/zezic/ZZC/issues/90) |
+
+TODO: ask permission for:
+- Atelier
+- AudibleInstruments
+- Befaco
 
 ### Rack
 
