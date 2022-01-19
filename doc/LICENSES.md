@@ -84,8 +84,8 @@ Below is a list of artwork licenses from plugins
 | AriaModules/lcd/Fixed_v01/*             | Custom           | See [LICENSE.txt](../plugins/AriaModules/res/lcd/Fixed_v01/LICENSE.txt) |
 | AriaModules/lcd/piano/*                 | WTFPL            | |
 | AriaModules/signature/*                 | Custom           | Removal required if modifying other files without author's permission |
-| AS/*                                    | Custom           | Copyright 2017, derivative works may not use the AS logo or panel graphics including custom component graphics (knobs, switches, screws, caps,etc.). |
-| AS/saxmono.ttf                          | Custom           | You may download this font, circulate it und use it freely. You may not alter rename, change copyrights or modify this font in any way. |
+| AS/*                                    | Custom           | Copyright 2017, derivative works may not use the AS logo or panel graphics including custom component graphics (knobs, switches, screws, caps, etc.). Redistribution rights requested at [AS#60](https://github.com/AScustomWorks/AS/issues/60) |
+| AS/saxmono.ttf                          | Custom           | You may download this font, circulate it und use it freely. You may not alter, rename, change copyrights or modify this font in any way. |
 | AS/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
 | Atelier/*                               | Custom           | Copyright © Pyer 2020, used and distributed with permission |
 | AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, used and distributed with permission |
