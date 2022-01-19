@@ -58,7 +58,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 Bellow follows a list of all licenses related to **artwork and module panels**, sorted by file name.  
 Licenses were retrieved from the official project's LICENSE, README or related files.  
 When * is used, it is meant as wildcard of all files, with potential exceptions mentioned afterwards.  
-When a license is uncertain, ?? is used.
+When a license is uncertain, ??? is used.
 
 The sentence "used and distributed with permission" refers to the original project.  
 Since Cardinal does not modify these files, it is assumed their usage is permitted as well.
@@ -91,7 +91,7 @@ Below is a list of artwork licenses from plugins
 | AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, used and distributed with permission |
 | BaconPlugs/*                            | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/midi/*                       | CC-BY-SA-3.0-DE  | |
-| BaconPlugs/midi/beeth/*                 | ??               | Taken from http://www.jsbach.net/ |
+| BaconPlugs/midi/beeth/*                 | ???              | Taken from http://www.jsbach.net/ |
 | BaconPlugs/1f953.svg                    | CC-BY-4.0        | |
 | BaconPlugs/Keypunch029.json             | OFL-1.1          | |
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
@@ -108,10 +108,10 @@ Below is a list of artwork licenses from plugins
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
 | E-Series/*                              | Custom           | Copyright © Synthesis Technology, used and distributed with permission |
 | ExpertSleepers-Encoders/*               | MIT              | No artwork specific license provided, see [vcvrack-encoders#3](https://github.com/expertsleepersltd/vcvrack-encoders/issues/3) |
-| Extratone/*                             | GPL-3.0-or-later | No artwork specific license provided, see [Extratone#7](https://github.com/EaterOfSheep/Extratone/issues/7) |
+| Extratone/*                             | GPL-3.0-or-later | Artwork has same license as code, see [Extratone#7](https://github.com/EaterOfSheep/Extratone/issues/7) |
 | FehlerFabrik/*                          | GPL-3.0-or-later | No artwork specific license provided, see [FehlerFabrik#17](https://github.com/RCameron93/FehlerFabrik/issues/17) |
 | Fundamental/*                           | CC-BY-NC-ND-4.0  | |
-| GlueTheGiant/*                          | GPL-3.0-or-later | No artwork specific license provided, see [gtg-rack#10](https://github.com/gluethegiant/gtg-rack/issues/10) |
+| GlueTheGiant/*                          | GPL-3.0-or-later | Artwork has same license as code, see [gtg-rack#10](https://github.com/gluethegiant/gtg-rack/issues/10) |
 | GlueTheGiant/fonts/DSEG7-*              | OFL-1.1-RFN      | |
 | GrandeModular/*                         | CC-BY-NC-ND-4.0  | |
 | HetrickCV/*                             | CC0-1.0          | No artwork specific license provided |
