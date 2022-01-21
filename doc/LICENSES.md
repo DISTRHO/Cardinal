@@ -17,26 +17,18 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Amalgamated Harmonics   | BSD-3-Clause          | |
 | Animated Circuits       | GPL-3.0-or-later      | |
 | Aria Salvatrice         | GPL-3.0-or-later      | |
-| AS                      | MIT                   | |
-| Atelier                 | GPL-3.0-or-later      | |
-| Audible Instruments     | GPL-3.0-or-later      | |
 | Bacon Music             | GPL-3.0-or-later      | |
-| Befaco                  | GPL-3.0-or-later      | |
-| Bidoo                   | GPL-3.0-or-later      | |
 | Bogaudio                | GPL-3.0-or-later      | |
-| cf                      | BSD-3-Clause          | |
 | ChowDSP                 | GPL-3.0-or-later      | |
 | DrumKit                 | CC0-1.0               | |
 | E-Series                | GPL-3.0-or-later      | |
 | ExpertSleepers Encoders | MIT                   | |
 | Extratone               | GPL-3.0-or-later      | |
 | Fehler Fabrik           | GPL-3.0-or-later      | |
-| Fundamental             | GPL-3.0-or-later      | |
 | Glue the Giant          | GPL-3.0-or-later      | |
 | Grande                  | GPL-3.0-or-later      | |
 | HetrickCV               | CC0-1.0               | |
 | Impromptu               | GPL-3.0-or-later      | |
-| ihtsyn                  | GPL-3.0-or-later      | |
 | JW-Modules              | BSD-3-Clause          | |
 | LifeFormModular         | MIT                   | |
 | Little Utils            | EUPL-1.2              | |
@@ -51,7 +43,20 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Sonus Modular           | GPL-3.0-or-later      | |
 | Valley                  | GPL-3.0-or-later      | |
 | ZetaCarinae             | GPL-3.0-or-later      | |
-| ZZC                     | GPL-3.0-or-later      | |
+
+Bellow follows a list of code licenses from potentially coming modules.
+
+| Name                    | License(s)            | Pending reason |
+|-------------------------|-----------------------|----------------|
+| AS                      | MIT                   | Artwork license issues, does not allow use outside VCVRack |
+| Atelier                 | GPL-3.0-or-later      | Custom artwork license, needs permission request |
+| Audible Instruments     | GPL-3.0-or-later      | Custom artwork license, needs permission request, also for dark mode |
+| Befaco                  | GPL-3.0-or-later      | Custom artwork license, needs permission request |
+| Bidoo                   | GPL-3.0-or-later      | CC-ND, needs permission for dark mode |
+| cf                      | BSD-3-Clause          | Non-free font use |
+| Fundamental             | GPL-3.0-or-later      | CC-ND, needs permission for dark mode |
+| ihtsyn                  | GPL-3.0-or-later      | Project deleted by author |
+| ZZC                     | GPL-3.0-or-later      | Artwork license terms unclear |
 
 ## ARTWORK / PANEL LICENSES
 
@@ -85,19 +90,11 @@ Below is a list of artwork licenses from plugins
 | AriaModules/lcd/Fixed_v01/*             | Custom           | See [LICENSE.txt](../plugins/AriaModules/res/lcd/Fixed_v01/LICENSE.txt) |
 | AriaModules/lcd/piano/*                 | WTFPL            | |
 | AriaModules/signature/*                 | Custom           | Removal required if modifying other files without author's permission |
-| AS/*                                    | Custom           | Copyright 2017, derivative works may not use the AS logo or panel graphics including custom component graphics (knobs, switches, screws, caps, etc.). Redistribution rights requested at [AS#60](https://github.com/AScustomWorks/AS/issues/60) |
-| AS/saxmono.ttf                          | Custom           | You may download this font, circulate it und use it freely. You may not alter, rename, change copyrights or modify this font in any way. |
-| AS/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
-| Atelier/*                               | Custom           | Copyright © Pyer 2020, used and distributed with permission |
-| AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, used and distributed with permission |
 | BaconPlugs/*                            | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/midi/*                       | CC-BY-SA-3.0-DE  | |
 | BaconPlugs/midi/beeth/*                 | ???              | Taken from http://www.jsbach.net/ |
 | BaconPlugs/1f953.svg                    | CC-BY-4.0        | |
 | BaconPlugs/Keypunch029.json             | OFL-1.1          | |
-| Befaco/components/*                     | CC-BY-NC-4.0     | |
-| Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission |
-| Bidoo/*                                 | CC-BY-NC-ND-4.0  | |
 | BogaudioModules/*                       | CC-BY-SA-4.0     | |
 | BogaudioModules/fonts/audiowide.ttf     | OFL-1.1-RFN      | |
 | BogaudioModules/fonts/inconsolata*.ttf  | OFL-1.1-no-RFN   | |
@@ -118,8 +115,6 @@ Below is a list of artwork licenses from plugins
 | HetrickCV/*                             | CC0-1.0          | No artwork specific license provided |
 | ImpromptuModular/*                      | CC-BY-NC-ND-4.0  | |
 | ImpromptuModular/res/comp/complib/*     | CC-BY-NC-4.0     | |
-| ihtsyn/*                                | GPL-3.0-or-later | No artwork specific license provided, author has deleted this repo |
-| ihtsyn/LEDCalculator.ttf                | Custom           | Free for personal use |
 | JW-Modules/*                            | BSD-3-Clause     | No artwork specific license provided |
 | JW-Modules/DejaVuSansMono.ttf           | Bitstream-Vera   | Unused in Cardinal |
 | LifeFormModular/*                       | MIT              | No artwork specific license provided |
@@ -146,6 +141,24 @@ Below is a list of artwork licenses from plugins
 | ValleyAudio/DSEG14Classic-*.ttf         | OFL-1.1-RFN      | |
 | ValleyAudio/ShareTechMono-*.ttf         | OFL-1.1-RFN      | |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided, see [ZetaCarinaeModules#8](https://github.com/mhampton/ZetaCarinaeModules/issues/8) |
+
+Bellow follows a list of artwork licenses from potentially coming modules.
+
+| AS/*                                    | Custom           | Copyright 2017, derivative works may not use the AS logo or panel graphics including custom component graphics (knobs, switches, screws, caps, etc.). Redistribution rights requested at [AS#60](https://github.com/AScustomWorks/AS/issues/60) |
+| AS/saxmono.ttf                          | Custom           | You may download this font, circulate it und use it freely. You may not alter, rename, change copyrights or modify this font in any way. |
+| AS/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
+| Atelier/*                               | Custom           | Copyright © Pyer 2020, used and distributed with permission |
+| AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, used and distributed with permission |
+| Befaco/components/*                     | CC-BY-NC-4.0     | |
+| Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission |
+| Bidoo/*                                 | CC-BY-NC-ND-4.0  | |
+| cf/*                                    | BSD-3-Clause     | No artwork specific license provided (TODO check intentional) |
+| cf/ArialBlack.ttf                       | Custom           | https://docs.microsoft.com/en-us/typography/fonts/font-faq |
+| cf/DejaVuSansMono.ttf                   | Bitstream-Vera   | |
+| cf/LEDCalculator.ttf                    | Custom           | Free for personal use |
+| cf/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
+| ihtsyn/*                                | GPL-3.0-or-later | No artwork specific license provided, author has deleted this repo |
+| ihtsyn/LEDCalculator.ttf                | Custom           | Free for personal use |
 | ZZC/*                                   | ??? | See [ZZC#89](https://github.com/zezic/ZZC/issues/89) and [ZZC#90](https://github.com/zezic/ZZC/issues/90) |
 
 TODO: ask permission for:

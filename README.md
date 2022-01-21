@@ -78,29 +78,21 @@ An overview of the included code and linked submodules can be seen [here](doc/LI
 At the moment the following 3rd-party modules are provided:
 
 - 21kHz
-- AS
 - Amalgamated Harmonics
 - Animated Circuits
 - Aria Salvatrice
-- Atelier
-- Audible Instruments
 - Bacon Music
-- Befaco
-- Bidoo
 - Bogaudio
-- cf
 - ChowDSP
 - DrumKit
 - E-Series
 - ExpertSleepers Encoders
 - Extratone
 - Fehler Fabrik
-- Fundamental
 - Glue the Giant
 - Grande
 - HetrickCV
 - Impromptu
-- ihtsyn
 - JW-Modules
 - LifeFormModular
 - Little Utils
@@ -115,6 +107,16 @@ At the moment the following 3rd-party modules are provided:
 - Sonus Modular
 - Valley
 - ZetaCarinae
+
+Potentially coming soon, currently sorting out license situation:
+- AS
+- Atelier
+- Audible Instruments
+- Befaco
+- Bidoo
+- cf
+- Fundamental
+- ihtsyn
 - ZZC
 
 Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.

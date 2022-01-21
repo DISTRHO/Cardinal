@@ -61,6 +61,7 @@ extern Model* modelBlank;
 #undef modelBlank
 
 // AS
+/*
 #define modelADSR modelASADSR
 #define modelVCA modelASVCA
 #define YellowRedLight ASYellowRedLight
@@ -68,12 +69,17 @@ extern Model* modelBlank;
 #undef modelADSR
 #undef modelVCA
 #undef YellowRedLight
+*/
 
 // Atelier
+/*
 #include "Atelier/src/plugin.hpp"
+*/
 
 // AudibleInstruments
+/*
 #include "AudibleInstruments/src/plugin.hpp"
+*/
 
 // BaconPlugs
 #define INCLUDE_COMPONENTS_HPP
@@ -83,14 +89,18 @@ extern Model* modelBlank;
 #undef RACK_HEIGHT
 
 // Befaco
+/*
 #define modelADSR modelBefacoADSR
 #define modelMixer modelBefacoMixer
 #include "Befaco/src/plugin.hpp"
 #undef modelADSR
 #undef modelMixer
+*/
 
 // Bidoo
+/*
 #include "Bidoo/src/plugin.hpp"
+*/
 
 // BogaudioModules - force dark skin as default
 #include <mutex>
@@ -241,7 +251,9 @@ extern Model* modelTestVCF;
 #undef modelVCO
 
 // cf
+/*
 #include "cf/src/plugin.hpp"
+*/
 
 // ChowDSP
 #include "ChowDSP/src/plugin.hpp"
@@ -266,7 +278,9 @@ void setupSamples();
 #include "FehlerFabrik/src/plugin.hpp"
 
 // Fundamental
+/*
 #include "Fundamental/src/plugin.hpp"
+*/
 
 // GlueTheGiant
 #include "GlueTheGiant/src/plugin.hpp"
@@ -361,7 +375,9 @@ extern Model* modelWriteSeq64;
 extern Model* modelBlankPanel;
 
 // ihtsyn
+/*
 #include "ihtsyn/src/plugin.hpp"
+*/
 
 // JW-Modules
 #define modelQuantizer modelJWQuantizer
@@ -481,12 +497,14 @@ extern Model* modelMaude_221;
 #include "ZetaCarinaeModules/src/plugin.hpp"
 
 // ZZC
+/*
 #define DISPLAYS_H
 #define ZZC_SHARED_H
 #define ZZC_WIDGETS_H
 #define modelClock modelZZCClock
 #include "ZZC/src/ZZC.hpp"
 #undef modelClock
+*/
 
 #endif // NOPLUGINS
 
@@ -505,26 +523,26 @@ Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
-Plugin* pluginInstance__AS;
-Plugin* pluginInstance__Atelier;
-Plugin* pluginInstance__AudibleInstruments;
+// Plugin* pluginInstance__AS;
+// Plugin* pluginInstance__Atelier;
+// Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__Bacon;
-Plugin* pluginInstance__Befaco;
-Plugin* pluginInstance__Bidoo;
+// Plugin* pluginInstance__Befaco;
+// Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
-Plugin* pluginInstance__cf;
+// Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
 Plugin* pluginInstance__Extratone;
 Plugin* pluginInstance__FehlerFabrik;
-Plugin* pluginInstance__Fundamental;
+// Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
-Plugin* pluginInstance__ihtsyn;
+// Plugin* pluginInstance__ihtsyn;
 Plugin* pluginInstance__JW;
 Plugin* pluginInstance__LifeFormModular;
 Plugin* pluginInstance__LittleUtils;
@@ -539,7 +557,7 @@ Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
-Plugin* pluginInstance__ZZC;
+// Plugin* pluginInstance__ZZC;
 #endif // NOPLUGINS
 
 namespace rack {
@@ -793,6 +811,7 @@ static void initStatic__Aria()
     }
 }
 
+/*
 static void initStatic__AS()
 {
     Plugin* const p = new Plugin;
@@ -858,7 +877,9 @@ static void initStatic__AS()
 #undef modelVCA
     }
 }
+*/
 
+/*
 static void initStatic__Atelier()
 {
     Plugin* const p = new Plugin;
@@ -870,7 +891,9 @@ static void initStatic__Atelier()
         p->addModel(modelPalette);
     }
 }
+*/
 
+/*
 static void initStatic__AudibleInstruments()
 {
     Plugin* const p = new Plugin;
@@ -901,6 +924,7 @@ static void initStatic__AudibleInstruments()
         p->addModel(modelStreams);
     }
 }
+*/
 
 static void initStatic__Bacon()
 {
@@ -935,6 +959,7 @@ static void initStatic__Bacon()
     }
 }
 
+/*
 static void initStatic__Befaco()
 {
     Plugin* const p = new Plugin;
@@ -966,7 +991,9 @@ static void initStatic__Befaco()
 #undef modelMixer
     }
 }
+*/
 
+/*
 static void initStatic__Bidoo()
 {
     Plugin* const p = new Plugin;
@@ -1025,6 +1052,7 @@ static void initStatic__Bidoo()
         spl.removeModule("antN");
     }
 }
+*/
 
 static void initStatic__BogaudioModules()
 {
@@ -1176,6 +1204,7 @@ static void initStatic__BogaudioModules()
     }
 }
 
+/*
 static void initStatic__cf()
 {
     Plugin* const p = new Plugin;
@@ -1212,6 +1241,7 @@ static void initStatic__cf()
         p->addModel(modelDAVE);
     }
 }
+*/
 
 static void initStatic__ChowDSP()
 {
@@ -1344,6 +1374,7 @@ static void initStatic__FehlerFabrik()
     }
 }
 
+/*
 static void initStatic__Fundamental()
 {
     Plugin* const p = new Plugin;
@@ -1393,6 +1424,7 @@ static void initStatic__Fundamental()
         }
     }
 }
+*/
 
 static void initStatic__GlueTheGiant()
 {
@@ -1537,6 +1569,7 @@ static void initStatic__ImpromptuModular()
     }
 }
 
+/*
 static void initStatic__ihtsyn()
 {
     Plugin* const p = new Plugin;
@@ -1551,6 +1584,7 @@ static void initStatic__ihtsyn()
         p->addModel(modelMVerb);
     }
 }
+*/
 
 static void initStatic__JW()
 {
@@ -1884,6 +1918,7 @@ static void initStatic__ZetaCarinaeModules()
     }
 }
 
+/*
 static void initStatic__ZZC()
 {
     Plugin* p = new Plugin;
@@ -1905,6 +1940,7 @@ static void initStatic__ZZC()
 #undef modelClock
     }
 }
+*/
 #endif // NOPLUGINS
 
 void initStaticPlugins()
@@ -1916,26 +1952,26 @@ void initStaticPlugins()
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__Aria();
-    initStatic__AS();
-    initStatic__Atelier();
-    initStatic__AudibleInstruments();
+    // initStatic__AS();
+    // initStatic__Atelier();
+    // initStatic__AudibleInstruments();
     initStatic__Bacon();
-    initStatic__Befaco();
-    initStatic__Bidoo();
+    // initStatic__Befaco();
+    // initStatic__Bidoo();
     initStatic__BogaudioModules();
-    initStatic__cf();
+    // initStatic__cf();
     initStatic__ChowDSP();
     initStatic__DrumKit();
     initStatic__ESeries();
     initStatic__ExpertSleepersEncoders();
     initStatic__Extratone();
     initStatic__FehlerFabrik();
-    initStatic__Fundamental();
+    // initStatic__Fundamental();
     initStatic__GlueTheGiant();
     initStatic__GrandeModular();
     initStatic__HetrickCV();
     initStatic__ImpromptuModular();
-    initStatic__ihtsyn();
+    // initStatic__ihtsyn();
     initStatic__JW();
     initStatic__LifeFormModular();
     initStatic__LittleUtils();
@@ -1950,7 +1986,7 @@ void initStaticPlugins()
     initStatic__sonusmodular();
     initStatic__ValleyAudio();
     initStatic__ZetaCarinaeModules();
-    initStatic__ZZC();
+    // initStatic__ZZC();
 #endif // NOPLUGINS
 }
 

@@ -238,127 +238,127 @@ ARIA_CUSTOM = Blank
 # --------------------------------------------------------------
 # AS
 
-PLUGIN_FILES += $(filter-out AS/src/AS.cpp,$(wildcard AS/src/*.cpp))
-PLUGIN_FILES += AS/freeverb/revmodel.cpp
-
-# modules/types which are present in other plugins
-AS_CUSTOM = ADSR LabelDisplayWidget LowFrequencyOscillator VCA YellowRedLight allpass comb revmodel
-AS_CUSTOM_PER_FILE = NumberDisplayWidget
+# PLUGIN_FILES += $(filter-out AS/src/AS.cpp,$(wildcard AS/src/*.cpp))
+# PLUGIN_FILES += AS/freeverb/revmodel.cpp
+# 
+# # modules/types which are present in other plugins
+# AS_CUSTOM = ADSR LabelDisplayWidget LowFrequencyOscillator VCA YellowRedLight allpass comb revmodel
+# AS_CUSTOM_PER_FILE = NumberDisplayWidget
 
 # --------------------------------------------------------------
 # Atelier
 
-PLUGIN_FILES += Atelier/src/Palette.cpp
-PLUGIN_FILES += Atelier/eurorack/stmlib/dsp/atan.cc
-PLUGIN_FILES += Atelier/eurorack/stmlib/dsp/units.cc
-PLUGIN_FILES += Atelier/eurorack/stmlib/utils/random.cc
-PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/*.cc)
-PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/engine/*.cc)
-PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/speech/*.cc)
-PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/physical_modelling/*.cc)
-PLUGIN_FILES += Atelier/eurorack/plaits/resources.cc
-
-# modules/types which are present in other plugins
-ATELIER_CUSTOM = plaits stmlib
+# PLUGIN_FILES += Atelier/src/Palette.cpp
+# PLUGIN_FILES += Atelier/eurorack/stmlib/dsp/atan.cc
+# PLUGIN_FILES += Atelier/eurorack/stmlib/dsp/units.cc
+# PLUGIN_FILES += Atelier/eurorack/stmlib/utils/random.cc
+# PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/*.cc)
+# PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/engine/*.cc)
+# PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/speech/*.cc)
+# PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/physical_modelling/*.cc)
+# PLUGIN_FILES += Atelier/eurorack/plaits/resources.cc
+# 
+# # modules/types which are present in other plugins
+# ATELIER_CUSTOM = plaits stmlib
 
 # --------------------------------------------------------------
 # AudibleInstruments
 
-PLUGIN_FILES += $(filter-out AudibleInstruments/src/plugin.cpp,$(wildcard AudibleInstruments/src/*.cpp))
-
-PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/atan.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/units.cc
-
-PLUGIN_FILES += AudibleInstruments/eurorack/braids/macro_oscillator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/braids/analog_oscillator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/braids/digital_oscillator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/braids/quantizer.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/braids/resources.cc
-
-PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/*.cc)
-PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/engine/*.cc)
-PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/speech/*.cc)
-PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/physical_modelling/*.cc)
-PLUGIN_FILES += AudibleInstruments/eurorack/plaits/resources.cc
-
-PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/correlator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/granular_processor.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/mu_law.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/pvoc/frame_transformation.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/pvoc/phase_vocoder.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/pvoc/stft.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/clouds/resources.cc
-
-PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/exciter.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/ominous_voice.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/resonator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/tube.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/multistage_envelope.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/part.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/string.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/voice.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/elements/resources.cc
-
-PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/fm_voice.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/part.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/string_synth_part.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/string.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/resonator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/rings/resources.cc
-
-PLUGIN_FILES += AudibleInstruments/eurorack/tides/generator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/tides/resources.cc
-
-PLUGIN_FILES += AudibleInstruments/eurorack/tides2/poly_slope_generator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/tides2/ramp_extractor.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/tides2/resources.cc
-
-PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/modulator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/oscillator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/vocoder.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/filter_bank.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/warps/resources.cc
-
-PLUGIN_FILES += AudibleInstruments/eurorack/frames/keyframer.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/frames/resources.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/frames/poly_lfo.cc
-
-PLUGIN_FILES += AudibleInstruments/eurorack/peaks/processors.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/peaks/resources.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/bass_drum.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/fm_drum.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/high_hat.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/snare_drum.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/peaks/modulations/lfo.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/peaks/modulations/multistage_envelope.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/peaks/pulse_processor/pulse_shaper.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/peaks/pulse_processor/pulse_randomizer.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/peaks/number_station/number_station.cc
-
-PLUGIN_FILES += AudibleInstruments/eurorack/stages/segment_generator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/stages/ramp_extractor.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/stages/resources.cc
-
-PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/atan.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/units.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/t_generator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/x_y_generator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/output_channel.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/lag_processor.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/quantizer.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/marbles/ramp/ramp_extractor.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/marbles/resources.cc
-
-PLUGIN_FILES += AudibleInstruments/eurorack/streams/resources.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/streams/processor.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/streams/follower.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/streams/lorenz_generator.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/streams/envelope.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/streams/svf.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/streams/vactrol.cc
-PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
+# PLUGIN_FILES += $(filter-out AudibleInstruments/src/plugin.cpp,$(wildcard AudibleInstruments/src/*.cpp))
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/atan.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/units.cc
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/braids/macro_oscillator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/braids/analog_oscillator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/braids/digital_oscillator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/braids/quantizer.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/braids/resources.cc
+# 
+# PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/*.cc)
+# PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/engine/*.cc)
+# PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/speech/*.cc)
+# PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/physical_modelling/*.cc)
+# PLUGIN_FILES += AudibleInstruments/eurorack/plaits/resources.cc
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/correlator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/granular_processor.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/mu_law.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/pvoc/frame_transformation.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/pvoc/phase_vocoder.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/pvoc/stft.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/resources.cc
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/exciter.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/ominous_voice.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/resonator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/tube.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/multistage_envelope.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/part.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/string.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/voice.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/elements/resources.cc
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/fm_voice.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/part.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/string_synth_part.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/string.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/resonator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/rings/resources.cc
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/tides/generator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/tides/resources.cc
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/tides2/poly_slope_generator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/tides2/ramp_extractor.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/tides2/resources.cc
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/modulator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/oscillator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/vocoder.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/filter_bank.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/warps/resources.cc
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/frames/keyframer.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/frames/resources.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/frames/poly_lfo.cc
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/processors.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/resources.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/bass_drum.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/fm_drum.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/high_hat.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/snare_drum.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/modulations/lfo.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/modulations/multistage_envelope.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/pulse_processor/pulse_shaper.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/pulse_processor/pulse_randomizer.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/number_station/number_station.cc
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/stages/segment_generator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/stages/ramp_extractor.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/stages/resources.cc
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/atan.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/units.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/t_generator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/x_y_generator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/output_channel.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/lag_processor.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/quantizer.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/ramp/ramp_extractor.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/resources.cc
+# 
+# PLUGIN_FILES += AudibleInstruments/eurorack/streams/resources.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/streams/processor.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/streams/follower.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/streams/lorenz_generator.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/streams/envelope.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/streams/svf.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/streams/vactrol.cc
+# PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
 
 # --------------------------------------------------------------
 # BaconPlugs
@@ -370,25 +370,25 @@ PLUGIN_FILES += $(wildcard BaconPlugs/libs/open303-code/Source/DSPCode/*.cpp)
 # --------------------------------------------------------------
 # Befaco
 
-PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
-PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
-
-# modules/types which are present in other plugins
-BEFACO_CUSTOM = ADSR Mixer
+# PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
+# PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
+# 
+# # modules/types which are present in other plugins
+# BEFACO_CUSTOM = ADSR Mixer
 
 # --------------------------------------------------------------
 # Bidoo
 
-PLUGIN_FILES += $(filter-out Bidoo/src/plugin.cpp Bidoo/src/ANTN.cpp,$(wildcard Bidoo/src/*.cpp))
-PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
-PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
-PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
-PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
-PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/src/dep/resampler/*.cpp))
-
-# modules/types which are present in other plugins
-BIDOO_CUSTOM = ChannelDisplay LadderFilter $(DRWAV)
-BIDOO_CUSTOM_PER_FILE = channel channel filterType
+# PLUGIN_FILES += $(filter-out Bidoo/src/plugin.cpp Bidoo/src/ANTN.cpp,$(wildcard Bidoo/src/*.cpp))
+# PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
+# PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
+# PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
+# PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
+# PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/src/dep/resampler/*.cpp))
+# 
+# # modules/types which are present in other plugins
+# BIDOO_CUSTOM = ChannelDisplay LadderFilter $(DRWAV)
+# BIDOO_CUSTOM_PER_FILE = channel channel filterType
 
 # --------------------------------------------------------------
 # BogaudioModules
@@ -451,11 +451,11 @@ FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter
 # --------------------------------------------------------------
 # Fundamental
 
-PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
-PLUGIN_FILES += Fundamental/src/dr_wav.c
-
-# modules/types which are present in other plugins
-FUNDAMENTAL_CUSTOM = $(DRWAV)
+# PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
+# PLUGIN_FILES += Fundamental/src/dr_wav.c
+# 
+# # modules/types which are present in other plugins
+# FUNDAMENTAL_CUSTOM = $(DRWAV)
 
 # --------------------------------------------------------------
 # GlueTheGiant
@@ -493,15 +493,15 @@ IMPROMPTUMODULAR_CUSTOM_PER_FILE = Clock stepClock
 # --------------------------------------------------------------
 # ihtsyn
 
-PLUGIN_FILES += $(filter-out ihtsyn/src/plugin.cpp,$(wildcard ihtsyn/src/*.cpp))
-
-# modules/types which are present in other plugins
-IHTSYN_CUSTOM_PER_FILE  = mv_allpass
-IHTSYN_CUSTOM_PER_FILE += mv_staticallpass4tap
-IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline
-IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline4tap
-IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline8tap
-IHTSYN_CUSTOM_PER_FILE += mv_statevariable
+# PLUGIN_FILES += $(filter-out ihtsyn/src/plugin.cpp,$(wildcard ihtsyn/src/*.cpp))
+# 
+# # modules/types which are present in other plugins
+# IHTSYN_CUSTOM_PER_FILE  = mv_allpass
+# IHTSYN_CUSTOM_PER_FILE += mv_staticallpass4tap
+# IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline
+# IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline4tap
+# IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline8tap
+# IHTSYN_CUSTOM_PER_FILE += mv_statevariable
 
 # --------------------------------------------------------------
 # JW-Modules
@@ -692,12 +692,12 @@ PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCa
 # --------------------------------------------------------------
 # ZZC
 
-PLUGIN_FILES += $(filter-out ZZC/src/ZZC.cpp,$(wildcard ZZC/src/*.cpp))
-PLUGIN_FILES += ZZC/src/dsp/Wavetable.cpp
-PLUGIN_FILES += ZZC/src/filetypes/WavSupport.cpp
-
-# modules/types which are present in other plugins
-ZZC_CUSTOM = Clock LowFrequencyOscillator
+# PLUGIN_FILES += $(filter-out ZZC/src/ZZC.cpp,$(wildcard ZZC/src/*.cpp))
+# PLUGIN_FILES += ZZC/src/dsp/Wavetable.cpp
+# PLUGIN_FILES += ZZC/src/filetypes/WavSupport.cpp
+# 
+# # modules/types which are present in other plugins
+# ZZC_CUSTOM = Clock LowFrequencyOscillator
 
 # --------------------------------------------------------------
 

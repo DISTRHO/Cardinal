@@ -51,6 +51,7 @@ static const struct {
     const char* const filename;
     const char* shapes[8];
 } pathsToFilterOut[] = {
+    // Core will be removed soon, so this part doesnt matter
     {
         "/Core/Audio2.svg",
         {
@@ -150,6 +151,8 @@ static const struct {
             "a58877fa-d57b-4d74-bbda-a883bf30a365"
         }
     },
+    /*
+    // CC-BY-NC-ND-4.0, needs permission
     {
         "/Fundamental/8vert.svg",
         {"path17","path21","circle15","path19"}
@@ -261,17 +264,22 @@ static const struct {
         "/Fundamental/WTVCO.svg",
         {"path12","path16","circle18","path14"}
     },
+    */
 };
 static const struct {
     const char* const filename;
     const char* shapeIdsToIgnore[5];
     const int shapeNumberToIgnore;
 } svgFilesToInvert[] = {
+    // MIT
     { "/21kHz/Panels/D_Inf.svg", {}, -1 },
     { "/21kHz/Panels/PalmLoop.svg", {}, -1 },
     { "/21kHz/Panels/TachyonEntangler.svg", {}, -1 },
+    // CC-BY-NC-SA-4.0
     { "/AnimatedCircuits/FoldingLight.svg", {}, -1 },
     { "/AnimatedCircuits/Knob_Black_Light_21.svg", {}, -1 },
+    /*
+    // Custom, needs permission
     { "/AudibleInstruments/Blinds.svg", {}, -1 },
     { "/AudibleInstruments/Braids.svg", {}, -1 },
     { "/AudibleInstruments/Branches.svg", {}, -1 },
@@ -294,6 +302,9 @@ static const struct {
     { "/AudibleInstruments/Tides2.svg", {}, -1 },
     { "/AudibleInstruments/Veils.svg", {}, -1 },
     { "/AudibleInstruments/Warps.svg", {}, -1 },
+    */
+    /*
+    // CC-BY-NC-ND-4.0, needs permission
     { "/Bidoo/ACNE.svg", {}, -1 },
     { "/Bidoo/ANTN.svg", {}, -1 },
     { "/Bidoo/BAFIS.svg", {}, -1 },
@@ -339,6 +350,9 @@ static const struct {
     { "/Bidoo/VOID.svg", {}, -1 },
     { "/Bidoo/ZINC.svg", {}, -1 },
     { "/Bidoo/ZOUMAI.svg", {}, -1 },
+    */
+    /*
+    // BSD-3-Clause ??
     { "/cf/ALGEBRA.svg", {}, -1 },
     { "/cf/BUFFER.svg", {}, -1 },
     { "/cf/CHOKE.svg", {}, -1 },
@@ -365,6 +379,8 @@ static const struct {
     { "/cf/SUB.svg", {}, -1 },
     { "/cf/trSEQ.svg", {}, -1 },
     { "/cf/VARIABLE.svg", {}, -1 },
+    */
+    // CC0-1.0
     { "/DrumKit/Baronial.svg", {}, -1 },
     { "/DrumKit/BD9.svg", {}, -1 },
     { "/DrumKit/ClosedHH.svg", {}, -1 },
@@ -378,7 +394,11 @@ static const struct {
     { "/DrumKit/Snare.svg", {}, -1 },
     { "/DrumKit/Tomi.svg", {}, -1 },
     { "/ESeries/E340.svg", {}, -1 },
+    /*
+    // CC-BY-NC-ND-4.0, needs permission
     { "/Fundamental/VCA.svg", {}, -1 },
+    */
+    // CC0-1.0
     { "/HetrickCV/1OpChaos.svg", {}, -1},
     { "/HetrickCV/2OpChaos.svg", {}, -1},
     { "/HetrickCV/2To4.svg", {}, -1},
@@ -422,6 +442,7 @@ static const struct {
     { "/HetrickCV/Blanks/BlankPanel6.svg", {}, -1},
     { "/HetrickCV/Blanks/BlankPanel7.svg", {}, -1},
     { "/HetrickCV/Blanks/BlankPanel8.svg", {}, -1},
+    // BSD-3-Clause
     { "/JW-Modules/Add5.svg", {}, -1 },
     { "/JW-Modules/BlankPanel1hp.svg", {}, -1 },
     { "/JW-Modules/BlankPanelLarge.svg", {}, -1 },
@@ -444,6 +465,7 @@ static const struct {
     { "/JW-Modules/Trigs.svg", {}, -1 },
     { "/JW-Modules/WavHeadPanel.svg", {}, -1 },
     { "/JW-Modules/XYPad.svg", {}, -1 },
+    // EUPL-1.2
     { "/LittleUtils/Bias_Semitone.svg", {}, -1 },
     { "/LittleUtils/ButtonModule.svg", {}, -1 },
     { "/LittleUtils/MulDiv.svg", {}, -1 },
