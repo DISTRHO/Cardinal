@@ -65,10 +65,6 @@ Licenses were retrieved from the official project's LICENSE, README or related f
 When * is used, it is meant as wildcard of all files, with potential exceptions mentioned afterwards.  
 When a license is uncertain, ??? is used.
 
-The sentence "used and distributed with permission" refers to the original project.  
-Since Cardinal does not modify these files, it is assumed their usage is permitted as well.  
-In any case, Cardinal authors are in the process of asking permission to reuse the same contents.
-
 Note: The "final" version of Cardinal MUST NOT be released with unclear licenses!  
 So all uncertainties need to be resolved ASAP.
 
@@ -142,15 +138,17 @@ Below is a list of artwork licenses from plugins
 | ValleyAudio/ShareTechMono-*.ttf         | OFL-1.1-RFN      | |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided, see [ZetaCarinaeModules#8](https://github.com/mhampton/ZetaCarinaeModules/issues/8) |
 
-Bellow follows a list of artwork licenses from potentially coming modules.
+Bellow follows a list of artwork licenses from potentially coming plugins.
 
+| Name                                    | License(s)       | Additional notes |
+|-----------------------------------------|------------------|------------------|
 | AS/*                                    | Custom           | Copyright 2017, derivative works may not use the AS logo or panel graphics including custom component graphics (knobs, switches, screws, caps, etc.). Redistribution rights requested at [AS#60](https://github.com/AScustomWorks/AS/issues/60) |
 | AS/saxmono.ttf                          | Custom           | You may download this font, circulate it und use it freely. You may not alter, rename, change copyrights or modify this font in any way. |
 | AS/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
-| Atelier/*                               | Custom           | Copyright © Pyer 2020, used and distributed with permission |
-| AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, used and distributed with permission |
+| Atelier/*                               | Custom           | Copyright © Pyer 2020, used and distributed with permission (TODO ask for it) |
+| AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, used and distributed with permission (TODO ask for it) |
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
-| Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission |
+| Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission (TODO ask for it) |
 | Bidoo/*                                 | CC-BY-NC-ND-4.0  | |
 | cf/*                                    | BSD-3-Clause     | No artwork specific license provided (TODO check intentional) |
 | cf/ArialBlack.ttf                       | Custom           | https://docs.microsoft.com/en-us/typography/fonts/font-faq |
@@ -161,14 +159,9 @@ Bellow follows a list of artwork licenses from potentially coming modules.
 | ihtsyn/LEDCalculator.ttf                | Custom           | Free for personal use |
 | ZZC/*                                   | ??? | See [ZZC#89](https://github.com/zezic/ZZC/issues/89) and [ZZC#90](https://github.com/zezic/ZZC/issues/90) |
 
-TODO: ask permission for:
-- Atelier
-- AudibleInstruments
-- Befaco
-
 ### Rack
 
-Below is a list of artwork licenses from Rack
+Below is a list of artwork licenses from Rack (note most of these will be unused soon)
 
 | Name                            | License(s)       |
 |---------------------------------|------------------|
