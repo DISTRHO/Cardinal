@@ -41,11 +41,17 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 
 Additionally, Cardinal contains the following built-in modules not present in the official plugin or standalone:
 
+ * Amalgamated Harmonics
  * Aria Salvatrice modules (except Arcane related modules, due to their online requirement)
  * Mog (never updated to v2)
  * mscHack (never updated to v2)
+ * rackwindows
+ * repelzen
+ * Audio File
  * Carla Plugin Host
  * Ildaeil Host
+ * glBars (OpenGL bars visualization, as seen in XMMS and XBMC/Kodi)
+ * Text Editor (resizable and with syntax highlight)
  * Host Parameters (24 host-exposed parameters as CV sources)
  * Host Time (play, reset, bar, beat, tick, bar-phase and beat-phase CV sources)
  * Host CV (for the Raw-CV plugin variant, allows direct CV access to/from the DAW)

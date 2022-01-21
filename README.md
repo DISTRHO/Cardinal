@@ -102,7 +102,7 @@ At the moment the following 3rd-party modules are provided:
 - Mog
 - mscHack
 - Prism
-- Rackwindows
+- rackwindows
 - repelzen
 - Sonus Modular
 - Valley
