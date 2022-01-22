@@ -83,6 +83,7 @@ At the moment the following 3rd-party modules are provided:
 - Aria Salvatrice
 - Bacon Music
 - Bogaudio
+- cf
 - ChowDSP
 - DrumKit
 - E-Series
@@ -114,7 +115,6 @@ Potentially coming soon, currently sorting out license situation:
 - Audible Instruments
 - Befaco
 - Bidoo
-- cf
 - Fundamental
 - ihtsyn
 - ZZC

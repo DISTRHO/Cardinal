@@ -251,9 +251,7 @@ extern Model* modelTestVCF;
 #undef modelVCO
 
 // cf
-/*
 #include "cf/src/plugin.hpp"
-*/
 
 // ChowDSP
 #include "ChowDSP/src/plugin.hpp"
@@ -530,7 +528,7 @@ Plugin* pluginInstance__Bacon;
 // Plugin* pluginInstance__Befaco;
 // Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
-// Plugin* pluginInstance__cf;
+Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__ESeries;
@@ -1204,7 +1202,6 @@ static void initStatic__BogaudioModules()
     }
 }
 
-/*
 static void initStatic__cf()
 {
     Plugin* const p = new Plugin;
@@ -1241,7 +1238,6 @@ static void initStatic__cf()
         p->addModel(modelDAVE);
     }
 }
-*/
 
 static void initStatic__ChowDSP()
 {
@@ -1959,7 +1955,7 @@ void initStaticPlugins()
     // initStatic__Befaco();
     // initStatic__Bidoo();
     initStatic__BogaudioModules();
-    // initStatic__cf();
+    initStatic__cf();
     initStatic__ChowDSP();
     initStatic__DrumKit();
     initStatic__ESeries();

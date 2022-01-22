@@ -96,6 +96,10 @@ Below is a list of artwork licenses from plugins
 | BogaudioModules/fonts/inconsolata*.ttf  | OFL-1.1-no-RFN   | |
 | Cardinal/*                              | CC0-1.0          | |
 | Cardinal/Miku/Miku.png                  | CC-BY-NC-3.0     | https://piapro.net/intl/en_for_creators.html |
+| cf/*                                    | BSD-3-Clause     | No artwork specific license provided |
+| cf/DejaVuSansMono.ttf                   | Bitstream-Vera   | |
+| cf/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
+| cf/VT323-Regular.ttf                    | OFL-1.1-no-RFN   | |
 | ChowDSP/*                               | GPL-3.0-or-later | |
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
 | DrumKit/*                               | CC0-1.0          | |
@@ -136,7 +140,7 @@ Below is a list of artwork licenses from plugins
 | ValleyAudio/din1451alt.ttf              | CC-BY-3.0-DE     | |
 | ValleyAudio/DSEG14Classic-*.ttf         | OFL-1.1-RFN      | |
 | ValleyAudio/ShareTechMono-*.ttf         | OFL-1.1-RFN      | |
-| ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided, see [ZetaCarinaeModules#8](https://github.com/mhampton/ZetaCarinaeModules/issues/8) |
+| ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided |
 
 Bellow follows a list of artwork licenses from potentially coming plugins.
 
@@ -150,11 +154,6 @@ Bellow follows a list of artwork licenses from potentially coming plugins.
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
 | Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission (TODO ask for it) |
 | Bidoo/*                                 | CC-BY-NC-ND-4.0  | |
-| cf/*                                    | BSD-3-Clause     | No artwork specific license provided (TODO check intentional) |
-| cf/ArialBlack.ttf                       | Custom           | https://docs.microsoft.com/en-us/typography/fonts/font-faq |
-| cf/DejaVuSansMono.ttf                   | Bitstream-Vera   | |
-| cf/LEDCalculator.ttf                    | Custom           | Free for personal use |
-| cf/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
 | ihtsyn/*                                | GPL-3.0-or-later | No artwork specific license provided, author has deleted this repo |
 | ihtsyn/LEDCalculator.ttf                | Custom           | Free for personal use |
 | ZZC/*                                   | ??? | See [ZZC#89](https://github.com/zezic/ZZC/issues/89) and [ZZC#90](https://github.com/zezic/ZZC/issues/90) |

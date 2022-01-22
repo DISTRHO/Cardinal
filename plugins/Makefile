@@ -412,7 +412,7 @@ PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
 # --------------------------------------------------------------
 # cf
 
-# PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
+PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 
 # --------------------------------------------------------------
 # DrumKit

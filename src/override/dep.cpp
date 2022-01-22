@@ -351,8 +351,7 @@ static const struct {
     { "/Bidoo/ZINC.svg", {}, -1 },
     { "/Bidoo/ZOUMAI.svg", {}, -1 },
     */
-    /*
-    // BSD-3-Clause ??
+    // BSD-3-Clause
     { "/cf/ALGEBRA.svg", {}, -1 },
     { "/cf/BUFFER.svg", {}, -1 },
     { "/cf/CHOKE.svg", {}, -1 },
@@ -379,7 +378,6 @@ static const struct {
     { "/cf/SUB.svg", {}, -1 },
     { "/cf/trSEQ.svg", {}, -1 },
     { "/cf/VARIABLE.svg", {}, -1 },
-    */
     // CC0-1.0
     { "/DrumKit/Baronial.svg", {}, -1 },
     { "/DrumKit/BD9.svg", {}, -1 },
