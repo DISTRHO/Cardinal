@@ -748,8 +748,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         if (module->fCarlaHostHandle == nullptr)
         {
             fDrawingState = kDrawingErrorInit;
-            fPopupError = "Ildaeil backend failed to init properly, cannot continue.";
             fIdleState = kIdleNothing;
+            fPopupError = "Ildaeil backend failed to init properly, cannot continue.";
             return;
         }
 
@@ -857,6 +857,13 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             updatePluginGenericUI(handle);
 
         setDirty(true);
+    }
+
+    void hidePluginUI(const CarlaHostHandle handle)
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(fPluginRunning,);
+
+        carla_show_custom_ui(handle, 0, false);
     }
 
     void createPluginGenericUI(const CarlaHostHandle handle, const CarlaPluginInfo* const info)
@@ -1470,7 +1477,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                     ImGui::CloseCurrentPopup();
 
                 ImGui::SameLine();
-                ImGui::Dummy(ImVec2(500, 1));
+                ImGui::Dummy(ImVec2(500 * getScaleFactor(), 1));
                 ImGui::EndPopup();
             }
             else if (fPluginSearchFirstShow)
@@ -1482,6 +1489,9 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             if (ImGui::InputText("##pluginsearch", fPluginSearchString, sizeof(fPluginSearchString)-1,
                                  ImGuiInputTextFlags_CharsNoBlank|ImGuiInputTextFlags_AutoSelectAll))
                 fPluginSearchActive = true;
+
+            if (ImGui::IsKeyDown(ImGuiKey_Escape))
+                fPluginSearchActive = false;
 
             ImGui::SameLine();
             ImGui::PushItemWidth(-1.0f);
@@ -1510,9 +1520,6 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                     break;
                 }
             }
-
-            if (ImGui::IsKeyDown(ImGuiKey_Escape))
-                fPluginSearchActive = false;
 
             ImGui::BeginDisabled(!fPluginScanningFinished || fPluginSelected < 0);
 
