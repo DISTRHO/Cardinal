@@ -19,6 +19,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Aria Salvatrice         | GPL-3.0-or-later      | |
 | Bacon Music             | GPL-3.0-or-later      | |
 | Bogaudio                | GPL-3.0-or-later      | |
+| cf                      | BSD-3-Clause          | |
 | ChowDSP                 | GPL-3.0-or-later      | |
 | DrumKit                 | CC0-1.0               | |
 | E-Series                | GPL-3.0-or-later      | |
@@ -53,7 +54,6 @@ Bellow follows a list of code licenses from potentially coming modules.
 | Audible Instruments     | GPL-3.0-or-later      | Custom artwork license, needs permission request, also for dark mode |
 | Befaco                  | GPL-3.0-or-later      | Custom artwork license, needs permission request |
 | Bidoo                   | GPL-3.0-or-later      | CC-ND, needs permission for dark mode |
-| cf                      | BSD-3-Clause          | Non-free font use |
 | Fundamental             | GPL-3.0-or-later      | CC-ND, needs permission for dark mode |
 | ihtsyn                  | GPL-3.0-or-later      | Project deleted by author |
 | ZZC                     | GPL-3.0-or-later      | Artwork license terms unclear |
@@ -104,12 +104,12 @@ Below is a list of artwork licenses from plugins
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
-| E-Series/*                              | Custom           | Copyright © Synthesis Technology, used and distributed with permission, see [LICENSE-PERMISSIONS.md#ESeries](LICENSE-PERMISSIONS.md#eseries-paul-schreiber--synthtech) |
-| ExpertSleepers-Encoders/*               | MIT              | Artwork has same license as code, see [vcvrack-encoders#3](https://github.com/expertsleepersltd/vcvrack-encoders/issues/3) |
-| Extratone/*                             | GPL-3.0-or-later | Artwork has same license as code, see [Extratone#7](https://github.com/EaterOfSheep/Extratone/issues/7) |
+| E-Series/*                              | Custom           | Copyright © Synthesis Technology, [used and distributed with permission](LICENSE-PERMISSIONS.md#eseries-paul-schreiber--synthtech) |
+| ExpertSleepers-Encoders/*               | MIT              | |
+| Extratone/*                             | GPL-3.0-or-later | |
 | FehlerFabrik/*                          | GPL-3.0-or-later | No artwork specific license provided, see [FehlerFabrik#17](https://github.com/RCameron93/FehlerFabrik/issues/17) |
 | Fundamental/*                           | CC-BY-NC-ND-4.0  | |
-| GlueTheGiant/*                          | GPL-3.0-or-later | Artwork has same license as code, see [gtg-rack#10](https://github.com/gluethegiant/gtg-rack/issues/10) |
+| GlueTheGiant/*                          | GPL-3.0-or-later | |
 | GlueTheGiant/fonts/DSEG7-*              | OFL-1.1-RFN      | |
 | GrandeModular/*                         | CC-BY-NC-ND-4.0  | |
 | HetrickCV/*                             | CC0-1.0          | No artwork specific license provided |
@@ -133,14 +133,14 @@ Below is a list of artwork licenses from plugins
 | mscHack/*                               | BSD-3-Clause     | No artwork specific license provided, see [mschack#108](https://github.com/mschack/VCV-Rack-Plugins/issues/108) |
 | Prism/*                                 | CC-BY-SA-4.0     | |
 | Prism/RobotoCondensed-Regular.ttf       | Apache-2.0       | |
-| Rackwindows/*                           | MIT              | Artwork uses same license as code, see [rackwindows#15](https://github.com/n0jo/rackwindows/issues/15) |
+| Rackwindows/*                           | MIT              | |
 | repelzen/*                              | CC-BY-SA-4.0     | |
 | sonusmodular/*                          | GPL-3.0-or-later | No artwork specific license provided, see [sonusmodular#14](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
-| ValleyAudio/*                           | GPL-3.0-or-later | No artwork specific license provided, see [ValleyRackFree#73](https://github.com/ValleyAudio/ValleyRackFree/issues/73) |
+| ValleyAudio/*                           | GPL-3.0-or-later | |
 | ValleyAudio/din1451alt.ttf              | CC-BY-3.0-DE     | |
 | ValleyAudio/DSEG14Classic-*.ttf         | OFL-1.1-RFN      | |
 | ValleyAudio/ShareTechMono-*.ttf         | OFL-1.1-RFN      | |
-| ZetaCarinaeModules/*                    | GPL-3.0-or-later | No artwork specific license provided |
+| ZetaCarinaeModules/*                    | GPL-3.0-or-later | |
 
 Bellow follows a list of artwork licenses from potentially coming plugins.
 
