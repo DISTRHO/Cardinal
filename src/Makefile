@@ -124,6 +124,7 @@ IGNORED_FILES += Rack/src/rtaudio.cpp
 IGNORED_FILES += Rack/src/rtmidi.cpp
 IGNORED_FILES += Rack/src/app/MenuBar.cpp
 IGNORED_FILES += Rack/src/app/Scene.cpp
+IGNORED_FILES += Rack/src/app/TipWindow.cpp
 IGNORED_FILES += Rack/src/core/MIDI_CV.cpp
 IGNORED_FILES += Rack/src/engine/Engine.cpp
 IGNORED_FILES += Rack/src/window/Window.cpp
