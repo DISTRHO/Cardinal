@@ -29,10 +29,8 @@ ifneq ($(DEBUG),true)
 CARLA_EXTRA_ARGS += EXTERNAL_PLUGINS=true
 endif
 
-# ifneq ($(MACOS),true)
 CARLA_EXTRA_ARGS += USING_JUCE=false
 CARLA_EXTRA_ARGS += USING_JUCE_GUI_EXTRA=false
-# endif
 
 # --------------------------------------------------------------
 # Check for system-wide dependencies

@@ -1181,11 +1181,15 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         fPluginCount = 0;
         delete[] fPlugins;
 
-        const MutexLocker cml(sPluginInfoLoadMutex);
+        uint count;
 
-        d_stdout("Will scan plugins now...");
-        const uint count = carla_get_cached_plugin_count(fPluginType, path);
-        d_stdout("Scanning found %u plugins", count);
+        {
+            const MutexLocker cml(sPluginInfoLoadMutex);
+
+            d_stdout("Will scan plugins now...");
+            count = carla_get_cached_plugin_count(fPluginType, path);
+            d_stdout("Scanning found %u plugins", count);
+        }
 
         if (fDrawingState == kDrawingLoading)
         {
@@ -1199,6 +1203,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
             for (uint i=0, j; i < count && ! shouldThreadExit(); ++i)
             {
+                const MutexLocker cml(sPluginInfoLoadMutex);
+
                 const CarlaCachedPluginInfo* const info = carla_get_cached_plugin_info(fPluginType, i);
                 DISTRHO_SAFE_ASSERT_CONTINUE(info != nullptr);
 
