@@ -133,3 +133,6 @@
 [submodule "plugins/ihtsyn"]
 	path = plugins/ihtsyn
 	url = https://github.com/CardinalModules/ihtsyn.git
+[submodule "deps/QuickJS"]
+	path = deps/QuickJS
+	url = https://github.com/JerrySievert/QuickJS.git

@@ -200,16 +200,12 @@ else ifeq ($(MACOS),true)
 QUICKJS_MAKE_FLAGS += CONFIG_DARWIN=y
 endif
 
-$(DEP_PATH)/lib/libquickjs.a: $(DEP_PATH)/QuickJS
-	$(DEP_MAKE) $(QUICKJS_MAKE_FLAGS) -C $(DEP_PATH)/QuickJS
+$(DEP_PATH)/lib/libquickjs.a:
+	$(DEP_MAKE) $(QUICKJS_MAKE_FLAGS) -C $(CURDIR)/QuickJS
 	install -d $(DEP_PATH)/include
 	install -d $(DEP_PATH)/lib
-	install -m644 $(DEP_PATH)/QuickJS/libquickjs.a $@
-	install -m644 $(DEP_PATH)/QuickJS/quickjs.h $(DEP_PATH)/include/quickjs.h
-
-$(DEP_PATH)/QuickJS:
-	git clone "https://github.com/JerrySievert/QuickJS.git" $(DEP_PATH)/QuickJS
-	git -C $(DEP_PATH)/QuickJS checkout b70d5344013836544631c361ae20569b978176c9
+	install -m644 $(CURDIR)/QuickJS/libquickjs.a $@
+	install -m644 $(CURDIR)/QuickJS/quickjs.h $(DEP_PATH)/include/quickjs.h
 
 # --------------------------------------------------------------
 # Build targets
