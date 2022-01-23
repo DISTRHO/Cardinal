@@ -26,8 +26,8 @@ Being GPLv2+ the code license is compatible with Cardinal's GPLv3+.
 ## deps
 
 3rd-party libraries build setup.  
-No actual code is hosted here, only a Makefile with steps for fetching source code and build it.  
-It basically overrides Rack's `dep.mk` things for a proper static build, and supporting more platforms.
+No Cardinal specific code is hosted here, only external submodules and a Makefile with steps for fetching extra source code and build it.
+The Makefile overrides Rack's `dep.mk` things for a proper static build, and supporting more platforms.
 
 ## doc
 
@@ -81,11 +81,15 @@ The source code is the same for all the variants, with compiler macros used to t
 A few extra files for having access to a few utilities, code borrowed from Carla, which in turn borrowed it from JUCE.  
 The important one is `SharedResourcePointer`, as a way to easily manage a shared class lifecycle.
 
+### custom
+
+Here are files that are originally from Rack but fully reimplemented in Cardinal.  
+Some of them are just stubs to define function symbols but without an actual implementation, for example disabling network features.
+
 ### override
 
-Here are files that need to be customized by Cardinal, where it is not possible or wanted to use the originals from Rack.  
-This can be for disabling certain features, or simply tweaking engine/UI behaviour.  
-The filenames should be self-explanatory in what they override from Rack.
+Here are files that are very close to the original from Rack but required tweaks for Cardinal.  
+Extra care is needed to ensure these are kept in sync with the originals.
 
 ### Rack
 

@@ -95,17 +95,17 @@ BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
 
 RACK_FILES += AsyncDialog.cpp
 RACK_FILES += CardinalModuleWidget.cpp
+RACK_FILES += custom/asset.cpp
+RACK_FILES += custom/dep.cpp
+RACK_FILES += custom/library.cpp
+RACK_FILES += custom/network.cpp
+RACK_FILES += custom/osdialog.cpp
 RACK_FILES += override/blendish.c
+RACK_FILES += override/context.cpp
 RACK_FILES += override/Engine.cpp
 RACK_FILES += override/MenuBar.cpp
 RACK_FILES += override/MIDI_CV.cpp
 RACK_FILES += override/Scene.cpp
-RACK_FILES += override/asset.cpp
-RACK_FILES += override/context.cpp
-RACK_FILES += override/dep.cpp
-RACK_FILES += override/library.cpp
-RACK_FILES += override/network.cpp
-RACK_FILES += override/osdialog.cpp
 
 RACK_FILES += Rack/dep/pffft/pffft.c
 RACK_FILES += Rack/dep/pffft/fftpack.c
