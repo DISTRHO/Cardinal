@@ -1,0 +1,29 @@
+--- ../Rack/dep/oui-blendish/blendish.c	2021-10-17 13:57:24.613620711 +0100
++++ blendish.c	2021-12-13 09:36:22.182673256 +0000
+@@ -61,7 +61,7 @@
+ }
+ 
+ #else
+-    #define BND_INLINE inline
++    #define BND_INLINE static inline
+     #define bnd_fminf(a, b) fminf(a, b)
+     #define bnd_fmaxf(a, b) fmaxf(a, b)
+     #define bnd_fmin(a, b) fmin(a, b)
+@@ -1061,7 +1061,7 @@
+     // search horizontal position
+     static NVGglyphPosition glyphs[BND_MAX_GLYPHS];
+     int nglyphs = nvgTextGlyphPositions(
+-        ctx, x, y, rows[row].start, rows[row].end + 1, glyphs, BND_MAX_GLYPHS);
++        ctx, x, y, rows[row].start, rows[row].end, glyphs, BND_MAX_GLYPHS);
+     int col, p = 0;
+     for (col = 0; col < nglyphs && glyphs[col].x < px; ++col)
+         p = glyphs[col].str - label;
+@@ -1083,7 +1083,7 @@
+     if (nrows == 0) return;
+     *cx = rows[r].minx;
+     nglyphs = nvgTextGlyphPositions(
+-        ctx, x, y, rows[r].start, rows[r].end+1, glyphs, BND_MAX_GLYPHS);
++        ctx, x, y, rows[r].start, rows[r].end, glyphs, BND_MAX_GLYPHS);
+     for (int i=0; i < nglyphs; ++i) {
+         *cx=glyphs[i].x;
+         if (glyphs[i].str == caret) break;

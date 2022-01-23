@@ -1,0 +1,1052 @@
+--- ../Rack/src/window/Window.cpp	2022-01-05 19:24:25.995101080 +0000
++++ Window.cpp	2022-01-23 17:13:27.375765288 +0000
+@@ -1,33 +1,73 @@
++/*
++ * DISTRHO Cardinal Plugin
++ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * For a full copy of the GNU General Public License see the LICENSE file.
++ */
++
++/**
++ * This file is an edited version of VCVRack's window/Window.cpp
++ * Copyright (C) 2016-2021 VCV.
++ *
++ * This program is free software: you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or (at your option) any later version.
++ */
++
+ #include <map>
+ #include <queue>
+ #include <thread>
+ 
+-#if defined ARCH_MAC
+-	// For CGAssociateMouseAndMouseCursorPosition
+-	#include <ApplicationServices/ApplicationServices.h>
+-#endif
+-
+-#include <stb_image_write.h>
+-#include <osdialog.h>
+-
+ #include <window/Window.hpp>
+ #include <asset.hpp>
+ #include <widget/Widget.hpp>
+ #include <app/Scene.hpp>
+-#include <keyboard.hpp>
+-#include <gamepad.hpp>
+ #include <context.hpp>
+ #include <patch.hpp>
+ #include <settings.hpp>
+ #include <plugin.hpp> // used in Window::screenshot
+ #include <system.hpp> // used in Window::screenshot
+ 
++#ifdef NDEBUG
++# undef DEBUG
++#endif
++
++#include "DistrhoUI.hpp"
++#include "Application.hpp"
++#include "../CardinalCommon.hpp"
++#include "../WindowParameters.hpp"
++
++#ifndef DGL_NO_SHARED_RESOURCES
++# include "src/Resources.hpp"
++#endif
+ 
+ namespace rack {
+ namespace window {
+ 
+ 
+-static const math::Vec WINDOW_SIZE_MIN = math::Vec(480, 320);
++static const math::Vec WINDOW_SIZE_MIN = math::Vec(648, 538);
++
++
++struct FontWithOriginalContext : Font {
++	int ohandle = -1;
++	std::string ofilename;
++};
++
++struct ImageWithOriginalContext : Image {
++	int ohandle = -1;
++	std::string ofilename;
++};
+ 
+ 
+ Font::~Font() {
+@@ -82,369 +122,241 @@
+ struct Window::Internal {
+ 	std::string lastWindowTitle;
+ 
+-	int lastWindowX = 0;
+-	int lastWindowY = 0;
+-	int lastWindowWidth = 0;
+-	int lastWindowHeight = 0;
++	DISTRHO_NAMESPACE::UI* ui = nullptr;
++	DISTRHO_NAMESPACE::WindowParameters params;
++	DISTRHO_NAMESPACE::WindowParametersCallback* callback = nullptr;
++	DGL_NAMESPACE::Application hiddenApp;
++	DGL_NAMESPACE::Window hiddenWindow;
++	NVGcontext* r_vg = nullptr;
++	NVGcontext* r_fbVg = nullptr;
++	NVGcontext* o_vg = nullptr;
++	NVGcontext* o_fbVg = nullptr;
++
++	math::Vec size = WINDOW_SIZE_MIN;
++
++	int mods = 0;
++	int currentRateLimit = 0;
+ 
+ 	int frame = 0;
+-	bool ignoreNextMouseDelta = false;
+-	int frameSwapInterval = -1;
+-	double monitorRefreshRate = 0.0;
++	int frameSwapInterval = 1;
++	double monitorRefreshRate = 60.0;
+ 	double frameTime = 0.0;
+ 	double lastFrameDuration = 0.0;
+ 
+-	math::Vec lastMousePos;
+-
+-	std::map<std::string, std::shared_ptr<Font>> fontCache;
+-	std::map<std::string, std::shared_ptr<Image>> imageCache;
++	std::map<std::string, std::shared_ptr<FontWithOriginalContext>> fontCache;
++	std::map<std::string, std::shared_ptr<ImageWithOriginalContext>> imageCache;
+ 
+ 	bool fbDirtyOnSubpixelChange = true;
+ 	int fbCount = 0;
+-};
+-
+ 
+-static void windowPosCallback(GLFWwindow* win, int x, int y) {
+-	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED))
+-		return;
+-	if (glfwGetWindowAttrib(win, GLFW_ICONIFIED))
+-		return;
+-	if (glfwGetWindowMonitor(win))
+-		return;
+-	settings::windowPos = math::Vec(x, y);
+-	// DEBUG("windowPosCallback %d %d", x, y);
+-}
++	Internal()
++		: hiddenApp(false),
++		  hiddenWindow(hiddenApp) { hiddenApp.idle(); }
++};
+ 
+ 
+-static void windowSizeCallback(GLFWwindow* win, int width, int height) {
+-	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED))
+-		return;
+-	if (glfwGetWindowAttrib(win, GLFW_ICONIFIED))
+-		return;
+-	if (glfwGetWindowMonitor(win))
+-		return;
+-	settings::windowSize = math::Vec(width, height);
+-	// DEBUG("windowSizeCallback %d %d", width, height);
+-}
++#ifndef DGL_NO_SHARED_RESOURCES
++static int loadFallbackFont(NVGcontext* const vg)
++{
++	const int font = nvgFindFont(vg, NANOVG_DEJAVU_SANS_TTF);
++	if (font >= 0)
++		return font;
+ 
++	using namespace dpf_resources;
+ 
+-static void windowMaximizeCallback(GLFWwindow* win, int maximized) {
+-	settings::windowMaximized = maximized;
+-	// DEBUG("windowMaximizeCallback %d", maximized);
++	return nvgCreateFontMem(vg, NANOVG_DEJAVU_SANS_TTF,
++	                        (uchar*)dejavusans_ttf, dejavusans_ttf_size, 0);
+ }
+-
+-
+-static void mouseButtonCallback(GLFWwindow* win, int button, int action, int mods) {
+-	contextSet((Context*) glfwGetWindowUserPointer(win));
+-#if defined ARCH_MAC
+-	// Remap Ctrl-left click to right click on Mac
+-	if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & RACK_MOD_MASK) == GLFW_MOD_CONTROL) {
+-		button = GLFW_MOUSE_BUTTON_RIGHT;
+-		mods &= ~GLFW_MOD_CONTROL;
+-	}
+-	// Remap Ctrl-shift-left click to middle click on Mac
+-	if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & RACK_MOD_MASK) == (GLFW_MOD_CONTROL | GLFW_MOD_SHIFT)) {
+-		button = GLFW_MOUSE_BUTTON_MIDDLE;
+-		mods &= ~(GLFW_MOD_CONTROL | GLFW_MOD_SHIFT);
+-	}
+ #endif
+ 
+-	APP->event->handleButton(APP->window->internal->lastMousePos, button, action, mods);
+-}
+-
+-
+-static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
+-	contextSet((Context*) glfwGetWindowUserPointer(win));
+-	math::Vec mousePos = math::Vec(xpos, ypos).div(APP->window->pixelRatio / APP->window->windowRatio).round();
+-	math::Vec mouseDelta = mousePos.minus(APP->window->internal->lastMousePos);
+ 
+-	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
+-	if (APP->window->internal->ignoreNextMouseDelta) {
+-		APP->window->internal->ignoreNextMouseDelta = false;
+-		mouseDelta = math::Vec();
+-	}
++Window::Window() {
++	internal = new Internal;
+ 
+-	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
+-	(void) cursorMode;
++	DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
+ 
+-#if defined ARCH_MAC
+-	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
+-	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
+-	if (cursorMode == GLFW_CURSOR_HIDDEN) {
+-		// CGSetLocalEventsSuppressionInterval(0.0);
+-		glfwSetCursorPos(win, APP->window->internal->lastMousePos.x, APP->window->internal->lastMousePos.y);
+-		CGAssociateMouseAndMouseCursorPosition(true);
+-		mousePos = APP->window->internal->lastMousePos;
+-	}
+-	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
+-	glfwSetCursor(win, NULL);
++	// Set up NanoVG
++	const int nvgFlags = NVG_ANTIALIAS;
++	vg = nvgCreateGL(nvgFlags);
++	DISTRHO_SAFE_ASSERT_RETURN(vg != nullptr,);
++#ifdef NANOVG_GLES2
++	fbVg = nvgCreateSharedGLES2(vg, nvgFlags);
++#else
++	fbVg = nvgCreateSharedGL2(vg, nvgFlags);
+ #endif
+ 
+-	APP->window->internal->lastMousePos = mousePos;
+-
+-	APP->event->handleHover(mousePos, mouseDelta);
+-
+-	// Keyboard/mouse MIDI driver
+-	int width, height;
+-	glfwGetWindowSize(win, &width, &height);
+-	math::Vec scaledPos(xpos / width, ypos / height);
+-	keyboard::mouseMove(scaledPos);
+-}
+-
+-
+-static void cursorEnterCallback(GLFWwindow* win, int entered) {
+-	contextSet((Context*) glfwGetWindowUserPointer(win));
+-	if (!entered) {
+-		APP->event->handleLeave();
+-	}
+-}
+-
+-
+-static void scrollCallback(GLFWwindow* win, double x, double y) {
+-	contextSet((Context*) glfwGetWindowUserPointer(win));
+-	math::Vec scrollDelta = math::Vec(x, y);
+-#if defined ARCH_MAC
+-	scrollDelta = scrollDelta.mult(10.0);
++	// Load default Blendish font
++#ifndef DGL_NO_SHARED_RESOURCES
++	uiFont = std::make_shared<Font>();
++	uiFont->vg = vg;
++	uiFont->handle = loadFallbackFont(vg);
++
++	std::shared_ptr<FontWithOriginalContext> uiFont2;
++	uiFont2 = std::make_shared<FontWithOriginalContext>();
++	uiFont2->vg = vg;
++	uiFont2->handle = loadFallbackFont(vg);
++	uiFont2->ofilename = asset::system("res/fonts/DejaVuSans.ttf");
++	internal->fontCache[uiFont2->ofilename] = uiFont2;
+ #else
+-	scrollDelta = scrollDelta.mult(50.0);
++	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
+ #endif
+ 
+-	APP->event->handleScroll(APP->window->internal->lastMousePos, scrollDelta);
+-}
+-
+-
+-static void charCallback(GLFWwindow* win, unsigned int codepoint) {
+-	contextSet((Context*) glfwGetWindowUserPointer(win));
+-	if (APP->event->handleText(APP->window->internal->lastMousePos, codepoint))
+-		return;
++	if (uiFont != nullptr)
++		bndSetFont(uiFont->handle);
+ }
+ 
++void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
++{
++	if (ui != nullptr)
++	{
++		const GLubyte* vendor = glGetString(GL_VENDOR);
++		const GLubyte* renderer = glGetString(GL_RENDERER);
++		const GLubyte* version = glGetString(GL_VERSION);
++		INFO("Renderer: %s %s", vendor, renderer);
++		INFO("OpenGL: %s", version);
++
++		window->internal->ui = ui;
++		window->internal->size = rack::math::Vec(ui->getWidth(), ui->getHeight());
++
++		// Set up NanoVG
++		window->internal->r_vg = ui->getContext();
++#ifdef NANOVG_GLES2
++		window->internal->r_fbVg = nvgCreateSharedGLES2(window->internal->r_vg, NVG_ANTIALIAS);
++#else
++		window->internal->r_fbVg = nvgCreateSharedGL2(window->internal->r_vg, NVG_ANTIALIAS);
++#endif
+ 
+-static void keyCallback(GLFWwindow* win, int key, int scancode, int action, int mods) {
+-	contextSet((Context*) glfwGetWindowUserPointer(win));
+-	if (APP->event->handleKey(APP->window->internal->lastMousePos, key, scancode, action, mods))
+-		return;
+-
+-	// Keyboard/mouse MIDI driver
+-	if (action == GLFW_PRESS && (mods & RACK_MOD_MASK) == 0) {
+-		keyboard::press(key);
+-	}
+-	if (action == GLFW_RELEASE) {
+-		keyboard::release(key);
+-	}
+-}
++		// swap contexts
++		window->internal->o_vg = window->vg;
++		window->internal->o_fbVg = window->fbVg;
++		window->vg = window->internal->r_vg;
++		window->fbVg = window->internal->r_fbVg;
++
++		// also for fonts and images
++		window->uiFont->vg = window->vg;
++		window->uiFont->handle = loadFallbackFont(window->vg);
++		for (auto& font : window->internal->fontCache)
++		{
++			font.second->vg = window->vg;
++			font.second->ohandle = font.second->handle;
++			font.second->handle = nvgCreateFont(window->vg,
++			                                    font.second->ofilename.c_str(), font.second->ofilename.c_str());
++		}
++		for (auto& image : window->internal->imageCache)
++		{
++			image.second->vg = window->vg;
++			image.second->ohandle = image.second->handle;
++			image.second->handle = nvgCreateImage(window->vg, image.second->ofilename.c_str(),
++			                                      NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
++		}
+ 
++		// Init settings
++		WindowParametersRestore(window);
+ 
+-static void dropCallback(GLFWwindow* win, int count, const char** paths) {
+-	contextSet((Context*) glfwGetWindowUserPointer(win));
+-	std::vector<std::string> pathsVec;
+-	for (int i = 0; i < count; i++) {
+-		pathsVec.push_back(paths[i]);
++		widget::Widget::ContextCreateEvent e;
++		APP->scene->onContextCreate(e);
+ 	}
+-	APP->event->handleDrop(APP->window->internal->lastMousePos, pathsVec);
+-}
+-
+-
+-static void errorCallback(int error, const char* description) {
+-	WARN("GLFW error %d: %s", error, description);
+-}
+-
+-
+-Window::Window() {
+-	internal = new Internal;
+-	int err;
++	else
++	{
++		widget::Widget::ContextDestroyEvent e;
++		APP->scene->onContextDestroy(e);
+ 
+-	// Set window hints
+-#if defined NANOVG_GL2
+-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+-#elif defined NANOVG_GL3
+-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+-#endif
+-	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+-	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
++		// swap contexts
++		window->uiFont->vg = window->internal->o_vg;
++		window->vg = window->internal->o_vg;
++		window->fbVg = window->internal->o_fbVg;
++		window->internal->o_vg = nullptr;
++		window->internal->o_fbVg = nullptr;
++
++		// also for fonts and images
++		window->uiFont->vg = window->vg;
++		window->uiFont->handle = loadFallbackFont(window->vg);
++		for (auto& font : window->internal->fontCache)
++		{
++			font.second->vg = window->vg;
++			font.second->handle = font.second->ohandle;
++			font.second->ohandle = -1;
++		}
++		for (auto& image : window->internal->imageCache)
++		{
++			image.second->vg = window->vg;
++			image.second->handle = image.second->ohandle;
++			image.second->ohandle = -1;
++		}
+ 
+-#if defined ARCH_MAC
+-	glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
++#if defined NANOVG_GLES2
++		nvgDeleteGLES2(window->internal->r_fbVg);
++#else
++		nvgDeleteGL2(window->internal->r_fbVg);
+ #endif
+ 
+-	// Create window
+-	win = glfwCreateWindow(1024, 720, "", NULL, NULL);
+-	if (!win) {
+-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not open GLFW window. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
+-		throw Exception("Could not create Window");
+-	}
+-
+-	float contentScale;
+-	glfwGetWindowContentScale(win, &contentScale, NULL);
+-	INFO("Window content scale: %f", contentScale);
+-
+-	glfwSetWindowSizeLimits(win, WINDOW_SIZE_MIN.x, WINDOW_SIZE_MIN.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
+-	if (settings::windowSize.x > 0 && settings::windowSize.y > 0) {
+-		glfwSetWindowSize(win, settings::windowSize.x, settings::windowSize.y);
+-	}
+-	if (settings::windowPos.x > -32000 && settings::windowPos.y > -32000) {
+-		glfwSetWindowPos(win, settings::windowPos.x, settings::windowPos.y);
+-	}
+-	if (settings::windowMaximized) {
+-		glfwMaximizeWindow(win);
+-	}
+-	glfwShowWindow(win);
+-
+-	glfwSetWindowUserPointer(win, contextGet());
+-	glfwSetInputMode(win, GLFW_LOCK_KEY_MODS, 1);
+-
+-	glfwMakeContextCurrent(win);
+-	glfwSwapInterval(1);
+-	const GLFWvidmode* monitorMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+-	if (monitorMode->refreshRate > 0) {
+-		internal->monitorRefreshRate = monitorMode->refreshRate;
+-	}
+-	else {
+-		// Some monitors report 0Hz refresh rate for some reason, so as a workaround, assume 60Hz.
+-		internal->monitorRefreshRate = 60;
+-	}
+-
+-	// Set window callbacks
+-	glfwSetWindowPosCallback(win, windowPosCallback);
+-	glfwSetWindowSizeCallback(win, windowSizeCallback);
+-	glfwSetWindowMaximizeCallback(win, windowMaximizeCallback);
+-	glfwSetMouseButtonCallback(win, mouseButtonCallback);
+-	// Call this ourselves, but on every frame instead of only when the mouse moves
+-	// glfwSetCursorPosCallback(win, cursorPosCallback);
+-	glfwSetCursorEnterCallback(win, cursorEnterCallback);
+-	glfwSetScrollCallback(win, scrollCallback);
+-	glfwSetCharCallback(win, charCallback);
+-	glfwSetKeyCallback(win, keyCallback);
+-	glfwSetDropCallback(win, dropCallback);
+-
+-	// Set up GLEW
+-	glewExperimental = GL_TRUE;
+-	err = glewInit();
+-	if (err != GLEW_OK) {
+-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLEW. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
+-		throw Exception("Could not initialize GLEW");
+-	}
+-
+-	const GLubyte* vendor = glGetString(GL_VENDOR);
+-	const GLubyte* renderer = glGetString(GL_RENDERER);
+-	const GLubyte* version = glGetString(GL_VERSION);
+-	INFO("Renderer: %s %s", vendor, renderer);
+-	INFO("OpenGL: %s", version);
+-
+-	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
+-	glGetError();
+-
+-	// Set up NanoVG
+-	int nvgFlags = NVG_ANTIALIAS;
+-#if defined NANOVG_GL2
+-	vg = nvgCreateGL2(nvgFlags);
+-	fbVg = nvgCreateSharedGL2(vg, nvgFlags);
+-#elif defined NANOVG_GL3
+-	vg = nvgCreateGL3(nvgFlags);
+-#elif defined NANOVG_GLES2
+-	vg = nvgCreateGLES2(nvgFlags);
+-#endif
+-	if (!vg) {
+-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize NanoVG. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
+-		throw Exception("Could not initialize NanoVG");
+-	}
+-
+-	// Load default Blendish font
+-	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
+-	bndSetFont(uiFont->handle);
+-
+-	if (APP->scene) {
+-		widget::Widget::ContextCreateEvent e;
+-		APP->scene->onContextCreate(e);
++		window->internal->ui = nullptr;
++		window->internal->callback = nullptr;
+ 	}
+ }
+ 
++void WindowSetMods(Window* const window, const int mods)
++{
++	window->internal->mods = mods;
++}
+ 
+ Window::~Window() {
+-	if (APP->scene) {
+-		widget::Widget::ContextDestroyEvent e;
+-		APP->scene->onContextDestroy(e);
+-	}
+-
+-	// Fonts and Images in the cache must be deleted before the NanoVG context is deleted
+-	internal->fontCache.clear();
+-	internal->imageCache.clear();
+-
+-	// nvgDeleteClone(fbVg);
+-
+-#if defined NANOVG_GL2
+-	nvgDeleteGL2(vg);
+-	nvgDeleteGL2(fbVg);
+-#elif defined NANOVG_GL3
+-	nvgDeleteGL3(vg);
+-#elif defined NANOVG_GLES2
+-	nvgDeleteGLES2(vg);
++	{
++		DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
++		internal->hiddenWindow.close();
++		internal->hiddenApp.idle();
++
++		// Fonts and Images in the cache must be deleted before the NanoVG context is deleted
++		internal->fontCache.clear();
++		internal->imageCache.clear();
++
++#if defined NANOVG_GLES2
++		nvgDeleteGLES2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
++		nvgDeleteGLES2(internal->o_vg != nullptr ? internal->o_vg : vg);
++#else
++		nvgDeleteGL2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
++		nvgDeleteGL2(internal->o_vg != nullptr ? internal->o_vg : vg);
+ #endif
++	}
+ 
+-	glfwDestroyWindow(win);
+ 	delete internal;
+ }
+ 
+ 
+ math::Vec Window::getSize() {
+-	int width, height;
+-	glfwGetWindowSize(win, &width, &height);
+-	return math::Vec(width, height);
++	return internal->size;
+ }
+ 
+ 
+ void Window::setSize(math::Vec size) {
+ 	size = size.max(WINDOW_SIZE_MIN);
+-	glfwSetWindowSize(win, size.x, size.y);
++	internal->size = size;
++
++	if (DISTRHO_NAMESPACE::UI* const ui = internal->ui)
++		ui->setSize(internal->size.x, internal->size.y);
+ }
+ 
+ 
+ void Window::run() {
+ 	internal->frame = 0;
+-	while (!glfwWindowShouldClose(win)) {
+-		step();
+-	}
+ }
+ 
+ 
+ void Window::step() {
++	DISTRHO_SAFE_ASSERT_RETURN(internal->ui != nullptr,);
++
+ 	double frameTime = system::getTime();
+ 	double lastFrameTime = internal->frameTime;
+ 	internal->frameTime = frameTime;
+ 	internal->lastFrameDuration = frameTime - lastFrameTime;
+ 	internal->fbCount = 0;
+ 	// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
+-	// double t1 = 0.0, t2 = 0.0, t3 = 0.0, t4 = 0.0, t5 = 0.0;
+ 
+ 	// Make event handlers and step() have a clean NanoVG context
+ 	nvgReset(vg);
+ 
+-	bndSetFont(uiFont->handle);
+-
+-	// Poll events
+-	// Save and restore context because event handler set their own context based on which window they originate from.
+-	Context* context = contextGet();
+-	glfwPollEvents();
+-	contextSet(context);
+-
+-	// In case glfwPollEvents() sets another OpenGL context
+-	glfwMakeContextCurrent(win);
+-	if (settings::frameSwapInterval != internal->frameSwapInterval) {
+-		glfwSwapInterval(settings::frameSwapInterval);
+-		internal->frameSwapInterval = settings::frameSwapInterval;
+-	}
+-
+-	// Call cursorPosCallback every frame, not just when the mouse moves
+-	{
+-		double xpos, ypos;
+-		glfwGetCursorPos(win, &xpos, &ypos);
+-		cursorPosCallback(win, xpos, ypos);
+-	}
+-	gamepad::step();
++	if (uiFont != nullptr)
++		bndSetFont(uiFont->handle);
+ 
+ 	// Set window title
+ 	std::string windowTitle = APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION;
+@@ -455,31 +367,23 @@
+ 		windowTitle += system::getFilename(APP->patch->path);
+ 	}
+ 	if (windowTitle != internal->lastWindowTitle) {
+-		glfwSetWindowTitle(win, windowTitle.c_str());
++		internal->ui->getWindow().setTitle(windowTitle.c_str());
+ 		internal->lastWindowTitle = windowTitle;
+ 	}
+ 
+ 	// Get desired pixel ratio
+-	float newPixelRatio;
+-	if (settings::pixelRatio > 0.0) {
+-		newPixelRatio = settings::pixelRatio;
+-	}
+-	else {
+-		glfwGetWindowContentScale(win, &newPixelRatio, NULL);
+-		newPixelRatio = std::floor(newPixelRatio + 0.5);
+-	}
++	float newPixelRatio = internal->ui->getScaleFactor();
+ 	if (newPixelRatio != pixelRatio) {
+ 		pixelRatio = newPixelRatio;
+ 		APP->event->handleDirty();
+ 	}
+ 
+ 	// Get framebuffer/window ratio
+-	int fbWidth, fbHeight;
+-	glfwGetFramebufferSize(win, &fbWidth, &fbHeight);
+-	int winWidth, winHeight;
+-	glfwGetWindowSize(win, &winWidth, &winHeight);
++	int winWidth = internal->ui->getWidth();
++	int winHeight = internal->ui->getHeight();
++	int fbWidth = winWidth;// * newPixelRatio;
++	int fbHeight = winHeight;// * newPixelRatio;
+ 	windowRatio = (float)fbWidth / winWidth;
+-	// t1 = system::getTime();
+ 
+ 	if (APP->scene) {
+ 		// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
+@@ -488,13 +392,10 @@
+ 
+ 		// Step scene
+ 		APP->scene->step();
+-		// t2 = system::getTime();
+ 
+ 		// Render scene
+-		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
+-		if (visible) {
++		{
+ 			// Update and render
+-			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
+ 			nvgScale(vg, pixelRatio, pixelRatio);
+ 
+ 			// Draw scene
+@@ -502,196 +403,60 @@
+ 			args.vg = vg;
+ 			args.clipBox = APP->scene->box.zeroPos();
+ 			APP->scene->draw(args);
+-			// t3 = system::getTime();
+ 
+ 			glViewport(0, 0, fbWidth, fbHeight);
+ 			glClearColor(0.0, 0.0, 0.0, 1.0);
+ 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+-			nvgEndFrame(vg);
+-			// t4 = system::getTime();
+ 		}
+ 	}
+ 
+-	glfwSwapBuffers(win);
+-
+-	// On some platforms, glfwSwapBuffers() doesn't wait on monitor refresh, so we have to sleep as a fallback.
+-	double frameDurationRemaining = getFrameDurationRemaining();
+-	if (frameDurationRemaining > 0.0) {
+-		std::this_thread::sleep_for(std::chrono::duration<double>(frameDurationRemaining));
+-	}
+-
+-	// t5 = system::getTime();
+-
+-	// DEBUG("pre-step %6.1f step %6.1f draw %6.1f nvgEndFrame %6.1f glfwSwapBuffers %6.1f total %6.1f",
+-	// 	(t1 - frameTime) * 1e3f,
+-	// 	(t2 - t1) * 1e3f,
+-	// 	(t3 - t2) * 1e3f,
+-	// 	(t4 - t2) * 1e3f,
+-	// 	(t5 - t4) * 1e3f,
+-	// 	(t5 - frameTime) * 1e3f
+-	// );
+-	internal->frame++;
++	++internal->frame;
+ }
+ 
+ 
+ void Window::activateContext() {
+-	glfwMakeContextCurrent(win);
+ }
+ 
+ 
+-static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
+-	for (int y = 0; y < height / 2; y++) {
+-		int flipY = height - y - 1;
+-		uint8_t tmp[width * depth];
+-		std::memcpy(tmp, &pixels[y * width * depth], width * depth);
+-		std::memcpy(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
+-		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
+-	}
++void Window::screenshot(const std::string&) {
+ }
+ 
+ 
+-void Window::screenshot(const std::string& screenshotPath) {
+-	// Get window framebuffer size
+-	int width, height;
+-	glfwGetFramebufferSize(APP->window->win, &width, &height);
+-
+-	// Allocate pixel color buffer
+-	uint8_t* pixels = new uint8_t[height * width * 4];
+-
+-	// glReadPixels defaults to GL_BACK, but the back-buffer is unstable, so use the front buffer (what the user sees)
+-	glReadBuffer(GL_FRONT);
+-	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+-
+-	// Write pixels to PNG
+-	flipBitmap(pixels, width, height, 4);
+-	stbi_write_png(screenshotPath.c_str(), width, height, 4, pixels, width * 4);
+-
+-	delete[] pixels;
+-}
+-
+-
+-void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
+-	// Iterate plugins and create directories
+-	system::createDirectories(screenshotsDir);
+-	for (plugin::Plugin* p : plugin::plugins) {
+-		std::string dir = system::join(screenshotsDir, p->slug);
+-		system::createDirectory(dir);
+-		for (plugin::Model* model : p->models) {
+-			std::string filename = system::join(dir, model->slug + ".png");
+-
+-			// Skip model if screenshot already exists
+-			if (system::isFile(filename))
+-				continue;
+-
+-			INFO("Screenshotting %s %s to %s", p->slug.c_str(), model->slug.c_str(), filename.c_str());
+-
+-			// Create widgets
+-			widget::FramebufferWidget* fbw = new widget::FramebufferWidget;
+-			fbw->oversample = 2;
+-
+-			struct ModuleWidgetContainer : widget::Widget {
+-				void draw(const DrawArgs& args) override {
+-					Widget::draw(args);
+-					Widget::drawLayer(args, 1);
+-				}
+-			};
+-			ModuleWidgetContainer* mwc = new ModuleWidgetContainer;
+-			fbw->addChild(mwc);
+-
+-			app::ModuleWidget* mw = model->createModuleWidget(NULL);
+-			mwc->box.size = mw->box.size;
+-			fbw->box.size = mw->box.size;
+-			mwc->addChild(mw);
+-
+-			// Step to allow the ModuleWidget state to set its default appearance.
+-			fbw->step();
+-
+-			// Draw to framebuffer
+-			fbw->render(math::Vec(zoom, zoom));
+-
+-			// Read pixels
+-			nvgluBindFramebuffer(fbw->getFramebuffer());
+-			int width, height;
+-			nvgImageSize(vg, fbw->getImageHandle(), &width, &height);
+-			uint8_t* pixels = new uint8_t[height * width * 4];
+-			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+-
+-			// Write pixels to PNG
+-			flipBitmap(pixels, width, height, 4);
+-			stbi_write_png(filename.c_str(), width, height, 4, pixels, width * 4);
+-
+-			// Cleanup
+-			delete[] pixels;
+-			nvgluBindFramebuffer(NULL);
+-			delete fbw;
+-		}
+-	}
++void Window::screenshotModules(const std::string&, float) {
+ }
+ 
+ 
+ void Window::close() {
+-	glfwSetWindowShouldClose(win, GLFW_TRUE);
++	DISTRHO_SAFE_ASSERT_RETURN(internal->ui != nullptr,);
++
++	internal->ui->getWindow().close();
+ }
+ 
+ 
+ void Window::cursorLock() {
+-	if (!settings::allowCursorLock)
+-		return;
+-
+-#if defined ARCH_MAC
+-	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+-#else
+-	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+-#endif
+-	internal->ignoreNextMouseDelta = true;
+ }
+ 
+ 
+ void Window::cursorUnlock() {
+-	if (!settings::allowCursorLock)
+-		return;
+-
+-	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+-	internal->ignoreNextMouseDelta = true;
+ }
+ 
+ 
+ bool Window::isCursorLocked() {
+-	return glfwGetInputMode(win, GLFW_CURSOR) != GLFW_CURSOR_NORMAL;
++	return false;
+ }
+ 
+ 
+ int Window::getMods() {
+-	int mods = 0;
+-	if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
+-		mods |= GLFW_MOD_SHIFT;
+-	if (glfwGetKey(win, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
+-		mods |= GLFW_MOD_CONTROL;
+-	if (glfwGetKey(win, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS)
+-		mods |= GLFW_MOD_ALT;
+-	if (glfwGetKey(win, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS)
+-		mods |= GLFW_MOD_SUPER;
+-	return mods;
++	return internal->mods;
+ }
+ 
+ 
+-void Window::setFullScreen(bool fullScreen) {
+-	if (!fullScreen) {
+-		glfwSetWindowMonitor(win, NULL, internal->lastWindowX, internal->lastWindowY, internal->lastWindowWidth, internal->lastWindowHeight, GLFW_DONT_CARE);
+-	}
+-	else {
+-		glfwGetWindowPos(win, &internal->lastWindowX, &internal->lastWindowY);
+-		glfwGetWindowSize(win, &internal->lastWindowWidth, &internal->lastWindowHeight);
+-		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+-		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+-		glfwSetWindowMonitor(win, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+-	}
++void Window::setFullScreen(bool) {
+ }
+ 
+ 
+ bool Window::isFullScreen() {
+-	GLFWmonitor* monitor = glfwGetWindowMonitor(win);
+-	return monitor != NULL;
++	return false;
+ }
+ 
+ 
+@@ -722,14 +487,15 @@
+ 		return pair->second;
+ 
+ 	// Load font
+-	std::shared_ptr<Font> font;
++	std::shared_ptr<FontWithOriginalContext> font;
+ 	try {
+-		font = std::make_shared<Font>();
++		font = std::make_shared<FontWithOriginalContext>();
++		font->ofilename = filename;
+ 		font->loadFile(filename, vg);
+ 	}
+ 	catch (Exception& e) {
+ 		WARN("%s", e.what());
+-		font = NULL;
++		font = nullptr;
+ 	}
+ 	internal->fontCache[filename] = font;
+ 	return font;
+@@ -742,14 +508,15 @@
+ 		return pair->second;
+ 
+ 	// Load image
+-	std::shared_ptr<Image> image;
++	std::shared_ptr<ImageWithOriginalContext> image;
+ 	try {
+-		image = std::make_shared<Image>();
++		image = std::make_shared<ImageWithOriginalContext>();
++		image->ofilename = filename;
+ 		image->loadFile(filename, vg);
+ 	}
+ 	catch (Exception& e) {
+ 		WARN("%s", e.what());
+-		image = NULL;
++		image = nullptr;
+ 	}
+ 	internal->imageCache[filename] = image;
+ 	return image;
+@@ -767,27 +534,116 @@
+ 
+ 
+ void init() {
+-	int err;
+-
+-	// Set up GLFW
+-#if defined ARCH_MAC
+-	glfwInitHint(GLFW_COCOA_CHDIR_RESOURCES, GLFW_TRUE);
+-	glfwInitHint(GLFW_COCOA_MENUBAR, GLFW_FALSE);
+-#endif
+-
+-	glfwSetErrorCallback(errorCallback);
+-	err = glfwInit();
+-	if (err != GLFW_TRUE) {
+-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLFW.");
+-		throw Exception("Could not initialize GLFW");
+-	}
+ }
+ 
+ 
+ void destroy() {
+-	glfwTerminate();
+ }
+ 
+ 
+ } // namespace window
+ } // namespace rack
++
++
++START_NAMESPACE_DISTRHO
++
++void WindowParametersSave(rack::window::Window* const window)
++{
++	if (d_isNotEqual(window->internal->params.cableOpacity, rack::settings::cableOpacity))
++	{
++		window->internal->params.cableOpacity = rack::settings::cableOpacity;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterCableOpacity,
++			                                                    rack::settings::cableOpacity);
++	}
++	if (d_isNotEqual(window->internal->params.cableTension, rack::settings::cableTension))
++	{
++		window->internal->params.cableTension = rack::settings::cableTension;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterCableTension,
++			                                                    rack::settings::cableTension);
++	}
++	if (d_isNotEqual(window->internal->params.rackBrightness, rack::settings::rackBrightness))
++	{
++		window->internal->params.rackBrightness = rack::settings::rackBrightness;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterRackBrightness,
++			                                                    rack::settings::rackBrightness);
++	}
++	if (d_isNotEqual(window->internal->params.haloBrightness, rack::settings::haloBrightness))
++	{
++		window->internal->params.haloBrightness = rack::settings::haloBrightness;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterHaloBrightness,
++			                                                    rack::settings::haloBrightness);
++	}
++	if (d_isNotEqual(window->internal->params.knobScrollSensitivity, rack::settings::knobScrollSensitivity))
++	{
++		window->internal->params.knobScrollSensitivity = rack::settings::knobScrollSensitivity;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterWheelSensitivity,
++			                                                    rack::settings::knobScrollSensitivity);
++	}
++	if (window->internal->params.knobMode != rack::settings::knobMode)
++	{
++		window->internal->params.knobMode = rack::settings::knobMode;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterKnobMode,
++			                                                    rack::settings::knobMode);
++	}
++	if (window->internal->params.tooltips != rack::settings::tooltips)
++	{
++		window->internal->params.tooltips = rack::settings::tooltips;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterShowTooltips,
++			                                                    rack::settings::tooltips);
++	}
++	if (window->internal->params.knobScroll != rack::settings::knobScroll)
++	{
++		window->internal->params.knobScroll = rack::settings::knobScroll;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterWheelKnobControl,
++			                                                    rack::settings::knobScroll);
++	}
++	if (window->internal->params.lockModules != rack::settings::lockModules)
++	{
++		window->internal->params.lockModules = rack::settings::lockModules;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterLockModulePositions,
++			                                                    rack::settings::lockModules);
++	}
++	if (window->internal->params.rateLimit != rack::settings::rateLimit)
++	{
++		window->internal->params.rateLimit = rack::settings::rateLimit;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterUpdateRateLimit,
++			                                                    rack::settings::rateLimit);
++	}
++}
++
++void WindowParametersRestore(rack::window::Window* const window)
++{
++	rack::settings::cableOpacity = window->internal->params.cableOpacity;
++	rack::settings::cableTension = window->internal->params.cableTension;
++	rack::settings::rackBrightness = window->internal->params.rackBrightness;
++	rack::settings::haloBrightness = window->internal->params.haloBrightness;
++	rack::settings::knobScrollSensitivity = window->internal->params.knobScrollSensitivity;
++	rack::settings::knobMode = static_cast<rack::settings::KnobMode>(window->internal->params.knobMode);
++	rack::settings::tooltips = window->internal->params.tooltips;
++	rack::settings::knobScroll = window->internal->params.knobScroll;
++	rack::settings::lockModules = window->internal->params.lockModules;
++	rack::settings::rateLimit = window->internal->params.rateLimit;
++}
++
++void WindowParametersSetCallback(rack::window::Window* const window, WindowParametersCallback* const callback)
++{
++	window->internal->callback = callback;
++}
++
++void WindowParametersSetValues(rack::window::Window* const window, const WindowParameters& params)
++{
++	window->internal->params = params;
++}
++
++END_NAMESPACE_DISTRHO
++

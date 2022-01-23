@@ -1,0 +1,69 @@
+--- ../Rack/src/common.cpp	2021-11-23 19:57:23.719015894 +0000
++++ common.cpp	2022-01-23 17:13:08.824652617 +0000
+@@ -1,6 +1,38 @@
++/*
++ * DISTRHO Cardinal Plugin
++ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * For a full copy of the GNU General Public License see the LICENSE file.
++ */
++
++/**
++ * This file is an edited version of VCVRack's common.cpp
++ * Copyright (C) 2016-2021 VCV.
++ *
++ * This program is free software: you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or (at your option) any later version.
++ */
++
+ #include <common.hpp>
+ #include <string.hpp>
+ 
++#ifdef NDEBUG
++# undef DEBUG
++#endif
++
++#include "DistrhoPluginUtils.hpp"
+ 
+ #if defined ARCH_WIN
+ #include <windows.h>
+@@ -14,20 +46,21 @@
+ 
+ namespace rack {
+ 
+-
+-const std::string APP_NAME = "VCV Rack";
+-const std::string APP_EDITION = "Free";
+-const std::string APP_EDITION_NAME = "Free";
++const std::string APP_NAME = "Cardinal";
++const std::string APP_EDITION = getPluginFormatName();
++const std::string APP_EDITION_NAME = "Audio Plugin";
+ const std::string APP_VERSION_MAJOR = "2";
+-const std::string APP_VERSION = TOSTRING(_APP_VERSION);
++const std::string APP_VERSION = "2.0";
+ #if defined ARCH_WIN
+ 	const std::string APP_OS = "win";
+ #elif ARCH_MAC
+ 	const std::string APP_OS = "mac";
+ #elif defined ARCH_LIN
+ 	const std::string APP_OS = "lin";
++#else
++	#error ARCH_LIN undefined
+ #endif
+-const std::string API_URL = "https://api.vcvrack.com";
++const std::string API_URL = "";
+ 
+ 
+ Exception::Exception(const char* format, ...) {

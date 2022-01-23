@@ -1,0 +1,234 @@
+--- ../Rack/src/app/Scene.cpp	2021-12-14 21:35:44.414568198 +0000
++++ Scene.cpp	2022-01-23 17:13:24.715889665 +0000
+@@ -1,3 +1,30 @@
++/*
++ * DISTRHO Cardinal Plugin
++ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * For a full copy of the GNU General Public License see the LICENSE file.
++ */
++
++/**
++ * This file is an edited version of VCVRack's app/Scene.cpp
++ * Copyright (C) 2016-2021 VCV.
++ *
++ * This program is free software: you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or (at your option) any later version.
++ */
++
+ #include <thread>
+ 
+ #include <osdialog.h>
+@@ -14,31 +41,49 @@
+ #include <patch.hpp>
+ #include <asset.hpp>
+ 
++#include "../CardinalCommon.hpp"
++
+ 
+ namespace rack {
+ namespace app {
+ 
+ 
+ struct ResizeHandle : widget::OpaqueWidget {
+-	math::Vec size;
+-
+ 	void draw(const DrawArgs& args) override {
++		nvgStrokeColor(args.vg, nvgRGBf(1, 1, 1));
++		nvgStrokeWidth(args.vg, 1);
++
+ 		nvgBeginPath(args.vg);
+-		nvgMoveTo(args.vg, box.size.x, box.size.y);
++		nvgMoveTo(args.vg, box.size.x, 0);
+ 		nvgLineTo(args.vg, 0, box.size.y);
+-		nvgLineTo(args.vg, box.size.x, 0);
+-		nvgClosePath(args.vg);
+-		nvgFillColor(args.vg, nvgRGBAf(1, 1, 1, 0.15));
+-		nvgFill(args.vg);
+-	}
++		nvgStroke(args.vg);
+ 
+-	void onDragStart(const DragStartEvent& e) override {
+-		size = APP->window->getSize();
+-	}
++		nvgBeginPath(args.vg);
++		nvgMoveTo(args.vg, box.size.x + 5, 0);
++		nvgLineTo(args.vg, 0, box.size.y + 5);
++		nvgStroke(args.vg);
++
++		nvgBeginPath(args.vg);
++		nvgMoveTo(args.vg, box.size.x + 10, 0);
++		nvgLineTo(args.vg, 0, box.size.y + 10);
++		nvgStroke(args.vg);
++
++		nvgStrokeColor(args.vg, nvgRGBf(0, 0, 0));
++
++		nvgBeginPath(args.vg);
++		nvgMoveTo(args.vg, box.size.x+1, 0);
++		nvgLineTo(args.vg, 0, box.size.y+1);
++		nvgStroke(args.vg);
+ 
+-	void onDragMove(const DragMoveEvent& e) override {
+-		size = size.plus(e.mouseDelta);
+-		APP->window->setSize(size.round());
++		nvgBeginPath(args.vg);
++		nvgMoveTo(args.vg, box.size.x + 6, 0);
++		nvgLineTo(args.vg, 0, box.size.y + 6);
++		nvgStroke(args.vg);
++
++		nvgBeginPath(args.vg);
++		nvgMoveTo(args.vg, box.size.x + 11, 0);
++		nvgLineTo(args.vg, 0, box.size.y + 11);
++		nvgStroke(args.vg);
+ 	}
+ };
+ 
+@@ -46,12 +91,15 @@
+ struct Scene::Internal {
+ 	ResizeHandle* resizeHandle;
+ 
+-	double lastAutosaveTime = 0.0;
+-
+ 	bool heldArrowKeys[4] = {};
+ };
+ 
+ 
++void hideResizeHandle(Scene* scene) {
++	scene->internal->resizeHandle->hide();
++}
++
++
+ Scene::Scene() {
+ 	internal = new Internal;
+ 
+@@ -67,13 +115,8 @@
+ 	browser->hide();
+ 	addChild(browser);
+ 
+-	if (settings::showTipsOnLaunch) {
+-		addChild(tipWindowCreate());
+-	}
+-
+ 	internal->resizeHandle = new ResizeHandle;
+-	internal->resizeHandle->box.size = math::Vec(15, 15);
+-	internal->resizeHandle->hide();
++	internal->resizeHandle->box.size = math::Vec(16, 16);
+ 	addChild(internal->resizeHandle);
+ }
+ 
+@@ -89,32 +132,13 @@
+ 
+ 
+ void Scene::step() {
+-	if (APP->window->isFullScreen()) {
+-		// Expand RackScrollWidget to cover entire screen if fullscreen
+-		rackScroll->box.pos.y = 0;
+-	}
+-	else {
+-		// Always show MenuBar if not fullscreen
+-		menuBar->show();
+-		rackScroll->box.pos.y = menuBar->box.size.y;
+-	}
+-
+ 	internal->resizeHandle->box.pos = box.size.minus(internal->resizeHandle->box.size);
+ 
+ 	// Resize owned descendants
+ 	menuBar->box.size.x = box.size.x;
++	rackScroll->box.pos.y = menuBar->box.size.y;
+ 	rackScroll->box.size = box.size.minus(rackScroll->box.pos);
+ 
+-	// Autosave periodically
+-	if (settings::autosaveInterval > 0.0) {
+-		double time = system::getTime();
+-		if (time - internal->lastAutosaveTime >= settings::autosaveInterval) {
+-			internal->lastAutosaveTime = time;
+-			APP->patch->saveAutosave();
+-			settings::save();
+-		}
+-	}
+-
+ 	// Scroll RackScrollWidget with arrow keys
+ 	math::Vec arrowDelta;
+ 	if (internal->heldArrowKeys[0]) {
+@@ -172,7 +196,7 @@
+ 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
+ 		// DEBUG("key '%d '%c' scancode %d '%c' keyName '%s'", e.key, e.key, e.scancode, e.scancode, e.keyName.c_str());
+ 		if (e.keyName == "n" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+-			APP->patch->loadTemplateDialog();
++			patchUtils::loadTemplateDialog();
+ 			e.consume(this);
+ 		}
+ 		if (e.keyName == "q" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+@@ -180,19 +204,20 @@
+ 			e.consume(this);
+ 		}
+ 		if (e.keyName == "o" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+-			APP->patch->loadDialog();
++			patchUtils::loadDialog();
+ 			e.consume(this);
+ 		}
+ 		if (e.keyName == "o" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
+-			APP->patch->revertDialog();
++			patchUtils::revertDialog();
+ 			e.consume(this);
+ 		}
+ 		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+-			APP->patch->saveDialog();
++			// NOTE: will do nothing if path is empty, intentionally
++			patchUtils::saveDialog(APP->patch->path);
+ 			e.consume(this);
+ 		}
+ 		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
+-			APP->patch->saveAsDialog();
++			patchUtils::saveAsDialog();
+ 			e.consume(this);
+ 		}
+ 		if (e.keyName == "z" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+@@ -232,10 +257,8 @@
+ 			settings::cpuMeter ^= true;
+ 			e.consume(this);
+ 		}
+-		if (e.key == GLFW_KEY_F11 && (e.mods & RACK_MOD_MASK) == 0) {
+-			APP->window->setFullScreen(!APP->window->isFullScreen());
+-			// The MenuBar will be hidden when the mouse moves over the RackScrollWidget.
+-			// menuBar->hide();
++		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
++			patchUtils::deployToMOD();
+ 			e.consume(this);
+ 		}
+ 
+@@ -326,13 +349,6 @@
+ 
+ 	// Key commands that can be overridden by children
+ 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
+-		// Alternate key command for exiting fullscreen, since F11 doesn't work reliably on Mac due to "Show desktop" OS binding.
+-		if (e.key == GLFW_KEY_ESCAPE && (e.mods & RACK_MOD_MASK) == 0) {
+-			if (APP->window->isFullScreen()) {
+-				APP->window->setFullScreen(false);
+-				e.consume(this);
+-			}
+-		}
+ 		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+ 			rack->pasteClipboardAction();
+ 			e.consume(this);
+@@ -351,7 +367,7 @@
+ 		std::string extension = system::getExtension(path);
+ 
+ 		if (extension == ".vcv") {
+-			APP->patch->loadPathDialog(path);
++			patchUtils::loadPathDialog(path);
+ 			e.consume(this);
+ 			return;
+ 		}

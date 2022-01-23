@@ -1,0 +1,129 @@
+--- ../Rack/src/plugin/Model.cpp	2021-10-17 13:57:23.257633662 +0100
++++ Model.cpp	2022-01-23 17:13:22.080013846 +0000
+@@ -1,3 +1,30 @@
++/*
++ * DISTRHO Cardinal Plugin
++ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * For a full copy of the GNU General Public License see the LICENSE file.
++ */
++
++/**
++ * This file is an edited version of VCVRack's plugin/Model.cpp
++ * Copyright (C) 2016-2021 VCV.
++ *
++ * This program is free software: you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or (at your option) any later version.
++ */
++
+ #include <algorithm>
+ 
+ #include <plugin/Model.hpp>
+@@ -17,7 +44,7 @@
+ 
+ 
+ void Model::fromJson(json_t* rootJ) {
+-	assert(plugin);
++	DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr,);
+ 
+ 	json_t* nameJ = json_object_get(rootJ, "name");
+ 	if (nameJ)
+@@ -54,11 +81,6 @@
+ 	if (manualUrlJ)
+ 		manualUrl = json_string_value(manualUrlJ);
+ 
+-	// modularGridUrl
+-	json_t* modularGridUrlJ = json_object_get(rootJ, "modularGridUrl");
+-	if (modularGridUrlJ)
+-		modularGridUrl = json_string_value(modularGridUrlJ);
+-
+ 	// hidden
+ 	json_t* hiddenJ = json_object_get(rootJ, "hidden");
+ 	// Use `disabled` as an alias which was deprecated in Rack 2.0
+@@ -73,7 +95,7 @@
+ 
+ 
+ std::string Model::getFullName() {
+-	assert(plugin);
++	DISTRHO_SAFE_ASSERT_RETURN(plugin, {});
+ 	return plugin->getBrand() + " " + name;
+ }
+ 
+@@ -95,7 +117,7 @@
+ }
+ 
+ 
+-void Model::appendContextMenu(ui::Menu* menu, bool inBrowser) {
++void Model::appendContextMenu(ui::Menu* menu, bool) {
+ 	// plugin
+ 	menu->addChild(createMenuItem("Plugin: " + plugin->name, "", [=]() {
+ 		system::openBrowser(plugin->pluginUrl);
+@@ -132,18 +154,6 @@
+ 
+ 	menu->addChild(new ui::MenuSeparator);
+ 
+-	// VCV Library page
+-	menu->addChild(createMenuItem("VCV Library page", "", [=]() {
+-		system::openBrowser("https://library.vcvrack.com/" + plugin->slug + "/" + slug);
+-	}));
+-
+-	// modularGridUrl
+-	if (modularGridUrl != "") {
+-		menu->addChild(createMenuItem("ModularGrid page", "", [=]() {
+-			system::openBrowser(modularGridUrl);
+-		}));
+-	}
+-
+ 	// manual
+ 	std::string manualUrl = getManualUrl();
+ 	if (manualUrl != "") {
+@@ -172,35 +182,15 @@
+ 			system::openBrowser(plugin->changelogUrl);
+ 		}));
+ 	}
+-
+-	// plugin folder
+-	if (plugin->path != "") {
+-		menu->addChild(createMenuItem("Open plugin folder", "", [=]() {
+-			system::openDirectory(plugin->path);
+-		}));
+-	}
+-
+-	// Favorite
+-	std::string favoriteRightText = inBrowser ? (RACK_MOD_CTRL_NAME "+click") : "";
+-	if (isFavorite())
+-		favoriteRightText += " " CHECKMARK_STRING;
+-	menu->addChild(createMenuItem("Favorite", favoriteRightText,
+-		[=]() {
+-			setFavorite(!isFavorite());
+-		}
+-	));
+ }
+ 
+ 
+ bool Model::isFavorite() {
+-	const settings::ModuleInfo* mi = settings::getModuleInfo(plugin->slug, slug);
+-	return mi && mi->favorite;
++	return false;
+ }
+ 
+ 
+-void Model::setFavorite(bool favorite) {
+-	settings::ModuleInfo& mi = settings::moduleInfos[plugin->slug][slug];
+-	mi.favorite = favorite;
++void Model::setFavorite(bool) {
+ }
+ 
+ 

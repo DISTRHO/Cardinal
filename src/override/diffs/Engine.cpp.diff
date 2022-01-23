@@ -1,0 +1,761 @@
+--- ../Rack/src/engine/Engine.cpp	2022-01-15 14:44:46.395281005 +0000
++++ Engine.cpp	2022-01-23 17:13:03.200930905 +0000
+@@ -1,3 +1,30 @@
++/*
++ * DISTRHO Cardinal Plugin
++ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * For a full copy of the GNU General Public License see the LICENSE file.
++ */
++
++/**
++ * This file is an edited version of VCVRack's engine/Engine.cpp
++ * Copyright (C) 2016-2021 VCV.
++ *
++ * This program is free software: you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or (at your option) any later version.
++ */
++
+ #include <algorithm>
+ #include <set>
+ #include <thread>
+@@ -11,178 +38,25 @@
+ #include <settings.hpp>
+ #include <system.hpp>
+ #include <random.hpp>
+-#include <context.hpp>
+ #include <patch.hpp>
+ #include <plugin.hpp>
+ #include <mutex.hpp>
++#include <helpers.hpp>
++
++#ifdef NDEBUG
++# undef DEBUG
++#endif
+ 
++#include "DistrhoUtils.hpp"
+ 
+ namespace rack {
+ namespace engine {
+ 
+ 
+-static void initMXCSR() {
+-	// Set CPU to flush-to-zero (FTZ) and denormals-are-zero (DAZ) mode
+-	// https://software.intel.com/en-us/node/682949
+-	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+-	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+-	// Reset other flags
+-	_MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
+-}
+-
+-
+-/** Barrier based on mutexes.
+-Not finished or tested, do not use.
+-*/
+-struct Barrier {
+-	int count = 0;
+-	uint8_t step = 0;
+-	int threads = 0;
+-
+-	std::mutex mutex;
+-	std::condition_variable cv;
+-
+-	void setThreads(int threads) {
+-		this->threads = threads;
+-	}
+-
+-	void wait() {
+-		std::unique_lock<std::mutex> lock(mutex);
+-		uint8_t s = step;
+-		if (++count >= threads) {
+-			// We're the last thread. Reset next phase.
+-			count = 0;
+-			// Allow other threads to exit wait()
+-			step++;
+-			cv.notify_all();
+-			return;
+-		}
+-
+-		cv.wait(lock, [&] {
+-			return step != s;
+-		});
+-	}
+-};
+-
+-
+-/** 2-phase barrier based on spin-locking.
+-*/
+-struct SpinBarrier {
+-	std::atomic<int> count{0};
+-	std::atomic<uint8_t> step{0};
+-	int threads = 0;
+-
+-	/** Must be called when no threads are calling wait().
+-	*/
+-	void setThreads(int threads) {
+-		this->threads = threads;
+-	}
+-
+-	void wait() {
+-		uint8_t s = step;
+-		if (count.fetch_add(1, std::memory_order_acquire) + 1 >= threads) {
+-			// We're the last thread. Reset next phase.
+-			count = 0;
+-			// Allow other threads to exit wait()
+-			step++;
+-			return;
+-		}
+-
+-		// Spin until the last thread begins waiting
+-		while (true) {
+-			if (step.load(std::memory_order_relaxed) != s)
+-				return;
+-			__builtin_ia32_pause();
+-		}
+-	}
+-};
+-
+-
+-/** Barrier that spin-locks until yield() is called, and then all threads switch to a mutex.
+-yield() should be called if it is likely that all threads will block for a while and continuing to spin-lock is unnecessary.
+-Saves CPU power after yield is called.
+-*/
+-struct HybridBarrier {
+-	std::atomic<int> count{0};
+-	std::atomic<uint8_t> step{0};
+-	int threads = 0;
+-
+-	std::atomic<bool> yielded{false};
+-	std::mutex mutex;
+-	std::condition_variable cv;
+-
+-	void setThreads(int threads) {
+-		this->threads = threads;
+-	}
+-
+-	void yield() {
+-		yielded = true;
+-	}
+-
+-	void wait() {
+-		uint8_t s = step;
+-		if (count.fetch_add(1, std::memory_order_acquire) + 1 >= threads) {
+-			// We're the last thread. Reset next phase.
+-			count = 0;
+-			bool wasYielded = yielded;
+-			yielded = false;
+-			// Allow other threads to exit wait()
+-			step++;
+-			if (wasYielded) {
+-				std::unique_lock<std::mutex> lock(mutex);
+-				cv.notify_all();
+-			}
+-			return;
+-		}
+-
+-		// Spin until the last thread begins waiting
+-		while (!yielded.load(std::memory_order_relaxed)) {
+-			if (step.load(std::memory_order_relaxed) != s)
+-				return;
+-			__builtin_ia32_pause();
+-		}
+-
+-		// Wait on mutex CV
+-		std::unique_lock<std::mutex> lock(mutex);
+-		cv.wait(lock, [&] {
+-			return step != s;
+-		});
+-	}
+-};
+-
+-
+-struct EngineWorker {
+-	Engine* engine;
+-	int id;
+-	std::thread thread;
+-	bool running = false;
+-
+-	void start() {
+-		assert(!running);
+-		running = true;
+-		thread = std::thread([&] {
+-			run();
+-		});
+-	}
+-
+-	void requestStop() {
+-		running = false;
+-	}
+-
+-	void join() {
+-		assert(thread.joinable());
+-		thread.join();
+-	}
+-
+-	void run();
+-};
+-
+-
+ struct Engine::Internal {
+ 	std::vector<Module*> modules;
+ 	std::vector<Cable*> cables;
+ 	std::set<ParamHandle*> paramHandles;
+-	Module* masterModule = NULL;
+ 
+ 	// moduleId
+ 	std::map<int64_t, Module*> modulesCache;
+@@ -217,22 +91,6 @@
+ 	Readers lock when using the engine's state.
+ 	*/
+ 	SharedMutex mutex;
+-	/** Mutex that guards stepBlock() so it's not called simultaneously.
+-	*/
+-	std::mutex blockMutex;
+-
+-	int threadCount = 0;
+-	std::vector<EngineWorker> workers;
+-	HybridBarrier engineBarrier;
+-	HybridBarrier workerBarrier;
+-	std::atomic<int> workerModuleIndex;
+-	// For worker threads
+-	Context* context;
+-
+-	bool fallbackRunning = false;
+-	std::thread fallbackThread;
+-	std::mutex fallbackMutex;
+-	std::condition_variable fallbackCv;
+ };
+ 
+ 
+@@ -260,71 +118,6 @@
+ }
+ 
+ 
+-static void Engine_relaunchWorkers(Engine* that, int threadCount) {
+-	Engine::Internal* internal = that->internal;
+-	if (threadCount == internal->threadCount)
+-		return;
+-
+-	if (internal->threadCount > 0) {
+-		// Stop engine workers
+-		for (EngineWorker& worker : internal->workers) {
+-			worker.requestStop();
+-		}
+-		internal->engineBarrier.wait();
+-
+-		// Join and destroy engine workers
+-		for (EngineWorker& worker : internal->workers) {
+-			worker.join();
+-		}
+-		internal->workers.resize(0);
+-	}
+-
+-	// Configure engine
+-	internal->threadCount = threadCount;
+-
+-	// Set barrier counts
+-	internal->engineBarrier.setThreads(threadCount);
+-	internal->workerBarrier.setThreads(threadCount);
+-
+-	if (threadCount > 0) {
+-		// Create and start engine workers
+-		internal->workers.resize(threadCount - 1);
+-		for (int id = 1; id < threadCount; id++) {
+-			EngineWorker& worker = internal->workers[id - 1];
+-			worker.id = id;
+-			worker.engine = that;
+-			worker.start();
+-		}
+-	}
+-}
+-
+-
+-static void Engine_stepWorker(Engine* that, int threadId) {
+-	Engine::Internal* internal = that->internal;
+-
+-	// int threadCount = internal->threadCount;
+-	int modulesLen = internal->modules.size();
+-
+-	// Build ProcessArgs
+-	Module::ProcessArgs processArgs;
+-	processArgs.sampleRate = internal->sampleRate;
+-	processArgs.sampleTime = internal->sampleTime;
+-	processArgs.frame = internal->frame;
+-
+-	// Step each module
+-	while (true) {
+-		// Choose next module
+-		// First-come-first serve module-to-thread allocation algorithm
+-		int i = internal->workerModuleIndex++;
+-		if (i >= modulesLen)
+-			break;
+-
+-		Module* module = internal->modules[i];
+-		module->doProcess(processArgs);
+-	}
+-}
+-
+-
+ static void Cable_step(Cable* that) {
+ 	Output* output = &that->outputModule->outputs[that->outputId];
+ 	Input* input = &that->inputModule->inputs[that->inputId];
+@@ -373,12 +166,12 @@
+ 	}
+ 
+ 	// Step cables
+-	for (Cable* cable : that->internal->cables) {
++	for (Cable* cable : internal->cables) {
+ 		Cable_step(cable);
+ 	}
+ 
+ 	// Flip messages for each module
+-	for (Module* module : that->internal->modules) {
++	for (Module* module : internal->modules) {
+ 		if (module->leftExpander.messageFlipRequested) {
+ 			std::swap(module->leftExpander.producerMessage, module->leftExpander.consumerMessage);
+ 			module->leftExpander.messageFlipRequested = false;
+@@ -389,13 +182,18 @@
+ 		}
+ 	}
+ 
+-	// Step modules along with workers
+-	internal->workerModuleIndex = 0;
+-	internal->engineBarrier.wait();
+-	Engine_stepWorker(that, 0);
+-	internal->workerBarrier.wait();
++	// Build ProcessArgs
++	Module::ProcessArgs processArgs;
++	processArgs.sampleRate = internal->sampleRate;
++	processArgs.sampleTime = internal->sampleTime;
++	processArgs.frame = internal->frame;
++
++	// Step each module
++	for (Module* module : internal->modules) {
++		module->doProcess(processArgs);
++	}
+ 
+-	internal->frame++;
++	++internal->frame;
+ }
+ 
+ 
+@@ -460,37 +258,22 @@
+ 
+ Engine::Engine() {
+ 	internal = new Internal;
+-
+-	internal->context = contextGet();
+-	setSuggestedSampleRate(0.f);
+ }
+ 
+ 
+ Engine::~Engine() {
+-	// Stop fallback thread if running
+-	{
+-		std::lock_guard<std::mutex> lock(internal->fallbackMutex);
+-		internal->fallbackRunning = false;
+-		internal->fallbackCv.notify_all();
+-	}
+-	if (internal->fallbackThread.joinable())
+-		internal->fallbackThread.join();
+-
+-	// Shut down workers
+-	Engine_relaunchWorkers(this, 0);
+-
+ 	// Clear modules, cables, etc
+ 	clear();
+ 
+ 	// Make sure there are no cables or modules in the rack on destruction.
+ 	// If this happens, a module must have failed to remove itself before the RackWidget was destroyed.
+-	assert(internal->cables.empty());
+-	assert(internal->modules.empty());
+-	assert(internal->paramHandles.empty());
+-
+-	assert(internal->modulesCache.empty());
+-	assert(internal->cablesCache.empty());
+-	assert(internal->paramHandlesCache.empty());
++	DISTRHO_SAFE_ASSERT(internal->cables.empty());
++	DISTRHO_SAFE_ASSERT(internal->modules.empty());
++	DISTRHO_SAFE_ASSERT(internal->paramHandles.empty());
++
++	DISTRHO_SAFE_ASSERT(internal->modulesCache.empty());
++	DISTRHO_SAFE_ASSERT(internal->cablesCache.empty());
++	DISTRHO_SAFE_ASSERT(internal->paramHandlesCache.empty());
+ 
+ 	delete internal;
+ }
+@@ -526,11 +309,8 @@
+ 	// Start timer before locking
+ 	double startTime = system::getTime();
+ 
+-	std::lock_guard<std::mutex> stepLock(internal->blockMutex);
+ 	SharedLock<SharedMutex> lock(internal->mutex);
+ 	// Configure thread
+-	uint32_t csr = _mm_getcsr();
+-	initMXCSR();
+ 	random::init();
+ 
+ 	internal->blockFrame = internal->frame;
+@@ -543,16 +323,11 @@
+ 		Engine_updateExpander_NoLock(this, module, true);
+ 	}
+ 
+-	// Launch workers
+-	Engine_relaunchWorkers(this, settings::threadCount);
+-
+ 	// Step individual frames
+ 	for (int i = 0; i < frames; i++) {
+ 		Engine_stepFrame(this);
+ 	}
+ 
+-	yieldWorkers();
+-
+ 	internal->block++;
+ 
+ 	// Stop timer
+@@ -572,47 +347,19 @@
+ 		internal->meterTotal = 0.0;
+ 		internal->meterMax = 0.0;
+ 	}
+-
+-	// Reset MXCSR back to original value
+-	_mm_setcsr(csr);
+ }
+ 
+ 
+ void Engine::setMasterModule(Module* module) {
+-	if (module == internal->masterModule)
+-		return;
+-	std::lock_guard<SharedMutex> lock(internal->mutex);
+-	setMasterModule_NoLock(module);
+ }
+ 
+ 
+ void Engine::setMasterModule_NoLock(Module* module) {
+-	if (module == internal->masterModule)
+-		return;
+-
+-	if (internal->masterModule) {
+-		// Dispatch UnsetMasterEvent
+-		Module::UnsetMasterEvent e;
+-		internal->masterModule->onUnsetMaster(e);
+-	}
+-
+-	internal->masterModule = module;
+-
+-	if (internal->masterModule) {
+-		// Dispatch SetMasterEvent
+-		Module::SetMasterEvent e;
+-		internal->masterModule->onSetMaster(e);
+-	}
+-
+-	// Wake up fallback thread if master module was unset
+-	if (!internal->masterModule) {
+-		internal->fallbackCv.notify_all();
+-	}
+ }
+ 
+ 
+ Module* Engine::getMasterModule() {
+-	return internal->masterModule;
++	return nullptr;
+ }
+ 
+ 
+@@ -639,16 +386,6 @@
+ 
+ 
+ void Engine::setSuggestedSampleRate(float suggestedSampleRate) {
+-	if (settings::sampleRate > 0) {
+-		setSampleRate(settings::sampleRate);
+-	}
+-	else if (suggestedSampleRate > 0) {
+-		setSampleRate(suggestedSampleRate);
+-	}
+-	else {
+-		// Fallback sample rate
+-		setSampleRate(44100.f);
+-	}
+ }
+ 
+ 
+@@ -658,7 +395,6 @@
+ 
+ 
+ void Engine::yieldWorkers() {
+-	internal->workerBarrier.yield();
+ }
+ 
+ 
+@@ -738,10 +474,10 @@
+ 
+ void Engine::addModule(Module* module) {
+ 	std::lock_guard<SharedMutex> lock(internal->mutex);
+-	assert(module);
++	DISTRHO_SAFE_ASSERT_RETURN(module,);
+ 	// Check that the module is not already added
+ 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
+-	assert(it == internal->modules.end());
++	DISTRHO_SAFE_ASSERT_RETURN(it == internal->modules.end(),);
+ 	// Set ID if unset or collides with an existing ID
+ 	while (module->id < 0 || internal->modulesCache.find(module->id) != internal->modulesCache.end()) {
+ 		// Randomly generate ID
+@@ -773,10 +509,14 @@
+ 
+ 
+ void Engine::removeModule_NoLock(Module* module) {
+-	assert(module);
++	DISTRHO_SAFE_ASSERT_RETURN(module,);
+ 	// Check that the module actually exists
+ 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
+-	assert(it != internal->modules.end());
++	DISTRHO_SAFE_ASSERT_RETURN(it != internal->modules.end(),);
++	// Remove from widgets cache
++	CardinalPluginModelHelper* const helper = dynamic_cast<CardinalPluginModelHelper*>(module->model);
++	DISTRHO_SAFE_ASSERT_RETURN(helper != nullptr,);
++	helper->removeCachedModuleWidget(module);
+ 	// Dispatch RemoveEvent
+ 	Module::RemoveEvent eRemove;
+ 	module->onRemove(eRemove);
+@@ -785,18 +525,14 @@
+ 		if (paramHandle->moduleId == module->id)
+ 			paramHandle->module = NULL;
+ 	}
+-	// Unset master module
+-	if (getMasterModule() == module) {
+-		setMasterModule_NoLock(NULL);
+-	}
+ 	// If a param is being smoothed on this module, stop smoothing it immediately
+ 	if (module == internal->smoothModule) {
+ 		internal->smoothModule = NULL;
+ 	}
+ 	// Check that all cables are disconnected
+ 	for (Cable* cable : internal->cables) {
+-		assert(cable->inputModule != module);
+-		assert(cable->outputModule != module);
++		DISTRHO_SAFE_ASSERT(cable->inputModule != module);
++		DISTRHO_SAFE_ASSERT(cable->outputModule != module);
+ 	}
+ 	// Update expanders of other modules
+ 	for (Module* m : internal->modules) {
+@@ -844,7 +580,7 @@
+ 
+ void Engine::resetModule(Module* module) {
+ 	std::lock_guard<SharedMutex> lock(internal->mutex);
+-	assert(module);
++	DISTRHO_SAFE_ASSERT_RETURN(module,);
+ 
+ 	Module::ResetEvent eReset;
+ 	module->onReset(eReset);
+@@ -853,7 +589,7 @@
+ 
+ void Engine::randomizeModule(Module* module) {
+ 	std::lock_guard<SharedMutex> lock(internal->mutex);
+-	assert(module);
++	DISTRHO_SAFE_ASSERT_RETURN(module,);
+ 
+ 	Module::RandomizeEvent eRandomize;
+ 	module->onRandomize(eRandomize);
+@@ -861,7 +597,7 @@
+ 
+ 
+ void Engine::bypassModule(Module* module, bool bypassed) {
+-	assert(module);
++	DISTRHO_SAFE_ASSERT_RETURN(module,);
+ 	if (module->isBypassed() == bypassed)
+ 		return;
+ 
+@@ -946,16 +682,16 @@
+ 
+ void Engine::addCable(Cable* cable) {
+ 	std::lock_guard<SharedMutex> lock(internal->mutex);
+-	assert(cable);
++	DISTRHO_SAFE_ASSERT_RETURN(cable,);
+ 	// Check cable properties
+-	assert(cable->inputModule);
+-	assert(cable->outputModule);
++	DISTRHO_SAFE_ASSERT_RETURN(cable->inputModule,);
++	DISTRHO_SAFE_ASSERT_RETURN(cable->outputModule,);
+ 	bool outputWasConnected = false;
+ 	for (Cable* cable2 : internal->cables) {
+ 		// Check that the cable is not already added
+-		assert(cable2 != cable);
++		DISTRHO_SAFE_ASSERT_RETURN(cable2 != cable,);
+ 		// Check that the input is not already used by another cable
+-		assert(!(cable2->inputModule == cable->inputModule && cable2->inputId == cable->inputId));
++		DISTRHO_SAFE_ASSERT_RETURN(!(cable2->inputModule == cable->inputModule && cable2->inputId == cable->inputId),);
+ 		// Get connected status of output, to decide whether we need to call a PortChangeEvent.
+ 		// It's best to not trust `cable->outputModule->outputs[cable->outputId]->isConnected()`
+ 		if (cable2->outputModule == cable->outputModule && cable2->outputId == cable->outputId)
+@@ -996,10 +732,10 @@
+ 
+ 
+ void Engine::removeCable_NoLock(Cable* cable) {
+-	assert(cable);
++	DISTRHO_SAFE_ASSERT_RETURN(cable,);
+ 	// Check that the cable is already added
+ 	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
+-	assert(it != internal->cables.end());
++	DISTRHO_SAFE_ASSERT_RETURN(it != internal->cables.end(),);
+ 	// Remove the cable
+ 	internal->cablesCache.erase(cable->id);
+ 	internal->cables.erase(it);
+@@ -1085,11 +821,11 @@
+ 	std::lock_guard<SharedMutex> lock(internal->mutex);
+ 	// New ParamHandles must be blank.
+ 	// This means we don't have to refresh the cache.
+-	assert(paramHandle->moduleId < 0);
++	DISTRHO_SAFE_ASSERT_RETURN(paramHandle->moduleId < 0,);
+ 
+ 	// Check that the ParamHandle is not already added
+ 	auto it = internal->paramHandles.find(paramHandle);
+-	assert(it == internal->paramHandles.end());
++	DISTRHO_SAFE_ASSERT_RETURN(it == internal->paramHandles.end(),);
+ 
+ 	// Add it
+ 	internal->paramHandles.insert(paramHandle);
+@@ -1106,7 +842,7 @@
+ void Engine::removeParamHandle_NoLock(ParamHandle* paramHandle) {
+ 	// Check that the ParamHandle is already added
+ 	auto it = internal->paramHandles.find(paramHandle);
+-	assert(it != internal->paramHandles.end());
++	DISTRHO_SAFE_ASSERT_RETURN(it != internal->paramHandles.end(),);
+ 
+ 	// Remove it
+ 	paramHandle->module = NULL;
+@@ -1143,7 +879,7 @@
+ void Engine::updateParamHandle_NoLock(ParamHandle* paramHandle, int64_t moduleId, int paramId, bool overwrite) {
+ 	// Check that it exists
+ 	auto it = internal->paramHandles.find(paramHandle);
+-	assert(it != internal->paramHandles.end());
++	DISTRHO_SAFE_ASSERT_RETURN(it != internal->paramHandles.end(),);
+ 
+ 	// Set IDs
+ 	paramHandle->moduleId = moduleId;
+@@ -1197,11 +933,6 @@
+ 	}
+ 	json_object_set_new(rootJ, "cables", cablesJ);
+ 
+-	// masterModule
+-	if (internal->masterModule) {
+-		json_object_set_new(rootJ, "masterModuleId", json_integer(internal->masterModule->id));
+-	}
+-
+ 	return rootJ;
+ }
+ 
+@@ -1225,14 +956,20 @@
+ 		}
+ 		catch (Exception& e) {
+ 			WARN("Cannot load model: %s", e.what());
+-			APP->patch->log(e.what());
++			// APP->patch->log(e.what());
+ 			continue;
+ 		}
+ 
+ 		// Create module
+-		INFO("Creating module %s", model->getFullName().c_str());
+-		Module* module = model->createModule();
+-		assert(module);
++		Module* const module = model->createModule();
++		DISTRHO_SAFE_ASSERT_CONTINUE(module != nullptr);
++
++		// Create the widget too, needed by a few modules
++		CardinalPluginModelHelper* const helper = dynamic_cast<CardinalPluginModelHelper*>(model);
++		DISTRHO_SAFE_ASSERT_CONTINUE(helper != nullptr);
++
++		app::ModuleWidget* const moduleWidget = helper->createModuleWidgetFromEngineLoad(module);
++		DISTRHO_SAFE_ASSERT_CONTINUE(moduleWidget != nullptr);
+ 
+ 		try {
+ 			// This doesn't need a lock because the Module is not added to the Engine yet.
+@@ -1248,7 +985,8 @@
+ 		}
+ 		catch (Exception& e) {
+ 			WARN("Cannot load module: %s", e.what());
+-			APP->patch->log(e.what());
++			// APP->patch->log(e.what());
++			helper->removeCachedModuleWidget(module);
+ 			delete module;
+ 			continue;
+ 		}
+@@ -1285,67 +1023,10 @@
+ 			continue;
+ 		}
+ 	}
+-
+-	// masterModule
+-	json_t* masterModuleIdJ = json_object_get(rootJ, "masterModuleId");
+-	if (masterModuleIdJ) {
+-		Module* masterModule = getModule(json_integer_value(masterModuleIdJ));
+-		setMasterModule(masterModule);
+-	}
+-}
+-
+-
+-void EngineWorker::run() {
+-	// Configure thread
+-	contextSet(engine->internal->context);
+-	system::setThreadName(string::f("Worker %d", id));
+-	initMXCSR();
+-	random::init();
+-
+-	while (true) {
+-		engine->internal->engineBarrier.wait();
+-		if (!running)
+-			return;
+-		Engine_stepWorker(engine, id);
+-		engine->internal->workerBarrier.wait();
+-	}
+-}
+-
+-
+-static void Engine_fallbackRun(Engine* that) {
+-	system::setThreadName("Engine fallback");
+-	contextSet(that->internal->context);
+-
+-	while (that->internal->fallbackRunning) {
+-		if (!that->getMasterModule()) {
+-			// Step blocks and wait
+-			double start = system::getTime();
+-			int frames = std::floor(that->getSampleRate() / 60);
+-			that->stepBlock(frames);
+-			double end = system::getTime();
+-
+-			double duration = frames * that->getSampleTime() - (end - start);
+-			if (duration > 0.0) {
+-				std::this_thread::sleep_for(std::chrono::duration<double>(duration));
+-			}
+-		}
+-		else {
+-			// Wait for master module to be unset, or for the request to stop running
+-			std::unique_lock<std::mutex> lock(that->internal->fallbackMutex);
+-			that->internal->fallbackCv.wait(lock, [&]() {
+-				return !that->internal->fallbackRunning || !that->getMasterModule();
+-			});
+-		}
+-	}
+ }
+ 
+ 
+ void Engine::startFallbackThread() {
+-	if (internal->fallbackThread.joinable())
+-		return;
+-
+-	internal->fallbackRunning = true;
+-	internal->fallbackThread = std::thread(Engine_fallbackRun, this);
+ }
+ 
+ 

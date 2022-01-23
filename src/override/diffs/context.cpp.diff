@@ -1,0 +1,57 @@
+--- ../Rack/src/context.cpp	2022-01-15 14:44:46.391280963 +0000
++++ context.cpp	2022-01-23 17:13:11.652514338 +0000
+@@ -1,3 +1,30 @@
++/*
++ * DISTRHO Cardinal Plugin
++ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * For a full copy of the GNU General Public License see the LICENSE file.
++ */
++
++/**
++ * This file is an edited version of VCVRack's context.cpp
++ * Copyright (C) 2016-2021 VCV.
++ *
++ * This program is free software: you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or (at your option) any later version.
++ */
++
+ #include <context.hpp>
+ #include <window/Window.hpp>
+ #include <patch.hpp>
+@@ -6,9 +33,13 @@
+ #include <history.hpp>
+ #include <settings.hpp>
+ 
++#ifdef NDEBUG
++# undef DEBUG
++#endif
+ 
+-namespace rack {
++#include "DistrhoUtils.hpp"
+ 
++namespace rack {
+ 
+ Context::~Context() {
+ 	// Deleting NULL is safe in C++.
+@@ -44,7 +75,7 @@
+ static thread_local Context* threadContext = NULL;
+ 
+ Context* contextGet() {
+-	assert(threadContext);
++	DISTRHO_SAFE_ASSERT(threadContext != nullptr);
+ 	return threadContext;
+ }
+ 
