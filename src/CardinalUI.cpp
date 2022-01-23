@@ -297,7 +297,9 @@ public:
         // hide "Browse VCV Library" button
         rack::widget::Widget* const browser = context->scene->browser->children.back();
         rack::widget::Widget* const headerLayout = browser->children.front();
+        rack::widget::Widget* const favoriteButton = *std::next(headerLayout->children.begin(), 3);
         rack::widget::Widget* const libraryButton = headerLayout->children.back();
+        favoriteButton->hide();
         libraryButton->hide();
 
         // Report to user if something is wrong with the installation
