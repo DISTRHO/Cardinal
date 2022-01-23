@@ -30,13 +30,6 @@
       "params": [],
       "leftModuleId": 1,
       "rightModuleId": 3,
-      "data": {
-        "channels": 1,
-        "polyMode": 0,
-        "clockDivision": 24,
-        "lastPitch": 8192,
-        "lastMod": 0
-      },
       "pos": [
         5,
         0

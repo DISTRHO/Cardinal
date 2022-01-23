@@ -1,0 +1,359 @@
+--- ../Rack/src/plugin.cpp	2022-01-15 14:44:46.395281005 +0000
++++ plugin.cpp	2022-01-23 22:59:41.770256440 +0000
+@@ -1,308 +1,40 @@
+-#include <thread>
+-#include <map>
+-#include <stdexcept>
+-#include <tuple>
+-
+-#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <unistd.h>
+-#include <sys/param.h> // for MAXPATHLEN
+-#include <fcntl.h>
+-#if defined ARCH_WIN
+-	#include <windows.h>
+-	#include <direct.h>
+-#else
+-	#include <dlfcn.h> // for dlopen
+-#endif
+-#include <dirent.h>
++/*
++ * DISTRHO Cardinal Plugin
++ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * For a full copy of the GNU General Public License see the LICENSE file.
++ */
++
++/**
++ * This file is an edited version of VCVRack's plugin.cpp
++ * Copyright (C) 2016-2021 VCV.
++ *
++ * This program is free software: you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or (at your option) any later version.
++ */
+ 
+-#include <osdialog.h>
+-#include <jansson.h>
++#include <algorithm>
++#include <map>
+ 
+ #include <plugin.hpp>
+-#include <system.hpp>
+-#include <asset.hpp>
+-#include <string.hpp>
+-#include <context.hpp>
+-#include <plugin/callbacks.hpp>
+-#include <settings.hpp>
+ 
+ 
+ namespace rack {
+-
+-namespace core {
+-void init(rack::plugin::Plugin* plugin);
+-} // namespace core
+-
+ namespace plugin {
+ 
+ 
+-////////////////////
+-// private API
+-////////////////////
+-
+-/** Returns library handle */
+-static void* loadLibrary(std::string libraryPath) {
+-#if defined ARCH_WIN
+-	SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
+-	std::wstring libraryFilenameW = string::UTF8toUTF16(libraryPath);
+-	HINSTANCE handle = LoadLibraryW(libraryFilenameW.c_str());
+-	SetErrorMode(0);
+-	if (!handle) {
+-		int error = GetLastError();
+-		throw Exception("Failed to load library %s: code %d", libraryPath.c_str(), error);
+-	}
+-#else
+-	// Since Rack 2, plugins on Linux/Mac link to the absolute path /tmp/Rack2/libRack.<ext>
+-	// Create a symlink at /tmp/Rack2 to the system dir containting libRack.
+-	std::string systemDir = system::getAbsolute(asset::systemDir);
+-	std::string linkPath = "/tmp/Rack2";
+-	if (!settings::devMode) {
+-		// Clean up old symbolic link in case a different edition was run earlier
+-		system::remove(linkPath);
+-		system::createSymbolicLink(systemDir, linkPath);
+-	}
+-	// Load library with dlopen
+-	void* handle = NULL;
+-	#if defined ARCH_LIN
+-	handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
+-	#elif defined ARCH_MAC
+-	handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
+-	#endif
+-	if (!settings::devMode) {
+-		system::remove(linkPath);
+-	}
+-	if (!handle)
+-		throw Exception("Failed to load library %s: %s", libraryPath.c_str(), dlerror());
+-#endif
+-	return handle;
+-}
+-
+-typedef void (*InitCallback)(Plugin*);
+-
+-static InitCallback loadPluginCallback(Plugin* plugin) {
+-	// Load plugin library
+-	std::string libraryExt;
+-#if defined ARCH_LIN
+-	libraryExt = "so";
+-#elif defined ARCH_WIN
+-	libraryExt = "dll";
+-#elif ARCH_MAC
+-	libraryExt = "dylib";
+-#endif
+-	std::string libraryPath = system::join(plugin->path, "plugin." + libraryExt);
+-
+-	// Check file existence
+-	if (!system::isFile(libraryPath))
+-		throw Exception("Plugin binary not found at %s", libraryPath.c_str());
+-
+-	// Load dynamic/shared library
+-	plugin->handle = loadLibrary(libraryPath);
+-
+-	// Get plugin's init() function
+-	InitCallback initCallback;
+-#if defined ARCH_WIN
+-	initCallback = (InitCallback) GetProcAddress((HMODULE) plugin->handle, "init");
+-#else
+-	initCallback = (InitCallback) dlsym(plugin->handle, "init");
+-#endif
+-	if (!initCallback)
+-		throw Exception("Failed to read init() symbol in %s", libraryPath.c_str());
+-
+-	return initCallback;
+-}
+-
+-
+-/** If path is blank, loads Core */
+-static Plugin* loadPlugin(std::string path) {
+-	if (path == "")
+-		INFO("Loading Core plugin");
+-	else
+-		INFO("Loading plugin from %s", path.c_str());
+-
+-	Plugin* plugin = new Plugin;
+-	try {
+-		// Set plugin path
+-		plugin->path = (path == "") ? asset::systemDir : path;
+-
+-		// Get modified timestamp
+-		if (path != "") {
+-			struct stat statbuf;
+-			if (!stat(path.c_str(), &statbuf)) {
+-#if defined ARCH_MAC
+-				plugin->modifiedTimestamp = (double) statbuf.st_mtimespec.tv_sec + statbuf.st_mtimespec.tv_nsec * 1e-9;
+-#elif defined ARCH_WIN
+-				plugin->modifiedTimestamp = (double) statbuf.st_mtime;
+-#elif defined ARCH_LIN
+-				plugin->modifiedTimestamp = (double) statbuf.st_mtim.tv_sec + statbuf.st_mtim.tv_nsec * 1e-9;
+-#endif
+-			}
+-		}
+-
+-		// Load plugin.json
+-		std::string manifestFilename = (path == "") ? asset::system("Core.json") : system::join(path, "plugin.json");
+-		FILE* file = std::fopen(manifestFilename.c_str(), "r");
+-		if (!file)
+-			throw Exception("Manifest file %s does not exist", manifestFilename.c_str());
+-		DEFER({std::fclose(file);});
+-
+-		json_error_t error;
+-		json_t* rootJ = json_loadf(file, 0, &error);
+-		if (!rootJ)
+-			throw Exception("JSON parsing error at %s %d:%d %s", manifestFilename.c_str(), error.line, error.column, error.text);
+-		DEFER({json_decref(rootJ);});
+-
+-		// Call init callback
+-		InitCallback initCallback;
+-		if (path == "") {
+-			initCallback = core::init;
+-		}
+-		else {
+-			initCallback = loadPluginCallback(plugin);
+-		}
+-		initCallback(plugin);
+-
+-		// Load manifest
+-		plugin->fromJson(rootJ);
+-
+-		// Reject plugin if slug already exists
+-		Plugin* existingPlugin = getPlugin(plugin->slug);
+-		if (existingPlugin)
+-			throw Exception("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str());
+-	}
+-	catch (Exception& e) {
+-		WARN("Could not load plugin %s: %s", path.c_str(), e.what());
+-		delete plugin;
+-		return NULL;
+-	}
+-
+-	INFO("Loaded %s v%s", plugin->slug.c_str(), plugin->version.c_str());
+-	plugins.push_back(plugin);
+-	return plugin;
+-}
+-
+-
+-static void loadPlugins(std::string path) {
+-	for (std::string pluginPath : system::getEntries(path)) {
+-		if (!system::isDirectory(pluginPath))
+-			continue;
+-		if (!loadPlugin(pluginPath)) {
+-			// Ignore bad plugins. They are reported in the log.
+-		}
+-	}
+-}
+-
+-
+-static void extractPackages(std::string path) {
+-	std::string message;
+-
+-	for (std::string packagePath : system::getEntries(path)) {
+-		if (!system::isFile(packagePath))
+-			continue;
+-		if (system::getExtension(packagePath) != ".vcvplugin")
+-			continue;
+-
+-		// Extract package
+-		INFO("Extracting package %s", packagePath.c_str());
+-		try {
+-			system::unarchiveToDirectory(packagePath, path);
+-		}
+-		catch (Exception& e) {
+-			WARN("Plugin package %s failed to extract: %s", packagePath.c_str(), e.what());
+-			message += string::f("Could not extract plugin package %s\n", packagePath.c_str());
+-			continue;
+-		}
+-		// Remove package
+-		system::remove(packagePath.c_str());
+-	}
+-	if (!message.empty()) {
+-		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
+-	}
+-}
+-
+-////////////////////
+-// public API
+-////////////////////
+-
+-void init() {
+-	// Don't re-initialize
+-	assert(plugins.empty());
+-
+-	// Load Core
+-	loadPlugin("");
+-
+-	pluginsPath = asset::user("plugins");
+-
+-	// Get user plugins directory
+-	system::createDirectory(pluginsPath);
+-
+-	// Extract packages and load plugins
+-	extractPackages(pluginsPath);
+-	loadPlugins(pluginsPath);
+-
+-	// If Fundamental wasn't loaded, copy the bundled Fundamental package and load it
+-	if (!settings::devMode && !getPlugin("Fundamental")) {
+-		std::string fundamentalSrc = asset::system("Fundamental.vcvplugin");
+-		std::string fundamentalDir = system::join(pluginsPath, "Fundamental");
+-		if (system::isFile(fundamentalSrc)) {
+-			INFO("Extracting bundled Fundamental package");
+-			try {
+-				system::unarchiveToDirectory(fundamentalSrc.c_str(), pluginsPath.c_str());
+-				loadPlugin(fundamentalDir);
+-			}
+-			catch (Exception& e) {
+-				WARN("Could not extract Fundamental package: %s", e.what());
+-			}
+-		}
+-	}
+-}
+-
+-
+-static void destroyPlugin(Plugin* plugin) {
+-	void* handle = plugin->handle;
+-
+-	// Call destroy() if defined in the plugin library
+-	typedef void (*DestroyCallback)();
+-	DestroyCallback destroyCallback = NULL;
+-	if (handle) {
+-#if defined ARCH_WIN
+-		destroyCallback = (DestroyCallback) GetProcAddress((HMODULE) handle, "destroy");
+-#else
+-		destroyCallback = (DestroyCallback) dlsym(handle, "destroy");
+-#endif
+-	}
+-	if (destroyCallback) {
+-		try {
+-			destroyCallback();
+-		}
+-		catch (Exception& e) {
+-			WARN("Could not destroy plugin %s", plugin->slug.c_str());
+-		}
+-	}
+-
+-	// We must delete the Plugin instance *before* freeing the library, because the vtables of Model subclasses are defined in the library, which are needed in the Plugin destructor.
+-	delete plugin;
+-
+-	// Free library handle
+-	if (handle) {
+-#if defined ARCH_WIN
+-		FreeLibrary((HINSTANCE) handle);
+-#else
+-		dlclose(handle);
+-#endif
+-	}
+-}
+-
+-
+-void destroy() {
+-	for (Plugin* plugin : plugins) {
+-		INFO("Destroying plugin %s", plugin->name.c_str());
+-		destroyPlugin(plugin);
+-	}
+-	plugins.clear();
+-}
+-
+-
+ /** Given slug => fallback slug.
+ Correctly handles bidirectional fallbacks.
+ To request fallback slugs to be added to this list, open a GitHub issue.
+@@ -352,6 +84,11 @@
+ */
+ using PluginModuleSlug = std::tuple<std::string, std::string>;
+ static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = {
++	{{"Core", "AudioInterface2"}, {"Cardinal", "HostAudio2"}},
++	{{"Core", "AudioInterface"}, {"Cardinal", "HostAudio8"}},
++	{{"Core", "AudioInterface16"}, {"Cardinal", "HostAudio8"}},
++	{{"Core", "MIDIToCVInterface"}, {"Cardinal", "HostMIDI"}},
++	{{"Core", "CV-MIDI"}, {"Cardinal", "HostMIDI"}},
+ 	{{"MindMeld-ShapeMasterPro", "ShapeMasterPro"}, {"MindMeldModular", "ShapeMaster"}},
+ 	{{"MindMeldModular", "ShapeMaster"}, {"MindMeld-ShapeMasterPro", "ShapeMasterPro"}},
+ 	// {{"", ""}, {"", ""}},
+@@ -441,7 +178,6 @@
+ }
+ 
+ 
+-std::string pluginsPath;
+ std::vector<Plugin*> plugins;
+ 
+ 
