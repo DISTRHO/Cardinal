@@ -74,9 +74,16 @@ struct HostMIDI : Module {
     CardinalPluginContext* const pcontext;
 
     struct MidiInput {
+        // Cardinal specific
         CardinalPluginContext* const pcontext;
         midi::Message converterMsg;
+        const MidiEvent* midiEvents;
+        uint32_t midiEventsLeft;
+        uint32_t midiEventFrame;
+        int64_t lastBlockFrame;
+        bool wasPlaying;
 
+        // stuff from Rack
         bool smooth;
         int channels;
         enum PolyMode {
@@ -126,6 +133,11 @@ struct HostMIDI : Module {
 
         void reset()
         {
+            midiEvents = nullptr;
+            midiEventsLeft = 0;
+            midiEventFrame = 0;
+            lastBlockFrame = -1;
+            wasPlaying = false;
             smooth = true;
             channels = 1;
             polyMode = ROTATE_MODE;
@@ -152,29 +164,44 @@ struct HostMIDI : Module {
 
         void process(const ProcessArgs& args, std::vector<rack::engine::Output>& outputs)
         {
-            DISTRHO_SAFE_ASSERT_RETURN(args.frame >= 0,);
-
+            // Cardinal specific
             const int64_t blockFrame = pcontext->engine->getBlockFrame();
-            DISTRHO_SAFE_ASSERT_RETURN(blockFrame >= 0,);
-            DISTRHO_SAFE_ASSERT_RETURN(args.frame >= blockFrame,);
 
-            /*
             if (lastBlockFrame != blockFrame)
             {
                 lastBlockFrame = blockFrame;
+
+                midiEvents = pcontext->midiEvents;
+                midiEventsLeft = pcontext->midiEventCount;
+                midiEventFrame = 0;
+
+                if (pcontext->playing)
+                {
+                    if (! wasPlaying)
+                    {
+                        wasPlaying = true;
+                        if (pcontext->frame == 0)
+                            startPulse.trigger(1e-3);
+
+                        continuePulse.trigger(1e-3);
+                    }
+                }
+                else if (wasPlaying)
+                {
+                    wasPlaying = false;
+                    stopPulse.trigger(1e-3);
+                }
             }
-            */
 
-            const uint32_t frame = static_cast<uint32_t>(args.frame - blockFrame);
-
-            for (uint32_t i=0; i<pcontext->midiEventCount; ++i)
+            for (uint32_t i=0; i<midiEventsLeft; ++i)
             {
-                const MidiEvent& midiEvent(pcontext->midiEvents[i]);
+                const MidiEvent& midiEvent(*midiEvents);
 
-                if (midiEvent.frame < frame)
-                    continue;
-                if (midiEvent.frame > frame)
+                if (midiEvent.frame > midiEventFrame)
                     break;
+
+                ++midiEvents;
+                --midiEventsLeft;
 
                 const uint8_t* data;
 
@@ -188,12 +215,15 @@ struct HostMIDI : Module {
                     data = midiEvent.data;
                 }
 
-                converterMsg.frame = midiEvent.frame;
+                converterMsg.frame = midiEventFrame;
                 std::memcpy(converterMsg.bytes.data(), data, midiEvent.size);
 
                 processMessage(converterMsg);
             }
 
+            ++midiEventFrame;
+
+            // Rack stuff
             outputs[PITCH_OUTPUT].setChannels(channels);
             outputs[GATE_OUTPUT].setChannels(channels);
             outputs[VELOCITY_OUTPUT].setChannels(channels);
@@ -709,17 +739,18 @@ struct HostMIDIWidget : ModuleWidget {
     {
         menu->addChild(new MenuSeparator);
 
-        /*
-        menu->addChild(createBoolPtrMenuItem("Smooth pitch/mod wheel", "", &module->smooth));
+        menu->addChild(createMenuLabel("MIDI Input"));
+
+        menu->addChild(createBoolPtrMenuItem("Smooth pitch/mod wheel", "", &module->midiInput.smooth));
 
         struct ChannelItem : MenuItem {
-            MIDI_CV* module;
+            HostMIDI* module;
             Menu* createChildMenu() override {
                 Menu* menu = new Menu;
                 for (int c = 1; c <= 16; c++) {
                     menu->addChild(createCheckMenuItem((c == 1) ? "Monophonic" : string::f("%d", c), "",
-                        [=]() {return module->channels == c;},
-                        [=]() {module->setChannels(c);}
+                        [=]() {return module->midiInput.channels == c;},
+                        [=]() {module->midiInput.setChannels(c);}
                     ));
                 }
                 return menu;
@@ -727,7 +758,7 @@ struct HostMIDIWidget : ModuleWidget {
         };
         ChannelItem* channelItem = new ChannelItem;
         channelItem->text = "Polyphony channels";
-        channelItem->rightText = string::f("%d", module->channels) + "  " + RIGHT_ARROW;
+        channelItem->rightText = string::f("%d", module->midiInput.channels) + "  " + RIGHT_ARROW;
         channelItem->module = module;
         menu->addChild(channelItem);
 
@@ -736,12 +767,15 @@ struct HostMIDIWidget : ModuleWidget {
             "Reuse",
             "Reset",
             "MPE",
-        }, &module->polyMode));
+        }, &module->midiInput.polyMode));
+
+        menu->addChild(new MenuSeparator);
+
+        menu->addChild(createMenuLabel("MIDI Input & Output"));
 
         menu->addChild(createMenuItem("Panic", "",
-            [=]() {module->panic();}
+            [=]() { module->midiInput.panic(); module->midiOutput.panic(); }
         ));
-        */
     }
 };
 
