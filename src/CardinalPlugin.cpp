@@ -42,7 +42,7 @@
 #include <list>
 
 #include "DistrhoPluginUtils.hpp"
-#include "PluginDriver.hpp"
+#include "PluginContext.hpp"
 #include "extra/Base64.hpp"
 #include "extra/SharedResourcePointer.hpp"
 
@@ -182,9 +182,6 @@ struct Initializer
                       "Make sure Cardinal was downloaded and installed correctly.", asset::systemDir.c_str());
         }
 
-        INFO("Initializing midi driver");
-        midi::addDriver(0, new CardinalMidiDriver);
-
         INFO("Initializing plugins");
         plugin::initStaticPlugins();
 
@@ -315,6 +312,66 @@ struct Initializer
 
 // -----------------------------------------------------------------------------------------------------------
 
+void CardinalPluginContext::writeMidiMessage(const rack::midi::Message& message)
+{
+    const size_t size = message.bytes.size();
+    DISTRHO_SAFE_ASSERT_RETURN(size > 0,);
+    DISTRHO_SAFE_ASSERT_RETURN(message.frame >= 0,);
+
+    MidiEvent event;
+    event.frame = message.frame;
+
+    switch (message.bytes[0] & 0xF0)
+    {
+    case 0x80:
+    case 0x90:
+    case 0xA0:
+    case 0xB0:
+    case 0xE0:
+        event.size = 3;
+        break;
+    case 0xC0:
+    case 0xD0:
+        event.size = 2;
+        break;
+    case 0xF0:
+        switch (message.bytes[0] & 0x0F)
+        {
+        case 0x0:
+        case 0x4:
+        case 0x5:
+        case 0x7:
+        case 0x9:
+        case 0xD:
+            // unsupported
+            return;
+        case 0x1:
+        case 0x2:
+        case 0x3:
+        case 0xE:
+            event.size = 3;
+            break;
+        case 0x6:
+        case 0x8:
+        case 0xA:
+        case 0xB:
+        case 0xC:
+        case 0xF:
+            event.size = 1;
+            break;
+        }
+        break;
+    }
+
+    DISTRHO_SAFE_ASSERT_RETURN(size >= event.size,);
+
+    std::memcpy(event.data, message.bytes.data(), event.size);
+
+    plugin->writeMidiEvent(event);
+}
+
+// -----------------------------------------------------------------------------------------------------------
+
 struct ScopedContext {
     ScopedContext(const CardinalBasePlugin* const plugin)
     {
@@ -327,6 +384,7 @@ struct ScopedContext {
     }
 };
 
+
 // -----------------------------------------------------------------------------------------------------------
 
 class CardinalPlugin : public CardinalBasePlugin
@@ -335,13 +393,8 @@ class CardinalPlugin : public CardinalBasePlugin
 
     float** fAudioBufferCopy;
     std::string fAutosavePath;
-    String fWindowSize;
-
-    // for base/context handling
-    CardinalMidiInputDevice** fCurrentMidiInputs;
-    CardinalMidiOutputDevice** fCurrentMidiOutputs;
     uint64_t fPreviousFrame;
-    Mutex fDeviceMutex;
+    String fWindowSize;
 
    #ifndef HEADLESS
     // real values, not VCV interpreted ones
@@ -353,8 +406,6 @@ public:
         : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, kCardinalStateCount),
           fInitializer(this),
           fAudioBufferCopy(nullptr),
-          fCurrentMidiInputs(nullptr),
-          fCurrentMidiOutputs(nullptr),
           fPreviousFrame(0)
     {
        #ifndef HEADLESS
@@ -432,14 +483,6 @@ public:
             delete context;
         }
 
-        {
-            const MutexLocker cml(fDeviceMutex);
-            delete[] fCurrentMidiInputs;
-            fCurrentMidiInputs = nullptr;
-            delete[] fCurrentMidiOutputs;
-            fCurrentMidiOutputs = nullptr;
-        }
-
         if (! fAutosavePath.empty())
             rack::system::removeRecursively(fAutosavePath);
     }
@@ -450,101 +493,6 @@ public:
     }
 
 protected:
-   /* --------------------------------------------------------------------------------------------------------
-    * Cardinal Base things */
-
-    void assignMidiInputDevice(CardinalMidiInputDevice* const dev) noexcept override
-    {
-        CardinalMidiInputDevice** const oldDevs = fCurrentMidiInputs;
-
-        uint numDevs = 0;
-        if (oldDevs != nullptr)
-        {
-            while (oldDevs[numDevs] != nullptr)
-                ++numDevs;
-        }
-
-        CardinalMidiInputDevice** const newDevs = new CardinalMidiInputDevice*[numDevs + 2];
-
-        for (uint i=0; i<numDevs; ++i)
-            newDevs[i] = oldDevs[i];
-
-        newDevs[numDevs+0] = dev;
-        newDevs[numDevs+1] = nullptr;
-
-        {
-            const MutexLocker cml(fDeviceMutex);
-            fCurrentMidiInputs = newDevs;
-        }
-
-        delete[] oldDevs;
-    }
-
-    void assignMidiOutputDevice(CardinalMidiOutputDevice* const dev) noexcept override
-    {
-        CardinalMidiOutputDevice** const oldDevs = fCurrentMidiOutputs;
-
-        uint numDevs = 0;
-        if (oldDevs != nullptr)
-        {
-            while (oldDevs[numDevs] != nullptr)
-                ++numDevs;
-        }
-
-        CardinalMidiOutputDevice** const newDevs = new CardinalMidiOutputDevice*[numDevs + 2];
-
-        for (uint i=0; i<numDevs; ++i)
-            newDevs[i] = oldDevs[i];
-
-        newDevs[numDevs+0] = dev;
-        newDevs[numDevs+1] = nullptr;
-
-        {
-            const MutexLocker cml(fDeviceMutex);
-            fCurrentMidiOutputs = newDevs;
-        }
-
-        delete[] oldDevs;
-    }
-
-    void clearMidiInputDevice(CardinalMidiInputDevice* const dev) noexcept override
-    {
-        const MutexLocker cml(fDeviceMutex);
-
-        CardinalMidiInputDevice** const inputs = fCurrentMidiInputs;
-        DISTRHO_SAFE_ASSERT_RETURN(inputs != nullptr,);
-
-        for (uint i=0; inputs[i] != nullptr; ++i)
-        {
-            CardinalMidiInputDevice* const input = inputs[i];
-            if (input != dev)
-                continue;
-            for (; inputs[i+1] != nullptr; ++i)
-                inputs[i] = inputs[i+1];
-            inputs[i] = nullptr;
-            break;
-        }
-    }
-
-    void clearMidiOutputDevice(CardinalMidiOutputDevice* const dev) noexcept override
-    {
-        const MutexLocker cml(fDeviceMutex);
-
-        CardinalMidiOutputDevice** const outputs = fCurrentMidiOutputs;
-        DISTRHO_SAFE_ASSERT_RETURN(outputs != nullptr,);
-
-        for (uint i=0; outputs[i] != nullptr; ++i)
-        {
-            CardinalMidiOutputDevice* const output = outputs[i];
-            if (output != dev)
-                continue;
-            for (; outputs[i+1] != nullptr; ++i)
-                outputs[i] = outputs[i+1];
-            outputs[i] = nullptr;
-            break;
-        }
-    }
-
    /* --------------------------------------------------------------------------------------------------------
     * Information */
 
@@ -875,32 +823,22 @@ protected:
         }
     }
 
-    inline void sendSingleSimpleMidiMessage(const MidiEvent& midiEvent)
-    {
-        if (CardinalMidiInputDevice** inputs = fCurrentMidiInputs)
-        {
-            for (;*inputs != nullptr; ++inputs)
-                (*inputs)->handleSingleSimpleMessageFromHost(midiEvent);
-        }
-    }
-
     void run(const float** const inputs, float** const outputs, const uint32_t frames,
              const MidiEvent* const midiEvents, const uint32_t midiEventCount) override
     {
-        const MutexLocker cml(fDeviceMutex);
         rack::contextSet(context);
 
         {
             const TimePosition& timePos(getTimePosition());
 
             bool reset = false;
-            MidiEvent singleTimeMidiEvent = { 0, 1, { 0, 0, 0, 0 }, nullptr };
 
             if (timePos.playing)
             {
                 if (timePos.frame == 0 || fPreviousFrame + frames != timePos.frame)
                     reset = true;
 
+                /*
                 if (! context->playing)
                 {
                     if (timePos.frame == 0)
@@ -912,11 +850,14 @@ protected:
                     singleTimeMidiEvent.data[0] = 0xFB; // continue
                     sendSingleSimpleMidiMessage(singleTimeMidiEvent);
                 }
+                */
             }
             else if (context->playing)
             {
+                /*
                 singleTimeMidiEvent.data[0] = 0xFC; // stop
                 sendSingleSimpleMidiMessage(singleTimeMidiEvent);
+                */
             }
 
             context->playing = timePos.playing;
@@ -945,12 +886,6 @@ protected:
             fPreviousFrame = timePos.frame;
         }
 
-        if (CardinalMidiInputDevice** inputs = fCurrentMidiInputs)
-        {
-            for (;*inputs != nullptr; ++inputs)
-                (*inputs)->handleMessagesFromHost(midiEvents, midiEventCount);
-        }
-
         // separate buffers, use them
         if (inputs != outputs && (inputs == nullptr || inputs[0] != outputs[0]))
         {
@@ -969,6 +904,9 @@ protected:
 
         for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
             std::memset(outputs[i], 0, sizeof(float)*frames);
+
+        context->midiEvents = midiEvents;
+        context->midiEventCount = midiEventCount;
 
         context->engine->stepBlock(frames);
     }

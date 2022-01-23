@@ -60,6 +60,8 @@ struct CardinalPluginContext : rack::Context {
     uintptr_t nativeWindowId;
     const float* const* dataIns;
     float** dataOuts;
+    const MidiEvent* midiEvents;
+    uint32_t midiEventCount;
     Plugin* const plugin;
 #ifndef HEADLESS
     UI* ui;
@@ -95,6 +97,8 @@ struct CardinalPluginContext : rack::Context {
           nativeWindowId(0),
           dataIns(nullptr),
           dataOuts(nullptr),
+          midiEvents(nullptr),
+          midiEventCount(0),
           plugin(p)
 #ifndef HEADLESS
         , ui(nullptr)
@@ -102,6 +106,8 @@ struct CardinalPluginContext : rack::Context {
     {
         std::memset(parameters, 0, sizeof(parameters));
     }
+
+    void writeMidiMessage(const rack::midi::Message& message);
 
 #ifndef HEADLESS
     bool addIdleCallback(IdleCallback* cb) const;
@@ -129,10 +135,6 @@ public:
         : Plugin(parameterCount, programCount, stateCount),
           context(new CardinalPluginContext(this)) {}
     ~CardinalBasePlugin() override {}
-    virtual void assignMidiInputDevice(CardinalMidiInputDevice* dev) noexcept = 0;
-    virtual void assignMidiOutputDevice(CardinalMidiOutputDevice* dev) noexcept = 0;
-    virtual void clearMidiInputDevice(CardinalMidiInputDevice* dev) noexcept = 0;
-    virtual void clearMidiOutputDevice(CardinalMidiOutputDevice* dev) noexcept = 0;
 };
 
 #ifndef HEADLESS

@@ -42,6 +42,14 @@ enum CardinalVariant {
 class Plugin;
 class UI;
 
+struct MidiEvent {
+    static const uint32_t kDataSize = 4;
+    uint32_t frame;
+    uint32_t size;
+    uint8_t data[kDataSize];
+    const uint8_t* dataExt;
+};
+
 struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize;
     double sampleRate;
@@ -55,11 +63,14 @@ struct CardinalPluginContext : rack::Context {
     uintptr_t nativeWindowId;
     const float* const* dataIns;
     float** dataOuts;
+    const MidiEvent* midiEvents;
+    uint32_t midiEventCount;
     Plugin* const plugin;
 #ifndef HEADLESS
     UI* ui;
 #endif
     CardinalPluginContext(Plugin* const p);
+    void writeMidiMessage(const rack::midi::Message& message);
 #ifndef HEADLESS
     bool addIdleCallback(IdleCallback* cb) const;
     void removeIdleCallback(IdleCallback* cb) const;
