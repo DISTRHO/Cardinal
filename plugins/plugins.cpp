@@ -570,7 +570,7 @@ namespace core {
 extern Model* modelAudio2;
 extern Model* modelAudio8;
 extern Model* modelAudio16;
-extern Model* modelMIDI_CV_Cardinal;
+extern Model* modelMIDI_CV;
 extern Model* modelMIDICC_CV;
 extern Model* modelMIDI_Gate;
 extern Model* modelMIDIMap;
@@ -673,7 +673,7 @@ static void initStatic__Core()
         p->addModel(rack::core::modelAudio2);
         p->addModel(rack::core::modelAudio8);
         p->addModel(rack::core::modelAudio16);
-        p->addModel(rack::core::modelMIDI_CV_Cardinal);
+        p->addModel(rack::core::modelMIDI_CV);
         p->addModel(rack::core::modelMIDICC_CV);
         p->addModel(rack::core::modelMIDI_Gate);
         p->addModel(rack::core::modelMIDIMap);
