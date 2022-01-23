@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,7 +16,7 @@
  */
 
 /**
- * This file is an edited version of VCVRack's Window.cpp
+ * This file is an edited version of VCVRack's window/Window.cpp
  * Copyright (C) 2016-2021 VCV.
  *
  * This program is free software: you can redistribute it and/or
@@ -56,7 +56,23 @@ namespace rack {
 namespace window {
 
 
-static const math::Vec minWindowSize = math::Vec(648, 538);
+static const math::Vec WINDOW_SIZE_MIN = math::Vec(648, 538);
+
+
+struct FontWithOriginalContext : Font {
+	int ohandle = -1;
+	std::string ofilename;
+};
+
+struct ImageWithOriginalContext : Image {
+	int ohandle = -1;
+	std::string ofilename;
+};
+
+
+Font::~Font() {
+	// There is no NanoVG deleteFont() function yet, so do nothing
+}
 
 
 void Font::loadFile(const std::string& filename, NVGcontext* vg) {
@@ -75,13 +91,15 @@ void Font::loadFile(const std::string& filename, NVGcontext* vg) {
 }
 
 
-Font::~Font() {
-	// There is no NanoVG deleteFont() function yet, so do nothing
+std::shared_ptr<Font> Font::load(const std::string& filename) {
+	return APP->window->loadFont(filename);
 }
 
 
-std::shared_ptr<Font> Font::load(const std::string& filename) {
-	return APP->window->loadFont(filename);
+Image::~Image() {
+	// TODO What if handle is invalid?
+	if (handle >= 0)
+		nvgDeleteImage(vg, handle);
 }
 
 
@@ -96,30 +114,14 @@ void Image::loadFile(const std::string& filename, NVGcontext* vg) {
 }
 
 
-Image::~Image() {
-	// TODO What if handle is invalid?
-	if (handle >= 0)
-		nvgDeleteImage(vg, handle);
-}
-
-
 std::shared_ptr<Image> Image::load(const std::string& filename) {
 	return APP->window->loadImage(filename);
 }
 
 
-struct FontWithOriginalContext : Font {
-	int ohandle = -1;
-	std::string ofilename;
-};
-
-struct ImageWithOriginalContext : Image {
-	int ohandle = -1;
-	std::string ofilename;
-};
-
-
 struct Window::Internal {
+	std::string lastWindowTitle;
+
 	DISTRHO_NAMESPACE::UI* ui = nullptr;
 	DISTRHO_NAMESPACE::WindowParameters params;
 	DISTRHO_NAMESPACE::WindowParametersCallback* callback = nullptr;
@@ -130,16 +132,16 @@ struct Window::Internal {
 	NVGcontext* o_vg = nullptr;
 	NVGcontext* o_fbVg = nullptr;
 
-	math::Vec size = minWindowSize;
-	std::string lastWindowTitle;
+	math::Vec size = WINDOW_SIZE_MIN;
 
 	int mods = 0;
+	int currentRateLimit = 0;
+
 	int frame = 0;
 	int frameSwapInterval = 1;
-	double monitorRefreshRate = 60.0; // FIXME
+	double monitorRefreshRate = 60.0;
 	double frameTime = 0.0;
 	double lastFrameDuration = 0.0;
-	int currentRateLimit = 0;
 
 	std::map<std::string, std::shared_ptr<FontWithOriginalContext>> fontCache;
 	std::map<std::string, std::shared_ptr<ImageWithOriginalContext>> imageCache;
@@ -327,7 +329,8 @@ math::Vec Window::getSize() {
 
 
 void Window::setSize(math::Vec size) {
-	internal->size = size.max(minWindowSize);
+	size = size.max(WINDOW_SIZE_MIN);
+	internal->size = size;
 
 	if (DISTRHO_NAMESPACE::UI* const ui = internal->ui)
 		ui->setSize(internal->size.x, internal->size.y);
@@ -391,21 +394,27 @@ void Window::step() {
 		APP->scene->step();
 
 		// Render scene
-		// Update and render
-		nvgScale(vg, pixelRatio, pixelRatio);
+		{
+			// Update and render
+			nvgScale(vg, pixelRatio, pixelRatio);
 
-		// Draw scene
-		widget::Widget::DrawArgs args;
-		args.vg = vg;
-		args.clipBox = APP->scene->box.zeroPos();
-		APP->scene->draw(args);
+			// Draw scene
+			widget::Widget::DrawArgs args;
+			args.vg = vg;
+			args.clipBox = APP->scene->box.zeroPos();
+			APP->scene->draw(args);
 
-		glViewport(0, 0, fbWidth, fbHeight);
-		glClearColor(0.0, 0.0, 0.0, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			glViewport(0, 0, fbWidth, fbHeight);
+			glClearColor(0.0, 0.0, 0.0, 1.0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		}
 	}
 
 	++internal->frame;
+}
+
+
+void Window::activateContext() {
 }
 
 
@@ -521,6 +530,14 @@ bool& Window::fbDirtyOnSubpixelChange() {
 
 int& Window::fbCount() {
 	return internal->fbCount;
+}
+
+
+void init() {
+}
+
+
+void destroy() {
 }
 
 

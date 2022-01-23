@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -46,26 +46,33 @@ Context::~Context() {
 
 	// Set pointers to NULL so other objects will segfault when attempting to access them
 
+	INFO("Deleting window");
 	delete window;
 	window = NULL;
 
+	INFO("Deleting patch manager");
 	delete patch;
 	patch = NULL;
 
+	INFO("Deleting scene");
 	delete scene;
 	scene = NULL;
 
+	INFO("Deleting event state");
 	delete event;
 	event = NULL;
 
+	INFO("Deleting history state");
 	delete history;
 	history = NULL;
 
+	INFO("Deleting engine");
 	delete engine;
 	engine = NULL;
 }
 
-static thread_local Context* threadContext = nullptr;
+
+static thread_local Context* threadContext = NULL;
 
 Context* contextGet() {
 	DISTRHO_SAFE_ASSERT(threadContext != nullptr);
@@ -76,9 +83,9 @@ Context* contextGet() {
 #ifdef ARCH_MAC
 __attribute__((optnone))
 #endif
-void contextSet(Context* const context) {
-	// DISTRHO_SAFE_ASSERT(threadContext == nullptr);
+void contextSet(Context* context) {
 	threadContext = context;
 }
+
 
 } // namespace rack

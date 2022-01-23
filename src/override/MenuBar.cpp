@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,7 +16,7 @@
  */
 
 /**
- * This file is an edited version of VCVRack's MenuBar.cpp
+ * This file is an edited version of VCVRack's app/MenuBar.cpp
  * Copyright (C) 2016-2021 VCV.
  *
  * This program is free software: you can redistribute it and/or
@@ -160,7 +160,6 @@ struct FileButton : MenuButton {
 
 		// Load selection
 		menu->addChild(createMenuItem("Import selection", "", [=]() {
-			// APP->scene->rack->loadSelectionDialog();
 			patchUtils::loadSelectionDialog();
 		}, false, true));
 
@@ -622,7 +621,6 @@ struct MenuBar : widget::OpaqueWidget {
 
 	MenuBar(const bool isStandalone)
 		: widget::OpaqueWidget()
-		// : context(ctx)
     {
 		const float margin = 5;
 		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;

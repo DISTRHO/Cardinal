@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,7 +16,7 @@
  */
 
 /**
- * This file is an edited version of VCVRack's Engine.cpp
+ * This file is an edited version of VCVRack's engine/Engine.cpp
  * Copyright (C) 2016-2021 VCV.
  *
  * This program is free software: you can redistribute it and/or

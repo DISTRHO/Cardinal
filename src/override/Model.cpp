@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,7 +16,7 @@
  */
 
 /**
- * This file is an edited version of VCVRack's Model.cpp
+ * This file is an edited version of VCVRack's plugin/Model.cpp
  * Copyright (C) 2016-2021 VCV.
  *
  * This program is free software: you can redistribute it and/or
@@ -44,7 +44,7 @@ namespace plugin {
 
 
 void Model::fromJson(json_t* rootJ) {
-	assert(plugin);
+	DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr,);
 
 	json_t* nameJ = json_object_get(rootJ, "name");
 	if (nameJ)
@@ -95,7 +95,7 @@ void Model::fromJson(json_t* rootJ) {
 
 
 std::string Model::getFullName() {
-	assert(plugin);
+	DISTRHO_SAFE_ASSERT_RETURN(plugin, {});
 	return plugin->getBrand() + " " + name;
 }
 
