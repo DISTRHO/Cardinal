@@ -162,12 +162,13 @@ struct HostMIDI : Module {
             heldNotes.clear();
         }
 
-        void process(const ProcessArgs& args, std::vector<rack::engine::Output>& outputs)
+        bool process(const ProcessArgs& args, std::vector<rack::engine::Output>& outputs)
         {
             // Cardinal specific
             const int64_t blockFrame = pcontext->engine->getBlockFrame();
+            const bool blockFrameChanged = lastBlockFrame != blockFrame;
 
-            if (lastBlockFrame != blockFrame)
+            if (blockFrameChanged)
             {
                 lastBlockFrame = blockFrame;
 
@@ -261,6 +262,8 @@ struct HostMIDI : Module {
             outputs[START_OUTPUT].setVoltage(startPulse.process(args.sampleTime) ? 10.f : 0.f);
             outputs[STOP_OUTPUT].setVoltage(stopPulse.process(args.sampleTime) ? 10.f : 0.f);
             outputs[CONTINUE_OUTPUT].setVoltage(continuePulse.process(args.sampleTime) ? 10.f : 0.f);
+
+            return blockFrameChanged;
         }
 
         void processMessage(const midi::Message& msg) {
@@ -554,7 +557,10 @@ struct HostMIDI : Module {
 
     void process(const ProcessArgs& args) override
     {
-        midiInput.process(args, outputs);
+        if (midiInput.process(args, outputs))
+            midiOutput.frame = 0;
+        else
+            ++midiOutput.frame;
 
         // MIDI baud rate is 31250 b/s, or 3125 B/s.
         // CC messages are 3 bytes, so we can send a maximum of 1041 CC messages per second.
@@ -563,8 +569,6 @@ struct HostMIDI : Module {
         bool rateLimiterTriggered = (midiOutput.rateLimiterTimer.process(args.sampleTime) >= rateLimiterPeriod);
         if (rateLimiterTriggered)
             midiOutput.rateLimiterTimer.time -= rateLimiterPeriod;
-
-        midiOutput.setFrame(args.frame);
 
         for (int c = 0; c < inputs[PITCH_INPUT].getChannels(); c++) {
             int vel = (int) std::round(inputs[VELOCITY_INPUT].getNormalPolyVoltage(10.f * 100 / 127, c) / 10.f * 127);
