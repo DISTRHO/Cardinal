@@ -107,7 +107,7 @@ struct CardinalPluginContext : rack::Context {
         std::memset(parameters, 0, sizeof(parameters));
     }
 
-    void writeMidiMessage(const rack::midi::Message& message);
+    void writeMidiMessage(const rack::midi::Message& message, uint8_t channel);
 
 #ifndef HEADLESS
     bool addIdleCallback(IdleCallback* cb) const;

@@ -312,7 +312,7 @@ struct Initializer
 
 // -----------------------------------------------------------------------------------------------------------
 
-void CardinalPluginContext::writeMidiMessage(const rack::midi::Message& message)
+void CardinalPluginContext::writeMidiMessage(const rack::midi::Message& message, const uint8_t channel)
 {
     const size_t size = message.bytes.size();
     DISTRHO_SAFE_ASSERT_RETURN(size > 0,);
@@ -366,6 +366,9 @@ void CardinalPluginContext::writeMidiMessage(const rack::midi::Message& message)
     DISTRHO_SAFE_ASSERT_RETURN(size >= event.size,);
 
     std::memcpy(event.data, message.bytes.data(), event.size);
+
+    if (channel != 0 && event.data[0] < 0xF0)
+        event.data[0] |= channel & 0x0F;
 
     plugin->writeMidiEvent(event);
 }
@@ -831,34 +834,7 @@ protected:
         {
             const TimePosition& timePos(getTimePosition());
 
-            bool reset = false;
-
-            if (timePos.playing)
-            {
-                if (timePos.frame == 0 || fPreviousFrame + frames != timePos.frame)
-                    reset = true;
-
-                /*
-                if (! context->playing)
-                {
-                    if (timePos.frame == 0)
-                    {
-                        singleTimeMidiEvent.data[0] = 0xFA; // start
-                        sendSingleSimpleMidiMessage(singleTimeMidiEvent);
-                    }
-
-                    singleTimeMidiEvent.data[0] = 0xFB; // continue
-                    sendSingleSimpleMidiMessage(singleTimeMidiEvent);
-                }
-                */
-            }
-            else if (context->playing)
-            {
-                /*
-                singleTimeMidiEvent.data[0] = 0xFC; // stop
-                sendSingleSimpleMidiMessage(singleTimeMidiEvent);
-                */
-            }
+            const bool reset = timePos.playing && (timePos.frame == 0 || fPreviousFrame + frames != timePos.frame);
 
             context->playing = timePos.playing;
             context->bbtValid = timePos.bbt.valid;

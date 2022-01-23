@@ -82,6 +82,7 @@ struct HostMIDI : Module {
         uint32_t midiEventFrame;
         int64_t lastBlockFrame;
         bool wasPlaying;
+        uint8_t channel;
 
         // stuff from Rack
         bool smooth;
@@ -138,6 +139,7 @@ struct HostMIDI : Module {
             midiEventFrame = 0;
             lastBlockFrame = -1;
             wasPlaying = false;
+            channel = 0;
             smooth = true;
             channels = 1;
             polyMode = ROTATE_MODE;
@@ -194,7 +196,7 @@ struct HostMIDI : Module {
                 }
             }
 
-            for (uint32_t i=0; i<midiEventsLeft; ++i)
+            while (midiEventsLeft != 0)
             {
                 const MidiEvent& midiEvent(*midiEvents);
 
@@ -214,6 +216,12 @@ struct HostMIDI : Module {
                 else
                 {
                     data = midiEvent.data;
+                }
+
+                if (channel != 0 && data[0] < 0xF0)
+                {
+                    if ((data[0] & 0x0F) != (channel - 1))
+                        continue;
                 }
 
                 converterMsg.frame = midiEventFrame;
@@ -509,6 +517,7 @@ struct HostMIDI : Module {
 
     struct MidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS> {
         CardinalPluginContext* const pcontext;
+        uint8_t channel = 0;
         dsp::Timer rateLimiterTimer;
 
         MidiOutput(CardinalPluginContext* const pc)
@@ -516,7 +525,7 @@ struct HostMIDI : Module {
 
         void onMessage(const midi::Message& message) override
         {
-            pcontext->writeMidiMessage(message);
+            pcontext->writeMidiMessage(message, channel);
         }
     } midiOutput;
 
@@ -553,6 +562,13 @@ struct HostMIDI : Module {
         configOutput(START_OUTPUT, "Start trigger");
         configOutput(STOP_OUTPUT, "Stop trigger");
         configOutput(CONTINUE_OUTPUT, "Continue trigger");
+    }
+
+    void onReset() override
+    {
+        midiInput.reset();
+        midiOutput.reset();
+        midiOutput.channel = 0;
     }
 
     void process(const ProcessArgs& args) override
@@ -622,39 +638,48 @@ struct HostMIDI : Module {
 
     json_t* dataToJson() override
     {
-        json_t* rootJ = json_object();
+        json_t* const rootJ = json_object();
+        DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr, nullptr);
+
         json_object_set_new(rootJ, "smooth", json_boolean(midiInput.smooth));
         json_object_set_new(rootJ, "channels", json_integer(midiInput.channels));
         json_object_set_new(rootJ, "polyMode", json_integer(midiInput.polyMode));
+
         // Saving/restoring pitch and mod doesn't make much sense for MPE.
-        if (midiInput.polyMode != MidiInput::MPE_MODE) {
+        if (midiInput.polyMode != MidiInput::MPE_MODE)
+        {
             json_object_set_new(rootJ, "lastPitch", json_integer(midiInput.pws[0]));
             json_object_set_new(rootJ, "lastMod", json_integer(midiInput.mods[0]));
         }
+
+        json_object_set_new(rootJ, "inputChannel", json_integer(midiInput.channel));
+        json_object_set_new(rootJ, "outputChannel", json_integer(midiOutput.channel));
+
         return rootJ;
     }
 
     void dataFromJson(json_t* rootJ) override
     {
-        json_t* smoothJ = json_object_get(rootJ, "smooth");
-        if (smoothJ)
+        if (json_t* const smoothJ = json_object_get(rootJ, "smooth"))
             midiInput.smooth = json_boolean_value(smoothJ);
 
-        json_t* channelsJ = json_object_get(rootJ, "channels");
-        if (channelsJ)
+        if (json_t* const channelsJ = json_object_get(rootJ, "channels"))
             midiInput.setChannels(json_integer_value(channelsJ));
 
-        json_t* polyModeJ = json_object_get(rootJ, "polyMode");
-        if (polyModeJ)
+        if (json_t* const polyModeJ = json_object_get(rootJ, "polyMode"))
             midiInput.polyMode = (MidiInput::PolyMode) json_integer_value(polyModeJ);
 
-        json_t* lastPitchJ = json_object_get(rootJ, "lastPitch");
-        if (lastPitchJ)
+        if (json_t* const lastPitchJ = json_object_get(rootJ, "lastPitch"))
             midiInput.pws[0] = json_integer_value(lastPitchJ);
 
-        json_t* lastModJ = json_object_get(rootJ, "lastMod");
-        if (lastModJ)
+        if (json_t* const lastModJ = json_object_get(rootJ, "lastMod"))
             midiInput.mods[0] = json_integer_value(lastModJ);
+
+        if (json_t* const inputChannelJ = json_object_get(rootJ, "inputChannel"))
+            midiInput.channel = json_integer_value(inputChannelJ);
+
+        if (json_t* const outputChannelJ = json_object_get(rootJ, "outputChannel"))
+            midiOutput.channel = json_integer_value(outputChannelJ) & 0x0F;
     }
 };
 
@@ -742,12 +767,31 @@ struct HostMIDIWidget : ModuleWidget {
     void appendContextMenu(Menu* const menu) override
     {
         menu->addChild(new MenuSeparator);
-
         menu->addChild(createMenuLabel("MIDI Input"));
 
         menu->addChild(createBoolPtrMenuItem("Smooth pitch/mod wheel", "", &module->midiInput.smooth));
 
-        struct ChannelItem : MenuItem {
+        struct InputChannelItem : MenuItem {
+            HostMIDI* module;
+            Menu* createChildMenu() override {
+                Menu* menu = new Menu;
+                for (int c = 0; c <= 16; c++) {
+                    menu->addChild(createCheckMenuItem((c == 0) ? "All" : string::f("%d", c), "",
+                        [=]() {return module->midiInput.channel == c;},
+                        [=]() {module->midiInput.channel = c;}
+                    ));
+                }
+                return menu;
+            }
+        };
+        InputChannelItem* const inputChannelItem = new InputChannelItem;
+        inputChannelItem->text = "MIDI channel";
+        inputChannelItem->rightText = (module->midiInput.channel ? string::f("%d", module->midiInput.channel) : "All")
+                                    + "  " + RIGHT_ARROW;
+        inputChannelItem->module = module;
+        menu->addChild(inputChannelItem);
+
+        struct PolyphonyChannelItem : MenuItem {
             HostMIDI* module;
             Menu* createChildMenu() override {
                 Menu* menu = new Menu;
@@ -760,11 +804,11 @@ struct HostMIDIWidget : ModuleWidget {
                 return menu;
             }
         };
-        ChannelItem* channelItem = new ChannelItem;
-        channelItem->text = "Polyphony channels";
-        channelItem->rightText = string::f("%d", module->midiInput.channels) + "  " + RIGHT_ARROW;
-        channelItem->module = module;
-        menu->addChild(channelItem);
+        PolyphonyChannelItem* const polyphonyChannelItem = new PolyphonyChannelItem;
+        polyphonyChannelItem->text = "Polyphony channels";
+        polyphonyChannelItem->rightText = string::f("%d", module->midiInput.channels) + "  " + RIGHT_ARROW;
+        polyphonyChannelItem->module = module;
+        menu->addChild(polyphonyChannelItem);
 
         menu->addChild(createIndexPtrSubmenuItem("Polyphony mode", {
             "Rotate",
@@ -774,7 +818,28 @@ struct HostMIDIWidget : ModuleWidget {
         }, &module->midiInput.polyMode));
 
         menu->addChild(new MenuSeparator);
+        menu->addChild(createMenuLabel("MIDI Output"));
 
+        struct OutputChannelItem : MenuItem {
+            HostMIDI* module;
+            Menu* createChildMenu() override {
+                Menu* menu = new Menu;
+                for (uint8_t c = 0; c < 15; c++) {
+                    menu->addChild(createCheckMenuItem(string::f("%d", c+1), "",
+                        [=]() {return module->midiOutput.channel == c;},
+                        [=]() {module->midiOutput.channel = c;}
+                    ));
+                }
+                return menu;
+            }
+        };
+        OutputChannelItem* const outputChannelItem = new OutputChannelItem;
+        outputChannelItem->text = "MIDI channel";
+        outputChannelItem->rightText = string::f("%d", module->midiOutput.channel+1) + "  " + RIGHT_ARROW;
+        outputChannelItem->module = module;
+        menu->addChild(outputChannelItem);
+
+        menu->addChild(new MenuSeparator);
         menu->addChild(createMenuLabel("MIDI Input & Output"));
 
         menu->addChild(createMenuItem("Panic", "",

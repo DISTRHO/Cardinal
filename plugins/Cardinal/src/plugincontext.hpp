@@ -70,7 +70,7 @@ struct CardinalPluginContext : rack::Context {
     UI* ui;
 #endif
     CardinalPluginContext(Plugin* const p);
-    void writeMidiMessage(const rack::midi::Message& message);
+    void writeMidiMessage(const rack::midi::Message& message, uint8_t channel);
 #ifndef HEADLESS
     bool addIdleCallback(IdleCallback* cb) const;
     void removeIdleCallback(IdleCallback* cb) const;
