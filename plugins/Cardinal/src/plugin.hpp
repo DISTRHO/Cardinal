@@ -34,6 +34,7 @@ extern Model* modelGlBars;
 extern Model* modelHostAudio2;
 extern Model* modelHostAudio8;
 extern Model* modelHostCV;
+extern Model* modelHostMIDI;
 extern Model* modelHostParameters;
 extern Model* modelHostTime;
 extern Model* modelIldaeil;

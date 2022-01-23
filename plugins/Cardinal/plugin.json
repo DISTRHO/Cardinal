@@ -39,6 +39,15 @@
       ]
     },
     {
+      "slug": "HostMIDI",
+      "disabled": false,
+      "name": "Host MIDI",
+      "description": "Exposes host-provided MIDI in a module",
+      "tags": [
+        "External"
+      ]
+    },
+    {
       "slug": "HostParameters",
       "disabled": false,
       "name": "Host Parameters",

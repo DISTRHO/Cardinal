@@ -190,6 +190,7 @@ PLUGIN_FILES += Cardinal/src/Blank.cpp
 PLUGIN_FILES += Cardinal/src/glBars.cpp
 PLUGIN_FILES += Cardinal/src/HostAudio.cpp
 PLUGIN_FILES += Cardinal/src/HostCV.cpp
+PLUGIN_FILES += Cardinal/src/HostMIDI.cpp
 PLUGIN_FILES += Cardinal/src/HostParameters.cpp
 PLUGIN_FILES += Cardinal/src/HostTime.cpp
 PLUGIN_FILES += Cardinal/src/TextEditor.cpp

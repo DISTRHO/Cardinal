@@ -698,6 +698,7 @@ static void initStatic__Cardinal()
         p->addModel(modelHostAudio2);
         p->addModel(modelHostAudio8);
         p->addModel(modelHostCV);
+        p->addModel(modelHostMIDI);
         p->addModel(modelHostParameters);
         p->addModel(modelHostTime);
         p->addModel(modelTextEditor);
