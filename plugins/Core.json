@@ -51,7 +51,8 @@
         "External",
         "MIDI",
         "Polyphonic"
-      ]
+      ],
+      "hidden": true
     },
     {
       "slug": "MIDICCToCVInterface",
@@ -92,7 +93,8 @@
         "External",
         "MIDI",
         "Polyphonic"
-      ]
+      ],
+      "hidden": true
     },
     {
       "slug": "CV-CC",
@@ -121,7 +123,8 @@
       "manualUrl": "https://vcvrack.com/manual/Core#Blank",
       "tags": [
         "Blank"
-      ]
+      ],
+      "hidden": true
     },
     {
       "slug": "Notes",
@@ -130,7 +133,8 @@
       "manualUrl": "https://vcvrack.com/manual/Core#Notes",
       "tags": [
         "Blank"
-      ]
+      ],
+      "hidden": true
     }
   ]
 }

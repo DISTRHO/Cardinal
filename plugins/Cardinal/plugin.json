@@ -44,7 +44,9 @@
       "name": "Host MIDI",
       "description": "Exposes host-provided MIDI in a module",
       "tags": [
-        "External"
+        "External",
+        "MIDI",
+        "Polyphonic"
       ]
     },
     {
