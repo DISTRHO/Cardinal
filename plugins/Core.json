@@ -71,16 +71,6 @@
         "Blank"
       ],
       "hidden": true
-    },
-    {
-      "slug": "Notes",
-      "name": "Notes",
-      "description": "Write text for patch notes or artist attribution",
-      "manualUrl": "https://vcvrack.com/manual/Core#Notes",
-      "tags": [
-        "Blank"
-      ],
-      "hidden": true
     }
   ]
 }

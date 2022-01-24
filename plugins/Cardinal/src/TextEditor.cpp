@@ -50,13 +50,29 @@ struct TextEditorModule : Module {
         json_t* rootJ = json_object();
         json_object_set_new(rootJ, "filepath", json_string(file.c_str()));
         json_object_set_new(rootJ, "lang", json_string(lang.c_str()));
-        json_object_set_new(rootJ, "text", json_string(text.c_str()));
+        json_object_set_new(rootJ, "etext", json_string(text.c_str()));
         json_object_set_new(rootJ, "width", json_integer(width));
         return rootJ;
     }
 
     void dataFromJson(json_t* const rootJ) override
     {
+        // Rack Core Notes compatiblity
+        if (json_t* const textJ = json_object_get(rootJ, "text"))
+        {
+            text = json_string_value(textJ);
+            file = "";
+            lang = "None";
+            width = 16;
+#ifndef HEADLESS
+            if (ImGuiTextEditor* const widget = widgetPtr)
+            {
+                widget->setLanguageDefinition(lang);
+                widget->setText(text);
+            }
+#endif
+        }
+
         if (json_t* const widthJ = json_object_get(rootJ, "width"))
             width = json_integer_value(widthJ);
 
@@ -90,7 +106,7 @@ struct TextEditorModule : Module {
             }
         }
 
-        if (json_t* const textJ = json_object_get(rootJ, "text"))
+        if (json_t* const textJ = json_object_get(rootJ, "etext"))
         {
             text = json_string_value(textJ);
 #ifndef HEADLESS

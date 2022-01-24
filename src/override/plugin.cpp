@@ -89,6 +89,7 @@ static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = 
 	{{"Core", "AudioInterface16"}, {"Cardinal", "HostAudio8"}},
 	{{"Core", "MIDIToCVInterface"}, {"Cardinal", "HostMIDI"}},
 	{{"Core", "CV-MIDI"}, {"Cardinal", "HostMIDI"}},
+	{{"Core", "Notes"}, {"Cardinal", "TextEditor"}},
 	{{"MindMeld-ShapeMasterPro", "ShapeMasterPro"}, {"MindMeldModular", "ShapeMaster"}},
 	{{"MindMeldModular", "ShapeMaster"}, {"MindMeld-ShapeMasterPro", "ShapeMasterPro"}},
 	// {{"", ""}, {"", ""}},

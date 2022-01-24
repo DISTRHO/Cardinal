@@ -607,7 +607,6 @@ extern Model* modelMIDIMap;
 extern Model* modelCV_MIDICC;
 extern Model* modelGate_MIDI;
 extern Model* modelBlank;
-extern Model* modelNotes;
 }
 
 // regular plugins
@@ -705,7 +704,6 @@ static void initStatic__Core()
         p->addModel(rack::core::modelCV_MIDICC);
         p->addModel(rack::core::modelGate_MIDI);
         p->addModel(rack::core::modelBlank);
-        p->addModel(rack::core::modelNotes);
     }
 }
 

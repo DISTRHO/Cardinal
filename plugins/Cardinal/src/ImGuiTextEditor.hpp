@@ -59,4 +59,7 @@ struct ImGuiTextEditor : ImGuiWidget
 protected:
     /** @internal */
     void drawImGui() override;
+    /*
+    void onSelectKey(const SelectKeyEvent& e) override;
+    */
 };

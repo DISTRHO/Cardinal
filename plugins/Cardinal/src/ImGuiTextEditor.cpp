@@ -145,11 +145,10 @@ void ImGuiTextEditor::drawImGui()
 
         const TextEditor::Coordinates cpos = editor.GetCursorPosition();
 
-        ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s",
+        ImGui::Text("%6d/%-6d %6d lines | %s | %s | %s",
                     cpos.mLine + 1, cpos.mColumn + 1,
                     editor.GetTotalLines(),
                     editor.IsOverwrite() ? "Ovr" : "Ins",
-                    editor.CanUndo() ? "*" : " ",
                     editor.GetLanguageDefinition().mName.c_str(),
                     pData->file.c_str());
 
@@ -158,3 +157,26 @@ void ImGuiTextEditor::drawImGui()
 
     ImGui::End();
 }
+
+/*
+void ImGuiTextEditor::onSelectKey(const SelectKeyEvent& e)
+{
+    ImGuiWidget::onSelectKey(e);
+
+    if (e.action == GLFW_PRESS && (e.mods & GLFW_MOD_CONTROL) != 0)
+    {
+        switch (e.key)
+        {
+        case GLFW_KEY_X:
+            pData->editor.Cut();
+            break;
+        case GLFW_KEY_C:
+            pData->editor.Copy();
+            break;
+        case GLFW_KEY_V:
+            pData->editor.Paste();
+            break;
+        }
+    }
+}
+*/

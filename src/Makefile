@@ -130,6 +130,7 @@ IGNORED_FILES += Rack/src/app/TipWindow.cpp
 IGNORED_FILES += Rack/src/core/Audio.cpp
 IGNORED_FILES += Rack/src/core/CV_MIDI.cpp
 IGNORED_FILES += Rack/src/core/MIDI_CV.cpp
+IGNORED_FILES += Rack/src/core/Notes.cpp
 IGNORED_FILES += Rack/src/engine/Engine.cpp
 IGNORED_FILES += Rack/src/plugin/Model.cpp
 IGNORED_FILES += Rack/src/window/Window.cpp
