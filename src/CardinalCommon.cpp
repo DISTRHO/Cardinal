@@ -37,15 +37,10 @@
 #include <string.hpp>
 #include <system.hpp>
 #include <app/Scene.hpp>
-#include <engine/Engine.hpp>
 #include <window/Window.hpp>
 
 #ifdef NDEBUG
 # undef DEBUG
-#endif
-
-#ifdef HAVE_LIBLO
-# include <lo/lo.h>
 #endif
 
 // for finding home dir
@@ -212,27 +207,6 @@ void saveAsDialog()
     opts.startDir = dir.c_str();
     opts.saving = ui->saving = true;
     ui->openFileBrowser(opts);
-#endif
-}
-
-void deployToMOD()
-{
-#ifdef HAVE_LIBLO
-    const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
-    DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
-
-    APP->engine->prepareSave();
-    APP->patch->saveAutosave();
-    APP->patch->cleanAutosave();
-    std::vector<uint8_t> data(rack::system::archiveDirectory(APP->patch->autosavePath, 1));
-
-    if (const lo_blob blob = lo_blob_new(data.size(), data.data()))
-    {
-        lo_send(addr, "/load", "b", blob);
-        lo_blob_free(blob);
-    }
-
-    lo_address_free(addr);
 #endif
 }
 

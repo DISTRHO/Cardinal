@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+cd $(dirname ${0})
 
 diff -U3 ../Rack/dep/oui-blendish/blendish.c blendish.c > diffs/blendish.c.diff
 diff -U3 ../Rack/src/common.cpp common.cpp > diffs/common.cpp.diff

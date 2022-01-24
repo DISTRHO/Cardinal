@@ -1,5 +1,5 @@
 --- ../Rack/src/app/MenuBar.cpp	2022-01-15 14:44:46.391280963 +0000
-+++ MenuBar.cpp	2022-01-23 17:13:16.500279828 +0000
++++ MenuBar.cpp	2022-01-24 11:25:15.507061204 +0000
 @@ -1,8 +1,33 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -48,7 +48,7 @@
  
  namespace rack {
  namespace app {
-@@ -48,80 +78,108 @@
+@@ -48,79 +78,75 @@
  };
  
  
@@ -72,27 +72,6 @@
  
  struct FileButton : MenuButton {
 +	const bool isStandalone;
-+
-+#ifdef HAVE_LIBLO
-+	bool oscConnected = false;
-+	lo_server oscServer = nullptr;
-+
-+	static int osc_handler(const char* const path, const char* const types, lo_arg** argv, const int argc, lo_message, void* const self)
-+	{
-+		d_stdout("osc_handler(\"%s\", \"%s\", %p, %i)", path, types, argv, argc);
-+
-+		if (std::strcmp(path, "/resp") == 0 && argc == 2 && types[0] == 's' && types[1] == 's') {
-+			d_stdout("osc_handler(\"%s\", ...) - got resp | '%s' '%s'", path, &argv[0]->s, &argv[1]->s);
-+			if (std::strcmp(&argv[0]->s, "hello") == 0 && std::strcmp(&argv[1]->s, "ok") == 0)
-+				static_cast<FileButton*>(self)->oscConnected = true;
-+		}
-+		return 0;
-+	}
-+
-+	~FileButton() {
-+		lo_server_free(oscServer);
-+	}
-+#endif
 +
 +	FileButton(const bool standalone)
 +		: MenuButton(),  isStandalone(standalone) {}
@@ -124,10 +103,6 @@
 -
  		menu->addChild(createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
 -			APP->patch->saveDialog();
--		}));
--
--		menu->addChild(createMenuItem("Save as", RACK_MOD_CTRL_NAME "+Shift+S", []() {
--			APP->patch->saveAsDialog();
 +			// NOTE: will do nothing if path is empty, intentionally
 +			patchUtils::saveDialog(APP->patch->path);
 +		}, APP->patch->path.empty()));
@@ -136,25 +111,26 @@
 +			patchUtils::saveAsDialog();
  		}));
  
+-		menu->addChild(createMenuItem("Save as", RACK_MOD_CTRL_NAME "+Shift+S", []() {
+-			APP->patch->saveAsDialog();
+-		}));
++#ifdef HAVE_LIBLO
++		if (patchUtils::isRemoteConnected()) {
++			menu->addChild(createMenuItem("Deploy to MOD", "F7", []() {
++				patchUtils::deployToRemote();
++			}));
+ 
 -		menu->addChild(createMenuItem("Save a copy", "", []() {
 -			APP->patch->saveAsDialog(false);
 -		}));
-+#ifdef HAVE_LIBLO
-+		if (oscServer == nullptr || !oscConnected) {
-+			menu->addChild(createMenuItem("Connect to MOD", "", [this]() {
-+				if (oscServer == nullptr) {
-+					oscServer = lo_server_new_with_proto(nullptr, LO_UDP, nullptr);
-+					DISTRHO_SAFE_ASSERT_RETURN(oscServer != nullptr,);
-+					lo_server_add_method(oscServer, "/resp", nullptr, osc_handler, this);
-+				}
-+				const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
-+				DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
-+				lo_send(addr, "/hello", "");
-+				lo_address_free(addr);
-+			}));
++			const bool autoDeploy = patchUtils::isRemoteAutoDeployed();
++			menu->addChild(createCheckMenuItem("Auto deploy to MOD", "",
++				[=]() {return autoDeploy;},
++				[=]() {patchUtils::setRemoteAutoDeploy(!autoDeploy);}
++			));
 +		} else {
-+			menu->addChild(createMenuItem("Deploy to MOD", "F7", []() {
-+				patchUtils::deployToMOD();
++			menu->addChild(createMenuItem("Connect to MOD", "", [this]() {
++				patchUtils::connectToRemote();
 +			}));
 +		}
 +#endif
@@ -189,19 +165,9 @@
 +			}));
 +		};
  	}
-+
-+#ifdef HAVE_LIBLO
-+	void step() override {
-+		MenuButton::step();
-+		if (oscServer != nullptr) {
-+			while (lo_server_recv_noblock(oscServer, 0) != 0) {}
-+		}
-+	}
-+#endif
  };
  
- 
-@@ -166,7 +224,7 @@
+@@ -166,7 +192,7 @@
  
  		menu->addChild(new ui::MenuSeparator);
  
@@ -210,7 +176,7 @@
  	}
  };
  
-@@ -256,7 +314,7 @@
+@@ -256,7 +282,7 @@
  		return settings::cableTension;
  	}
  	float getDefaultValue() override {
@@ -219,7 +185,7 @@
  	}
  	float getDisplayValue() override {
  		return getValue() * 100;
-@@ -421,28 +479,9 @@
+@@ -421,28 +447,9 @@
  		haloBrightnessSlider->box.size.x = 250.0;
  		menu->addChild(haloBrightnessSlider);
  
@@ -249,7 +215,7 @@
  
  		static const std::vector<std::string> knobModeLabels = {
  			"Linear",
-@@ -467,6 +506,21 @@
+@@ -467,6 +474,21 @@
  		menu->addChild(knobScrollSensitivitySlider);
  
  		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
@@ -271,7 +237,7 @@
  	}
  };
  
-@@ -476,47 +530,6 @@
+@@ -476,47 +498,6 @@
  ////////////////////
  
  
@@ -319,7 +285,7 @@
  struct EngineButton : MenuButton {
  	void onAction(const ActionEvent& e) override {
  		ui::Menu* menu = createMenu();
-@@ -529,269 +542,6 @@
+@@ -529,269 +510,6 @@
  		menu->addChild(createMenuItem("Performance meters", cpuMeterText, [=]() {
  			settings::cpuMeter ^= true;
  		}));
@@ -589,7 +555,7 @@
  	}
  };
  
-@@ -802,63 +552,24 @@
+@@ -802,63 +520,24 @@
  
  
  struct HelpButton : MenuButton {
@@ -616,14 +582,14 @@
  
 -		menu->addChild(createMenuItem("VCVRack.com", "", [=]() {
 -			system::openBrowser("https://vcvrack.com/");
--		}));
--
--		menu->addChild(createMenuItem("Open user folder", "", [=]() {
--			system::openDirectory(asset::user(""));
 +		menu->addChild(createMenuItem("Cardinal Project page", "", [=]() {
 +			system::openBrowser("https://github.com/DISTRHO/Cardinal/");
  		}));
  
+-		menu->addChild(createMenuItem("Open user folder", "", [=]() {
+-			system::openDirectory(asset::user(""));
+-		}));
+-
 -		if (library::isAppUpdateAvailable()) {
 -			menu->addChild(new ui::MenuSeparator);
 -
@@ -658,7 +624,7 @@
  	}
  };
  
-@@ -908,7 +619,9 @@
+@@ -908,7 +587,9 @@
  struct MenuBar : widget::OpaqueWidget {
  	MeterLabel* meterLabel;
  
@@ -669,7 +635,7 @@
  		const float margin = 5;
  		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
  
-@@ -917,7 +630,7 @@
+@@ -917,7 +598,7 @@
  		layout->spacing = math::Vec(0, 0);
  		addChild(layout);
  
@@ -678,7 +644,7 @@
  		fileButton->text = "File";
  		layout->addChild(fileButton);
  
-@@ -933,10 +646,6 @@
+@@ -933,10 +614,6 @@
  		engineButton->text = "Engine";
  		layout->addChild(engineButton);
  
@@ -689,7 +655,7 @@
  		HelpButton* helpButton = new HelpButton;
  		helpButton->text = "Help";
  		layout->addChild(helpButton);
-@@ -971,7 +680,11 @@
+@@ -971,7 +648,11 @@
  
  
  widget::Widget* createMenuBar() {

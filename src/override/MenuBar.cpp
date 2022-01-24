@@ -86,27 +86,6 @@ struct MenuButton : ui::Button {
 struct FileButton : MenuButton {
 	const bool isStandalone;
 
-#ifdef HAVE_LIBLO
-	bool oscConnected = false;
-	lo_server oscServer = nullptr;
-
-	static int osc_handler(const char* const path, const char* const types, lo_arg** argv, const int argc, lo_message, void* const self)
-	{
-		d_stdout("osc_handler(\"%s\", \"%s\", %p, %i)", path, types, argv, argc);
-
-		if (std::strcmp(path, "/resp") == 0 && argc == 2 && types[0] == 's' && types[1] == 's') {
-			d_stdout("osc_handler(\"%s\", ...) - got resp | '%s' '%s'", path, &argv[0]->s, &argv[1]->s);
-			if (std::strcmp(&argv[0]->s, "hello") == 0 && std::strcmp(&argv[1]->s, "ok") == 0)
-				static_cast<FileButton*>(self)->oscConnected = true;
-		}
-		return 0;
-	}
-
-	~FileButton() {
-		lo_server_free(oscServer);
-	}
-#endif
-
 	FileButton(const bool standalone)
 		: MenuButton(),  isStandalone(standalone) {}
 
@@ -133,21 +112,19 @@ struct FileButton : MenuButton {
 		}));
 
 #ifdef HAVE_LIBLO
-		if (oscServer == nullptr || !oscConnected) {
-			menu->addChild(createMenuItem("Connect to MOD", "", [this]() {
-				if (oscServer == nullptr) {
-					oscServer = lo_server_new_with_proto(nullptr, LO_UDP, nullptr);
-					DISTRHO_SAFE_ASSERT_RETURN(oscServer != nullptr,);
-					lo_server_add_method(oscServer, "/resp", nullptr, osc_handler, this);
-				}
-				const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
-				DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
-				lo_send(addr, "/hello", "");
-				lo_address_free(addr);
-			}));
-		} else {
+		if (patchUtils::isRemoteConnected()) {
 			menu->addChild(createMenuItem("Deploy to MOD", "F7", []() {
-				patchUtils::deployToMOD();
+				patchUtils::deployToRemote();
+			}));
+
+			const bool autoDeploy = patchUtils::isRemoteAutoDeployed();
+			menu->addChild(createCheckMenuItem("Auto deploy to MOD", "",
+				[=]() {return autoDeploy;},
+				[=]() {patchUtils::setRemoteAutoDeploy(!autoDeploy);}
+			));
+		} else {
+			menu->addChild(createMenuItem("Connect to MOD", "", [this]() {
+				patchUtils::connectToRemote();
 			}));
 		}
 #endif
@@ -171,15 +148,6 @@ struct FileButton : MenuButton {
 			}));
 		};
 	}
-
-#ifdef HAVE_LIBLO
-	void step() override {
-		MenuButton::step();
-		if (oscServer != nullptr) {
-			while (lo_server_recv_noblock(oscServer, 0) != 0) {}
-		}
-	}
-#endif
 };
 
 

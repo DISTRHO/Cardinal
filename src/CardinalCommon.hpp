@@ -25,8 +25,7 @@
 # define REMOTE_HOST_PORT "2228"
 #endif
 
-namespace rack
-{
+namespace rack {
 
 namespace settings {
 extern int rateLimit;
@@ -36,10 +35,9 @@ namespace ui {
 struct Menu;
 }
 
-}
+} // namespace rack
 
-namespace patchUtils
-{
+namespace patchUtils {
 
 void loadDialog();
 void loadPathDialog(const std::string& path);
@@ -49,6 +47,11 @@ void revertDialog();
 void saveDialog(const std::string& path);
 void saveAsDialog();
 void appendSelectionContextMenu(rack::ui::Menu* menu);
-void deployToMOD();
 
-}
+bool connectToRemote();
+bool isRemoteConnected();
+bool isRemoteAutoDeployed();
+void setRemoteAutoDeploy(bool autoDeploy);
+void deployToRemote();
+
+} // namespace patchUtils
