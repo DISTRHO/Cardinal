@@ -36,7 +36,7 @@ struct CardinalBlankModule : Module {
     }
 };
 
-struct CardinalBlankImage : OpaqueWidget {
+struct CardinalBlankImage : Widget {
     int imageId = -2;
     int imageWidth = 0;
     int imageHeight = 0;
@@ -46,14 +46,6 @@ struct CardinalBlankImage : OpaqueWidget {
         box.size = size;
         this->hasModule = hasModule;
     }
-
-    /*
-    ~CardinalBlankWidget()
-    {
-        if (imageId >= 0)
-            nvgDeleteImage(args.vg, imageId);
-    }
-    */
 
     void draw(const DrawArgs& args) override
     {
@@ -79,8 +71,6 @@ struct CardinalBlankImage : OpaqueWidget {
                                                   imgHeight, 0, imageId, 1.0f));
             nvgFill(args.vg);
         }
-
-        OpaqueWidget::draw(args);
     }
 };
 
