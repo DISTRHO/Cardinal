@@ -37,8 +37,8 @@ struct HostAudio : Module {
     HostAudio()
         : pcontext(static_cast<CardinalPluginContext*>(APP)),
           numParams(numIO == 2 ? 1 : 0),
-          numInputs(pcontext->variant == kCardinalVariantSynth ? 0 : pcontext->variant == kCardinalVariantMain ? numIO : 2),
-          numOutputs(pcontext->variant == kCardinalVariantMain ? numIO : 2)
+          numInputs(pcontext->variant == kCardinalVariantMain ? numIO : 2),
+          numOutputs(pcontext->variant == kCardinalVariantSynth ? 0 : pcontext->variant == kCardinalVariantMain ? numIO : 2)
     {
         if (pcontext == nullptr)
             throw rack::Exception("Plugin context is null");
