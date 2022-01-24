@@ -103,6 +103,9 @@ struct HostAudio : Module {
 
             dataOuts[i][k] += clamp(v * gain, -1.0f, 1.0f);
         }
+
+        if (numInputs == 2 && ! inputs[1].isConnected())
+            dataOuts[1][k] += dataOuts[0][k];
     }
 
     json_t* dataToJson() override
