@@ -17,6 +17,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Amalgamated Harmonics   | BSD-3-Clause          | |
 | Animated Circuits       | GPL-3.0-or-later      | |
 | Aria Salvatrice         | GPL-3.0-or-later      | |
+| Autinn                  | GPL-3.0-or-later      | |
 | Bacon Music             | GPL-3.0-or-later      | |
 | Bogaudio                | GPL-3.0-or-later      | |
 | cf                      | BSD-3-Clause          | |
@@ -86,6 +87,7 @@ Below is a list of artwork licenses from plugins
 | AriaModules/lcd/Fixed_v01/*             | Custom           | See [LICENSE.txt](../plugins/AriaModules/res/lcd/Fixed_v01/LICENSE.txt) |
 | AriaModules/lcd/piano/*                 | WTFPL            | |
 | AriaModules/signature/*                 | Custom           | Removal required if modifying other files without author's permission |
+| Autinn/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/*                            | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/midi/*                       | CC-BY-SA-3.0-DE  | |
 | BaconPlugs/midi/beeth/*                 | ???              | Taken from http://www.jsbach.net/ |

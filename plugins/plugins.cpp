@@ -81,6 +81,39 @@ extern Model* modelBlank;
 #include "AudibleInstruments/src/plugin.hpp"
 */
 
+// Autinn
+/* NOTE too much noise in original include, do this a different way
+// #include "Autinn/src/Autinn.hpp"
+*/
+#define modelChord modelAutinnChord
+#define modelVibrato modelAutinnVibrato
+extern Model* modelJette;
+extern Model* modelFlora;
+extern Model* modelOxcart;
+extern Model* modelDeadband;
+extern Model* modelDigi;
+extern Model* modelFlopper;
+extern Model* modelAmp;
+extern Model* modelDC;
+extern Model* modelSjip;
+extern Model* modelBass;
+extern Model* modelSquare;
+extern Model* modelSaw;
+extern Model* modelBoomerang;
+extern Model* modelVibrato;
+extern Model* modelVectorDriver; //deprecated
+extern Model* modelCVConverter;
+extern Model* modelZod;
+extern Model* modelTriBand;
+extern Model* modelMixer6;
+extern Model* modelNon;
+extern Model* modelFil;
+extern Model* modelNap;
+extern Model* modelMelody;
+extern Model* modelChord;
+#undef modelChord
+#undef modelVibrato
+
 // BaconPlugs
 #define INCLUDE_COMPONENTS_HPP
 #include "BaconPlugs/src/BaconPlugs.hpp"
@@ -524,6 +557,7 @@ Plugin* pluginInstance__Aria;
 // Plugin* pluginInstance__AS;
 // Plugin* pluginInstance__Atelier;
 // Plugin* pluginInstance__AudibleInstruments;
+extern Plugin* pluginInstance__Autinn;
 Plugin* pluginInstance__Bacon;
 // Plugin* pluginInstance__Befaco;
 // Plugin* pluginInstance__Bidoo;
@@ -914,6 +948,45 @@ static void initStatic__AudibleInstruments()
     }
 }
 */
+
+static void initStatic__Autinn()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Autinn = p;
+
+    const StaticPluginLoader spl(p, "Autinn");
+    if (spl.ok())
+    {
+#define modelChord modelAutinnChord
+#define modelVibrato modelAutinnVibrato
+        p->addModel(modelAmp);
+        p->addModel(modelDeadband);
+        p->addModel(modelBass);
+        p->addModel(modelCVConverter);
+        p->addModel(modelDC);
+        p->addModel(modelDigi);
+        p->addModel(modelFlopper);
+        p->addModel(modelFlora);
+        p->addModel(modelJette);
+        p->addModel(modelBoomerang);
+        p->addModel(modelOxcart);
+        p->addModel(modelSaw);
+        p->addModel(modelSjip);
+        p->addModel(modelSquare);
+        p->addModel(modelVibrato);
+        p->addModel(modelVectorDriver);
+        p->addModel(modelZod);
+        p->addModel(modelTriBand);
+        p->addModel(modelMixer6);
+        p->addModel(modelNon);
+        p->addModel(modelFil);
+        p->addModel(modelNap);
+        p->addModel(modelMelody);
+        p->addModel(modelChord);
+#undef modelChord
+#undef modelVibrato
+    }
+}
 
 static void initStatic__Bacon()
 {
@@ -1942,6 +2015,7 @@ void initStaticPlugins()
     // initStatic__AS();
     // initStatic__Atelier();
     // initStatic__AudibleInstruments();
+    initStatic__Autinn();
     initStatic__Bacon();
     // initStatic__Befaco();
     // initStatic__Bidoo();

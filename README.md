@@ -81,6 +81,7 @@ At the moment the following 3rd-party modules are provided:
 - Amalgamated Harmonics
 - Animated Circuits
 - Aria Salvatrice
+- Autinn
 - Bacon Music
 - Bogaudio
 - cf

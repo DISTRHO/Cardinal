@@ -136,3 +136,6 @@
 [submodule "deps/QuickJS"]
 	path = deps/QuickJS
 	url = https://github.com/JerrySievert/QuickJS.git
+[submodule "plugins/Autinn"]
+	path = plugins/Autinn
+	url = https://github.com/NikolaiVChr/Autinn.git

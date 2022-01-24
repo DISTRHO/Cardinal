@@ -362,6 +362,13 @@ ARIA_CUSTOM = Blank
 # PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
 
 # --------------------------------------------------------------
+# Autinn
+
+PLUGIN_FILES += $(wildcard Autinn/src/*.cpp)
+
+AUTINN_CUSTOM = Chord Vibrato
+
+# --------------------------------------------------------------
 # BaconPlugs
 
 PLUGIN_FILES += $(filter-out BaconPlugs/src/BaconPlugs.cpp,$(wildcard BaconPlugs/src/*.cpp))
@@ -976,6 +983,14 @@ $(BUILD_DIR)/AudibleInstruments/%.o: AudibleInstruments/%
 		-IAudibleInstruments/eurorack \
 		-Wno-class-memaccess \
 		-Wno-unused-local-typedefs
+
+$(BUILD_DIR)/Autinn/%.cpp.o: Autinn/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(AUTINN_CUSTOM),$(call custom_module_names,$(m),Autinn)) \
+		-DpluginInstance=pluginInstance__Autinn \
+		-Dinit=init__Autinn
 
 $(BUILD_DIR)/BaconPlugs/%.cpp.o: BaconPlugs/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
