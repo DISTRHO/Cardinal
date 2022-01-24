@@ -1,6 +1,6 @@
 /*
  * Syntax highlighting text editor (for ImGui in DPF)
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  * Copyright (c) 2017 BalazsJako
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -75,6 +75,8 @@ std::string ImGuiTextEditor::getFile() const
 
 void ImGuiTextEditor::setLanguageDefinition(const std::string& lang)
 {
+    pData->editor.SetColorizerEnable(true);
+
     if (lang == "AngelScript")
         return pData->editor.SetLanguageDefinition(TextEditor::LanguageDefinition::AngelScript());
     if (lang == "C")
@@ -90,6 +92,7 @@ void ImGuiTextEditor::setLanguageDefinition(const std::string& lang)
     if (lang == "SQL")
         return pData->editor.SetLanguageDefinition(TextEditor::LanguageDefinition::SQL());
 
+    pData->editor.SetColorizerEnable(false);
     pData->editor.SetLanguageDefinition(TextEditor::LanguageDefinition());
 }
 

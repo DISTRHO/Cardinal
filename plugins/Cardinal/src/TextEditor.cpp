@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -134,7 +134,7 @@ struct TextEditorLangSelectItem : MenuItem {
             rightText = CHECKMARK_STRING;
     }
 
-    void onAction(const event::Action &e) override
+    void onAction(const event::Action&) override
     {
         module->lang = text;
         widget->setLanguageDefinition(text);
@@ -311,6 +311,7 @@ struct TextEditorModuleWidget : ModuleWidget {
             textEditorWidget->box.pos = Vec(RACK_GRID_WIDTH, 0);
             textEditorWidget->box.size = Vec((module->width - 2) * RACK_GRID_WIDTH, box.size.y);
             addChild(textEditorWidget);
+            module->widgetPtr = textEditorWidget;
         }
         else
         {

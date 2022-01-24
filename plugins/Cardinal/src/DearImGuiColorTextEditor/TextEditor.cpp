@@ -2010,7 +2010,7 @@ void TextEditor::Redo(int aSteps)
 const TextEditor::Palette & TextEditor::GetDarkPalette()
 {
 	const static Palette p = { {
-			0xff7f7f7f,	// Default
+			0xffe0e0e0,	// Default
 			0xffd69c56,	// Keyword
 			0xff00ff00,	// Number
 			0xff7070e0,	// String

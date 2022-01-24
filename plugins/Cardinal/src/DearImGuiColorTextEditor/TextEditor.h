@@ -173,7 +173,8 @@ public:
 		bool mCaseSensitive;
 
 		LanguageDefinition()
-			: mPreprocChar('#')
+			: mName("None")
+			, mPreprocChar('#')
 			, mAutoIndentation(true)
 			, mColorize(nullptr)
 			, mColorizeData(nullptr)
