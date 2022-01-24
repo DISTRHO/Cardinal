@@ -71,6 +71,7 @@ struct TextEditorModule : Module {
                 widget->setText(text);
             }
 #endif
+            return;
         }
 
         if (json_t* const widthJ = json_object_get(rootJ, "width"))
@@ -202,7 +203,7 @@ struct TextEditorLoadFileItem : MenuItem {
         text = "Load File";
     }
 
-    void onAction(const event::Action &e) override
+    void onAction(const event::Action&) override
     {
         TextEditorModule* const module = this->module;;
         WeakPtr<ImGuiTextEditor> widget = this->widget;

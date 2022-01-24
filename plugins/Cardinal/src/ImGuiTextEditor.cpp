@@ -158,6 +158,27 @@ void ImGuiTextEditor::drawImGui()
     ImGui::End();
 }
 
+void ImGuiTextEditor::onButton(const ButtonEvent& e)
+{
+    setAsCurrentContext();
+
+    // if mouse press is over the top status bar, do nothing so editor can be moved in the Rack
+    if (e.action == GLFW_PRESS && e.pos.y < 25)
+        return;
+
+    ImGuiWidget::onButton(e);
+}
+
+void ImGuiTextEditor::onHoverScroll(const HoverScrollEvent& e)
+{
+    // use Rack view scrolling if there is no scrollbar
+    if (pData->editor.GetTotalLines() < 27)
+        return;
+
+    // if there is a scrollbar, handle the event
+    ImGuiWidget::onHoverScroll(e);
+}
+
 /*
 void ImGuiTextEditor::onSelectKey(const SelectKeyEvent& e)
 {

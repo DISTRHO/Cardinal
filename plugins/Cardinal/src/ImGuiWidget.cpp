@@ -165,62 +165,9 @@ void ImGuiWidget::onContextDestroy(const ContextDestroyEvent& e)
     OpenGlWidget::onContextDestroy(e);
 }
 
-void ImGuiWidget::drawFramebuffer()
+void ImGuiWidget::setAsCurrentContext()
 {
     ImGui::SetCurrentContext(imData->context);
-    ImGuiIO& io(ImGui::GetIO());
-
-    const math::Vec fbSize = getFramebufferSize();
-    const float scaleFactor = APP->window->pixelRatio;
-
-    if (d_isNotEqual(imData->scaleFactor, scaleFactor))
-    {
-        imData->scaleFactor = scaleFactor;
-
-        ImGuiStyle& style(ImGui::GetStyle());
-        new(&style)ImGuiStyle();
-        imData->resetStyle();
-
-        if (! imData->fontGenerated)
-        {
-            imData->originalScaleFactor = scaleFactor;
-            imData->generateFontIfNeeded();
-        }
-        else
-        {
-            io.FontGlobalScale = scaleFactor / imData->originalScaleFactor;
-        }
-    }
-
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    glOrtho(0.0, box.size.x * scaleFactor, box.size.y * scaleFactor, 0.0, -1.0, 1.0);
-    glViewport(0.0, 0.0, fbSize.x, fbSize.y);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-
-    io.DisplaySize = ImVec2(box.size.x * scaleFactor, box.size.y * scaleFactor);
-    io.DisplayFramebufferScale = ImVec2(fbSize.x / (box.size.x * scaleFactor), fbSize.y / (box.size.y * scaleFactor));
-
-    if (!imData->created)
-    {
-        ImGui_ImplOpenGL2_Init();
-        imData->created = true;
-    }
-
-    // TODO io.DeltaTime
-
-    ImGui_ImplOpenGL2_NewFrame();
-    ImGui::NewFrame();
-
-    drawImGui();
-
-    ImGui::Render();
-
-    if (ImDrawData* const data = ImGui::GetDrawData())
-        ImGui_ImplOpenGL2_RenderDrawData(data);
 }
 
 void ImGuiWidget::onHover(const HoverEvent& e)
@@ -357,4 +304,62 @@ void ImGuiWidget::onSelectText(const SelectTextEvent& e)
 
     if (io.WantCaptureKeyboard)
         e.consume(this);
+}
+
+void ImGuiWidget::drawFramebuffer()
+{
+    ImGui::SetCurrentContext(imData->context);
+    ImGuiIO& io(ImGui::GetIO());
+
+    const math::Vec fbSize = getFramebufferSize();
+    const float scaleFactor = APP->window->pixelRatio;
+
+    if (d_isNotEqual(imData->scaleFactor, scaleFactor))
+    {
+        imData->scaleFactor = scaleFactor;
+
+        ImGuiStyle& style(ImGui::GetStyle());
+        new(&style)ImGuiStyle();
+        imData->resetStyle();
+
+        if (! imData->fontGenerated)
+        {
+            imData->originalScaleFactor = scaleFactor;
+            imData->generateFontIfNeeded();
+        }
+        else
+        {
+            io.FontGlobalScale = scaleFactor / imData->originalScaleFactor;
+        }
+    }
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0.0, box.size.x * scaleFactor, box.size.y * scaleFactor, 0.0, -1.0, 1.0);
+    glViewport(0.0, 0.0, fbSize.x, fbSize.y);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    io.DisplaySize = ImVec2(box.size.x * scaleFactor, box.size.y * scaleFactor);
+    io.DisplayFramebufferScale = ImVec2(fbSize.x / (box.size.x * scaleFactor), fbSize.y / (box.size.y * scaleFactor));
+
+    if (!imData->created)
+    {
+        ImGui_ImplOpenGL2_Init();
+        imData->created = true;
+    }
+
+    // TODO io.DeltaTime
+
+    ImGui_ImplOpenGL2_NewFrame();
+    ImGui::NewFrame();
+
+    drawImGui();
+
+    ImGui::Render();
+
+    if (ImDrawData* const data = ImGui::GetDrawData())
+        ImGui_ImplOpenGL2_RenderDrawData(data);
 }

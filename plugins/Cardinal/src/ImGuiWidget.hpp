@@ -27,21 +27,11 @@ struct ImGuiWidget : OpenGlWidget {
     ImGuiWidget();
     ~ImGuiWidget() override;
 
-    virtual void drawImGui()
-    {
-        ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::SetNextWindowSize(ImVec2(box.size.x, box.size.y));
-        ImGui::ShowDemoWindow();
-    }
-
     float getScaleFactor() const noexcept;
 
 protected:
     void onContextCreate(const ContextCreateEvent& e) override;
     void onContextDestroy(const ContextDestroyEvent& e) override;
-
-private:
-    void drawFramebuffer() override;
     void onHover(const HoverEvent& e) override;
     void onDragHover(const DragHoverEvent& e) override;
     void onDragLeave(const DragLeaveEvent& e) override;
@@ -49,4 +39,15 @@ private:
     void onButton(const ButtonEvent& e) override;
     void onSelectKey(const SelectKeyEvent& e) override;
     void onSelectText(const SelectTextEvent& e) override;
+    void setAsCurrentContext();
+
+    virtual void drawImGui()
+    {
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImVec2(box.size.x, box.size.y));
+        ImGui::ShowDemoWindow();
+    }
+
+private:
+    void drawFramebuffer() override;
 };
