@@ -824,7 +824,7 @@ struct HostMIDIWidget : ModuleWidget {
             HostMIDI* module;
             Menu* createChildMenu() override {
                 Menu* menu = new Menu;
-                for (uint8_t c = 0; c < 15; c++) {
+                for (uint8_t c = 0; c < 16; c++) {
                     menu->addChild(createCheckMenuItem(string::f("%d", c+1), "",
                         [=]() {return module->midiOutput.channel == c;},
                         [=]() {module->midiOutput.channel = c;}
