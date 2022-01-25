@@ -16,9 +16,9 @@
  */
 
 #include "plugincontext.hpp"
-
 #ifndef HEADLESS
 # include "EmbedWidget.hpp"
+# include "extra/ExternalWindow.hpp"
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ struct CardinalEmbedModule : Module {
 // --------------------------------------------------------------------------------------------------------------------
 
 #ifndef HEADLESS
-struct CardinalEmbedWidget : ModuleWidget {
+struct CardinalEmbedWidget : ModuleWidget, ExternalWindow {
     CardinalEmbedModule* const module;
     CardinalPluginContext* const pcontext;
     EmbedWidget* embedWidget = nullptr;
@@ -62,6 +62,7 @@ struct CardinalEmbedWidget : ModuleWidget {
 
     CardinalEmbedWidget(CardinalEmbedModule* const m)
         : ModuleWidget(),
+          ExternalWindow(),
           module(m),
           pcontext(m != nullptr ? m->pcontext : nullptr)
     {
@@ -73,6 +74,11 @@ struct CardinalEmbedWidget : ModuleWidget {
             embedWidget = new EmbedWidget(box.size);
             addChild(embedWidget);
         }
+    }
+
+    ~CardinalEmbedWidget()
+    {
+        terminateAndWaitForExternalProcess();
     }
 
     void onContextCreate(const ContextCreateEvent& e) override
@@ -120,6 +126,47 @@ struct CardinalEmbedWidget : ModuleWidget {
 
         isEmbed = false;
         embedWidget->hide();
+    }
+
+    void appendContextMenu(ui::Menu* const menu) override
+    {
+        menu->addChild(new ui::MenuSeparator);
+
+        struct LoadVideoFileItem : MenuItem {
+            CardinalEmbedWidget* const self;
+
+            LoadVideoFileItem(CardinalEmbedWidget* const s)
+                : self(s)
+            {
+                text = "Load video file...";
+            }
+
+            void onAction(const event::Action&) override
+            {
+                WeakPtr<CardinalEmbedWidget> const self = this->self;
+                async_dialog_filebrowser(false, nullptr, text.c_str(), [self](char* path)
+                {
+                    if (path == nullptr)
+                        return;
+
+                    if (self != nullptr)
+                    {
+                        char winIdStr[64];
+                        std::snprintf(winIdStr, sizeof(winIdStr), "--wid=%lu",
+                                      static_cast<ulong>(self->embedWidget->getNativeWindowId()));
+                        const char* args[] = {
+                            "mpv", "--no-audio", winIdStr, path, nullptr
+                        };
+                        self->terminateAndWaitForExternalProcess();
+                        self->startExternalProcess(args);
+                    }
+
+                    std::free(path);
+                });
+            }
+        };
+
+        menu->addChild(new LoadVideoFileItem(this));
     }
 };
 #else

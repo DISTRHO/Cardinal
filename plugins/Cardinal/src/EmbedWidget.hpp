@@ -29,6 +29,8 @@ struct EmbedWidget : Widget {
     void embedIntoRack(uintptr_t nativeWindowId);
     void hide();
 
+    uintptr_t getNativeWindowId() const;
+
 private:
     void draw(const DrawArgs&) override {}
     void step() override;

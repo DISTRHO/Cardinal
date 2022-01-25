@@ -208,6 +208,15 @@ void EmbedWidget::hide()
     pData->hide();
 }
 
+uintptr_t EmbedWidget::getNativeWindowId() const
+{
+   #ifdef HAVE_X11
+    return pData->window;
+   #else
+    return 0;
+   #endif
+}
+
 void EmbedWidget::step()
 {
     pData->step(getAbsoluteRect());
