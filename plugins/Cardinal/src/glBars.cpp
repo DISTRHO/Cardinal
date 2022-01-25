@@ -65,7 +65,10 @@ struct glBarsRendererWidget : OpenGlWidget {
     glBarsModule* const glBars;
 
     glBarsRendererWidget(glBarsModule* const module)
-        : glBars(module) {}
+        : glBars(module)
+    {
+        oversample = 2.0f;
+    }
 
     void drawFramebuffer() override {
         math::Vec fbSize = getFramebufferSize();
@@ -74,12 +77,13 @@ struct glBarsRendererWidget : OpenGlWidget {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        glViewport(0.0, 0.0, fbSize.x, fbSize.y);
+        glViewport(0.0, -100, fbSize.x * oversample, fbSize.y * oversample);
         glFrustum(-1, 1, -1, 1, 1.5, 10);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
 
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glBars->state.Render();
@@ -100,16 +104,28 @@ struct glBarsWidget : ModuleWidget {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/glBars.svg")));
 
-        addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
+        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-        glBarsRenderer->box.pos = Vec(2 * RACK_GRID_WIDTH, 0);
-        glBarsRenderer->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH, box.size.y);
+        addInput(createInput<PJ301MPort>(Vec(135.0f, 20.0f), module, glBarsModule::IN1_INPUT));
+
+        const float size = mm2px(127.0f);
+        glBarsRenderer->box.pos = Vec((box.size.x - size) * 0.5f, (box.size.y - size) * 0.5f);
+        glBarsRenderer->box.size = Vec(size, size);
         addChild(glBarsRenderer);
+    }
 
-        addInput(createInput<PJ301MPort>(Vec(3, 54), module, glBarsModule::IN1_INPUT));
+    void draw(const DrawArgs& args) override
+    {
+        nvgBeginPath(args.vg);
+        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
+                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
+        nvgFill(args.vg);
+
+        ModuleWidget::draw(args);
     }
 };
 #else
