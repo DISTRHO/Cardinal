@@ -47,7 +47,12 @@ struct TextEditorModule : Module {
 
     json_t* dataToJson() override
     {
-        json_t* rootJ = json_object();
+        json_t* const rootJ = json_object();
+        DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr, nullptr);
+
+        if (ImGuiTextEditor* const widget = widgetPtr)
+            text = widget->getText();
+
         json_object_set_new(rootJ, "filepath", json_string(file.c_str()));
         json_object_set_new(rootJ, "lang", json_string(lang.c_str()));
         json_object_set_new(rootJ, "etext", json_string(text.c_str()));
