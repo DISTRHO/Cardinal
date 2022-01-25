@@ -1660,8 +1660,8 @@ struct IldaeilModuleWidget : ModuleWidget {
         if (module != nullptr && module->pcontext != nullptr)
         {
             ildaeilWidget = new IldaeilWidget(module);
-            ildaeilWidget->box.pos = Vec(2 * RACK_GRID_WIDTH, 1);
-            ildaeilWidget->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH - 1, box.size.y - 2);
+            ildaeilWidget->box.pos = Vec(2 * RACK_GRID_WIDTH, 0);
+            ildaeilWidget->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH, box.size.y);
             addChild(ildaeilWidget);
         }
 
@@ -1681,6 +1681,17 @@ struct IldaeilModuleWidget : ModuleWidget {
         addInput(createInput<PJ301MPort>(Vec(3, 54 + 225), module, IldaeilModule::AFT_INPUT));
         addInput(createInput<PJ301MPort>(Vec(3, 54 + 255), module, IldaeilModule::PW_INPUT));
         addInput(createInput<PJ301MPort>(Vec(3, 54 + 285), module, IldaeilModule::MW_INPUT));
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        nvgBeginPath(args.vg);
+        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
+                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
+        nvgFill(args.vg);
+
+        ModuleWidget::draw(args);
     }
 
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IldaeilModuleWidget)

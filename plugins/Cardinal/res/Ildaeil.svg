@@ -2,45 +2,22 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="131.44501mm"
    height="128.5mm"
    viewBox="0 0 131.44501 128.5"
    version="1.1"
    id="svg4620"
-   inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
-   sodipodi:docname="glBars.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:dc="http://purl.org/dc/elements/1.1/">
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   sodipodi:docname="Ildaeil.svg">
   <defs
      id="defs4614">
-    <linearGradient
-       gradientTransform="matrix(2.8749528,0,0,1,5.1153789e-6,168.49892)"
-       inkscape:collect="always"
-       xlink:href="#linearGradient869"
-       id="linearGradient871"
-       x1="22.450642"
-       y1="0.64095056"
-       x2="22.450642"
-       y2="129.73215"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient869">
-      <stop
-         style="stop-color:#181919;stop-opacity:1;"
-         offset="0"
-         id="stop865" />
-      <stop
-         style="stop-color:#212222;stop-opacity:1"
-         offset="1"
-         id="stop867" />
-    </linearGradient>
     <style
        id="style6"
        type="text/css">
@@ -60,16 +37,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6568543"
-     inkscape:cx="15.556349"
-     inkscape:cy="51.176853"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="260.22565"
+     inkscape:cy="198.9489"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1229"
-     inkscape:window-height="667"
-     inkscape:window-x="51"
-     inkscape:window-y="25"
+     inkscape:window-width="1920"
+     inkscape:window-height="1026"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:pagecheckerboard="0"
      width="45.72mm"
@@ -90,13 +67,6 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-168.5)">
-    <rect
-       style="opacity:1;fill:url(#linearGradient871);fill-opacity:1;stroke-width:0.533853;stroke-miterlimit:4;stroke-dasharray:none"
-       id="rect815"
-       width="131.44411"
-       height="128.49823"
-       x="0"
-       y="168.50089" />
     <g
        style="fill-rule:evenodd"
        id="g5299"
