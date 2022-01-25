@@ -17,26 +17,21 @@
 
 #pragma once
 
-#include "rack.hpp"
+#include "plugin.hpp"
 
-#ifdef NDEBUG
-# undef DEBUG
-#endif
+struct EmbedWidget : Widget {
+    struct PrivateData;
+    PrivateData* const pData;
 
-using namespace rack;
+    EmbedWidget(Vec size);
+    ~EmbedWidget() override;
 
-extern Plugin* pluginInstance;
+    void embedIntoRack(uintptr_t nativeWindowId);
+    void hide();
 
-extern Model* modelAudioFile;
-extern Model* modelCarla;
-extern Model* modelCardinalBlank;
-extern Model* modelGlBars;
-extern Model* modelHostAudio2;
-extern Model* modelHostAudio8;
-extern Model* modelHostCV;
-extern Model* modelHostMIDI;
-extern Model* modelHostParameters;
-extern Model* modelHostTime;
-extern Model* modelIldaeil;
-extern Model* modelMPV;
-extern Model* modelTextEditor;
+private:
+    void draw(const DrawArgs&) override {}
+    void step() override;
+
+    Rect getAbsoluteRect();
+};

@@ -113,6 +113,15 @@
       ]
     },
     {
+      "slug": "MPV",
+      "disabled": false,
+      "name": "MPV",
+      "description": "An embed video player inside Cardinal",
+      "tags": [
+        "Visual"
+      ]
+    },
+    {
       "slug": "TextEditor",
       "disabled": false,
       "name": "Text Editor",

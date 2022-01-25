@@ -199,9 +199,11 @@ ifneq ($(STATIC_BUILD),true)
 PLUGIN_FILES += Cardinal/src/AudioFile.cpp
 PLUGIN_FILES += Cardinal/src/Carla.cpp
 PLUGIN_FILES += Cardinal/src/Ildaeil.cpp
+PLUGIN_FILES += Cardinal/src/MPV.cpp
 endif
 
 ifneq ($(HEADLESS),true)
+PLUGIN_FILES += Cardinal/src/EmbedWidget.cpp
 PLUGIN_FILES += Cardinal/src/ImGuiWidget.cpp
 PLUGIN_FILES += Cardinal/src/ImGuiTextEditor.cpp
 PLUGIN_FILES += $(wildcard Cardinal/src/DearImGui/*.cpp)
