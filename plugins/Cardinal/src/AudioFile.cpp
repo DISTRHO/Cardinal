@@ -490,6 +490,60 @@ struct AudioFileWidget : ModuleWidget {
         }
     }
 
+    void drawLayer(const DrawArgs& args, int layer) override
+    {
+        if (layer != 1)
+            return ModuleWidget::drawLayer(args, layer);
+
+        const Rect audioPreviewPos = Rect(8, box.size.y - 80 - 80, box.size.x - 16, 80);
+        const float alpha = 1.0f - (0.5f - settings::rackBrightness * 0.5f);
+        char textInfo[0xff];
+
+        if (module != nullptr && module->audioInfo.channels != 0)
+        {
+            const float audioPreviewBarHeight = audioPreviewPos.size.y - 20;
+            const size_t position = (module->audioInfo.position * 0.01f) * ARRAY_SIZE(module->audioInfo.preview);
+
+            nvgFillColor(args.vg, nvgRGBAf(0.839f, 0.459f, 0.086f, alpha));
+
+            for (size_t i=0; i<ARRAY_SIZE(module->audioInfo.preview); ++i)
+            {
+                const float value = module->audioInfo.preview[i];
+                const float height = std::max(0.01f, value * audioPreviewBarHeight);
+                const float y = audioPreviewPos.pos.y + audioPreviewBarHeight - height;
+
+                if (position == i)
+                    nvgFillColor(args.vg, nvgRGBAf(1.0f, 1.0f, 1.0f, alpha));
+
+                nvgBeginPath(args.vg);
+                nvgRect(args.vg,
+                        audioPreviewPos.pos.x + 3 + 3 * i, y + 2, 2, height);
+                nvgFill(args.vg);
+            }
+
+            std::snprintf(textInfo, sizeof(textInfo), "%s %d-Bit, %.1fkHz, %dm%02ds",
+                          module->audioInfo.channels == 1 ? "Mono" : module->audioInfo.channels == 2 ? "Stereo" : "Other",
+                          module->audioInfo.bitDepth,
+                          static_cast<float>(module->audioInfo.sampleRate)/1000.0f,
+                          module->audioInfo.length / 60,
+                          module->audioInfo.length % 60);
+        }
+        else
+        {
+            std::strcpy(textInfo, "No file loaded");
+        }
+
+        nvgFillColor(args.vg, nvgRGBAf(1.0f, 1.0f, 1.0f, alpha));
+        nvgFontFaceId(args.vg, 0);
+        nvgFontSize(args.vg, 13);
+        nvgTextAlign(args.vg, NVG_ALIGN_LEFT);
+
+        nvgText(args.vg,
+                audioPreviewPos.pos.x + 4,
+                audioPreviewPos.pos.y + audioPreviewPos.size.y - 6,
+                textInfo, nullptr);
+    }
+
     void draw(const DrawArgs& args) override
     {
         nvgBeginPath(args.vg);
@@ -511,73 +565,17 @@ struct AudioFileWidget : ModuleWidget {
         nvgStrokeColor(args.vg, nvgRGB(0xd6, 0x75, 0x16));
         nvgStroke(args.vg);
 
-        char textInfo[0xff];
-
-        if (module != nullptr && module->audioInfo.channels != 0)
-        {
-            const float audioPreviewBarHeight = audioPreviewPos.size.y - 20;
-            const size_t position = (module->audioInfo.position * 0.01f) * ARRAY_SIZE(module->audioInfo.preview);
-
-            nvgFillColor(args.vg, nvgRGB(0xd6, 0x75, 0x16));
-
-            for (size_t i=0; i<ARRAY_SIZE(module->audioInfo.preview); ++i)
-            {
-                const float value = module->audioInfo.preview[i];
-                const float height = std::max(0.01f, value * audioPreviewBarHeight);
-                const float y = audioPreviewPos.pos.y + audioPreviewBarHeight - height;
-
-                if (position == i)
-                    nvgFillColor(args.vg, color::WHITE);
-
-                nvgBeginPath(args.vg);
-                nvgRect(args.vg,
-                        audioPreviewPos.pos.x + 3 + 3 * i, y + 2, 2, height);
-                nvgFill(args.vg);
-            }
-
-            std::snprintf(textInfo, sizeof(textInfo), "%s %d-Bit, %.1fkHz, %dm%02ds",
-                          module->audioInfo.channels == 1 ? "Mono" : module->audioInfo.channels == 2 ? "Stereo" : "Other",
-                          module->audioInfo.bitDepth,
-                          static_cast<float>(module->audioInfo.sampleRate)/1000.0f,
-                          module->audioInfo.length / 60,
-                          module->audioInfo.length % 60);
-        }
-        else
-        {
-            std::strcpy(textInfo, "No file loaded");
-        }
-
-        nvgFillColor(args.vg, color::WHITE);
-        nvgFontFaceId(args.vg, 0);
-        nvgFontSize(args.vg, 13);
-        nvgTextAlign(args.vg, NVG_ALIGN_LEFT);
-
-        nvgText(args.vg, audioPreviewPos.pos.x + 4, audioPreviewPos.pos.y + audioPreviewPos.size.y - 6,
-                textInfo, nullptr);
-
-        nvgFontSize(args.vg, 11);
-        nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-        // nvgTextBounds(vg, 0, 0, text, nullptr, nullptr);
-
         nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg, startX_Out - 4.0f, RACK_GRID_HEIGHT - padding * CarlaInternalPluginModule::NUM_INPUTS - 2.0f,
-                       padding, padding * CarlaInternalPluginModule::NUM_INPUTS, 4);
+        nvgRoundedRect(args.vg,
+                       startX_Out - 4.0f,
+                       RACK_GRID_HEIGHT - padding * CarlaInternalPluginModule::NUM_INPUTS - 2.0f,
+                       padding,
+                       padding * CarlaInternalPluginModule::NUM_INPUTS, 4);
         nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
         nvgFill(args.vg);
 
         ModuleWidget::draw(args);
     }
-
-//     void step() override
-//     {
-//         if (d_isNotEqual(module->audioInfo.position, lastPosition))
-//         {
-//             lastPosition = module->audioInfo.position;
-// //             setDirty(true);
-//         }
-//
-//         ModuleWidget::step();
-//     }
 
     void appendContextMenu(ui::Menu* const menu) override
     {

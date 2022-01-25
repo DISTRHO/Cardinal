@@ -71,6 +71,18 @@ struct glBarsRendererWidget : OpenGlWidget {
             oversample = 2.0f;
     }
 
+    void draw(const DrawArgs&) override
+    {
+    }
+
+    void drawLayer(const DrawArgs& args, int layer) override
+    {
+        if (layer != 1)
+            return;
+
+        OpenGlWidget::draw(args);
+    }
+
     void drawFramebuffer() override {
         math::Vec fbSize = getFramebufferSize();
 
