@@ -103,7 +103,7 @@ struct HostCVWidget : ModuleWidget {
     static constexpr const float startX_Out = 96.0f;
     static constexpr const float startY = 74.0f;
     static constexpr const float padding = 29.0f;
-    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.25f;
+    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
 
     HostCVWidget(HostCV* const module)
     {
@@ -141,10 +141,9 @@ struct HostCVWidget : ModuleWidget {
         nvgFontFaceId(args.vg, 0);
         nvgFontSize(args.vg, 11);
         nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-        // nvgTextBounds(vg, 0, 0, text, nullptr, nullptr);
 
         nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg, startX_Out - 4.0f, startY - 2.0f, padding, padding * HostCV::NUM_INPUTS, 4);
+        nvgRoundedRect(args.vg, startX_Out - 2.5f, startY - 2.0f, padding, padding * HostCV::NUM_INPUTS, 4);
         nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
         nvgFill(args.vg);
 

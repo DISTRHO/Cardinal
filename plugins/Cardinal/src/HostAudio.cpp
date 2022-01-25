@@ -132,7 +132,7 @@ struct HostAudioWidget : ModuleWidget {
     static constexpr const float startX_Out = 96.0f;
     static constexpr const float startY = 74.0f;
     static constexpr const float padding = 29.0f;
-    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.25f;
+    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
 
     HostAudio<numIO>* const module;
 
@@ -159,12 +159,12 @@ struct HostAudioWidget : ModuleWidget {
         }
     }
 
-    void drawTextLine(NVGcontext* const vg, const float offsetX, const uint posY, const char* const text)
+    void drawTextLine(NVGcontext* const vg, const uint posY, const char* const text)
     {
         const float y = startY + posY * padding;
         nvgBeginPath(vg);
         nvgFillColor(vg, color::WHITE);
-        nvgText(vg, middleX + offsetX, y + 16, text, nullptr);
+        nvgText(vg, middleX, y + 16, text, nullptr);
     }
 
     void draw(const DrawArgs& args) override
@@ -180,21 +180,21 @@ struct HostAudioWidget : ModuleWidget {
         nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
 
         nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg, startX_Out - 4.0f, startY - 2.0f, padding, padding * numIO, 4);
+        nvgRoundedRect(args.vg, startX_Out - 2.5f, startY - 2.0f, padding, padding * numIO, 4);
         nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
         nvgFill(args.vg);
 
         if (numIO == 2)
         {
-            drawTextLine(args.vg, 3.0f, 0, "Left/Mono");
-            drawTextLine(args.vg, 0.0f, 1, "Right");
+            drawTextLine(args.vg, 0, "Left/Mono");
+            drawTextLine(args.vg, 1, "Right");
         }
         else
         {
             for (int i=0; i<numIO; ++i)
             {
                 char text[] = {'A','u','d','i','o',' ',static_cast<char>('0'+i+1),'\0'};
-                drawTextLine(args.vg, 0.0f, i, text);
+                drawTextLine(args.vg, i, text);
             }
         }
 
