@@ -756,7 +756,7 @@ struct HostMIDIWidget : ModuleWidget {
         drawTextLine(args.vg, 2, "Velocity");
         drawTextLine(args.vg, 3, "Aftertouch");
         drawTextLine(args.vg, 4, "Pitchbend");
-        drawTextLine(args.vg, 5, "Mod Wheel");
+        drawTextLine(args.vg, 5, "ModWheel");
         drawTextLine(args.vg, 6, "Start");
         drawTextLine(args.vg, 7, "Stop");
         drawTextLine(args.vg, 8, "Cont");

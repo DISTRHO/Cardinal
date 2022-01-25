@@ -67,7 +67,8 @@ struct glBarsRendererWidget : OpenGlWidget {
     glBarsRendererWidget(glBarsModule* const module)
         : glBars(module)
     {
-        oversample = 2.0f;
+        if (APP->window->pixelRatio < 2.0f)
+            oversample = 2.0f;
     }
 
     void drawFramebuffer() override {
@@ -92,6 +93,12 @@ struct glBarsRendererWidget : OpenGlWidget {
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
         glEnable(GL_BLEND);
+    }
+
+    void step() override {
+        OpenGlWidget::step();
+
+        oversample = APP->window->pixelRatio < 2.0f ? 2.0f : 1.0f;
     }
 };
 
