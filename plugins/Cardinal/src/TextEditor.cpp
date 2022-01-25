@@ -50,8 +50,10 @@ struct TextEditorModule : Module {
         json_t* const rootJ = json_object();
         DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr, nullptr);
 
+#ifndef HEADLESS
         if (ImGuiTextEditor* const widget = widgetPtr)
             text = widget->getText();
+#endif
 
         json_object_set_new(rootJ, "filepath", json_string(file.c_str()));
         json_object_set_new(rootJ, "lang", json_string(lang.c_str()));
