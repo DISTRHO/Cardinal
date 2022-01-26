@@ -213,25 +213,36 @@ struct CarlaInternalPluginModule : Module, Thread {
         return 0;
     }
 
-//     json_t* dataToJson() override
-//     {
-//         if (fCarlaPluginHandle == nullptr)
-//             return nullptr;
-// 
-//         char* const state = fCarlaPluginDescriptor->get_state(fCarlaPluginHandle);
-//         return json_string(state);
-//     }
-// 
-//     void dataFromJson(json_t* const rootJ) override
-//     {
-//         if (fCarlaPluginHandle == nullptr)
-//             return;
-// 
-//         const char* const state = json_string_value(rootJ);
-//         DISTRHO_SAFE_ASSERT_RETURN(state != nullptr,);
-// 
-//         fCarlaPluginDescriptor->set_state(fCarlaPluginHandle, state);
-//     }
+    json_t* dataToJson() override
+    {
+        json_t* const rootJ = json_object();
+        DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr, nullptr);
+
+        json_object_set_new(rootJ, "filepath", json_string(currentFile.c_str()));
+        return rootJ;
+    }
+
+    void dataFromJson(json_t* const rootJ) override
+    {
+        if (json_t* const filepathJ = json_object_get(rootJ, "filepath"))
+        {
+            const char* const filepath = json_string_value(filepathJ);
+
+            if (filepath[0] != '\0')
+            {
+                currentFile = filepath;
+                fileChanged = true;
+
+                if (fCarlaPluginHandle != nullptr)
+                    fCarlaPluginDescriptor->set_custom_data(fCarlaPluginHandle, "file", filepath);
+
+                return;
+            }
+        }
+
+        currentFile.clear();
+        fileChanged = true;
+    }
 
     void process(const ProcessArgs&) override
     {
@@ -450,8 +461,6 @@ struct AudioFileListWidget : ImGuiWidget {
 };
 
 struct AudioFileWidget : ModuleWidget {
-    static constexpr const float startX_In = 14.0f;
-    static constexpr const float startX_Out = 96.0f;
     static constexpr const float padding = 29.0f;
 
     CarlaInternalPluginModule* const module;
@@ -471,19 +480,17 @@ struct AudioFileWidget : ModuleWidget {
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
         addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-        addOutput(createOutput<PJ301MPort>(Vec(box.size.x - RACK_GRID_WIDTH * 5/2,
-                                               RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding * 2),
-                                           module, 0));
+        addOutput(createOutput<PJ301MPort>(Vec(box.size.x - RACK_GRID_WIDTH * 5/2 - padding,
+                                               RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding), module, 0));
 
         addOutput(createOutput<PJ301MPort>(Vec(box.size.x - RACK_GRID_WIDTH * 5/2,
-                                               RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding * 1),
-                                           module, 1));
+                                               RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding), module, 1));
 
         if (m != nullptr)
         {
             AudioFileListWidget* const listw = new AudioFileListWidget(m);
             listw->box.pos.x = 0;
-            listw->box.pos.y = 36;
+            listw->box.pos.y = 71.0f;
             listw->box.size.x = box.size.x;
             listw->box.size.y = box.size.y / 2 - 20;
             addChild(listw);
@@ -495,7 +502,7 @@ struct AudioFileWidget : ModuleWidget {
         if (layer != 1)
             return ModuleWidget::drawLayer(args, layer);
 
-        const Rect audioPreviewPos = Rect(8, box.size.y - 80 - 80, box.size.x - 16, 80);
+        const Rect audioPreviewPos = Rect(8, box.size.y - 51 - 80, box.size.x - 16, 80);
         const float alpha = 1.0f - (0.5f - settings::rackBrightness * 0.5f);
         char textInfo[0xff];
 
@@ -553,7 +560,7 @@ struct AudioFileWidget : ModuleWidget {
                                                 nvgRGB(0x21, 0x22, 0x22)));
         nvgFill(args.vg);
 
-        const Rect audioPreviewPos = Rect(8, box.size.y - 80 - 80, box.size.x - 16, 80);
+        const Rect audioPreviewPos = Rect(8, box.size.y - 51 - 80, box.size.x - 16, 80);
 
         nvgBeginPath(args.vg);
         nvgRoundedRect(args.vg,
@@ -567,7 +574,7 @@ struct AudioFileWidget : ModuleWidget {
 
         nvgBeginPath(args.vg);
         nvgRoundedRect(args.vg,
-                       startX_Out - 4.0f,
+                       02.0f,
                        RACK_GRID_HEIGHT - padding * CarlaInternalPluginModule::NUM_INPUTS - 2.0f,
                        padding,
                        padding * CarlaInternalPluginModule::NUM_INPUTS, 4);

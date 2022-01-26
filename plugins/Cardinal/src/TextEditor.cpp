@@ -64,11 +64,12 @@ struct TextEditorModule : Module {
 
     void dataFromJson(json_t* const rootJ) override
     {
+        file.clear();
+
         // Rack Core Notes compatiblity
         if (json_t* const textJ = json_object_get(rootJ, "text"))
         {
             text = json_string_value(textJ);
-            file = "";
             lang = "None";
             width = 16;
 #ifndef HEADLESS
