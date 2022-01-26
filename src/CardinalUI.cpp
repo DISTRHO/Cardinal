@@ -36,7 +36,6 @@
 #include "AsyncDialog.hpp"
 #include "PluginContext.hpp"
 #include "WindowParameters.hpp"
-#include "ResizeHandle.hpp"
 
 GLFWAPI int glfwGetKeyScancode(int) { return 0; }
 
