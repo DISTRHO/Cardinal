@@ -95,7 +95,23 @@ endif
 # MOD builds
 
 MOD_WORKDIR ?= $(HOME)/mod-workdir
-MOD_ENVIRONMENT = AR=${1}/host/usr/bin/${2}-gcc-ar CC=${1}/host/usr/bin/${2}-gcc CPP=${1}/host/usr/bin/${2}-cpp CXX=${1}/host/usr/bin/${2}-g++ LD=${1}/host/usr/bin/${2}-ld PKG_CONFIG=${1}/host/usr/bin/pkg-config STRIP=${1}/host/usr/bin/${2}-strip CFLAGS="-I${1}/staging/usr/include" CPPFLAGS= CXXFLAGS="-I${1}/staging/usr/include" LDFLAGS="-L${1}/staging/usr/lib" \ EXE_WRAPPER="qemu-${3}-static -L ${1}/target" HEADLESS=true MOD_BUILD=true NOOPT=true STATIC_BUILD=true
+MOD_ENVIRONMENT = \
+	AR=${1}/host/usr/bin/${2}-gcc-ar \
+	CC=${1}/host/usr/bin/${2}-gcc \
+	CPP=${1}/host/usr/bin/${2}-cpp \
+	CXX=${1}/host/usr/bin/${2}-g++ \
+	LD=${1}/host/usr/bin/${2}-ld \
+	PKG_CONFIG=${1}/host/usr/bin/pkg-config \
+	STRIP=${1}/host/usr/bin/${2}-strip \
+	CFLAGS="-I${1}/staging/usr/include -fsingle-precision-constant" \
+	CPPFLAGS= \
+	CXXFLAGS="-I${1}/staging/usr/include -I../include/single-precision -fsingle-precision-constant -Wno-attributes" \
+	LDFLAGS="-L${1}/staging/usr/lib" \
+	EXE_WRAPPER="qemu-${3}-static -L ${1}/target" \
+	HEADLESS=true \
+	MOD_BUILD=true \
+	NOOPT=true \
+	STATIC_BUILD=true
 
 modduo:
 	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduo-static,arm-mod-linux-gnueabihf.static,arm)
