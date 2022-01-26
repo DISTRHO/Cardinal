@@ -70,6 +70,15 @@ GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char* const text)
     context->ui->setClipboard(nullptr, text, std::strlen(text)+1);
 }
 
+GLFWAPI void glfwSetCursor(GLFWwindow*, GLFWcursor* const cursor)
+{
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+    DISTRHO_SAFE_ASSERT_RETURN(context != nullptr,);
+    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr,);
+
+    context->ui->setCursor(cursor != nullptr ? kMouseCursorDiagonal : kMouseCursorArrow);
+}
+
 GLFWAPI double glfwGetTime(void)
 {
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
@@ -181,7 +190,6 @@ GLFWAPI const char* glfwGetKeyName(const int key, int)
 namespace rack {
 namespace app {
     widget::Widget* createMenuBar(bool isStandalone);
-    void hideResizeHandle(Scene* scene);
 }
 namespace window {
     void WindowSetPluginUI(Window* window, DISTRHO_NAMESPACE::UI* ui);
@@ -231,7 +239,6 @@ class CardinalUI : public CardinalBaseUI,
                    public WindowParametersCallback
 {
     rack::math::Vec fLastMousePos;
-    ResizeHandle fResizeHandle;
     WindowParameters fWindowParameters;
     int fRateLimitStep = 0;
 
@@ -263,19 +270,12 @@ class CardinalUI : public CardinalBaseUI,
 
 public:
     CardinalUI()
-        : CardinalBaseUI(1228, 666),
-          fResizeHandle(this)
+        : CardinalBaseUI(1228, 666)
     {
         Window& window(getWindow());
 
         window.setIgnoringKeyRepeat(true);
         context->nativeWindowId = window.getNativeWindowHandle();
-
-        if (isResizable())
-        {
-            fResizeHandle.hide();
-            hideResizeHandle(context->scene);
-        }
 
         const double scaleFactor = getScaleFactor();
 

@@ -1,5 +1,5 @@
 --- ../Rack/src/app/Scene.cpp	2021-12-14 21:35:44.414568198 +0000
-+++ Scene.cpp	2022-01-24 11:12:33.268767988 +0000
++++ Scene.cpp	2022-01-26 18:47:48.006168325 +0000
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -39,7 +39,7 @@
  #include <system.hpp>
  #include <network.hpp>
  #include <history.hpp>
-@@ -14,31 +42,58 @@
+@@ -14,6 +42,17 @@
  #include <patch.hpp>
  #include <asset.hpp>
  
@@ -57,11 +57,9 @@
  
  namespace rack {
  namespace app {
+@@ -23,16 +62,55 @@
+ 	math::Vec size;
  
- 
- struct ResizeHandle : widget::OpaqueWidget {
--	math::Vec size;
--
  	void draw(const DrawArgs& args) override {
 +		nvgStrokeColor(args.vg, nvgRGBf(1, 1, 1));
 +		nvgStrokeWidth(args.vg, 1);
@@ -74,12 +72,8 @@
 -		nvgClosePath(args.vg);
 -		nvgFillColor(args.vg, nvgRGBAf(1, 1, 1, 0.15));
 -		nvgFill(args.vg);
--	}
 +		nvgStroke(args.vg);
- 
--	void onDragStart(const DragStartEvent& e) override {
--		size = APP->window->getSize();
--	}
++
 +		nvgBeginPath(args.vg);
 +		nvgMoveTo(args.vg, box.size.x + 5, 0);
 +		nvgLineTo(args.vg, 0, box.size.y + 5);
@@ -91,10 +85,7 @@
 +		nvgStroke(args.vg);
 +
 +		nvgStrokeColor(args.vg, nvgRGBf(0, 0, 0));
- 
--	void onDragMove(const DragMoveEvent& e) override {
--		size = size.plus(e.mouseDelta);
--		APP->window->setSize(size.round());
++
 +		nvgBeginPath(args.vg);
 +		nvgMoveTo(args.vg, box.size.x+1, 0);
 +		nvgLineTo(args.vg, 0, box.size.y+1);
@@ -109,10 +100,26 @@
 +		nvgMoveTo(args.vg, box.size.x + 11, 0);
 +		nvgLineTo(args.vg, 0, box.size.y + 11);
 +		nvgStroke(args.vg);
++	}
++
++	void onHover(const HoverEvent& e) override {
++		e.consume(this);
++	}
++
++	void onEnter(const EnterEvent& e) override {
++		glfwSetCursor(nullptr, (GLFWcursor*)0x1);
++	}
++
++	void onLeave(const LeaveEvent& e) override {
++		glfwSetCursor(nullptr, nullptr);
  	}
- };
  
-@@ -46,9 +101,32 @@
+-	void onDragStart(const DragStartEvent& e) override {
++	void onDragStart(const DragStartEvent&) override {
+ 		size = APP->window->getSize();
+ 	}
+ 
+@@ -46,9 +124,32 @@
  struct Scene::Internal {
  	ResizeHandle* resizeHandle;
  
@@ -147,7 +154,7 @@
  };
  
  
-@@ -67,17 +145,17 @@
+@@ -67,13 +168,8 @@
  	browser->hide();
  	addChild(browser);
  
@@ -162,16 +169,7 @@
  	addChild(internal->resizeHandle);
  }
  
- 
-+void hideResizeHandle(Scene* scene) {
-+	scene->internal->resizeHandle->hide();
-+}
-+
-+
- Scene::~Scene() {
- 	delete internal;
- }
-@@ -89,32 +167,13 @@
+@@ -89,32 +185,13 @@
  
  
  void Scene::step() {
@@ -205,7 +203,7 @@
  	// Scroll RackScrollWidget with arrow keys
  	math::Vec arrowDelta;
  	if (internal->heldArrowKeys[0]) {
-@@ -143,6 +202,22 @@
+@@ -143,6 +220,22 @@
  		rackScroll->offset += arrowDelta * arrowSpeed;
  	}
  
@@ -228,7 +226,7 @@
  	Widget::step();
  }
  
-@@ -172,7 +247,7 @@
+@@ -172,7 +265,7 @@
  	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
  		// DEBUG("key '%d '%c' scancode %d '%c' keyName '%s'", e.key, e.key, e.scancode, e.scancode, e.keyName.c_str());
  		if (e.keyName == "n" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -237,7 +235,7 @@
  			e.consume(this);
  		}
  		if (e.keyName == "q" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -180,19 +255,20 @@
+@@ -180,19 +273,20 @@
  			e.consume(this);
  		}
  		if (e.keyName == "o" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -262,7 +260,7 @@
  			e.consume(this);
  		}
  		if (e.keyName == "z" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -232,10 +308,8 @@
+@@ -232,10 +326,8 @@
  			settings::cpuMeter ^= true;
  			e.consume(this);
  		}
@@ -275,7 +273,7 @@
  			e.consume(this);
  		}
  
-@@ -326,13 +400,6 @@
+@@ -326,13 +418,6 @@
  
  	// Key commands that can be overridden by children
  	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -289,7 +287,7 @@
  		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
  			rack->pasteClipboardAction();
  			e.consume(this);
-@@ -351,7 +418,7 @@
+@@ -351,7 +436,7 @@
  		std::string extension = system::getExtension(path);
  
  		if (extension == ".vcv") {
@@ -298,7 +296,7 @@
  			e.consume(this);
  			return;
  		}
-@@ -368,3 +435,73 @@
+@@ -368,3 +453,73 @@
  
  } // namespace app
  } // namespace rack

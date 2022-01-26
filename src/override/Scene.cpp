@@ -59,6 +59,8 @@ namespace app {
 
 
 struct ResizeHandle : widget::OpaqueWidget {
+	math::Vec size;
+
 	void draw(const DrawArgs& args) override {
 		nvgStrokeColor(args.vg, nvgRGBf(1, 1, 1));
 		nvgStrokeWidth(args.vg, 1);
@@ -94,6 +96,27 @@ struct ResizeHandle : widget::OpaqueWidget {
 		nvgMoveTo(args.vg, box.size.x + 11, 0);
 		nvgLineTo(args.vg, 0, box.size.y + 11);
 		nvgStroke(args.vg);
+	}
+
+	void onHover(const HoverEvent& e) override {
+		e.consume(this);
+	}
+
+	void onEnter(const EnterEvent& e) override {
+		glfwSetCursor(nullptr, (GLFWcursor*)0x1);
+	}
+
+	void onLeave(const LeaveEvent& e) override {
+		glfwSetCursor(nullptr, nullptr);
+	}
+
+	void onDragStart(const DragStartEvent&) override {
+		size = APP->window->getSize();
+	}
+
+	void onDragMove(const DragMoveEvent& e) override {
+		size = size.plus(e.mouseDelta);
+		APP->window->setSize(size.round());
 	}
 };
 
@@ -148,11 +171,6 @@ Scene::Scene() {
 	internal->resizeHandle = new ResizeHandle;
 	internal->resizeHandle->box.size = math::Vec(16, 16);
 	addChild(internal->resizeHandle);
-}
-
-
-void hideResizeHandle(Scene* scene) {
-	scene->internal->resizeHandle->hide();
 }
 
 

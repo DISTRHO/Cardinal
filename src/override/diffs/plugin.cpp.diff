@@ -1,5 +1,5 @@
 --- ../Rack/src/plugin.cpp	2022-01-15 14:44:46.395281005 +0000
-+++ plugin.cpp	2022-01-23 22:59:41.770256440 +0000
++++ plugin.cpp	2022-01-24 20:38:11.436099651 +0000
 @@ -1,308 +1,40 @@
 -#include <thread>
 -#include <map>
@@ -337,7 +337,7 @@
  /** Given slug => fallback slug.
  Correctly handles bidirectional fallbacks.
  To request fallback slugs to be added to this list, open a GitHub issue.
-@@ -352,6 +84,11 @@
+@@ -352,6 +84,12 @@
  */
  using PluginModuleSlug = std::tuple<std::string, std::string>;
  static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = {
@@ -346,10 +346,11 @@
 +	{{"Core", "AudioInterface16"}, {"Cardinal", "HostAudio8"}},
 +	{{"Core", "MIDIToCVInterface"}, {"Cardinal", "HostMIDI"}},
 +	{{"Core", "CV-MIDI"}, {"Cardinal", "HostMIDI"}},
++	{{"Core", "Notes"}, {"Cardinal", "TextEditor"}},
  	{{"MindMeld-ShapeMasterPro", "ShapeMasterPro"}, {"MindMeldModular", "ShapeMaster"}},
  	{{"MindMeldModular", "ShapeMaster"}, {"MindMeld-ShapeMasterPro", "ShapeMasterPro"}},
  	// {{"", ""}, {"", ""}},
-@@ -441,7 +178,6 @@
+@@ -441,7 +179,6 @@
  }
  
  
