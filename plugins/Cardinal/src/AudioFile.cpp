@@ -574,10 +574,10 @@ struct AudioFileWidget : ModuleWidget {
 
         nvgBeginPath(args.vg);
         nvgRoundedRect(args.vg,
-                       02.0f,
-                       RACK_GRID_HEIGHT - padding * CarlaInternalPluginModule::NUM_INPUTS - 2.0f,
-                       padding,
-                       padding * CarlaInternalPluginModule::NUM_INPUTS, 4);
+                       box.size.x - RACK_GRID_WIDTH * 5/2 - padding - 3.0f,
+                       RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding - 2.0f,
+                       padding * CarlaInternalPluginModule::NUM_OUTPUTS,
+                       padding, 4);
         nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
         nvgFill(args.vg);
 
