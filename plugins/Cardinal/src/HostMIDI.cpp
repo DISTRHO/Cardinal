@@ -274,7 +274,8 @@ struct HostMIDI : Module {
             return blockFrameChanged;
         }
 
-        void processMessage(const midi::Message& msg) {
+        void processMessage(const midi::Message& msg)
+        {
             // DEBUG("MIDI: %ld %s", msg.getFrame(), msg.toString().c_str());
 
             switch (msg.getStatus()) {
