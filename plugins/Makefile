@@ -270,101 +270,101 @@ ARIA_CUSTOM = Blank
 # --------------------------------------------------------------
 # AudibleInstruments
 
-# PLUGIN_FILES += $(filter-out AudibleInstruments/src/plugin.cpp,$(wildcard AudibleInstruments/src/*.cpp))
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/atan.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/units.cc
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/braids/macro_oscillator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/braids/analog_oscillator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/braids/digital_oscillator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/braids/quantizer.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/braids/resources.cc
-# 
-# PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/*.cc)
-# PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/engine/*.cc)
-# PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/speech/*.cc)
-# PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/physical_modelling/*.cc)
-# PLUGIN_FILES += AudibleInstruments/eurorack/plaits/resources.cc
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/correlator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/granular_processor.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/mu_law.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/pvoc/frame_transformation.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/pvoc/phase_vocoder.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/pvoc/stft.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/clouds/resources.cc
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/exciter.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/ominous_voice.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/resonator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/tube.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/multistage_envelope.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/part.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/string.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/voice.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/elements/resources.cc
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/fm_voice.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/part.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/string_synth_part.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/string.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/resonator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/rings/resources.cc
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/tides/generator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/tides/resources.cc
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/tides2/poly_slope_generator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/tides2/ramp_extractor.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/tides2/resources.cc
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/modulator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/oscillator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/vocoder.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/filter_bank.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/warps/resources.cc
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/frames/keyframer.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/frames/resources.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/frames/poly_lfo.cc
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/processors.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/resources.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/bass_drum.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/fm_drum.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/high_hat.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/snare_drum.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/modulations/lfo.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/modulations/multistage_envelope.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/pulse_processor/pulse_shaper.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/pulse_processor/pulse_randomizer.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/peaks/number_station/number_station.cc
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/stages/segment_generator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/stages/ramp_extractor.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/stages/resources.cc
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/atan.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/units.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/t_generator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/x_y_generator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/output_channel.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/lag_processor.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/quantizer.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/ramp/ramp_extractor.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/marbles/resources.cc
-# 
-# PLUGIN_FILES += AudibleInstruments/eurorack/streams/resources.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/streams/processor.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/streams/follower.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/streams/lorenz_generator.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/streams/envelope.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/streams/svf.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/streams/vactrol.cc
-# PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
+PLUGIN_FILES += $(filter-out AudibleInstruments/src/plugin.cpp,$(wildcard AudibleInstruments/src/*.cpp))
+
+PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/atan.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/units.cc
+
+PLUGIN_FILES += AudibleInstruments/eurorack/braids/macro_oscillator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/braids/analog_oscillator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/braids/digital_oscillator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/braids/quantizer.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/braids/resources.cc
+
+PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/*.cc)
+PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/engine/*.cc)
+PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/speech/*.cc)
+PLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/physical_modelling/*.cc)
+PLUGIN_FILES += AudibleInstruments/eurorack/plaits/resources.cc
+
+PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/correlator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/granular_processor.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/mu_law.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/pvoc/frame_transformation.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/pvoc/phase_vocoder.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/clouds/dsp/pvoc/stft.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/clouds/resources.cc
+
+PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/exciter.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/ominous_voice.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/resonator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/tube.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/multistage_envelope.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/part.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/string.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/elements/dsp/voice.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/elements/resources.cc
+
+PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/fm_voice.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/part.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/string_synth_part.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/string.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/rings/dsp/resonator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/rings/resources.cc
+
+PLUGIN_FILES += AudibleInstruments/eurorack/tides/generator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/tides/resources.cc
+
+PLUGIN_FILES += AudibleInstruments/eurorack/tides2/poly_slope_generator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/tides2/ramp_extractor.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/tides2/resources.cc
+
+PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/modulator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/oscillator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/vocoder.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/warps/dsp/filter_bank.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/warps/resources.cc
+
+PLUGIN_FILES += AudibleInstruments/eurorack/frames/keyframer.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/frames/resources.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/frames/poly_lfo.cc
+
+PLUGIN_FILES += AudibleInstruments/eurorack/peaks/processors.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/peaks/resources.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/bass_drum.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/fm_drum.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/high_hat.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/peaks/drums/snare_drum.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/peaks/modulations/lfo.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/peaks/modulations/multistage_envelope.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/peaks/pulse_processor/pulse_shaper.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/peaks/pulse_processor/pulse_randomizer.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/peaks/number_station/number_station.cc
+
+PLUGIN_FILES += AudibleInstruments/eurorack/stages/segment_generator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/stages/ramp_extractor.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/stages/resources.cc
+
+PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/atan.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/units.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/t_generator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/x_y_generator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/output_channel.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/lag_processor.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/marbles/random/quantizer.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/marbles/ramp/ramp_extractor.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/marbles/resources.cc
+
+PLUGIN_FILES += AudibleInstruments/eurorack/streams/resources.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/streams/processor.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/streams/follower.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/streams/lorenz_generator.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/streams/envelope.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/streams/svf.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/streams/vactrol.cc
+PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
 
 # --------------------------------------------------------------
 # Autinn

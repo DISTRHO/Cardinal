@@ -17,6 +17,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Amalgamated Harmonics   | BSD-3-Clause          | |
 | Animated Circuits       | GPL-3.0-or-later      | |
 | Aria Salvatrice         | GPL-3.0-or-later      | |
+| Audible Instruments     | GPL-3.0-or-later      | |
 | Autinn                  | GPL-3.0-or-later      | |
 | Bacon Music             | GPL-3.0-or-later      | |
 | Bidoo                   | GPL-3.0-or-later      | |
@@ -53,7 +54,6 @@ Bellow follows a list of code licenses from potentially coming modules.
 |-------------------------|-----------------------|----------------|
 | AS                      | MIT                   | Artwork license issues, does not allow use outside VCVRack |
 | Atelier                 | GPL-3.0-or-later      | Custom artwork license, needs permission request |
-| Audible Instruments     | GPL-3.0-or-later      | Custom artwork license, needs permission request, also for dark mode |
 | Befaco                  | GPL-3.0-or-later      | Custom artwork license, needs permission request |
 | Fundamental             | GPL-3.0-or-later      | CC-ND, needs permission for dark mode |
 | ihtsyn                  | GPL-3.0-or-later      | Project deleted by author |
@@ -87,6 +87,7 @@ Below is a list of artwork licenses from plugins
 | AriaModules/lcd/Fixed_v01/*             | Custom           | See [LICENSE.txt](../plugins/AriaModules/res/lcd/Fixed_v01/LICENSE.txt) |
 | AriaModules/lcd/piano/*                 | WTFPL            | |
 | AriaModules/signature/*                 | Custom           | Removal required if modifying other files without author's permission |
+| AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, [used and distributed with permission](LICENSE-PERMISSIONS.md#audible-instruments-émilie-gillet--mutable-instruments) |
 | Autinn/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/*                            | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/midi/*                       | CC-BY-SA-3.0-DE  | |
@@ -152,7 +153,6 @@ Bellow follows a list of artwork licenses from potentially coming plugins.
 | AS/saxmono.ttf                          | Custom           | You may download this font, circulate it und use it freely. You may not alter, rename, change copyrights or modify this font in any way. |
 | AS/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
 | Atelier/*                               | Custom           | Copyright © Pyer 2020, used and distributed with permission (TODO ask for it) |
-| AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, used and distributed with permission (TODO ask for it) |
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
 | Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission (TODO ask for it) |
 | Fundamental/*                           | CC-BY-NC-ND-4.0  | |

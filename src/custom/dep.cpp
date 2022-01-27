@@ -278,8 +278,7 @@ static const struct {
     // CC-BY-NC-SA-4.0
     { "/AnimatedCircuits/FoldingLight.svg", {}, -1 },
     { "/AnimatedCircuits/Knob_Black_Light_21.svg", {}, -1 },
-    /*
-    // Custom, needs permission
+    // Custom, runtime dark mode used with permission
     { "/AudibleInstruments/Blinds.svg", {}, -1 },
     { "/AudibleInstruments/Braids.svg", {}, -1 },
     { "/AudibleInstruments/Branches.svg", {}, -1 },
@@ -302,7 +301,6 @@ static const struct {
     { "/AudibleInstruments/Tides2.svg", {}, -1 },
     { "/AudibleInstruments/Veils.svg", {}, -1 },
     { "/AudibleInstruments/Warps.svg", {}, -1 },
-    */
     // CC-BY-NC-ND-4.0, runtime dark mode used with permission
     { "/Bidoo/ACNE.svg", {}, -1 },
     { "/Bidoo/ANTN.svg", {}, -1 },

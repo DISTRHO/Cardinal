@@ -77,9 +77,7 @@ extern Model* modelBlank;
 */
 
 // AudibleInstruments
-/*
 #include "AudibleInstruments/src/plugin.hpp"
-*/
 
 // Autinn
 /* NOTE too much noise in original include, do this a different way
@@ -554,7 +552,7 @@ Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
 // Plugin* pluginInstance__AS;
 // Plugin* pluginInstance__Atelier;
-// Plugin* pluginInstance__AudibleInstruments;
+Plugin* pluginInstance__AudibleInstruments;
 extern Plugin* pluginInstance__Autinn;
 Plugin* pluginInstance__Bacon;
 // Plugin* pluginInstance__Befaco;
@@ -917,7 +915,6 @@ static void initStatic__Atelier()
 }
 */
 
-/*
 static void initStatic__AudibleInstruments()
 {
     Plugin* const p = new Plugin;
@@ -948,7 +945,6 @@ static void initStatic__AudibleInstruments()
         p->addModel(modelStreams);
     }
 }
-*/
 
 static void initStatic__Autinn()
 {
@@ -2013,7 +2009,7 @@ void initStaticPlugins()
     initStatic__Aria();
     // initStatic__AS();
     // initStatic__Atelier();
-    // initStatic__AudibleInstruments();
+    initStatic__AudibleInstruments();
     initStatic__Autinn();
     initStatic__Bacon();
     // initStatic__Befaco();
