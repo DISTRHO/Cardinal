@@ -19,6 +19,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Aria Salvatrice         | GPL-3.0-or-later      | |
 | Autinn                  | GPL-3.0-or-later      | |
 | Bacon Music             | GPL-3.0-or-later      | |
+| Bidoo                   | GPL-3.0-or-later      | |
 | Bogaudio                | GPL-3.0-or-later      | |
 | cf                      | BSD-3-Clause          | |
 | ChowDSP                 | GPL-3.0-or-later      | |
@@ -54,7 +55,6 @@ Bellow follows a list of code licenses from potentially coming modules.
 | Atelier                 | GPL-3.0-or-later      | Custom artwork license, needs permission request |
 | Audible Instruments     | GPL-3.0-or-later      | Custom artwork license, needs permission request, also for dark mode |
 | Befaco                  | GPL-3.0-or-later      | Custom artwork license, needs permission request |
-| Bidoo                   | GPL-3.0-or-later      | CC-ND, needs permission for dark mode |
 | Fundamental             | GPL-3.0-or-later      | CC-ND, needs permission for dark mode |
 | ihtsyn                  | GPL-3.0-or-later      | Project deleted by author |
 | ZZC                     | GPL-3.0-or-later      | Artwork license terms unclear |
@@ -93,6 +93,7 @@ Below is a list of artwork licenses from plugins
 | BaconPlugs/midi/beeth/*                 | ???              | Taken from http://www.jsbach.net/ |
 | BaconPlugs/1f953.svg                    | CC-BY-4.0        | |
 | BaconPlugs/Keypunch029.json             | OFL-1.1          | |
+| Bidoo/*                                 | CC-BY-NC-ND-4.0  | [Special permission granted for runtime dark mode](https://github.com/sebastien-bouffier/Bidoo/issues/191) |
 | BogaudioModules/*                       | CC-BY-SA-4.0     | |
 | BogaudioModules/fonts/audiowide.ttf     | OFL-1.1-RFN      | |
 | BogaudioModules/fonts/inconsolata*.ttf  | OFL-1.1-no-RFN   | |
@@ -110,7 +111,6 @@ Below is a list of artwork licenses from plugins
 | ExpertSleepers-Encoders/*               | MIT              | |
 | Extratone/*                             | GPL-3.0-or-later | |
 | FehlerFabrik/*                          | GPL-3.0-or-later | No artwork specific license provided, see [FehlerFabrik#17](https://github.com/RCameron93/FehlerFabrik/issues/17) |
-| Fundamental/*                           | CC-BY-NC-ND-4.0  | |
 | GlueTheGiant/*                          | GPL-3.0-or-later | |
 | GlueTheGiant/fonts/DSEG7-*              | OFL-1.1-RFN      | |
 | GrandeModular/*                         | CC-BY-NC-ND-4.0  | |
@@ -155,7 +155,7 @@ Bellow follows a list of artwork licenses from potentially coming plugins.
 | AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, used and distributed with permission (TODO ask for it) |
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
 | Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission (TODO ask for it) |
-| Bidoo/*                                 | CC-BY-NC-ND-4.0  | |
+| Fundamental/*                           | CC-BY-NC-ND-4.0  | |
 | ihtsyn/*                                | GPL-3.0-or-later | No artwork specific license provided, author has deleted this repo |
 | ihtsyn/LEDCalculator.ttf                | Custom           | Free for personal use |
 | ZZC/*                                   | ??? | See [ZZC#89](https://github.com/zezic/ZZC/issues/89) and [ZZC#90](https://github.com/zezic/ZZC/issues/90) |

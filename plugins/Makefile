@@ -392,16 +392,16 @@ PLUGIN_FILES += $(wildcard BaconPlugs/libs/open303-code/Source/DSPCode/*.cpp)
 # --------------------------------------------------------------
 # Bidoo
 
-# PLUGIN_FILES += $(filter-out Bidoo/src/plugin.cpp Bidoo/src/ANTN.cpp,$(wildcard Bidoo/src/*.cpp))
-# PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
-# PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
-# PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
-# PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
-# PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/src/dep/resampler/*.cpp))
-# 
-# # modules/types which are present in other plugins
-# BIDOO_CUSTOM = ChannelDisplay LadderFilter $(DRWAV)
-# BIDOO_CUSTOM_PER_FILE = channel channel filterType
+PLUGIN_FILES += $(filter-out Bidoo/src/plugin.cpp Bidoo/src/ANTN.cpp,$(wildcard Bidoo/src/*.cpp))
+PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
+PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
+PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
+PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
+PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/src/dep/resampler/*.cpp))
+
+# modules/types which are present in other plugins
+BIDOO_CUSTOM = ChannelDisplay LadderFilter $(DRWAV)
+BIDOO_CUSTOM_PER_FILE = channel channel filterType
 
 # --------------------------------------------------------------
 # BogaudioModules

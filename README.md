@@ -83,6 +83,7 @@ At the moment the following 3rd-party modules are provided:
 - Aria Salvatrice
 - Autinn
 - Bacon Music
+- Bidoo
 - Bogaudio
 - cf
 - ChowDSP
@@ -115,7 +116,6 @@ Potentially coming soon, currently sorting out license situation:
 - Atelier
 - Audible Instruments
 - Befaco
-- Bidoo
 - Fundamental
 - ihtsyn
 - ZZC

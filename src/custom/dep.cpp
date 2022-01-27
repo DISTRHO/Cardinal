@@ -303,8 +303,7 @@ static const struct {
     { "/AudibleInstruments/Veils.svg", {}, -1 },
     { "/AudibleInstruments/Warps.svg", {}, -1 },
     */
-    /*
-    // CC-BY-NC-ND-4.0, needs permission
+    // CC-BY-NC-ND-4.0, runtime dark mode used with permission
     { "/Bidoo/ACNE.svg", {}, -1 },
     { "/Bidoo/ANTN.svg", {}, -1 },
     { "/Bidoo/BAFIS.svg", {}, -1 },
@@ -350,7 +349,6 @@ static const struct {
     { "/Bidoo/VOID.svg", {}, -1 },
     { "/Bidoo/ZINC.svg", {}, -1 },
     { "/Bidoo/ZOUMAI.svg", {}, -1 },
-    */
     // BSD-3-Clause
     { "/cf/ALGEBRA.svg", {}, -1 },
     { "/cf/BUFFER.svg", {}, -1 },
@@ -391,6 +389,7 @@ static const struct {
     { "/DrumKit/Sequencer.svg", {}, -1 },
     { "/DrumKit/Snare.svg", {}, -1 },
     { "/DrumKit/Tomi.svg", {}, -1 },
+    // Custom, runtime dark mode used with permission
     { "/ESeries/E340.svg", {}, -1 },
     /*
     // CC-BY-NC-ND-4.0, needs permission
