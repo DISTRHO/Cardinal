@@ -714,11 +714,12 @@ protected:
         setState("windowSize", sizeString);
     }
 
-    void uiFocus(const bool gotFocus, CrossingMode) override
+    void uiFocus(const bool focus, const CrossingMode mode) override
     {
-        if (gotFocus)
+        if (focus)
         {
-            getWindow().focus();
+            if (mode == kCrossingNormal)
+                getWindow().focus();
         }
         else
         {
