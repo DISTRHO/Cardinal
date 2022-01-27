@@ -31,7 +31,6 @@
     },
     {
       "slug": "HostCV",
-      "disabled": false,
       "name": "Host CV",
       "description": "Exposes host-provided CV ports in a module",
       "tags": [
@@ -40,7 +39,6 @@
     },
     {
       "slug": "HostMIDI",
-      "disabled": false,
       "name": "Host MIDI",
       "description": "Exposes host-provided MIDI in a module",
       "tags": [
@@ -50,8 +48,34 @@
       ]
     },
     {
+      "slug": "HostMIDICC",
+      "name": "Host MIDI CC",
+      "description": "Exposes host-provided MIDI CC in a module",
+      "tags": [
+        "External",
+        "MIDI"
+      ]
+    },
+    {
+      "slug": "HostMIDIGate",
+      "name": "Host MIDI Gate",
+      "description": "Exposes host-provided MIDI as gates in a module",
+      "tags": [
+        "External",
+        "MIDI"
+      ]
+    },
+    {
+      "slug": "HostMIDIMap",
+      "name": "Host MIDI Map",
+      "description": "Allows host-provided MIDI to control other module parameters",
+      "tags": [
+        "External",
+        "MIDI"
+      ]
+    },
+    {
       "slug": "HostParameters",
-      "disabled": false,
       "name": "Host Parameters",
       "description": "Exposes host-controlled plugin parameters in a module",
       "tags": [
@@ -60,7 +84,6 @@
     },
     {
       "slug": "HostTime",
-      "disabled": false,
       "name": "Host Time",
       "description": "Exposes host-provided time/transport information in a module",
       "tags": [
@@ -69,7 +92,6 @@
     },
     {
       "slug": "glBars",
-      "disabled": false,
       "name": "glBars",
       "description": "OpenGL bars visualization, as seen in XMMS and XBMC/Kodi",
       "tags": [
@@ -78,7 +100,6 @@
     },
     {
       "slug": "Blank",
-      "disabled": false,
       "name": "Blank",
       "description": "Cardinal's own blank panel, featuring Hatsune Miku",
       "tags": [
@@ -87,7 +108,6 @@
     },
     {
       "slug": "AudioFile",
-      "disabled": false,
       "name": "Audio File",
       "description": "Audio file player as a module",
       "tags": [
@@ -96,7 +116,6 @@
     },
     {
       "slug": "Carla",
-      "disabled": false,
       "name": "Carla Plugin Host",
       "description": "A modular plugin host within Cardinal",
       "tags": [
@@ -105,7 +124,6 @@
     },
     {
       "slug": "Ildaeil",
-      "disabled": false,
       "name": "Ildaeil Plugin Host",
       "description": "A mini plugin host within Cardinal for loading any FX",
       "tags": [
@@ -114,7 +132,6 @@
     },
     {
       "slug": "MPV",
-      "disabled": false,
       "name": "MPV",
       "description": "An embed video player inside Cardinal",
       "tags": [
@@ -123,7 +140,6 @@
     },
     {
       "slug": "TextEditor",
-      "disabled": false,
       "name": "Text Editor",
       "description": "An embed text editor inside Cardinal",
       "tags": [
