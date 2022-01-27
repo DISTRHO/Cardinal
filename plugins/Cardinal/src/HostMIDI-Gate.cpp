@@ -54,7 +54,6 @@ struct HostMIDIGate : Module {
     struct MidiInput {
         // Cardinal specific
         CardinalPluginContext* const pcontext;
-        midi::Message converterMsg;
         const MidiEvent* midiEvents;
         uint32_t midiEventsLeft;
         uint32_t midiEventFrame;
@@ -76,7 +75,6 @@ struct HostMIDIGate : Module {
         MidiInput(CardinalPluginContext* const pc)
             : pcontext(pc)
         {
-            converterMsg.bytes.resize(0xff);
             reset();
         }
 
@@ -92,7 +90,8 @@ struct HostMIDIGate : Module {
             panic();
         }
 
-        void panic() {
+        void panic()
+        {
             for (int i = 0; i < 16; ++i)
             {
                 for (int c = 0; c < 16; ++c)
@@ -129,17 +128,9 @@ struct HostMIDIGate : Module {
                 ++midiEvents;
                 --midiEventsLeft;
 
-                const uint8_t* data;
-
-                if (midiEvent.size > MidiEvent::kDataSize)
-                {
-                    data = midiEvent.dataExt;
-                    converterMsg.bytes.resize(midiEvent.size);
-                }
-                else
-                {
-                    data = midiEvent.data;
-                }
+                const uint8_t* const data = midiEvent.size > MidiEvent::kDataSize
+                                          ? midiEvent.dataExt
+                                          : midiEvent.data;
 
                 if (channel != 0 && data[0] < 0xF0)
                 {
