@@ -71,7 +71,7 @@ Come join us in your favorite IRC client or through a Matrix bridge.
 ## License
 
 Cardinal is licensed under GPLv3+, see [LICENSE](LICENSE) for more details.  
-An overview of the included code and linked submodules can be seen [here](doc/LICENSES.md).
+An overview of the included code and linked submodules can be seen [here](doc/LICENSES.md#code-license--binary).
 
 ## Included modules
 
@@ -122,17 +122,23 @@ Potentially coming soon, currently sorting out license situation:
 
 Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.
 
-### Restrictions
+### Module restrictions
 
-Being an open-source project, all included 3rd-party modules must be opensource and have a GPLv3+ compatible license.
-*GPLv3-only modules are not allowed*.
+All included modules are open-source and have a GPLv3+ compatible license. (GPLv3-only modules are not allowed)  
+It is a requirement that the final Cardinal binary is GPLv3+ licensed.
 
-Special care also needs to be taken with artwork licensing.  
-Cardinal allows the use of CC-NC because how prevalent it is across many Rack modules, but it should be avoided if possible.  
-Also, unless the module is really essential, CC-ND is not allowed.
-
-Dependencies should be kept at a minimum, as otherwise it quickly grows the complexity of the build.  
+Module dependencies should be kept at a minimum, as otherwise it quickly grows the complexity of the build.  
 Online access (such as phone-home) is not allowed.
+
+Worth noting that a few modules have artwork licensed separately from their code.  
+These licenses range from CC-0 to CC-NC-ND to custom (used with permission).  
+An overview of the included artwork licenses can be seen [here](doc/LICENSES.md#artwork--panel-licenses).
+
+Even though CC-NC is problematic for packaging (some linux distributions are commercial in nature),
+Cardinal allows their use because of how prevalent they are across many Rack modules.  
+Even the Rack "Component Library" (which can be considered the base widget elements) is CC-NC licensed.
+
+Any artwork that uses a custom license has had explicit permission to be used in Cardinal.
 
 ## Why
 
