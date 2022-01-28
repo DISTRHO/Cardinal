@@ -314,8 +314,12 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			APP->scene->rackScroll->setZoom(std::pow(2.f, zoom));
 			e.consume(this);
 		}
-		if ((e.keyName == "0") && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		if ((e.keyName == "0" || e.keyName == "1") && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			APP->scene->rackScroll->setZoom(1.f);
+			e.consume(this);
+		}
+		if (e.keyName == "2" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			APP->scene->rackScroll->setZoom(2.f);
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == 0) {
