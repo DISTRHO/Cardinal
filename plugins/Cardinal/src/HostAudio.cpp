@@ -21,6 +21,187 @@
 
 USE_NAMESPACE_DISTRHO;
 
+struct NanoKnob : Knob {
+    static const int ringSize = 4;
+
+    std::string displayLabel;
+    std::string displayString;
+    float normalizedValue = 0.0f;
+
+    NanoKnob()
+    {
+        box.size = Vec(100, 100);
+    }
+
+    void drawLayer(const DrawArgs& args, int layer) override
+    {
+        if (layer != 1)
+            return Knob::drawLayer(args, layer);
+
+        const float w = box.size.x;
+        const float h = box.size.y;
+
+        const int knobSize = std::min(w, h - BND_WIDGET_HEIGHT * 2) - ringSize;
+
+        const int knobStartX = w / 2 - knobSize / 2;
+        const int knobStartY = BND_WIDGET_HEIGHT + ringSize;
+        const int knobCenterX = knobStartX + knobSize / 2;
+        const int knobCenterY = knobStartY + knobSize / 2;
+
+        const NVGcolor testing = nvgRGBf(0.76f, 0.11f, 0.22f);
+
+        nvgLineCap(args.vg, NVG_ROUND);
+
+        // outer ring value
+        nvgBeginPath(args.vg);
+        nvgArc(args.vg,
+              knobCenterX,
+              knobCenterY,
+              knobSize / 2 + ringSize / 2 + 1,
+              nvgDegToRad(135.0f),
+              nvgDegToRad(135.0f) + nvgDegToRad(270.0f * normalizedValue),
+              NVG_CW);
+        nvgStrokeWidth(args.vg, ringSize);
+        nvgStrokeColor(args.vg, testing);
+        nvgStroke(args.vg);
+
+        // simulate color bleeding
+        nvgBeginPath(args.vg);
+        nvgArc(args.vg,
+              knobCenterX,
+              knobCenterY,
+              knobSize / 2 - 3,
+              nvgDegToRad(135.0f),
+              nvgDegToRad(135.0f) + nvgDegToRad(270.0f * normalizedValue),
+              NVG_CW);
+        nvgStrokeWidth(args.vg, 5);
+        nvgStrokeColor(args.vg, nvgRGBAf(testing.r, testing.g, testing.b, 0.1f));
+        nvgStroke(args.vg);
+
+        // adjusted from VCVRack's LightWidget.cpp
+        if (const float halo = settings::haloBrightness)
+        {
+            float radius = knobSize * 0.5f;
+            float oradius = radius + std::min(radius * 4.f, 15.f);
+
+            NVGcolor icol = color::mult(nvgRGBAf(testing.r, testing.g, testing.b, 0.2f), halo);
+            NVGcolor ocol = nvgRGBA(0, 0, 0, 0);
+            NVGpaint paint = nvgRadialGradient(args.vg, knobCenterX, knobCenterY, radius, oradius, icol, ocol);
+
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, knobCenterX - oradius, knobCenterY - oradius, 2 * oradius, 2 * oradius);
+            nvgFillPaint(args.vg, paint);
+            nvgFill(args.vg);
+        }
+
+        // bottom label (value)
+        bndIconLabelValue(args.vg, 0, BND_WIDGET_HEIGHT + knobSize + ringSize, w, BND_WIDGET_HEIGHT, -1,
+                          testing, BND_CENTER,
+                          BND_LABEL_FONT_SIZE, displayString.c_str(), nullptr);
+
+        Knob::drawLayer(args, layer);
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        if (engine::ParamQuantity* const pq = getParamQuantity())
+            normalizedValue = pq->getScaledValue();
+
+        const float w = box.size.x;
+        const float h = box.size.y;
+
+        const int knobSize = std::min(w, h - BND_WIDGET_HEIGHT * 2) - ringSize;
+
+        const int knobStartX = w / 2 - knobSize / 2;
+        const int knobStartY = BND_WIDGET_HEIGHT + ringSize;
+        const int knobCenterX = knobStartX + knobSize / 2;
+        const int knobCenterY = knobStartY + knobSize / 2;
+
+        // top label (name)
+        bndIconLabelValue(args.vg, 0, 0, w, BND_WIDGET_HEIGHT, -1,
+                          SCHEME_WHITE, BND_CENTER,
+                          BND_LABEL_FONT_SIZE, displayLabel.c_str(), nullptr);
+
+        // knob
+        NVGcolor shade_top;
+        NVGcolor shade_down;
+        BNDwidgetState state;
+        if (APP->event->getDraggedWidget() == this)
+            state = BND_ACTIVE;
+        else if (APP->event->getHoveredWidget() == this)
+            state = BND_HOVER;
+        else
+            state = BND_DEFAULT;
+        bndInnerColors(&shade_top, &shade_down, &bndGetTheme()->optionTheme, state, 0);
+
+        // inner fill
+        nvgBeginPath(args.vg);
+        nvgCircle(args.vg, knobCenterX, knobCenterY, knobSize / 2);
+        nvgFillPaint(args.vg, nvgLinearGradient(args.vg,
+                                            knobStartX,
+                                            knobStartY,
+                                            knobStartX,
+                                            knobStartY + knobSize,
+                                            shade_top,
+                                            shade_down));
+        nvgFill(args.vg);
+
+        // inner fill border (inner)
+        nvgBeginPath(args.vg);
+        nvgArc(args.vg, knobCenterX, knobCenterY, knobSize / 2 - 1, nvgDegToRad(0.0f), nvgDegToRad(360.0f), NVG_CCW);
+        nvgClosePath(args.vg);
+        nvgStrokeWidth(args.vg, 1);
+        nvgStrokeColor(args.vg, nvgRGBAf(0.5f, 0.5f, 0.5f, 0.4f));
+        nvgStroke(args.vg);
+
+        // inner fill border (outer)
+        nvgBeginPath(args.vg);
+        nvgArc(args.vg, knobCenterX, knobCenterY, knobSize / 2, nvgDegToRad(0.0f), nvgDegToRad(360.0f), NVG_CCW);
+        nvgClosePath(args.vg);
+        nvgStrokeWidth(args.vg, 1);
+        nvgStrokeColor(args.vg, nvgRGBAf(0.0f, 0.0f, 0.0f, 0.4f));
+        nvgStroke(args.vg);
+
+        nvgLineCap(args.vg, NVG_ROUND);
+
+        // line indicator
+        nvgStrokeWidth(args.vg, 2);
+        nvgSave(args.vg);
+        nvgTranslate(args.vg, knobCenterX, knobCenterY);
+        nvgRotate(args.vg, nvgDegToRad(45.0f) + normalizedValue * nvgDegToRad(270.0f));
+        nvgBeginPath(args.vg);
+        nvgRoundedRect(args.vg, -2, knobSize / 2 - 9, 2, 6, 1);
+        nvgClosePath(args.vg);
+        nvgFillColor(args.vg, nvgRGBf(1.0f, 1.0f, 1.0f));
+        nvgFill(args.vg);
+        nvgRestore(args.vg);
+
+        // outer ring background
+        nvgBeginPath(args.vg);
+        nvgArc(args.vg,
+              knobCenterX,
+              knobCenterY,
+              knobSize / 2 + ringSize / 2 + 1,
+              nvgDegToRad(135.0f),
+              nvgDegToRad(45.0f),
+              NVG_CW);
+        nvgStrokeWidth(args.vg, ringSize);
+        nvgStrokeColor(args.vg, nvgRGBf(0.5f, 0.5f, 0.5f));
+        nvgStroke(args.vg);
+
+        Knob::draw(args);
+    }
+
+    void onChange(const ChangeEvent&) override
+    {
+        engine::ParamQuantity* const pq = getParamQuantity();
+        DISTRHO_SAFE_ASSERT_RETURN(pq != nullptr,);
+
+        displayLabel = pq->getLabel();
+        displayString = pq->getDisplayValueString() + pq->getUnit();
+    }
+};
+
 template<int numIO>
 struct HostAudio : Module {
     CardinalPluginContext* const pcontext;
@@ -155,7 +336,7 @@ struct HostAudioWidget : ModuleWidget {
 
         if (numIO == 2)
         {
-            addParam(createParamCentered<RoundLargeBlackKnob>(Vec(middleX, 290.0f), m, 0));
+            addParam(createParamCentered<NanoKnob>(Vec(middleX, 290.0f), m, 0));
         }
     }
 
