@@ -219,6 +219,7 @@ struct HostMIDICC : Module {
         CardinalPluginContext* const pcontext;
         uint8_t channel = 0;
 
+        // from Rack
         dsp::Timer rateLimiterTimer;
         int lastValues[128];
         int64_t frame = 0;
