@@ -24,9 +24,9 @@ USE_NAMESPACE_DISTRHO;
 struct NanoKnob : Knob {
     static const int ringSize = 4;
 
-    std::string displayLabel;
-    std::string displayString;
-    float normalizedValue = 0.0f;
+    std::string displayLabel = "Level";
+    std::string displayString = "0 dB";
+    float normalizedValue = 0.5f;
 
     NanoKnob()
     {

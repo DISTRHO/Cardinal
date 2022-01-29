@@ -39,10 +39,14 @@ struct HostMIDICC : Module {
     };
     enum InputIds {
         ENUMS(CC_INPUTS, 16),
+        CC_INPUT_CHANNEL_PRESSURE,
+        CC_INPUT_PITCHBEND,
         NUM_INPUTS
     };
     enum OutputIds {
         ENUMS(CC_OUTPUT, 16),
+        CC_OUTPUT_CHANNEL_PRESSURE,
+        CC_OUTPUT_PITCHBEND,
         NUM_OUTPUTS
     };
     enum LightIds {
@@ -272,8 +276,14 @@ struct HostMIDICC : Module {
         for (int i = 0; i < 16; i++)
             configInput(CC_INPUTS + i, string::f("Cell %d", i + 1));
 
+        configInput(CC_INPUT_CHANNEL_PRESSURE, "Channel pressure");
+        configInput(CC_INPUT_PITCHBEND, "Pitchbend");
+
         for (int i = 0; i < 16; i++)
             configOutput(CC_OUTPUT + i, string::f("Cell %d", i + 1));
+
+        configOutput(CC_OUTPUT_CHANNEL_PRESSURE, "Channel pressure");
+        configOutput(CC_OUTPUT_PITCHBEND, "Pitchbend");
 
         onReset();
     }
@@ -281,7 +291,7 @@ struct HostMIDICC : Module {
     void onReset() override
     {
         for (int i = 0; i < 16; i++) {
-            learnedCcs[i] = i;
+            learnedCcs[i] = i + 1;
         }
         midiInput.reset();
         midiOutput.reset();
@@ -353,7 +363,7 @@ struct HostMIDICC : Module {
                 if (json_t* const ccJ = json_array_get(ccsJ, i))
                     learnedCcs[i] = json_integer_value(ccJ);
                 else
-                    learnedCcs[i] = i;
+                    learnedCcs[i] = i + 1;
             }
         }
 
@@ -386,12 +396,204 @@ struct HostMIDICC : Module {
 
 // --------------------------------------------------------------------------------------------------------------------
 
+struct CardinalMIDILearnPJ301MPort : PJ301MPort {
+    void onDragStart(const DragStartEvent& e) override {
+        PJ301MPort::onDragStart(e);
+    }
+    void onDragEnd(const DragEndEvent& e) override {
+        PJ301MPort::onDragEnd(e);
+    }
+};
+
+struct CardinalLedDisplayChoice : LedDisplayChoice {
+    CardinalLedDisplayChoice(const char* const label = nullptr)
+    {
+        color = nvgRGBf(0.76f, 0.11f, 0.22f);
+        textOffset.y -= 4;
+
+        if (label != nullptr)
+            text = label;
+    }
+
+    void drawLayer(const DrawArgs& args, int layer) override
+    {
+        // nvgScissor(args.vg, RECT_ARGS(args.clipBox));
+
+        if (layer == 1)
+        {
+            nvgFillColor(args.vg, color);
+            nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+            nvgTextLetterSpacing(args.vg, 0.0f);
+            nvgText(args.vg, box.size.x * 0.5f, textOffset.y, text.c_str(), NULL);
+        }
+
+        Widget::drawLayer(args, layer);
+        // nvgResetScissor(args.vg);
+    }
+};
+
+/**
+ * Based on VCVRack's CcChoice as defined in src/core/plugin.hpp
+ * Copyright (C) 2016-2021 VCV.
+ *
+ * This program is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ */
+struct CardinalCcChoice : CardinalLedDisplayChoice {
+    HostMIDICC* const module;
+    const int id;
+    int focusCc;
+
+    CardinalCcChoice(HostMIDICC* const m, const int i)
+      : CardinalLedDisplayChoice(),
+        module(m),
+        id(i) {}
+
+    void step() override
+    {
+        int cc;
+
+        if (module == nullptr)
+        {
+            cc = id;
+        }
+        else if (module->midiInput.learningId == id)
+        {
+            cc = focusCc;
+            color.a = 0.5f;
+        }
+        else
+        {
+            cc = module->learnedCcs[id];
+            color.a = 1.0f;
+
+            // Cancel focus if no longer learning
+            if (APP->event->getSelectedWidget() == this)
+                APP->event->setSelectedWidget(NULL);
+        }
+
+        // Set text
+        if (cc < 0)
+            text = "--";
+        else
+            text = string::f("%d", cc);
+    }
+
+    void onSelect(const SelectEvent& e) override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);
+
+        module->midiInput.learningId = id;
+        focusCc = -1;
+        e.consume(this);
+    }
+
+    void onDeselect(const DeselectEvent&) override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);
+
+        if (module->midiInput.learningId == id)
+        {
+            if (0 <= focusCc && focusCc < 128)
+                module->learnedCcs[id] = focusCc;
+            module->midiInput.learningId = -1;
+        }
+    }
+
+    void onSelectText(const SelectTextEvent& e) override
+    {
+        int c = e.codepoint;
+
+        if ('0' <= c && c <= '9')
+        {
+            if (focusCc < 0)
+                focusCc = 0;
+            focusCc = focusCc * 10 + (c - '0');
+        }
+
+        if (focusCc >= 128)
+            focusCc = -1;
+
+        e.consume(this);
+    }
+
+    void onSelectKey(const SelectKeyEvent& e) override
+    {
+        if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && e.action == GLFW_PRESS && (e.mods & RACK_MOD_MASK) == 0) {
+            DeselectEvent eDeselect;
+            onDeselect(eDeselect);
+            APP->event->selectedWidget = NULL;
+            e.consume(this);
+        }
+    }
+};
+
+struct CCGridDisplay : Widget {
+    void draw(const DrawArgs& args) override
+    {
+        nvgBeginPath(args.vg);
+        nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 4);
+        nvgFillColor(args.vg, nvgRGB(0, 0, 0));
+        nvgFill(args.vg);
+
+        Widget::draw(args);
+    }
+
+    void setModule(HostMIDICC* const module)
+    {
+        LedDisplaySeparator* hSeparators[6];
+        LedDisplaySeparator* vSeparators[3];
+        LedDisplayChoice* choices[3][6];
+
+        // Add vSeparators
+        for (int x = 0; x < 3; ++x)
+        {
+            vSeparators[x] = new LedDisplaySeparator;
+            vSeparators[x]->box.pos = Vec(box.size.x / 3 * (x+1), 0.0f);
+            vSeparators[x]->box.size = Vec(1.0f, box.size.y);
+            addChild(vSeparators[x]);
+        }
+
+        // Add hSeparators and choice widgets
+        for (int y = 0; y < 6; ++y)
+        {
+            hSeparators[y] = new LedDisplaySeparator;
+            hSeparators[y]->box.pos = Vec(0.0f, box.size.y / 6 * (y+1));
+            hSeparators[y]->box.size = Vec(box.size.x, 1.0f);
+            addChild(hSeparators[y]);
+
+            for (int x = 0; x < 3; ++x)
+            {
+                const int id = 6 * x + y;
+
+                switch (id)
+                {
+                case 16:
+                    choices[x][y] = new CardinalLedDisplayChoice("Ch.press");
+                    break;
+                case 17:
+                    choices[x][y] = new CardinalLedDisplayChoice("Pbend");
+                    break;
+                default:
+                    choices[x][y] = new CardinalCcChoice(module, id);
+                    break;
+                }
+
+                choices[x][y]->box.pos = Vec(box.size.x / 3 * x, box.size.y / 6 * y);
+                choices[x][y]->box.size = Vec(box.size.x / 3, box.size.y / 6);
+                addChild(choices[x][y]);
+            }
+        }
+	}
+};
+
 struct HostMIDICCWidget : ModuleWidget {
     static constexpr const float startX_In = 14.0f;
-    static constexpr const float startX_Out = 96.0f;
-    static constexpr const float startY = 74.0f;
+    static constexpr const float startX_Out = 115.0f;
+    static constexpr const float startY = 190.0f;
     static constexpr const float padding = 29.0f;
-    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
 
     HostMIDICC* const module;
 
@@ -399,12 +601,31 @@ struct HostMIDICCWidget : ModuleWidget {
         : module(m)
     {
         setModule(m);
-        setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostMIDI.svg")));
+        setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostMIDICC.svg")));
 
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
         addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+        for (int i=0; i<18; ++i)
+        {
+            const float x = startX_In + int(i / 6) * padding;
+            const float y = startY + int(i % 6) * padding;
+            addInput(createInput<CardinalMIDILearnPJ301MPort>(Vec(x, y), module, i));
+        }
+
+        for (int i=0; i<18; ++i)
+        {
+            const float x = startX_Out + int(i / 6) * padding;
+            const float y = startY + int(i % 6) * padding;
+            addOutput(createOutput<CardinalMIDILearnPJ301MPort>(Vec(x, y), module, i));
+        }
+
+        CCGridDisplay* const display = createWidget<CCGridDisplay>(Vec(startX_In - 3.0f, 70.0f));
+        display->box.size = Vec(box.size.x - startX_In * 2.0f + 6.0f, startY - 74.0f - 9.0f);
+        display->setModule(m);
+        addChild(display);
     }
 
     void draw(const DrawArgs& args) override
@@ -413,6 +634,11 @@ struct HostMIDICCWidget : ModuleWidget {
         nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
         nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
                                                 nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
+        nvgFill(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgRoundedRect(args.vg, startX_Out - 2.5f, startY - 2.0f, padding * 3, padding * 6, 4);
+        nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
         nvgFill(args.vg);
 
         ModuleWidget::draw(args);

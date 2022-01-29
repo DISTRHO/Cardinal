@@ -597,10 +597,8 @@ std::string pluginPath(const std::string& dirname);
 
 // core plugins
 namespace core {
-extern Model* modelMIDICC_CV;
 extern Model* modelMIDI_Gate;
 extern Model* modelMIDIMap;
-extern Model* modelCV_MIDICC;
 extern Model* modelGate_MIDI;
 extern Model* modelBlank;
 }
@@ -694,10 +692,8 @@ static void initStatic__Core()
     const StaticPluginLoader spl(p, "Core");
     if (spl.ok())
     {
-        p->addModel(rack::core::modelMIDICC_CV);
         p->addModel(rack::core::modelMIDI_Gate);
         p->addModel(rack::core::modelMIDIMap);
-        p->addModel(rack::core::modelCV_MIDICC);
         p->addModel(rack::core::modelGate_MIDI);
         p->addModel(rack::core::modelBlank);
     }
