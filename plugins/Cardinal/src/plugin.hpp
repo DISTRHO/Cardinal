@@ -25,6 +25,30 @@
 
 using namespace rack;
 
+struct CardinalLedDisplayChoice : LedDisplayChoice {
+    CardinalLedDisplayChoice(const char* const label = nullptr)
+    {
+        color = nvgRGBf(0.76f, 0.11f, 0.22f);
+        textOffset.y -= 4;
+
+        if (label != nullptr)
+            text = label;
+    }
+
+    void drawLayer(const DrawArgs& args, int layer) override
+    {
+        if (layer == 1)
+        {
+            nvgFillColor(args.vg, color);
+            nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+            nvgTextLetterSpacing(args.vg, 0.0f);
+            nvgText(args.vg, box.size.x * 0.5f, textOffset.y, text.c_str(), NULL);
+        }
+
+        Widget::drawLayer(args, layer);
+    }
+};
+
 extern Plugin* pluginInstance;
 
 extern Model* modelAudioFile;

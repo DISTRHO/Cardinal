@@ -38,11 +38,11 @@ struct HostMIDIGate : Module {
         NUM_PARAMS
     };
     enum InputIds {
-        ENUMS(GATE_INPUTS, 16),
+        ENUMS(GATE_INPUTS, 18),
         NUM_INPUTS
     };
     enum OutputIds {
-        ENUMS(GATE_OUTPUTS, 16),
+        ENUMS(GATE_OUTPUTS, 18),
         NUM_OUTPUTS
     };
     enum LightIds {
@@ -62,11 +62,11 @@ struct HostMIDIGate : Module {
 
         // stuff from Rack
         /** [cell][channel] */
-        bool gates[16][16];
+        bool gates[18][16];
         /** [cell][channel] */
-        float gateTimes[16][16];
+        float gateTimes[18][16];
         /** [cell][channel] */
-        uint8_t velocities[16][16];
+        uint8_t velocities[18][16];
         /** Cell ID in learn mode, or -1 if none. */
         int learningId;
 
@@ -92,7 +92,7 @@ struct HostMIDIGate : Module {
 
         void panic()
         {
-            for (int i = 0; i < 16; ++i)
+            for (int i = 0; i < 18; ++i)
             {
                 for (int c = 0; c < 16; ++c)
                 {
@@ -103,7 +103,7 @@ struct HostMIDIGate : Module {
         }
 
         bool process(const ProcessArgs& args, std::vector<rack::engine::Output>& outputs,
-                     const bool velocityMode, uint8_t learnedNotes[16])
+                     const bool velocityMode, uint8_t learnedNotes[18])
         {
             // Cardinal specific
             const int64_t blockFrame = pcontext->engine->getBlockFrame();
@@ -180,9 +180,11 @@ struct HostMIDIGate : Module {
             // Rack stuff
             const int channels = mpeMode ? 16 : 1;
 
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < 18; i++)
+            {
                 outputs[GATE_OUTPUTS + i].setChannels(channels);
-                for (int c = 0; c < channels; c++) {
+                for (int c = 0; c < channels; c++)
+                {
                     // Make sure all pulses last longer than 1ms
                     if (gates[i][c] || gateTimes[i][c] > 0.f)
                     {
@@ -287,7 +289,7 @@ struct HostMIDIGate : Module {
     } midiOutput;
 
     bool velocityMode = false;
-    uint8_t learnedNotes[16] = {};
+    uint8_t learnedNotes[18] = {};
 
     HostMIDIGate()
         : pcontext(static_cast<CardinalPluginContext*>(APP)),
@@ -299,10 +301,10 @@ struct HostMIDIGate : Module {
 
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
-        for (int i = 0; i < 16; i++)
-            configInput(GATE_INPUTS + i, string::f("Cell %d", i + 1));
+        for (int i = 0; i < 18; i++)
+            configInput(GATE_INPUTS + i, string::f("Gate %d", i + 1));
 
-        for (int i = 0; i < 16; i++)
+        for (int i = 0; i < 18; i++)
             configOutput(GATE_OUTPUTS + i, string::f("Gate %d", i + 1));
 
         onReset();
@@ -310,9 +312,8 @@ struct HostMIDIGate : Module {
 
     void onReset() override
     {
-        for (int y = 0; y < 4; ++y)
-            for (int x = 0; x < 4; ++x)
-                learnedNotes[4 * y + x] = 36 + 4 * (3 - y) + x;
+        for (int i = 0; i < 18; ++i)
+            learnedNotes[i] = 36 + i;
 
         velocityMode = false;
 
@@ -327,7 +328,7 @@ struct HostMIDIGate : Module {
         else
             ++midiOutput.frame;
 
-        for (int i = 0; i < 16; i++)
+        for (int i = 0; i < 18; ++i)
         {
             const int note = learnedNotes[i];
 
@@ -355,7 +356,7 @@ struct HostMIDIGate : Module {
         // input and output
         if (json_t* const notesJ = json_array())
         {
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < 18; i++)
                 json_array_append_new(notesJ, json_integer(learnedNotes[i]));
             json_object_set_new(rootJ, "notes", notesJ);
         }
@@ -376,7 +377,7 @@ struct HostMIDIGate : Module {
         // input and output
         if (json_t* const notesJ = json_object_get(rootJ, "notes"))
         {
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < 18; i++)
             {
                 if (json_t* const noteJ = json_array_get(notesJ, i))
                     learnedNotes[i] = json_integer_value(noteJ);
@@ -403,12 +404,189 @@ struct HostMIDIGate : Module {
 
 // --------------------------------------------------------------------------------------------------------------------
 
+struct CardinalMIDILearnPJ301MPort : PJ301MPort {
+    void onDragStart(const DragStartEvent& e) override {
+        PJ301MPort::onDragStart(e);
+    }
+    void onDragEnd(const DragEndEvent& e) override {
+        PJ301MPort::onDragEnd(e);
+    }
+};
+
+/**
+ * Based on VCVRack's NoteChoice as defined in src/core/plugin.hpp
+ * Copyright (C) 2016-2021 VCV.
+ *
+ * This program is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ */
+struct CardinalNoteChoice : CardinalLedDisplayChoice {
+    HostMIDIGate* const module;
+    const int id;
+    int focusNote = -1;
+
+    CardinalNoteChoice(HostMIDIGate* const m, const int i)
+      : CardinalLedDisplayChoice(),
+        module(m),
+        id(i) {}
+
+    void step() override
+    {
+        int note;
+
+        if (module == nullptr)
+        {
+            note = id + 36;
+        }
+        else if (module->midiInput.learningId == id)
+        {
+            note = focusNote;
+            color.a = 0.5;
+        }
+        else
+        {
+            note = module->learnedNotes[id];
+            color.a = 1.0f;
+
+            // Cancel focus if no longer learning
+            if (APP->event->getSelectedWidget() == this)
+                APP->event->setSelectedWidget(NULL);
+        }
+
+        // Set text
+        if (note < 0)
+        {
+            text = "--";
+        }
+        else
+        {
+            static const char* noteNames[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+            const int oct = note / 12 - 1;
+            const int semi = note % 12;
+            text = string::f("%s%d", noteNames[semi], oct);
+        }
+    }
+
+    void onSelect(const SelectEvent& e) override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);
+
+        module->midiInput.learningId = id;
+        focusNote = -1;
+        e.consume(this);
+    }
+
+    void onDeselect(const DeselectEvent&) override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);
+
+        if (module->midiInput.learningId == id)
+        {
+            if (0 <= focusNote && focusNote < 128)
+                module->learnedNotes[id] = focusNote;
+            module->midiInput.learningId = -1;
+        }
+    }
+
+    void onSelectText(const SelectTextEvent& e) override
+    {
+        const int c = e.codepoint;
+
+        if ('a' <= c && c <= 'g')
+        {
+            static const int majorNotes[7] = {9, 11, 0, 2, 4, 5, 7};
+            focusNote = majorNotes[c - 'a'];
+        }
+        else if (c == '#')
+        {
+            if (focusNote >= 0)
+                focusNote += 1;
+        }
+        else if ('0' <= c && c <= '9')
+        {
+            if (focusNote >= 0)
+            {
+                focusNote = focusNote % 12;
+                focusNote += 12 * (c - '0' + 1);
+            }
+        }
+
+        if (focusNote >= 128)
+            focusNote = -1;
+
+        e.consume(this);
+    }
+
+    void onSelectKey(const SelectKeyEvent& e) override
+    {
+        if (e.key != GLFW_KEY_ENTER && e.key != GLFW_KEY_KP_ENTER)
+            return;
+        if (e.action != GLFW_PRESS)
+            return;
+        if (e.mods & RACK_MOD_MASK)
+            return;
+
+        DeselectEvent eDeselect;
+        onDeselect(eDeselect);
+        APP->event->selectedWidget = NULL;
+        e.consume(this);
+    }
+};
+
+struct NoteGridDisplay : Widget {
+    void draw(const DrawArgs& args) override
+    {
+        nvgBeginPath(args.vg);
+        nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 4);
+        nvgFillColor(args.vg, nvgRGB(0, 0, 0));
+        nvgFill(args.vg);
+
+        Widget::draw(args);
+    }
+
+    void setModule(HostMIDIGate* const module)
+    {
+        LedDisplaySeparator* hSeparators[6];
+        LedDisplaySeparator* vSeparators[3];
+        LedDisplayChoice* choices[3][6];
+
+        // Add vSeparators
+        for (int x = 0; x < 3; ++x)
+        {
+            vSeparators[x] = new LedDisplaySeparator;
+            vSeparators[x]->box.pos = Vec(box.size.x / 3 * (x+1), 0.0f);
+            vSeparators[x]->box.size = Vec(1.0f, box.size.y);
+            addChild(vSeparators[x]);
+        }
+
+        // Add hSeparators and choice widgets
+        for (int y = 0; y < 6; ++y)
+        {
+            hSeparators[y] = new LedDisplaySeparator;
+            hSeparators[y]->box.pos = Vec(0.0f, box.size.y / 6 * (y+1));
+            hSeparators[y]->box.size = Vec(box.size.x, 1.0f);
+            addChild(hSeparators[y]);
+
+            for (int x = 0; x < 3; ++x)
+            {
+                const int id = 6 * x + y;
+
+                choices[x][y] = new CardinalNoteChoice(module, id);
+                choices[x][y]->box.pos = Vec(box.size.x / 3 * x, box.size.y / 6 * y);
+                choices[x][y]->box.size = Vec(box.size.x / 3, box.size.y / 6);
+                addChild(choices[x][y]);
+            }
+        }
+	}
+};
+
 struct HostMIDIGateWidget : ModuleWidget {
     static constexpr const float startX_In = 14.0f;
-    static constexpr const float startX_Out = 96.0f;
-    static constexpr const float startY = 74.0f;
+    static constexpr const float startX_Out = 115.0f;
+    static constexpr const float startY = 190.0f;
     static constexpr const float padding = 29.0f;
-    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
 
     HostMIDIGate* const module;
 
@@ -416,12 +594,31 @@ struct HostMIDIGateWidget : ModuleWidget {
         : module(m)
     {
         setModule(m);
-        setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostMIDI.svg")));
+        setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostMIDIGate.svg")));
 
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
         addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+        for (int i=0; i<18; ++i)
+        {
+            const float x = startX_In + int(i / 6) * padding;
+            const float y = startY + int(i % 6) * padding;
+            addInput(createInput<CardinalMIDILearnPJ301MPort>(Vec(x, y), module, i));
+        }
+
+        for (int i=0; i<18; ++i)
+        {
+            const float x = startX_Out + int(i / 6) * padding;
+            const float y = startY + int(i % 6) * padding;
+            addOutput(createOutput<CardinalMIDILearnPJ301MPort>(Vec(x, y), module, i));
+        }
+
+        NoteGridDisplay* const display = createWidget<NoteGridDisplay>(Vec(startX_In - 3.0f, 70.0f));
+        display->box.size = Vec(box.size.x - startX_In * 2.0f + 6.0f, startY - 74.0f - 9.0f);
+        display->setModule(m);
+        addChild(display);
     }
 
     void draw(const DrawArgs& args) override
@@ -430,6 +627,11 @@ struct HostMIDIGateWidget : ModuleWidget {
         nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
         nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
                                                 nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
+        nvgFill(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgRoundedRect(args.vg, startX_Out - 2.5f, startY - 2.0f, padding * 3, padding * 6, 4);
+        nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
         nvgFill(args.vg);
 
         ModuleWidget::draw(args);

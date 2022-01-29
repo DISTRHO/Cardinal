@@ -405,33 +405,6 @@ struct CardinalMIDILearnPJ301MPort : PJ301MPort {
     }
 };
 
-struct CardinalLedDisplayChoice : LedDisplayChoice {
-    CardinalLedDisplayChoice(const char* const label = nullptr)
-    {
-        color = nvgRGBf(0.76f, 0.11f, 0.22f);
-        textOffset.y -= 4;
-
-        if (label != nullptr)
-            text = label;
-    }
-
-    void drawLayer(const DrawArgs& args, int layer) override
-    {
-        // nvgScissor(args.vg, RECT_ARGS(args.clipBox));
-
-        if (layer == 1)
-        {
-            nvgFillColor(args.vg, color);
-            nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-            nvgTextLetterSpacing(args.vg, 0.0f);
-            nvgText(args.vg, box.size.x * 0.5f, textOffset.y, text.c_str(), NULL);
-        }
-
-        Widget::drawLayer(args, layer);
-        // nvgResetScissor(args.vg);
-    }
-};
-
 /**
  * Based on VCVRack's CcChoice as defined in src/core/plugin.hpp
  * Copyright (C) 2016-2021 VCV.
@@ -444,7 +417,7 @@ struct CardinalLedDisplayChoice : LedDisplayChoice {
 struct CardinalCcChoice : CardinalLedDisplayChoice {
     HostMIDICC* const module;
     const int id;
-    int focusCc;
+    int focusCc = -1;
 
     CardinalCcChoice(HostMIDICC* const m, const int i)
       : CardinalLedDisplayChoice(),
@@ -521,12 +494,17 @@ struct CardinalCcChoice : CardinalLedDisplayChoice {
 
     void onSelectKey(const SelectKeyEvent& e) override
     {
-        if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && e.action == GLFW_PRESS && (e.mods & RACK_MOD_MASK) == 0) {
-            DeselectEvent eDeselect;
-            onDeselect(eDeselect);
-            APP->event->selectedWidget = NULL;
-            e.consume(this);
-        }
+        if (e.key != GLFW_KEY_ENTER && e.key != GLFW_KEY_KP_ENTER)
+            return;
+        if (e.action != GLFW_PRESS)
+            return;
+        if (e.mods & RACK_MOD_MASK)
+            return;
+
+        DeselectEvent eDeselect;
+        onDeselect(eDeselect);
+        APP->event->selectedWidget = NULL;
+        e.consume(this);
     }
 };
 
