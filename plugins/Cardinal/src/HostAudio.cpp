@@ -44,7 +44,7 @@ struct NanoKnob : Knob {
         const int knobSize = std::min(w, h - BND_WIDGET_HEIGHT * 2) - ringSize;
 
         const int knobStartX = w / 2 - knobSize / 2;
-        const int knobStartY = BND_WIDGET_HEIGHT + ringSize;
+        const int knobStartY = ringSize;
         const int knobCenterX = knobStartX + knobSize / 2;
         const int knobCenterY = knobStartY + knobSize / 2;
 
@@ -78,6 +78,18 @@ struct NanoKnob : Knob {
         nvgStrokeColor(args.vg, nvgRGBAf(testing.r, testing.g, testing.b, 0.1f));
         nvgStroke(args.vg);
 
+        // line indicator
+        nvgStrokeWidth(args.vg, 2);
+        nvgSave(args.vg);
+        nvgTranslate(args.vg, knobCenterX, knobCenterY);
+        nvgRotate(args.vg, nvgDegToRad(45.0f) + normalizedValue * nvgDegToRad(270.0f));
+        nvgBeginPath(args.vg);
+        nvgRoundedRect(args.vg, -2, knobSize / 2 - 9, 2, 6, 1);
+        nvgClosePath(args.vg);
+        nvgFillColor(args.vg, nvgRGBf(1.0f, 1.0f, 1.0f));
+        nvgFill(args.vg);
+        nvgRestore(args.vg);
+
         // adjusted from VCVRack's LightWidget.cpp
         if (const float halo = settings::haloBrightness)
         {
@@ -95,7 +107,7 @@ struct NanoKnob : Knob {
         }
 
         // bottom label (value)
-        bndIconLabelValue(args.vg, 0, BND_WIDGET_HEIGHT + knobSize + ringSize, w, BND_WIDGET_HEIGHT, -1,
+        bndIconLabelValue(args.vg, 0, knobSize + ringSize, w, BND_WIDGET_HEIGHT, -1,
                           testing, BND_CENTER,
                           BND_LABEL_FONT_SIZE, displayString.c_str(), nullptr);
 
@@ -113,14 +125,9 @@ struct NanoKnob : Knob {
         const int knobSize = std::min(w, h - BND_WIDGET_HEIGHT * 2) - ringSize;
 
         const int knobStartX = w / 2 - knobSize / 2;
-        const int knobStartY = BND_WIDGET_HEIGHT + ringSize;
+        const int knobStartY = ringSize;
         const int knobCenterX = knobStartX + knobSize / 2;
         const int knobCenterY = knobStartY + knobSize / 2;
-
-        // top label (name)
-        bndIconLabelValue(args.vg, 0, 0, w, BND_WIDGET_HEIGHT, -1,
-                          SCHEME_WHITE, BND_CENTER,
-                          BND_LABEL_FONT_SIZE, displayLabel.c_str(), nullptr);
 
         // knob
         NVGcolor shade_top;
@@ -164,18 +171,6 @@ struct NanoKnob : Knob {
 
         nvgLineCap(args.vg, NVG_ROUND);
 
-        // line indicator
-        nvgStrokeWidth(args.vg, 2);
-        nvgSave(args.vg);
-        nvgTranslate(args.vg, knobCenterX, knobCenterY);
-        nvgRotate(args.vg, nvgDegToRad(45.0f) + normalizedValue * nvgDegToRad(270.0f));
-        nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg, -2, knobSize / 2 - 9, 2, 6, 1);
-        nvgClosePath(args.vg);
-        nvgFillColor(args.vg, nvgRGBf(1.0f, 1.0f, 1.0f));
-        nvgFill(args.vg);
-        nvgRestore(args.vg);
-
         // outer ring background
         nvgBeginPath(args.vg);
         nvgArc(args.vg,
@@ -188,6 +183,11 @@ struct NanoKnob : Knob {
         nvgStrokeWidth(args.vg, ringSize);
         nvgStrokeColor(args.vg, nvgRGBf(0.5f, 0.5f, 0.5f));
         nvgStroke(args.vg);
+
+        // bottom label (name)
+        bndIconLabelValue(args.vg, 0, knobStartY + knobSize + BND_WIDGET_HEIGHT * 0.75f, w, BND_WIDGET_HEIGHT, -1,
+                          SCHEME_WHITE, BND_CENTER,
+                          BND_LABEL_FONT_SIZE, displayLabel.c_str(), nullptr);
 
         Knob::draw(args);
     }
@@ -202,6 +202,36 @@ struct NanoKnob : Knob {
     }
 };
 
+/*
+ * Find the highest absolute and normalized value within a float array.
+ */
+static inline
+float d_findMaxNormalizedFloat(const float floats[], const std::size_t count)
+{
+    DISTRHO_SAFE_ASSERT_RETURN(floats != nullptr, 0.0f);
+    DISTRHO_SAFE_ASSERT_RETURN(count > 0, 0.0f);
+
+    static const float kEmptyFloats[8192] = {};
+
+    if (count <= 8192 && std::memcmp(floats, kEmptyFloats, count) == 0)
+        return 0.0f;
+
+    float tmp, maxf2 = std::abs(floats[0]);
+
+    for (std::size_t i=1; i<count; ++i)
+    {
+        tmp = std::abs(*floats++);
+
+        if (tmp > maxf2)
+            maxf2 = tmp;
+    }
+
+    if (maxf2 > 1.0f)
+        maxf2 = 1.0f;
+
+    return maxf2;
+}
+
 template<int numIO>
 struct HostAudio : Module {
     CardinalPluginContext* const pcontext;
@@ -214,6 +244,8 @@ struct HostAudio : Module {
     // for rack core audio module compatibility
     dsp::RCFilter dcFilters[numIO];
     bool dcFilterEnabled = (numIO == 2);
+    float gainMeterL = 0.0f;
+    float gainMeterR = 0.0f;
 
     HostAudio()
         : pcontext(static_cast<CardinalPluginContext*>(APP)),
@@ -250,6 +282,7 @@ struct HostAudio : Module {
         const float* const* const dataIns = pcontext->dataIns;
         float** const dataOuts = pcontext->dataOuts;
 
+        const int blockFrames = pcontext->engine->getBlockFrames();
         const int64_t blockFrame = pcontext->engine->getBlockFrame();
 
         if (lastBlockFrame != blockFrame)
@@ -259,7 +292,7 @@ struct HostAudio : Module {
         }
 
         const int k = dataFrame++;
-        DISTRHO_SAFE_ASSERT_RETURN(k < pcontext->engine->getBlockFrames(),);
+        DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
 
         const float gain = numParams != 0 ? std::pow(params[0].getValue(), 2.f) : 1.0f;
 
@@ -285,8 +318,23 @@ struct HostAudio : Module {
             dataOuts[i][k] += clamp(v * gain, -1.0f, 1.0f);
         }
 
-        if (numInputs == 2 && ! inputs[1].isConnected())
-            dataOuts[1][k] += dataOuts[0][k];
+        if (numInputs == 2)
+        {
+            const bool connected = inputs[1].isConnected();
+
+            if (! connected)
+                dataOuts[1][k] += dataOuts[0][k];
+
+            if (dataFrame == blockFrames)
+            {
+                gainMeterL = std::max(gainMeterL, d_findMaxNormalizedFloat(dataOuts[0], blockFrames));
+
+                if (connected)
+                    gainMeterR = std::max(gainMeterR, d_findMaxNormalizedFloat(dataOuts[1], blockFrames));
+                else
+                    gainMeterR = gainMeterL;
+            }
+        }
     }
 
     json_t* dataToJson() override
@@ -304,6 +352,120 @@ struct HostAudio : Module {
         DISTRHO_SAFE_ASSERT_RETURN(dcFilterJ != nullptr,);
 
         dcFilterEnabled = json_boolean_value(dcFilterJ);
+    }
+};
+
+template<int numIO>
+struct NanoMeter : Widget {
+    HostAudio<numIO>* const module;
+
+    NanoMeter(HostAudio<numIO>* const m)
+        : module(m)
+    {
+        box.size = Vec(100, 100);
+    }
+
+    void drawLayer(const DrawArgs& args, int layer) override
+    {
+        if (layer != 1)
+            return;
+
+        const float usableHeight = box.size.y - 10.0f;
+
+        // draw background
+        nvgBeginPath(args.vg);
+        nvgRect(args.vg,
+                0,
+                0,
+                box.size.x,
+                usableHeight);
+        nvgFillColor(args.vg, nvgRGB(26, 26, 26));
+        nvgFill(args.vg);
+
+        nvgFillColor(args.vg, nvgRGBAf(0.76f, 0.11f, 0.22f, 0.5f));
+        nvgStrokeColor(args.vg, nvgRGBf(0.76f, 0.11f, 0.22f));
+
+        if (module != nullptr)
+        {
+            float gainMeterL = 0.0f;
+            float gainMeterR = 0.0f;
+            std::swap(gainMeterL, module->gainMeterL);
+            std::swap(gainMeterR, module->gainMeterR);
+
+            const float heightL = sqrtf(gainMeterL) * usableHeight;
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, 0.0f, usableHeight - heightL, box.size.x * 0.5f - 1.0f, heightL);
+            nvgFill(args.vg);
+            nvgStroke(args.vg);
+
+            const float heightR = sqrtf(gainMeterR) * usableHeight;
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, box.size.x * 0.5f + 1.0f, usableHeight - heightR, box.size.x * 0.5f - 2.0f, heightR);
+            nvgFill(args.vg);
+            nvgStroke(args.vg);
+        }
+
+        nvgLineCap(args.vg, NVG_ROUND);
+
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, 0.0f, usableHeight + 2.0f);
+        nvgLineTo(args.vg, box.size.x * 0.5f - 11.0f, usableHeight + 2.0f);
+        nvgStroke(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, 0.0f, usableHeight + 4.0f);
+        nvgLineTo(args.vg, box.size.x * 0.5f - 16.0f, usableHeight + 4.0f);
+        nvgStroke(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, 0.0f, usableHeight + 6.0f);
+        nvgLineTo(args.vg, box.size.x * 0.5f - 19.0f, usableHeight + 6.0f);
+        nvgStroke(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, 0.0f, usableHeight + 8.0f);
+        nvgLineTo(args.vg, box.size.x * 0.5f - 22.0f, usableHeight + 8.0f);
+        nvgStroke(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, 0.0f, usableHeight + 10.0f);
+        nvgLineTo(args.vg, box.size.x * 0.5f - 24.0f, usableHeight + 10.0f);
+        nvgStroke(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, 0.0f, usableHeight + 12.0f);
+        nvgLineTo(args.vg, box.size.x * 0.5f - 26.0f, usableHeight + 12.0f);
+        nvgStroke(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, box.size.x * 0.5f + 10.0f, usableHeight + 2.0f);
+        nvgLineTo(args.vg, box.size.x - 1.0f, usableHeight + 2.0f);
+        nvgStroke(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, box.size.x * 0.5f + 15.0f, usableHeight + 4.0f);
+        nvgLineTo(args.vg, box.size.x - 1.0f, usableHeight + 4.0f);
+        nvgStroke(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, box.size.x * 0.5f + 18.0f, usableHeight + 6.0f);
+        nvgLineTo(args.vg, box.size.x - 1.0f, usableHeight + 6.0f);
+        nvgStroke(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, box.size.x * 0.5f + 20.0f, usableHeight + 8.0f);
+        nvgLineTo(args.vg, box.size.x - 1.0f, usableHeight + 8.0f);
+        nvgStroke(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, box.size.x * 0.5f + 22.0f, usableHeight + 10.0f);
+        nvgLineTo(args.vg, box.size.x - 1.0f, usableHeight + 10.0f);
+        nvgStroke(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, box.size.x * 0.5f + 24.0f, usableHeight + 12.0f);
+        nvgLineTo(args.vg, box.size.x - 1.0f, usableHeight + 12.0f);
+        nvgStroke(args.vg);
     }
 };
 
@@ -336,7 +498,12 @@ struct HostAudioWidget : ModuleWidget {
 
         if (numIO == 2)
         {
-            addParam(createParamCentered<NanoKnob>(Vec(middleX, 290.0f), m, 0));
+            addParam(createParamCentered<NanoKnob>(Vec(middleX, 310.0f), m, 0));
+
+            NanoMeter<numIO>* const meter = new NanoMeter<numIO>(m);
+            meter->box.pos = Vec(startX_In + padding - 4.0f, startY + padding * 2);
+            meter->box.size = Vec(padding * 2.0f - 4.0f, 136.0f);
+            addChild(meter);
         }
     }
 
