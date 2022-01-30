@@ -326,21 +326,24 @@ struct TextEditorModuleWidget : ModuleWidget {
         addChild(rightHandle = new ModuleResizeHandle(module, this, true));
         addChild(new ModuleResizeHandle(module, this, false));
 
+        box.size = Vec(RACK_GRID_WIDTH * (module != nullptr ? module->width : DEFAULT_WIDTH), RACK_GRID_HEIGHT);
+
+        textEditorModule = module;
+        textEditorWidget = new ImGuiTextEditor();
+        textEditorWidget->box.pos = Vec(RACK_GRID_WIDTH, 0);
+        textEditorWidget->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH, box.size.y);
+        addChild(textEditorWidget);
+
         if (module != nullptr)
         {
-            box.size = Vec(RACK_GRID_WIDTH * module->width, RACK_GRID_HEIGHT);
-            textEditorModule = module;
-            textEditorWidget = new ImGuiTextEditor();
-            textEditorWidget->setFileWithKnownText(module->file, module->text);
             textEditorWidget->setLanguageDefinition(module->lang);
-            textEditorWidget->box.pos = Vec(RACK_GRID_WIDTH, 0);
-            textEditorWidget->box.size = Vec((module->width - 2) * RACK_GRID_WIDTH, box.size.y);
-            addChild(textEditorWidget);
+            textEditorWidget->setFileWithKnownText(module->file, module->text);
             module->widgetPtr = textEditorWidget;
         }
         else
         {
-            box.size = Vec(RACK_GRID_WIDTH * DEFAULT_WIDTH, RACK_GRID_HEIGHT);
+            textEditorWidget->setLanguageDefinition(DEFAULT_LANG);
+            textEditorWidget->setText(DEFAULT_TEXT);
         }
     }
 

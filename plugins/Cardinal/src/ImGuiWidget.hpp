@@ -1,6 +1,6 @@
 /*
  * Dear ImGui for DPF, converted to VCV
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  * Copyright (C) 2021 Jean Pierre Cimalando <jp-dev@inbox.ru>
  *
  * Permission to use, copy, modify, and/or distribute this software for any purpose with
@@ -20,7 +20,7 @@
 #include "plugin.hpp"
 #include "DearImGui/imgui.h"
 
-struct ImGuiWidget : OpenGlWidget {
+struct ImGuiWidget : OpenGlWidgetWithBrowserPreview {
     struct PrivateData;
     PrivateData* const imData;
 
@@ -50,4 +50,6 @@ protected:
 
 private:
     void drawFramebuffer() override;
+    void drawFramebufferForBrowserPreview() override;
+    void drawFramebufferCommon(const Vec& fbSize, float scaleFactor);
 };

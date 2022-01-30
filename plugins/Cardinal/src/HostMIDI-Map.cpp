@@ -90,10 +90,10 @@ struct HostMIDIMap : Module {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
         for (int id = 0; id < MAX_MIDI_CONTROL; ++id)
-//         {
-//             paramHandles[id].color = nvgRGB(0xff, 0xff, 0x40);
+        {
+            paramHandles[id].color = nvgRGBf(0.76f, 0.11f, 0.22f);
             pcontext->engine->addParamHandle(&paramHandles[id]);
-//         }
+        }
 
         for (int i = 0; i < MAX_MIDI_CONTROL; i++)
             valueFilters[i].setTau(1 / 30.f);
@@ -460,18 +460,27 @@ struct HostMIDIMap : Module {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct MIDIMapChoice : CardinalLedDisplayChoice {
+#ifndef HEADLESS
+struct CardinalMIDIMapChoice : CardinalLedDisplayChoice {
     HostMIDIMap* const module;
     const int id;
     int disableLearnFrames = -1;
     ParamWidget* lastTouchedParam = nullptr;
 
-    MIDIMapChoice(HostMIDIMap* const m, const int i)
+    CardinalMIDIMapChoice(HostMIDIMap* const m, const int i)
       : CardinalLedDisplayChoice(),
         module(m),
         id(i)
     {
         alignTextCenter = false;
+
+        // Module browser setup
+        if (m == nullptr)
+        {
+            bgColor = nvgRGB(0, 0, 0);
+            color.a = 0.75f;
+            text = "Click here to map";
+        }
     }
 
     void draw(const DrawArgs& args) override
@@ -489,7 +498,7 @@ struct MIDIMapChoice : CardinalLedDisplayChoice {
 
     void step() override
     {
-        if (!module)
+        if (module == nullptr)
             return;
 
         // Set bgColor and selected state
@@ -609,7 +618,7 @@ struct MIDIMapChoice : CardinalLedDisplayChoice {
 struct HostMIDIMapDisplay : Widget {
     HostMIDIMap* module;
     ScrollWidget* scroll;
-    MIDIMapChoice* choices[MAX_MIDI_CONTROL];
+    CardinalMIDIMapChoice* choices[MAX_MIDI_CONTROL];
     LedDisplaySeparator* separators[MAX_MIDI_CONTROL];
 
     void drawLayer(const DrawArgs& args, int layer) override
@@ -634,13 +643,15 @@ struct HostMIDIMapDisplay : Widget {
             {
                 LedDisplaySeparator* separator = createWidget<LedDisplaySeparator>(Vec(0.0f, posY));
                 separator->box.size = Vec(box.size.x, 1.0f);
+                separator->visible = false;
                 scroll->container->addChild(separator);
                 separators[id] = separator;
             }
 
-            MIDIMapChoice* const choice = new MIDIMapChoice(module, id);
+            CardinalMIDIMapChoice* const choice = new CardinalMIDIMapChoice(module, id);
             choice->box.pos = Vec(0.0f, posY);
             choice->box.size = Vec(box.size.x, 20.0f);
+            choice->visible = id == 0;
             scroll->container->addChild(choice);
             choices[id] = choice;
 
@@ -722,6 +733,9 @@ struct HostMIDIMapWidget : ModuleWidget {
         menu->addChild(inputChannelItem);
     }
 };
+#else
+typedef ModuleWidget HostMIDIMapWidget;
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 

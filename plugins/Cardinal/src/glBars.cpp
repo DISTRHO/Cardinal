@@ -61,13 +61,13 @@ struct glBarsModule : Module {
 };
 
 #ifndef HEADLESS
-struct glBarsRendererWidget : OpenGlWidget {
+struct glBarsRendererWidget : OpenGlWidgetWithBrowserPreview {
     glBarsModule* const glBars;
 
     glBarsRendererWidget(glBarsModule* const module)
         : glBars(module)
     {
-        if (APP->window->pixelRatio < 2.0f)
+        if (glBars != nullptr && APP->window->pixelRatio < 2.0f)
             oversample = 2.0f;
     }
 
@@ -75,22 +75,34 @@ struct glBarsRendererWidget : OpenGlWidget {
     {
     }
 
-    void drawLayer(const DrawArgs& args, int layer) override
+    void drawLayer(const DrawArgs& args, const int layer) override
     {
         if (layer != 1)
             return;
 
-        OpenGlWidget::draw(args);
+        OpenGlWidgetWithBrowserPreview::draw(args);
     }
 
-    void drawFramebuffer() override {
-        math::Vec fbSize = getFramebufferSize();
+    void drawFramebuffer() override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(glBars != nullptr,);
 
+        drawFramebuffer(glBars->state, getFramebufferSize());
+    }
+
+    void drawFramebufferForBrowserPreview() override
+    {
+        glBarsState state;
+        drawFramebuffer(state, box.size);
+    }
+
+    void drawFramebuffer(glBarsState& state, const Vec& fbSize)
+    {
         glDisable(GL_BLEND);
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        glViewport(0.0, -100, fbSize.x * oversample, fbSize.y * oversample);
+        glViewport(0.0, -50 * oversample, fbSize.x * oversample, fbSize.y * oversample);
         glFrustum(-1, 1, -1, 1, 1.5, 10);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
@@ -99,7 +111,7 @@ struct glBarsRendererWidget : OpenGlWidget {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBars->state.Render();
+        state.Render();
 
         glPopMatrix();
         glMatrixMode(GL_PROJECTION);
@@ -107,18 +119,17 @@ struct glBarsRendererWidget : OpenGlWidget {
         glEnable(GL_BLEND);
     }
 
-    void step() override {
+    void step() override
+    {
         OpenGlWidget::step();
 
-        oversample = APP->window->pixelRatio < 2.0f ? 2.0f : 1.0f;
+        if (glBars != nullptr)
+            oversample = APP->window->pixelRatio < 2.0f ? 2.0f : 1.0f;
     }
 };
 
 struct glBarsWidget : ModuleWidget {
-    glBarsRendererWidget* const glBarsRenderer;
-
     glBarsWidget(glBarsModule* const module)
-        : glBarsRenderer(new glBarsRendererWidget(module))
     {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/glBars.svg")));
@@ -131,6 +142,7 @@ struct glBarsWidget : ModuleWidget {
         addInput(createInput<PJ301MPort>(Vec(135.0f, 20.0f), module, glBarsModule::IN1_INPUT));
 
         const float size = mm2px(127.0f);
+        glBarsRendererWidget* const glBarsRenderer = new glBarsRendererWidget(module);
         glBarsRenderer->box.pos = Vec((box.size.x - size) * 0.5f, (box.size.y - size) * 0.5f);
         glBarsRenderer->box.size = Vec(size, size);
         addChild(glBarsRenderer);

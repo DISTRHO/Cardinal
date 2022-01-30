@@ -1,6 +1,6 @@
 /*
  * Dear ImGui for DPF, converted to VCV
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  * Copyright (C) 2021 Jean Pierre Cimalando <jp-dev@inbox.ru>
  *
  * Permission to use, copy, modify, and/or distribute this software for any purpose with
@@ -145,7 +145,7 @@ float ImGuiWidget::getScaleFactor() const noexcept
 
 void ImGuiWidget::onContextCreate(const ContextCreateEvent& e)
 {
-    OpenGlWidget::onContextCreate(e);
+    OpenGlWidgetWithBrowserPreview::onContextCreate(e);
     DISTRHO_SAFE_ASSERT_RETURN(!imData->created,);
 
     ImGui::SetCurrentContext(imData->context);
@@ -162,7 +162,7 @@ void ImGuiWidget::onContextDestroy(const ContextDestroyEvent& e)
         imData->created = false;
     }
 
-    OpenGlWidget::onContextDestroy(e);
+    OpenGlWidgetWithBrowserPreview::onContextDestroy(e);
 }
 
 void ImGuiWidget::setAsCurrentContext()
@@ -308,11 +308,37 @@ void ImGuiWidget::onSelectText(const SelectTextEvent& e)
 
 void ImGuiWidget::drawFramebuffer()
 {
+    const float scaleFactor = APP->window->pixelRatio;
+
+    drawFramebufferCommon(getFramebufferSize(), scaleFactor);
+}
+
+void ImGuiWidget::drawFramebufferForBrowserPreview()
+{
+    if (imData->created)
+    {
+        ImGui::SetCurrentContext(imData->context);
+        ImGui_ImplOpenGL2_Shutdown();
+        ImGui::DestroyContext(imData->context);
+
+        imData->created = false;
+        imData->fontGenerated = false;
+        imData->originalScaleFactor = 0.0f;
+        imData->scaleFactor = 0.0f;
+    }
+
+    imData->context = ImGui::CreateContext();
+    ImGui::SetCurrentContext(imData->context);
+    ImGui_ImplOpenGL2_Init();
+    imData->created = true;
+
+    drawFramebufferCommon(box.size.mult(oversample), oversample);
+}
+
+void ImGuiWidget::drawFramebufferCommon(const Vec& fbSize, const float scaleFactor)
+{
     ImGui::SetCurrentContext(imData->context);
     ImGuiIO& io(ImGui::GetIO());
-
-    const math::Vec fbSize = getFramebufferSize();
-    const float scaleFactor = APP->window->pixelRatio;
 
     if (d_isNotEqual(imData->scaleFactor, scaleFactor))
     {

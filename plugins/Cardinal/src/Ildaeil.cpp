@@ -745,25 +745,33 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         : ImGuiWidget(),
           module(m)
     {
-        if (module->fCarlaHostHandle == nullptr)
-        {
-            fDrawingState = kDrawingErrorInit;
-            fIdleState = kIdleNothing;
-            fPopupError = "Ildaeil backend failed to init properly, cannot continue.";
-            return;
-        }
-
         std::strcpy(fPluginSearchString, "Search...");
 
-        if (checkIfPluginIsLoaded())
-            fIdleState = kIdleInitPluginAlreadyLoaded;
+        if (m != nullptr)
+        {
+            if (m->fCarlaHostHandle == nullptr)
+            {
+                fDrawingState = kDrawingErrorInit;
+                fIdleState = kIdleNothing;
+                fPopupError = "Ildaeil backend failed to init properly, cannot continue.";
+                return;
+            }
 
-        module->fUI = this;
+            if (checkIfPluginIsLoaded())
+                fIdleState = kIdleInitPluginAlreadyLoaded;
+
+            m->fUI = this;
+        }
+        else
+        {
+            fDrawingState = kDrawingPluginList;
+            fIdleState = kIdleNothing;
+        }
     }
 
     ~IldaeilWidget() override
     {
-        if (module->fCarlaHostHandle != nullptr)
+        if (module != nullptr && module->fCarlaHostHandle != nullptr)
         {
             if (idleCallbackActive)
             {
@@ -1009,6 +1017,9 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
     void widgetCreated()
     {
+        if (module == nullptr)
+            return;
+
         if (const CarlaHostHandle handle = module->fCarlaHostHandle)
         {
             const CardinalPluginContext* const pcontext = module->pcontext;
@@ -1031,6 +1042,9 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
 
     void widgetDestroyed()
     {
+        if (module == nullptr)
+            return;
+
         if (const CarlaHostHandle handle = module->fCarlaHostHandle)
         {
             const CardinalPluginContext* const pcontext = module->pcontext;
@@ -1532,7 +1546,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             if (ImGui::Button("Load Plugin"))
                 fIdleState = kIdleLoadSelectedPlugin;
 
-            if (fPluginType != PLUGIN_INTERNAL && module->canUseBridges)
+            if (fPluginType != PLUGIN_INTERNAL && (module == nullptr || module->canUseBridges))
             {
                 ImGui::SameLine();
                 ImGui::Checkbox("Run in bridge mode", &fPluginWillRunInBridgeMode);
@@ -1657,7 +1671,7 @@ struct IldaeilModuleWidget : ModuleWidget {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Ildaeil.svg")));
 
-        if (module != nullptr && module->pcontext != nullptr)
+        if (module == nullptr || module->pcontext != nullptr)
         {
             ildaeilWidget = new IldaeilWidget(module);
             ildaeilWidget->box.pos = Vec(2 * RACK_GRID_WIDTH, 0);

@@ -404,15 +404,7 @@ struct HostMIDIGate : Module {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct CardinalMIDILearnPJ301MPort : PJ301MPort {
-    void onDragStart(const DragStartEvent& e) override {
-        PJ301MPort::onDragStart(e);
-    }
-    void onDragEnd(const DragEndEvent& e) override {
-        PJ301MPort::onDragEnd(e);
-    }
-};
-
+#ifndef HEADLESS
 /**
  * Based on VCVRack's NoteChoice as defined in src/core/plugin.hpp
  * Copyright (C) 2016-2021 VCV.
@@ -605,14 +597,14 @@ struct HostMIDIGateWidget : ModuleWidget {
         {
             const float x = startX_In + int(i / 6) * padding;
             const float y = startY + int(i % 6) * padding;
-            addInput(createInput<CardinalMIDILearnPJ301MPort>(Vec(x, y), module, i));
+            addInput(createInput<PJ301MPort>(Vec(x, y), module, i));
         }
 
         for (int i=0; i<18; ++i)
         {
             const float x = startX_Out + int(i / 6) * padding;
             const float y = startY + int(i % 6) * padding;
-            addOutput(createOutput<CardinalMIDILearnPJ301MPort>(Vec(x, y), module, i));
+            addOutput(createOutput<PJ301MPort>(Vec(x, y), module, i));
         }
 
         NoteGridDisplay* const display = createWidget<NoteGridDisplay>(Vec(startX_In - 3.0f, 70.0f));
@@ -696,6 +688,9 @@ struct HostMIDIGateWidget : ModuleWidget {
         ));
     }
 };
+#else
+typedef ModuleWidget HostMIDIGateWidget;
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 

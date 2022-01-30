@@ -497,15 +497,7 @@ struct HostMIDICC : Module {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct CardinalMIDILearnPJ301MPort : PJ301MPort {
-    void onDragStart(const DragStartEvent& e) override {
-        PJ301MPort::onDragStart(e);
-    }
-    void onDragEnd(const DragEndEvent& e) override {
-        PJ301MPort::onDragEnd(e);
-    }
-};
-
+#ifndef HEADLESS
 /**
  * Based on VCVRack's CcChoice as defined in src/core/plugin.hpp
  * Copyright (C) 2016-2021 VCV.
@@ -523,7 +515,14 @@ struct CardinalCcChoice : CardinalLedDisplayChoice {
     CardinalCcChoice(HostMIDICC* const m, const int i)
       : CardinalLedDisplayChoice(),
         module(m),
-        id(i) {}
+        id(i)
+    {
+        // Module browser setup
+        if (m == nullptr)
+        {
+            text = string::f("%d", i+1);
+        }
+    }
 
     void step() override
     {
@@ -691,14 +690,14 @@ struct HostMIDICCWidget : ModuleWidget {
         {
             const float x = startX_In + int(i / 6) * padding;
             const float y = startY + int(i % 6) * padding;
-            addInput(createInput<CardinalMIDILearnPJ301MPort>(Vec(x, y), module, i));
+            addInput(createInput<PJ301MPort>(Vec(x, y), module, i));
         }
 
         for (int i=0; i<18; ++i)
         {
             const float x = startX_Out + int(i / 6) * padding;
             const float y = startY + int(i % 6) * padding;
-            addOutput(createOutput<CardinalMIDILearnPJ301MPort>(Vec(x, y), module, i));
+            addOutput(createOutput<PJ301MPort>(Vec(x, y), module, i));
         }
 
         CCGridDisplay* const display = createWidget<CCGridDisplay>(Vec(startX_In - 3.0f, 70.0f));
@@ -775,6 +774,9 @@ struct HostMIDICCWidget : ModuleWidget {
         menu->addChild(outputChannelItem);
     }
 };
+#else
+typedef ModuleWidget HostMIDICCWidget;
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 
