@@ -113,6 +113,7 @@ RACK_FILES += Rack/dep/pffft/fftpack.c
 RACK_FILES += Rack/dep/osdialog/osdialog.c
 
 IGNORED_FILES  = Rack/src/asset.cpp
+IGNORED_FILES += Rack/src/audio.cpp
 IGNORED_FILES += Rack/src/common.cpp
 IGNORED_FILES += Rack/src/context.cpp
 IGNORED_FILES += Rack/src/dep.cpp
@@ -125,6 +126,7 @@ IGNORED_FILES += Rack/src/network.cpp
 IGNORED_FILES += Rack/src/plugin.cpp
 IGNORED_FILES += Rack/src/rtaudio.cpp
 IGNORED_FILES += Rack/src/rtmidi.cpp
+IGNORED_FILES += Rack/src/app/AudioDisplay.cpp
 IGNORED_FILES += Rack/src/app/MenuBar.cpp
 IGNORED_FILES += Rack/src/app/MidiDisplay.cpp
 IGNORED_FILES += Rack/src/app/Scene.cpp
