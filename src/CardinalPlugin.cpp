@@ -388,7 +388,13 @@ class CardinalPlugin : public CardinalBasePlugin
 {
     SharedResourcePointer<Initializer> fInitializer;
 
+   #if DISTRHO_PLUGIN_NUM_INPUTS != 0
+    /* If host audio ins == outs we can get issues for inplace processing.
+     * So allocate a float array that will serve as safe copy for those cases.
+     */
     float** fAudioBufferCopy;
+   #endif
+
     std::string fAutosavePath;
     uint64_t fPreviousFrame;
     String fWindowSize;
@@ -402,7 +408,9 @@ public:
     CardinalPlugin()
         : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, kCardinalStateCount),
           fInitializer(this),
+         #if DISTRHO_PLUGIN_NUM_INPUTS != 0
           fAudioBufferCopy(nullptr),
+         #endif
           fPreviousFrame(0)
     {
        #ifndef HEADLESS
@@ -802,7 +810,7 @@ protected:
        #if DISTRHO_PLUGIN_NUM_INPUTS != 0
         const uint32_t bufferSize = getBufferSize();
         fAudioBufferCopy = new float*[DISTRHO_PLUGIN_NUM_INPUTS];
-        for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
+        for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
             fAudioBufferCopy[i] = new float[bufferSize];
        #endif
 
@@ -811,13 +819,15 @@ protected:
 
     void deactivate() override
     {
+       #if DISTRHO_PLUGIN_NUM_INPUTS != 0
         if (fAudioBufferCopy != nullptr)
         {
-            for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
+            for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
                 delete[] fAudioBufferCopy[i];
             delete[] fAudioBufferCopy;
             fAudioBufferCopy = nullptr;
         }
+       #endif
     }
 
     void run(const float** const inputs, float** const outputs, const uint32_t frames,
@@ -865,10 +875,13 @@ protected:
         // inline processing, use a safe copy
         else
         {
-            for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
+           #if DISTRHO_PLUGIN_NUM_INPUTS != 0
+            for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
                 std::memcpy(fAudioBufferCopy[i], inputs[i], sizeof(float)*frames);
-
             context->dataIns = fAudioBufferCopy;
+           #else
+            context->dataIns = nullptr;
+           #endif
             context->dataOuts = outputs;
         }
 
