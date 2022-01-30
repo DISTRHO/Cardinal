@@ -50,7 +50,7 @@
     {
       "slug": "HostMIDICC",
       "name": "Host MIDI CC",
-      "description": "Exposes host-provided MIDI CC in a module",
+      "description": "Exposes host-provided MIDI CC, channel pressure and pitchbend in a module",
       "tags": [
         "External",
         "MIDI"

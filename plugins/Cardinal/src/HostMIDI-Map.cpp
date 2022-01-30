@@ -708,7 +708,7 @@ struct HostMIDIMapWidget : ModuleWidget {
                 for (int c = 0; c <= 16; c++) {
                     menu->addChild(createCheckMenuItem((c == 0) ? "All" : string::f("%d", c), "",
                         [=]() {return module->channel == c;},
-                        [=]() {module->channel = c;}
+                        [=]() {module->setChannel(c);}
                     ));
                 }
                 return menu;

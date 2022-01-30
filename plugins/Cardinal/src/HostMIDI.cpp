@@ -519,7 +519,6 @@ struct HostMIDI : Module {
     struct MidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS> {
         CardinalPluginContext* const pcontext;
         uint8_t channel = 0;
-        dsp::Timer rateLimiterTimer;
 
         MidiOutput(CardinalPluginContext* const pc)
             : pcontext(pc) {}
@@ -579,15 +578,8 @@ struct HostMIDI : Module {
         else
             ++midiOutput.frame;
 
-        // MIDI baud rate is 31250 b/s, or 3125 B/s.
-        // CC messages are 3 bytes, so we can send a maximum of 1041 CC messages per second.
-        // Since multiple CCs can be generated, play it safe and limit the CC rate to 200 Hz.
-        static constexpr const float rateLimiterPeriod = 1 / 200.f;
-        bool rateLimiterTriggered = (midiOutput.rateLimiterTimer.process(args.sampleTime) >= rateLimiterPeriod);
-        if (rateLimiterTriggered)
-            midiOutput.rateLimiterTimer.time -= rateLimiterPeriod;
-
-        for (int c = 0; c < inputs[PITCH_INPUT].getChannels(); c++) {
+        for (int c = 0; c < inputs[PITCH_INPUT].getChannels(); ++c)
+        {
             int vel = (int) std::round(inputs[VELOCITY_INPUT].getNormalPolyVoltage(10.f * 100 / 127, c) / 10.f * 127);
             vel = clamp(vel, 0, 127);
             midiOutput.setVelocity(vel, c);
@@ -602,30 +594,13 @@ struct HostMIDI : Module {
             midiOutput.setKeyPressure(aft, c);
         }
 
-        if (rateLimiterTriggered) {
-            int pw = (int) std::round((inputs[PITCHBEND_INPUT].getVoltage() + 5.f) / 10.f * 0x4000);
-            pw = clamp(pw, 0, 0x3fff);
-            midiOutput.setPitchWheel(pw);
+        int pw = (int) std::round((inputs[PITCHBEND_INPUT].getVoltage() + 5.f) / 10.f * 16383);
+        pw = clamp(pw, 0, 16383);
+        midiOutput.setPitchWheel(pw);
 
-            int mw = (int) std::round(inputs[MODWHEEL_INPUT].getVoltage() / 10.f * 127);
-            mw = clamp(mw, 0, 127);
-            midiOutput.setModWheel(mw);
-
-            /* unused
-            int vol = (int) std::round(inputs[VOL_INPUT].getNormalVoltage(10.f) / 10.f * 127);
-            vol = clamp(vol, 0, 127);
-            midiOutput.setVolume(vol);
-
-            int pan = (int) std::round((inputs[PAN_INPUT].getVoltage() + 5.f) / 10.f * 127);
-            pan = clamp(pan, 0, 127);
-            midiOutput.setPan(pan);
-            */
-        }
-
-        /* unused
-        bool clk = inputs[CLK_INPUT].getVoltage() >= 1.f;
-        midiOutput.setClock(clk);
-        */
+        int mw = (int) std::round(inputs[MODWHEEL_INPUT].getVoltage() / 10.f * 127);
+        mw = clamp(mw, 0, 127);
+        midiOutput.setModWheel(mw);
 
         bool start = inputs[START_INPUT].getVoltage() >= 1.f;
         midiOutput.setStart(start);

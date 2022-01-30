@@ -39,13 +39,13 @@ struct HostMIDICC : Module {
     };
     enum InputIds {
         ENUMS(CC_INPUTS, 16),
-        CC_INPUT_CHANNEL_PRESSURE,
+        CC_INPUT_CH_PRESSURE,
         CC_INPUT_PITCHBEND,
         NUM_INPUTS
     };
     enum OutputIds {
         ENUMS(CC_OUTPUT, 16),
-        CC_OUTPUT_CHANNEL_PRESSURE,
+        CC_OUTPUT_CH_PRESSURE,
         CC_OUTPUT_PITCHBEND,
         NUM_OUTPUTS
     };
@@ -64,16 +64,19 @@ struct HostMIDICC : Module {
         int64_t lastBlockFrame;
         uint8_t channel;
 
+        uint8_t chPressure[16];
+        uint16_t pitchbend[16];
+
         // stuff from Rack
         /** [cc][channel] */
-        int8_t ccValues[128][16];
+        uint8_t ccValues[128][16];
         /** When LSB is enabled for CC 0-31, the MSB is stored here until the LSB is received.
         [cc][channel]
         */
-        int8_t msbValues[32][16];
+        uint8_t msbValues[32][16];
         int learningId;
         /** [cell][channel] */
-        dsp::ExponentialFilter valueFilters[16][16];
+        dsp::ExponentialFilter valueFilters[NUM_OUTPUTS][16];
         bool smooth;
         bool mpeMode;
         bool lsbMode;
@@ -81,7 +84,7 @@ struct HostMIDICC : Module {
         MidiInput(CardinalPluginContext* const pc)
             : pcontext(pc)
         {
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < NUM_OUTPUTS; i++) {
                 for (int c = 0; c < 16; c++) {
                     valueFilters[i][c].setTau(1 / 30.f);
                 }
@@ -106,6 +109,10 @@ struct HostMIDICC : Module {
                 for (int c = 0; c < 16; c++) {
                     msbValues[cc][c] = 0;
                 }
+            }
+            for (int c = 0; c < 16; c++) {
+                chPressure[c] = 0;
+                pitchbend[c] = 8192;
             }
             learningId = -1;
             smooth = true;
@@ -148,33 +155,47 @@ struct HostMIDICC : Module {
                         continue;
                 }
 
-                // adapted from Rack
-                if ((data[0] & 0xF0) != 0xB0)
+                const uint8_t status = data[0] & 0xF0;
+                const uint8_t chan = data[0] & 0x0F;
+
+                /**/ if (status == 0xD0)
+                {
+                    chPressure[chan] = data[1];
+                }
+                else if (status == 0xE0)
+                {
+                    pitchbend[chan] = (data[2] << 7) | data[1];
+                }
+                else if (status != 0xB0)
+                {
                     continue;
+                }
 
-                uint8_t c = mpeMode ? (data[0] & 0x0F) : 0;
-                uint8_t cc = data[1];
+                // adapted from Rack
+                const uint8_t c = mpeMode ? chan : 0;
+                const uint8_t cc = data[1];
+                const uint8_t value = data[2];
 
-                // Allow CC to be negative if the 8th bit is set.
-                // The gamepad driver abuses this, for example.
-                // Cast uint8_t to int8_t
-                int8_t value = data[2];
                 // Learn
-                if (learningId >= 0 && ccValues[cc][c] != value) {
+                if (learningId >= 0 && ccValues[cc][c] != value)
+                {
                     learnedCcs[learningId] = cc;
                     learningId = -1;
                 }
 
-                if (lsbMode && cc < 32) {
+                if (lsbMode && cc < 32)
+                {
                     // Don't set MSB yet. Wait for LSB to be received.
                     msbValues[cc][c] = value;
                 }
-                else if (lsbMode && 32 <= cc && cc < 64) {
+                else if (lsbMode && 32 <= cc && cc < 64)
+                {
                     // Apply MSB when LSB is received
                     ccValues[cc - 32][c] = msbValues[cc - 32][c];
                     ccValues[cc][c] = value;
                 }
-                else {
+                else
+                {
                     ccValues[cc][c] = value;
                 }
             }
@@ -184,32 +205,84 @@ struct HostMIDICC : Module {
             // Rack stuff
             const int channels = mpeMode ? 16 : 1;
 
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < 16; i++)
+            {
                 if (!outputs[CC_OUTPUT + i].isConnected())
                     continue;
                 outputs[CC_OUTPUT + i].setChannels(channels);
 
                 int cc = learnedCcs[i];
 
-                for (int c = 0; c < channels; c++) {
+                for (int c = 0; c < channels; c++)
+                {
                     int16_t cellValue = int16_t(ccValues[cc][c]) * 128;
                     if (lsbMode && cc < 32)
                         cellValue += ccValues[cc + 32][c];
+
                     // Maximum value for 14-bit CC should be MSB=127 LSB=0, not MSB=127 LSB=127, because this is the maximum value that 7-bit controllers can send.
-                    float value = float(cellValue) / (128 * 127);
-                    // Support negative values because the gamepad MIDI driver generates nonstandard 8-bit CC values.
-                    value = clamp(value, -1.f, 1.f);
+                    const float value = static_cast<float>(cellValue) / (128.0f * 127.0f);
 
                     // Detect behavior from MIDI buttons.
-                    if (smooth && std::fabs(valueFilters[i][c].out - value) < 1.f) {
+                    if (smooth && std::fabs(valueFilters[i][c].out - value) < 1.f)
+                    {
                         // Smooth value with filter
                         valueFilters[i][c].process(args.sampleTime, value);
                     }
-                    else {
+                    else
+                    {
                         // Jump value
                         valueFilters[i][c].out = value;
                     }
+
                     outputs[CC_OUTPUT + i].setVoltage(valueFilters[i][c].out * 10.f, c);
+                }
+            }
+
+            if (outputs[CC_OUTPUT_CH_PRESSURE].isConnected())
+            {
+                outputs[CC_OUTPUT_CH_PRESSURE].setChannels(channels);
+
+                for (int c = 0; c < channels; c++)
+                {
+                    const float value = static_cast<float>(chPressure[c]) / 128.0f;
+
+                    // Detect behavior from MIDI buttons.
+                    if (smooth && std::fabs(valueFilters[CC_OUTPUT_CH_PRESSURE][c].out - value) < 1.f)
+                    {
+                        // Smooth value with filter
+                        valueFilters[CC_OUTPUT_CH_PRESSURE][c].process(args.sampleTime, value);
+                    }
+                    else
+                    {
+                        // Jump value
+                        valueFilters[CC_OUTPUT_CH_PRESSURE][c].out = value;
+                    }
+
+                    outputs[CC_OUTPUT_CH_PRESSURE].setVoltage(valueFilters[CC_OUTPUT_CH_PRESSURE][c].out * 10.f, c);
+                }
+            }
+
+            if (outputs[CC_OUTPUT_PITCHBEND].isConnected())
+            {
+                outputs[CC_OUTPUT_PITCHBEND].setChannels(channels);
+
+                for (int c = 0; c < channels; c++)
+                {
+                    const float value = static_cast<float>(pitchbend[c]) / 16384.0f;
+
+                    // Detect behavior from MIDI buttons.
+                    if (smooth && std::fabs(valueFilters[CC_OUTPUT_PITCHBEND][c].out - value) < 1.f)
+                    {
+                        // Smooth value with filter
+                        valueFilters[CC_OUTPUT_PITCHBEND][c].process(args.sampleTime, value);
+                    }
+                    else
+                    {
+                        // Jump value
+                        valueFilters[CC_OUTPUT_PITCHBEND][c].out = value;
+                    }
+
+                    outputs[CC_OUTPUT_CH_PRESSURE].setVoltage(valueFilters[CC_OUTPUT_PITCHBEND][c].out * 10.f, c);
                 }
             }
 
@@ -224,8 +297,7 @@ struct HostMIDICC : Module {
         uint8_t channel = 0;
 
         // from Rack
-        dsp::Timer rateLimiterTimer;
-        int lastValues[128];
+        int lastValues[130];
         int64_t frame = 0;
 
         MidiOutput(CardinalPluginContext* const pc)
@@ -236,20 +308,44 @@ struct HostMIDICC : Module {
 
         void reset()
         {
-            for (int n = 0; n < 128; n++)
+            for (int n = 0; n < 130; ++n)
                 lastValues[n] = -1;
         }
 
-        void setValue(int value, int cc)
+        void sendCC(const int cc, const int value)
         {
-            if (value == lastValues[cc])
+            if (lastValues[cc] == value)
                 return;
             lastValues[cc] = value;
-            // CC
             midi::Message m;
             m.setStatus(0xb);
             m.setNote(cc);
             m.setValue(value);
+            m.setFrame(frame);
+            sendMessage(m);
+        }
+
+        void sendChanPressure(const int pressure)
+        {
+            if (lastValues[128] == pressure)
+                return;
+            lastValues[128] = pressure;
+            midi::Message m;
+            m.setStatus(0xd);
+            m.setNote(pressure);
+            m.setFrame(frame);
+            sendMessage(m);
+        }
+
+        void sendPitchbend(const int pitchbend)
+        {
+            if (lastValues[129] == pitchbend)
+                return;
+            lastValues[129] = pitchbend;
+            midi::Message m;
+            m.setStatus(0xe);
+            m.setNote(pitchbend & 0x7F);
+            m.setValue(pitchbend >> 7);
             m.setFrame(frame);
             sendMessage(m);
         }
@@ -276,13 +372,13 @@ struct HostMIDICC : Module {
         for (int i = 0; i < 16; i++)
             configInput(CC_INPUTS + i, string::f("Cell %d", i + 1));
 
-        configInput(CC_INPUT_CHANNEL_PRESSURE, "Channel pressure");
+        configInput(CC_INPUT_CH_PRESSURE, "Channel pressure");
         configInput(CC_INPUT_PITCHBEND, "Pitchbend");
 
         for (int i = 0; i < 16; i++)
             configOutput(CC_OUTPUT + i, string::f("Cell %d", i + 1));
 
-        configOutput(CC_OUTPUT_CHANNEL_PRESSURE, "Channel pressure");
+        configOutput(CC_OUTPUT_CH_PRESSURE, "Channel pressure");
         configOutput(CC_OUTPUT_PITCHBEND, "Pitchbend");
 
         onReset();
@@ -304,18 +400,23 @@ struct HostMIDICC : Module {
         else
             ++midiOutput.frame;
 
-        const float rateLimiterPeriod = 1 / 200.f;
-        bool rateLimiterTriggered = (midiOutput.rateLimiterTimer.process(args.sampleTime) >= rateLimiterPeriod);
-        if (rateLimiterTriggered)
-            midiOutput.rateLimiterTimer.time -= rateLimiterPeriod;
-        else
-            return;
-
         for (int i = 0; i < 16; i++)
         {
             int value = (int) std::round(inputs[CC_INPUTS + i].getVoltage() / 10.f * 127);
             value = clamp(value, 0, 127);
-            midiOutput.setValue(value, learnedCcs[i]);
+            midiOutput.sendCC(learnedCcs[i], value);
+        }
+
+        {
+            int value = (int) std::round(inputs[CC_INPUT_CH_PRESSURE].getVoltage() / 10.f * 127);
+            value = clamp(value, 0, 127);
+            midiOutput.sendChanPressure(value);
+        }
+
+        {
+            int value = (int) std::round(inputs[CC_INPUT_PITCHBEND].getVoltage() / 10.f * 16383);
+            value = clamp(value, 0, 16383);
+            midiOutput.sendPitchbend(value);
         }
     }
 
