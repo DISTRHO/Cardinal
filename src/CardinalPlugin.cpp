@@ -225,12 +225,6 @@ struct Initializer
         INFO("Destroying plugins");
         plugin::destroyStaticPlugins();
 
-        INFO("Destroying MIDI devices");
-        midi::destroy();
-
-        INFO("Destroying audio devices");
-        audio::destroy();
-
         INFO("Destroying logger");
         logger::destroy();
     }
