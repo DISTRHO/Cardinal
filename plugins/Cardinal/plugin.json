@@ -59,7 +59,7 @@
     {
       "slug": "HostMIDIGate",
       "name": "Host MIDI Gate",
-      "description": "Exposes host-provided MIDI as gates in a module",
+      "description": "Exposes host-provided MIDI notes as gates in a module",
       "tags": [
         "External",
         "MIDI"
@@ -67,8 +67,8 @@
     },
     {
       "slug": "HostMIDIMap",
-      "name": "Host MIDI Map",
-      "description": "Allows host-provided MIDI to control other module parameters",
+      "name": "Host MIDI CC Map",
+      "description": "Allows host-provided MIDI CC to control other module parameters",
       "tags": [
         "External",
         "MIDI"

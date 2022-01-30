@@ -26,6 +26,8 @@
 using namespace rack;
 
 struct CardinalLedDisplayChoice : LedDisplayChoice {
+    bool alignTextCenter = true;
+
     CardinalLedDisplayChoice(const char* const label = nullptr)
     {
         color = nvgRGBf(0.76f, 0.11f, 0.22f);
@@ -35,14 +37,23 @@ struct CardinalLedDisplayChoice : LedDisplayChoice {
             text = label;
     }
 
-    void drawLayer(const DrawArgs& args, int layer) override
+    void drawLayer(const DrawArgs& args, const int layer) override
     {
         if (layer == 1)
         {
             nvgFillColor(args.vg, color);
-            nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
             nvgTextLetterSpacing(args.vg, 0.0f);
-            nvgText(args.vg, box.size.x * 0.5f, textOffset.y, text.c_str(), NULL);
+
+            if (alignTextCenter)
+            {
+                nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+                nvgText(args.vg, box.size.x * 0.5f, textOffset.y, text.c_str(), nullptr);
+            }
+            else
+            {
+                nvgTextAlign(args.vg, NVG_ALIGN_LEFT);
+                nvgText(args.vg, textOffset.x, textOffset.y, text.c_str(), nullptr);
+            }
         }
 
         Widget::drawLayer(args, layer);

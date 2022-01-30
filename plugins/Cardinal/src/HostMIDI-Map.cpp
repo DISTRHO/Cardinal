@@ -33,7 +33,7 @@
 
 USE_NAMESPACE_DISTRHO;
 
-static const int MAX_CHANNELS = 128;
+static const int MAX_MIDI_CONTROL = 120; /* 0x77 + 1 */
 
 struct HostMIDIMap : Module {
     enum ParamIds {
@@ -55,6 +55,7 @@ struct HostMIDIMap : Module {
     uint32_t midiEventsLeft;
     uint32_t midiEventFrame;
     int64_t lastBlockFrame;
+    int nextLearningId;
     uint8_t channel;
 
     // from Rack
@@ -62,9 +63,9 @@ struct HostMIDIMap : Module {
     /** Number of maps */
     int mapLen = 0;
     /** The mapped CC number of each channel */
-    int ccs[MAX_CHANNELS];
+    int ccs[MAX_MIDI_CONTROL];
     /** The mapped param handle of each channel */
-    ParamHandle paramHandles[MAX_CHANNELS];
+    ParamHandle paramHandles[MAX_MIDI_CONTROL];
 
     /** Channel ID of the learning session */
     int learningId;
@@ -74,10 +75,10 @@ struct HostMIDIMap : Module {
     bool learnedParam;
 
     /** The value of each CC number */
-    int8_t values[128];
+    int8_t values[MAX_MIDI_CONTROL];
     /** The smoothing processor (normalized between 0 and 1) of each channel */
-    dsp::ExponentialFilter valueFilters[MAX_CHANNELS];
-    bool filterInitialized[MAX_CHANNELS] = {};
+    dsp::ExponentialFilter valueFilters[MAX_MIDI_CONTROL];
+    bool filterInitialized[MAX_MIDI_CONTROL] = {};
     dsp::ClockDivider divider;
 
     HostMIDIMap()
@@ -88,13 +89,13 @@ struct HostMIDIMap : Module {
 
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
-        for (int id = 0; id < MAX_CHANNELS; ++id)
-        {
-            paramHandles[id].color = nvgRGB(0xff, 0xff, 0x40);
+        for (int id = 0; id < MAX_MIDI_CONTROL; ++id)
+//         {
+//             paramHandles[id].color = nvgRGB(0xff, 0xff, 0x40);
             pcontext->engine->addParamHandle(&paramHandles[id]);
-        }
+//         }
 
-        for (int i = 0; i < MAX_CHANNELS; i++)
+        for (int i = 0; i < MAX_MIDI_CONTROL; i++)
             valueFilters[i].setTau(1 / 30.f);
 
         divider.setDivision(32);
@@ -106,7 +107,7 @@ struct HostMIDIMap : Module {
         if (pcontext == nullptr)
             return;
 
-        for (int id = 0; id < MAX_CHANNELS; ++id)
+        for (int id = 0; id < MAX_MIDI_CONTROL; ++id)
             pcontext->engine->removeParamHandle(&paramHandles[id]);
     }
 
@@ -116,6 +117,7 @@ struct HostMIDIMap : Module {
         midiEventsLeft = 0;
         midiEventFrame = 0;
         lastBlockFrame = -1;
+        nextLearningId = -1;
         channel = 0;
 
         smooth = true;
@@ -126,9 +128,6 @@ struct HostMIDIMap : Module {
         // We also might be in the MIDIMap() constructor, which could cause problems, but when constructing, all ParamHandles will point to no Modules anyway.
         clearMaps_NoLock();
         mapLen = 1;
-        for (int i = 0; i < 128; i++) {
-            values[i] = -1;
-        }
     }
 
     void process(const ProcessArgs& args) override
@@ -175,24 +174,23 @@ struct HostMIDIMap : Module {
             // adapted from Rack
             if ((data[0] & 0xF0) != 0xB0)
                 continue;
+            if (data[1] >= MAX_MIDI_CONTROL)
+                continue;
 
-            uint8_t cc = data[1];
-            int8_t value = data[2];
+            const uint8_t cc = data[1];
+            const int8_t value = data[2];
 
             // Learn
-            if (0 <= learningId && values[cc] != value)
+            if (learningId >= 0 && values[cc] != value)
             {
                 ccs[learningId] = cc;
+                filterInitialized[cc] = false;
                 valueFilters[learningId].reset();
                 learnedCc = true;
-                commitLearn();
-                updateMapLen();
+                maybeCommitLearn();
                 refreshParamHandleText(learningId);
+                updateMapLen();
             }
-
-            // Ignore negative values generated using the nonstandard 8-bit MIDI extension from the gamepad driver
-            if (value < 0)
-                continue;
 
             values[cc] = value;
         }
@@ -202,80 +200,144 @@ struct HostMIDIMap : Module {
         // Step channels
         for (int id = 0; id < mapLen; ++id)
         {
-            int cc = ccs[id];
+            const int cc = ccs[id];
             if (cc < 0)
                 continue;
+
             // Get Module
-            Module* module = paramHandles[id].module;
+            Module* const module = paramHandles[id].module;
             if (!module)
                 continue;
+
             // Get ParamQuantity from ParamHandle
-            int paramId = paramHandles[id].paramId;
-            ParamQuantity* paramQuantity = module->paramQuantities[paramId];
+            const int paramId = paramHandles[id].paramId;
+            ParamQuantity* const paramQuantity = module->paramQuantities[paramId];
             if (!paramQuantity)
                 continue;
             if (!paramQuantity->isBounded())
                 continue;
+
             // Set filter from param value if filter is uninitialized
-            if (!filterInitialized[id]) {
+            if (!filterInitialized[id])
+            {
                 valueFilters[id].out = paramQuantity->getScaledValue();
                 filterInitialized[id] = true;
                 continue;
             }
+
             // Check if CC has been set by the MIDI device
             if (values[cc] < 0)
                 continue;
-            float value = values[cc] / 127.f;
+
+            const float value = values[cc] / 127.f;
+
             // Detect behavior from MIDI buttons.
-            if (smooth && std::fabs(valueFilters[id].out - value) < 1.f) {
+            if (smooth && std::fabs(valueFilters[id].out - value) < 1.f)
+            {
                 // Smooth value with filter
-                valueFilters[id].process(args.sampleTime * divider.getDivision(), value);
+                if (d_isEqual(valueFilters[id].process(args.sampleTime * divider.getDivision(), value), value))
+                {
+                    values[cc] = -1;
+                    continue;
+                }
             }
-            else {
+            else
+            {
                 // Jump value
+                if (d_isEqual(valueFilters[id].out, value))
+                {
+                    values[cc] = -1;
+                    continue;
+                }
+
                 valueFilters[id].out = value;
             }
+
             paramQuantity->setScaledValue(valueFilters[id].out);
         }
     }
 
     void clearMap(int id)
     {
+        nextLearningId = -1;
         learningId = -1;
+        learnedCc = false;
+        learnedParam = false;
+
         ccs[id] = -1;
+        values[id] = -1;
         pcontext->engine->updateParamHandle(&paramHandles[id], -1, 0, true);
         valueFilters[id].reset();
-        updateMapLen();
         refreshParamHandleText(id);
+        updateMapLen();
     }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // stuff for resetting state
 
     void clearMaps_NoLock()
     {
+        nextLearningId = -1;
         learningId = -1;
-        for (int id = 0; id < MAX_CHANNELS; id++) {
+        learnedCc = false;
+        learnedParam = false;
+
+        for (int id = 0; id < MAX_MIDI_CONTROL; ++id)
+        {
             ccs[id] = -1;
+            values[id] = -1;
             pcontext->engine->updateParamHandle_NoLock(&paramHandles[id], -1, 0, true);
             valueFilters[id].reset();
             refreshParamHandleText(id);
         }
-        mapLen = 0;
     }
 
-    void updateMapLen()
+    void setChannel(uint8_t channel)
     {
-        // Find last nonempty map
-        int id;
-        for (id = MAX_CHANNELS - 1; id >= 0; id--) {
-            if (ccs[id] >= 0 || paramHandles[id].moduleId >= 0)
-                break;
-        }
-        mapLen = id + 1;
-        // Add an empty "Mapping..." slot
-        if (mapLen < MAX_CHANNELS)
-            mapLen++;
+        this->channel = channel;
+
+        for (int i = 0; i < MAX_MIDI_CONTROL; ++i)
+            values[i] = -1;
     }
 
-    void commitLearn()
+    // ----------------------------------------------------------------------------------------------------------------
+    // stuff called from panel side, must lock engine
+
+    // called from onSelect
+    void enableLearn(const int id)
+    {
+        if (learningId == id)
+            return;
+
+        ccs[id] = -1;
+        nextLearningId = -1;
+        learningId = id;
+        learnedCc = false;
+        learnedParam = false;
+    }
+
+    // called from onDeselect
+    void disableLearn(const int id)
+    {
+        nextLearningId = -1;
+
+        if (learningId == id)
+            learningId = -1;
+    }
+
+    // called from onDeselect
+    void learnParam(const int id, const int64_t moduleId, const int paramId)
+    {
+        pcontext->engine->updateParamHandle(&paramHandles[id], moduleId, paramId, true);
+        learnedParam = true;
+        maybeCommitLearn();
+        updateMapLen();
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // common utils
+
+    void maybeCommitLearn()
     {
         if (learningId < 0)
             return;
@@ -283,42 +345,27 @@ struct HostMIDIMap : Module {
             return;
         if (!learnedParam)
             return;
+
         // Reset learned state
         learnedCc = false;
         learnedParam = false;
+
         // Find next incomplete map
-        while (++learningId < MAX_CHANNELS) {
+        while (++learningId < MAX_MIDI_CONTROL)
+        {
             if (ccs[learningId] < 0 || paramHandles[learningId].moduleId < 0)
+            {
+                nextLearningId = learningId;
                 return;
+            }
         }
-        learningId = -1;
+
+        nextLearningId = learningId = -1;
     }
 
-    void enableLearn(int id)
+    // FIXME this allocates string during RT!!
+    void refreshParamHandleText(const int id)
     {
-        if (learningId != id) {
-            learningId = id;
-            learnedCc = false;
-            learnedParam = false;
-        }
-    }
-
-    void disableLearn(int id)
-    {
-        if (learningId == id) {
-            learningId = -1;
-        }
-    }
-
-    void learnParam(int id, int64_t moduleId, int paramId)
-    {
-        pcontext->engine->updateParamHandle(&paramHandles[id], moduleId, paramId, true);
-        learnedParam = true;
-        commitLearn();
-        updateMapLen();
-    }
-
-    void refreshParamHandleText(int id) {
         std::string text;
         if (ccs[id] >= 0)
             text = string::f("CC%02d", ccs[id]);
@@ -326,6 +373,26 @@ struct HostMIDIMap : Module {
             text = "MIDI-Map";
         paramHandles[id].text = text;
     }
+
+    void updateMapLen()
+    {
+        // Find last nonempty map
+        int id;
+        for (id = MAX_MIDI_CONTROL; --id >= 0;)
+        {
+            if (ccs[id] >= 0 || paramHandles[id].moduleId >= 0)
+                break;
+        }
+
+        mapLen = id + 1;
+
+        // Add an empty "Mapping..." slot
+        if (mapLen < MAX_MIDI_CONTROL)
+            ++mapLen;
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // save and load json stuff
 
     json_t* dataToJson() override
     {
@@ -369,7 +436,7 @@ struct HostMIDIMap : Module {
                 json_t* paramIdJ = json_object_get(mapJ, "paramId");
                 if (!(ccJ && moduleIdJ && paramIdJ))
                     continue;
-                if (mapIndex >= MAX_CHANNELS)
+                if (mapIndex >= MAX_MIDI_CONTROL)
                     continue;
                 ccs[mapIndex] = json_integer_value(ccJ);
                 pcontext->engine->updateParamHandle_NoLock(&paramHandles[mapIndex],
@@ -393,25 +460,229 @@ struct HostMIDIMap : Module {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct HostMIDIMapWidget : ModuleWidget {
-    static constexpr const float startX_In = 14.0f;
-    static constexpr const float startX_Out = 96.0f;
-    static constexpr const float startY = 74.0f;
-    static constexpr const float padding = 29.0f;
-    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
+struct MIDIMapChoice : CardinalLedDisplayChoice {
+    HostMIDIMap* const module;
+    const int id;
+    int disableLearnFrames = -1;
+    ParamWidget* lastTouchedParam = nullptr;
 
+    MIDIMapChoice(HostMIDIMap* const m, const int i)
+      : CardinalLedDisplayChoice(),
+        module(m),
+        id(i)
+    {
+        alignTextCenter = false;
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        if (bgColor.a > 0.0)
+        {
+            nvgBeginPath(args.vg);
+            nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 4);
+            nvgFillColor(args.vg, bgColor);
+            nvgFill(args.vg);
+        }
+
+        Widget::draw(args);
+    }
+
+    void step() override
+    {
+        if (!module)
+            return;
+
+        // Set bgColor and selected state
+        if (module->learningId == id)
+        {
+            bgColor = color;
+            bgColor.a = 0.125f;
+
+            if (ParamWidget* const touchedParam = APP->scene->rack->touchedParam)
+            {
+                if (module->nextLearningId == id)
+                {
+                    module->nextLearningId = -1;
+                    lastTouchedParam = touchedParam;
+                }
+                else if (lastTouchedParam != touchedParam)
+                {
+                    const int64_t moduleId = touchedParam->module->id;
+                    const int paramId = touchedParam->paramId;
+                    module->learnParam(id, moduleId, paramId);
+                    lastTouchedParam = touchedParam;
+                }
+            }
+            else
+            {
+                lastTouchedParam = nullptr;
+            }
+        }
+        else
+        {
+            bgColor = nvgRGB(0, 0, 0);
+        }
+
+        // Set text
+        text.clear();
+
+        // mapped
+        if (module->ccs[id] >= 0)
+            text += string::f("CC%02d: ", module->ccs[id]);
+        if (module->paramHandles[id].moduleId >= 0)
+            text += getParamName();
+
+        // Set text color
+        if (text.empty() && module->learningId != id)
+            color.a = 0.75f;
+        else
+            color.a = 1.0f;
+
+        // unmapped
+        if (text.empty())
+        {
+            if (module->learningId == id)
+                text = "Mapping...";
+            else
+                text = module->mapLen == 1 ? "Click here to map" : "Unmapped";
+        }
+    }
+
+    void onButton(const ButtonEvent& e) override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);
+
+        e.stopPropagating();
+
+        if (e.action != GLFW_PRESS)
+            return;
+
+        switch (e.button)
+        {
+        case GLFW_MOUSE_BUTTON_RIGHT:
+            module->clearMap(id);
+            e.consume(this);
+            break;
+            // fall-through
+        case GLFW_MOUSE_BUTTON_LEFT:
+            APP->scene->rack->touchedParam = lastTouchedParam = nullptr;
+            module->enableLearn(id);
+            e.consume(this);
+            break;
+        }
+    }
+
+    /*
+    void onSelect(const SelectEvent& e) override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);
+
+        ScrollWidget* scroll = getAncestorOfType<ScrollWidget>();
+        scroll->scrollTo(box);
+    }
+    */
+
+    std::string getParamName() const
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(module != nullptr, "error");
+        DISTRHO_SAFE_ASSERT_RETURN(id < module->mapLen, "error");
+
+        ParamHandle* const paramHandle = &module->paramHandles[id];
+
+        Module* const paramModule = paramHandle->module;
+        DISTRHO_SAFE_ASSERT_RETURN(paramModule != nullptr, "error");
+
+        const int paramId = paramHandle->paramId;
+        DISTRHO_SAFE_ASSERT_RETURN(paramId < (int) paramModule->params.size(), "error");
+
+        ParamQuantity* const paramQuantity = paramModule->paramQuantities[paramId];
+        std::string s = paramQuantity->name;
+        if (s.empty())
+            s = "Unnamed";
+        s += " (";
+        s += paramModule->model->name;
+        s += ")";
+        return s;
+    }
+};
+
+struct HostMIDIMapDisplay : Widget {
+    HostMIDIMap* module;
+    ScrollWidget* scroll;
+    MIDIMapChoice* choices[MAX_MIDI_CONTROL];
+    LedDisplaySeparator* separators[MAX_MIDI_CONTROL];
+
+    void drawLayer(const DrawArgs& args, int layer) override
+    {
+        nvgScissor(args.vg, RECT_ARGS(args.clipBox));
+        Widget::drawLayer(args, layer);
+        nvgResetScissor(args.vg);
+    }
+
+    void setModule(HostMIDIMap* const module)
+    {
+        this->module = module;
+
+        scroll = new ScrollWidget;
+        scroll->box.size = box.size;
+        addChild(scroll);
+
+        float posY = 0.0f;
+        for (int id = 0; id < MAX_MIDI_CONTROL; ++id)
+        {
+            if (id != 0)
+            {
+                LedDisplaySeparator* separator = createWidget<LedDisplaySeparator>(Vec(0.0f, posY));
+                separator->box.size = Vec(box.size.x, 1.0f);
+                scroll->container->addChild(separator);
+                separators[id] = separator;
+            }
+
+            MIDIMapChoice* const choice = new MIDIMapChoice(module, id);
+            choice->box.pos = Vec(0.0f, posY);
+            choice->box.size = Vec(box.size.x, 20.0f);
+            scroll->container->addChild(choice);
+            choices[id] = choice;
+
+            posY += choice->box.size.y;
+        }
+    }
+
+    void step() override
+    {
+        if (module != nullptr)
+        {
+            const int mapLen = module->mapLen;
+
+            for (int id = 1; id < MAX_MIDI_CONTROL; ++id)
+            {
+                separators[id]->visible = (id < mapLen);
+                choices[id]->visible = (id < mapLen);
+            }
+        }
+
+        Widget::step();
+    }
+};
+
+struct HostMIDIMapWidget : ModuleWidget {
     HostMIDIMap* const module;
 
     HostMIDIMapWidget(HostMIDIMap* const m)
         : module(m)
     {
         setModule(m);
-        setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostMIDI.svg")));
+        setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostMIDIMap.svg")));
 
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
         addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+        HostMIDIMapDisplay* const display = createWidget<HostMIDIMapDisplay>(Vec(1.0f, 71.0f));
+        display->box.size = Vec(box.size.x - 2.0f, box.size.y - 89.0f);
+        display->setModule(m);
+        addChild(display);
     }
 
     void draw(const DrawArgs& args) override

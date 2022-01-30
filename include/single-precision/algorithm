@@ -42,5 +42,3 @@ std::complex<float> operator/(const std::complex<double>& a, const std::complex<
 }
 
 }
-
-// std::complex<double>

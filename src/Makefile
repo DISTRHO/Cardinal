@@ -127,15 +127,10 @@ IGNORED_FILES += Rack/src/rtmidi.cpp
 IGNORED_FILES += Rack/src/app/MenuBar.cpp
 IGNORED_FILES += Rack/src/app/Scene.cpp
 IGNORED_FILES += Rack/src/app/TipWindow.cpp
-IGNORED_FILES += Rack/src/core/Audio.cpp
-IGNORED_FILES += Rack/src/core/CV_MIDI.cpp
-IGNORED_FILES += Rack/src/core/CV_MIDICC.cpp
-IGNORED_FILES += Rack/src/core/MIDI_CV.cpp
-IGNORED_FILES += Rack/src/core/MIDICC_CV.cpp
-IGNORED_FILES += Rack/src/core/Notes.cpp
 IGNORED_FILES += Rack/src/engine/Engine.cpp
 IGNORED_FILES += Rack/src/plugin/Model.cpp
 IGNORED_FILES += Rack/src/window/Window.cpp
+IGNORED_FILES += $(wildcard Rack/src/core/*.cpp)
 
 RACK_FILES += $(wildcard Rack/src/*.c)
 RACK_FILES += $(wildcard Rack/src/*/*.c)
@@ -196,16 +191,6 @@ $(BUILD_DIR)/%.c.o: %.c
 	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@
 
 $(BUILD_DIR)/override/MIDI_CV.cpp.o: override/MIDI_CV.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -UPRIVATE -c -o $@
-
-$(BUILD_DIR)/Rack/src/core/Blank.cpp.o: Rack/src/core/Blank.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -UPRIVATE -D'nvgRGB(r,g,b)=nvgRGBblank(r,g,b)' -c -o $@
-
-$(BUILD_DIR)/Rack/src/core/%.cpp.o: Rack/src/core/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -UPRIVATE -c -o $@

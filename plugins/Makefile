@@ -826,27 +826,20 @@ else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 endif
 
-PLUGIN_RESOURCES  = ../bin/CardinalFX.lv2/resources/PluginManifests/Core.json
+PLUGIN_RESOURCES  =
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
 ifeq ($(MACOS),true)
-PLUGIN_RESOURCES += ../bin/CardinalFX.vst/Contents/Resources/PluginManifests/Core.json
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json)
 else
-PLUGIN_RESOURCES += ../bin/CardinalFX.vst/resources/PluginManifests/Core.json
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/resources/PluginManifests/%.json)
 endif
-PLUGIN_RESOURCES += ../bin/CardinalFX.vst3/Contents/Resources/PluginManifests/Core.json
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst3/Contents/Resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst3/Contents/Resources/PluginManifests/%.json)
 
 resources: $(PLUGIN_RESOURCES)
-
-../bin/CardinalFX.%/Core.json: Core.json
-	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
 
 ../bin/CardinalFX.lv2/resources/%: %/res
 	-@mkdir -p "$(shell dirname $@)"

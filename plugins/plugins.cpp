@@ -595,14 +595,6 @@ std::string pluginManifest(const std::string& dirname);
 std::string pluginPath(const std::string& dirname);
 }
 
-// core plugins
-namespace core {
-extern Model* modelMIDI_Gate;
-extern Model* modelMIDIMap;
-extern Model* modelGate_MIDI;
-extern Model* modelBlank;
-}
-
 // regular plugins
 namespace plugin {
 
@@ -684,20 +676,6 @@ struct StaticPluginLoader {
         }
     }
 };
-
-static void initStatic__Core()
-{
-    Plugin* const p = new Plugin;
-
-    const StaticPluginLoader spl(p, "Core");
-    if (spl.ok())
-    {
-        p->addModel(rack::core::modelMIDI_Gate);
-        p->addModel(rack::core::modelMIDIMap);
-        p->addModel(rack::core::modelGate_MIDI);
-        p->addModel(rack::core::modelBlank);
-    }
-}
 
 static void initStatic__Cardinal()
 {
@@ -1996,7 +1974,6 @@ static void initStatic__ZZC()
 
 void initStaticPlugins()
 {
-    initStatic__Core();
     initStatic__Cardinal();
 #ifndef NOPLUGINS
     initStatic__21kHz();
