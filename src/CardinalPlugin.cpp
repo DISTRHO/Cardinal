@@ -34,7 +34,7 @@
 # undef DEBUG
 #endif
 
-#ifdef HAVE_LIBLO
+#if defined(HAVE_LIBLO) && defined(HEADLESS)
 # include <lo/lo.h>
 # include "extra/Thread.hpp"
 #endif
@@ -54,8 +54,6 @@ static const constexpr uint kCardinalStateCount = 2; // patch, windowSize
 static const constexpr uint kCardinalStateCount = 1; // patch
 #endif
 
-#define REMOTE_HOST_PORT "2228"
-
 namespace rack {
 namespace plugin {
     void initStaticPlugins();
@@ -73,11 +71,11 @@ START_NAMESPACE_DISTRHO
 // -----------------------------------------------------------------------------------------------------------
 
 struct Initializer
-#ifdef HAVE_LIBLO
+#if defined(HAVE_LIBLO) && defined(HEADLESS)
 : public Thread
 #endif
 {
-#ifdef HAVE_LIBLO
+#if defined(HAVE_LIBLO) && defined(HEADLESS)
     lo_server oscServer = nullptr;
     CardinalBasePlugin* oscPlugin = nullptr;
 #endif
@@ -188,7 +186,7 @@ struct Initializer
         INFO("Initializing plugin browser DB");
         app::browserInit();
 
-#ifdef HAVE_LIBLO
+#if defined(HAVE_LIBLO) && defined(HEADLESS)
         INFO("Initializing OSC Remote control");
         oscServer = lo_server_new_with_proto(REMOTE_HOST_PORT, LO_UDP, osc_error_handler);
         DISTRHO_SAFE_ASSERT_RETURN(oscServer != nullptr,);
@@ -198,7 +196,7 @@ struct Initializer
         lo_server_add_method(oscServer, nullptr, nullptr, osc_fallback_handler, nullptr);
 
         startThread();
-#else
+#elif defined(HEADLESS)
         INFO("OSC Remote control is not enabled in this build");
 #endif
     }
@@ -207,7 +205,7 @@ struct Initializer
     {
         using namespace rack;
 
-#ifdef HAVE_LIBLO
+#if defined(HAVE_LIBLO) && defined(HEADLESS)
         if (oscServer != nullptr)
         {
             stopThread(5000);
@@ -229,7 +227,7 @@ struct Initializer
         logger::destroy();
     }
 
-#ifdef HAVE_LIBLO
+#if defined(HAVE_LIBLO) && defined(HEADLESS)
     void run() override
     {
         INFO("OSC Thread Listening for remote commands");
@@ -471,14 +469,14 @@ public:
         context->patch->loadTemplate();
         context->scene->rackScroll->reset();
 
-#ifdef HAVE_LIBLO
+#if defined(HAVE_LIBLO) && defined(HEADLESS)
         fInitializer->oscPlugin = this;
 #endif
     }
 
     ~CardinalPlugin() override
     {
-#ifdef HAVE_LIBLO
+#if defined(HAVE_LIBLO) && defined(HEADLESS)
         fInitializer->oscPlugin = nullptr;
 #endif
 
