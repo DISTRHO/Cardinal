@@ -15,8 +15,6 @@ It does not load external modules and does not connect to the official Rack libr
 Because it is using DPF, Cardinal already supports LV2 and VST2 with an extra JACK standalone mode if self-compiled.  
 A VST3 version is in progress, already part of the build but still experimental.
 
-**The project should be considered in beta state at the moment.**
-
 ## Plugin variants
 
 Cardinal provides 3 plugin variants - "main", Synth and FX.  

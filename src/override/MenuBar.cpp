@@ -535,8 +535,7 @@ struct HelpButton : MenuButton {
 
 		menu->addChild(new ui::MenuSeparator);
 
-		menu->addChild(createMenuLabel(APP_EDITION + " " + APP_EDITION_NAME));
-
+		menu->addChild(createMenuLabel("Cardinal " + APP_EDITION + " " + CARDINAL_VERSION));
 		menu->addChild(createMenuLabel("Rack " + APP_VERSION + " Compatible"));
 	}
 };

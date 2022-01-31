@@ -49,6 +49,8 @@
 # include <unistd.h>
 #endif
 
+const std::string CARDINAL_VERSION = "22.02";
+
 namespace rack {
 namespace settings {
 int rateLimit = 0;

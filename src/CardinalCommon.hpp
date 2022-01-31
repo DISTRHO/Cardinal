@@ -25,6 +25,8 @@
 # define REMOTE_HOST_PORT "2228"
 #endif
 
+extern const std::string CARDINAL_VERSION;
+
 namespace rack {
 
 namespace settings {
