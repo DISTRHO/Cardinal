@@ -226,6 +226,7 @@ TARGETS += $(DEP_PATH)/lib/libzstd.a
 all: $(TARGETS)
 
 clean:
+	$(DEP_MAKE) $(QUICKJS_MAKE_FLAGS) -C $(CURDIR)/QuickJS clean
 	rm -f $(TARGETS)
 	rm -f $(DEP_PATH)/*.tgz
 	rm -f $(DEP_PATH)/*.tar.gz
@@ -238,7 +239,6 @@ clean:
 	rm -rf $(DEP_PATH)/libsamplerate-0.1.9
 	rm -rf $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3
 	rm -rf $(DEP_PATH)/zstd-1.4.5
-	rm -rf $(DEP_PATH)/QuickJS
 
 quickjs: $(DEP_PATH)/lib/libquickjs.a
 
