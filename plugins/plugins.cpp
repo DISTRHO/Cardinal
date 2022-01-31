@@ -305,9 +305,9 @@ void setupSamples();
 #include "FehlerFabrik/src/plugin.hpp"
 
 // Fundamental
-/*
+#ifdef WITH_FUNDAMENTAL
 #include "Fundamental/src/plugin.hpp"
-*/
+#endif
 
 // GlueTheGiant
 #include "GlueTheGiant/src/plugin.hpp"
@@ -565,7 +565,9 @@ Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
 Plugin* pluginInstance__Extratone;
 Plugin* pluginInstance__FehlerFabrik;
-// Plugin* pluginInstance__Fundamental;
+#ifdef WITH_FUNDAMENTAL
+Plugin* pluginInstance__Fundamental;
+#endif
 Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__HetrickCV;
@@ -1406,7 +1408,7 @@ static void initStatic__FehlerFabrik()
     }
 }
 
-/*
+#ifdef WITH_FUNDAMENTAL
 static void initStatic__Fundamental()
 {
     Plugin* const p = new Plugin;
@@ -1456,7 +1458,7 @@ static void initStatic__Fundamental()
         }
     }
 }
-*/
+#endif
 
 static void initStatic__GlueTheGiant()
 {
@@ -1998,7 +2000,9 @@ void initStaticPlugins()
     initStatic__ExpertSleepersEncoders();
     initStatic__Extratone();
     initStatic__FehlerFabrik();
-    // initStatic__Fundamental();
+   #ifdef WITH_FUNDAMENTAL
+    initStatic__Fundamental();
+   #endif
     initStatic__GlueTheGiant();
     initStatic__GrandeModular();
     initStatic__HetrickCV();
