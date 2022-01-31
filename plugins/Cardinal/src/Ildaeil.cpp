@@ -1714,7 +1714,23 @@ struct IldaeilModuleWidget : ModuleWidget {
 static void host_ui_parameter_changed(NativeHostHandle, uint32_t, float) {}
 static const char* host_ui_open_file(NativeHostHandle, bool, const char*, const char*) { return nullptr; }
 static void projectLoadedFromDSP(void*) {}
-typedef ModuleWidget IldaeilModuleWidget;
+struct IldaeilModuleWidget : ModuleWidget {
+    IldaeilModuleWidget(HostParameters* const module) {
+        setModule(module);
+
+        addInput(createInput<PJ301MPort>(Vec(3, 54), module, IldaeilModule::INPUT1));
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 30), module, IldaeilModule::INPUT2));
+        addOutput(createOutput<PJ301MPort>(Vec(3, 54 + 60), module, IldaeilModule::OUTPUT1));
+        addOutput(createOutput<PJ301MPort>(Vec(3, 54 + 90), module, IldaeilModule::OUTPUT2));
+
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 135), module, IldaeilModule::PITCH_INPUT));
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 165), module, IldaeilModule::GATE_INPUT));
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 195), module, IldaeilModule::VEL_INPUT));
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 225), module, IldaeilModule::AFT_INPUT));
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 255), module, IldaeilModule::PW_INPUT));
+        addInput(createInput<PJ301MPort>(Vec(3, 54 + 285), module, IldaeilModule::MW_INPUT));
+    }
+};
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------

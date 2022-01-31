@@ -652,7 +652,17 @@ static void host_ui_closed(NativeHostHandle handle)
 }
 #else
 static void host_ui_closed(NativeHostHandle) {}
-typedef ModuleWidget CarlaModuleWidget;
+struct CarlaModuleWidget : ModuleWidget {
+    CarlaModuleWidget(CarlaModule* const module) {
+        setModule(module);
+
+        for (uint i=0; i<CarlaModule::NUM_INPUTS; ++i)
+            addInput(createInput<PJ301MPort>({}, module, i));
+
+        for (uint i=0; i<CarlaModule::NUM_OUTPUTS; ++i)
+            addOutput(createOutput<PJ301MPort>({}), module, i));
+    }
+};
 #endif
 
 

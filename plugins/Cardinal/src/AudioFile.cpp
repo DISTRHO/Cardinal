@@ -619,7 +619,14 @@ struct AudioFileWidget : ModuleWidget {
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioFileWidget)
 };
 #else
-typedef ModuleWidget AudioFileWidget;
+struct AudioFileWidget : ModuleWidget {
+    AudioFileWidget(CarlaInternalPluginModule* const module) {
+        setModule(module);
+
+        addOutput(createOutput<PJ301MPort>({}, module, 0));
+        addOutput(createOutput<PJ301MPort>({}, module, 1));
+    }
+};
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------

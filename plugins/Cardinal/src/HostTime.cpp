@@ -184,8 +184,6 @@ struct HostTimeWidget : ModuleWidget {
         nvgRoundedRect(vg, startX - 1.0f, y - 2.0f, box.size.x - (startX + 1) * 2, 28.0f, 4);
         nvgFillColor(vg, nvgRGB(0xd0, 0xd0, 0xd0));
         nvgFill(vg);
-//         nvgStrokeColor(vg, nvgRGBA(0x4a, 0x4a, 0x4a, 0xc0));
-//         nvgStroke(vg);
         nvgBeginPath(vg);
         nvgFillColor(vg, color::BLACK);
         nvgText(vg, startX + 36, y + 16, text, nullptr);

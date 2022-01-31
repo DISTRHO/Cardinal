@@ -35,18 +35,18 @@ struct HostParameters : Module {
         NUM_LIGHTS
     };
 
+    CardinalPluginContext* const pcontext;
     rack::dsp::SlewLimiter parameters[kModuleParameters];
     bool parametersConnected[kModuleParameters] = {};
     float sampleTime = 0.0f;
 
     HostParameters()
+        : pcontext(static_cast<CardinalPluginContext*>(APP))
     {
-        config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-
-        const CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
-
         if (pcontext == nullptr)
             throw rack::Exception("Plugin context is null.");
+
+        config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
         const float fsampleRate = static_cast<float>(pcontext->sampleRate);
         SampleRateChangeEvent e = {
@@ -58,38 +58,32 @@ struct HostParameters : Module {
 
     void process(const ProcessArgs&) override
     {
-        if (const CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
+        for (uint32_t i=0; i<kModuleParameters; ++i)
         {
-            for (uint32_t i=0; i<kModuleParameters; ++i)
+            const bool connected = outputs[i].isConnected();
+
+            if (parametersConnected[i] != connected)
             {
-                const bool connected = outputs[i].isConnected();
-
-                if (parametersConnected[i] != connected)
-                {
-                    parametersConnected[i] = connected;
-                    parameters[i].reset();
-                }
-
-                if (connected)
-                    outputs[i].setVoltage(parameters[i].process(sampleTime, pcontext->parameters[i]));
+                parametersConnected[i] = connected;
+                parameters[i].reset();
             }
+
+            if (connected)
+                outputs[i].setVoltage(parameters[i].process(sampleTime, pcontext->parameters[i]));
         }
     }
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override
     {
-        if (const CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP))
+        const double fall = 1.0 / (double(pcontext->bufferSize) / e.sampleRate);
+
+        for (uint32_t i=0; i<kModuleParameters; ++i)
         {
-            const double fall = 1.0 / (double(pcontext->bufferSize) / e.sampleRate);
-
-            for (uint32_t i=0; i<kModuleParameters; ++i)
-            {
-                parameters[i].reset();
-                parameters[i].setRiseFall(fall, fall);
-            }
-
-            sampleTime = e.sampleTime;
+            parameters[i].reset();
+            parameters[i].setRiseFall(fall, fall);
         }
+
+        sampleTime = e.sampleTime;
     }
 };
 
@@ -166,8 +160,14 @@ struct HostParametersWidget : ModuleWidget {
     }
 };
 #else
-typedef ModuleWidget HostParametersWidget;
-#endif
+struct HostParametersWidget : ModuleWidget {
+    HostParametersWidget(HostParameters* const module) {
+        setModule(module);
 
+        for (int i=0; i<24; ++i)
+            addOutput(createOutput<PJ301MPort>({}, module, i));
+    }
+};
+#endif
 
 Model* modelHostParameters = createModel<HostParameters, HostParametersWidget>("HostParameters");

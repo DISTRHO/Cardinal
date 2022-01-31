@@ -380,7 +380,11 @@ struct TextEditorModuleWidget : ModuleWidget {
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TextEditorModuleWidget)
 };
 #else
-typedef ModuleWidget TextEditorModuleWidget;
+struct TextEditorModuleWidget : ModuleWidget {
+    TextEditorModuleWidget(TextEditorModule* const module) {
+        setModule(module);
+    }
+};
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------

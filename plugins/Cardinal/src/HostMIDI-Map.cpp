@@ -734,7 +734,11 @@ struct HostMIDIMapWidget : ModuleWidget {
     }
 };
 #else
-typedef ModuleWidget HostMIDIMapWidget;
+struct HostMIDIMapWidget : ModuleWidget {
+    HostMIDIMapWidget(HostMIDIMap* const module) {
+        setModule(module);
+    }
+};
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------

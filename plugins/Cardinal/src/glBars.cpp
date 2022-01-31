@@ -160,7 +160,13 @@ struct glBarsWidget : ModuleWidget {
     }
 };
 #else
-typedef ModuleWidget glBarsWidget;
+struct glBarsWidget : ModuleWidget {
+    glBarsWidget(glBarsModule* const module) {
+        setModule(module);
+
+        addInput(createInput<PJ301MPort>({}, module, glBarsModule::IN1_INPUT));
+    }
+};
 #endif
 
 Model* modelGlBars = createModel<glBarsModule, glBarsWidget>("glBars");

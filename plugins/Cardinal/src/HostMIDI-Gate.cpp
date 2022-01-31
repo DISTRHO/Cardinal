@@ -689,7 +689,17 @@ struct HostMIDIGateWidget : ModuleWidget {
     }
 };
 #else
-typedef ModuleWidget HostMIDIGateWidget;
+struct HostMIDIGateWidget : ModuleWidget {
+    HostMIDIGateWidget(HostMIDIGate* const module) {
+        setModule(module);
+
+        for (int i=0; i<18; ++i)
+        {
+            addInput(createInput<PJ301MPort>({}, module, i));
+            addOutput(createOutput<PJ301MPort>({}, module, i));
+        }
+    }
+};
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
