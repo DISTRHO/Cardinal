@@ -202,11 +202,15 @@ ifneq ($(STATIC_BUILD),true)
 PLUGIN_FILES += Cardinal/src/AudioFile.cpp
 PLUGIN_FILES += Cardinal/src/Carla.cpp
 PLUGIN_FILES += Cardinal/src/Ildaeil.cpp
+ifneq ($(HEADLESS),true)
+ifeq ($(HAVE_X11),true)
+PLUGIN_FILES += Cardinal/src/EmbedWidget.cpp
 PLUGIN_FILES += Cardinal/src/MPV.cpp
+endif
+endif
 endif
 
 ifneq ($(HEADLESS),true)
-PLUGIN_FILES += Cardinal/src/EmbedWidget.cpp
 PLUGIN_FILES += Cardinal/src/ImGuiWidget.cpp
 PLUGIN_FILES += Cardinal/src/ImGuiTextEditor.cpp
 PLUGIN_FILES += $(wildcard Cardinal/src/DearImGui/*.cpp)
@@ -736,6 +740,10 @@ BASE_FLAGS += -I../dpf/distrho
 
 BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat
+
+ifeq ($(HAVE_X11),true)
+BASE_FLAGS += -DHAVE_X11
+endif
 
 ifeq ($(SYSDEPS),true)
 BASE_FLAGS += -DCARDINAL_SYSDEPS

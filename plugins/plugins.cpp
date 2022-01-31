@@ -701,11 +701,14 @@ static void initStatic__Cardinal()
         p->addModel(modelAudioFile);
         p->addModel(modelCarla);
         p->addModel(modelIldaeil);
-        p->addModel(modelMPV);
        #else
         spl.removeModule("AudioFile");
         spl.removeModule("Carla");
         spl.removeModule("Ildaeil");
+       #endif
+       #if defined(HAVE_X11) && !defined(HEADLESS) && !defined(STATIC_BUILD)
+        p->addModel(modelMPV);
+       #else
         spl.removeModule("MPV");
        #endif
     }
