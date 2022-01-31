@@ -27,12 +27,15 @@ struct EmbedWidget : Widget {
     ~EmbedWidget() override;
 
     void embedIntoRack(uintptr_t nativeWindowId);
+    void removeFromRack();
+
+    void show();
     void hide();
 
     uintptr_t getNativeWindowId() const;
 
 private:
-    void draw(const DrawArgs&) override {}
+    void draw(const DrawArgs&) override;
     void step() override;
 
     Rect getAbsoluteRect();

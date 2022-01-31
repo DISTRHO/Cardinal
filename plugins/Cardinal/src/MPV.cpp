@@ -59,6 +59,7 @@ struct CardinalEmbedWidget : ModuleWidget, ExternalWindow {
     CardinalPluginContext* const pcontext;
     EmbedWidget* embedWidget = nullptr;
     bool isEmbed = false;
+    bool videoIsLoaded = false;
 
     CardinalEmbedWidget(CardinalEmbedModule* const m)
         : ModuleWidget(),
@@ -81,55 +82,64 @@ struct CardinalEmbedWidget : ModuleWidget, ExternalWindow {
         terminateAndWaitForExternalProcess();
     }
 
+    void onAdd(const AddEvent&) override
+    {
+        if (isEmbed)
+            return;
+
+        ContextCreateEvent ce;
+        onContextCreate(ce);
+    }
+
+    void onRemove(const RemoveEvent&) override
+    {
+        if (!isEmbed)
+            return;
+
+        ContextDestroyEvent ce;
+        onContextDestroy(ce);
+    }
+
     void onContextCreate(const ContextCreateEvent& e) override
     {
         ModuleWidget::onContextCreate(e);
-        widgetCreated();
+
+        if (module == nullptr)
+            return;
+
+        DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);
+        DISTRHO_SAFE_ASSERT_RETURN(pcontext != nullptr,);
+        DISTRHO_SAFE_ASSERT_RETURN(pcontext->nativeWindowId != 0,);
+        DISTRHO_SAFE_ASSERT_RETURN(!isEmbed,);
+
+        isEmbed = true;
+        embedWidget->embedIntoRack(pcontext->nativeWindowId);
+        embedWidget->show();
     }
 
     void onContextDestroy(const ContextDestroyEvent& e) override
     {
-        widgetDestroyed();
         ModuleWidget::onContextDestroy(e);
-    }
 
-    void onAdd(const AddEvent& e) override
-    {
-        ModuleWidget::onAdd(e);
-        widgetCreated();
-    }
-
-    void onRemove(const RemoveEvent& e) override
-    {
-        widgetDestroyed();
-        ModuleWidget::onRemove(e);
-    }
-
-    void widgetCreated()
-    {
-        DISTRHO_SAFE_ASSERT_RETURN(pcontext != nullptr,);
-        DISTRHO_SAFE_ASSERT_RETURN(pcontext->nativeWindowId != 0,);
-
-        if (isEmbed)
+        if (module == nullptr)
             return;
 
-        isEmbed = true;
-        embedWidget->embedIntoRack(pcontext->nativeWindowId);
-    }
-
-    void widgetDestroyed()
-    {
+        DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);
         DISTRHO_SAFE_ASSERT_RETURN(pcontext != nullptr,);
-
-        if (! isEmbed)
-            return;
+        DISTRHO_SAFE_ASSERT_RETURN(isEmbed,);
 
         isEmbed = false;
         embedWidget->hide();
+        embedWidget->removeFromRack();
+        terminateAndWaitForExternalProcess();
     }
 
     void appendContextMenu(ui::Menu* const menu) override
     {
+        // embed player gets in the way, hide it
+        if (isEmbed)
+            embedWidget->hide();
+
         menu->addChild(new ui::MenuSeparator);
 
         struct LoadVideoFileItem : MenuItem {
@@ -141,8 +151,19 @@ struct CardinalEmbedWidget : ModuleWidget, ExternalWindow {
                 text = "Load video file...";
             }
 
+            ~LoadVideoFileItem() override
+            {
+                d_stdout("submenu closed");
+                if (self->isEmbed)
+                    self->embedWidget->show();
+            }
+
             void onAction(const event::Action&) override
             {
+                // terminate old one
+                self->videoIsLoaded = false;
+                self->terminateAndWaitForExternalProcess();
+
                 WeakPtr<CardinalEmbedWidget> const self = this->self;
                 async_dialog_filebrowser(false, nullptr, text.c_str(), [self](char* path)
                 {
@@ -157,7 +178,9 @@ struct CardinalEmbedWidget : ModuleWidget, ExternalWindow {
                         const char* args[] = {
                             "mpv", "--no-audio", winIdStr, path, nullptr
                         };
-                        self->terminateAndWaitForExternalProcess();
+
+                        self->videoIsLoaded = true;
+                        self->embedWidget->show();
                         self->startExternalProcess(args);
                     }
 

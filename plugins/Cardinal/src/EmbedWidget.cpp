@@ -24,6 +24,7 @@
 # include <X11/Xatom.h>
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
+# include <X11/extensions/shape.h>
 #endif
 
 #include "EmbedWidget.hpp"
@@ -55,6 +56,7 @@ struct EmbedWidget::PrivateData {
     int lastY = 0;
     uint lastWidth = 0;
     uint lastHeight = 0;
+    bool browserWasVisible = false;
 
     PrivateData(const Vec size)
     {
@@ -64,6 +66,15 @@ struct EmbedWidget::PrivateData {
        #ifdef HAVE_X11
         display = XOpenDisplay(nullptr);
         DISTRHO_SAFE_ASSERT_RETURN(display != nullptr,);
+
+        int ignore = 0;
+        if (XShapeQueryExtension(display, &ignore, &ignore) == False)
+        {
+            XCloseDisplay(display);
+            display = nullptr;
+            async_dialog_message("XShape extension unsupported, cannot use embed widgets");
+            return;
+        }
 
         const ::Window rootWindow = RootWindow(display, DefaultScreen(display));
 
@@ -120,10 +131,29 @@ struct EmbedWidget::PrivateData {
         DISTRHO_SAFE_ASSERT_RETURN(window != 0,);
 
         XReparentWindow(display, window, nativeWindowId, x, y);
+        setClipMask(x, y, width, height);
+       #endif
+    }
+
+    void removeFromRack()
+    {
+       #ifdef HAVE_X11
+        DISTRHO_SAFE_ASSERT_RETURN(window != 0,);
+
+        const ::Window rootWindow = RootWindow(display, DefaultScreen(display));
+
+        XReparentWindow(display, window, rootWindow, 0, 0);
+        XSync(display, False);
+       #endif
+    }
+
+    void show()
+    {
+       #ifdef HAVE_X11
+        DISTRHO_SAFE_ASSERT_RETURN(window != 0,);
+
         XMapRaised(display, window);
         XSync(display, False);
-
-        d_stdout("this window is %lu", window);
        #endif
     }
 
@@ -132,10 +162,7 @@ struct EmbedWidget::PrivateData {
        #ifdef HAVE_X11
         DISTRHO_SAFE_ASSERT_RETURN(window != 0,);
 
-        const ::Window rootWindow = RootWindow(display, DefaultScreen(display));
-
         XUnmapWindow(display, window);
-        XReparentWindow(display, window, rootWindow, 0, 0);
        #endif
     }
 
@@ -144,28 +171,29 @@ struct EmbedWidget::PrivateData {
         int x, y;
         offsetToXY(rect.pos, x, y);
 
+        const bool browserVisible = APP->scene->browser->visible;
         const uint width = rect.size.x;
         const uint height = rect.size.y;
 
-        const bool diffPos = (lastX != x || lastY != y);
-        const bool diffSize = (lastWidth != width || lastHeight != height);
+        const bool diffBrowser = browserWasVisible != browserVisible;
+        const bool diffPos = lastX != x || lastY != y;
+        const bool diffSize = lastWidth != width || lastHeight != height;
 
-        if (diffPos && diffSize)
+        if (diffBrowser)
+            browserWasVisible = browserVisible;
+
+        /**/ if (diffPos && diffSize)
         {
             lastX = x;
             lastY = y;
             lastWidth = width;
             lastHeight = height;
-           #ifdef HAVE_X11
-            XMoveResizeWindow(display, window, x, y, width, height);
-           #endif
         }
         else if (diffPos)
         {
             lastX = x;
             lastY = y;
            #ifdef HAVE_X11
-            XMoveWindow(display, window, x, y);
            #endif
         }
         else if (diffSize)
@@ -173,7 +201,6 @@ struct EmbedWidget::PrivateData {
             lastWidth = width;
             lastHeight = height;
            #ifdef HAVE_X11
-            XResizeWindow(display, window, width, height);
            #endif
         }
 
@@ -181,10 +208,74 @@ struct EmbedWidget::PrivateData {
         if (window == 0)
             return;
 
+        if (diffBrowser || diffPos || diffSize)
+        {
+            /**/ if (diffPos && diffSize)
+                XMoveResizeWindow(display, window, x, y, width, height);
+            else if (diffPos)
+                XMoveWindow(display, window, x, y);
+            else if (diffSize)
+                XResizeWindow(display, window, width, height);
+
+            setClipMask(x, y, width, height);
+        }
+
         for (XEvent event; XPending(display) > 0;)
             XNextEvent(display, &event);
        #endif
     }
+
+   #ifdef HAVE_X11
+    void setClipMask(const int x, const int y, const uint width, const uint height)
+    {
+        const size_t len = width*height/4;
+        uchar* const data = new uchar[len];
+
+        if (browserWasVisible)
+        {
+            // allow nothing
+            std::memset(data, 0xff, sizeof(uchar)*len);
+        }
+        else
+        {
+            // allow everything
+            std::memset(data, 0, sizeof(uchar)*len);
+
+            // crop out menuBar
+            const int menuBarSize = APP->scene->menuBar->box.size.y * APP->window->pixelRatio;
+            const uint normy = (y < menuBarSize ? std::max(menuBarSize - y, 0) : 0);
+            for (uint i=0, j=0, d=0; i < width * height; ++i, ++j)
+            {
+                if (i >= normy * width)
+                    break;
+
+                if (i == 0)
+                {
+                }
+                else if ((j % width) == 0)
+                {
+                    j = 0;
+                    ++d;
+                }
+                else if ((j % 8) == 0)
+                {
+                    ++d;
+                }
+
+                DISTRHO_SAFE_ASSERT_BREAK(d < len);
+
+                const uint v = (j % 8);
+                data[d] |= 1 << v;
+            }
+        }
+
+        const ::Pixmap pixmap = XCreatePixmapFromBitmapData(display, window, (char*)data, width, height, 0, 1, 1);
+        delete[] data;
+
+        XShapeCombineMask(display, window, ShapeBounding, 0, 0, pixmap, ShapeSet);
+        XFreePixmap(display, pixmap);
+    }
+   #endif
 };
 
 EmbedWidget::EmbedWidget(const Vec size)
@@ -203,6 +294,16 @@ void EmbedWidget::embedIntoRack(const uintptr_t nativeWindowId)
     pData->embedIntoRack(nativeWindowId, getAbsoluteRect());
 }
 
+void EmbedWidget::removeFromRack()
+{
+    pData->removeFromRack();
+}
+
+void EmbedWidget::show()
+{
+    pData->show();
+}
+
 void EmbedWidget::hide()
 {
     pData->hide();
@@ -215,6 +316,14 @@ uintptr_t EmbedWidget::getNativeWindowId() const
    #else
     return 0;
    #endif
+}
+
+void EmbedWidget::draw(const DrawArgs& args)
+{
+    nvgBeginPath(args.vg);
+    nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+    nvgFillColor(args.vg, nvgRGB(0, 0, 0));
+    nvgFill(args.vg);
 }
 
 void EmbedWidget::step()
