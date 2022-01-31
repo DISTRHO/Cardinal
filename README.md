@@ -2,18 +2,24 @@
 
 *Cardinal, the Rack!*
 
-**! THIS PROJECT IS A WORK IN PROGRESS !**
+A virtual Eurorack modular synthesizer platform,
+available as JACK standalone and LV2, VST2 and VST3 audio plugin for Linux, macOS and Windows.
 
 This is a [DPF-based](https://github.com/DISTRHO/DPF/) plugin wrapper around [VCV Rack](https://github.com/VCVRack/Rack/),
 using its code directly instead of forking the project.  
 The target is to have a **proper, self-contained, fully free and open-source plugin version of Rack**.  
-See [project overview](doc/OVERVIEW.md) document for an overview on how the project source code is structured.
+See the [why section](#Why) below for the reasons Cardinal exists,
+also perhaps the [project overview document](doc/OVERVIEW.md) for an overview on how the project source code is structured.
 
 Cardinal contains Rack, some 3rd-party modules and a few internal utilities all in a single binary.  
-It does not load external modules and does not connect to the official Rack library/store.
+All "Core" modules from Rack have been replaced by Cardinal equivalents, simplified to better work for an audio plugin.
 
-Because it is using DPF, Cardinal already supports LV2 and VST2 with an extra JACK standalone mode if self-compiled.  
-A VST3 version is in progress, already part of the build but still experimental.
+Cardinal does not load external modules and does not connect to the official Rack library/store.  
+All VCV branding has been removed (to the best of our knowledge) in order to avoid any trademark issues.
+
+Because it is using DPF, Cardinal already supports LV2 and VST2 with an extra JACK standalone mode for some systems.  
+The VST3 version is in progress, already part of the build but still experimental.
+
 
 ## Plugin variants
 
@@ -40,6 +46,7 @@ Plugin type is set as "instrument".
 This variant provides 2 audio inputs and outputs, but no CV ports.  
 Plugin type is set as regular "effect".
 
+
 ## Screenshots
 
 Because people will ask for it. It is, well... Rack.  
@@ -48,10 +55,11 @@ But a couple of modules background's have their colors flipped, because damn we 
 ![screenshot1](doc/Screenshot1.png "Screenshot1")
 ![screenshot2](doc/Screenshot2.png "Screenshot2")
 
+
 ## Current status
 
-Most of the features already work, you can assume things work in general except when stated otherwise.  
-Currently the following features are known NOT to work:
+With the exception of a few bugs, Cardinal can be considered stable.  
+Though currently the following features are known NOT to work:
 
 - VST3 support incomplete/experimental [#41](https://github.com/DISTRHO/Cardinal/issues/41)
 - Factory (plugin-provided) presets [#58](https://github.com/DISTRHO/Cardinal/issues/58)
@@ -68,10 +76,12 @@ Basic building instructions are available in [BUILDING.md](doc/BUILDING.md)
 Currently we are all on #cardinal IRC room in irc.libera.chat server.  
 Come join us in your favorite IRC client or through a Matrix bridge.
 
+
 ## License
 
 Cardinal is licensed under GPLv3+, see [LICENSE](LICENSE) for more details.  
 An overview of the included code and linked submodules can be seen [here](doc/LICENSES.md#code-license--binary).
+
 
 ## Included modules
 
@@ -140,6 +150,7 @@ Even the Rack "Component Library" (which can be considered the base widget eleme
 
 Any artwork that uses a custom license has had explicit permission to be used in Cardinal.
 
+
 ## Why
 
 Cardinal was created first and foremost as a way to have Rack as a **proper open-source audio plugin**.  
@@ -171,6 +182,7 @@ Other relevant reasons include:
  - Removing online access from the plugin and included modules (no phone-home here!)
  - Works as a test case for [DPF](https://github.com/DISTRHO/DPF/) and [Carla](https://github.com/falkTX/Carla/)
  - It is fun :)
+
 
 ## Vs. Rack Pro
 

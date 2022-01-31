@@ -162,12 +162,11 @@ Bellow follows a list of artwork licenses from potentially coming plugins.
 
 ### Rack
 
-Below is a list of artwork licenses from Rack (note most of these will be unused soon)
+Below is a list of artwork licenses from Rack
 
 | Name                            | License(s)       |
 |---------------------------------|------------------|
 | ComponentLibrary/*              | CC-BY-NC-4.0     |
-| Core/*                          | CC-BY-NC-ND-4.0  |
 | fonts/DejaVuSans.ttf            | Bitstream-Vera   |
 | fonts/DSEG*.ttf                 | OFL-1.1-RFN      |
 | fonts/Nunito-Bold.ttf           | OFL-1.1-RFN      |
