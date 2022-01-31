@@ -26,14 +26,31 @@
 
 // --------------------------------------------------------------------------------------------------------------------
 
-// defaults
-#define DEFAULT_LANG "C++"
-#define DEFAULT_TEXT "" \
-"// Welcome to a real text editor inside Cardinal\n\n"  \
-"#define I_AM_A_MACRO\n\n"                              \
-"int and_i_am_a_variable;\n\n"                          \
-"/* look ma, a comment! */\n"                           \
-"int such_highlight_much_wow() { return 1337; }\n"
+// defaults (artwork based on content from https://www.asciiart.eu/animals/cats)
+#define DEFAULT_LANG "None"
+#define DEFAULT_TEXT ""                                     \
+"                                                   \n"     \
+"        ^ ^        ,_,                             \n"     \
+"       (O,O)      (.,.)                            \n"     \
+"       (   )      (   )                            \n"     \
+"--------\"-\"---dwb--\"-\"---dwb-                      \n" \
+"                                                   \n"     \
+"                                                   \n"     \
+"                                                   \n"     \
+"                                                   \n"     \
+"                                                   \n"     \
+"                                                   \n"     \
+"                                                   \n"     \
+"      /^--^\\     /^--^\\     /^--^\\                 \n"  \
+"      \\____/     \\____/     \\____/                 \n"  \
+"     /      \\   /      \\   /      \\                \n"  \
+"    |        | |        | |        |               \n"     \
+"     \\__  __/   \\__  __/   \\__  __/                \n"  \
+"|^|^|^|^\\ \\^|^|^|^/ /^|^|^|^|^\\ \\^|^|^|^|^|^|^|^|^|\n" \
+"| | | | |\\ \\| | |/ /| | | | | |\\ \\| | | | | | | | |\n" \
+"#########/ /#####\\ \\###########/ /#################\n"   \
+"| | | | |\\/ | | | \\/| | | | | |\\/ | | | | | | | | |\n"  \
+"|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|\n"
 #define DEFAULT_WIDTH 30
 
 struct TextEditorModule : Module {

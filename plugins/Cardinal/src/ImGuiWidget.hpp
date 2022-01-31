@@ -40,6 +40,7 @@ protected:
     void onSelectKey(const SelectKeyEvent& e) override;
     void onSelectText(const SelectTextEvent& e) override;
     void setAsCurrentContext();
+    void setUseMonospaceFont(bool useMonoFont = true);
 
     virtual void drawImGui()
     {

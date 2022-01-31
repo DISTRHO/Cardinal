@@ -38,7 +38,10 @@ struct ImGuiTextEditor::PrivateData {
 
 ImGuiTextEditor::ImGuiTextEditor()
     : ImGuiWidget(),
-      pData(new PrivateData) {}
+      pData(new PrivateData())
+{
+    setUseMonospaceFont();
+}
 
 ImGuiTextEditor::~ImGuiTextEditor()
 {

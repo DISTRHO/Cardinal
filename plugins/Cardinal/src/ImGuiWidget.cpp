@@ -28,6 +28,7 @@ struct ImGuiWidget::PrivateData {
     ImGuiContext* context = nullptr;
     bool created = false;
     bool fontGenerated = false;
+    bool useMonospacedFont = false;
     float originalScaleFactor = 0.0f;
     float scaleFactor = 0.0f;
 
@@ -86,17 +87,31 @@ struct ImGuiWidget::PrivateData {
 
         fontGenerated = true;
 
-#ifndef DGL_NO_SHARED_RESOURCES
         ImGuiIO& io(ImGui::GetIO());
-        using namespace dpf_resources;
-        ImFontConfig fc;
-        fc.FontDataOwnedByAtlas = false;
-        fc.OversampleH = 1;
-        fc.OversampleV = 1;
-        fc.PixelSnapH = true;
-        io.Fonts->AddFontFromMemoryTTF((void*)dejavusans_ttf, dejavusans_ttf_size, 13.0f * scaleFactor, &fc);
-        io.Fonts->Build();
+
+        if (useMonospacedFont)
+        {
+            const std::string fontPath = asset::system("fonts/ShareTechMono-Regular.ttf");
+            ImFontConfig fc;
+            fc.OversampleH = 1;
+            fc.OversampleV = 1;
+            fc.PixelSnapH = true;
+            io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 13.0f * scaleFactor, &fc);
+            io.Fonts->Build();
+        }
+        else
+        {
+#ifndef DGL_NO_SHARED_RESOURCES
+            using namespace dpf_resources;
+            ImFontConfig fc;
+            fc.FontDataOwnedByAtlas = false;
+            fc.OversampleH = 1;
+            fc.OversampleV = 1;
+            fc.PixelSnapH = true;
+            io.Fonts->AddFontFromMemoryTTF((void*)dejavusans_ttf, dejavusans_ttf_size, 13.0f * scaleFactor, &fc);
+            io.Fonts->Build();
 #endif
+        }
     }
 
     void resetStyle()
@@ -168,6 +183,13 @@ void ImGuiWidget::onContextDestroy(const ContextDestroyEvent& e)
 void ImGuiWidget::setAsCurrentContext()
 {
     ImGui::SetCurrentContext(imData->context);
+}
+
+void ImGuiWidget::setUseMonospaceFont(const bool useMonoFont)
+{
+    DISTRHO_SAFE_ASSERT_RETURN(!imData->fontGenerated,);
+
+    imData->useMonospacedFont = useMonoFont;
 }
 
 void ImGuiWidget::onHover(const HoverEvent& e)
