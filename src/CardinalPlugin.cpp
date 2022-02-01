@@ -37,6 +37,7 @@
 #if defined(HAVE_LIBLO) && defined(HEADLESS)
 # include <lo/lo.h>
 # include "extra/Thread.hpp"
+# include "CardinalCommon.hpp"
 #endif
 
 #include <list>
