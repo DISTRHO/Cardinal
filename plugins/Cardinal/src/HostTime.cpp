@@ -151,14 +151,14 @@ struct HostTimeWidget : ModuleWidget {
     static constexpr const float padding = 32.0f;
 
     HostTime* const module;
-    std::shared_ptr<Font> monoFont;
+    std::string monoFontPath;
 
     HostTimeWidget(HostTime* const m)
         : module(m)
     {
         setModule(m);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostTime.svg")));
-        monoFont = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
+        monoFontPath = asset::system("res/fonts/ShareTechMono-Regular.ttf");
 
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
@@ -228,15 +228,18 @@ struct HostTimeWidget : ModuleWidget {
     {
         if (layer == 1)
         {
-            nvgFontFaceId(args.vg, monoFont->handle);
             nvgFontSize(args.vg, 17);
             nvgFillColor(args.vg, nvgRGBf(0.76f, 0.11f, 0.22f));
 
             char timeString1[24];
             char timeString2[24];
 
+            std::shared_ptr<Font> monoFont = APP->window->loadFont(monoFontPath);
+
             if (module != nullptr && monoFont != nullptr)
             {
+                nvgFontFaceId(args.vg, monoFont->handle);
+
                 const uint32_t seconds = module->timeInfo.seconds;
                 std::snprintf(timeString1, sizeof(timeString1), "  %02d:%02d:%02d",
                               (seconds / 3600) % 100,
