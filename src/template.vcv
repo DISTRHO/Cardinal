@@ -38,7 +38,7 @@
     {
       "id": 3,
       "plugin": "Cardinal",
-      "model": "HostParameters",
+      "model": "HostTime",
       "version": "2.0",
       "params": [],
       "leftModuleId": 2,
@@ -51,12 +51,12 @@
     {
       "id": 4,
       "plugin": "Cardinal",
-      "model": "HostTime",
+      "model": "HostParameters",
       "version": "2.0",
       "params": [],
       "leftModuleId": 3,
       "pos": [
-        27,
+        26,
         0
       ]
     }

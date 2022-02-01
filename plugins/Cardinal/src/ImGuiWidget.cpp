@@ -91,7 +91,7 @@ struct ImGuiWidget::PrivateData {
 
         if (useMonospacedFont)
         {
-            const std::string fontPath = asset::system("fonts/ShareTechMono-Regular.ttf");
+            const std::string fontPath = asset::system("res/fonts/ShareTechMono-Regular.ttf");
             ImFontConfig fc;
             fc.OversampleH = 1;
             fc.OversampleV = 1;
