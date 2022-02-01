@@ -660,7 +660,7 @@ struct CarlaModuleWidget : ModuleWidget {
             addInput(createInput<PJ301MPort>({}, module, i));
 
         for (uint i=0; i<CarlaModule::NUM_OUTPUTS; ++i)
-            addOutput(createOutput<PJ301MPort>({}), module, i));
+            addOutput(createOutput<PJ301MPort>({}, module, i));
     }
 };
 #endif
