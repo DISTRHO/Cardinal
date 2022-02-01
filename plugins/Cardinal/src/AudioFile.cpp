@@ -340,7 +340,10 @@ struct AudioFileListWidget : ImGuiWidget {
     bool showError = false;
     String errorMessage;
 
-    struct ghcFile { std::string full, base; };
+    struct ghcFile {
+        std::string full, base;
+        bool operator<(const ghcFile& other) noexcept { return base < other.base; }
+    };
     std::string currentDirectory;
     std::vector<ghcFile> currentFiles;
     size_t selectedFile = (size_t)-1;
@@ -438,7 +441,6 @@ struct AudioFileListWidget : ImGuiWidget {
         currentDirectory = path(module->currentFile).parent_path().string();
 
         directory_iterator it(currentDirectory);
-        size_t index = 0;
         for (directory_iterator itb = begin(it), ite=end(it); itb != ite; ++itb)
         {
             if (! itb->is_regular_file())
@@ -449,12 +451,20 @@ struct AudioFileListWidget : ImGuiWidget {
             {
                 if (extension.compare(supportedExtensions[i]) == 0)
                 {
-                    if (filepath.compare(module->currentFile) == 0)
-                        selectedFile = index;
                     currentFiles.push_back({ filepath.string(), filepath.filename().string() });
-                    ++index;
                     break;
                 }
+            }
+        }
+
+        std::sort(currentFiles.begin(), currentFiles.end());
+
+        for (size_t index = 0; index < currentFiles.size(); ++index)
+        {
+            if (currentFiles[index].full.compare(module->currentFile) == 0)
+            {
+                selectedFile = index;
+                break;
             }
         }
     }
