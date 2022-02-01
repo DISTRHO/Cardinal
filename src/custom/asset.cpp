@@ -91,7 +91,7 @@ std::string pluginManifest(const std::string& dirname) {
 std::string pluginPath(const std::string& dirname) {
     // no bundlePath set, assume local source build
     if (bundlePath.empty())
-        return system::join(systemDir, "..", "..", "plugins", "res", dirname);
+        return system::join(systemDir, "..", "..", "plugins", dirname);
     // bundlePath is present, use resources from bundle
     return system::join(systemDir, dirname);
 }
