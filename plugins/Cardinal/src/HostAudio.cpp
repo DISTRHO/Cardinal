@@ -472,7 +472,7 @@ struct NanoMeter : Widget {
 template<int numIO>
 struct HostAudioWidget : ModuleWidget {
     static constexpr const float startX_In = 14.0f;
-    static constexpr const float startX_Out = 96.0f;
+    static constexpr const float startX_Out = 81.0f;
     static constexpr const float startY = 74.0f;
     static constexpr const float padding = 29.0f;
     static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
@@ -501,7 +501,7 @@ struct HostAudioWidget : ModuleWidget {
             addParam(createParamCentered<NanoKnob>(Vec(middleX, 310.0f), m, 0));
 
             NanoMeter<numIO>* const meter = new NanoMeter<numIO>(m);
-            meter->box.pos = Vec(startX_In + padding - 4.0f, startY + padding * 2);
+            meter->box.pos = Vec(middleX - padding + 2.75f, startY + padding * 2);
             meter->box.size = Vec(padding * 2.0f - 4.0f, 136.0f);
             addChild(meter);
         }
@@ -534,7 +534,7 @@ struct HostAudioWidget : ModuleWidget {
 
         if (numIO == 2)
         {
-            drawTextLine(args.vg, 0, "Left/Mono");
+            drawTextLine(args.vg, 0, "Left/M");
             drawTextLine(args.vg, 1, "Right");
         }
         else

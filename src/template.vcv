@@ -31,7 +31,7 @@
       "leftModuleId": 1,
       "rightModuleId": 3,
       "pos": [
-        5,
+        8,
         0
       ]
     },
@@ -44,7 +44,7 @@
       "leftModuleId": 2,
       "rightModuleId": 4,
       "pos": [
-        18,
+        17,
         0
       ]
     },
@@ -56,7 +56,7 @@
       "params": [],
       "leftModuleId": 3,
       "pos": [
-        26,
+        25,
         0
       ]
     }
