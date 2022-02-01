@@ -1489,6 +1489,7 @@ static void initStatic__GrandeModular()
     if (spl.ok())
     {
         p->addModel(modelClip);
+        p->addModel(modelLFO3);
         p->addModel(modelMerge8);
         p->addModel(modelMergeSplit4);
         p->addModel(modelMicrotonalChords);
@@ -1504,6 +1505,7 @@ static void initStatic__GrandeModular()
         p->addModel(modelSplit8);
         p->addModel(modelTails);
         p->addModel(modelVarSampleDelays);
+        p->addModel(modelVCA3);
     }
 }
 
