@@ -479,6 +479,11 @@ FUNDAMENTAL_CUSTOM = $(DRWAV)
 endif
 
 # --------------------------------------------------------------
+# Geodesics
+
+PLUGIN_FILES += $(filter-out Geodesics/src/plugin.cpp,$(wildcard Geodesics/src/*.cpp))
+
+# --------------------------------------------------------------
 # GlueTheGiant
 
 PLUGIN_FILES += $(filter-out GlueTheGiant/src/plugin.cpp,$(wildcard GlueTheGiant/src/*.cpp))
@@ -1134,6 +1139,16 @@ $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
 		-DpluginInstance=pluginInstance__Fundamental
+
+$(BUILD_DIR)/Geodesics/%.cpp.o: Geodesics/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(GEODESICS_CUSTOM),$(call custom_module_names,$(m),Geodesics)) \
+		-DpluginInstance=pluginInstance__Geodesics \
+		-DsaveDarkAsDefault=saveDarkAsDefault__Geodesics \
+		-DisDark=isDark__Geodesics \
+		-Dinit=init__Geodesics
 
 $(BUILD_DIR)/GlueTheGiant/%.cpp.o: GlueTheGiant/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

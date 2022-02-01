@@ -139,3 +139,6 @@
 [submodule "plugins/Autinn"]
 	path = plugins/Autinn
 	url = https://github.com/NikolaiVChr/Autinn.git
+[submodule "plugins/Geodesics"]
+	path = plugins/Geodesics
+	url = https://github.com/MarcBoule/Geodesics.git
