@@ -392,13 +392,13 @@ struct NanoMeter : Widget {
             std::swap(gainMeterL, module->gainMeterL);
             std::swap(gainMeterR, module->gainMeterR);
 
-            const float heightL = sqrtf(gainMeterL) * usableHeight;
+            const float heightL = 1.0f + std::sqrt(gainMeterL) * (usableHeight - 1.0f);
             nvgBeginPath(args.vg);
             nvgRect(args.vg, 0.0f, usableHeight - heightL, box.size.x * 0.5f - 1.0f, heightL);
             nvgFill(args.vg);
             nvgStroke(args.vg);
 
-            const float heightR = sqrtf(gainMeterR) * usableHeight;
+            const float heightR = 1.0f + std::sqrt(gainMeterR) * (usableHeight - 1.0f);
             nvgBeginPath(args.vg);
             nvgRect(args.vg, box.size.x * 0.5f + 1.0f, usableHeight - heightR, box.size.x * 0.5f - 2.0f, heightR);
             nvgFill(args.vg);
