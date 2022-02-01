@@ -49,10 +49,10 @@
 
 #ifndef HEADLESS
 # include "WindowParameters.hpp"
-static const constexpr uint kCardinalStateCount = 2; // patch, windowSize
+static const constexpr uint kCardinalStateCount = 3; // patch, text, windowSize
 #else
 # define kWindowParameterCount 0
-static const constexpr uint kCardinalStateCount = 1; // patch
+static const constexpr uint kCardinalStateCount = 2; // patch, text
 #endif
 
 namespace rack {
@@ -396,6 +396,7 @@ class CardinalPlugin : public CardinalBasePlugin
 
     std::string fAutosavePath;
     uint64_t fPreviousFrame;
+    String fStateText;
     String fWindowSize;
 
    #ifndef HEADLESS
@@ -696,11 +697,25 @@ protected:
         case 0:
             stateKey = "patch";
             break;
-       #ifndef HEADLESS
         case 1:
+            stateKey = "text";
+            break;
+       #ifndef HEADLESS
+        case 2:
             stateKey = "windowSize";
             break;
        #endif
+        }
+    }
+
+    uint32_t getStateHints(const uint32_t index) override
+    {
+        switch (index)
+        {
+        case 1:
+            return kStateIsHostVisible;
+        default:
+            return 0x0;
         }
     }
 
@@ -748,6 +763,9 @@ protected:
             return fWindowSize;
        #endif
 
+        if (std::strcmp(key, "text") == 0)
+            return fStateText;
+
         if (std::strcmp(key, "patch") != 0)
             return String();
         if (fAutosavePath.empty())
@@ -780,6 +798,12 @@ protected:
             return;
         }
        #endif
+
+        if (std::strcmp(key, "text") == 0)
+        {
+            fStateText = value;
+            return;
+        }
 
         if (std::strcmp(key, "patch") != 0)
             return;
