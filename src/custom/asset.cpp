@@ -50,14 +50,16 @@ std::string user(std::string filename) {
 
 // get system resource, trimming "res/" prefix if we are loaded as a plugin bundle
 std::string system(std::string filename) {
-    if (string::endsWith(filename, "/ComponentLibrary/ScrewSilver.svg"))
+    // Always use dark screws
+    if (string::endsWith(filename, "/ScrewSilver.svg"))
         filename = filename.substr(0, filename.size()-10) + "Black.svg";
     return system::join(systemDir, bundlePath.empty() ? filename : trim(filename));
 }
 
-// get plugin resource, also trims "res/" as needed
+// get plugin resource
 std::string plugin(plugin::Plugin* plugin, std::string filename) {
     DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, {});
+    // always use dark scheme
     if (plugin->slug == "GlueTheGiant")
     {
         if (filename == "res/BusDepot.svg"
@@ -73,28 +75,24 @@ std::string plugin(plugin::Plugin* plugin, std::string filename) {
             filename = filename.substr(0, filename.size()-4) + "_Night.svg";
         }
     }
-    return system::join(plugin->path, trim(filename));
+    return system::join(plugin->path, filename);
 }
 
 // path to plugin manifest
 std::string pluginManifest(const std::string& dirname) {
+    // no bundlePath set, assume local source build
     if (bundlePath.empty())
-    {
-        if (dirname == "Core")
-            return system::join(systemDir, "..", "..", "plugins", "Core.json");
         return system::join(systemDir, "..", "..", "plugins", dirname, "plugin.json");
-    }
+    // bundlePath is present, use resources from bundle
     return system::join(bundlePath, dirname + ".json");
 }
 
 // path to plugin files
 std::string pluginPath(const std::string& dirname) {
+    // no bundlePath set, assume local source build
     if (bundlePath.empty())
-    {
-        if (dirname == "Core")
-            return systemDir;
         return system::join(systemDir, "..", "..", "plugins", "res", dirname);
-    }
+    // bundlePath is present, use resources from bundle
     return system::join(systemDir, dirname);
 }
 

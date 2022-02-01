@@ -838,34 +838,40 @@ else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 endif
 
+RESOURCE_FILES = \
+	$(wildcard */presets) \
+	$(wildcard */res/*.svg) \
+	$(filter-out HetrickCV/res/illustrator - deprecated/MyModule.svg,$(wildcard */res/*/*.svg)) \
+	$(wildcard */res/*.ttf) $(wildcard */res/*/*.ttf)
+
 PLUGIN_RESOURCES  =
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
 ifeq ($(MACOS),true)
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json)
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/Contents/Resources/%)
 else
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/resources/PluginManifests/%.json)
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/resources/%)
 endif
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst3/Contents/Resources/%)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst3/Contents/Resources/PluginManifests/%.json)
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst3/Contents/Resources/%)
 
 resources: $(PLUGIN_RESOURCES)
 
-../bin/CardinalFX.lv2/resources/%: %/res
+../bin/CardinalFX.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 
-../bin/CardinalFX.vst/resources/%: %/res
+../bin/CardinalFX.vst/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 
-../bin/CardinalFX.vst/Contents/Resources/%: %/res
+../bin/CardinalFX.vst/Contents/Resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 
-../bin/CardinalFX.vst3/Contents/Resources/%: %/res
+../bin/CardinalFX.vst3/Contents/Resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	ln -sf $(abspath $<) $@
 

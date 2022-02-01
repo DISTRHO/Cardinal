@@ -223,7 +223,7 @@ ifeq ($(NAME),CardinalFX)
 
 all: lv2 vst2 vst3 resources
 
-CORE_RESOURCES = $(filter-out icon.png,$(subst ../Rack/res/,,$(wildcard ../Rack/res/*))) template.vcv
+CORE_RESOURCES = $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf)) template.vcv
 
 PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/CardinalFX.lv2/resources/%)
 ifeq ($(MACOS),true)
