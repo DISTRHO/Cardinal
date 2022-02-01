@@ -100,7 +100,7 @@ struct HostCV : Module {
 
 struct HostCVWidget : ModuleWidget {
     static constexpr const float startX_In = 14.0f;
-    static constexpr const float startX_Out = 96.0f;
+    static constexpr const float startX_Out = 81.0f;
     static constexpr const float startY = 74.0f;
     static constexpr const float padding = 29.0f;
     static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
