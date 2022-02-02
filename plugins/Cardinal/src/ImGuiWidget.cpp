@@ -103,12 +103,15 @@ struct ImGuiWidget::PrivateData {
         {
 #ifndef DGL_NO_SHARED_RESOURCES
             using namespace dpf_resources;
+            static const ImWchar ranges[] = { 0x20, 0xFF, 0 }; /* FIXME unicode range not working.. */
             ImFontConfig fc;
             fc.FontDataOwnedByAtlas = false;
             fc.OversampleH = 1;
             fc.OversampleV = 1;
             fc.PixelSnapH = true;
-            io.Fonts->AddFontFromMemoryTTF((void*)dejavusans_ttf, dejavusans_ttf_size, 13.0f * scaleFactor, &fc);
+            io.Fonts->AddFontFromMemoryTTF((void*)dejavusans_ttf,
+                                           dejavusans_ttf_size,
+                                           13.0f * scaleFactor, &fc, ranges);
             io.Fonts->Build();
 #endif
         }
