@@ -244,6 +244,7 @@ struct HostAudio : Module {
     // for rack core audio module compatibility
     dsp::RCFilter dcFilters[numIO];
     bool dcFilterEnabled = (numIO == 2);
+    volatile bool resetMeters = true;
     float gainMeterL = 0.0f;
     float gainMeterR = 0.0f;
 
@@ -269,10 +270,13 @@ struct HostAudio : Module {
     void onReset() override
     {
         dcFilterEnabled = (numIO == 2);
+        resetMeters = true;
     }
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override
     {
+        resetMeters = true;
+
         for (int i=0; i<numIO; ++i)
             dcFilters[i].setCutoffFreq(10.f * e.sampleTime);
     }
@@ -327,12 +331,17 @@ struct HostAudio : Module {
 
             if (dataFrame == blockFrames)
             {
+                if (resetMeters)
+                    gainMeterL = gainMeterR = 0.0f;
+
                 gainMeterL = std::max(gainMeterL, d_findMaxNormalizedFloat(dataOuts[0], blockFrames));
 
                 if (connected)
                     gainMeterR = std::max(gainMeterR, d_findMaxNormalizedFloat(dataOuts[1], blockFrames));
                 else
                     gainMeterR = gainMeterL;
+
+                resetMeters = false;
             }
         }
     }
@@ -358,6 +367,8 @@ struct HostAudio : Module {
 template<int numIO>
 struct NanoMeter : Widget {
     HostAudio<numIO>* const module;
+    float gainMeterL = 0.0f;
+    float gainMeterR = 0.0f;
 
     NanoMeter(HostAudio<numIO>* const m)
         : module(m)
@@ -387,10 +398,13 @@ struct NanoMeter : Widget {
 
         if (module != nullptr)
         {
-            float gainMeterL = 0.0f;
-            float gainMeterR = 0.0f;
-            std::swap(gainMeterL, module->gainMeterL);
-            std::swap(gainMeterR, module->gainMeterR);
+            // Only fetch new values once DSP side is updated
+            if (! module->resetMeters)
+            {
+                gainMeterL = module->gainMeterL;
+                gainMeterR = module->gainMeterR;
+                module->resetMeters = true;
+            }
 
             const float heightL = 1.0f + std::sqrt(gainMeterL) * (usableHeight - 1.0f);
             nvgBeginPath(args.vg);
