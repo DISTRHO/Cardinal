@@ -32,6 +32,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Glue the Giant          | GPL-3.0-or-later      | |
 | Grande                  | GPL-3.0-or-later      | |
 | HetrickCV               | CC0-1.0               | |
+| ihtsyn                  | GPL-3.0-or-later      | |
 | Impromptu               | GPL-3.0-or-later      | |
 | JW-Modules              | BSD-3-Clause          | |
 | LifeFormModular         | MIT                   | |
@@ -55,7 +56,6 @@ Bellow follows a list of code licenses from potentially coming modules.
 | Atelier                 | GPL-3.0-or-later      | Custom artwork license, needs permission request |
 | Befaco                  | GPL-3.0-or-later      | Custom artwork license, needs permission request |
 | Fundamental             | GPL-3.0-or-later      | CC-ND, needs permission for dark mode |
-| ihtsyn                  | GPL-3.0-or-later      | Project deleted by author |
 | ZZC                     | GPL-3.0-or-later      | Artwork license terms unclear |
 
 ## ARTWORK / PANEL LICENSES
@@ -115,6 +115,7 @@ Below is a list of artwork licenses from plugins
 | GlueTheGiant/fonts/DSEG7-*              | OFL-1.1-RFN      | |
 | GrandeModular/*                         | CC-BY-NC-ND-4.0  | |
 | HetrickCV/*                             | CC0-1.0          | No artwork specific license provided |
+| ihtsyn/*                                | GPL-3.0-or-later | [Same license as source code](https://github.com/nysthi/nysthi/issues/379#issuecomment-1027873902) |
 | ImpromptuModular/*                      | CC-BY-NC-ND-4.0  | |
 | ImpromptuModular/res/comp/complib/*     | CC-BY-NC-4.0     | |
 | JW-Modules/*                            | BSD-3-Clause     | No artwork specific license provided |
@@ -152,8 +153,6 @@ Bellow follows a list of artwork licenses from potentially coming plugins.
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
 | Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission (TODO ask for it) |
 | Fundamental/*                           | CC-BY-NC-ND-4.0  | |
-| ihtsyn/*                                | GPL-3.0-or-later | No artwork specific license provided, author has deleted this repo |
-| ihtsyn/LEDCalculator.ttf                | Custom           | Free for personal use |
 | ZZC/*                                   | ??? | See [ZZC#89](https://github.com/zezic/ZZC/issues/89) and [ZZC#90](https://github.com/zezic/ZZC/issues/90) |
 
 ### Rack

@@ -504,15 +504,15 @@ IMPROMPTUMODULAR_CUSTOM_PER_FILE = Clock stepClock
 # --------------------------------------------------------------
 # ihtsyn
 
-# PLUGIN_FILES += $(filter-out ihtsyn/src/plugin.cpp,$(wildcard ihtsyn/src/*.cpp))
-# 
-# # modules/types which are present in other plugins
-# IHTSYN_CUSTOM_PER_FILE  = mv_allpass
-# IHTSYN_CUSTOM_PER_FILE += mv_staticallpass4tap
-# IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline
-# IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline4tap
-# IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline8tap
-# IHTSYN_CUSTOM_PER_FILE += mv_statevariable
+PLUGIN_FILES += $(filter-out ihtsyn/src/plugin.cpp,$(wildcard ihtsyn/src/*.cpp))
+
+# modules/types which are present in other plugins
+IHTSYN_CUSTOM_PER_FILE  = mv_allpass
+IHTSYN_CUSTOM_PER_FILE += mv_staticallpass4tap
+IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline
+IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline4tap
+IHTSYN_CUSTOM_PER_FILE += mv_staticdelayline8tap
+IHTSYN_CUSTOM_PER_FILE += mv_statevariable
 
 # --------------------------------------------------------------
 # JW-Modules

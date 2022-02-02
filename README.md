@@ -106,6 +106,7 @@ At the moment the following 3rd-party modules are provided:
 - Glue the Giant
 - Grande
 - HetrickCV
+- ihtsyn
 - Impromptu
 - JW-Modules
 - LifeFormModular
@@ -126,7 +127,6 @@ Potentially coming soon, currently sorting out license situation:
 - Atelier
 - Befaco
 - Fundamental
-- ihtsyn
 - ZZC
 
 Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.

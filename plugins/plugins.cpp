@@ -391,9 +391,7 @@ extern Model* modelWriteSeq64;
 extern Model* modelBlankPanel;
 
 // ihtsyn
-/*
 #include "ihtsyn/src/plugin.hpp"
-*/
 
 // JW-Modules
 #define modelQuantizer modelJWQuantizer
@@ -539,7 +537,6 @@ Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
-// Plugin* pluginInstance__AS;
 // Plugin* pluginInstance__Atelier;
 Plugin* pluginInstance__AudibleInstruments;
 extern Plugin* pluginInstance__Autinn;
@@ -561,7 +558,7 @@ Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
-// Plugin* pluginInstance__ihtsyn;
+Plugin* pluginInstance__ihtsyn;
 Plugin* pluginInstance__JW;
 Plugin* pluginInstance__LifeFormModular;
 Plugin* pluginInstance__LittleUtils;
@@ -1526,7 +1523,6 @@ static void initStatic__ImpromptuModular()
     }
 }
 
-/*
 static void initStatic__ihtsyn()
 {
     Plugin* const p = new Plugin;
@@ -1541,7 +1537,6 @@ static void initStatic__ihtsyn()
         p->addModel(modelMVerb);
     }
 }
-*/
 
 static void initStatic__JW()
 {
@@ -1908,7 +1903,6 @@ void initStaticPlugins()
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__Aria();
-    // initStatic__AS();
     // initStatic__Atelier();
     initStatic__AudibleInstruments();
     initStatic__Autinn();
@@ -1930,7 +1924,7 @@ void initStaticPlugins()
     initStatic__GrandeModular();
     initStatic__HetrickCV();
     initStatic__ImpromptuModular();
-    // initStatic__ihtsyn();
+    initStatic__ihtsyn();
     initStatic__JW();
     initStatic__LifeFormModular();
     initStatic__LittleUtils();
