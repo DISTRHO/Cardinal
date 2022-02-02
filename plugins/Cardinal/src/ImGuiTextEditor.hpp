@@ -1,6 +1,6 @@
 /*
  * Syntax highlighting text editor (for ImGui in DPF, converted to VCV)
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  * Copyright (c) 2017 BalazsJako
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -56,12 +56,21 @@ struct ImGuiTextEditor : ImGuiWidget
     std::string getSelectedText() const;
     std::string getCurrentLineText()const;
 
+    bool hasSelection() const;
+    void selectAll();
+
+    void copy();
+    void cut();
+    void paste();
+
+    bool canUndo() const;
+    bool canRedo() const;
+    void undo();
+    void redo();
+
 protected:
     /** @internal */
     void drawImGui() override;
     void onButton(const ButtonEvent& e) override;
     void onHoverScroll(const HoverScrollEvent& e) override;
-    /*
-    void onSelectKey(const SelectKeyEvent& e) override;
-    */
 };

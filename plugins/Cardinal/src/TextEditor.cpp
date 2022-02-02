@@ -364,13 +364,6 @@ struct TextEditorModuleWidget : ModuleWidget {
         }
     }
 
-    void appendContextMenu(Menu *menu) override
-    {
-        menu->addChild(new MenuSeparator);
-        menu->addChild(new TextEditorLoadFileItem(textEditorModule, textEditorWidget));
-        menu->addChild(new TextEditorLangSelectMenuItem(textEditorModule, textEditorWidget));
-    }
-
     void step() override
     {
         if (textEditorModule)
@@ -392,6 +385,29 @@ struct TextEditorModuleWidget : ModuleWidget {
         nvgFillColor(args.vg, nvgRGB(0x20, 0x20, 0x20));
         nvgFill(args.vg);
         ModuleWidget::draw(args);
+    }
+
+    void appendContextMenu(Menu* const menu) override
+    {
+        menu->addChild(new MenuSeparator);
+        menu->addChild(new TextEditorLoadFileItem(textEditorModule, textEditorWidget));
+        menu->addChild(new TextEditorLangSelectMenuItem(textEditorModule, textEditorWidget));
+
+        menu->addChild(new ui::MenuSeparator);
+        menu->addChild(createMenuItem("Undo", RACK_MOD_CTRL_NAME "+Z", [=]{ textEditorWidget->undo(); },
+                                      !textEditorWidget->canUndo()));
+        menu->addChild(createMenuItem("Redo", RACK_MOD_CTRL_NAME "+Y", [=]{ textEditorWidget->redo(); },
+                                      !textEditorWidget->canRedo()));
+
+        menu->addChild(new ui::MenuSeparator);
+        menu->addChild(createMenuItem("Cut", RACK_MOD_CTRL_NAME "+X", [=]{ textEditorWidget->cut(); },
+                                      !textEditorWidget->hasSelection()));
+        menu->addChild(createMenuItem("Copy", RACK_MOD_CTRL_NAME "+C", [=]{ textEditorWidget->copy(); },
+                                      !textEditorWidget->hasSelection()));
+        menu->addChild(createMenuItem("Paste", RACK_MOD_CTRL_NAME "+V", [=]{ textEditorWidget->paste(); }));
+
+        menu->addChild(new ui::MenuSeparator);
+        menu->addChild(createMenuItem("Select all", RACK_MOD_CTRL_NAME "+A", [=]{ textEditorWidget->selectAll(); }));
     }
 
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TextEditorModuleWidget)

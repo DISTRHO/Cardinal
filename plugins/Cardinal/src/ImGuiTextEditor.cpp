@@ -133,6 +133,51 @@ std::string ImGuiTextEditor::getCurrentLineText()const
     return pData->editor.GetCurrentLineText();
 }
 
+bool ImGuiTextEditor::hasSelection() const
+{
+    return pData->editor.HasSelection();
+}
+
+void ImGuiTextEditor::selectAll()
+{
+    pData->editor.SelectAll();
+}
+
+void ImGuiTextEditor::copy()
+{
+    pData->editor.Copy();
+}
+
+void ImGuiTextEditor::cut()
+{
+    pData->editor.Cut();
+}
+
+void ImGuiTextEditor::paste()
+{
+    pData->editor.Paste();
+}
+
+bool ImGuiTextEditor::canUndo() const
+{
+    return pData->editor.CanUndo();
+}
+
+bool ImGuiTextEditor::canRedo() const
+{
+    return pData->editor.CanRedo();
+}
+
+void ImGuiTextEditor::undo()
+{
+    pData->editor.Undo();
+}
+
+void ImGuiTextEditor::redo()
+{
+    pData->editor.Redo();
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 
 void ImGuiTextEditor::drawImGui()
@@ -163,8 +208,6 @@ void ImGuiTextEditor::drawImGui()
 
 void ImGuiTextEditor::onButton(const ButtonEvent& e)
 {
-    setAsCurrentContext();
-
     // if mouse press is over the top status bar, do nothing so editor can be moved in the Rack
     if (e.action == GLFW_PRESS && e.pos.y < 25)
         return;
@@ -181,26 +224,3 @@ void ImGuiTextEditor::onHoverScroll(const HoverScrollEvent& e)
     // if there is a scrollbar, handle the event
     ImGuiWidget::onHoverScroll(e);
 }
-
-/*
-void ImGuiTextEditor::onSelectKey(const SelectKeyEvent& e)
-{
-    ImGuiWidget::onSelectKey(e);
-
-    if (e.action == GLFW_PRESS && (e.mods & GLFW_MOD_CONTROL) != 0)
-    {
-        switch (e.key)
-        {
-        case GLFW_KEY_X:
-            pData->editor.Cut();
-            break;
-        case GLFW_KEY_C:
-            pData->editor.Copy();
-            break;
-        case GLFW_KEY_V:
-            pData->editor.Paste();
-            break;
-        }
-    }
-}
-*/
