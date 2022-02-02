@@ -123,7 +123,6 @@ At the moment the following 3rd-party modules are provided:
 - ZetaCarinae
 
 Potentially coming soon, currently sorting out license situation:
-- AS
 - Atelier
 - Befaco
 - Fundamental

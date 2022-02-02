@@ -43,9 +43,6 @@
 [submodule "plugins/rackwindows"]
 	path = plugins/rackwindows
 	url = https://github.com/CardinalModules/rackwindows.git
-[submodule "plugins/AS"]
-	path = plugins/AS
-	url = https://github.com/AScustomWorks/AS.git
 [submodule "plugins/ImpromptuModular"]
 	path = plugins/ImpromptuModular
 	url = https://github.com/MarcBoule/ImpromptuModular.git

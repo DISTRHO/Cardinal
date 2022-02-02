@@ -52,7 +52,6 @@ Bellow follows a list of code licenses from potentially coming modules.
 
 | Name                    | License(s)            | Pending reason |
 |-------------------------|-----------------------|----------------|
-| AS                      | MIT                   | Artwork license issues, does not allow use outside VCVRack |
 | Atelier                 | GPL-3.0-or-later      | Custom artwork license, needs permission request |
 | Befaco                  | GPL-3.0-or-later      | Custom artwork license, needs permission request |
 | Fundamental             | GPL-3.0-or-later      | CC-ND, needs permission for dark mode |
@@ -149,9 +148,6 @@ Bellow follows a list of artwork licenses from potentially coming plugins.
 
 | Name                                    | License(s)       | Additional notes |
 |-----------------------------------------|------------------|------------------|
-| AS/*                                    | Custom           | Copyright 2017, derivative works may not use the AS logo or panel graphics including custom component graphics (knobs, switches, screws, caps, etc.). Redistribution rights requested at [AS#60](https://github.com/AScustomWorks/AS/issues/60) |
-| AS/saxmono.ttf                          | Custom           | You may download this font, circulate it und use it freely. You may not alter, rename, change copyrights or modify this font in any way. |
-| AS/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
 | Atelier/*                               | Custom           | Copyright © Pyer 2020, used and distributed with permission (TODO ask for it) |
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
 | Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission (TODO ask for it) |

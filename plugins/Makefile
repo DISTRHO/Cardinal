@@ -246,16 +246,6 @@ PLUGIN_FILES += $(filter-out AriaModules/src/Arcane.cpp AriaModules/src/plugin.c
 ARIA_CUSTOM = Blank
 
 # --------------------------------------------------------------
-# AS
-
-# PLUGIN_FILES += $(filter-out AS/src/AS.cpp,$(wildcard AS/src/*.cpp))
-# PLUGIN_FILES += AS/freeverb/revmodel.cpp
-# 
-# # modules/types which are present in other plugins
-# AS_CUSTOM = ADSR LabelDisplayWidget LowFrequencyOscillator VCA YellowRedLight allpass comb revmodel
-# AS_CUSTOM_PER_FILE = NumberDisplayWidget
-
-# --------------------------------------------------------------
 # Atelier
 
 # PLUGIN_FILES += Atelier/src/Palette.cpp

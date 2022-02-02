@@ -11,7 +11,7 @@ NYSTHI                    58494.0 (not opensource?)
 ML_modules                55847.0
 https://github.com/martin-lueders/ML_modules/
 
-FrozenWasteland           53690.0
+FrozenWasteland           53690.0 (GPL-3.0-only)
 https://github.com/almostEric/FrozenWasteland/
 
 ArableInstruments         48756.0
@@ -22,7 +22,7 @@ https://github.com/squinkylabs/SquinkyVCV
 
 LindenbergResearch        43959.0 (not opensource?)
 
-Geodesics                 42761.0
+Geodesics                 42761.0 (GPL-3.0-only)
 https://github.com/MarcBoule/Geodesics
 
 Alikins                   41798.0
