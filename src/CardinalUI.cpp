@@ -693,7 +693,13 @@ protected:
         case kKeyNumLock: key = GLFW_KEY_NUM_LOCK; break;
         case kKeyPrintScreen: key = GLFW_KEY_PRINT_SCREEN; break;
         case kKeyPause: key = GLFW_KEY_PAUSE; break;
-        default: key = ev.key; break;
+        default:
+            // glfw expects uppercase
+            if (ev.key >= 'a' && ev.key <= 'z')
+                key = ev.key - ('a' - 'A');
+            else
+                key = ev.key;
+            break;
         }
 
         const ScopedContext sc(this, mods);
