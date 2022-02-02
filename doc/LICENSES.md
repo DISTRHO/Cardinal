@@ -90,7 +90,7 @@ Below is a list of artwork licenses from plugins
 | Autinn/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/*                            | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/midi/*                       | CC-BY-SA-3.0-DE  | |
-| BaconPlugs/midi/beeth/*                 | ???              | Taken from http://www.jsbach.net/ |
+| BaconPlugs/midi/beeth/*                 | ???              | Unused in Cardinal, taken from http://www.jsbach.net/ |
 | BaconPlugs/1f953.svg                    | CC-BY-4.0        | |
 | BaconPlugs/Keypunch029.json             | OFL-1.1          | |
 | Bidoo/*                                 | CC-BY-NC-ND-4.0  | [Special permission granted for runtime dark mode](https://github.com/sebastien-bouffier/Bidoo/issues/191) |

@@ -828,11 +828,28 @@ else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 endif
 
+UNWANTED_FILES = HetrickCV/res/illustrator - deprecated/MyModule.svg
+
 RESOURCE_FILES = \
-	$(wildcard */presets) \
-	$(wildcard */res/*.svg) \
-	$(filter-out HetrickCV/res/illustrator - deprecated/MyModule.svg,$(wildcard */res/*/*.svg)) \
-	$(wildcard */res/*.ttf) $(wildcard */res/*/*.ttf)
+	$(filter-out $(UNWANTED_FILES), \
+		$(wildcard */res/*.svg) \
+		$(wildcard */res/*/*.svg) \
+		$(wildcard */res/*/*/*.svg) \
+		$(wildcard */res/*.ttf) \
+		$(wildcard */res/*/*.ttf) \
+		$(wildcard */res/*/*/*.ttf))
+
+RESOURCE_FILES += $(wildcard */presets)
+RESOURCE_FILES += BaconPlugs/res/Keypunch029.json
+RESOURCE_FILES += BaconPlugs/res/midi/chopin
+RESOURCE_FILES += BaconPlugs/res/midi/debussy
+RESOURCE_FILES += BaconPlugs/res/midi/goldberg
+RESOURCE_FILES += Cardinal/res/Miku/Miku.png
+RESOURCE_FILES += DrumKit/res/samples
+RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
+RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
+RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
+RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
 
 PLUGIN_RESOURCES  =
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
