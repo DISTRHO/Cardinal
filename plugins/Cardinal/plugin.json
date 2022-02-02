@@ -107,6 +107,14 @@
       ]
     },
     {
+      "slug": "ExpanderInputMIDI",
+      "name": "ExpanderInputMIDI",
+      "description": "MIDI input expander for Carla Plugin Host or Ildaeil",
+      "tags": [
+        "Expander"
+      ]
+    },
+    {
       "slug": "AudioFile",
       "name": "Audio File",
       "description": "Audio file player as a module",

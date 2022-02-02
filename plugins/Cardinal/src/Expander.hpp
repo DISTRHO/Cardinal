@@ -17,30 +17,19 @@
 
 #pragma once
 
-#include "rack.hpp"
+#include "plugin.hpp"
 
-#ifdef NDEBUG
-# undef DEBUG
-#endif
+#include "CarlaNative.h"
 
-using namespace rack;
+template<int numInputs, int numOutputs>
+struct CardinalExpander : Module {
+    static const constexpr int kNumInputs = numInputs;
+    static const constexpr int kNumOutputs = numOutputs;
+};
 
-extern Plugin* pluginInstance;
-
-extern Model* modelAudioFile;
-extern Model* modelCarla;
-extern Model* modelCardinalBlank;
-extern Model* modelExpanderInputMIDI;
-extern Model* modelGlBars;
-extern Model* modelHostAudio2;
-extern Model* modelHostAudio8;
-extern Model* modelHostCV;
-extern Model* modelHostMIDI;
-extern Model* modelHostMIDICC;
-extern Model* modelHostMIDIGate;
-extern Model* modelHostMIDIMap;
-extern Model* modelHostParameters;
-extern Model* modelHostTime;
-extern Model* modelIldaeil;
-extern Model* modelMPV;
-extern Model* modelTextEditor;
+struct CardinalExpanderFromCVToCarlaMIDI : CardinalExpander<6, 0> {
+    static const constexpr uint MAX_MIDI_EVENTS = 128;
+    // continuously filled up, flushed on each new block frame
+    uint frame, midiEventCount;
+    NativeMidiEvent midiEvents[MAX_MIDI_EVENTS];
+};
