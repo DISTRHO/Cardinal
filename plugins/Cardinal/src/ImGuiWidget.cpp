@@ -32,6 +32,16 @@ struct ImGuiWidget::PrivateData {
     float originalScaleFactor = 0.0f;
     float scaleFactor = 0.0f;
 
+    static const char* GetClipboardTextFn(void*)
+    {
+        return glfwGetClipboardString(nullptr);
+    }
+
+    static void SetClipboardTextFn(void*, const char* const text)
+    {
+        glfwSetClipboardString(nullptr, text);
+    }
+
     PrivateData()
     {
         IMGUI_CHECKVERSION();
@@ -64,6 +74,10 @@ struct ImGuiWidget::PrivateData {
         io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
         io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
         io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
+
+        io.GetClipboardTextFn = GetClipboardTextFn;
+        io.SetClipboardTextFn = SetClipboardTextFn;
+        io.ClipboardUserData = this;
     }
 
     ~PrivateData()
