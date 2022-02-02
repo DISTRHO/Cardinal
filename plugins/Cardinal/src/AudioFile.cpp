@@ -342,7 +342,7 @@ struct AudioFileListWidget : ImGuiWidget {
 
     struct ghcFile {
         std::string full, base;
-        bool operator<(const ghcFile& other) noexcept { return base < other.base; }
+        bool operator<(const ghcFile& other) const noexcept { return base < other.base; }
     };
     std::string currentDirectory;
     std::vector<ghcFile> currentFiles;

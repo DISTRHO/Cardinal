@@ -123,7 +123,7 @@ struct FileButton : MenuButton {
 				[=]() {patchUtils::setRemoteAutoDeploy(!autoDeploy);}
 			));
 		} else {
-			menu->addChild(createMenuItem("Connect to MOD", "", [this]() {
+			menu->addChild(createMenuItem("Connect to MOD", "", []() {
 				patchUtils::connectToRemote();
 			}));
 		}
