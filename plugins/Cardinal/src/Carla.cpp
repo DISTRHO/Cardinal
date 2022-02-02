@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,6 +16,7 @@
  */
 
 #include "plugincontext.hpp"
+#include "ModuleWidgets.hpp"
 
 #include "CarlaNativePlugin.h"
 #include "CarlaBackendUtils.hpp"
@@ -442,34 +443,23 @@ static intptr_t host_dispatcher(const NativeHostHandle handle, const NativeHostD
 // --------------------------------------------------------------------------------------------------------------------
 
 #ifndef HEADLESS
-struct CarlaModuleWidget : ModuleWidget, IdleCallback {
-    static constexpr const float startX_In = 14.0f;
-    static constexpr const float startX_Out = 96.0f;
-    static constexpr const float startY = 74.0f;
-    static constexpr const float padding = 29.0f;
-    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
-
+struct CarlaModuleWidget : ModuleWidgetWith9HP, IdleCallback {
     CarlaModule* const module;
     bool idleCallbackActive = false;
     bool visible = false;
 
     CarlaModuleWidget(CarlaModule* const m)
-        : ModuleWidget(),
-          module(m)
+        : module(m)
     {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Carla.svg")));
-
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        setSideScrews();
 
         for (uint i=0; i<CarlaModule::NUM_INPUTS; ++i)
-            addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * i), module, i));
+            createAndAddInput(i);
 
         for (uint i=0; i<CarlaModule::NUM_OUTPUTS; ++i)
-            addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * i), module, i));
+            createAndAddOutput(i);
     }
 
     ~CarlaModuleWidget() override
@@ -565,30 +555,11 @@ struct CarlaModuleWidget : ModuleWidget, IdleCallback {
             module->fCarlaPluginDescriptor->ui_idle(module->fCarlaPluginHandle);
     }
 
-    void drawTextLine(NVGcontext* const vg, const uint offset, const char* const text)
-    {
-        const float y = startY + offset * padding;
-        nvgBeginPath(vg);
-        nvgFillColor(vg, color::WHITE);
-        nvgText(vg, middleX, y + 16, text, nullptr);
-    }
-
     void draw(const DrawArgs& args) override
     {
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
-                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
-        nvgFill(args.vg);
-
-        nvgFontFaceId(args.vg, 0);
-        nvgFontSize(args.vg, 11);
-        nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-
-        nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg, startX_Out - 2.5f, startY - 2.0f, padding, padding * CarlaModule::NUM_INPUTS, 4);
-        nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
-        nvgFill(args.vg);
+        drawBackground(args.vg);
+        drawOutputJacksArea(args.vg, CarlaModule::NUM_INPUTS);
+        setupTextLines(args.vg);
 
         drawTextLine(args.vg, 0, "Audio 1");
         drawTextLine(args.vg, 1, "Audio 2");
@@ -601,7 +572,7 @@ struct CarlaModuleWidget : ModuleWidget, IdleCallback {
         drawTextLine(args.vg, 8, "CV 7");
         drawTextLine(args.vg, 9, "CV 8");
 
-        ModuleWidget::draw(args);
+        ModuleWidgetWith9HP::draw(args);
     }
 
     void showUI()

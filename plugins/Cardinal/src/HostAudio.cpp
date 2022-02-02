@@ -16,191 +16,12 @@
  */
 
 #include "plugincontext.hpp"
+#include "ModuleWidgets.hpp"
+#include "Widgets.hpp"
 
 // -----------------------------------------------------------------------------------------------------------
 
 USE_NAMESPACE_DISTRHO;
-
-struct NanoKnob : Knob {
-    static const int ringSize = 4;
-
-    std::string displayLabel = "Level";
-    std::string displayString = "0 dB";
-    float normalizedValue = 0.5f;
-
-    NanoKnob()
-    {
-        box.size = Vec(100, 100);
-    }
-
-    void drawLayer(const DrawArgs& args, int layer) override
-    {
-        if (layer != 1)
-            return Knob::drawLayer(args, layer);
-
-        const float w = box.size.x;
-        const float h = box.size.y;
-
-        const int knobSize = std::min(w, h - BND_WIDGET_HEIGHT * 2) - ringSize;
-
-        const int knobStartX = w / 2 - knobSize / 2;
-        const int knobStartY = ringSize;
-        const int knobCenterX = knobStartX + knobSize / 2;
-        const int knobCenterY = knobStartY + knobSize / 2;
-
-        const NVGcolor testing = nvgRGBf(0.76f, 0.11f, 0.22f);
-
-        nvgLineCap(args.vg, NVG_ROUND);
-
-        // outer ring value
-        nvgBeginPath(args.vg);
-        nvgArc(args.vg,
-              knobCenterX,
-              knobCenterY,
-              knobSize / 2 + ringSize / 2 + 1,
-              nvgDegToRad(135.0f),
-              nvgDegToRad(135.0f) + nvgDegToRad(270.0f * normalizedValue),
-              NVG_CW);
-        nvgStrokeWidth(args.vg, ringSize);
-        nvgStrokeColor(args.vg, testing);
-        nvgStroke(args.vg);
-
-        // simulate color bleeding
-        nvgBeginPath(args.vg);
-        nvgArc(args.vg,
-              knobCenterX,
-              knobCenterY,
-              knobSize / 2 - 3,
-              nvgDegToRad(135.0f),
-              nvgDegToRad(135.0f) + nvgDegToRad(270.0f * normalizedValue),
-              NVG_CW);
-        nvgStrokeWidth(args.vg, 5);
-        nvgStrokeColor(args.vg, nvgRGBAf(testing.r, testing.g, testing.b, 0.1f));
-        nvgStroke(args.vg);
-
-        // line indicator
-        nvgStrokeWidth(args.vg, 2);
-        nvgSave(args.vg);
-        nvgTranslate(args.vg, knobCenterX, knobCenterY);
-        nvgRotate(args.vg, nvgDegToRad(45.0f) + normalizedValue * nvgDegToRad(270.0f));
-        nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg, -2, knobSize / 2 - 9, 2, 6, 1);
-        nvgClosePath(args.vg);
-        nvgFillColor(args.vg, nvgRGBf(1.0f, 1.0f, 1.0f));
-        nvgFill(args.vg);
-        nvgRestore(args.vg);
-
-        // adjusted from VCVRack's LightWidget.cpp
-        if (const float halo = settings::haloBrightness)
-        {
-            float radius = knobSize * 0.5f;
-            float oradius = radius + std::min(radius * 4.f, 15.f);
-
-            NVGcolor icol = color::mult(nvgRGBAf(testing.r, testing.g, testing.b, 0.2f), halo);
-            NVGcolor ocol = nvgRGBA(0, 0, 0, 0);
-            NVGpaint paint = nvgRadialGradient(args.vg, knobCenterX, knobCenterY, radius, oradius, icol, ocol);
-
-            nvgBeginPath(args.vg);
-            nvgRect(args.vg, knobCenterX - oradius, knobCenterY - oradius, 2 * oradius, 2 * oradius);
-            nvgFillPaint(args.vg, paint);
-            nvgFill(args.vg);
-        }
-
-        // bottom label (value)
-        bndIconLabelValue(args.vg, 0, knobSize + ringSize, w, BND_WIDGET_HEIGHT, -1,
-                          testing, BND_CENTER,
-                          BND_LABEL_FONT_SIZE, displayString.c_str(), nullptr);
-
-        Knob::drawLayer(args, layer);
-    }
-
-    void draw(const DrawArgs& args) override
-    {
-        if (engine::ParamQuantity* const pq = getParamQuantity())
-            normalizedValue = pq->getScaledValue();
-
-        const float w = box.size.x;
-        const float h = box.size.y;
-
-        const int knobSize = std::min(w, h - BND_WIDGET_HEIGHT * 2) - ringSize;
-
-        const int knobStartX = w / 2 - knobSize / 2;
-        const int knobStartY = ringSize;
-        const int knobCenterX = knobStartX + knobSize / 2;
-        const int knobCenterY = knobStartY + knobSize / 2;
-
-        // knob
-        NVGcolor shade_top;
-        NVGcolor shade_down;
-        BNDwidgetState state;
-        if (APP->event->getDraggedWidget() == this)
-            state = BND_ACTIVE;
-        else if (APP->event->getHoveredWidget() == this)
-            state = BND_HOVER;
-        else
-            state = BND_DEFAULT;
-        bndInnerColors(&shade_top, &shade_down, &bndGetTheme()->optionTheme, state, 0);
-
-        // inner fill
-        nvgBeginPath(args.vg);
-        nvgCircle(args.vg, knobCenterX, knobCenterY, knobSize / 2);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg,
-                                            knobStartX,
-                                            knobStartY,
-                                            knobStartX,
-                                            knobStartY + knobSize,
-                                            shade_top,
-                                            shade_down));
-        nvgFill(args.vg);
-
-        // inner fill border (inner)
-        nvgBeginPath(args.vg);
-        nvgArc(args.vg, knobCenterX, knobCenterY, knobSize / 2 - 1, nvgDegToRad(0.0f), nvgDegToRad(360.0f), NVG_CCW);
-        nvgClosePath(args.vg);
-        nvgStrokeWidth(args.vg, 1);
-        nvgStrokeColor(args.vg, nvgRGBAf(0.5f, 0.5f, 0.5f, 0.4f));
-        nvgStroke(args.vg);
-
-        // inner fill border (outer)
-        nvgBeginPath(args.vg);
-        nvgArc(args.vg, knobCenterX, knobCenterY, knobSize / 2, nvgDegToRad(0.0f), nvgDegToRad(360.0f), NVG_CCW);
-        nvgClosePath(args.vg);
-        nvgStrokeWidth(args.vg, 1);
-        nvgStrokeColor(args.vg, nvgRGBAf(0.0f, 0.0f, 0.0f, 0.4f));
-        nvgStroke(args.vg);
-
-        nvgLineCap(args.vg, NVG_ROUND);
-
-        // outer ring background
-        nvgBeginPath(args.vg);
-        nvgArc(args.vg,
-              knobCenterX,
-              knobCenterY,
-              knobSize / 2 + ringSize / 2 + 1,
-              nvgDegToRad(135.0f),
-              nvgDegToRad(45.0f),
-              NVG_CW);
-        nvgStrokeWidth(args.vg, ringSize);
-        nvgStrokeColor(args.vg, nvgRGBf(0.5f, 0.5f, 0.5f));
-        nvgStroke(args.vg);
-
-        // bottom label (name)
-        bndIconLabelValue(args.vg, 0, knobStartY + knobSize + BND_WIDGET_HEIGHT * 0.75f, w, BND_WIDGET_HEIGHT, -1,
-                          SCHEME_WHITE, BND_CENTER,
-                          BND_LABEL_FONT_SIZE, displayLabel.c_str(), nullptr);
-
-        Knob::draw(args);
-    }
-
-    void onChange(const ChangeEvent&) override
-    {
-        engine::ParamQuantity* const pq = getParamQuantity();
-        DISTRHO_SAFE_ASSERT_RETURN(pq != nullptr,);
-
-        displayLabel = pq->getLabel();
-        displayString = pq->getDisplayValueString() + pq->getUnit();
-    }
-};
 
 /*
  * Find the highest absolute and normalized value within a float array.
@@ -365,132 +186,26 @@ struct HostAudio : Module {
 };
 
 template<int numIO>
-struct NanoMeter : Widget {
+struct HostAudioNanoMeter : NanoMeter {
     HostAudio<numIO>* const module;
-    float gainMeterL = 0.0f;
-    float gainMeterR = 0.0f;
 
-    NanoMeter(HostAudio<numIO>* const m)
-        : module(m)
-    {
-        box.size = Vec(100, 100);
-    }
+    HostAudioNanoMeter(HostAudio<numIO>* const m)
+        : module(m) {}
 
-    void drawLayer(const DrawArgs& args, int layer) override
+    void updateMeters() override
     {
-        if (layer != 1)
+        if (module == nullptr || module->resetMeters)
             return;
 
-        const float usableHeight = box.size.y - 10.0f;
-
-        // draw background
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg,
-                0,
-                0,
-                box.size.x,
-                usableHeight);
-        nvgFillColor(args.vg, nvgRGB(26, 26, 26));
-        nvgFill(args.vg);
-
-        nvgFillColor(args.vg, nvgRGBAf(0.76f, 0.11f, 0.22f, 0.5f));
-        nvgStrokeColor(args.vg, nvgRGBf(0.76f, 0.11f, 0.22f));
-
-        if (module != nullptr)
-        {
-            // Only fetch new values once DSP side is updated
-            if (! module->resetMeters)
-            {
-                gainMeterL = module->gainMeterL;
-                gainMeterR = module->gainMeterR;
-                module->resetMeters = true;
-            }
-
-            const float heightL = 1.0f + std::sqrt(gainMeterL) * (usableHeight - 1.0f);
-            nvgBeginPath(args.vg);
-            nvgRect(args.vg, 0.0f, usableHeight - heightL, box.size.x * 0.5f - 1.0f, heightL);
-            nvgFill(args.vg);
-            nvgStroke(args.vg);
-
-            const float heightR = 1.0f + std::sqrt(gainMeterR) * (usableHeight - 1.0f);
-            nvgBeginPath(args.vg);
-            nvgRect(args.vg, box.size.x * 0.5f + 1.0f, usableHeight - heightR, box.size.x * 0.5f - 2.0f, heightR);
-            nvgFill(args.vg);
-            nvgStroke(args.vg);
-        }
-
-        nvgLineCap(args.vg, NVG_ROUND);
-
-        nvgBeginPath(args.vg);
-        nvgMoveTo(args.vg, 0.0f, usableHeight + 2.0f);
-        nvgLineTo(args.vg, box.size.x * 0.5f - 11.0f, usableHeight + 2.0f);
-        nvgStroke(args.vg);
-
-        nvgBeginPath(args.vg);
-        nvgMoveTo(args.vg, 0.0f, usableHeight + 4.0f);
-        nvgLineTo(args.vg, box.size.x * 0.5f - 16.0f, usableHeight + 4.0f);
-        nvgStroke(args.vg);
-
-        nvgBeginPath(args.vg);
-        nvgMoveTo(args.vg, 0.0f, usableHeight + 6.0f);
-        nvgLineTo(args.vg, box.size.x * 0.5f - 19.0f, usableHeight + 6.0f);
-        nvgStroke(args.vg);
-
-        nvgBeginPath(args.vg);
-        nvgMoveTo(args.vg, 0.0f, usableHeight + 8.0f);
-        nvgLineTo(args.vg, box.size.x * 0.5f - 22.0f, usableHeight + 8.0f);
-        nvgStroke(args.vg);
-
-        nvgBeginPath(args.vg);
-        nvgMoveTo(args.vg, 0.0f, usableHeight + 10.0f);
-        nvgLineTo(args.vg, box.size.x * 0.5f - 24.0f, usableHeight + 10.0f);
-        nvgStroke(args.vg);
-
-        nvgBeginPath(args.vg);
-        nvgMoveTo(args.vg, 0.0f, usableHeight + 12.0f);
-        nvgLineTo(args.vg, box.size.x * 0.5f - 26.0f, usableHeight + 12.0f);
-        nvgStroke(args.vg);
-
-        nvgBeginPath(args.vg);
-        nvgMoveTo(args.vg, box.size.x * 0.5f + 10.0f, usableHeight + 2.0f);
-        nvgLineTo(args.vg, box.size.x - 1.0f, usableHeight + 2.0f);
-        nvgStroke(args.vg);
-
-        nvgBeginPath(args.vg);
-        nvgMoveTo(args.vg, box.size.x * 0.5f + 15.0f, usableHeight + 4.0f);
-        nvgLineTo(args.vg, box.size.x - 1.0f, usableHeight + 4.0f);
-        nvgStroke(args.vg);
-
-        nvgBeginPath(args.vg);
-        nvgMoveTo(args.vg, box.size.x * 0.5f + 18.0f, usableHeight + 6.0f);
-        nvgLineTo(args.vg, box.size.x - 1.0f, usableHeight + 6.0f);
-        nvgStroke(args.vg);
-
-        nvgBeginPath(args.vg);
-        nvgMoveTo(args.vg, box.size.x * 0.5f + 20.0f, usableHeight + 8.0f);
-        nvgLineTo(args.vg, box.size.x - 1.0f, usableHeight + 8.0f);
-        nvgStroke(args.vg);
-
-        nvgBeginPath(args.vg);
-        nvgMoveTo(args.vg, box.size.x * 0.5f + 22.0f, usableHeight + 10.0f);
-        nvgLineTo(args.vg, box.size.x - 1.0f, usableHeight + 10.0f);
-        nvgStroke(args.vg);
-
-        nvgBeginPath(args.vg);
-        nvgMoveTo(args.vg, box.size.x * 0.5f + 24.0f, usableHeight + 12.0f);
-        nvgLineTo(args.vg, box.size.x - 1.0f, usableHeight + 12.0f);
-        nvgStroke(args.vg);
+        // Only fetch new values once DSP side is updated
+        gainMeterL = module->gainMeterL;
+        gainMeterR = module->gainMeterR;
+        module->resetMeters = true;
     }
 };
 
 template<int numIO>
-struct HostAudioWidget : ModuleWidget {
-    static constexpr const float startX_In = 14.0f;
-    static constexpr const float startX_Out = 81.0f;
-    static constexpr const float startY = 74.0f;
-    static constexpr const float padding = 29.0f;
-    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
-
+struct HostAudioWidget : ModuleWidgetWith8HP {
     HostAudio<numIO>* const module;
 
     HostAudioWidget(HostAudio<numIO>* const m)
@@ -498,53 +213,30 @@ struct HostAudioWidget : ModuleWidget {
     {
         setModule(m);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostAudio.svg")));
-
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        setSideScrews();
 
         for (uint i=0; i<numIO; ++i)
-            addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * i), m, i));
-
-        for (uint i=0; i<numIO; ++i)
-            addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * i), m, i));
+        {
+            createAndAddInput(i);
+            createAndAddOutput(i);
+        }
 
         if (numIO == 2)
         {
             addParam(createParamCentered<NanoKnob>(Vec(middleX, 310.0f), m, 0));
 
-            NanoMeter<numIO>* const meter = new NanoMeter<numIO>(m);
+            HostAudioNanoMeter<numIO>* const meter = new HostAudioNanoMeter<numIO>(m);
             meter->box.pos = Vec(middleX - padding + 2.75f, startY + padding * 2);
             meter->box.size = Vec(padding * 2.0f - 4.0f, 136.0f);
             addChild(meter);
         }
     }
 
-    void drawTextLine(NVGcontext* const vg, const uint posY, const char* const text)
-    {
-        const float y = startY + posY * padding;
-        nvgBeginPath(vg);
-        nvgFillColor(vg, color::WHITE);
-        nvgText(vg, middleX, y + 16, text, nullptr);
-    }
-
     void draw(const DrawArgs& args) override
     {
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
-                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
-        nvgFill(args.vg);
-
-        nvgFontFaceId(args.vg, 0);
-        nvgFontSize(args.vg, 11);
-        nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-
-        nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg, startX_Out - 2.5f, startY - 2.0f, padding, padding * numIO, 4);
-        nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
-        nvgFill(args.vg);
+        drawBackground(args.vg);
+        drawOutputJacksArea(args.vg, numIO);
+        setupTextLines(args.vg);
 
         if (numIO == 2)
         {
@@ -560,7 +252,7 @@ struct HostAudioWidget : ModuleWidget {
             }
         }
 
-        ModuleWidget::draw(args);
+        ModuleWidgetWith8HP::draw(args);
     }
 
     void appendContextMenu(Menu* const menu) override {

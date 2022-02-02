@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "plugin.hpp"
+#include "Widgets.hpp"
 #include "DearImGui/imgui.h"
 
 struct ImGuiWidget : OpenGlWidgetWithBrowserPreview {

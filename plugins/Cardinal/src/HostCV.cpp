@@ -16,6 +16,7 @@
  */
 
 #include "plugincontext.hpp"
+#include "ModuleWidgets.hpp"
 
 #define CARDINAL_AUDIO_IO_OFFSET 8
 
@@ -98,54 +99,25 @@ struct HostCV : Module {
     }
 };
 
-struct HostCVWidget : ModuleWidget {
-    static constexpr const float startX_In = 14.0f;
-    static constexpr const float startX_Out = 81.0f;
-    static constexpr const float startY = 74.0f;
-    static constexpr const float padding = 29.0f;
-    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
-
+struct HostCVWidget : ModuleWidgetWith8HP {
     HostCVWidget(HostCV* const module)
     {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostCV.svg")));
-
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        setSideScrews();
 
         for (uint i=0; i<HostCV::NUM_INPUTS; ++i)
-            addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * i), module, i));
+            createAndAddInput(i);
 
         for (uint i=0; i<HostCV::NUM_OUTPUTS; ++i)
-            addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * i), module, i));
-    }
-
-    void drawTextLine(NVGcontext* const vg, const uint offset, const char* const text)
-    {
-        const float y = startY + offset * padding;
-        nvgBeginPath(vg);
-        nvgFillColor(vg, color::WHITE);
-        nvgText(vg, middleX, y + 16, text, nullptr);
+            createAndAddOutput(i);
     }
 
     void draw(const DrawArgs& args) override
     {
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
-                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
-        nvgFill(args.vg);
-
-        nvgFontFaceId(args.vg, 0);
-        nvgFontSize(args.vg, 11);
-        nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-
-        nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg, startX_Out - 2.5f, startY - 2.0f, padding, padding * HostCV::NUM_INPUTS, 4);
-        nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
-        nvgFill(args.vg);
+        drawBackground(args.vg);
+        drawOutputJacksArea(args.vg, HostCV::NUM_INPUTS);
+        setupTextLines(args.vg);
 
         drawTextLine(args.vg, 0, "CV 1");
         drawTextLine(args.vg, 1, "CV 2");
@@ -158,7 +130,7 @@ struct HostCVWidget : ModuleWidget {
         drawTextLine(args.vg, 8, "CV 9");
         drawTextLine(args.vg, 9, "CV 10");
 
-        ModuleWidget::draw(args);
+        ModuleWidgetWith8HP::draw(args);
     }
 
     void appendContextMenu(ui::Menu* const menu) override

@@ -26,6 +26,7 @@
  */
 
 #include "plugincontext.hpp"
+#include "Widgets.hpp"
 
 #include <algorithm>
 

@@ -26,6 +26,7 @@
  */
 
 #include "plugincontext.hpp"
+#include "ModuleWidgets.hpp"
 
 #include <algorithm>
 
@@ -661,13 +662,7 @@ struct HostMIDI : Module {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct HostMIDIWidget : ModuleWidget {
-    static constexpr const float startX_In = 14.0f;
-    static constexpr const float startX_Out = 96.0f;
-    static constexpr const float startY = 74.0f;
-    static constexpr const float padding = 29.0f;
-    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
-
+struct HostMIDIWidget : ModuleWidgetWith9HP {
     HostMIDI* const module;
 
     HostMIDIWidget(HostMIDI* const m)
@@ -675,57 +670,34 @@ struct HostMIDIWidget : ModuleWidget {
     {
         setModule(m);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostMIDI.svg")));
+        setSideScrews();
 
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        createAndAddInput(0, HostMIDI::PITCH_INPUT);
+        createAndAddInput(1, HostMIDI::GATE_INPUT);
+        createAndAddInput(2, HostMIDI::VELOCITY_INPUT);
+        createAndAddInput(3, HostMIDI::AFTERTOUCH_INPUT);
+        createAndAddInput(4, HostMIDI::PITCHBEND_INPUT);
+        createAndAddInput(5, HostMIDI::MODWHEEL_INPUT);
+        createAndAddInput(6, HostMIDI::START_INPUT);
+        createAndAddInput(7, HostMIDI::STOP_INPUT);
+        createAndAddInput(8, HostMIDI::CONTINUE_INPUT);
 
-        addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * 0), m, HostMIDI::PITCH_INPUT));
-        addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * 1), m, HostMIDI::GATE_INPUT));
-        addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * 2), m, HostMIDI::VELOCITY_INPUT));
-        addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * 3), m, HostMIDI::AFTERTOUCH_INPUT));
-        addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * 4), m, HostMIDI::PITCHBEND_INPUT));
-        addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * 5), m, HostMIDI::MODWHEEL_INPUT));
-        addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * 6), m, HostMIDI::START_INPUT));
-        addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * 7), m, HostMIDI::STOP_INPUT));
-        addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * 8), m, HostMIDI::CONTINUE_INPUT));
-
-        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * 0), m, HostMIDI::PITCH_OUTPUT));
-        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * 1), m, HostMIDI::GATE_OUTPUT));
-        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * 2), m, HostMIDI::VELOCITY_OUTPUT));
-        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * 3), m, HostMIDI::AFTERTOUCH_OUTPUT));
-        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * 4), m, HostMIDI::PITCHBEND_OUTPUT));
-        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * 5), m, HostMIDI::MODWHEEL_OUTPUT));
-        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * 6), m, HostMIDI::START_OUTPUT));
-        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * 7), m, HostMIDI::STOP_OUTPUT));
-        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * 8), m, HostMIDI::CONTINUE_OUTPUT));
-    }
-
-    void drawTextLine(NVGcontext* const vg, const uint posY, const char* const text)
-    {
-        const float y = startY + posY * padding;
-        nvgBeginPath(vg);
-        nvgFillColor(vg, color::WHITE);
-        nvgText(vg, middleX, y + 16, text, nullptr);
+        createAndAddOutput(0, HostMIDI::PITCH_OUTPUT);
+        createAndAddOutput(1, HostMIDI::GATE_OUTPUT);
+        createAndAddOutput(2, HostMIDI::VELOCITY_OUTPUT);
+        createAndAddOutput(3, HostMIDI::AFTERTOUCH_OUTPUT);
+        createAndAddOutput(4, HostMIDI::PITCHBEND_OUTPUT);
+        createAndAddOutput(5, HostMIDI::MODWHEEL_OUTPUT);
+        createAndAddOutput(6, HostMIDI::START_OUTPUT);
+        createAndAddOutput(7, HostMIDI::STOP_OUTPUT);
+        createAndAddOutput(8, HostMIDI::CONTINUE_OUTPUT);
     }
 
     void draw(const DrawArgs& args) override
     {
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
-                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
-        nvgFill(args.vg);
-
-        nvgFontFaceId(args.vg, 0);
-        nvgFontSize(args.vg, 11);
-        nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-
-        nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg, startX_Out - 2.5f, startY - 2.0f, padding, padding * 9, 4);
-        nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
-        nvgFill(args.vg);
+        drawBackground(args.vg);
+        drawOutputJacksArea(args.vg, 9);
+        setupTextLines(args.vg);
 
         drawTextLine(args.vg, 0, "V/Oct");
         drawTextLine(args.vg, 1, "Gate");
@@ -737,7 +709,7 @@ struct HostMIDIWidget : ModuleWidget {
         drawTextLine(args.vg, 7, "Stop");
         drawTextLine(args.vg, 8, "Cont");
 
-        ModuleWidget::draw(args);
+        ModuleWidgetWith9HP::draw(args);
     }
 
     void appendContextMenu(Menu* const menu) override

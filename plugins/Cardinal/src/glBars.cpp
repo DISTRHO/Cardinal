@@ -17,6 +17,7 @@
 
 #ifndef HEADLESS
 # include "glBars.hpp"
+# include "Widgets.hpp"
 #else
 # include "plugin.hpp"
 #endif
