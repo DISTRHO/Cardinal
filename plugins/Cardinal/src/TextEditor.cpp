@@ -225,7 +225,7 @@ struct TextEditorLoadFileItem : MenuItem {
         : module(textEditorModule),
           widget(textEditorWidget)
     {
-        text = "Load File";
+        text = "Load text file...";
     }
 
     void onAction(const event::Action&) override
