@@ -187,7 +187,13 @@ void ImGuiTextEditor::drawImGui()
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(box.size.x * scaleFactor, box.size.y * scaleFactor));
 
-    if (ImGui::Begin("TextEdit", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize))
+    const int pflags = ImGuiWindowFlags_NoSavedSettings
+                     | ImGuiWindowFlags_NoCollapse
+                     | ImGuiWindowFlags_NoResize
+                     | ImGuiWindowFlags_NoTitleBar
+                     | ImGuiWindowFlags_AlwaysAutoResize;
+
+    if (ImGui::Begin("TextEdit", nullptr, pflags))
     {
         TextEditor& editor(pData->editor);
 
