@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="15.24mm"
+   height="128.5mm"
+   viewBox="0 0 15.24 128.5"
+   version="1.1"
+   id="svg4620"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="ExpanderMIDI.svg">
+  <defs
+     id="defs4614">
+    <style
+       id="style6"
+       type="text/css">
+   
+    .str0 {stroke:#565656;stroke-width:0.0966867}
+    .str1 {stroke:#4F4F4F;stroke-width:0.193345}
+    .fil0 {fill:none}
+    .fil2 {fill:#2B2A29}
+    .fil1 {fill:#6B6B6B}
+   
+  </style>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="-188.96587"
+     inkscape:cy="317.24373"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1015"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="0" />
+  <metadata
+     id="metadata4617">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-168.5)">
+    <g
+       style="fill-rule:evenodd"
+       id="g5299"
+       transform="matrix(6.342689,0,0,6.342689,4.4921904,175.6457)">
+      <g
+         transform="translate(-1.6191379e-5,-0.08553947)"
+         id="Layer_x0020_1"
+         inkscape:label="Layer 1">
+        <metadata
+           id="CorelCorpID_0Corel-Layer" />
+        <circle
+           style="fill:none;stroke:#ffffff;stroke-width:0.0966867;stroke-opacity:1"
+           id="circle10"
+           r="0.15916"
+           cy="0.61075097"
+           cx="0.525226"
+           class="fil0 str0" />
+        <circle
+           style="fill:none;stroke:#ffffff;stroke-width:0.193345;stroke-opacity:1"
+           id="circle12"
+           r="0.42853901"
+           cy="0.61075097"
+           cx="0.525226"
+           class="fil0 str1" />
+      </g>
+    </g>
+    <g
+       aria-label="MIDI"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.58329964px;line-height:1.25;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#808a8a;fill-opacity:1;stroke:none;stroke-width:0.26458299"
+       id="text845">
+      <path
+         d="m 2.8194309,185.05265 h 0.7258818 l 0.9188071,2.45015 0.9236303,-2.45015 h 0.7258818 v 3.60047 H 5.6385531 v -3.16156 L 4.7100997,187.961 H 4.2205515 l -0.9284534,-2.46944 v 3.16156 H 2.8194309 Z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.93888998px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#808a8a;fill-opacity:1;stroke-width:0.26458299"
+         id="path820" />
+      <path
+         d="m 7.0830818,185.05265 h 0.4871366 v 3.60047 H 7.0830818 Z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.93888998px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#808a8a;fill-opacity:1;stroke-width:0.26458299"
+         id="path822" />
+      <path
+         d="m 9.0268052,185.45297 v 2.79983 h 0.5884225 q 0.7451743,0 1.0900283,-0.33762 0.347266,-0.33762 0.347266,-1.06591 0,-0.72347 -0.347266,-1.05868 -0.344854,-0.33762 -1.0900283,-0.33762 z m -0.4871366,-0.40032 h 1.0008005 q 1.0466199,0 1.5361679,0.4365 0.489549,0.43408 0.489549,1.36012 0,0.93086 -0.49196,1.36736 -0.49196,0.43649 -1.5337569,0.43649 H 8.5396686 Z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.93888998px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#808a8a;fill-opacity:1;stroke-width:0.26458299"
+         id="path824" />
+      <path
+         d="m 12.340298,185.05265 h 0.487137 v 3.60047 h -0.487137 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.93888998px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#808a8a;fill-opacity:1;stroke-width:0.26458299"
+         id="path826" />
+    </g>
+  </g>
+</svg>

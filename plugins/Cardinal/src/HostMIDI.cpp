@@ -670,7 +670,8 @@ struct HostMIDIWidget : ModuleWidgetWith9HP {
     {
         setModule(m);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostMIDI.svg")));
-        setSideScrews();
+
+        createAndAddScrews();
 
         createAndAddInput(0, HostMIDI::PITCH_INPUT);
         createAndAddInput(1, HostMIDI::GATE_INPUT);

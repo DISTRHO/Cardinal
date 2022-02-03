@@ -16,6 +16,7 @@
  */
 
 #include "Expander.hpp"
+#include "ModuleWidgets.hpp"
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -205,19 +206,63 @@ struct CardinalExpanderForInputMIDI : CardinalExpanderFromCVToCarlaMIDI {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct CardinalExpanderForInputMIDIWidget : ModuleWidget {
+struct CardinalExpanderForInputMIDIWidget : ModuleWidgetWithSideScrews<> {
+    static constexpr const float startX = 14.0f;
+    static constexpr const float startY = 90.0f;
+    static constexpr const float padding = 49.0f;
+
     CardinalExpanderForInputMIDIWidget(CardinalExpanderForInputMIDI* const module)
     {
         setModule(module);
-        box.size.x = RACK_GRID_WIDTH * 2;
+        setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/ExpanderMIDI.svg")));
 
-        addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-        for (int i=0; i<6; ++i)
-            addInput(createInput<PJ301MPort>(Vec(15, 50 + 29 * i), module, i));
+        for (int i=0; i<CardinalExpanderForInputMIDI::NUM_INPUTS; ++i)
+            addInput(createInput<PJ301MPort>(Vec(startX + 5.0f, startY + padding * i), module, i));
+    }
+
+    void drawOutputJacksArea(NVGcontext* const vg, const int numOutputs) {
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, 12.0f, startY - 2.0f, box.size.x - 12.0f, padding * numOutputs, 4);
+        nvgFillColor(vg, nvgRGB(0xd0, 0xd0, 0xd0));
+        nvgFill(vg);
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        drawBackground(args.vg);
+
+        nvgScissor(args.vg, startX, 0.0f, box.size.x - startX, box.size.y);
+
+        for (int i=0; i<CardinalExpanderForInputMIDI::NUM_INPUTS; ++i)
+        {
+            const float y = startY + i* padding;
+
+            nvgBeginPath(args.vg);
+            nvgRoundedRect(args.vg, startX, y - 19.0f, box.size.x, padding - 4.0f, 4);
+            nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
+            nvgFill(args.vg);
+        }
+
+        nvgResetScissor(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgRect(args.vg, box.size.x * 0.5f, 0, box.size.x, box.size.y);
+        nvgFillColor(args.vg, color::BLACK);
+        nvgFontFaceId(args.vg, 0);
+        nvgFontSize(args.vg, 11);
+        nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+
+        nvgText(args.vg, box.size.x * 0.666f, startY + padding * 0 - 4.0f, "V/Oct", nullptr);
+        nvgText(args.vg, box.size.x * 0.666f, startY + padding * 1 - 4.0f, "Gate", nullptr);
+        nvgText(args.vg, box.size.x * 0.666f, startY + padding * 2 - 4.0f, "Vel", nullptr);
+        nvgText(args.vg, box.size.x * 0.666f, startY + padding * 3 - 4.0f, "Aft", nullptr);
+        nvgText(args.vg, box.size.x * 0.666f, startY + padding * 4 - 4.0f, "PW", nullptr);
+        nvgText(args.vg, box.size.x * 0.666f, startY + padding * 5 - 4.0f, "MW", nullptr);
+
+        ModuleWidgetWithSideScrews::draw(args);
     }
 };
 

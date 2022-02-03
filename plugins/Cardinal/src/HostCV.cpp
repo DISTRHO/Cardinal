@@ -104,7 +104,8 @@ struct HostCVWidget : ModuleWidgetWith8HP {
     {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostCV.svg")));
-        setSideScrews();
+
+        createAndAddScrews();
 
         for (uint i=0; i<HostCV::NUM_INPUTS; ++i)
             createAndAddInput(i);

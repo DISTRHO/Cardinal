@@ -16,9 +16,8 @@
  */
 
 #include "plugincontext.hpp"
+#include "ModuleWidgets.hpp"
 #include "extra/Thread.hpp"
-
-#include "dgl/src/nanovg/nanovg.h"
 
 #include "CarlaNativePlugin.h"
 
@@ -470,7 +469,7 @@ struct AudioFileListWidget : ImGuiWidget {
     }
 };
 
-struct AudioFileWidget : ModuleWidget {
+struct AudioFileWidget : ModuleWidgetWithSideScrews<> {
     static constexpr const float padding = 29.0f;
 
     CarlaInternalPluginModule* const module;
@@ -479,16 +478,12 @@ struct AudioFileWidget : ModuleWidget {
     float lastPosition = 0.0f;
 
     AudioFileWidget(CarlaInternalPluginModule* const m)
-        : ModuleWidget(),
-          module(m)
+        : module(m)
     {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/AudioFile.svg")));
 
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        createAndAddScrews();
 
         addOutput(createOutput<PJ301MPort>(Vec(box.size.x - RACK_GRID_WIDTH * 5/2 - padding,
                                                RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding), module, 0));

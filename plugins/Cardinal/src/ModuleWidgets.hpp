@@ -25,27 +25,12 @@
 
 using namespace rack;
 
-template<int startX_Out>
+template<int startX_Out = 0>
 struct ModuleWidgetWithSideScrews : ModuleWidget {
     static constexpr const float startX_In = 14.0f;
     static constexpr const float startY = 74.0f;
     static constexpr const float padding = 29.0f;
     static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
-
-    void setSideScrews() {
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-    }
-
-    void setupTextLines(NVGcontext* const vg) {
-        nvgBeginPath(vg);
-        nvgRect(vg, startX_Out - 2.5f, startY - 2.0f, padding, padding);
-        nvgFontFaceId(vg, 0);
-        nvgFontSize(vg, 11);
-        nvgTextAlign(vg, NVG_ALIGN_CENTER);
-    }
 
     void createAndAddInput(const uint paramId) {
         createAndAddInput(paramId, paramId);
@@ -61,6 +46,20 @@ struct ModuleWidgetWithSideScrews : ModuleWidget {
 
     void createAndAddOutput(const uint posY, const uint paramId) {
         addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * posY), module, paramId));
+    }
+
+    void createAndAddScrews() {
+        if (box.size.x > RACK_GRID_WIDTH * 3) {
+            addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
+            addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+            addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+            addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        } else {
+            addChild(createWidget<ScrewBlack>(Vec(0, 0)));
+            addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
+            addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+            addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        }
     }
 
     void drawBackground(NVGcontext* const vg) {
@@ -84,7 +83,16 @@ struct ModuleWidgetWithSideScrews : ModuleWidget {
         nvgFillColor(vg, color::WHITE);
         nvgText(vg, middleX, y + 16, text, nullptr);
     }
+
+    void setupTextLines(NVGcontext* const vg) {
+        nvgBeginPath(vg);
+        nvgRect(vg, startX_Out - 2.5f, startY - 2.0f, padding, padding);
+        nvgFontFaceId(vg, 0);
+        nvgFontSize(vg, 11);
+        nvgTextAlign(vg, NVG_ALIGN_CENTER);
+    }
 };
 
+typedef ModuleWidgetWithSideScrews<0> ModuleWidgetWith3HP;
 typedef ModuleWidgetWithSideScrews<81> ModuleWidgetWith8HP;
 typedef ModuleWidgetWithSideScrews<96> ModuleWidgetWith9HP;

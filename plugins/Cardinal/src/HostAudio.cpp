@@ -213,7 +213,8 @@ struct HostAudioWidget : ModuleWidgetWith8HP {
     {
         setModule(m);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostAudio.svg")));
-        setSideScrews();
+
+        createAndAddScrews();
 
         for (uint i=0; i<numIO; ++i)
         {

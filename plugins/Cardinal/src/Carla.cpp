@@ -453,7 +453,8 @@ struct CarlaModuleWidget : ModuleWidgetWith9HP, IdleCallback {
     {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Carla.svg")));
-        setSideScrews();
+
+        createAndAddScrews();
 
         for (uint i=0; i<CarlaModule::NUM_INPUTS; ++i)
             createAndAddInput(i);
