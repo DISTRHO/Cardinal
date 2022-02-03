@@ -16,6 +16,7 @@
  */
 
 #include "plugincontext.hpp"
+#include "Expander.hpp"
 #include "ModuleWidgets.hpp"
 
 #include "CarlaNativePlugin.h"
@@ -369,8 +370,25 @@ struct CarlaModule : Module {
                 }
             }
 
+            NativeMidiEvent* midiEvents;
+            uint midiEventCount;
+
+            if (CardinalExpanderFromCVToCarlaMIDI* const midiInExpander = leftExpander.module != nullptr && leftExpander.module->model == modelExpanderInputMIDI
+                                                                        ? static_cast<CardinalExpanderFromCVToCarlaMIDI*>(leftExpander.module)
+                                                                        : nullptr)
+            {
+                midiEvents = midiInExpander->midiEvents;
+                midiEventCount = midiInExpander->midiEventCount;
+                midiInExpander->midiEventCount = midiInExpander->frame = 0;
+            }
+            else
+            {
+                midiEvents = nullptr;
+                midiEventCount = 0;
+            }
+
             audioDataFill = 0;
-            fCarlaPluginDescriptor->process(fCarlaPluginHandle, dataInPtr, dataOutPtr, BUFFER_SIZE, nullptr, 0);
+            fCarlaPluginDescriptor->process(fCarlaPluginHandle, dataInPtr, dataOutPtr, BUFFER_SIZE, midiEvents, midiEventCount);
         }
     }
 

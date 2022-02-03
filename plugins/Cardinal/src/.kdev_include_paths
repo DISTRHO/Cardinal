@@ -1,0 +1,14 @@
+../../../include
+../../../carla/source/backend
+../../../carla/source/includes
+../../../carla/source/modules
+../../../carla/source/utils
+../../../dpf
+../../../dpf/distrho
+../../../dpf/dgl/src/nanovg
+../../../src/Rack/include
+../../../src/Rack/dep/include
+../../../src/Rack/dep/filesystem/include
+../../../src/Rack/dep/glfw/include
+../../../src/Rack/dep/nanosvg/src
+../../../src/Rack/dep/pffft
