@@ -463,6 +463,7 @@ static intptr_t host_dispatcher(const NativeHostHandle handle, const NativeHostD
 #ifndef HEADLESS
 struct CarlaModuleWidget : ModuleWidgetWith9HP, IdleCallback {
     CarlaModule* const module;
+    bool hasLeftSideExpander = false;
     bool idleCallbackActive = false;
     bool visible = false;
 
@@ -578,6 +579,26 @@ struct CarlaModuleWidget : ModuleWidgetWith9HP, IdleCallback {
     {
         drawBackground(args.vg);
         drawOutputJacksArea(args.vg, CarlaModule::NUM_INPUTS);
+
+        if (hasLeftSideExpander)
+        {
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, 1, 90 - 19, 18, 49 * 6 - 4);
+            nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 18, 0, nvgRGB(0xd0, 0xd0, 0xd0), nvgRGBA(0xd0, 0xd0, 0xd0, 0)));
+            nvgFill(args.vg);
+
+            for (int i=1; i<6; ++i)
+            {
+                const float y = 90 + 49 * i - 23;
+                const int col1 = 0x18 + static_cast<int>((y / box.size.y) * (0x21 - 0x18) + 0.5f);
+                const int col2 = 0x19 + static_cast<int>((y / box.size.y) * (0x22 - 0x19) + 0.5f);
+                nvgBeginPath(args.vg);
+                nvgRect(args.vg, 1, y, 18, 4);
+                nvgFillColor(args.vg, nvgRGB(col1, col2, col2));
+                nvgFill(args.vg);
+            }
+        }
+
         setupTextLines(args.vg);
 
         drawTextLine(args.vg, 0, "Audio 1");
@@ -592,6 +613,15 @@ struct CarlaModuleWidget : ModuleWidgetWith9HP, IdleCallback {
         drawTextLine(args.vg, 9, "CV 8");
 
         ModuleWidgetWith9HP::draw(args);
+    }
+
+    void step() override
+    {
+        hasLeftSideExpander = module != nullptr
+                            && module->leftExpander.module != nullptr
+                            && module->leftExpander.module->model == modelExpanderInputMIDI;
+
+        ModuleWidgetWith9HP::step();
     }
 
     void showUI()

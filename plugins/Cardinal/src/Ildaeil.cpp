@@ -30,6 +30,7 @@
 
 #ifndef HEADLESS
 # include "ImGuiWidget.hpp"
+# include "ModuleWidgets.hpp"
 # include "extra/FileBrowserDialog.hpp"
 # include "extra/ScopedPointer.hpp"
 # include "extra/Thread.hpp"
@@ -1519,7 +1520,8 @@ static void projectLoadedFromDSP(void* const ui)
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct IldaeilModuleWidget : ModuleWidget {
+struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<> {
+    bool hasLeftSideExpander = false;
     IldaeilWidget* ildaeilWidget = nullptr;
 
     IldaeilModuleWidget(IldaeilModule* const module)
@@ -1548,13 +1550,37 @@ struct IldaeilModuleWidget : ModuleWidget {
 
     void draw(const DrawArgs& args) override
     {
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
-                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
-        nvgFill(args.vg);
+        drawBackground(args.vg);
 
-        ModuleWidget::draw(args);
+        if (hasLeftSideExpander)
+        {
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, 1, 90 - 19, 18, 49 * 6 - 4);
+            nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 18, 0, nvgRGB(0xd0, 0xd0, 0xd0), nvgRGBA(0xd0, 0xd0, 0xd0, 0)));
+            nvgFill(args.vg);
+
+            for (int i=1; i<6; ++i)
+            {
+                const float y = 90 + 49 * i - 23;
+                const int col1 = 0x18 + static_cast<int>((y / box.size.y) * (0x21 - 0x18) + 0.5f);
+                const int col2 = 0x19 + static_cast<int>((y / box.size.y) * (0x22 - 0x19) + 0.5f);
+                nvgBeginPath(args.vg);
+                nvgRect(args.vg, 1, y, 18, 4);
+                nvgFillColor(args.vg, nvgRGB(col1, col2, col2));
+                nvgFill(args.vg);
+            }
+        }
+
+        ModuleWidgetWithSideScrews::draw(args);
+    }
+
+    void step() override
+    {
+        hasLeftSideExpander = module != nullptr
+                            && module->leftExpander.module != nullptr
+                            && module->leftExpander.module->model == modelExpanderInputMIDI;
+
+        ModuleWidgetWithSideScrews::step();
     }
 
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IldaeilModuleWidget)

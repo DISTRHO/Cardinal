@@ -227,19 +227,21 @@ struct CardinalExpanderForInputMIDIWidget : ModuleWidgetWithSideScrews<> {
     {
         drawBackground(args.vg);
 
-        nvgScissor(args.vg, startX, 0.0f, box.size.x - startX, box.size.y);
         nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
+
+        nvgSave(args.vg);
+        nvgIntersectScissor(args.vg, startX, 0.0f, box.size.x - startX - 1.0f, box.size.y);
 
         for (int i=0; i<CardinalExpanderForInputMIDI::NUM_INPUTS; ++i)
         {
-            const float y = startY + i* padding;
+            const float y = startY + i * padding;
 
             nvgBeginPath(args.vg);
             nvgRoundedRect(args.vg, startX, y - 19.0f, box.size.x, padding - 4.0f, 4);
             nvgFill(args.vg);
         }
 
-        nvgResetScissor(args.vg);
+        nvgRestore(args.vg);
 
         nvgBeginPath(args.vg);
         nvgRoundedRect(args.vg, 6.5f, startY - 19.0f, 3.0f, padding * 6.0f - 4.0f, 1);
