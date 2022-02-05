@@ -1553,7 +1553,10 @@ struct IldaeilNanoMeterIn : NanoMeter {
     IldaeilModule* const module;
 
     IldaeilNanoMeterIn(IldaeilModule* const m)
-        : module(m) {}
+        : module(m)
+    {
+        withBackground = false;
+    }
 
     void updateMeters() override
     {
@@ -1571,7 +1574,10 @@ struct IldaeilNanoMeterOut : NanoMeter {
     IldaeilModule* const module;
 
     IldaeilNanoMeterOut(IldaeilModule* const m)
-        : module(m) {}
+        : module(m)
+    {
+        withBackground = false;
+    }
 
     void updateMeters() override
     {
@@ -1613,12 +1619,12 @@ struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
 
         IldaeilNanoMeterIn* const meterIn = new IldaeilNanoMeterIn(module);
         meterIn->box.pos = Vec(2.0f, startY + padding * 2);
-        meterIn->box.size = Vec(RACK_GRID_WIDTH * 3 - 2.0f, box.size.y - meterIn->box.pos.y - 20.0f);
+        meterIn->box.size = Vec(RACK_GRID_WIDTH * 3 - 2.0f, box.size.y - meterIn->box.pos.y - 19.0f);
         addChild(meterIn);
 
         IldaeilNanoMeterOut* const meterOut = new IldaeilNanoMeterOut(module);
         meterOut->box.pos = Vec(box.size.x - RACK_GRID_WIDTH * 3 + 1.0f, startY + padding * 2);
-        meterOut->box.size = Vec(RACK_GRID_WIDTH * 3 - 2.0f, box.size.y - meterOut->box.pos.y - 20.0f);
+        meterOut->box.size = Vec(RACK_GRID_WIDTH * 3 - 2.0f, box.size.y - meterOut->box.pos.y - 19.0f);
         addChild(meterOut);
     }
 

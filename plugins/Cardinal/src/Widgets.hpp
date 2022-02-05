@@ -243,6 +243,7 @@ struct NanoKnob : Knob {
 
 struct NanoMeter : Widget {
     bool hasGainKnob = false;
+    bool withBackground = true;
     float gainMeterL = 0.0f;
     float gainMeterR = 0.0f;
 
@@ -255,15 +256,17 @@ struct NanoMeter : Widget {
 
         const float usableHeight = box.size.y - (hasGainKnob ? 10.0f : 0.0f);
 
-        // draw background
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg,
-                0,
-                0,
-                box.size.x,
-                usableHeight);
-        nvgFillColor(args.vg, nvgRGB(26, 26, 26));
-        nvgFill(args.vg);
+        if (withBackground)
+        {
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg,
+                    0,
+                    0,
+                    box.size.x,
+                    usableHeight);
+            nvgFillColor(args.vg, nvgRGB(26, 26, 26));
+            nvgFill(args.vg);
+        }
 
         nvgFillColor(args.vg, nvgRGBAf(0.76f, 0.11f, 0.22f, 0.5f));
         nvgStrokeColor(args.vg, nvgRGBf(0.76f, 0.11f, 0.22f));
