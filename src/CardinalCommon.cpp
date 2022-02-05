@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -190,9 +190,9 @@ void saveDialog(const std::string& path)
 #endif
 }
 
-void saveAsDialog()
-{
 #ifndef HEADLESS
+static void saveAsDialog(const bool uncompressed)
+{
     std::string dir;
     if (! APP->patch->path.empty())
         dir = system::getDirectory(APP->patch->path);
@@ -208,7 +208,22 @@ void saveAsDialog()
     FileBrowserOptions opts;
     opts.startDir = dir.c_str();
     opts.saving = ui->saving = true;
+    ui->savingUncompressed = true;
     ui->openFileBrowser(opts);
+}
+#endif
+
+void saveAsDialog()
+{
+#ifndef HEADLESS
+    saveAsDialog(false);
+#endif
+}
+
+void saveAsDialogUncompressed()
+{
+#ifndef HEADLESS
+    saveAsDialog(true);
 #endif
 }
 

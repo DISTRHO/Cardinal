@@ -111,6 +111,10 @@ struct FileButton : MenuButton {
 			patchUtils::saveAsDialog();
 		}));
 
+		menu->addChild(createMenuItem("Export uncompressed json...", "", []() {
+			patchUtils::saveAsDialogUncompressed();
+		}));
+
 #ifdef HAVE_LIBLO
 		if (patchUtils::isRemoteConnected()) {
 			menu->addChild(createMenuItem("Deploy to MOD", "F7", []() {

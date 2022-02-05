@@ -142,6 +142,7 @@ class CardinalBaseUI : public UI {
 public:
     CardinalPluginContext* const context;
     bool saving;
+    bool savingUncompressed;
 
     // for 3rd party modules
     std::function<void(char* path)> filebrowseraction;
@@ -151,6 +152,7 @@ public:
         : UI(width, height),
           context(getRackContextFromPlugin(getPluginInstancePointer())),
           saving(false),
+          savingUncompressed(false),
           filebrowseraction(),
           filebrowserhandle(nullptr)
     {

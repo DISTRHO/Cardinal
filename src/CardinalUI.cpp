@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -18,6 +18,7 @@
 #include <app/Scene.hpp>
 #include <asset.hpp>
 #include <context.hpp>
+#include <engine/Engine.hpp>
 #include <helpers.hpp>
 #include <patch.hpp>
 #include <settings.hpp>
@@ -748,11 +749,31 @@ protected:
 
         if (saving)
         {
+            const bool uncompressed = savingUncompressed;
+            savingUncompressed = false;
+
             if (rack::system::getExtension(sfilename) != ".vcv")
                 sfilename += ".vcv";
 
             try {
-                context->patch->save(sfilename);
+                if (uncompressed)
+                {
+                    context->engine->prepareSave();
+
+                    if (json_t* const rootJ = context->patch->toJson())
+                    {
+                        if (FILE* const file = std::fopen(sfilename.c_str(), "w"))
+                        {
+                            json_dumpf(rootJ, file, JSON_INDENT(2));
+                            std::fclose(file);
+                        }
+                        json_decref(rootJ);
+                    }
+                }
+                else
+                {
+                    context->patch->save(sfilename);
+                }
             }
             catch (rack::Exception& e) {
                 std::string message = rack::string::f("Could not save patch: %s", e.what());
