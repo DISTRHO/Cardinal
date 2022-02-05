@@ -75,6 +75,7 @@ struct ImGuiWidget::PrivateData {
     bool useMonospacedFont = false;
     float originalScaleFactor = 0.0f;
     float scaleFactor = 0.0f;
+    double lastFrameTime = 0.0;
 
     PrivateData()
     {
@@ -132,6 +133,32 @@ struct ImGuiWidget::PrivateData {
                                            13.0f * scaleFactor, &fc, ranges);
             io.Fonts->Build();
 #endif
+        }
+    }
+
+    void resetEverything(const bool doInit)
+    {
+        if (created)
+        {
+            ImGui::SetCurrentContext(context);
+            ImGui_ImplOpenGL2_Shutdown();
+            created = false;
+        }
+
+        fontGenerated = false;
+        originalScaleFactor = 0.0f;
+        scaleFactor = 0.0f;
+        lastFrameTime = 0.0;
+        ImGui::DestroyContext(context);
+
+        context = ImGui::CreateContext();
+        ImGui::SetCurrentContext(context);
+        setupIO();
+
+        if (doInit)
+        {
+            ImGui_ImplOpenGL2_Init();
+            created = true;
         }
     }
 
@@ -351,32 +378,17 @@ void ImGuiWidget::onSelectText(const SelectTextEvent& e)
 
 void ImGuiWidget::drawFramebuffer()
 {
-    const float scaleFactor = APP->window->pixelRatio;
+    const float scaleFactor = APP->window->pixelRatio * std::max(1.0f, APP->scene->rack->getAbsoluteZoom());
+
+    if (d_isNotEqual(imData->scaleFactor, scaleFactor))
+        imData->resetEverything(true);
 
     drawFramebufferCommon(getFramebufferSize(), scaleFactor);
 }
 
 void ImGuiWidget::drawFramebufferForBrowserPreview()
 {
-    if (imData->created)
-    {
-        ImGui::SetCurrentContext(imData->context);
-        ImGui_ImplOpenGL2_Shutdown();
-        ImGui::DestroyContext(imData->context);
-
-        imData->created = false;
-        imData->fontGenerated = false;
-        imData->originalScaleFactor = 0.0f;
-        imData->scaleFactor = 0.0f;
-    }
-
-    imData->context = ImGui::CreateContext();
-    ImGui::SetCurrentContext(imData->context);
-    setupIO();
-
-    ImGui_ImplOpenGL2_Init();
-    imData->created = true;
-
+    imData->resetEverything(true);
     drawFramebufferCommon(box.size.mult(oversample), oversample);
 }
 
@@ -422,7 +434,9 @@ void ImGuiWidget::drawFramebufferCommon(const Vec& fbSize, const float scaleFact
         imData->created = true;
     }
 
-    // TODO io.DeltaTime
+    const double time = glfwGetTime();
+    io.DeltaTime = time - imData->lastFrameTime;
+    imData->lastFrameTime = time;
 
     ImGui_ImplOpenGL2_NewFrame();
     ImGui::NewFrame();
