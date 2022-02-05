@@ -124,20 +124,27 @@ static void Cable_step(Cable* that) {
 	Output* output = &that->outputModule->outputs[that->outputId];
 	Input* input = &that->inputModule->inputs[that->inputId];
 	// Match number of polyphonic channels to output port
-	int channels = output->channels;
+	const int channels = output->channels;
 	// Copy all voltages from output to input
 	for (int c = 0; c < channels; c++) {
-		float v = output->voltages[c];
+		float v = output->cvoltages[c];
 		// Set 0V if infinite or NaN
 		if (!std::isfinite(v))
 			v = 0.f;
-		input->voltages[c] = v;
+		input->cvoltages[c] = v;
 	}
 	// Set higher channel voltages to 0
 	for (int c = channels; c < input->channels; c++) {
-		input->voltages[c] = 0.f;
+		input->cvoltages[c] = 0.f;
 	}
 	input->channels = channels;
+}
+
+
+void Port::stepCables()
+{
+    for (Cable* cable : cables)
+        Cable_step(cable);
 }
 
 
@@ -167,10 +174,13 @@ static void Engine_stepFrame(Engine* that) {
 		}
 	}
 
+	/* NOTE this is likely not needed in Cardinal, but needs testing.
+     * Leaving it as comment in case we need it bring it back
 	// Step cables
 	for (Cable* cable : internal->cables) {
 		Cable_step(cable);
 	}
+	*/
 
 	// Flip messages for each module
 	for (Module* module : internal->modules) {
@@ -202,7 +212,7 @@ static void Engine_stepFrame(Engine* that) {
 static void Port_setDisconnected(Port* that) {
 	that->channels = 0;
 	for (int c = 0; c < PORT_MAX_CHANNELS; c++) {
-		that->voltages[c] = 0.f;
+		that->cvoltages[c] = 0.f;
 	}
 }
 
@@ -242,6 +252,7 @@ static void Engine_updateConnected(Engine* that) {
 	// Disconnect ports that have no cable
 	for (Port* port : disconnectedPorts) {
 		Port_setDisconnected(port);
+		DISTRHO_SAFE_ASSERT(port->cables.empty());
 	}
 }
 
@@ -719,6 +730,8 @@ void Engine::addCable(Cable* cable) {
 	// Add the cable
 	internal->cables.push_back(cable);
 	internal->cablesCache[cable->id] = cable;
+	// Add the cable's zero-latency shortcut
+	cable->outputModule->outputs[cable->outputId].cables.push_back(cable);
 	Engine_updateConnected(this);
 	// Dispatch input port event
 	{
@@ -750,6 +763,8 @@ void Engine::removeCable_NoLock(Cable* cable) {
 	// Check that the cable is already added
 	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
 	DISTRHO_SAFE_ASSERT_RETURN(it != internal->cables.end(),);
+	// Remove the cable's zero-latency shortcut
+	cable->outputModule->outputs[cable->outputId].cables.remove(cable);
 	// Remove the cable
 	internal->cablesCache.erase(cable->id);
 	internal->cables.erase(it);
