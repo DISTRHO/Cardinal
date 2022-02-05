@@ -16,6 +16,7 @@
  */
 
 #include "plugincontext.hpp"
+#include "ModuleWidgets.hpp"
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -101,7 +102,7 @@ struct CardinalParameterPJ301MPort : PJ301MPort {
     }
 };
 
-struct HostParametersWidget : ModuleWidget {
+struct HostParametersWidget : ModuleWidgetWith9HP {
     static constexpr const float startX = 10.0f;
     static constexpr const float startY = 90.0f;
     static constexpr const float paddingH = 30.0f;
@@ -111,11 +112,7 @@ struct HostParametersWidget : ModuleWidget {
     {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostParameters.svg")));
-
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        createAndAddScrews();
 
         for (int i=0; i<24; ++i)
         {
@@ -127,11 +124,7 @@ struct HostParametersWidget : ModuleWidget {
 
     void draw(const DrawArgs& args) override
     {
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
-                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
-        nvgFill(args.vg);
+        drawBackground(args.vg);
 
         nvgFontFaceId(args.vg, 0);
         nvgFontSize(args.vg, 14);
@@ -156,7 +149,7 @@ struct HostParametersWidget : ModuleWidget {
             nvgText(args.vg, x + 4.0f, y - 4.0f, text, nullptr);
         }
 
-        ModuleWidget::draw(args);
+        ModuleWidgetWith9HP::draw(args);
     }
 };
 #else

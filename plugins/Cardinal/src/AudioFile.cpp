@@ -469,8 +469,16 @@ struct AudioFileListWidget : ImGuiWidget {
     }
 };
 
-struct AudioFileWidget : ModuleWidgetWithSideScrews<> {
-    static constexpr const float padding = 29.0f;
+struct AudioFileWidget : ModuleWidgetWithSideScrews<23> {
+    static constexpr const float previewBoxHeight = 80.0f;
+    static constexpr const float previewBoxBottom = 20.0f;
+    static constexpr const float previewBoxRect[] = {8.0f,
+                                                     380.0f - previewBoxHeight - previewBoxBottom,
+                                                     15.0f * 23 - 16.0f,
+                                                     previewBoxHeight};
+    static constexpr const float startY_list = startY - 2.0f;
+    static constexpr const float fileListHeight = 380.0f - startY_list - previewBoxHeight - previewBoxBottom * 1.5f;
+    static constexpr const float startY_preview = startY_list + fileListHeight;
 
     CarlaInternalPluginModule* const module;
     bool idleCallbackActive = false;
@@ -483,21 +491,19 @@ struct AudioFileWidget : ModuleWidgetWithSideScrews<> {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/AudioFile.svg")));
 
-        createAndAddScrews();
+        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
+        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 4 * RACK_GRID_WIDTH, 0)));
+        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-        addOutput(createOutput<PJ301MPort>(Vec(box.size.x - RACK_GRID_WIDTH * 5/2 - padding,
-                                               RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding), module, 0));
-
-        addOutput(createOutput<PJ301MPort>(Vec(box.size.x - RACK_GRID_WIDTH * 5/2,
-                                               RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding), module, 1));
+        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY_list * 0.5f - padding + 2.0f), module, 0));
+        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY_list * 0.5f + 2.0f), module, 1));
 
         if (m != nullptr)
         {
             AudioFileListWidget* const listw = new AudioFileListWidget(m);
-            listw->box.pos.x = 0;
-            listw->box.pos.y = 71.0f;
-            listw->box.size.x = box.size.x;
-            listw->box.size.y = box.size.y / 2 - 20;
+            listw->box.pos = Vec(0, startY_list);
+            listw->box.size = Vec(box.size.x, fileListHeight);
             addChild(listw);
         }
     }
@@ -507,13 +513,12 @@ struct AudioFileWidget : ModuleWidgetWithSideScrews<> {
         if (layer != 1)
             return ModuleWidget::drawLayer(args, layer);
 
-        const Rect audioPreviewPos = Rect(8, box.size.y - 51 - 80, box.size.x - 16, 80);
         const float alpha = 1.0f - (0.5f - settings::rackBrightness * 0.5f);
         char textInfo[0xff];
 
         if (module != nullptr && module->audioInfo.channels != 0)
         {
-            const float audioPreviewBarHeight = audioPreviewPos.size.y - 20;
+            const float audioPreviewBarHeight = previewBoxRect[3] - 20.0f;
             const size_t position = (module->audioInfo.position * 0.01f) * ARRAY_SIZE(module->audioInfo.preview);
 
             nvgFillColor(args.vg, nvgRGBAf(0.839f, 0.459f, 0.086f, alpha));
@@ -522,14 +527,13 @@ struct AudioFileWidget : ModuleWidgetWithSideScrews<> {
             {
                 const float value = module->audioInfo.preview[i];
                 const float height = std::max(0.01f, value * audioPreviewBarHeight);
-                const float y = audioPreviewPos.pos.y + audioPreviewBarHeight - height;
+                const float y = previewBoxRect[1] + audioPreviewBarHeight - height;
 
                 if (position == i)
                     nvgFillColor(args.vg, nvgRGBAf(1.0f, 1.0f, 1.0f, alpha));
 
                 nvgBeginPath(args.vg);
-                nvgRect(args.vg,
-                        audioPreviewPos.pos.x + 3 + 3 * i, y + 2, 2, height);
+                nvgRect(args.vg, previewBoxRect[0] + 3 + 3 * i, y + 2, 2, height);
                 nvgFill(args.vg);
             }
 
@@ -549,44 +553,35 @@ struct AudioFileWidget : ModuleWidgetWithSideScrews<> {
         nvgFontFaceId(args.vg, 0);
         nvgFontSize(args.vg, 13);
         nvgTextAlign(args.vg, NVG_ALIGN_LEFT);
-
-        nvgText(args.vg,
-                audioPreviewPos.pos.x + 4,
-                audioPreviewPos.pos.y + audioPreviewPos.size.y - 6,
-                textInfo, nullptr);
+        nvgText(args.vg, previewBoxRect[0] + 4, previewBoxRect[1] + previewBoxRect[3] - 6, textInfo, nullptr);
     }
 
     void draw(const DrawArgs& args) override
     {
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
-                                                nvgRGB(0x18, 0x19, 0x19),
-                                                nvgRGB(0x21, 0x22, 0x22)));
-        nvgFill(args.vg);
-
-        const Rect audioPreviewPos = Rect(8, box.size.y - 51 - 80, box.size.x - 16, 80);
-
-        nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg,
-                       audioPreviewPos.pos.x, audioPreviewPos.pos.y,
-                       audioPreviewPos.size.x, audioPreviewPos.size.y, 4.0f);
-        nvgFillColor(args.vg, nvgRGB(0x75, 0x17, 0x00));
-        nvgFill(args.vg);
-        nvgStrokeWidth(args.vg, 2.0f);
-        nvgStrokeColor(args.vg, nvgRGB(0xd6, 0x75, 0x16));
-        nvgStroke(args.vg);
-
-        nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg,
-                       box.size.x - RACK_GRID_WIDTH * 5/2 - padding - 3.0f,
-                       RACK_GRID_HEIGHT - RACK_GRID_WIDTH - padding - 2.0f,
-                       padding * CarlaInternalPluginModule::NUM_OUTPUTS,
-                       padding, 4);
-        nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
-        nvgFill(args.vg);
+        drawBackground(args.vg);
+        drawPreviewBox(args.vg);
+        drawOutputJacksArea(args.vg);
 
         ModuleWidget::draw(args);
+    }
+
+    void drawPreviewBox(NVGcontext* const vg)
+    {
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, previewBoxRect[0], previewBoxRect[1], previewBoxRect[2], previewBoxRect[3], 4.0f);
+        nvgFillColor(vg, nvgRGB(0x75, 0x17, 0x00));
+        nvgFill(vg);
+        nvgStrokeWidth(vg, 2.0f);
+        nvgStrokeColor(vg, nvgRGB(0xd6, 0x75, 0x16));
+        nvgStroke(vg);
+    }
+
+    void drawOutputJacksArea(NVGcontext* const vg)
+    {
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, startX_Out - 2.5f, startY_list * 0.5f - padding, padding, padding * 2, 4);
+        nvgFillColor(vg, nvgRGB(0xd0, 0xd0, 0xd0));
+        nvgFill(vg);
     }
 
     void appendContextMenu(ui::Menu* const menu) override

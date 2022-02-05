@@ -206,7 +206,7 @@ struct CardinalExpanderForInputMIDI : CardinalExpanderFromCVToCarlaMIDI {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct CardinalExpanderForInputMIDIWidget : ModuleWidgetWithSideScrews<> {
+struct CardinalExpanderForInputMIDIWidget : ModuleWidgetWith3HP {
     static constexpr const float startX = 14.0f;
     static constexpr const float startY = 90.0f;
     static constexpr const float padding = 49.0f;
