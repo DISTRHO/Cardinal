@@ -224,6 +224,8 @@ struct HostAudioWidget : ModuleWidgetWith8HP {
 
         if (numIO == 2)
         {
+            // FIXME
+            const float middleX = box.size.x * 0.5f;
             addParam(createParamCentered<NanoKnob>(Vec(middleX, 310.0f), m, 0));
 
             HostAudioNanoMeter<numIO>* const meter = new HostAudioNanoMeter<numIO>(m);

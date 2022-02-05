@@ -1520,7 +1520,7 @@ static void projectLoadedFromDSP(void* const ui)
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<> {
+struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
     bool hasLeftSideExpander = false;
     IldaeilWidget* ildaeilWidget = nullptr;
 
@@ -1528,29 +1528,27 @@ struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<> {
     {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Ildaeil.svg")));
+        createAndAddScrews();
 
         if (module == nullptr || module->pcontext != nullptr)
         {
             ildaeilWidget = new IldaeilWidget(module);
-            ildaeilWidget->box.pos = Vec(2 * RACK_GRID_WIDTH, 0);
-            ildaeilWidget->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH, box.size.y);
+            ildaeilWidget->box.pos = Vec(3 * RACK_GRID_WIDTH, 0);
+            ildaeilWidget->box.size = Vec(box.size.x - 6 * RACK_GRID_WIDTH, box.size.y);
             addChild(ildaeilWidget);
         }
 
-        addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        for (uint i=0; i<IldaeilModule::NUM_INPUTS; ++i)
+            createAndAddInput(i);
 
-        addInput(createInput<PJ301MPort>(Vec(3, 54), module, IldaeilModule::INPUT1));
-        addInput(createInput<PJ301MPort>(Vec(3, 54 + 30), module, IldaeilModule::INPUT2));
-        addOutput(createOutput<PJ301MPort>(Vec(3, 54 + 60), module, IldaeilModule::OUTPUT1));
-        addOutput(createOutput<PJ301MPort>(Vec(3, 54 + 90), module, IldaeilModule::OUTPUT2));
+        for (uint i=0; i<IldaeilModule::NUM_OUTPUTS; ++i)
+            createAndAddOutput(i);
     }
 
     void draw(const DrawArgs& args) override
     {
         drawBackground(args.vg);
+        drawOutputJacksArea(args.vg, 2);
 
         if (hasLeftSideExpander)
         {

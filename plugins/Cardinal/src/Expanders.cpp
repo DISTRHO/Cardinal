@@ -53,11 +53,11 @@ struct CardinalExpanderForInputMIDI : CardinalExpanderFromCVToCarlaMIDI {
     CardinalExpanderForInputMIDI() {
         static_assert(NUM_INPUTS == kNumInputs, "Invalid input configuration");
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-        configInput(PITCH_INPUT, "Pitch (1V/oct)");
+        configInput(PITCH_INPUT, "1V/octave pitch");
         configInput(GATE_INPUT, "Gate");
         configInput(VEL_INPUT, "Velocity");
         configInput(AFT_INPUT, "Aftertouch");
-        configInput(PW_INPUT, "Pitch wheel");
+        configInput(PW_INPUT, "Pitchbend");
         configInput(MW_INPUT, "Mod wheel");
         onReset();
     }
@@ -258,7 +258,7 @@ struct CardinalExpanderForInputMIDIWidget : ModuleWidgetWithSideScrews<> {
         nvgText(args.vg, box.size.x * 0.666f, startY + padding * 1 - 4.0f, "Gate", nullptr);
         nvgText(args.vg, box.size.x * 0.666f, startY + padding * 2 - 4.0f, "Vel", nullptr);
         nvgText(args.vg, box.size.x * 0.666f, startY + padding * 3 - 4.0f, "Aft", nullptr);
-        nvgText(args.vg, box.size.x * 0.666f, startY + padding * 4 - 4.0f, "PW", nullptr);
+        nvgText(args.vg, box.size.x * 0.666f, startY + padding * 4 - 4.0f, "Pb", nullptr);
         nvgText(args.vg, box.size.x * 0.666f, startY + padding * 5 - 4.0f, "MW", nullptr);
 
         ModuleWidgetWithSideScrews::draw(args);

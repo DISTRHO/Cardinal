@@ -25,12 +25,13 @@
 
 using namespace rack;
 
-template<int startX_Out = 0>
+template<int hp = 0>
 struct ModuleWidgetWithSideScrews : ModuleWidget {
-    static constexpr const float startX_In = 14.0f;
+    static constexpr const float startX_In = 10.65f;
+    static constexpr const float startX_Out = (hp - 3) * 15 + startX_In;
     static constexpr const float startY = 74.0f;
     static constexpr const float padding = 29.0f;
-    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f + padding * 0.35f;
+    static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f /*+ padding * 0.35f*/;
 
     void createAndAddInput(const uint paramId) {
         createAndAddInput(paramId, paramId);
@@ -49,7 +50,7 @@ struct ModuleWidgetWithSideScrews : ModuleWidget {
     }
 
     void createAndAddScrews() {
-        if (box.size.x > RACK_GRID_WIDTH * 3) {
+        if (hp > 3) {
             addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
             addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
             addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
@@ -81,18 +82,16 @@ struct ModuleWidgetWithSideScrews : ModuleWidget {
         const float y = startY + posY * padding;
         nvgBeginPath(vg);
         nvgFillColor(vg, color::WHITE);
-        nvgText(vg, middleX, y + 16, text, nullptr);
+        nvgText(vg, box.size.x * 0.5f, y + 16, text, nullptr);
     }
 
     void setupTextLines(NVGcontext* const vg) {
-        nvgBeginPath(vg);
-        nvgRect(vg, startX_Out - 2.5f, startY - 2.0f, padding, padding);
         nvgFontFaceId(vg, 0);
         nvgFontSize(vg, 11);
         nvgTextAlign(vg, NVG_ALIGN_CENTER);
     }
 };
 
-typedef ModuleWidgetWithSideScrews<0> ModuleWidgetWith3HP;
-typedef ModuleWidgetWithSideScrews<81> ModuleWidgetWith8HP;
-typedef ModuleWidgetWithSideScrews<96> ModuleWidgetWith9HP;
+typedef ModuleWidgetWithSideScrews<3> ModuleWidgetWith3HP;
+typedef ModuleWidgetWithSideScrews<8> ModuleWidgetWith8HP;
+typedef ModuleWidgetWithSideScrews<9> ModuleWidgetWith9HP;
