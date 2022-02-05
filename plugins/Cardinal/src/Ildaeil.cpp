@@ -148,6 +148,13 @@ struct IldaeilModule : Module {
     unsigned audioDataFill = 0;
     int64_t lastBlockFrame = -1;
 
+    volatile bool resetMeterIn = true;
+    volatile bool resetMeterOut = true;
+    float meterInL = 0.0f;
+    float meterInR = 0.0f;
+    float meterOutL = 0.0f;
+    float meterOutR = 0.0f;
+
     IldaeilModule()
         : pcontext(static_cast<CardinalPluginContext*>(APP))
     {
@@ -418,14 +425,36 @@ struct IldaeilModule : Module {
             audioDataFill = 0;
             float* ins[2] = { audioDataIn1, audioDataIn2 };
             float* outs[2] = { audioDataOut1, audioDataOut2 };
+
+            if (resetMeterIn)
+                meterInL = meterInR = 0.0f;
+
+            meterInL = std::max(meterInL, d_findMaxNormalizedFloat(audioDataIn1, BUFFER_SIZE));
+            meterInR = std::max(meterInR, d_findMaxNormalizedFloat(audioDataIn2, BUFFER_SIZE));
+
             fCarlaPluginDescriptor->process(fCarlaPluginHandle, ins, outs, BUFFER_SIZE, midiEvents, midiEventCount);
+
+            if (resetMeterOut)
+                meterOutL = meterOutR = 0.0f;
+
+            meterOutL = std::max(meterOutL, d_findMaxNormalizedFloat(audioDataOut1, BUFFER_SIZE));
+            meterOutR = std::max(meterOutR, d_findMaxNormalizedFloat(audioDataOut2, BUFFER_SIZE));
+
+            resetMeterIn = resetMeterOut = false;
         }
+    }
+
+    void onReset() override
+    {
+        resetMeterIn = resetMeterOut = true;
     }
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override
     {
         if (fCarlaPluginHandle == nullptr)
             return;
+
+        resetMeterIn = resetMeterOut = true;
 
         fCarlaPluginDescriptor->deactivate(fCarlaPluginHandle);
         fCarlaPluginDescriptor->dispatcher(fCarlaPluginHandle, NATIVE_PLUGIN_OPCODE_SAMPLE_RATE_CHANGED,
@@ -1520,6 +1549,44 @@ static void projectLoadedFromDSP(void* const ui)
 
 // --------------------------------------------------------------------------------------------------------------------
 
+struct IldaeilNanoMeterIn : NanoMeter {
+    IldaeilModule* const module;
+
+    IldaeilNanoMeterIn(IldaeilModule* const m)
+        : module(m) {}
+
+    void updateMeters() override
+    {
+        if (module == nullptr || module->resetMeterIn)
+            return;
+
+        // Only fetch new values once DSP side is updated
+        gainMeterL = module->meterInL;
+        gainMeterR = module->meterInR;
+        module->resetMeterIn = true;
+    }
+};
+
+struct IldaeilNanoMeterOut : NanoMeter {
+    IldaeilModule* const module;
+
+    IldaeilNanoMeterOut(IldaeilModule* const m)
+        : module(m) {}
+
+    void updateMeters() override
+    {
+        if (module == nullptr || module->resetMeterOut)
+            return;
+
+        // Only fetch new values once DSP side is updated
+        gainMeterL = module->meterOutL;
+        gainMeterR = module->meterOutR;
+        module->resetMeterOut = true;
+    }
+};
+
+// --------------------------------------------------------------------------------------------------------------------
+
 struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
     bool hasLeftSideExpander = false;
     IldaeilWidget* ildaeilWidget = nullptr;
@@ -1543,6 +1610,16 @@ struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
 
         for (uint i=0; i<IldaeilModule::NUM_OUTPUTS; ++i)
             createAndAddOutput(i);
+
+        IldaeilNanoMeterIn* const meterIn = new IldaeilNanoMeterIn(module);
+        meterIn->box.pos = Vec(2.0f, startY + padding * 2);
+        meterIn->box.size = Vec(RACK_GRID_WIDTH * 3 - 2.0f, box.size.y - meterIn->box.pos.y - 20.0f);
+        addChild(meterIn);
+
+        IldaeilNanoMeterOut* const meterOut = new IldaeilNanoMeterOut(module);
+        meterOut->box.pos = Vec(box.size.x - RACK_GRID_WIDTH * 3 + 1.0f, startY + padding * 2);
+        meterOut->box.size = Vec(RACK_GRID_WIDTH * 3 - 2.0f, box.size.y - meterOut->box.pos.y - 20.0f);
+        addChild(meterOut);
     }
 
     void draw(const DrawArgs& args) override
@@ -1569,7 +1646,7 @@ struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
             }
         }
 
-        ModuleWidgetWithSideScrews::draw(args);
+        ModuleWidgetWithSideScrews<26>::draw(args);
     }
 
     void step() override
@@ -1578,7 +1655,7 @@ struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
                             && module->leftExpander.module != nullptr
                             && module->leftExpander.module->model == modelExpanderInputMIDI;
 
-        ModuleWidgetWithSideScrews::step();
+        ModuleWidgetWithSideScrews<26>::step();
     }
 
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IldaeilModuleWidget)

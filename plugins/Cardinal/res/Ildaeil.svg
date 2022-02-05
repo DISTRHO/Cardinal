@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="131.44501mm"
+   width="132.08mm"
    height="128.5mm"
-   viewBox="0 0 131.44501 128.5"
+   viewBox="0 0 132.08 128.5"
    version="1.1"
    id="svg4620"
    inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
@@ -38,8 +38,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4142136"
-     inkscape:cx="260.22565"
-     inkscape:cy="198.9489"
+     inkscape:cx="211.24317"
+     inkscape:cy="346.0322"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -59,6 +59,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -70,7 +71,7 @@
     <g
        style="fill-rule:evenodd"
        id="g5299"
-       transform="matrix(6.342689,0,0,6.342689,1.7430866,175.6457)">
+       transform="matrix(6.342689,0,0,6.342689,4.2887574,175.6457)">
       <g
          transform="translate(-1.6191379e-5,-0.08553947)"
          id="Layer_x0020_1"
@@ -93,6 +94,55 @@
            cx="0.525226"
            class="fil0 str1" />
       </g>
+    </g>
+    <g
+       aria-label="일"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.99722242px;line-height:1.25;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#808a8a;fill-opacity:1;stroke:none;stroke-width:0.26458299"
+       id="text845"
+       transform="translate(0,0.52916667)">
+      <path
+         d="M 9.6740487,183.71741 H 9.1822765 v 2.75872 h 0.4917722 z m -3.8142334,1.39135 c 0,-0.46778 0.3898194,-0.79763 0.9115778,-0.79763 0.5277556,0 0.9115778,0.32985 0.9115778,0.79763 0,0.46179 -0.3838222,0.79164 -0.9115778,0.79164 -0.5217584,0 -0.9115778,-0.32985 -0.9115778,-0.79164 z m 2.3029334,0 c 0,-0.71367 -0.5877278,-1.19944 -1.3913556,-1.19944 -0.8036278,0 -1.3853584,0.48577 -1.3853584,1.19944 0,0.70768 0.5817306,1.18745 1.3853584,1.18745 0.8036278,0 1.3913556,-0.47977 1.3913556,-1.18745 z m -1.4753167,3.52637 v -0.59372 h 2.9866167 v -1.3014 H 6.1896625 v 0.38982 h 2.9986112 v 0.54574 H 6.2016569 v 1.34938 h 3.6523085 v -0.38982 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.99722242px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#808a8a;fill-opacity:1;stroke-width:0.26458299"
+         id="path867"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       style="fill-rule:evenodd"
+       id="g5299-9"
+       transform="matrix(6.342689,0,0,6.342689,121.12801,175.64549)">
+      <g
+         transform="translate(-1.6191379e-5,-0.08553947)"
+         id="Layer_x0020_1-0"
+         inkscape:label="Layer 1"
+         inkscape:groupmode="layer">
+        <metadata
+           id="CorelCorpID_0Corel-Layer-9" />
+        <circle
+           style="fill:none;stroke:#ffffff;stroke-width:0.0966867;stroke-opacity:1"
+           id="circle10-1"
+           r="0.15916"
+           cy="0.61075097"
+           cx="0.525226"
+           class="fil0 str0" />
+        <circle
+           style="fill:none;stroke:#ffffff;stroke-width:0.193345;stroke-opacity:1"
+           id="circle12-7"
+           r="0.42853901"
+           cy="0.61075097"
+           cx="0.525226"
+           class="fil0 str1" />
+      </g>
+    </g>
+    <g
+       aria-label="일"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.99722242px;line-height:1.25;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#808a8a;fill-opacity:1;stroke:none;stroke-width:0.26458299"
+       id="text845-7"
+       transform="translate(116.83997,0.52905)">
+      <path
+         d="M 9.6740487,183.71741 H 9.1822765 v 2.75872 h 0.4917722 z m -3.8142334,1.39135 c 0,-0.46778 0.3898194,-0.79763 0.9115778,-0.79763 0.5277556,0 0.9115778,0.32985 0.9115778,0.79763 0,0.46179 -0.3838222,0.79164 -0.9115778,0.79164 -0.5217584,0 -0.9115778,-0.32985 -0.9115778,-0.79164 z m 2.3029334,0 c 0,-0.71367 -0.5877278,-1.19944 -1.3913556,-1.19944 -0.8036278,0 -1.3853584,0.48577 -1.3853584,1.19944 0,0.70768 0.5817306,1.18745 1.3853584,1.18745 0.8036278,0 1.3913556,-0.47977 1.3913556,-1.18745 z m -1.4753167,3.52637 v -0.59372 h 2.9866167 v -1.3014 H 6.1896625 v 0.38982 h 2.9986112 v 0.54574 H 6.2016569 v 1.34938 h 3.6523085 v -0.38982 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.99722242px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#808a8a;fill-opacity:1;stroke-width:0.26458299"
+         id="path867-1"
+         inkscape:connector-curvature="0" />
     </g>
   </g>
 </svg>
