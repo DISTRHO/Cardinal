@@ -73,6 +73,7 @@ struct Engine::Internal {
 	double blockTime = 0.0;
 	int blockFrames = 0;
 
+#ifndef HEADLESS
 	// Meter
 	int meterCount = 0;
 	double meterTotal = 0.0;
@@ -80,6 +81,7 @@ struct Engine::Internal {
 	double meterLastTime = -INFINITY;
 	double meterLastAverage = 0.0;
 	double meterLastMax = 0.0;
+#endif
 
 	// Parameter smoothing
 	Module* smoothModule = NULL;
@@ -306,8 +308,10 @@ void Engine::clear_NoLock() {
 
 
 void Engine::stepBlock(int frames) {
+#ifndef HEADLESS
 	// Start timer before locking
 	double startTime = system::getTime();
+#endif
 
 	SharedLock<SharedMutex> lock(internal->mutex);
 	// Configure thread
@@ -330,6 +334,7 @@ void Engine::stepBlock(int frames) {
 
 	internal->block++;
 
+#ifndef HEADLESS
 	// Stop timer
 	double endTime = system::getTime();
 	double meter = (endTime - startTime) / (frames * internal->sampleTime);
@@ -347,6 +352,7 @@ void Engine::stepBlock(int frames) {
 		internal->meterTotal = 0.0;
 		internal->meterMax = 0.0;
 	}
+#endif
 }
 
 
@@ -434,12 +440,20 @@ double Engine::getBlockDuration() {
 
 
 double Engine::getMeterAverage() {
+#ifndef HEADLESS
 	return internal->meterLastAverage;
+#else
+	return 0.0;
+#endif
 }
 
 
 double Engine::getMeterMax() {
+#ifndef HEADLESS
 	return internal->meterLastMax;
+#else
+	return 0.0;
+#endif
 }
 
 
