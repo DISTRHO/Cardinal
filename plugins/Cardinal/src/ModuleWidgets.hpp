@@ -29,7 +29,7 @@ template<int hp>
 struct ModuleWidgetWithSideScrews : ModuleWidget {
     static constexpr const float startX_In = 10.65f;
     static constexpr const float startX_Out = (hp - 3) * 15 + startX_In;
-    static constexpr const float startY = 73.0f; // note out bg box has 2px extra
+    static constexpr const float startY = 73.0f; // note: out bg box has 2px extra
     static constexpr const float padding = 29.0f;
     static constexpr const float middleX = startX_In + (startX_Out - startX_In) * 0.5f /*+ padding * 0.35f*/;
 

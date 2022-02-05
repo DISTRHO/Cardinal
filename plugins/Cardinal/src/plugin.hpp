@@ -44,3 +44,33 @@ extern Model* modelHostTime;
 extern Model* modelIldaeil;
 extern Model* modelMPV;
 extern Model* modelTextEditor;
+
+/*
+ * Find the highest absolute and normalized value within a float array.
+ */
+static inline
+float d_findMaxNormalizedFloat(const float floats[], const std::size_t count)
+{
+    DISTRHO_SAFE_ASSERT_RETURN(floats != nullptr, 0.0f);
+    DISTRHO_SAFE_ASSERT_RETURN(count > 0, 0.0f);
+
+    static const float kEmptyFloats[8192] = {};
+
+    if (count <= 8192 && std::memcmp(floats, kEmptyFloats, count) == 0)
+        return 0.0f;
+
+    float tmp, maxf2 = std::abs(floats[0]);
+
+    for (std::size_t i=1; i<count; ++i)
+    {
+        tmp = std::abs(*floats++);
+
+        if (tmp > maxf2)
+            maxf2 = tmp;
+    }
+
+    if (maxf2 > 1.0f)
+        maxf2 = 1.0f;
+
+    return maxf2;
+}

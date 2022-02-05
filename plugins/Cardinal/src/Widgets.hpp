@@ -242,6 +242,7 @@ struct NanoKnob : Knob {
 };
 
 struct NanoMeter : Widget {
+    bool hasGainKnob = false;
     float gainMeterL = 0.0f;
     float gainMeterR = 0.0f;
 
@@ -252,7 +253,7 @@ struct NanoMeter : Widget {
         if (layer != 1)
             return;
 
-        const float usableHeight = box.size.y - 10.0f;
+        const float usableHeight = box.size.y - (hasGainKnob ? 10.0f : 0.0f);
 
         // draw background
         nvgBeginPath(args.vg);
@@ -280,6 +281,9 @@ struct NanoMeter : Widget {
         nvgRect(args.vg, box.size.x * 0.5f + 1.0f, usableHeight - heightR, box.size.x * 0.5f - 2.0f, heightR);
         nvgFill(args.vg);
         nvgStroke(args.vg);
+
+        if (! hasGainKnob)
+            return;
 
         nvgLineCap(args.vg, NVG_ROUND);
 
