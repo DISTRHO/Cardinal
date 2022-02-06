@@ -203,6 +203,11 @@ static void Engine_stepFrame(Engine* that) {
 	// Step each module
 	for (Module* module : internal->modules) {
 		module->doProcess(processArgs);
+		// FIXME remove this section below after all modules can use zero-latency cable stuff
+		for (Output& output : module->outputs) {
+			for (Cable* cable : output.cables)
+				Cable_step(cable);
+		}
 	}
 
 	++internal->frame;

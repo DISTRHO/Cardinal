@@ -124,6 +124,7 @@ struct Port {
 	/** Returns a pointer to the array of voltages beginning with firstChannel.
 	The pointer can be used for reading and writing.
 	*/
+	// TODO convert to const float* for zero-latency cable stuff and fix all plugins after
 	float* getVoltages(int firstChannel = 0) {
 		return &cvoltages[firstChannel];
 	}
