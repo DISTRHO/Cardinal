@@ -103,25 +103,25 @@ Below is a list of artwork licenses from plugins
 | cf/DejaVuSansMono.ttf                   | Bitstream-Vera   | |
 | cf/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
 | cf/VT323-Regular.ttf                    | OFL-1.1-no-RFN   | |
-| ChowDSP/*                               | GPL-3.0-or-later | |
+| ChowDSP/*                               | GPL-3.0-or-later | Same license as source code |
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
 | E-Series/*                              | Custom           | Copyright © Synthesis Technology, [used and distributed with permission](LICENSE-PERMISSIONS.md#eseries-paul-schreiber--synthtech) |
-| ExpertSleepers-Encoders/*               | MIT              | |
-| Extratone/*                             | GPL-3.0-or-later | |
+| ExpertSleepers-Encoders/*               | MIT              | [Same license as source code](https://github.com/expertsleepersltd/vcvrack-encoders/issues/3) |
+| Extratone/*                             | GPL-3.0-or-later | [Same license as source code](https://github.com/EaterOfSheep/Extratone/issues/7) |
 | FehlerFabrik/*                          | GPL-3.0-or-later | No artwork specific license provided, see [FehlerFabrik#17](https://github.com/RCameron93/FehlerFabrik/issues/17) |
-| GlueTheGiant/*                          | GPL-3.0-or-later | |
+| GlueTheGiant/*                          | GPL-3.0-or-later | Same license as source code |
 | GlueTheGiant/fonts/DSEG7-*              | OFL-1.1-RFN      | |
 | GrandeModular/*                         | CC-BY-NC-ND-4.0  | |
-| HetrickCV/*                             | CC0-1.0          | No artwork specific license provided |
+| HetrickCV/*                             | CC0-1.0          | |
 | ihtsyn/*                                | GPL-3.0-or-later | [Same license as source code](https://github.com/nysthi/nysthi/issues/379#issuecomment-1027873902) |
 | ImpromptuModular/*                      | CC-BY-NC-ND-4.0  | |
 | ImpromptuModular/res/comp/complib/*     | CC-BY-NC-4.0     | |
 | JW-Modules/*                            | BSD-3-Clause     | No artwork specific license provided |
 | JW-Modules/DejaVuSansMono.ttf           | Bitstream-Vera   | Unused in Cardinal |
 | LifeFormModular/*                       | MIT              | No artwork specific license provided |
-| LittleUtils/*                           | EUPL-1.2         | |
+| LittleUtils/*                           | EUPL-1.2         | Same license as source code |
 | LittleUtils/fonts/CooperHewitt-*.ttf    | OFL-1.1-RFN      | |
 | LittleUtils/fonts/Overpass-*.ttf        | OFL-1.1-RFN      | |
 | LittleUtils/fonts/RobotoMono-*.ttf      | Apache-2.0       | |
@@ -130,20 +130,24 @@ Below is a list of artwork licenses from plugins
 | LyraeModules/*                          | CC-BY-NC-SA-4.0  | |
 | MindMeld/*                              | CC-BY-NC-ND-4.0  | |
 | MindMeld/fonts/RobotoCondensed-*.ttf    | Apache-2.0       | |
-| Mog/*                                   | CC0-1.0          | No artwork specific license provided |
+| Mog/*                                   | CC0-1.0          | |
 | Mog/components/*                        | CC-BY-NC-4.0     | |
 | Mog/Exo2-BoldItalic.ttf                 | OFL-1.1-RFN      | |
 | mscHack/*                               | BSD-3-Clause     | No artwork specific license provided, see [mschack#108](https://github.com/mschack/VCV-Rack-Plugins/issues/108) |
 | Prism/*                                 | CC-BY-SA-4.0     | |
 | Prism/RobotoCondensed-Regular.ttf       | Apache-2.0       | |
-| Rackwindows/*                           | MIT              | |
+| Rackwindows/*                           | MIT              | [Same license as source code](https://github.com/n0jo/rackwindows/issues/15) |
 | repelzen/*                              | CC-BY-SA-4.0     | |
-| sonusmodular/*                          | GPL-3.0-or-later | No artwork specific license provided, see [sonusmodular#14](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
-| ValleyAudio/*                           | GPL-3.0-or-later | |
+| sonusmodular/*                          | GPL-3.0-or-later | [Same license as source code](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
+| ValleyAudio/*                           | GPL-3.0-or-later | [Same license as source code](https://github.com/ValleyAudio/ValleyRackFree/issues/73) |
 | ValleyAudio/din1451alt.ttf              | CC-BY-3.0-DE     | |
 | ValleyAudio/DSEG14Classic-*.ttf         | OFL-1.1-RFN      | |
 | ValleyAudio/ShareTechMono-*.ttf         | OFL-1.1-RFN      | |
-| ZetaCarinaeModules/*                    | GPL-3.0-or-later | |
+| ZetaCarinaeModules/*                    | GPL-3.0-or-later | [Same license as source code](https://github.com/mhampton/ZetaCarinaeModules/issues/8) |
+| ZZC/*                                   | CC-BY-NC-SA-4.0  | |
+| ZZC/panels/*                            | CC-BY-NC-SA-4.0  | NOTE: The ZZC Logo is Copyright (c) 2019 Sergey Ukolov and cannot be used in derivative works; Cardinal's use does not officially constitute derivative work. |
+| ZZC/fonts/DSEG/*                        | OFL-1.1-RFN      | |
+| ZZC/fonts/Nunito/*                      | OFL-1.1-RFN      | |
 
 Bellow follows a list of artwork licenses from potentially coming plugins.
 
@@ -153,7 +157,6 @@ Bellow follows a list of artwork licenses from potentially coming plugins.
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
 | Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission (TODO ask for it) |
 | Fundamental/*                           | CC-BY-NC-ND-4.0  | |
-| ZZC/*                                   | ??? | See [ZZC#89](https://github.com/zezic/ZZC/issues/89) and [ZZC#90](https://github.com/zezic/ZZC/issues/90) |
 
 ### Rack
 

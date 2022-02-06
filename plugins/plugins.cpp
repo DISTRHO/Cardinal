@@ -511,14 +511,12 @@ extern Model* modelMaude_221;
 #include "ZetaCarinaeModules/src/plugin.hpp"
 
 // ZZC
-/*
 #define DISPLAYS_H
 #define ZZC_SHARED_H
 #define ZZC_WIDGETS_H
 #define modelClock modelZZCClock
 #include "ZZC/src/ZZC.hpp"
 #undef modelClock
-*/
 
 #endif // NOPLUGINS
 
@@ -573,7 +571,7 @@ Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
-// Plugin* pluginInstance__ZZC;
+Plugin* pluginInstance__ZZC;
 #endif // NOPLUGINS
 
 namespace rack {
@@ -1872,7 +1870,6 @@ static void initStatic__ZetaCarinaeModules()
     }
 }
 
-/*
 static void initStatic__ZZC()
 {
     Plugin* p = new Plugin;
@@ -1894,7 +1891,6 @@ static void initStatic__ZZC()
 #undef modelClock
     }
 }
-*/
 #endif // NOPLUGINS
 
 void initStaticPlugins()
@@ -1941,7 +1937,7 @@ void initStaticPlugins()
     initStatic__sonusmodular();
     initStatic__ValleyAudio();
     initStatic__ZetaCarinaeModules();
-    // initStatic__ZZC();
+    initStatic__ZZC();
 #endif // NOPLUGINS
 }
 
