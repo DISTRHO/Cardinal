@@ -463,6 +463,7 @@ namespace patchUtils {
 
 
 bool connectToRemote() {
+#ifdef HAVE_LIBLO
 	rack::app::Scene::Internal* const internal = APP->scene->internal;
 
 	if (internal->oscServer == nullptr) {
@@ -478,6 +479,9 @@ bool connectToRemote() {
 	lo_address_free(addr);
 
 	return true;
+#else
+	return false;
+#endif
 }
 
 
