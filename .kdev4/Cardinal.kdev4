@@ -1,5 +1,5 @@
 [Filters]
-size=9
+size=10
 
 [Filters][0]
 inclusive=0
@@ -17,31 +17,36 @@ pattern=/plugins/Cardinal
 targets=2
 
 [Filters][3]
+inclusive=1
+pattern=/plugins/Cardinal/*
+targets=3
+
+[Filters][4]
 inclusive=0
 pattern=/carla/data
 targets=2
 
-[Filters][4]
+[Filters][5]
 inclusive=0
 pattern=/carla/source/modules/juce_*
 targets=2
 
-[Filters][5]
+[Filters][6]
 inclusive=0
 pattern=/carla/source/native-plugins/external
 targets=2
 
-[Filters][6]
+[Filters][7]
 inclusive=0
 pattern=/jucewrapper/build
 targets=2
 
-[Filters][7]
+[Filters][8]
 inclusive=0
 pattern=/jucewrapper/JUCE
 targets=2
 
-[Filters][8]
+[Filters][9]
 inclusive=0
 pattern=/lv2export
 targets=2
