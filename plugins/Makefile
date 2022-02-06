@@ -187,7 +187,7 @@ PLUGIN_FILES = plugins.cpp
 # Cardinal (built-in)
 
 PLUGIN_FILES += Cardinal/src/Blank.cpp
-PLUGIN_FILES += Cardinal/src/Expanders.cpp
+PLUGIN_FILES += Cardinal/src/ExpanderInputMIDI.cpp
 PLUGIN_FILES += Cardinal/src/glBars.cpp
 PLUGIN_FILES += Cardinal/src/HostAudio.cpp
 PLUGIN_FILES += Cardinal/src/HostCV.cpp

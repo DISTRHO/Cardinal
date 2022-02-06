@@ -635,7 +635,7 @@ struct HostMIDI : Module {
         return rootJ;
     }
 
-    void dataFromJson(json_t* rootJ) override
+    void dataFromJson(json_t* const rootJ) override
     {
         if (json_t* const smoothJ = json_object_get(rootJ, "smooth"))
             midiInput.smooth = json_boolean_value(smoothJ);
