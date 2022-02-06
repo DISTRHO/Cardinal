@@ -109,9 +109,19 @@
     {
       "slug": "ExpanderInputMIDI",
       "name": "ExpanderInputMIDI",
-      "description": "MIDI input expander for Carla Plugin Host or Ildaeil",
+      "description": "MIDI input (from CV) expander for Carla Plugin Host and Ildaeil",
       "tags": [
-        "Expander"
+        "Expander",
+        "MIDI"
+      ]
+    },
+    {
+      "slug": "ExpanderOutputMIDI",
+      "name": "ExpanderOutputMIDI",
+      "description": "MIDI output (to CV) expander for Carla Plugin Host and Ildaeil",
+      "tags": [
+        "Expander",
+        "MIDI"
       ]
     },
     {

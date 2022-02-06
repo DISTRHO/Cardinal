@@ -147,6 +147,7 @@ struct IldaeilModule : Module {
     float audioDataOut2[BUFFER_SIZE];
     unsigned audioDataFill = 0;
     int64_t lastBlockFrame = -1;
+    CardinalExpanderFromCarlaMIDIToCV* midiOutExpander = nullptr;
 
     volatile bool resetMeterIn = true;
     volatile bool resetMeterOut = true;
@@ -422,6 +423,11 @@ struct IldaeilModule : Module {
                 midiEventCount = 0;
             }
 
+            if ((midiOutExpander = rightExpander.module != nullptr && rightExpander.module->model == modelExpanderOutputMIDI
+                                 ? static_cast<CardinalExpanderFromCarlaMIDIToCV*>(rightExpander.module)
+                                 : nullptr))
+                midiOutExpander->midiEventCount = 0;
+
             audioDataFill = 0;
             float* ins[2] = { audioDataIn1, audioDataIn2 };
             float* outs[2] = { audioDataOut1, audioDataOut2 };
@@ -447,6 +453,7 @@ struct IldaeilModule : Module {
     void onReset() override
     {
         resetMeterIn = resetMeterOut = true;
+        midiOutExpander = nullptr;
     }
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override
@@ -455,6 +462,7 @@ struct IldaeilModule : Module {
             return;
 
         resetMeterIn = resetMeterOut = true;
+        midiOutExpander = nullptr;
 
         fCarlaPluginDescriptor->deactivate(fCarlaPluginHandle);
         fCarlaPluginDescriptor->dispatcher(fCarlaPluginHandle, NATIVE_PLUGIN_OPCODE_SAMPLE_RATE_CHANGED,
@@ -491,6 +499,16 @@ static const NativeTimeInfo* host_get_time_info(const NativeHostHandle handle)
 
 static bool host_write_midi_event(const NativeHostHandle handle, const NativeMidiEvent* const event)
 {
+    if (CardinalExpanderFromCarlaMIDIToCV* const expander = static_cast<IldaeilModule*>(handle)->midiOutExpander)
+    {
+        if (expander->midiEventCount == CardinalExpanderFromCarlaMIDIToCV::MAX_MIDI_EVENTS)
+            return false;
+
+        NativeMidiEvent& expanderEvent(expander->midiEvents[expander->midiEventCount++]);
+        carla_copyStruct(expanderEvent, *event);
+        return true;
+    }
+
     return false;
 }
 
@@ -1595,6 +1613,7 @@ struct IldaeilNanoMeterOut : NanoMeter {
 
 struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
     bool hasLeftSideExpander = false;
+    bool hasRightSideExpander = false;
     IldaeilWidget* ildaeilWidget = nullptr;
 
     IldaeilModuleWidget(IldaeilModule* const module)
@@ -1631,7 +1650,6 @@ struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
     void draw(const DrawArgs& args) override
     {
         drawBackground(args.vg);
-        drawOutputJacksArea(args.vg, 2);
 
         if (hasLeftSideExpander)
         {
@@ -1652,6 +1670,36 @@ struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
             }
         }
 
+        if (hasRightSideExpander)
+        {
+            // i == 0
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, box.size.x - 19, 90 - 19, 18, 49 - 4);
+            nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
+            nvgFill(args.vg);
+
+            // gradient for i > 0
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, box.size.x - 19, 90 + 49 - 23, 18, 49 * 5);
+            nvgFillPaint(args.vg, nvgLinearGradient(args.vg,
+                                                    box.size.x - 19, 0, box.size.x - 1, 0,
+                                                    nvgRGBA(0xd0, 0xd0, 0xd0, 0), nvgRGB(0xd0, 0xd0, 0xd0)));
+            nvgFill(args.vg);
+
+            for (int i=1; i<6; ++i)
+            {
+                const float y = 90 + 49 * i - 23;
+                const int col1 = 0x18 + static_cast<int>((y / box.size.y) * (0x21 - 0x18) + 0.5f);
+                const int col2 = 0x19 + static_cast<int>((y / box.size.y) * (0x22 - 0x19) + 0.5f);
+                nvgBeginPath(args.vg);
+                nvgRect(args.vg, box.size.x - 19, y, 18, 4);
+                nvgFillColor(args.vg, nvgRGB(col1, col2, col2));
+                nvgFill(args.vg);
+            }
+        }
+
+        drawOutputJacksArea(args.vg, 2);
+
         ModuleWidgetWithSideScrews<26>::draw(args);
     }
 
@@ -1660,6 +1708,10 @@ struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
         hasLeftSideExpander = module != nullptr
                             && module->leftExpander.module != nullptr
                             && module->leftExpander.module->model == modelExpanderInputMIDI;
+
+        hasRightSideExpander = module != nullptr
+                             && module->rightExpander.module != nullptr
+                             && module->rightExpander.module->model == modelExpanderOutputMIDI;
 
         ModuleWidgetWithSideScrews<26>::step();
     }

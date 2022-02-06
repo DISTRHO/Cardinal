@@ -675,6 +675,7 @@ static void initStatic__Cardinal()
     {
         p->addModel(modelCardinalBlank);
         p->addModel(modelExpanderInputMIDI);
+        p->addModel(modelExpanderOutputMIDI);
         p->addModel(modelGlBars);
         p->addModel(modelHostAudio2);
         p->addModel(modelHostAudio8);

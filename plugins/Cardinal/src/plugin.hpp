@@ -31,6 +31,7 @@ extern Model* modelAudioFile;
 extern Model* modelCarla;
 extern Model* modelCardinalBlank;
 extern Model* modelExpanderInputMIDI;
+extern Model* modelExpanderOutputMIDI;
 extern Model* modelGlBars;
 extern Model* modelHostAudio2;
 extern Model* modelHostAudio8;

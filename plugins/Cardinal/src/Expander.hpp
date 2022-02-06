@@ -29,7 +29,16 @@ struct CardinalExpander : Module {
 
 struct CardinalExpanderFromCVToCarlaMIDI : CardinalExpander<6, 0> {
     static const constexpr uint MAX_MIDI_EVENTS = 128;
-    // continuously filled up, flushed on each new block frame
+    // continuously filled up by expander, flushed on each new block frame
+    // frames are related to host block size
     uint frame, midiEventCount;
+    NativeMidiEvent midiEvents[MAX_MIDI_EVENTS];
+};
+
+struct CardinalExpanderFromCarlaMIDIToCV : CardinalExpander<0, 6> {
+    static const constexpr uint MAX_MIDI_EVENTS = 128;
+    // filled up by connector-side in bursts, must be reset on next cycle by expander
+    // frames are not related to any particular block size
+    uint midiEventCount;
     NativeMidiEvent midiEvents[MAX_MIDI_EVENTS];
 };

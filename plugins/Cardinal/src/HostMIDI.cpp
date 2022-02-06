@@ -238,7 +238,7 @@ struct HostMIDI : Module {
             outputs[GATE_OUTPUT].setChannels(channels);
             outputs[VELOCITY_OUTPUT].setChannels(channels);
             outputs[AFTERTOUCH_OUTPUT].setChannels(channels);
-            outputs[RETRIGGER_OUTPUT].setChannels(channels);
+
             for (int c = 0; c < channels; c++) {
                 outputs[PITCH_OUTPUT].setVoltage((notes[c] - 60.f) / 12.f, c);
                 outputs[GATE_OUTPUT].setVoltage(gates[c] ? 10.f : 0.f, c);

@@ -96,6 +96,7 @@ struct CarlaModule : Module {
     float* dataOutPtr[NUM_OUTPUTS];
     unsigned audioDataFill = 0;
     int64_t lastBlockFrame = -1;
+    CardinalExpanderFromCarlaMIDIToCV* midiOutExpander = nullptr;
     std::string patchStorage;
 
     CarlaModule()
@@ -387,15 +388,27 @@ struct CarlaModule : Module {
                 midiEventCount = 0;
             }
 
+            if ((midiOutExpander = rightExpander.module != nullptr && rightExpander.module->model == modelExpanderOutputMIDI
+                                 ? static_cast<CardinalExpanderFromCarlaMIDIToCV*>(rightExpander.module)
+                                 : nullptr))
+                midiOutExpander->midiEventCount = 0;
+
             audioDataFill = 0;
             fCarlaPluginDescriptor->process(fCarlaPluginHandle, dataInPtr, dataOutPtr, BUFFER_SIZE, midiEvents, midiEventCount);
         }
+    }
+
+    void onReset() override
+    {
+        midiOutExpander = nullptr;
     }
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override
     {
         if (fCarlaPluginHandle == nullptr)
             return;
+
+        midiOutExpander = nullptr;
 
         fCarlaPluginDescriptor->deactivate(fCarlaPluginHandle);
         fCarlaPluginDescriptor->dispatcher(fCarlaPluginHandle, NATIVE_PLUGIN_OPCODE_SAMPLE_RATE_CHANGED,
@@ -434,6 +447,16 @@ static const NativeTimeInfo* host_get_time_info(const NativeHostHandle handle)
 
 static bool host_write_midi_event(const NativeHostHandle handle, const NativeMidiEvent* const event)
 {
+    if (CardinalExpanderFromCarlaMIDIToCV* const expander = static_cast<CarlaModule*>(handle)->midiOutExpander)
+    {
+        if (expander->midiEventCount == CardinalExpanderFromCarlaMIDIToCV::MAX_MIDI_EVENTS)
+            return false;
+
+        NativeMidiEvent& expanderEvent(expander->midiEvents[expander->midiEventCount++]);
+        carla_copyStruct(expanderEvent, *event);
+        return true;
+    }
+
     return false;
 }
 
@@ -464,6 +487,7 @@ static intptr_t host_dispatcher(const NativeHostHandle handle, const NativeHostD
 struct CarlaModuleWidget : ModuleWidgetWith9HP, IdleCallback {
     CarlaModule* const module;
     bool hasLeftSideExpander = false;
+    bool hasRightSideExpander = false;
     bool idleCallbackActive = false;
     bool visible = false;
 
@@ -578,7 +602,6 @@ struct CarlaModuleWidget : ModuleWidgetWith9HP, IdleCallback {
     void draw(const DrawArgs& args) override
     {
         drawBackground(args.vg);
-        drawOutputJacksArea(args.vg, CarlaModule::NUM_INPUTS);
 
         if (hasLeftSideExpander)
         {
@@ -598,6 +621,21 @@ struct CarlaModuleWidget : ModuleWidgetWith9HP, IdleCallback {
                 nvgFill(args.vg);
             }
         }
+
+        if (hasRightSideExpander)
+        {
+            nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
+
+            for (int i=0; i<6; ++i)
+            {
+                const float y = 90 + 49 * i - 19;
+                nvgBeginPath(args.vg);
+                nvgRect(args.vg, box.size.x - 19, y, 18, 49 - 4);
+                nvgFill(args.vg);
+            }
+        }
+
+        drawOutputJacksArea(args.vg, CarlaModule::NUM_INPUTS);
 
         setupTextLines(args.vg);
 
@@ -620,6 +658,10 @@ struct CarlaModuleWidget : ModuleWidgetWith9HP, IdleCallback {
         hasLeftSideExpander = module != nullptr
                             && module->leftExpander.module != nullptr
                             && module->leftExpander.module->model == modelExpanderInputMIDI;
+
+        hasRightSideExpander = module != nullptr
+                             && module->rightExpander.module != nullptr
+                             && module->rightExpander.module->model == modelExpanderOutputMIDI;
 
         ModuleWidgetWith9HP::step();
     }

@@ -64,6 +64,7 @@ struct CardinalExpanderForInputMIDI : CardinalExpanderFromCVToCarlaMIDI {
     CardinalExpanderForInputMIDI()
     {
         static_assert(NUM_INPUTS == kNumInputs, "Invalid input configuration");
+        static_assert(NUM_OUTPUTS == kNumOutputs, "Invalid output configuration");
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
         configInput(PITCH_INPUT, "1V/octave pitch");
         configInput(GATE_INPUT, "Gate");
@@ -333,8 +334,6 @@ struct CardinalExpanderForInputMIDIWidget : ModuleWidgetWith3HP {
         nvgRoundedRect(args.vg, 6.5f, startY - 19.0f, 3.0f, padding * 6.0f - 4.0f, 1);
         nvgFill(args.vg);
 
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, box.size.x * 0.5f, 0, box.size.x, box.size.y);
         nvgFillColor(args.vg, color::BLACK);
         nvgFontFaceId(args.vg, 0);
         nvgFontSize(args.vg, 11);
