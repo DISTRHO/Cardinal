@@ -38,7 +38,23 @@ Advanced options:
 
 ## FreeBSD
 
-TODO
+Dependencies for using system libraries, that is, with `SYSDEPS=true`:
+
+```
+# common
+sudo pkg install -A dbus libglvnd liblo libsndfile libX11 libXcursor libXext libXrandr
+# system libraries
+sudo pkg install -A libarchive libsamplerate jansson speexdsp
+```
+
+Dependencies for vendored libraries:
+
+```
+# common
+sudo pkg install -A dbus libglvnd liblo libsndfile libX11 libXcursor libXext libXrandr
+# nedeed by vendored libraries
+sudo pkg install -A cmake
+```
 
 ## Linux
 
@@ -105,7 +121,7 @@ You can either cross-compile Cardinal for Windows from Linux, or install and use
 
 ### Cross-compile
 
-For cross-compilation, first install the relevant mingw packages.
+For cross-compilation, first install the relevant mingw packages.  
 On Ubuntu these are `binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64`.  
 Then build with `CC` and `CXX` pointing to the mingw compiler, like so:
 
@@ -121,6 +137,9 @@ After a successful build you will find the plugin binaries in the `bin/` directo
 You can either install them to your system using e.g. `make install PREFIX=/some/prefix` (not recommended for local source builds)
 or preferably just create a symbolic link on the respective plugin format folders.
 
+Cardinal plugin binaries expect to remain *within* their parent bundle/folder.  
+If you move them around make sure to keep their folder structure intact.
+
 If you are a packager you pretty much already know what to do at this point, otherwise regular users might want to do something like:
 
 ```
@@ -129,6 +148,8 @@ ln -s $(pwd)/bin/*.lv2 ~/.lv2/
 ln -s $(pwd)/bin/*.vst ~/.vst/
 ln -s $(pwd)/bin/*.vst3 ~/.vst3/
 ```
+
+## macOS
 
 If running macOS, use this instead:
 
@@ -139,10 +160,14 @@ ln -s $(pwd)/bin/*.vst ~/Library/Audio/Plug-Ins/VST/
 ln -s $(pwd)/bin/*.vst3 ~/Library/Audio/Plug-Ins/VST3/
 ```
 
-Symbolic links are not supported on Windows, so this approach doesn't work there.
+Note: Official macOS Cardinal builds install in the system-wide `/Library/Audio/Plug-Ins` location.  
+Watch out for conflicts if switching between the two builds.
 
-Note that the plugins expect to remain *within* their parent folder.  
-If you move them around make sure to keep their folder structure intact.
+## Windows
+
+Symbolic links are not supported on Windows, so this approach doesn't work there.  
+On Windows you will have to copy or move the plugin bundles.  
+If you are building from source, it is expected you know where they should go.
 
 # Keeping up to date
 
