@@ -1,49 +1,155 @@
 # Building
 
-> Note that you can likely also get a build directly by logging in to Github and heading to our [CI builds page](https://github.com/DISTRHO/Cardinal/actions/workflows/build.yml), the latest successful build has the files at the bottom of the page.
+This document describes how to build Cardinal from source,
+if you rather use Cardinal pre-built binaries please check [this wiki page](https://github.com/DISTRHO/Cardinal/wiki/Install) instead.
 
-To build Cardinal locally on Debian-based Linux, you need a few dependencies (taken from the Github CI [build.yml](.github/workflows/build.yml)):
+Before you begin, make sure you have the needed tools installed to build code, such as gcc or clang.  
+How to install those for your system is a bit outside the scope of this document.  
+It is expected you generally know how to build software by yourself.
 
-`sudo apt install libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev`
+Worth noting that, if cloning Cardinal from git, use of submodules is required.  
+So either clone with `--recursive` or use `git submodule update --init --recursive` after cloning.  
+If you are building from a release tarball you do not need to care about git.
 
-You also need a basic toolchain and `cmake`:
+## Build options
 
-`sudo apt install cmake build-essential`
+Cardinal uses makefiles as build system. So you just got to run `make` within the Cardinal main directory.
 
-It's important to clone the repo including all submodules:
+There are a few useful options you can pass as arguments when building.  
+Use them as `make SOMEOPTION=SOMEVALUE` syntax. You can specify as many options as you want.
 
-`git clone https://github.com/DISTRHO/Cardinal --recursive`
+Developer related options:
 
-You can simply build using:
+* `DEBUG=true` build non-stripped debug binaries (terrible performance, only useful for developers)
+* `NOPLUGINS=true` build only the Cardinal Core plugins (not recommended, only useful for developers)
 
-`make -j 2`
+Packaging related options:
 
-To quickly test you build setup you can run `make DEBUG=true NOPLUGINS=true -j $(nproc)`
+* `DESTDIR=/path` typical extra install target path (if you are used to packaging, this does what you expect)
+* `PREFIX=/usr` prefix used for installation (note that it **must** be set during build time as well)
+* `SKIP_STRIPPING=true` do not automatically strip the binaries
+* `SYSDEPS=true` use jansson, libarchive, samplerate and speexdsp system libraries, instead of vendored
+* `WITH_LTO=true` enable Link-Time-Optimization, which has performance benefits but significantly increases the build time
 
-The build will be in `bin/` where you should have vst2, vst3, lv2 and Jack standalone of all 3 compatible [variants](../README.md#plugin-variants) Full, FX and Synth.  
-The plugins expect to remain *within* their parent folder. If you move them around make sure to keep this structure.  
-You can alternatively use symlinks from the user-specific locations (this is recommended), e.g. for lv2:
-`ln -s <path to repo>/bin/Cardinal.lv2 ~/.lv2/Cardinal.lv2`
+Advanced options:
 
-There are a few build flags to know about, use them as `FLAG=true` or `false`:
+* `HEADLESS=true` build headless version (without gui), useful for embed systems
+* `STATIC_BUILD=true` skip building Cardinal core plugins that use local resources (e.g. audio file and plugin host)
 
-* `DEBUG=true` to enable debugging
-* `NOPLUGINS=true` to only build the Cardinal Core plugins for audio and Midi I/O and the fancy blank panel
-* `WITH_LTO=true` to enable Link Time Optimization, this significantly increases the build time
-* `SKIP_STRIPPING=true` to disable stripping the binaries if you don't need a full debug
+## FreeBSD
 
-#### Keeping up to date
+TODO
 
-Things are evolving quickly in Cardinal! To keep your local copy up to date with the changes, do:  
+## Linux
+
+There are a few differences between Linux distributions, this document covers the most common ones.  
+Adjust as needed if your distribution is not based on one of these.
+
+### ArchLinux
+
+Dependencies for using system libraries, that is, with `SYSDEPS=true`:
+
+```
+# common
+sudo pacman -S dbus libgl liblo libsndfile libx11 libxcursor libxext libxrandr
+# system libraries
+sudo pacman -S libarchive libsamplerate jansson speexdsp
+```
+
+Dependencies for vendored libraries:
+
+```
+# common
+sudo pacman -S dbus libgl liblo libsndfile libx11 libxcursor libxext libxrandr
+# nedeed by vendored libraries
+sudo pacman -S cmake
+```
+
+### Debian
+
+Dependencies for using system libraries, that is, with `SYSDEPS=true`:
+
+```
+# common
+sudo apt install libdbus-1-dev libgl1-mesa-dev liblo-dev libsndfile1-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+# system libraries
+sudo apt install libarchive-dev libjansson-dev libsamplerate0-dev libspeexdsp-dev
+```
+
+Dependencies for vendored libraries:
+
+```
+# common
+sudo apt install libdbus-1-dev libgl1-mesa-dev liblo-dev libsndfile1-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+# nedeed by vendored libraries
+sudo apt install cmake
+```
+
+## macOS
+
+Installing Xcode and the "Command-Line utilities" add-on is required.  
+Additionally you can install libsndfile from Homebrew or MacPorts in order to make Cardinal's audio file module work. (Otherwise it will support only mp3 files)
+
+If you want to have universal builds similar to the ones officially published by Cardinal, simply setup the environment like this:
+
+```
+export CFLAGS="-DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_12 -mmacosx-version-min=10.12 -arch x86_64 -arch arm64"
+export CXXFLAGS="${CFLAGS}"
+# make etc..
+```
+
+## Windows
+
+Cardinal does not support msvc, using mingw is required.  
+You can either cross-compile Cardinal for Windows from Linux, or install and use msys2 natively on a Windows system.
+
+### Cross-compile
+
+For cross-compilation, first install the relevant mingw packages.
+On Ubuntu these are `binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64`.  
+Then build with `CC` and `CXX` pointing to the mingw compiler, like so:
+
+```
+export CC=x86_64-w64-mingw32-gcc
+export CXX=x86_64-w64-mingw32-g++
+# make etc..
+```
+
+# Installing
+
+After a successful build you will find the plugin binaries in the `bin/` directory.  
+You can either install them to your system using e.g. `make install PREFIX=/some/prefix` (not recommended for local source builds)
+or preferably just create a symbolic link on the respective plugin format folders.
+
+If you are a packager you pretty much already know what to do at this point, otherwise regular users might want to do something like:
+
+```
+mkdir -p ~/.lv2 ~/.vst ~/.vst3
+ln -s $(pwd)/bin/*.lv2 ~/.lv2/
+ln -s $(pwd)/bin/*.vst ~/.vst/
+ln -s $(pwd)/bin/*.vst3 ~/.vst3/
+```
+
+If running macOS, use this instead:
+
+```
+mkdir -p ~/Library/Audio/Plug-Ins/LV2 ~/Library/Audio/Plug-Ins/VST ~/Library/Audio/Plug-Ins/VST3
+ln -s $(pwd)/bin/*.lv2 ~/Library/Audio/Plug-Ins/LV2/
+ln -s $(pwd)/bin/*.vst ~/Library/Audio/Plug-Ins/VST/
+ln -s $(pwd)/bin/*.vst3 ~/Library/Audio/Plug-Ins/VST3/
+```
+
+Symbolic links are not supported on Windows, so this approach doesn't work there.
+
+Note that the plugins expect to remain *within* their parent folder.  
+If you move them around make sure to keep their folder structure intact.
+
+# Keeping up to date
+
+Things are evolving quickly in Cardinal! To keep your local copy up to date with the changes, simply do:
+
 ```
 git pull
 git submodule update --init --recursive
+# make etc.. again
 ```
-
-### Packaging/distributing
-
-If you are a package maintainer, use the flag `SYSDEPS=true` to use the system dependencies.  
-
-Currently, the only existing packages we are aware of are in Arch's AUR: [cardinal.lv2-git](https://aur.archlinux.org/packages/cardinal.lv2-git/) and [cardinal-git](https://aur.archlinux.org/packages/cardinal-git/).
-
-Feel free to get in touch via Discussions tab or on [IRC](../README.md#community-chat)
