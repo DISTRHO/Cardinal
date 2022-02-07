@@ -738,7 +738,7 @@ endif
 ifeq ($(SYSDEPS),true)
 BASE_FLAGS += -DCARDINAL_SYSDEPS
 BASE_FLAGS += $(shell pkg-config --cflags jansson libarchive samplerate speexdsp)
-BASE_FLAGS += -I../deps/sysroot
+BASE_FLAGS += -I../deps/sysroot/include
 else
 BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 BASE_FLAGS += -I../src/Rack/dep/include

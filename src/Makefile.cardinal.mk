@@ -59,7 +59,7 @@ endif
 ifeq ($(SYSDEPS),true)
 DEP_LIB_PATH = $(abspath ../../deps/sysroot/lib)
 else
-DEP_LIB_PATH = $(abspath ../src/Rack/dep/lib)
+DEP_LIB_PATH = $(abspath ../Rack/dep/lib)
 endif
 
 # --------------------------------------------------------------
