@@ -969,15 +969,6 @@ $(BUILD_DIR)/AriaModules/%.cpp.o: AriaModules/%.cpp
 		-DpluginInstance=pluginInstance__Aria \
 		-Wno-cast-function-type
 
-$(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(AS_CUSTOM),$(call custom_module_names,$(m),AS)) \
-		$(foreach m,$(AS_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),AS_$(shell basename $*))) \
-		-DpluginInstance=pluginInstance__AS \
-		-Wno-unused-private-field
-
 $(BUILD_DIR)/Atelier/%.o: Atelier/%
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
