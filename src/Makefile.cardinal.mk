@@ -56,6 +56,12 @@ else
 SYSDEPS ?= false
 endif
 
+ifeq ($(SYSDEPS),true)
+DEP_LIB_PATH = $(abspath ../../deps/sysroot/lib)
+else
+DEP_LIB_PATH = $(abspath ../src/Rack/dep/lib)
+endif
+
 # --------------------------------------------------------------
 # Files to build (DPF stuff)
 
@@ -76,18 +82,18 @@ endif
 
 RACK_EXTRA_LIBS  = ../../plugins/plugins.a
 RACK_EXTRA_LIBS += ../rack.a
-RACK_EXTRA_LIBS += ../Rack/dep/lib/libquickjs.a
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libquickjs.a
 
 ifneq ($(SYSDEPS),true)
-RACK_EXTRA_LIBS += ../Rack/dep/lib/libjansson.a
-RACK_EXTRA_LIBS += ../Rack/dep/lib/libsamplerate.a
-RACK_EXTRA_LIBS += ../Rack/dep/lib/libspeexdsp.a
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libjansson.a
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libsamplerate.a
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libspeexdsp.a
 ifeq ($(WINDOWS),true)
-RACK_EXTRA_LIBS += ../Rack/dep/lib/libarchive_static.a
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libarchive_static.a
 else
-RACK_EXTRA_LIBS += ../Rack/dep/lib/libarchive.a
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libarchive.a
 endif
-RACK_EXTRA_LIBS += ../Rack/dep/lib/libzstd.a
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libzstd.a
 endif
 
 # --------------------------------------------------------------

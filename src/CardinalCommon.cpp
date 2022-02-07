@@ -208,7 +208,7 @@ static void saveAsDialog(const bool uncompressed)
     FileBrowserOptions opts;
     opts.startDir = dir.c_str();
     opts.saving = ui->saving = true;
-    ui->savingUncompressed = true;
+    ui->savingUncompressed = uncompressed;
     ui->openFileBrowser(opts);
 }
 #endif

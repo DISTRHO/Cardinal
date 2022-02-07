@@ -738,6 +738,7 @@ endif
 ifeq ($(SYSDEPS),true)
 BASE_FLAGS += -DCARDINAL_SYSDEPS
 BASE_FLAGS += $(shell pkg-config --cflags jansson libarchive samplerate speexdsp)
+BASE_FLAGS += -I../deps/sysroot
 else
 BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 BASE_FLAGS += -I../src/Rack/dep/include
@@ -763,6 +764,11 @@ BASE_FLAGS += -DHEADLESS
 ifeq ($(WITH_LTO),true)
 BASE_FLAGS += -ffat-lto-objects
 endif
+endif
+
+ifeq ($(BSD),true)
+BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
+BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
 endif
 
 ifeq ($(WASM),true)

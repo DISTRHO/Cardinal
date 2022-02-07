@@ -4,8 +4,6 @@
 # Created by falkTX
 #
 
-DEP_PATH = $(abspath ../src/Rack/dep)
-
 # --------------------------------------------------------------
 # Import base definitions
 
@@ -19,6 +17,12 @@ ifeq ($(BSD),true)
 SYSDEPS ?= true
 else
 SYSDEPS ?= false
+endif
+
+ifeq ($(SYSDEPS),true)
+DEP_PATH = $(abspath sysroot)
+else
+DEP_PATH = $(abspath ../src/Rack/dep)
 endif
 
 # --------------------------------------------------------------
