@@ -3,7 +3,7 @@
 *Cardinal, the Rack!*
 
 A virtual Eurorack modular synthesizer platform,
-available as JACK standalone and LV2, VST2 and VST3 audio plugin for Linux, macOS and Windows.
+available as JACK standalone and LV2, VST2 and VST3 audio plugin for FreeBSD, Linux, macOS and Windows.
 
 This is a [DPF-based](https://github.com/DISTRHO/DPF/) plugin wrapper around [VCV Rack](https://github.com/VCVRack/Rack/),
 using its code directly instead of forking the project.  
