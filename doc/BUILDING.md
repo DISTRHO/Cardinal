@@ -13,9 +13,10 @@ If you are building from a release tarball you do not need to care about git.
 
 ## Build options
 
-Cardinal uses makefiles as build system. So you just got to run `make` within the Cardinal main directory.
+Cardinal uses [GNU Make](https://www.gnu.org/software/make/) as build system.  
+So you just got to run `make` within the Cardinal main directory in order to build.
 
-There are a few useful options you can pass as arguments when building.  
+There are a few useful options you can pass as arguments when building though.  
 Use them as `make SOMEOPTION=SOMEVALUE` syntax. You can specify as many options as you want.
 
 Developer related options:
@@ -27,6 +28,7 @@ Packaging related options:
 
 * `DESTDIR=/path` typical extra install target path (if you are used to packaging, this does what you expect)
 * `PREFIX=/usr` prefix used for installation (note that it **must** be set during build time as well)
+* `NOOPT=true` do not automatically set well-known optimization flags
 * `SKIP_STRIPPING=true` do not automatically strip the binaries
 * `SYSDEPS=true` use jansson, libarchive, samplerate and speexdsp system libraries, instead of vendored
 * `WITH_LTO=true` enable Link-Time-Optimization, which has performance benefits but significantly increases the build time
@@ -36,24 +38,22 @@ Advanced options:
 * `HEADLESS=true` build headless version (without gui), useful for embed systems
 * `STATIC_BUILD=true` skip building Cardinal core plugins that use local resources (e.g. audio file and plugin host)
 
+The commonly used build environment flags such as `CC`, `CXX`, `CFLAGS`, etc are respected and used.
+
 ## FreeBSD
 
-Dependencies for using system libraries, that is, with `SYSDEPS=true`:
+The use of vendored libraries doesn't work on FreeBSD, as such the `SYSDEPS=true` build option is automatically set.  
+This means some dependencies that are optional in other systems are required under FreeBSD.
+
+The use of `gmake` instead of `make` is also required.
+
+Dependencies for using system libraries:
 
 ```
 # common
 sudo pkg install -A dbus libglvnd liblo libsndfile libX11 libXcursor libXext libXrandr
 # system libraries
 sudo pkg install -A libarchive libsamplerate jansson speexdsp
-```
-
-Dependencies for vendored libraries:
-
-```
-# common
-sudo pkg install -A dbus libglvnd liblo libsndfile libX11 libXcursor libXext libXrandr
-# nedeed by vendored libraries
-sudo pkg install -A cmake
 ```
 
 ## Linux
@@ -78,7 +78,7 @@ Dependencies for vendored libraries:
 # common
 sudo pacman -S dbus libgl liblo libsndfile libx11 libxcursor libxext libxrandr
 # nedeed by vendored libraries
-sudo pacman -S cmake
+sudo pacman -S cmake wget
 ```
 
 ### Debian
@@ -98,7 +98,7 @@ Dependencies for vendored libraries:
 # common
 sudo apt install libdbus-1-dev libgl1-mesa-dev liblo-dev libsndfile1-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
 # nedeed by vendored libraries
-sudo apt install cmake
+sudo apt install cmake wget
 ```
 
 ## macOS

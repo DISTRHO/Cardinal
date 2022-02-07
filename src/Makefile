@@ -5,17 +5,19 @@
 #
 
 # --------------------------------------------------------------
-# Build config
-
-PREFIX  ?= /usr/local
-DESTDIR ?=
-SYSDEPS ?= false
-
-# --------------------------------------------------------------
 # Import base definitions
 
 USE_NANOVG_FBO = true
 include ../dpf/Makefile.base.mk
+
+# --------------------------------------------------------------
+# Build config
+
+ifeq ($(BSD),true)
+SYSDEPS ?= true
+else
+SYSDEPS ?= false
+endif
 
 # --------------------------------------------------------------
 # Build setup

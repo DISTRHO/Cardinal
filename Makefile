@@ -4,7 +4,14 @@
 # Created by falkTX
 #
 
+# --------------------------------------------------------------
+# Import base definitions
+
+USE_NANOVG_FBO = true
 include dpf/Makefile.base.mk
+
+# --------------------------------------------------------------
+# Build targets
 
 all: cardinal carla deps dgl plugins gen resources
 
@@ -13,7 +20,12 @@ all: cardinal carla deps dgl plugins gen resources
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
+
+ifeq ($(BSD),true)
+SYSDEPS ?= true
+else
 SYSDEPS ?= false
+endif
 
 # --------------------------------------------------------------
 # Carla config

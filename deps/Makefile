@@ -9,12 +9,21 @@ DEP_PATH = $(abspath ../src/Rack/dep)
 # --------------------------------------------------------------
 # Import base definitions
 
+USE_NANOVG_FBO = true
 include ../dpf/Makefile.base.mk
+
+# --------------------------------------------------------------
+# Build config
+
+ifeq ($(BSD),true)
+SYSDEPS ?= true
+else
+SYSDEPS ?= false
+endif
 
 # --------------------------------------------------------------
 # custom build flags
 
-BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat
 
@@ -22,6 +31,10 @@ ifeq ($(HEADLESS),true)
 ifeq ($(WITH_LTO),true)
 BASE_FLAGS += -ffat-lto-objects
 endif
+endif
+
+ifneq ($(SYSDEPS),true)
+BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 endif
 
 ifeq ($(WASM),true)
@@ -191,7 +204,7 @@ QUICKJS_MAKE_FLAGS += PROGS=libquickjs.a
 ifeq ($(WITH_LTO),true)
 QUICKJS_MAKE_FLAGS += CONFIG_LTO=y
 else
-QUICKJS_MAKE_FLAGS += CONFIG_LTO=n
+QUICKJS_MAKE_FLAGS += CONFIG_LTO=
 endif
 
 ifeq ($(WINDOWS),true)

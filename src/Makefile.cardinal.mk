@@ -7,13 +7,6 @@
 # Must have NAME defined
 
 # --------------------------------------------------------------
-# Build config
-
-PREFIX  ?= /usr/local
-DESTDIR ?=
-SYSDEPS ?= false
-
-# --------------------------------------------------------------
 # Carla stuff
 
 ifneq ($(STATIC_BUILD),true)
@@ -49,7 +42,19 @@ endif # STATIC_BUILD
 # --------------------------------------------------------------
 # Import base definitions
 
+USE_NANOVG_FBO = true
 include ../../dpf/Makefile.base.mk
+
+# --------------------------------------------------------------
+# Build config
+
+PREFIX  ?= /usr/local
+
+ifeq ($(BSD),true)
+SYSDEPS ?= true
+else
+SYSDEPS ?= false
+endif
 
 # --------------------------------------------------------------
 # Files to build (DPF stuff)

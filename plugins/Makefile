@@ -5,16 +5,19 @@
 #
 
 # --------------------------------------------------------------
-# Build config
-
-PREFIX  ?= /usr/local
-DESTDIR ?=
-SYSDEPS ?= false
-
-# --------------------------------------------------------------
 # Import base definitions
 
+USE_NANOVG_FBO = true
 include ../dpf/Makefile.base.mk
+
+# --------------------------------------------------------------
+# Build config
+
+ifeq ($(BSD),true)
+SYSDEPS ?= true
+else
+SYSDEPS ?= false
+endif
 
 # --------------------------------------------------------------
 # List of drwav functions, used in several modules
@@ -734,14 +737,15 @@ endif
 
 ifeq ($(SYSDEPS),true)
 BASE_FLAGS += -DCARDINAL_SYSDEPS
+BASE_FLAGS += $(shell pkg-config --cflags jansson libarchive samplerate speexdsp)
 else
 BASE_FLAGS += -DZSTDLIB_VISIBILITY=
+BASE_FLAGS += -I../src/Rack/dep/include
 endif
 
 BASE_FLAGS += -I../src
 BASE_FLAGS += -I../src/Rack/include
 BASE_FLAGS += -I../src/Rack/include/dsp
-BASE_FLAGS += -I../src/Rack/dep/include
 BASE_FLAGS += -I../src/Rack/dep/filesystem/include
 # # BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
 BASE_FLAGS += -I../src/Rack/dep/glfw/include
