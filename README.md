@@ -126,7 +126,6 @@ At the moment the following 3rd-party modules are provided:
 
 Potentially coming soon, currently sorting out license situation:
 - Atelier
-- Befaco
 - Fundamental
 
 Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.

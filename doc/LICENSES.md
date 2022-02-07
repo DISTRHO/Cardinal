@@ -54,8 +54,7 @@ Bellow follows a list of code licenses from potentially coming modules.
 | Name                    | License(s)            | Pending reason |
 |-------------------------|-----------------------|----------------|
 | Atelier                 | GPL-3.0-or-later      | Custom artwork license, needs permission request |
-| Befaco                  | GPL-3.0-or-later      | Custom artwork license, needs permission request |
-| Fundamental             | GPL-3.0-or-later      | CC-ND, needs permission for dark mode |
+| Fundamental             | GPL-3.0-or-later      | CC-ND without permission for runtime mode, panels need to be redone |
 | ZZC                     | GPL-3.0-or-later      | Artwork license terms unclear |
 
 ## ARTWORK / PANEL LICENSES
@@ -154,8 +153,6 @@ Bellow follows a list of artwork licenses from potentially coming plugins.
 | Name                                    | License(s)       | Additional notes |
 |-----------------------------------------|------------------|------------------|
 | Atelier/*                               | Custom           | Copyright © Pyer 2020, used and distributed with permission (TODO ask for it) |
-| Befaco/components/*                     | CC-BY-NC-4.0     | |
-| Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), used and distributed with permission (TODO ask for it) |
 | Fundamental/*                           | CC-BY-NC-ND-4.0  | |
 
 ### Rack
