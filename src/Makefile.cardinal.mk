@@ -261,6 +261,11 @@ CORE_RESOURCES += template.vcv
 PLUGIN_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
 PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
 
+# Cardinal main variant should not use rtaudio fallback (it has CV ports)
+ifeq ($(CARDINAL_VARIANT),main)
+jack: BUILD_CXX_FLAGS += -DDPF_JACK_STANDALONE_SKIP_RTAUDIO_FALLBACK
+endif
+
 # Cardinal main variant is not available as VST2 due to lack of CV ports
 ifneq ($(CARDINAL_VARIANT),main)
 ifeq ($(MACOS),true)
