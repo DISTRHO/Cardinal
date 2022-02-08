@@ -258,8 +258,8 @@ endif
 CORE_RESOURCES  = $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
 CORE_RESOURCES += template.vcv
 
-PLUGIN_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
+LV2_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
+VST3_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
 
 # Cardinal main variant should not use rtaudio fallback (it has CV ports)
 ifeq ($(CARDINAL_VARIANT),main)
@@ -269,13 +269,15 @@ endif
 # Cardinal main variant is not available as VST2 due to lack of CV ports
 ifneq ($(CARDINAL_VARIANT),main)
 ifeq ($(MACOS),true)
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%)
+VST2_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%)
 else
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/resources/%)
+VST2_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/resources/%)
 endif
 endif
 
-resources: $(PLUGIN_RESOURCES)
+lv2: $(LV2_RESOURCES)
+vst2: $(VST2_RESOURCES)
+vst3: $(VST3_RESOURCES)
 
 # --------------------------------------------------------------
 

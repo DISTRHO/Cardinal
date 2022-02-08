@@ -854,39 +854,39 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
 
-PLUGIN_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.lv2/resources/PluginManifests/%.json)
-
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst3/Contents/Resources/PluginManifests/%.json)
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst3/Contents/Resources/PluginManifests/%.json)
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst3/Contents/Resources/PluginManifests/%.json)
-
-ifeq ($(MACOS),true)
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json)
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst/Contents/Resources/PluginManifests/%.json)
+# MOD builds only have FX variant for now
+ifeq ($(MOD_BUILD),true)
+LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
 else
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/resources/PluginManifests/%.json)
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst/resources/PluginManifests/%.json)
+LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
+LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
+LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.lv2/resources/%)
 endif
 
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.lv2/resources/%)
-
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.vst3/Contents/Resources/%)
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst3/Contents/Resources/%)
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst3/Contents/Resources/%)
-
 ifeq ($(MACOS),true)
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/Contents/Resources/%)
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst/Contents/Resources/%)
+VST2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json)
+VST2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst/Contents/Resources/PluginManifests/%.json)
+VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/Contents/Resources/%)
+VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst/Contents/Resources/%)
 else
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/resources/%)
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst/resources/%)
+VST2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalFX.vst/resources/PluginManifests/%.json)
+VST2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst/resources/PluginManifests/%.json)
+VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/resources/%)
+VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst/resources/%)
 endif
 
-resources: $(PLUGIN_RESOURCES)
+VST3_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.vst3/Contents/Resources/PluginManifests/%.json)
+VST3_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst3/Contents/Resources/PluginManifests/%.json)
+VST3_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst3/Contents/Resources/PluginManifests/%.json)
+VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.vst3/Contents/Resources/%)
+VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst3/Contents/Resources/%)
+VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst3/Contents/Resources/%)
+
+resources: $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES)
 
 ../bin/Cardinal.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"

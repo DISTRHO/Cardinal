@@ -166,17 +166,12 @@ TARGET = rack.a
 
 all: $(TARGET)
 ifeq ($(MOD_BUILD),true)
-	$(MAKE) -C CardinalFX lv2 resources
+	$(MAKE) -C CardinalFX lv2
 else
+	$(MAKE) -C Cardinal
 	$(MAKE) -C CardinalFX
 	$(MAKE) -C CardinalSynth
-	$(MAKE) -C Cardinal
 endif
-
-resources:
-	$(MAKE) resources -C Cardinal
-	$(MAKE) resources -C CardinalFX
-	$(MAKE) resources -C CardinalSynth
 
 clean:
 	rm -f $(TARGET)
