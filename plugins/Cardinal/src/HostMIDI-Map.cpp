@@ -36,7 +36,7 @@ USE_NAMESPACE_DISTRHO;
 
 static const int MAX_MIDI_CONTROL = 120; /* 0x77 + 1 */
 
-struct HostMIDIMap : Module {
+struct HostMIDIMap : TerminalModule {
     enum ParamIds {
         NUM_PARAMS
     };
@@ -131,7 +131,7 @@ struct HostMIDIMap : Module {
         mapLen = 1;
     }
 
-    void process(const ProcessArgs& args) override
+    void processTerminalInput(const ProcessArgs& args) override
     {
         // Cardinal specific
         const int64_t blockFrame = pcontext->engine->getBlockFrame();
@@ -146,7 +146,7 @@ struct HostMIDIMap : Module {
             midiEventFrame = 0;
         }
 
-        if (!divider.process())
+        if (isBypassed() || !divider.process())
         {
             ++midiEventFrame;
             return;
@@ -257,6 +257,9 @@ struct HostMIDIMap : Module {
             paramQuantity->setScaledValue(valueFilters[id].out);
         }
     }
+
+    void processTerminalOutput(const ProcessArgs&) override
+    {}
 
     void clearMap(int id)
     {

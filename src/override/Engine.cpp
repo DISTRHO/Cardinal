@@ -52,8 +52,7 @@
 
 
 // known terminal modules
-extern rack::plugin::Model* modelHostAudio2;
-extern rack::plugin::Model* modelHostAudio8;
+extern std::vector<rack::plugin::Model*> hostTerminalModels;
 
 
 namespace rack {
@@ -577,7 +576,7 @@ std::vector<int64_t> Engine::getModuleIds() {
 
 static TerminalModule* asTerminalModule(Module* const module) {
 	const plugin::Model* const model = module->model;
-	if (model == modelHostAudio2 || model == modelHostAudio8)
+	if (std::find(hostTerminalModels.begin(), hostTerminalModels.end(), model) != hostTerminalModels.end())
 		return static_cast<TerminalModule*>(module);
 	return nullptr;
 }

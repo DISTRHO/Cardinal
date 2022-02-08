@@ -17,7 +17,7 @@
 
 #include "plugincontext.hpp"
 
-struct HostTime : Module {
+struct HostTime : TerminalModule {
     enum ParamIds {
         NUM_PARAMS
     };
@@ -59,7 +59,7 @@ struct HostTime : Module {
         config(NUM_PARAMS, NUM_INPUTS, kHostTimeCount, kHostTimeCount);
     }
 
-    void process(const ProcessArgs& args) override
+    void processTerminalInput(const ProcessArgs& args) override
     {
         const int64_t blockFrame = pcontext->engine->getBlockFrame();
 
@@ -126,6 +126,9 @@ struct HostTime : Module {
                               ? ((float) (timeInfo.beat - 1) + beatPhase) / pcontext->beatsPerBar
                               : 0.0f;
 
+        if (isBypassed())
+            return;
+
         lights[kHostTimeRolling].setBrightness(playing ? 1.0f : 0.0f);
         lights[kHostTimeReset].setBrightnessSmooth(hasReset ? 1.0f : 0.0f, args.sampleTime * 0.5f);
         lights[kHostTimeBar].setBrightnessSmooth(hasBar ? 1.0f : 0.0f, args.sampleTime * 0.5f);
@@ -142,6 +145,9 @@ struct HostTime : Module {
         outputs[kHostTimeBarPhase].setVoltage(barPhase * 10.0f);
         outputs[kHostTimeBeatPhase].setVoltage(beatPhase * 10.0f);
     }
+
+    void processTerminalOutput(const ProcessArgs&) override
+    {}
 };
 
 struct HostTimeWidget : ModuleWidget {

@@ -34,7 +34,7 @@
 
 USE_NAMESPACE_DISTRHO;
 
-struct HostMIDI : Module {
+struct HostMIDI : TerminalModule {
     enum ParamIds {
         NUM_PARAMS
     };
@@ -165,7 +165,7 @@ struct HostMIDI : Module {
             heldNotes.clear();
         }
 
-        bool process(const ProcessArgs& args, std::vector<rack::engine::Output>& outputs)
+        bool process(const ProcessArgs& args, std::vector<rack::engine::Output>& outputs, const bool isBypassed)
         {
             // Cardinal specific
             const int64_t blockFrame = pcontext->engine->getBlockFrame();
@@ -177,6 +177,13 @@ struct HostMIDI : Module {
 
                 midiEvents = pcontext->midiEvents;
                 midiEventsLeft = pcontext->midiEventCount;
+
+                if (isBypassed)
+                {
+                    midiEventFrame = 1;
+                    return true;
+                }
+
                 midiEventFrame = 0;
 
                 if (pcontext->playing)
@@ -195,6 +202,11 @@ struct HostMIDI : Module {
                     wasPlaying = false;
                     stopPulse.trigger(1e-3);
                 }
+            }
+            else if (isBypassed)
+            {
+                ++midiEventFrame;
+                return false;
             }
 
             while (midiEventsLeft != 0)
@@ -572,12 +584,18 @@ struct HostMIDI : Module {
         midiOutput.channel = 0;
     }
 
-    void process(const ProcessArgs& args) override
+    void processTerminalInput(const ProcessArgs& args) override
     {
-        if (midiInput.process(args, outputs))
+        if (midiInput.process(args, outputs, isBypassed()))
             midiOutput.frame = 0;
         else
             ++midiOutput.frame;
+    }
+
+    void processTerminalOutput(const ProcessArgs&) override
+    {
+        if (isBypassed())
+            return;
 
         for (int c = 0; c < inputs[PITCH_INPUT].getChannels(); ++c)
         {

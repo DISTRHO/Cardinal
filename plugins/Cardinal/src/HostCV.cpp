@@ -24,7 +24,7 @@
 
 USE_NAMESPACE_DISTRHO;
 
-struct HostCV : Module {
+struct HostCV : TerminalModule {
     CardinalPluginContext* const pcontext;
     int dataFrame = 0;
     int64_t lastBlockFrame = -1;
@@ -59,7 +59,7 @@ struct HostCV : Module {
         configParam<SwitchQuantity>(BIPOLAR_OUTPUTS_6_10, 0.f, 1.f, 0.f, "Bipolar Outputs 6-10")->randomizeEnabled = false;
     }
 
-    void process(const ProcessArgs&) override
+    void processTerminalInput(const ProcessArgs&) override
     {
         if (pcontext->variant != kCardinalVariantMain)
             return;
@@ -77,6 +77,9 @@ struct HostCV : Module {
 
         const int k = dataFrame++;
         DISTRHO_SAFE_ASSERT_RETURN(k < pcontext->engine->getBlockFrames(),);
+
+        if (isBypassed())
+            return;
 
         float inputOffset, outputOffset;
         inputOffset = params[BIPOLAR_INPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
@@ -97,6 +100,9 @@ struct HostCV : Module {
             dataOuts[i+CARDINAL_AUDIO_IO_OFFSET][k] = inputs[i].getVoltage() + inputOffset;
         }
     }
+
+    void processTerminalOutput(const ProcessArgs&) override
+    {}
 };
 
 struct HostCVWidget : ModuleWidgetWith8HP {

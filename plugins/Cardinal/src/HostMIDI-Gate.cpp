@@ -34,7 +34,7 @@
 
 USE_NAMESPACE_DISTRHO;
 
-struct HostMIDIGate : Module {
+struct HostMIDIGate : TerminalModule {
     enum ParamIds {
         NUM_PARAMS
     };
@@ -104,7 +104,7 @@ struct HostMIDIGate : Module {
         }
 
         bool process(const ProcessArgs& args, std::vector<rack::engine::Output>& outputs,
-                     const bool velocityMode, uint8_t learnedNotes[18])
+                     const bool velocityMode, uint8_t learnedNotes[18], const bool isBypassed)
         {
             // Cardinal specific
             const int64_t blockFrame = pcontext->engine->getBlockFrame();
@@ -117,6 +117,12 @@ struct HostMIDIGate : Module {
                 midiEvents = pcontext->midiEvents;
                 midiEventsLeft = pcontext->midiEventCount;
                 midiEventFrame = 0;
+            }
+
+            if (isBypassed)
+            {
+                ++midiEventFrame;
+                return blockFrameChanged;
             }
 
             while (midiEventsLeft != 0)
@@ -322,12 +328,18 @@ struct HostMIDIGate : Module {
         midiOutput.reset();
     }
 
-    void process(const ProcessArgs& args) override
+    void processTerminalInput(const ProcessArgs& args) override
     {
-        if (midiInput.process(args, outputs, velocityMode, learnedNotes))
+        if (midiInput.process(args, outputs, velocityMode, learnedNotes, isBypassed()))
             midiOutput.frame = 0;
         else
             ++midiOutput.frame;
+    }
+
+    void processTerminalOutput(const ProcessArgs&) override
+    {
+        if (isBypassed())
+            return;
 
         for (int i = 0; i < 18; ++i)
         {

@@ -47,6 +47,8 @@ extern Model* modelIldaeil;
 extern Model* modelMPV;
 extern Model* modelTextEditor;
 
+extern std::vector<Model*> hostTerminalModels;
+
 /*
  * Find the highest absolute and normalized value within a float array.
  */

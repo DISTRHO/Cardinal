@@ -22,7 +22,7 @@
 
 USE_NAMESPACE_DISTRHO;
 
-struct HostParameters : Module {
+struct HostParameters : TerminalModule {
     enum ParamIds {
         NUM_PARAMS
     };
@@ -39,7 +39,6 @@ struct HostParameters : Module {
     CardinalPluginContext* const pcontext;
     rack::dsp::SlewLimiter parameters[kModuleParameters];
     bool parametersConnected[kModuleParameters] = {};
-    float sampleTime = 0.0f;
 
     HostParameters()
         : pcontext(static_cast<CardinalPluginContext*>(APP))
@@ -57,8 +56,11 @@ struct HostParameters : Module {
         onSampleRateChange(e);
     }
 
-    void process(const ProcessArgs&) override
+    void processTerminalInput(const ProcessArgs& args) override
     {
+        if (isBypassed())
+            return;
+
         for (uint32_t i=0; i<kModuleParameters; ++i)
         {
             const bool connected = outputs[i].isConnected();
@@ -70,9 +72,12 @@ struct HostParameters : Module {
             }
 
             if (connected)
-                outputs[i].setVoltage(parameters[i].process(sampleTime, pcontext->parameters[i]));
+                outputs[i].setVoltage(parameters[i].process(args.sampleTime, pcontext->parameters[i]));
         }
     }
+
+    void processTerminalOutput(const ProcessArgs&) override
+    {}
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override
     {
@@ -83,8 +88,6 @@ struct HostParameters : Module {
             parameters[i].reset();
             parameters[i].setRiseFall(fall, fall);
         }
-
-        sampleTime = e.sampleTime;
     }
 };
 

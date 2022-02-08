@@ -34,7 +34,7 @@
 
 USE_NAMESPACE_DISTRHO;
 
-struct HostMIDICC : Module {
+struct HostMIDICC : TerminalModule {
     enum ParamIds {
         NUM_PARAMS
     };
@@ -121,7 +121,8 @@ struct HostMIDICC : Module {
             lsbMode = false;
         }
 
-        bool process(const ProcessArgs& args, std::vector<rack::engine::Output>& outputs, int learnedCcs[16])
+        bool process(const ProcessArgs& args, std::vector<rack::engine::Output>& outputs, int learnedCcs[16],
+                     const bool isBypassed)
         {
             // Cardinal specific
             const int64_t blockFrame = pcontext->engine->getBlockFrame();
@@ -134,6 +135,12 @@ struct HostMIDICC : Module {
                 midiEvents = pcontext->midiEvents;
                 midiEventsLeft = pcontext->midiEventCount;
                 midiEventFrame = 0;
+            }
+
+            if (isBypassed)
+            {
+                ++midiEventFrame;
+                return false;
             }
 
             while (midiEventsLeft != 0)
@@ -394,12 +401,18 @@ struct HostMIDICC : Module {
         midiOutput.reset();
     }
 
-    void process(const ProcessArgs& args) override
+    void processTerminalInput(const ProcessArgs& args) override
     {
-        if (midiInput.process(args, outputs, learnedCcs))
+        if (midiInput.process(args, outputs, learnedCcs, isBypassed()))
             midiOutput.frame = 0;
         else
             ++midiOutput.frame;
+    }
+
+    void processTerminalOutput(const ProcessArgs&) override
+    {
+        if (isBypassed())
+            return;
 
         for (int i = 0; i < 16; i++)
         {

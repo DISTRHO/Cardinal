@@ -511,6 +511,9 @@ extern Model* modelMaude_221;
 
 #endif // NOPLUGINS
 
+// known terminal modules
+std::vector<Model*> hostTerminalModels;
+
 // stuff that reads config files, we dont want that
 int loadConsoleType() { return 0; }
 int loadDirectOutMode() { return 0; }
@@ -571,7 +574,6 @@ std::string pluginManifest(const std::string& dirname);
 std::string pluginPath(const std::string& dirname);
 }
 
-// regular plugins
 namespace plugin {
 
 struct StaticPluginLoader {
@@ -689,6 +691,18 @@ static void initStatic__Cardinal()
        #else
         spl.removeModule("MPV");
        #endif
+
+        hostTerminalModels = {
+            modelHostAudio2,
+            modelHostAudio8,
+            modelHostCV,
+            modelHostMIDI,
+            modelHostMIDICC,
+            modelHostMIDIGate,
+            modelHostMIDIMap,
+            modelHostParameters,
+            modelHostTime,
+        };
     }
 }
 
