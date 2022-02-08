@@ -182,6 +182,12 @@ LINK_FLAGS += -ldl
 endif
 endif
 
+ifeq ($(BSD),true)
+ifeq ($(DEBUG),true)
+LINK_FLAGS += -lexecinfo
+endif
+endif
+
 ifeq ($(MACOS),true)
 LINK_FLAGS += -framework IOKit
 else ifeq ($(WINDOWS),true)
