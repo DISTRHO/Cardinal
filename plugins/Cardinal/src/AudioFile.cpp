@@ -437,9 +437,15 @@ struct AudioFileListWidget : ImGuiWidget {
         };
 
         using namespace ghc::filesystem;
-        currentDirectory = path(module->currentFile).parent_path().string();
+        const path currentFile = u8path(module->currentFile);
+        currentDirectory = currentFile.parent_path().generic_u8string();
 
-        directory_iterator it(currentDirectory);
+        directory_iterator it;
+
+        try {
+            it = directory_iterator(u8path(currentDirectory));
+        } DISTRHO_SAFE_EXCEPTION_RETURN("Failed to open current directory",);
+
         for (directory_iterator itb = begin(it), ite=end(it); itb != ite; ++itb)
         {
             if (! itb->is_regular_file())
@@ -450,7 +456,7 @@ struct AudioFileListWidget : ImGuiWidget {
             {
                 if (extension.compare(supportedExtensions[i]) == 0)
                 {
-                    currentFiles.push_back({ filepath.string(), filepath.filename().string() });
+                    currentFiles.push_back({ filepath.generic_u8string(), filepath.filename().generic_u8string() });
                     break;
                 }
             }
@@ -460,7 +466,7 @@ struct AudioFileListWidget : ImGuiWidget {
 
         for (size_t index = 0; index < currentFiles.size(); ++index)
         {
-            if (currentFiles[index].full.compare(module->currentFile) == 0)
+            if (currentFiles[index].full.compare(currentFile) == 0)
             {
                 selectedFile = index;
                 break;
