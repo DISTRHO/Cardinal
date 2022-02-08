@@ -1,5 +1,5 @@
 --- ../Rack/src/app/Scene.cpp	2021-12-14 21:35:44.414568198 +0000
-+++ Scene.cpp	2022-01-26 18:47:48.006168325 +0000
++++ Scene.cpp	2022-02-06 14:11:59.259830276 +0000
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -108,13 +108,13 @@
 +
 +	void onEnter(const EnterEvent& e) override {
 +		glfwSetCursor(nullptr, (GLFWcursor*)0x1);
-+	}
-+
-+	void onLeave(const LeaveEvent& e) override {
-+		glfwSetCursor(nullptr, nullptr);
  	}
  
 -	void onDragStart(const DragStartEvent& e) override {
++	void onLeave(const LeaveEvent& e) override {
++		glfwSetCursor(nullptr, nullptr);
++	}
++
 +	void onDragStart(const DragStartEvent&) override {
  		size = APP->window->getSize();
  	}
@@ -260,7 +260,23 @@
  			e.consume(this);
  		}
  		if (e.keyName == "z" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -232,10 +326,8 @@
+@@ -220,10 +314,14 @@
+ 			APP->scene->rackScroll->setZoom(std::pow(2.f, zoom));
+ 			e.consume(this);
+ 		}
+-		if ((e.keyName == "0") && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
++		if ((e.keyName == "0" || e.keyName == "1") && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+ 			APP->scene->rackScroll->setZoom(1.f);
+ 			e.consume(this);
+ 		}
++		if (e.keyName == "2" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
++			APP->scene->rackScroll->setZoom(2.f);
++			e.consume(this);
++		}
+ 		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == 0) {
+ 			system::openBrowser("https://vcvrack.com/manual/");
+ 			e.consume(this);
+@@ -232,10 +330,8 @@
  			settings::cpuMeter ^= true;
  			e.consume(this);
  		}
@@ -273,7 +289,7 @@
  			e.consume(this);
  		}
  
-@@ -326,13 +418,6 @@
+@@ -326,13 +422,6 @@
  
  	// Key commands that can be overridden by children
  	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -287,7 +303,7 @@
  		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
  			rack->pasteClipboardAction();
  			e.consume(this);
-@@ -351,7 +436,7 @@
+@@ -351,7 +440,7 @@
  		std::string extension = system::getExtension(path);
  
  		if (extension == ".vcv") {
@@ -296,7 +312,7 @@
  			e.consume(this);
  			return;
  		}
-@@ -368,3 +453,73 @@
+@@ -368,3 +457,77 @@
  
  } // namespace app
  } // namespace rack
@@ -306,6 +322,7 @@
 +
 +
 +bool connectToRemote() {
++#ifdef HAVE_LIBLO
 +	rack::app::Scene::Internal* const internal = APP->scene->internal;
 +
 +	if (internal->oscServer == nullptr) {
@@ -321,6 +338,9 @@
 +	lo_address_free(addr);
 +
 +	return true;
++#else
++	return false;
++#endif
 +}
 +
 +

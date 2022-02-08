@@ -1,5 +1,5 @@
---- ../Rack/src/app/MenuBar.cpp	2022-01-15 14:44:46.391280963 +0000
-+++ MenuBar.cpp	2022-01-24 11:25:15.507061204 +0000
+--- ../Rack/src/app/MenuBar.cpp	2022-02-05 22:30:09.233392896 +0000
++++ MenuBar.cpp	2022-02-05 18:08:00.272028714 +0000
 @@ -1,8 +1,33 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -48,7 +48,7 @@
  
  namespace rack {
  namespace app {
-@@ -48,79 +78,75 @@
+@@ -48,79 +78,79 @@
  };
  
  
@@ -103,25 +103,34 @@
 -
  		menu->addChild(createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
 -			APP->patch->saveDialog();
+-		}));
 +			// NOTE: will do nothing if path is empty, intentionally
 +			patchUtils::saveDialog(APP->patch->path);
 +		}, APP->patch->path.empty()));
-+
+ 
+-		menu->addChild(createMenuItem("Save as", RACK_MOD_CTRL_NAME "+Shift+S", []() {
+-			APP->patch->saveAsDialog();
 +		menu->addChild(createMenuItem("Save as / Export...", RACK_MOD_CTRL_NAME "+Shift+S", []() {
 +			patchUtils::saveAsDialog();
  		}));
  
--		menu->addChild(createMenuItem("Save as", RACK_MOD_CTRL_NAME "+Shift+S", []() {
--			APP->patch->saveAsDialog();
--		}));
+-		menu->addChild(createMenuItem("Save a copy", "", []() {
+-			APP->patch->saveAsDialog(false);
++		menu->addChild(createMenuItem("Export uncompressed json...", "", []() {
++			patchUtils::saveAsDialogUncompressed();
+ 		}));
+ 
+-		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
+-			APP->patch->revertDialog();
+-		}, APP->patch->path == ""));
 +#ifdef HAVE_LIBLO
 +		if (patchUtils::isRemoteConnected()) {
 +			menu->addChild(createMenuItem("Deploy to MOD", "F7", []() {
 +				patchUtils::deployToRemote();
 +			}));
  
--		menu->addChild(createMenuItem("Save a copy", "", []() {
--			APP->patch->saveAsDialog(false);
+-		menu->addChild(createMenuItem("Overwrite template", "", []() {
+-			APP->patch->saveTemplateDialog();
 -		}));
 +			const bool autoDeploy = patchUtils::isRemoteAutoDeployed();
 +			menu->addChild(createCheckMenuItem("Auto deploy to MOD", "",
@@ -129,19 +138,13 @@
 +				[=]() {patchUtils::setRemoteAutoDeploy(!autoDeploy);}
 +			));
 +		} else {
-+			menu->addChild(createMenuItem("Connect to MOD", "", [this]() {
++			menu->addChild(createMenuItem("Connect to MOD", "", []() {
 +				patchUtils::connectToRemote();
 +			}));
 +		}
 +#endif
- 
- 		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
--			APP->patch->revertDialog();
--		}, APP->patch->path == ""));
--
--		menu->addChild(createMenuItem("Overwrite template", "", []() {
--			APP->patch->saveTemplateDialog();
--		}));
++
++		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
 +			patchUtils::revertDialog();
 +		}, APP->patch->path.empty()));
  
@@ -167,7 +170,7 @@
  	}
  };
  
-@@ -166,7 +192,7 @@
+@@ -166,7 +196,7 @@
  
  		menu->addChild(new ui::MenuSeparator);
  
@@ -176,7 +179,7 @@
  	}
  };
  
-@@ -256,7 +282,7 @@
+@@ -256,7 +286,7 @@
  		return settings::cableTension;
  	}
  	float getDefaultValue() override {
@@ -185,7 +188,7 @@
  	}
  	float getDisplayValue() override {
  		return getValue() * 100;
-@@ -421,28 +447,9 @@
+@@ -421,28 +451,9 @@
  		haloBrightnessSlider->box.size.x = 250.0;
  		menu->addChild(haloBrightnessSlider);
  
@@ -215,7 +218,7 @@
  
  		static const std::vector<std::string> knobModeLabels = {
  			"Linear",
-@@ -467,6 +474,21 @@
+@@ -467,6 +478,21 @@
  		menu->addChild(knobScrollSensitivitySlider);
  
  		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
@@ -237,7 +240,7 @@
  	}
  };
  
-@@ -476,47 +498,6 @@
+@@ -476,47 +502,6 @@
  ////////////////////
  
  
@@ -285,7 +288,7 @@
  struct EngineButton : MenuButton {
  	void onAction(const ActionEvent& e) override {
  		ui::Menu* menu = createMenu();
-@@ -529,269 +510,6 @@
+@@ -529,269 +514,6 @@
  		menu->addChild(createMenuItem("Performance meters", cpuMeterText, [=]() {
  			settings::cpuMeter ^= true;
  		}));
@@ -555,7 +558,7 @@
  	}
  };
  
-@@ -802,63 +520,24 @@
+@@ -802,63 +524,23 @@
  
  
  struct HelpButton : MenuButton {
@@ -614,17 +617,17 @@
  
 -		menu->addChild(createMenuLabel(APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION));
 -	}
-+		menu->addChild(createMenuLabel(APP_EDITION + " " + APP_EDITION_NAME));
- 
+-
 -	void step() override {
 -		notification->box.pos = math::Vec(0, 0);
 -		notification->visible = library::isAppUpdateAvailable();
 -		MenuButton::step();
++		menu->addChild(createMenuLabel("Cardinal " + APP_EDITION + " " + CARDINAL_VERSION));
 +		menu->addChild(createMenuLabel("Rack " + APP_VERSION + " Compatible"));
  	}
  };
  
-@@ -908,7 +587,9 @@
+@@ -908,7 +590,9 @@
  struct MenuBar : widget::OpaqueWidget {
  	MeterLabel* meterLabel;
  
@@ -635,7 +638,7 @@
  		const float margin = 5;
  		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
  
-@@ -917,7 +598,7 @@
+@@ -917,7 +601,7 @@
  		layout->spacing = math::Vec(0, 0);
  		addChild(layout);
  
@@ -644,7 +647,7 @@
  		fileButton->text = "File";
  		layout->addChild(fileButton);
  
-@@ -933,10 +614,6 @@
+@@ -933,10 +617,6 @@
  		engineButton->text = "Engine";
  		layout->addChild(engineButton);
  
@@ -655,7 +658,7 @@
  		HelpButton* helpButton = new HelpButton;
  		helpButton->text = "Help";
  		layout->addChild(helpButton);
-@@ -971,7 +648,11 @@
+@@ -971,7 +651,11 @@
  
  
  widget::Widget* createMenuBar() {

@@ -46,27 +46,12 @@ struct Cable;
 
 struct Port {
 	/** Voltage of the port. */
-	/** NOTE Purposefully renamed in Cardinal as a way to catch plugins using it directly. */
 	union {
 		/** Unstable API. Use getVoltage() and setVoltage() instead. */
-		float cvoltages[PORT_MAX_CHANNELS] = {};
+		float voltages[PORT_MAX_CHANNELS] = {};
 		/** DEPRECATED. Unstable API. Use getVoltage() and setVoltage() instead. */
-		float cvalue;
+		float value;
 	};
-
-	/** Special trickery for backwards compatibility with plugins using DEPRECATED APIs */
-	struct BackwardsCompatPortValue {
-		Port* const port;
-		BackwardsCompatPortValue(Port* p) : port(p) {}
-		void operator=(float value) { port->setVoltage(value); }
-		void operator-=(float value) { port->setVoltage(port->cvalue - value); }
-		void operator+=(float value) { port->setVoltage(port->cvalue + value); }
-		void operator*=(float value) { port->setVoltage(port->cvalue * value); }
-		void operator/=(float value) { port->setVoltage(port->cvalue / value); }
-		operator float() const { return port->cvalue; }
-	} value;
-	Port() : value(this) {}
-
 	union {
 		/** Number of polyphonic channels.
 		DEPRECATED. Unstable API. Use set/getChannels() instead.
@@ -87,24 +72,19 @@ struct Port {
 		OUTPUT,
 	};
 
-	/** Cables connected to this output port. */
+	/** List of cables connected to this port (if output type). */
 	std::list<Cable*> cables;
-
-	/** Step-through the cables.
-	Called whenever voltage changes, required for zero latency operation. */
-	void stepCables();
 
 	/** Sets the voltage of the given channel. */
 	void setVoltage(float voltage, int channel = 0) {
-		cvoltages[channel] = voltage;
-		stepCables();
+		voltages[channel] = voltage;
 	}
 
 	/** Returns the voltage of the given channel.
 	Because of proper bookkeeping, all channels higher than the input port's number of channels should be 0V.
 	*/
 	float getVoltage(int channel = 0) {
-		return cvoltages[channel];
+		return voltages[channel];
 	}
 
 	/** Returns the given channel's voltage if the port is polyphonic, otherwise returns the first voltage (channel 0). */
@@ -124,15 +104,14 @@ struct Port {
 	/** Returns a pointer to the array of voltages beginning with firstChannel.
 	The pointer can be used for reading and writing.
 	*/
-	// TODO convert to const float* for zero-latency cable stuff and fix all plugins after
 	float* getVoltages(int firstChannel = 0) {
-		return &cvoltages[firstChannel];
+		return &voltages[firstChannel];
 	}
 
 	/** Copies the port's voltages to an array of size at least `channels`. */
 	void readVoltages(float* v) {
 		for (int c = 0; c < channels; c++) {
-			v[c] = cvoltages[c];
+			v[c] = voltages[c];
 		}
 	}
 
@@ -141,24 +120,22 @@ struct Port {
 	*/
 	void writeVoltages(const float* v) {
 		for (int c = 0; c < channels; c++) {
-			cvoltages[c] = v[c];
+			voltages[c] = v[c];
 		}
-		stepCables();
 	}
 
 	/** Sets all voltages to 0. */
 	void clearVoltages() {
 		for (int c = 0; c < channels; c++) {
-			cvoltages[c] = 0.f;
+			voltages[c] = 0.f;
 		}
-		stepCables();
 	}
 
 	/** Returns the sum of all voltages. */
 	float getVoltageSum() {
 		float sum = 0.f;
 		for (int c = 0; c < channels; c++) {
-			sum += cvoltages[c];
+			sum += voltages[c];
 		}
 		return sum;
 	}
@@ -171,12 +148,12 @@ struct Port {
 			return 0.f;
 		}
 		else if (channels == 1) {
-			return std::fabs(cvoltages[0]);
+			return std::fabs(voltages[0]);
 		}
 		else {
 			float sum = 0.f;
 			for (int c = 0; c < channels; c++) {
-				sum += std::pow(cvoltages[c], 2);
+				sum += std::pow(voltages[c], 2);
 			}
 			return std::sqrt(sum);
 		}
@@ -184,7 +161,7 @@ struct Port {
 
 	template <typename T>
 	T getVoltageSimd(int firstChannel) {
-		return T::load(&cvoltages[firstChannel]);
+		return T::load(&voltages[firstChannel]);
 	}
 
 	template <typename T>
@@ -204,8 +181,7 @@ struct Port {
 
 	template <typename T>
 	void setVoltageSimd(T voltage, int firstChannel) {
-		voltage.store(&cvoltages[firstChannel]);
-		stepCables();
+		voltage.store(&voltages[firstChannel]);
 	}
 
 	/** Sets the number of polyphony channels.
@@ -220,7 +196,7 @@ struct Port {
 		}
 		// Set higher channel voltages to 0
 		for (int c = channels; c < this->channels; c++) {
-			cvoltages[c] = 0.f;
+			voltages[c] = 0.f;
 		}
 		// Don't allow caller to set port as disconnected
 		if (channels == 0) {

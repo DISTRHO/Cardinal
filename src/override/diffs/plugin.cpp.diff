@@ -1,5 +1,5 @@
---- ../Rack/src/plugin.cpp	2022-01-15 14:44:46.395281005 +0000
-+++ plugin.cpp	2022-01-24 20:38:11.436099651 +0000
+--- ../Rack/src/plugin.cpp	2022-02-05 22:30:09.265393248 +0000
++++ plugin.cpp	2022-01-30 00:24:49.375329910 +0000
 @@ -1,308 +1,40 @@
 -#include <thread>
 -#include <map>
@@ -337,7 +337,7 @@
  /** Given slug => fallback slug.
  Correctly handles bidirectional fallbacks.
  To request fallback slugs to be added to this list, open a GitHub issue.
-@@ -352,6 +84,12 @@
+@@ -352,8 +84,19 @@
  */
  using PluginModuleSlug = std::tuple<std::string, std::string>;
  static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = {
@@ -345,12 +345,20 @@
 +	{{"Core", "AudioInterface"}, {"Cardinal", "HostAudio8"}},
 +	{{"Core", "AudioInterface16"}, {"Cardinal", "HostAudio8"}},
 +	{{"Core", "MIDIToCVInterface"}, {"Cardinal", "HostMIDI"}},
++	{{"Core", "MIDICCToCVInterface"}, {"Cardinal", "HostMIDICC"}},
++	{{"Core", "MIDITriggerToCVInterface"}, {"Cardinal", "HostMIDIGate"}},
 +	{{"Core", "CV-MIDI"}, {"Cardinal", "HostMIDI"}},
++	{{"Core", "CV-CC"}, {"Cardinal", "HostMIDICC"}},
++	{{"Core", "CV-Gate"}, {"Cardinal", "HostMIDIGate"}},
++	{{"Core", "MIDI-Map"}, {"Cardinal", "HostMIDIMap"}},
 +	{{"Core", "Notes"}, {"Cardinal", "TextEditor"}},
++	{{"Core", "Blank"}, {"Cardinal", "Blank"}},
  	{{"MindMeld-ShapeMasterPro", "ShapeMasterPro"}, {"MindMeldModular", "ShapeMaster"}},
- 	{{"MindMeldModular", "ShapeMaster"}, {"MindMeld-ShapeMasterPro", "ShapeMasterPro"}},
+-	{{"MindMeldModular", "ShapeMaster"}, {"MindMeld-ShapeMasterPro", "ShapeMasterPro"}},
  	// {{"", ""}, {"", ""}},
-@@ -441,7 +179,6 @@
+ };
+ 
+@@ -441,7 +184,6 @@
  }
  
  

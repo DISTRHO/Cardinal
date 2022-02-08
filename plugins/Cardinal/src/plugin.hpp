@@ -18,6 +18,7 @@
 #pragma once
 
 #include "rack.hpp"
+#include "engine/TerminalModule.hpp"
 
 #ifdef NDEBUG
 # undef DEBUG

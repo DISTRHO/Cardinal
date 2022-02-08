@@ -24,7 +24,7 @@
 USE_NAMESPACE_DISTRHO;
 
 template<int numIO>
-struct HostAudio : Module {
+struct HostAudio : TerminalModule {
     CardinalPluginContext* const pcontext;
     const int numParams;
     const int numInputs;
@@ -74,45 +74,65 @@ struct HostAudio : Module {
             dcFilters[i].setCutoffFreq(10.f * e.sampleTime);
     }
 
-    void process(const ProcessArgs&) override
+    void processTerminalInput(const ProcessArgs&) override
     {
         const float* const* const dataIns = pcontext->dataIns;
-        float** const dataOuts = pcontext->dataOuts;
 
         const int blockFrames = pcontext->engine->getBlockFrames();
         const int64_t blockFrame = pcontext->engine->getBlockFrame();
 
+        // only checked on input
         if (lastBlockFrame != blockFrame)
         {
             dataFrame = 0;
             lastBlockFrame = blockFrame;
         }
 
+        // only incremented on output
+        const int k = dataFrame;
+        DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
+
+        // from host into cardinal, shows as output plug
+        if (isBypassed())
+        {
+            for (int i=0; i<numOutputs; ++i)
+                outputs[i].setVoltage(0.0f);
+        }
+        else if (dataIns != nullptr)
+        {
+            for (int i=0; i<numOutputs; ++i)
+                outputs[i].setVoltage(dataIns[i][k] * 10.0f);
+        }
+    }
+
+    void processTerminalOutput(const ProcessArgs&) override
+    {
+        float** const dataOuts = pcontext->dataOuts;
+
+        const int blockFrames = pcontext->engine->getBlockFrames();
+
+        // only incremented on output
         const int k = dataFrame++;
         DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
 
         const float gain = numParams != 0 ? std::pow(params[0].getValue(), 2.f) : 1.0f;
 
-        // from host into cardinal, shows as output plug
-        if (dataIns != nullptr)
-        {
-            for (int i=0; i<numOutputs; ++i)
-                outputs[i].setVoltage(dataIns[i][k] * 10.0f);
-        }
-
         // from cardinal into host, shows as input plug
-        for (int i=0; i<numInputs; ++i)
+        if (! isBypassed())
         {
-            float v = inputs[i].getVoltageSum() * 0.1f;
-
-            // Apply DC filter
-            if (dcFilterEnabled)
+            for (int i=0; i<numInputs; ++i)
             {
-                dcFilters[i].process(v);
-                v = dcFilters[i].highpass();
-            }
+                float v = inputs[i].getVoltageSum() * 0.1f;
 
-            dataOuts[i][k] += clamp(v * gain, -1.0f, 1.0f);
+                // Apply DC filter
+                if (dcFilterEnabled)
+                {
+                    dcFilters[i].process(v);
+                    v = dcFilters[i].highpass();
+                }
+
+                dataOuts[i][k] += clamp(v * gain, -1.0f, 1.0f);
+            }
         }
 
         if (numInputs == 2)
