@@ -1,5 +1,5 @@
 --- ../Rack/src/window/Window.cpp	2022-01-05 19:24:25.995101080 +0000
-+++ Window.cpp	2022-01-26 18:35:47.181645555 +0000
++++ Window.cpp	2022-02-08 03:46:08.216824790 +0000
 @@ -1,33 +1,73 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -85,7 +85,7 @@
  
  
  Font::~Font() {
-@@ -82,369 +122,241 @@
+@@ -82,372 +122,244 @@
  struct Window::Internal {
  	std::string lastWindowTitle;
  
@@ -619,7 +619,11 @@
 +		bndSetFont(uiFont->handle);
  
  	// Set window title
- 	std::string windowTitle = APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION;
+-	std::string windowTitle = APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION;
++	std::string windowTitle = "Cardinal";
+ 	if (APP->patch->path != "") {
+ 		windowTitle += " - ";
+ 		if (!APP->history->isSaved())
 @@ -455,31 +367,23 @@
  		windowTitle += system::getFilename(APP->patch->path);
  	}
