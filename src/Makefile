@@ -69,6 +69,10 @@ BASE_FLAGS += -ffat-lto-objects
 endif
 endif
 
+ifeq ($(BSD),true)
+BASE_FLAGS += -DCLOCK_MONOTONIC_RAW=CLOCK_MONOTONIC_PRECISE
+endif
+
 ifeq ($(WASM),true)
 BASE_FLAGS += -DNANOVG_GLES2=1
 BASE_FLAGS += -msse -msse2 -msse3 -msimd128
