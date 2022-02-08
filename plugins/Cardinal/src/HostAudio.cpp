@@ -76,8 +76,6 @@ struct HostAudio : TerminalModule {
 
     void processTerminalInput(const ProcessArgs&) override
     {
-        const float* const* const dataIns = pcontext->dataIns;
-
         const int blockFrames = pcontext->engine->getBlockFrames();
         const int64_t blockFrame = pcontext->engine->getBlockFrame();
 
@@ -98,7 +96,7 @@ struct HostAudio : TerminalModule {
             for (int i=0; i<numOutputs; ++i)
                 outputs[i].setVoltage(0.0f);
         }
-        else if (dataIns != nullptr)
+        else if (const float* const* const dataIns = pcontext->dataIns)
         {
             for (int i=0; i<numOutputs; ++i)
                 outputs[i].setVoltage(dataIns[i][k] * 10.0f);

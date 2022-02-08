@@ -64,45 +64,64 @@ struct HostCV : TerminalModule {
         if (pcontext->variant != kCardinalVariantMain)
             return;
 
-        const float* const* const dataIns = pcontext->dataIns;
-        float** const dataOuts = pcontext->dataOuts;
-
         const int64_t blockFrame = pcontext->engine->getBlockFrame();
 
+        // only checked on input
         if (lastBlockFrame != blockFrame)
         {
             dataFrame = 0;
             lastBlockFrame = blockFrame;
         }
 
+        // only incremented on output
+        const int k = dataFrame;
+        DISTRHO_SAFE_ASSERT_RETURN(k < pcontext->engine->getBlockFrames(),);
+
+        if (isBypassed())
+        {
+            for (int i=0; i<10; ++i)
+                outputs[i].setVoltage(0.0f);
+        }
+        else if (const float* const* const dataIns = pcontext->dataIns)
+        {
+            float outputOffset;
+            outputOffset = params[BIPOLAR_OUTPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
+
+            for (int i=0; i<5; ++i)
+                outputs[i].setVoltage(dataIns[i+CARDINAL_AUDIO_IO_OFFSET][k] - outputOffset);
+
+            outputOffset = params[BIPOLAR_OUTPUTS_6_10].getValue() > 0.1f ? 5.0f : 0.0f;
+
+            for (int i=5; i<10; ++i)
+                outputs[i].setVoltage(dataIns[i+CARDINAL_AUDIO_IO_OFFSET][k] - outputOffset);
+        }
+    }
+
+    void processTerminalOutput(const ProcessArgs&) override
+    {
+        if (pcontext->variant != kCardinalVariantMain)
+            return;
+
+        // only incremented on output
         const int k = dataFrame++;
         DISTRHO_SAFE_ASSERT_RETURN(k < pcontext->engine->getBlockFrames(),);
 
         if (isBypassed())
             return;
 
-        float inputOffset, outputOffset;
+        float** const dataOuts = pcontext->dataOuts;
+
+        float inputOffset;
         inputOffset = params[BIPOLAR_INPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
-        outputOffset = params[BIPOLAR_OUTPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
 
         for (int i=0; i<5; ++i)
-        {
-            outputs[i].setVoltage(dataIns[i+CARDINAL_AUDIO_IO_OFFSET][k] - outputOffset);
-            dataOuts[i+CARDINAL_AUDIO_IO_OFFSET][k] = inputs[i].getVoltage() + inputOffset;
-        }
+            dataOuts[i+CARDINAL_AUDIO_IO_OFFSET][k] += inputs[i].getVoltage() + inputOffset;
 
         inputOffset = params[BIPOLAR_INPUTS_6_10].getValue() > 0.1f ? 5.0f : 0.0f;
-        outputOffset = params[BIPOLAR_OUTPUTS_6_10].getValue() > 0.1f ? 5.0f : 0.0f;
 
         for (int i=5; i<10; ++i)
-        {
-            outputs[i].setVoltage(dataIns[i+CARDINAL_AUDIO_IO_OFFSET][k] - outputOffset);
-            dataOuts[i+CARDINAL_AUDIO_IO_OFFSET][k] = inputs[i].getVoltage() + inputOffset;
-        }
+            dataOuts[i+CARDINAL_AUDIO_IO_OFFSET][k] += inputs[i].getVoltage() + inputOffset;
     }
-
-    void processTerminalOutput(const ProcessArgs&) override
-    {}
 };
 
 struct HostCVWidget : ModuleWidgetWith8HP {
