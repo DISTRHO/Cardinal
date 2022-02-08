@@ -38,7 +38,7 @@ namespace engine {
 
 
 /** This is inspired by the number of MIDI channels. */
-static const int PORT_MAX_CHANNELS = 16;
+static constexpr const int PORT_MAX_CHANNELS = 16;
 
 
 struct Cable;
@@ -46,7 +46,9 @@ struct Cable;
 
 struct Port {
 	/** Voltage of the port. */
-	union {
+	/** NOTE alignas is required in order to allow SSE usage.
+	Consecutive data (like in a vector) would otherwise pack Ports in a way that breaks SSE. */
+	union alignas(PORT_MAX_CHANNELS) {
 		/** Unstable API. Use getVoltage() and setVoltage() instead. */
 		float voltages[PORT_MAX_CHANNELS] = {};
 		/** DEPRECATED. Unstable API. Use getVoltage() and setVoltage() instead. */
@@ -71,9 +73,6 @@ struct Port {
 		INPUT,
 		OUTPUT,
 	};
-
-	/** List of cables connected to this port (if output type). */
-	std::list<Cable*> cables;
 
 	/** Sets the voltage of the given channel. */
 	void setVoltage(float voltage, int channel = 0) {
@@ -236,7 +235,11 @@ struct Port {
 };
 
 
-struct Output : Port {};
+struct Output : Port {
+	/** List of cables connected to this port. */
+	std::list<Cable*> cables;
+};
+
 
 struct Input : Port {};
 

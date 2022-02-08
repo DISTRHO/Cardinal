@@ -279,41 +279,45 @@ static void Port_setConnected(Port* that) {
 
 static void Engine_updateConnected(Engine* that) {
 	// Find disconnected ports
-	std::set<Port*> disconnectedPorts;
+	std::set<Input*> disconnectedInputs;
+	std::set<Output*> disconnectedOutputs;
 	for (Module* module : that->internal->modules) {
 		for (Input& input : module->inputs) {
-			disconnectedPorts.insert(&input);
+			disconnectedInputs.insert(&input);
 		}
 		for (Output& output : module->outputs) {
-			disconnectedPorts.insert(&output);
+			disconnectedOutputs.insert(&output);
 		}
 	}
 	for (TerminalModule* terminalModule : that->internal->terminalModules) {
 		for (Input& input : terminalModule->inputs) {
-			disconnectedPorts.insert(&input);
+			disconnectedInputs.insert(&input);
 		}
 		for (Output& output : terminalModule->outputs) {
-			disconnectedPorts.insert(&output);
+			disconnectedOutputs.insert(&output);
 		}
 	}
 	for (Cable* cable : that->internal->cables) {
 		// Connect input
 		Input& input = cable->inputModule->inputs[cable->inputId];
-		auto inputIt = disconnectedPorts.find(&input);
-		if (inputIt != disconnectedPorts.end())
-			disconnectedPorts.erase(inputIt);
+		auto inputIt = disconnectedInputs.find(&input);
+		if (inputIt != disconnectedInputs.end())
+			disconnectedInputs.erase(inputIt);
 		Port_setConnected(&input);
 		// Connect output
 		Output& output = cable->outputModule->outputs[cable->outputId];
-		auto outputIt = disconnectedPorts.find(&output);
-		if (outputIt != disconnectedPorts.end())
-			disconnectedPorts.erase(outputIt);
+		auto outputIt = disconnectedOutputs.find(&output);
+		if (outputIt != disconnectedOutputs.end())
+			disconnectedOutputs.erase(outputIt);
 		Port_setConnected(&output);
 	}
 	// Disconnect ports that have no cable
-	for (Port* port : disconnectedPorts) {
-		Port_setDisconnected(port);
-		DISTRHO_SAFE_ASSERT(port->cables.empty());
+	for (Input* input : disconnectedInputs) {
+		Port_setDisconnected(input);
+	}
+	for (Output* output : disconnectedOutputs) {
+		Port_setDisconnected(output);
+		DISTRHO_SAFE_ASSERT(output->cables.empty());
 	}
 }
 
