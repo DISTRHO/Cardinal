@@ -250,9 +250,9 @@ BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 # Enable all possible plugin types and setup resources
 
 ifeq ($(CARDINAL_VARIANT),main)
-all: jack lv2 vst3 resources
+all: jack lv2 vst3
 else
-all: lv2 vst2 vst3 resources
+all: lv2 vst2 vst3
 endif
 
 CORE_RESOURCES  = $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
@@ -288,6 +288,12 @@ $(TARGET_DIR)/$(NAME).%/template.vcv: ../template.vcv
 $(TARGET_DIR)/$(NAME).lv2/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
+
+ifeq ($(MOD_BUILD),true)
+$(TARGET_DIR)/$(NAME).lv2/resources/%.svg: ../Rack/res/%.svg ../../deps/svg2stub.py
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)python3 ../../deps/svg2stub.py $< $@
+endif
 
 $(TARGET_DIR)/$(NAME).vst/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"

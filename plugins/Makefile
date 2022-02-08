@@ -854,7 +854,7 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
 
-# MOD builds only have FX variant for now
+# MOD builds only have LV2 FX variant for now
 ifeq ($(MOD_BUILD),true)
 LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
@@ -865,7 +865,6 @@ LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.lv2/resources/PluginManife
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.lv2/resources/%)
-endif
 
 ifeq ($(MACOS),true)
 VST2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json)
@@ -885,6 +884,7 @@ VST3_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst3/Contents/Resources/P
 VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.vst3/Contents/Resources/%)
 VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst3/Contents/Resources/%)
 VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst3/Contents/Resources/%)
+endif
 
 resources: $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES)
 
@@ -899,6 +899,12 @@ resources: $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES)
 ../bin/CardinalSynth.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
+
+ifeq ($(MOD_BUILD),true)
+../bin/CardinalFX.lv2/resources/%.svg: %.svg ../deps/svg2stub.py
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)python3 ../deps/svg2stub.py $< $@
+endif
 
 ../bin/Cardinal.lv2/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
@@ -987,10 +993,10 @@ $(TARGET): $(PLUGIN_OBJS)
 	$(SILENT)rm -f $@
 	$(SILENT)$(AR) crs $@ $^
 
-$(BUILD_DIR)/%.bin.c: % res2c.py
+$(BUILD_DIR)/%.bin.c: % ../deps/res2c.py
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Generating $*.bin.c"
-	$(SILENT)python3 ./res2c.py $< > $@
+	$(SILENT)python3 ../deps/res2c.py $< > $@
 
 $(BUILD_DIR)/%.bin.o: $(BUILD_DIR)/%.bin.c
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
