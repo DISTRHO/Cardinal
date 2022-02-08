@@ -74,6 +74,21 @@ struct CarlaInternalPluginModule : Module, Thread {
         NUM_LIGHTS
     };
 
+    enum Parameters {
+        kParameterLooping,
+        kParameterHostSync,
+        kParameterVolume,
+        kParameterEnabled,
+        kParameterInfoChannels,
+        kParameterInfoBitRate,
+        kParameterInfoBitDepth,
+        kParameterInfoSampleRate,
+        kParameterInfoLength,
+        kParameterInfoPosition,
+        kParameterInfoPoolFill,
+        kParameterCount
+    };
+
     CardinalPluginContext* const pcontext;
 
     const NativePluginDescriptor* fCarlaPluginDescriptor = nullptr;
@@ -151,7 +166,7 @@ struct CarlaInternalPluginModule : Module, Thread {
         fCarlaPluginDescriptor->activate(fCarlaPluginHandle);
 
         // host-sync disabled by default
-        fCarlaPluginDescriptor->set_parameter_value(fCarlaPluginHandle, 1, 0.0f);
+        fCarlaPluginDescriptor->set_parameter_value(fCarlaPluginHandle, kParameterHostSync, 0.0f);
 
         startThread();
     }
@@ -218,6 +233,18 @@ struct CarlaInternalPluginModule : Module, Thread {
         DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr, nullptr);
 
         json_object_set_new(rootJ, "filepath", json_string(currentFile.c_str()));
+
+        if (fCarlaPluginHandle != nullptr)
+        {
+            const bool looping = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle,
+                                                                             kParameterLooping) > 0.5f;
+            const bool hostSync = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle,
+                                                                              kParameterLooping) > 0.5f;
+
+            json_object_set_new(rootJ, "looping", json_boolean(looping));
+            json_object_set_new(rootJ, "hostSync", json_boolean(hostSync));
+        }
+
         return rootJ;
     }
 
@@ -241,6 +268,21 @@ struct CarlaInternalPluginModule : Module, Thread {
 
         currentFile.clear();
         fileChanged = true;
+
+        if (fCarlaPluginHandle == nullptr)
+            return;
+
+        if (json_t* const loopingJ = json_object_get(rootJ, "looping"))
+        {
+            const float value = json_boolean_value(loopingJ) ? 1.0f : 0.0f;
+            fCarlaPluginDescriptor->set_parameter_value(fCarlaPluginHandle, kParameterLooping, value);
+        }
+
+        if (json_t* const hostSyncJ = json_object_get(rootJ, "hostSync"))
+        {
+            const float value = json_boolean_value(hostSyncJ) ? 1.0f : 0.0f;
+            fCarlaPluginDescriptor->set_parameter_value(fCarlaPluginHandle, kParameterHostSync, value);
+        }
     }
 
     void process(const ProcessArgs&) override
@@ -593,6 +635,20 @@ struct AudioFileWidget : ModuleWidgetWithSideScrews<23> {
     void appendContextMenu(ui::Menu* const menu) override
     {
         menu->addChild(new ui::MenuSeparator);
+
+        const bool looping = module->fCarlaPluginDescriptor->get_parameter_value(module->fCarlaPluginHandle,
+            CarlaInternalPluginModule::kParameterLooping) > 0.5f;
+        const bool hostSync = module->fCarlaPluginDescriptor->get_parameter_value(module->fCarlaPluginHandle,
+            CarlaInternalPluginModule::kParameterHostSync) > 0.5f;
+
+        menu->addChild(createMenuItem("Looping", looping ? CHECKMARK_STRING : "",
+            [=]() { module->fCarlaPluginDescriptor->set_parameter_value(module->fCarlaPluginHandle,
+                        CarlaInternalPluginModule::kParameterLooping, looping ? 0.0f : 1.0f); }
+        ));
+        menu->addChild(createMenuItem("Host sync", hostSync ? CHECKMARK_STRING : "",
+            [=]() { module->fCarlaPluginDescriptor->set_parameter_value(module->fCarlaPluginHandle,
+                        CarlaInternalPluginModule::kParameterHostSync, hostSync ? 0.0f : 1.0f); }
+        ));
 
         struct LoadAudioFileItem : MenuItem {
             CarlaInternalPluginModule* const module;
