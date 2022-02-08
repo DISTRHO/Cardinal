@@ -430,7 +430,7 @@ struct AudioFileListWidget : ImGuiWidget {
 
         static constexpr const char* const supportedExtensions[] = {
        #ifdef HAVE_SNDFILE
-            ".aif",".aifc",".aiff",".au",".bwf",".flac",".htk",".iff",".mat4",".mat5",".oga",".ogg;"
+            ".aif",".aifc",".aiff",".au",".bwf",".flac",".htk",".iff",".mat4",".mat5",".oga",".ogg"
             ".paf",".pvf",".pvf5",".sd2",".sf",".snd",".svx",".vcc",".w64",".wav",".xi",
        #endif
             ".mp3"
