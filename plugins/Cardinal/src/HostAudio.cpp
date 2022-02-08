@@ -120,7 +120,7 @@ struct HostAudio : TerminalModule {
         const float gain = numParams != 0 ? std::pow(params[0].getValue(), 2.f) : 1.0f;
 
         // read first value, special case for mono mode
-        float valueL = inputs[0].getVoltage() * 0.1f;
+        float valueL = inputs[0].getVoltageSum() * 0.1f;
 
         // Apply DC filter
         if (dcFilterEnabled)
@@ -135,7 +135,7 @@ struct HostAudio : TerminalModule {
         // read everything else
         for (int i=1; i<numInputs; ++i)
         {
-            float v = inputs[i].getVoltage() * 0.1f;
+            float v = inputs[i].getVoltageSum() * 0.1f;
 
             // Apply DC filter
             if (dcFilterEnabled)
