@@ -111,26 +111,40 @@ struct HostAudio : TerminalModule {
         const int k = dataFrame++;
         DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
 
+        if (isBypassed())
+            return;
+
         float** const dataOuts = pcontext->dataOuts;
 
-        // from cardinal into host, shows as input plug
-        if (! isBypassed())
+        // stereo version gain
+        const float gain = numParams != 0 ? std::pow(params[0].getValue(), 2.f) : 1.0f;
+
+        // read first value, special case for mono mode
+        float valueL = inputs[0].getVoltage() * 0.1f;
+
+        // Apply DC filter
+        if (dcFilterEnabled)
         {
-            const float gain = numParams != 0 ? std::pow(params[0].getValue(), 2.f) : 1.0f;
+            dcFilters[0].process(valueL);
+            valueL = dcFilters[0].highpass();
+        }
 
-            for (int i=0; i<numInputs; ++i)
+        valueL = clamp(valueL * gain, -1.0f, 1.0f);
+        dataOuts[0][k] += valueL;
+
+        // read everything else
+        for (int i=1; i<numInputs; ++i)
+        {
+            float v = inputs[i].getVoltage() * 0.1f;
+
+            // Apply DC filter
+            if (dcFilterEnabled)
             {
-                float v = inputs[i].getVoltageSum() * 0.1f;
-
-                // Apply DC filter
-                if (dcFilterEnabled)
-                {
-                    dcFilters[i].process(v);
-                    v = dcFilters[i].highpass();
-                }
-
-                dataOuts[i][k] += clamp(v * gain, -1.0f, 1.0f);
+                dcFilters[i].process(v);
+                v = dcFilters[i].highpass();
             }
+
+            dataOuts[i][k] += clamp(v * gain, -1.0f, 1.0f);
         }
 
         if (numInputs == 2)
@@ -138,7 +152,7 @@ struct HostAudio : TerminalModule {
             const bool connected = inputs[1].isConnected();
 
             if (! connected)
-                dataOuts[1][k] += dataOuts[0][k];
+                dataOuts[1][k] += valueL;
 
             if (dataFrame == blockFrames)
             {
