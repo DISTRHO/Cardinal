@@ -150,9 +150,6 @@ BASE_FLAGS += -pthread
 
 ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
-ifeq ($(WITH_LTO),true)
-BASE_FLAGS += -ffat-lto-objects
-endif
 endif
 
 ifeq ($(WASM),true)

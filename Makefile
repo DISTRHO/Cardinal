@@ -106,6 +106,10 @@ endif
 # --------------------------------------------------------------
 # MOD builds
 
+ifeq ($(WITH_LTO),true)
+EXTRA_MOD_FLAGS += -ffat-lto-objects
+endif
+
 MOD_WORKDIR ?= $(HOME)/mod-workdir
 MOD_ENVIRONMENT = \
 	AR=${1}/host/usr/bin/${2}-gcc-ar \
@@ -115,10 +119,10 @@ MOD_ENVIRONMENT = \
 	LD=${1}/host/usr/bin/${2}-ld \
 	PKG_CONFIG=${1}/host/usr/bin/pkg-config \
 	STRIP=${1}/host/usr/bin/${2}-strip \
-	CFLAGS="-I${1}/staging/usr/include -fsingle-precision-constant" \
+	CFLAGS="-I${1}/staging/usr/include -fsingle-precision-constant $(EXTRA_MOD_FLAGS)" \
 	CPPFLAGS= \
-	CXXFLAGS="-I${1}/staging/usr/include -I../include/single-precision -fsingle-precision-constant -Wno-attributes" \
-	LDFLAGS="-L${1}/staging/usr/lib" \
+	CXXFLAGS="-I${1}/staging/usr/include -I../include/single-precision -fsingle-precision-constant $(EXTRA_MOD_FLAGS) -Wno-attributes" \
+	LDFLAGS="-L${1}/staging/usr/lib $(EXTRA_MOD_FLAGS)" \
 	EXE_WRAPPER="qemu-${3}-static -L ${1}/target" \
 	HEADLESS=true \
 	MOD_BUILD=true \

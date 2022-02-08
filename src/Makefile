@@ -64,9 +64,6 @@ endif
 
 ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
-ifeq ($(WITH_LTO),true)
-BASE_FLAGS += -ffat-lto-objects
-endif
 endif
 
 ifeq ($(BSD),true)
