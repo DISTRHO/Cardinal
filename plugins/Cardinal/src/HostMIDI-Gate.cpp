@@ -159,7 +159,7 @@ struct HostMIDIGate : TerminalModule {
                             learningId = -1;
                         }
                         // Find id
-                        for (int i = 0; i < 16; i++) {
+                        for (int i = 0; i < 18; i++) {
                             if (learnedNotes[i] == data[1]) {
                                 gates[i][c] = true;
                                 gateTimes[i][c] = 1e-3f;
@@ -173,7 +173,7 @@ struct HostMIDIGate : TerminalModule {
                 case 0x80:
                     const int c = mpeMode ? (data[0] & 0x0F) : 0;
                     // Find id
-                    for (int i = 0; i < 16; i++) {
+                    for (int i = 0; i < 18; i++) {
                         if (learnedNotes[i] == data[1]) {
                             gates[i][c] = false;
                         }
