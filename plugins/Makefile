@@ -854,52 +854,121 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
 
-PLUGIN_RESOURCES  =
+PLUGIN_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.lv2/resources/PluginManifests/%.json)
+
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.vst3/Contents/Resources/PluginManifests/%.json)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst3/Contents/Resources/PluginManifests/%.json)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst3/Contents/Resources/PluginManifests/%.json)
+
 ifeq ($(MACOS),true)
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json)
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/Contents/Resources/%)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst/Contents/Resources/PluginManifests/%.json)
 else
 PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst/resources/PluginManifests/%.json)
-PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/resources/%)
+PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst/resources/PluginManifests/%.json)
 endif
-PLUGIN_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.vst3/Contents/Resources/PluginManifests/%.json)
+
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.lv2/resources/%)
+
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.vst3/Contents/Resources/%)
 PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst3/Contents/Resources/%)
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst3/Contents/Resources/%)
+
+ifeq ($(MACOS),true)
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/Contents/Resources/%)
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst/Contents/Resources/%)
+else
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/resources/%)
+PLUGIN_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst/resources/%)
+endif
 
 resources: $(PLUGIN_RESOURCES)
 
+../bin/Cardinal.lv2/resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
 ../bin/CardinalFX.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/CardinalFX.vst/resources/%: %
+../bin/CardinalSynth.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/CardinalFX.vst/Contents/Resources/%: %
+../bin/Cardinal.lv2/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
-
-../bin/CardinalFX.vst3/Contents/Resources/%: %
-	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
 
 ../bin/CardinalFX.lv2/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/CardinalFX.vst/resources/PluginManifests/%.json: %/plugin.json
+../bin/CardinalSynth.lv2/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json: %/plugin.json
+../bin/Cardinal.vst3/Contents/Resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalFX.vst3/Contents/Resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalSynth.vst3/Contents/Resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/Cardinal.vst3/Contents/Resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
 
 ../bin/CardinalFX.vst3/Contents/Resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
-	ln -sf $(abspath $<) $@
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalSynth.vst3/Contents/Resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+ifeq ($(MACOS),true)
+../bin/CardinalFX.vst/Contents/Resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalSynth.vst/Contents/Resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalSynth.vst/Contents/Resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+else
+../bin/CardinalFX.vst/resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalSynth.vst/resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalFX.vst/resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalSynth.vst/resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+endif
 
 # --------------------------------------------------------------
 # Build commands

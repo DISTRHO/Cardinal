@@ -6,6 +6,14 @@
 
 # Must have NAME defined
 
+ifeq ($(NAME),Cardinal)
+CARDINAL_VARIANT = main
+else ifeq ($(NAME),CardinalFX)
+CARDINAL_VARIANT = fx
+else ifeq ($(NAME),CardinalSynth)
+CARDINAL_VARIANT = synth
+endif
+
 # --------------------------------------------------------------
 # Carla stuff
 
@@ -221,87 +229,68 @@ endif
 # --------------------------------------------------------------
 # fallback path to resource files
 
+ifneq ($(SYSDEPS),true)
+
 ifeq ($(EXE_WRAPPER),wine)
 SOURCE_DIR = Z:$(subst /,\\,$(abspath $(CURDIR)/..))
 else
 SOURCE_DIR = $(abspath $(CURDIR)/..)
 endif
 
-ifneq ($(SYSDEPS),true)
 BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_SOURCE_DIR='"$(SOURCE_DIR)"'
+
 endif
+
+# --------------------------------------------------------------
+# install path prefix for resource files
 
 BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 
 # --------------------------------------------------------------
 # Enable all possible plugin types and setup resources
 
-ifeq ($(NAME),CardinalFX)
-
-all: lv2 vst2 vst3 resources
-
-CORE_RESOURCES = $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf)) template.vcv
-
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/CardinalFX.lv2/resources/%)
-ifeq ($(MACOS),true)
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/CardinalFX.vst/Contents/Resources/%)
-else
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/CardinalFX.vst/resources/%)
-endif
-PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/CardinalFX.vst3/Contents/Resources/%)
-
-else # CardinalFX
-
-ifeq ($(NAME),Cardinal)
+ifeq ($(CARDINAL_VARIANT),main)
 all: jack lv2 vst3 resources
 else
 all: lv2 vst2 vst3 resources
 endif
 
-PLUGIN_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/resources
-PLUGIN_RESOURCES += $(TARGET_DIR)/$(NAME).vst3/Contents/Resources
+CORE_RESOURCES  = $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
+CORE_RESOURCES += template.vcv
 
-# Cardinal (full) is not available as VST2 due to lack of CV ports
-ifneq ($(NAME),Cardinal)
+PLUGIN_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
+PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
+
+# Cardinal main variant is not available as VST2 due to lack of CV ports
+ifneq ($(CARDINAL_VARIANT),main)
 ifeq ($(MACOS),true)
-PLUGIN_RESOURCES += $(TARGET_DIR)/$(NAME).vst/Contents/Resources
+PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%)
 else
-PLUGIN_RESOURCES += $(TARGET_DIR)/$(NAME).vst/resources
+PLUGIN_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/resources/%)
 endif
 endif
-
-endif # CardinalFX
-
-# --------------------------------------------------------------
 
 resources: $(PLUGIN_RESOURCES)
 
-ifneq ($(NAME),CardinalFX)
-lv2: resources
-vst2: resources
-vst3: resources
-$(TARGET_DIR)/$(NAME).%: $(TARGET_DIR)/CardinalFX.%
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
-endif
+# --------------------------------------------------------------
 
-$(TARGET_DIR)/CardinalFX.%/template.vcv: ../template.vcv
+$(TARGET_DIR)/$(NAME).%/template.vcv: ../template.vcv
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-$(TARGET_DIR)/CardinalFX.lv2/resources/%: ../Rack/res/%
+$(TARGET_DIR)/$(NAME).lv2/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-$(TARGET_DIR)/CardinalFX.vst/resources/%: ../Rack/res/%
+$(TARGET_DIR)/$(NAME).vst/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-$(TARGET_DIR)/CardinalFX.vst/Contents/Resources/%: ../Rack/res/%
+$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-$(TARGET_DIR)/CardinalFX.vst3/Contents/Resources/%: ../Rack/res/%
+$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
