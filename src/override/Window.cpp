@@ -359,7 +359,7 @@ void Window::step() {
 		bndSetFont(uiFont->handle);
 
 	// Set window title
-	std::string windowTitle = APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION;
+	std::string windowTitle = "Cardinal";
 	if (APP->patch->path != "") {
 		windowTitle += " - ";
 		if (!APP->history->isSaved())

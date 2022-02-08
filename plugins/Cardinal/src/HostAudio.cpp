@@ -105,19 +105,19 @@ struct HostAudio : TerminalModule {
 
     void processTerminalOutput(const ProcessArgs&) override
     {
-        float** const dataOuts = pcontext->dataOuts;
-
         const int blockFrames = pcontext->engine->getBlockFrames();
 
         // only incremented on output
         const int k = dataFrame++;
         DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
 
-        const float gain = numParams != 0 ? std::pow(params[0].getValue(), 2.f) : 1.0f;
+        float** const dataOuts = pcontext->dataOuts;
 
         // from cardinal into host, shows as input plug
         if (! isBypassed())
         {
+            const float gain = numParams != 0 ? std::pow(params[0].getValue(), 2.f) : 1.0f;
+
             for (int i=0; i<numInputs; ++i)
             {
                 float v = inputs[i].getVoltageSum() * 0.1f;

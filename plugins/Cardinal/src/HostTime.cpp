@@ -63,6 +63,9 @@ struct HostTime : TerminalModule {
     {
         const int64_t blockFrame = pcontext->engine->getBlockFrame();
 
+        // local variables for faster access
+        double tick, tickClock;
+
         // Update time position if running a new audio block
         if (lastBlockFrame != blockFrame)
         {
@@ -70,9 +73,14 @@ struct HostTime : TerminalModule {
             timeInfo.reset = pcontext->reset;
             timeInfo.bar = pcontext->bar;
             timeInfo.beat = pcontext->beat;
-            timeInfo.tick = pcontext->tick;
-            timeInfo.tickClock = pcontext->tickClock;
             timeInfo.seconds = pcontext->frame / pcontext->sampleRate;
+            tick = pcontext->tick;
+            tickClock = pcontext->tickClock;
+        }
+        else
+        {
+            tick = timeInfo.tick;
+            tickClock = timeInfo.tickClock;
         }
 
         const bool playing = pcontext->playing;
@@ -80,7 +88,7 @@ struct HostTime : TerminalModule {
 
         if (playingWithBBT)
         {
-            if (timeInfo.tick == 0.0)
+            if (d_isZero(tick))
             {
                 pulseReset.trigger();
                 pulseClock.trigger();
@@ -95,9 +103,13 @@ struct HostTime : TerminalModule {
                 pulseReset.trigger();
             }
 
-            if ((timeInfo.tick += pcontext->ticksPerFrame) >= pcontext->ticksPerBeat)
+            tick += pcontext->ticksPerFrame;
+
+            // give a little help to keep tick active,
+            // as otherwise we might miss it if located at the very end of the audio block
+            if (tick + 0.0001 >= pcontext->ticksPerBeat)
             {
-                timeInfo.tick -= pcontext->ticksPerBeat;
+                tick -= pcontext->ticksPerBeat;
                 pulseBeat.trigger();
 
                 if (++timeInfo.beat > pcontext->beatsPerBar)
@@ -108,9 +120,9 @@ struct HostTime : TerminalModule {
                 }
             }
 
-            if ((timeInfo.tickClock += pcontext->ticksPerFrame) >= pcontext->ticksPerClock)
+            if ((tickClock += pcontext->ticksPerFrame) >= pcontext->ticksPerClock)
             {
-                timeInfo.tickClock -= pcontext->ticksPerClock;
+                tickClock -= pcontext->ticksPerClock;
                 pulseClock.trigger();
             }
         }
@@ -120,11 +132,15 @@ struct HostTime : TerminalModule {
         const bool hasBeat = pulseBeat.process(args.sampleTime);
         const bool hasClock = pulseClock.process(args.sampleTime);
         const float beatPhase = playingWithBBT && pcontext->ticksPerBeat > 0.0
-                              ? timeInfo.tick / pcontext->ticksPerBeat
+                              ? tick / pcontext->ticksPerBeat
                               : 0.0f;
         const float barPhase = playingWithBBT && pcontext->beatsPerBar > 0
                               ? ((float) (timeInfo.beat - 1) + beatPhase) / pcontext->beatsPerBar
                               : 0.0f;
+
+        // store back the local values
+        timeInfo.tick = tick;
+        timeInfo.tickClock = tickClock;
 
         if (isBypassed())
             return;
