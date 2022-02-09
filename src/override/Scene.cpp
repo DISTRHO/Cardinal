@@ -341,6 +341,7 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 		}
 		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
 			patchUtils::deployToRemote();
+			window::generateScreenshot();
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F9 && (e.mods & RACK_MOD_MASK) == 0) {
@@ -538,6 +539,17 @@ void deployToRemote() {
 		lo_blob_free(blob);
 	}
 
+	lo_address_free(addr);
+#endif
+}
+
+
+void sendScreenshotToRemote(const char* const screenshot) {
+#ifdef HAVE_LIBLO
+	const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
+	DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
+
+	lo_send(addr, "/screenshot", "s", screenshot);
 	lo_address_free(addr);
 #endif
 }

@@ -396,7 +396,8 @@ class CardinalPlugin : public CardinalBasePlugin
 
     std::string fAutosavePath;
     uint64_t fPreviousFrame;
-    String fStateText;
+    String fStateComment;
+    String fStateScreenshot;
     String fWindowSize;
 
    #ifndef HEADLESS
@@ -767,8 +768,10 @@ protected:
             return fWindowSize;
        #endif
 
-        if (std::strcmp(key, "text") == 0)
-            return fStateText;
+        if (std::strcmp(key, "comment") == 0)
+            return fStateComment;
+        if (std::strcmp(key, "screenshot") == 0)
+            return fStateScreenshot;
 
         if (std::strcmp(key, "patch") != 0)
             return String();
@@ -803,9 +806,18 @@ protected:
         }
        #endif
 
-        if (std::strcmp(key, "text") == 0)
+        if (std::strcmp(key, "comment") == 0)
         {
-            fStateText = value;
+            fStateComment = value;
+            return;
+        }
+
+        if (std::strcmp(key, "screenshot") == 0)
+        {
+            fStateScreenshot = value;
+           #if defined(HAVE_LIBLO) && defined(HEADLESS)
+            patchUtils::sendScreenshotToRemote(value);
+           #endif
             return;
         }
 

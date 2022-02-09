@@ -60,5 +60,6 @@ bool isRemoteConnected();
 bool isRemoteAutoDeployed();
 void setRemoteAutoDeploy(bool autoDeploy);
 void deployToRemote();
+void sendScreenshotToRemote(const char* screenshot);
 
 } // namespace patchUtils
