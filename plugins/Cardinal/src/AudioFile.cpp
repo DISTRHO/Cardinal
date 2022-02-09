@@ -239,7 +239,7 @@ struct CarlaInternalPluginModule : Module, Thread {
             const bool looping = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle,
                                                                              kParameterLooping) > 0.5f;
             const bool hostSync = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle,
-                                                                              kParameterLooping) > 0.5f;
+                                                                              kParameterHostSync) > 0.5f;
 
             json_object_set_new(rootJ, "looping", json_boolean(looping));
             json_object_set_new(rootJ, "hostSync", json_boolean(hostSync));
@@ -250,6 +250,8 @@ struct CarlaInternalPluginModule : Module, Thread {
 
     void dataFromJson(json_t* const rootJ) override
     {
+        fileChanged = false;
+
         if (json_t* const filepathJ = json_object_get(rootJ, "filepath"))
         {
             const char* const filepath = json_string_value(filepathJ);
@@ -261,13 +263,14 @@ struct CarlaInternalPluginModule : Module, Thread {
 
                 if (fCarlaPluginHandle != nullptr)
                     fCarlaPluginDescriptor->set_custom_data(fCarlaPluginHandle, "file", filepath);
-
-                return;
             }
         }
 
-        currentFile.clear();
-        fileChanged = true;
+        if (! fileChanged)
+        {
+            currentFile.clear();
+            fileChanged = true;
+        }
 
         if (fCarlaPluginHandle == nullptr)
             return;
