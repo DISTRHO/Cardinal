@@ -245,7 +245,20 @@ PLUGIN_FILES += $(wildcard AnimatedCircuits/src/Folding/*.cpp)
 # --------------------------------------------------------------
 # Aria
 
-PLUGIN_FILES += $(filter-out AriaModules/src/Arcane.cpp AriaModules/src/plugin.cpp,$(wildcard AriaModules/src/*.cpp))
+PLUGIN_FILES += AriaModules/src/Blank.cpp
+PLUGIN_FILES += AriaModules/src/Darius.cpp
+PLUGIN_FILES += AriaModules/src/Pokies.cpp
+PLUGIN_FILES += AriaModules/src/Psychopump.cpp
+PLUGIN_FILES += AriaModules/src/Qqqq.cpp
+PLUGIN_FILES += AriaModules/src/Quale.cpp
+PLUGIN_FILES += AriaModules/src/Rotatoes.cpp
+PLUGIN_FILES += AriaModules/src/Smerge.cpp
+PLUGIN_FILES += AriaModules/src/Solomon.cpp
+PLUGIN_FILES += AriaModules/src/Spleet.cpp
+PLUGIN_FILES += AriaModules/src/Splirge.cpp
+PLUGIN_FILES += AriaModules/src/Splort.cpp
+PLUGIN_FILES += AriaModules/src/Swerge.cpp
+PLUGIN_FILES += AriaModules/src/Undular.cpp
 
 # modules/types which are present in other plugins
 ARIA_CUSTOM = Blank

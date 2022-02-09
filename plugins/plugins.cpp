@@ -779,7 +779,6 @@ static void initStatic__Aria()
         p->addModel(modelSpleet);
         p->addModel(modelSwerge);
         p->addModel(modelSplirge);
-        // p->addModel(modelSrot);
         p->addModel(modelQqqq);
         p->addModel(modelQuack);
         p->addModel(modelQ);
