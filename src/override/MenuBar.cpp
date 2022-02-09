@@ -479,6 +479,8 @@ struct ViewButton : MenuButton {
 
 		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
 
+		menu->addChild(new ui::MenuSeparator);
+
 		static const std::vector<std::string> rateLimitLabels = {
 			"None",
 			"2x",

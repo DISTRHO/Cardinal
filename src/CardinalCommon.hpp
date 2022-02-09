@@ -37,6 +37,10 @@ namespace ui {
 struct Menu;
 }
 
+namespace window {
+void generateScreenshot();
+}
+
 } // namespace rack
 
 namespace patchUtils {

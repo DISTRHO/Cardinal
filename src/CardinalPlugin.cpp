@@ -49,10 +49,10 @@
 
 #ifndef HEADLESS
 # include "WindowParameters.hpp"
-static const constexpr uint kCardinalStateCount = 3; // patch, text, windowSize
+static const constexpr uint kCardinalStateCount = 4; // patch, screenshot, comment, windowSize
 #else
 # define kWindowParameterCount 0
-static const constexpr uint kCardinalStateCount = 2; // patch, text
+static const constexpr uint kCardinalStateCount = 3; // patch, screenshot, comment
 #endif
 
 namespace rack {
@@ -698,10 +698,13 @@ protected:
             stateKey = "patch";
             break;
         case 1:
-            stateKey = "text";
+            stateKey = "screenshot";
+            break;
+        case 2:
+            stateKey = "comment";
             break;
        #ifndef HEADLESS
-        case 2:
+        case 3:
             stateKey = "windowSize";
             break;
        #endif
@@ -712,7 +715,8 @@ protected:
     {
         switch (index)
         {
-        case 1:
+        case 1: // screenshot
+        case 2: // comment
             return kStateIsHostVisible;
         default:
             return 0x0;

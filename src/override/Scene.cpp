@@ -185,11 +185,20 @@ math::Vec Scene::getMousePos() {
 
 
 void Scene::step() {
+	if (APP->window->isFullScreen()) {
+		// Expand RackScrollWidget to cover entire screen if fullscreen
+		rackScroll->box.pos.y = 0;
+	}
+	else {
+		// Always show MenuBar if not fullscreen
+		menuBar->show();
+		rackScroll->box.pos.y = menuBar->box.size.y;
+	}
+
 	internal->resizeHandle->box.pos = box.size.minus(internal->resizeHandle->box.size);
 
 	// Resize owned descendants
 	menuBar->box.size.x = box.size.x;
-	rackScroll->box.pos.y = menuBar->box.size.y;
 	rackScroll->box.size = box.size.minus(rackScroll->box.pos);
 
 	// Scroll RackScrollWidget with arrow keys
@@ -332,6 +341,10 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 		}
 		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
 			patchUtils::deployToRemote();
+			e.consume(this);
+		}
+		if (e.key == GLFW_KEY_F9 && (e.mods & RACK_MOD_MASK) == 0) {
+			window::generateScreenshot();
 			e.consume(this);
 		}
 

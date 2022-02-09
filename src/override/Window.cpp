@@ -36,15 +36,25 @@
 #include <context.hpp>
 #include <patch.hpp>
 #include <settings.hpp>
-#include <plugin.hpp> // used in Window::screenshot
-#include <system.hpp> // used in Window::screenshot
+#include <system.hpp>
 
 #ifdef NDEBUG
 # undef DEBUG
 #endif
 
+// comment out if wanting to generate a local screenshot.png
+#define STBI_WRITE_NO_STDIO
+
+// uncomment to generate screenshots without the rack rail background (ie, transparent)
+// #define CARDINAL_TRANSPARENT_SCREENSHOTS
+
+// used in Window::screenshot
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "../src/Rack/dep/glfw/deps/stb_image_write.h"
+
 #include "DistrhoUI.hpp"
 #include "Application.hpp"
+#include "extra/String.hpp"
 #include "../CardinalCommon.hpp"
 #include "../WindowParameters.hpp"
 
@@ -119,6 +129,15 @@ std::shared_ptr<Image> Image::load(const std::string& filename) {
 }
 
 
+enum ScreenshotStep {
+	kScreenshotStepNone,
+	kScreenshotStepStarted,
+	kScreenshotStepFirstPass,
+	kScreenshotStepSecondPass,
+	kScreenshotStepSaving
+};
+
+
 struct Window::Internal {
 	std::string lastWindowTitle;
 
@@ -139,6 +158,7 @@ struct Window::Internal {
 
 	int frame = 0;
 	int frameSwapInterval = 1;
+	int generateScreenshotStep = kScreenshotStepNone;
 	double monitorRefreshRate = 60.0;
 	double frameTime = 0.0;
 	double lastFrameDuration = 0.0;
@@ -342,6 +362,26 @@ void Window::run() {
 }
 
 
+static void Window__flipBitmap(uint8_t* pixels, int width, int height, int depth) {
+	for (int y = 0; y < height / 2; y++) {
+		const int flipY = height - y - 1;
+		uint8_t tmp[width * depth];
+		std::memcpy(tmp, &pixels[y * width * depth], width * depth);
+		std::memcpy(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
+		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
+	}
+}
+
+
+static void Window__writeImagePNG(void* context, void* data, int size) {
+	USE_NAMESPACE_DISTRHO
+	UI* const ui = static_cast<UI*>(context);
+	String encodedPNG("data:image/png;base64,");
+	encodedPNG += String::asBase64(data, size);
+	ui->setState("screenshot", encodedPNG.buffer());
+}
+
+
 void Window::step() {
 	DISTRHO_SAFE_ASSERT_RETURN(internal->ui != nullptr,);
 
@@ -378,6 +418,16 @@ void Window::step() {
 		APP->event->handleDirty();
 	}
 
+	// Hide menu and background if generating screenshot
+	if (internal->generateScreenshotStep == kScreenshotStepStarted) {
+#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
+		APP->scene->menuBar->hide();
+		APP->scene->rack->children.front()->hide();
+#else
+		internal->generateScreenshotStep = kScreenshotStepSecondPass;
+#endif
+	}
+
 	// Get framebuffer/window ratio
 	int winWidth = internal->ui->getWidth();
 	int winHeight = internal->ui->getHeight();
@@ -388,7 +438,7 @@ void Window::step() {
 	if (APP->scene) {
 		// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
 		// Resize scene
-		APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
+		APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(newPixelRatio);
 
 		// Step scene
 		APP->scene->step();
@@ -396,7 +446,7 @@ void Window::step() {
 		// Render scene
 		{
 			// Update and render
-			nvgScale(vg, pixelRatio, pixelRatio);
+			nvgScale(vg, newPixelRatio, newPixelRatio);
 
 			// Draw scene
 			widget::Widget::DrawArgs args;
@@ -405,12 +455,52 @@ void Window::step() {
 			APP->scene->draw(args);
 
 			glViewport(0, 0, fbWidth, fbHeight);
+#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
+			glClearColor(0.0, 0.0, 0.0, 0.0);
+#else
 			glClearColor(0.0, 0.0, 0.0, 1.0);
+#endif
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		}
 	}
 
 	++internal->frame;
+
+	if (internal->generateScreenshotStep != kScreenshotStepNone) {
+		++internal->generateScreenshotStep;
+
+		int y = 0;
+#ifndef CARDINAL_TRANSPARENT_SCREENSHOTS
+		y = APP->scene->menuBar->box.size.y * newPixelRatio;
+#endif
+
+		// Allocate pixel color buffer
+		uint8_t* const pixels = new uint8_t[winHeight * winWidth * 4];
+
+		// glReadPixels defaults to GL_BACK, but the back-buffer is unstable, so use the front buffer (what the user sees)
+		glReadBuffer(GL_FRONT);
+		glReadPixels(0, 0, winWidth, winHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+		if (internal->generateScreenshotStep == kScreenshotStepSaving)
+		{
+			// Write pixels to PNG
+			const int stride = winWidth * 4;
+			const uint8_t* const pixelsWithOffset = pixels + (stride * y);
+			Window__flipBitmap(pixels, winWidth, winHeight, 4);
+#ifdef STBI_WRITE_NO_STDIO
+			stbi_write_png_to_func(Window__writeImagePNG, internal->ui,
+                                   winWidth, winHeight - y, 4, pixelsWithOffset, stride);
+#else
+			stbi_write_png("screenshot.png", winWidth, winHeight - y, 4, pixelsWithOffset, stride);
+#endif
+
+			internal->generateScreenshotStep = kScreenshotStepNone;
+			APP->scene->menuBar->show();
+			APP->scene->rack->children.front()->show();
+		}
+
+		delete[] pixels;
+	}
 }
 
 
@@ -456,7 +546,11 @@ void Window::setFullScreen(bool) {
 
 
 bool Window::isFullScreen() {
+#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
+	return internal->generateScreenshotStep != kScreenshotStepNone;
+#else
 	return false;
+#endif
 }
 
 
@@ -530,6 +624,11 @@ bool& Window::fbDirtyOnSubpixelChange() {
 
 int& Window::fbCount() {
 	return internal->fbCount;
+}
+
+
+void generateScreenshot() {
+	APP->window->internal->generateScreenshotStep = kScreenshotStepStarted;
 }
 
 
