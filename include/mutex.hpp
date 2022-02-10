@@ -29,18 +29,18 @@ struct SharedMutex {
 
     SharedMutex() noexcept {
         pthread_mutexattr_t attr;
-
         pthread_mutexattr_init(&attr);
         pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_INHERIT);
         pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
         pthread_mutex_init(&readLock, &attr);
         pthread_mutexattr_destroy(&attr);
 
-        pthread_mutexattr_init(&attr);
-        pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_INHERIT);
-        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
-        pthread_mutex_init(&writeLock, &attr);
-        pthread_mutexattr_destroy(&attr);
+        pthread_mutexattr_t attr2;
+        pthread_mutexattr_init(&attr2);
+        pthread_mutexattr_setprotocol(&attr2, PTHREAD_PRIO_NONE);
+        pthread_mutexattr_settype(&attr2, PTHREAD_MUTEX_NORMAL);
+        pthread_mutex_init(&writeLock, &attr2);
+        pthread_mutexattr_destroy(&attr2);
     }
 
     ~SharedMutex() noexcept {
