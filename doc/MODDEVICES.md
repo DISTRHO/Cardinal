@@ -8,6 +8,8 @@ This document briefly describes how to use Cardinal with a [MOD device](https://
 It is intended for this documentation to be part of the plugin bundle when installed from the
 [MOD Plugin store](https://pedalboards.moddevices.com/plugins).
 
+![Screenshot](../src/MOD/CardinalFX.lv2/modgui/screenshot.png "Screenshot")
+
 ## Plugin overview
 
 Cardinal is a free and open-source virtual modular synthesizer plugin,.  
