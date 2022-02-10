@@ -509,7 +509,7 @@ void Window::step() {
 #endif
 
 		// Allocate pixel color buffer
-		uint8_t* const pixels = new uint8_t[winHeight * winWidth * depth];
+		uint8_t* const pixels = new uint8_t[winHeight * winWidth * 4];
 
 		// glReadPixels defaults to GL_BACK, but the back-buffer is unstable, so use the front buffer (what the user sees)
 		glReadBuffer(GL_FRONT);
