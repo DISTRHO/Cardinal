@@ -312,5 +312,9 @@ int& Window::fbCount() {
 }
 
 
+void generateScreenshot() {
+}
+
+
 } // namespace window
 } // namespace rack
