@@ -152,6 +152,10 @@ ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
 endif
 
+ifeq ($(MOD_BUILD),true)
+BASE_FLAGS += -DDISTRHO_PLUGIN_USES_MODGUI=1 -DDISTRHO_PLUGIN_MINIMUM_BUFFER_SIZE=0xffff
+endif
+
 ifeq ($(WASM),true)
 BASE_FLAGS += -DNANOVG_GLES2=1
 BASE_FLAGS += -msse -msse2 -msse3 -msimd128
@@ -256,7 +260,13 @@ CORE_RESOURCES  = $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/
 CORE_RESOURCES += template.vcv
 
 LV2_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
-VST3_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
+VST3_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
+
+# Install modgui resources if MOD build
+ifeq ($(MOD_BUILD),true)
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui.ttl
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui
+endif
 
 # Cardinal main variant should not use rtaudio fallback (it has CV ports)
 ifeq ($(CARDINAL_VARIANT),main)
@@ -266,9 +276,9 @@ endif
 # Cardinal main variant is not available as VST2 due to lack of CV ports
 ifneq ($(CARDINAL_VARIANT),main)
 ifeq ($(MACOS),true)
-VST2_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%)
+VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%)
 else
-VST2_RESOURCES += $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/resources/%)
+VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/resources/%)
 endif
 endif
 
@@ -290,6 +300,10 @@ ifeq ($(MOD_BUILD),true)
 $(TARGET_DIR)/$(NAME).lv2/resources/%.svg: ../Rack/res/%.svg ../../deps/svg2stub.py
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)python3 ../../deps/svg2stub.py $< $@
+
+$(TARGET_DIR)/$(NAME).lv2/mod%: ../MOD/$(NAME).lv2/mod%
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
 endif
 
 $(TARGET_DIR)/$(NAME).vst/resources/%: ../Rack/res/%
