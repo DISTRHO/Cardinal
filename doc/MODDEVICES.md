@@ -41,4 +41,5 @@ There are a few critical things to take into consideration for this release:
 you can and should use multiple instances when there is no desktop connection though
 - The MOD unit must be connected over USB, so that the 192.168.51.1 IP is reachable
 - The Audio File, Carla and Ildaeil modules are not available in MOD builds
+- Lights and meters from the Cardinal MOD side are not transmitted back to the desktop side
 - Compared to desktop, MOD builds are not as fast, so do not expect to load big patches
