@@ -60,11 +60,6 @@ extern Model* modelUndular;
 extern Model* modelBlank;
 #undef modelBlank
 
-// Atelier
-/*
-#include "Atelier/src/plugin.hpp"
-*/
-
 // AudibleInstruments
 #include "AudibleInstruments/src/plugin.hpp"
 

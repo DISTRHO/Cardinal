@@ -264,22 +264,6 @@ PLUGIN_FILES += AriaModules/src/Undular.cpp
 ARIA_CUSTOM = Blank
 
 # --------------------------------------------------------------
-# Atelier
-
-# PLUGIN_FILES += Atelier/src/Palette.cpp
-# PLUGIN_FILES += Atelier/eurorack/stmlib/dsp/atan.cc
-# PLUGIN_FILES += Atelier/eurorack/stmlib/dsp/units.cc
-# PLUGIN_FILES += Atelier/eurorack/stmlib/utils/random.cc
-# PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/*.cc)
-# PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/engine/*.cc)
-# PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/speech/*.cc)
-# PLUGIN_FILES += $(wildcard Atelier/eurorack/plaits/dsp/physical_modelling/*.cc)
-# PLUGIN_FILES += Atelier/eurorack/plaits/resources.cc
-# 
-# # modules/types which are present in other plugins
-# ATELIER_CUSTOM = plaits stmlib
-
-# --------------------------------------------------------------
 # AudibleInstruments
 
 PLUGIN_FILES += $(filter-out AudibleInstruments/src/plugin.cpp,$(wildcard AudibleInstruments/src/*.cpp))
@@ -1066,17 +1050,6 @@ $(BUILD_DIR)/AriaModules/%.cpp.o: AriaModules/%.cpp
 		$(foreach m,$(ARIA_CUSTOM),$(call custom_module_names,$(m),Aria)) \
 		-DpluginInstance=pluginInstance__Aria \
 		-Wno-cast-function-type
-
-$(BUILD_DIR)/Atelier/%.o: Atelier/%
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(ATELIER_CUSTOM),$(call custom_module_names,$(m),Atelier)) \
-		-DpluginInstance=pluginInstance__Atelier \
-		-DTEST \
-		-IAtelier/eurorack \
-		-Wno-sign-compare \
-		-Wno-unused-local-typedefs
 
 $(BUILD_DIR)/AudibleInstruments/%.o: AudibleInstruments/%
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

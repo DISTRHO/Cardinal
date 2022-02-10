@@ -48,14 +48,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Sonus Modular           | GPL-3.0-or-later      | |
 | Valley                  | GPL-3.0-or-later      | |
 | ZetaCarinae             | GPL-3.0-or-later      | |
-
-Bellow follows a list of code licenses from potentially coming modules.
-
-| Name                    | License(s)            | Pending reason |
-|-------------------------|-----------------------|----------------|
-| Atelier                 | GPL-3.0-or-later      | Custom artwork license, needs permission request |
-| Fundamental             | GPL-3.0-or-later      | CC-ND without permission for runtime mode, panels need to be redone |
-| ZZC                     | GPL-3.0-or-later      | Artwork license terms unclear |
+| ZZC                     | GPL-3.0-or-later      | |
 
 ## ARTWORK / PANEL LICENSES
 
@@ -124,7 +117,7 @@ Below is a list of artwork licenses from plugins
 | LittleUtils/fonts/CooperHewitt-*.ttf    | OFL-1.1-RFN      | |
 | LittleUtils/fonts/Overpass-*.ttf        | OFL-1.1-RFN      | |
 | LittleUtils/fonts/RobotoMono-*.ttf      | Apache-2.0       | |
-| LomasModules/*                          | GPL-3.0-or-later | No artwork specific license provided, see [LomasModules#26](https://github.com/LomasModules/LomasModules/issues/26) |
+| LomasModules/*                          | GPL-3.0-or-later | [Same license as source code](https://github.com/LomasModules/LomasModules/issues/26) |
 | LomasModules/Fonts/FiraMono-Bold.ttf    | OFL-1.1-RFN      | |
 | LyraeModules/*                          | CC-BY-NC-SA-4.0  | |
 | MindMeld/*                              | CC-BY-NC-ND-4.0  | |
@@ -147,13 +140,6 @@ Below is a list of artwork licenses from plugins
 | ZZC/panels/*                            | CC-BY-NC-SA-4.0  | NOTE: The ZZC Logo is Copyright (c) 2019 Sergey Ukolov and cannot be used in derivative works; Cardinal's use does not officially constitute derivative work. |
 | ZZC/fonts/DSEG/*                        | OFL-1.1-RFN      | |
 | ZZC/fonts/Nunito/*                      | OFL-1.1-RFN      | |
-
-Bellow follows a list of artwork licenses from potentially coming plugins.
-
-| Name                                    | License(s)       | Additional notes |
-|-----------------------------------------|------------------|------------------|
-| Atelier/*                               | Custom           | Copyright © Pyer 2020, used and distributed with permission (TODO ask for it) |
-| Fundamental/*                           | CC-BY-NC-ND-4.0  | |
 
 ### Rack
 

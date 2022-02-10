@@ -2,7 +2,7 @@
 
 *Cardinal, the Rack!*
 
-A free and open-source virtual modular synthesizer plugin,
+Cardinal is a free and open-source virtual modular synthesizer plugin,
 available as JACK standalone and LV2, VST2 and VST3 audio plugin for FreeBSD, Linux, macOS and Windows.  
 It is based on the popular [VCV Rack](https://vcvrack.com/) but with a focus on being a fully self-contained plugin version.
 
@@ -125,10 +125,6 @@ At the moment the following 3rd-party modules are provided:
 - Valley
 - ZetaCarinae
 - ZZC
-
-Potentially coming soon, currently sorting out license situation:
-- Atelier
-- Fundamental
 
 Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.
 
