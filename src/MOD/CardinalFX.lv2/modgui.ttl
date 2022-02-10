@@ -7,6 +7,7 @@
     mod:label "CardinalFX" ;
     modgui:gui [
         modgui:resourcesDirectory <modgui> ;
+        modgui:documentation <modgui/documentation.pdf>;
         modgui:iconTemplate <modgui/icon.html> ;
         modgui:javascript <modgui/javascript.js> ;
         modgui:stylesheet <modgui/stylesheet.css> ;

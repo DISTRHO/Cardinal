@@ -265,6 +265,7 @@ VST3_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resourc
 # Install modgui resources if MOD build
 ifeq ($(MOD_BUILD),true)
 LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui.ttl
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf
 LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui
 endif
 
@@ -304,6 +305,9 @@ $(TARGET_DIR)/$(NAME).lv2/resources/%.svg: ../Rack/res/%.svg ../../deps/svg2stub
 $(TARGET_DIR)/$(NAME).lv2/mod%: ../MOD/$(NAME).lv2/mod%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
+
+$(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf: ../../doc/MODDEVICES.md $(TARGET_DIR)/$(NAME).lv2/modgui
+	pandoc $< -o $@
 endif
 
 $(TARGET_DIR)/$(NAME).vst/resources/%: ../Rack/res/%
