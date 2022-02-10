@@ -24,7 +24,7 @@ otherwise the audio thread would take all of valgrind's time and it would appear
 It is recommended to remove all modules from the Rack except for the strictly necessary ones for debug.
 
 ```
-env CARLA_BRIDGE_DUMMY=1 \
+env CARLA_BRIDGE_DUMMY=30 \
 valgrind --leak-check=full --track-origins=yes --suppressions=./dpf/utils/valgrind-dpf.supp \
 /usr/lib/carla/carla-bridge-native vst2 ./bin/CardinalFX.vst/CardinalFX.so ""
 ```
