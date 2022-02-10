@@ -196,6 +196,7 @@ struct Initializer
 
         lo_server_add_method(oscServer, "/hello", "", osc_hello_handler, this);
         lo_server_add_method(oscServer, "/load", "b", osc_load_handler, this);
+        lo_server_add_method(oscServer, "/screenshot", "b", osc_screenshot_handler, this);
         lo_server_add_method(oscServer, nullptr, nullptr, osc_fallback_handler, nullptr);
 
         startThread();
@@ -300,6 +301,29 @@ struct Initializer
         const lo_address source = lo_message_get_source(m);
         lo_send_from(source, static_cast<Initializer*>(self)->oscServer,
                      LO_TT_IMMEDIATE, "/resp", "ss", "load", ok ? "ok" : "fail");
+        return 0;
+    }
+
+    static int osc_screenshot_handler(const char*, const char* types, lo_arg** argv, int argc, const lo_message m, void* const self)
+    {
+        d_stdout("osc_screenshot_handler()");
+        DISTRHO_SAFE_ASSERT_RETURN(argc == 1, 0);
+        DISTRHO_SAFE_ASSERT_RETURN(types != nullptr && types[0] == 'b', 0);
+
+        const int32_t size = argv[0]->blob.size;
+        DISTRHO_SAFE_ASSERT_RETURN(size > 4, 0);
+
+        const uint8_t* const blob = (uint8_t*)(&argv[0]->blob.data);
+        DISTRHO_SAFE_ASSERT_RETURN(blob != nullptr, 0);
+
+        bool ok = false;
+
+        if (CardinalBasePlugin* const plugin = static_cast<Initializer*>(self)->oscPlugin)
+            ok = plugin->updateStateValue("screenshot", String::asBase64(blob, size).buffer());
+
+        const lo_address source = lo_message_get_source(m);
+        lo_send_from(source, static_cast<Initializer*>(self)->oscServer,
+                     LO_TT_IMMEDIATE, "/resp", "ss", "screenshot", ok ? "ok" : "fail");
         return 0;
     }
 #endif
