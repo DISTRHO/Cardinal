@@ -5,8 +5,6 @@
 
 <https://distrho.kx.studio/plugins/cardinal#fx>
     lv2:requiredFeature state:loadDefaultState ;
-    mod:brand "DISTRHO" ;
-    mod:label "CardinalFX" ;
     modgui:gui [
         modgui:resourcesDirectory <modgui> ;
         modgui:documentation <modgui/documentation.pdf>;

@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -26,9 +26,15 @@
 #define CARDINAL_NUM_AUDIO_OUTPUTS 2
 
 #define DISTRHO_PLUGIN_BRAND "DISTRHO"
+#define DISTRHO_PLUGIN_URI   "https://distrho.kx.studio/plugins/cardinal#fx"
+
+#ifdef __MOD_DEVICES__
+#define DISTRHO_PLUGIN_NAME  "Cardinal Mini"
+#define DISTRHO_PLUGIN_LABEL "CardinalMini"
+#else
 #define DISTRHO_PLUGIN_NAME  "Cardinal FX"
 #define DISTRHO_PLUGIN_LABEL "CardinalFX"
-#define DISTRHO_PLUGIN_URI   "https://distrho.kx.studio/plugins/cardinal#fx"
+#endif
 
 #ifdef HEADLESS
 #define DISTRHO_PLUGIN_HAS_UI             0
