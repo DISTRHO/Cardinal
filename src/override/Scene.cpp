@@ -241,6 +241,7 @@ void Scene::step() {
 				internal->historyActionIndex = actionIndex;
 				internal->lastSceneChangeTime = time;
 				patchUtils::deployToRemote();
+				window::generateScreenshot();
 			}
 		}
 	}

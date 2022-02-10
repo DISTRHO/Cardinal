@@ -379,18 +379,18 @@ static void Window__downscaleBitmap(uint8_t* pixels, int& width, int& height) {
 	int targetHeight = height;
 	double scale = 1.0;
 
-	if (targetWidth > 300) {
-		scale = width / 300.0;
-		targetWidth = 300;
+	if (targetWidth > 340) {
+		scale = width / 340.0;
+		targetWidth = 340;
 		targetHeight = height / scale;
 	}
-	if (targetHeight > 200) {
-		scale = height / 200.0;
-		targetHeight = 200;
+	if (targetHeight > 210) {
+		scale = height / 210.0;
+		targetHeight = 210;
 		targetWidth = width / scale;
 	}
-	DISTRHO_SAFE_ASSERT_INT_RETURN(targetWidth <= 300, targetWidth,);
-	DISTRHO_SAFE_ASSERT_INT_RETURN(targetHeight <= 200, targetHeight,);
+	DISTRHO_SAFE_ASSERT_INT_RETURN(targetWidth <= 340, targetWidth,);
+	DISTRHO_SAFE_ASSERT_INT_RETURN(targetHeight <= 210, targetHeight,);
 
 	// FIXME worst possible quality :/
 	for (int y = 0; y < targetHeight; ++y) {
