@@ -1,8 +1,10 @@
 @prefix lv2:    <http://lv2plug.in/ns/lv2core#> .
 @prefix mod:    <http://moddevices.com/ns/mod#> .
 @prefix modgui: <http://moddevices.com/ns/modgui#> .
+@prefix state:  <http://lv2plug.in/ns/ext/state#> .
 
 <https://distrho.kx.studio/plugins/cardinal#fx>
+    lv2:requiredFeature state:loadDefaultState ;
     mod:brand "DISTRHO" ;
     mod:label "CardinalFX" ;
     modgui:gui [
@@ -13,4 +15,9 @@
         modgui:stylesheet <modgui/stylesheet.css> ;
         modgui:screenshot <modgui/screenshot.png> ;
         modgui:thumbnail <modgui/thumbnail.png> ;
+    ] ;
+    state:state [
+        <https://distrho.kx.studio/plugins/cardinal#fx#screenshot> "" ;
+        <https://distrho.kx.studio/plugins/cardinal#fx#comment> """Welcome to Cardinal.
+If this is your first time, make sure to check out the documentation link on the plugin info, have fun!""" ;
     ] .
