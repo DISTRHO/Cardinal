@@ -51,6 +51,7 @@
 #endif
 
 #include "../CardinalCommon.hpp"
+#include "extra/Base64.hpp"
 #include "DistrhoUtils.hpp"
 
 
@@ -549,7 +550,13 @@ void sendScreenshotToRemote(const char* const screenshot) {
 	const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
 	DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
 
-	lo_send(addr, "/screenshot", "s", screenshot);
+	std::vector<uint8_t> data(d_getChunkFromBase64String(screenshot));
+
+	if (const lo_blob blob = lo_blob_new(data.size(), data.data())) {
+		lo_send(addr, "/screenshot", "b", blob);
+		lo_blob_free(blob);
+	}
+
 	lo_address_free(addr);
 #endif
 }

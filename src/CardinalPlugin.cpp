@@ -34,9 +34,11 @@
 # undef DEBUG
 #endif
 
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
-# include <lo/lo.h>
-# include "extra/Thread.hpp"
+#ifdef HAVE_LIBLO
+# ifdef HEADLESS
+#  include <lo/lo.h>
+#  include "extra/Thread.hpp"
+# endif
 # include "CardinalCommon.hpp"
 #endif
 
@@ -815,7 +817,7 @@ protected:
         if (std::strcmp(key, "screenshot") == 0)
         {
             fStateScreenshot = value;
-           #if defined(HAVE_LIBLO) && defined(HEADLESS)
+           #if defined(HAVE_LIBLO) && !defined(HEADLESS)
             patchUtils::sendScreenshotToRemote(value);
            #endif
             return;

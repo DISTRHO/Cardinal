@@ -362,24 +362,55 @@ void Window::run() {
 }
 
 
-static void Window__flipBitmap(uint8_t* pixels, int width, int height, int depth) {
+static void Window__flipBitmap(uint8_t* pixels, const int width, const int height, const int depth) {
 	for (int y = 0; y < height / 2; y++) {
 		const int flipY = height - y - 1;
 		uint8_t tmp[width * depth];
 		std::memcpy(tmp, &pixels[y * width * depth], width * depth);
-		std::memcpy(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
+		std::memmove(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
 		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
 	}
 }
 
 
+#ifdef STBI_WRITE_NO_STDIO
+static void Window__downscaleBitmap(uint8_t* pixels, int& width, int& height) {
+	int targetWidth = width;
+	int targetHeight = height;
+	double scale = 1.0;
+
+	if (targetWidth > 300) {
+		scale = width / 300.0;
+		targetWidth = 300;
+		targetHeight = height / scale;
+	}
+	if (targetHeight > 200) {
+		scale = height / 200.0;
+		targetHeight = 200;
+		targetWidth = width / scale;
+	}
+	DISTRHO_SAFE_ASSERT_INT_RETURN(targetWidth <= 300, targetWidth,);
+	DISTRHO_SAFE_ASSERT_INT_RETURN(targetHeight <= 200, targetHeight,);
+
+	// FIXME worst possible quality :/
+	for (int y = 0; y < targetHeight; ++y) {
+		const int ys = static_cast<int>(y * scale);
+		for (int x = 0; x < targetWidth; ++x) {
+			const int xs = static_cast<int>(x * scale);
+			std::memmove(pixels + (width * y + x) * 3, pixels + (width * ys + xs) * 3, 3);
+		}
+	}
+
+	width = targetWidth;
+	height = targetHeight;
+}
+
 static void Window__writeImagePNG(void* context, void* data, int size) {
 	USE_NAMESPACE_DISTRHO
 	UI* const ui = static_cast<UI*>(context);
-	String encodedPNG("data:image/png;base64,");
-	encodedPNG += String::asBase64(data, size);
-	ui->setState("screenshot", encodedPNG.buffer());
+	ui->setState("screenshot", String::asBase64(data, size).buffer());
 }
+#endif
 
 
 void Window::step() {
@@ -470,28 +501,33 @@ void Window::step() {
 		++internal->generateScreenshotStep;
 
 		int y = 0;
-#ifndef CARDINAL_TRANSPARENT_SCREENSHOTS
+#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
+		constexpr const int depth = 4;
+#else
 		y = APP->scene->menuBar->box.size.y * newPixelRatio;
+		constexpr const int depth = 3;
 #endif
 
 		// Allocate pixel color buffer
-		uint8_t* const pixels = new uint8_t[winHeight * winWidth * 4];
+		uint8_t* const pixels = new uint8_t[winHeight * winWidth * depth];
 
 		// glReadPixels defaults to GL_BACK, but the back-buffer is unstable, so use the front buffer (what the user sees)
 		glReadBuffer(GL_FRONT);
-		glReadPixels(0, 0, winWidth, winHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+		glReadPixels(0, 0, winWidth, winHeight, depth == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 		if (internal->generateScreenshotStep == kScreenshotStepSaving)
 		{
 			// Write pixels to PNG
-			const int stride = winWidth * 4;
-			const uint8_t* const pixelsWithOffset = pixels + (stride * y);
-			Window__flipBitmap(pixels, winWidth, winHeight, 4);
+			const int stride = winWidth * depth;
+			uint8_t* const pixelsWithOffset = pixels + (stride * y);
+			Window__flipBitmap(pixels, winWidth, winHeight, depth);
+			winHeight -= y;
 #ifdef STBI_WRITE_NO_STDIO
+			Window__downscaleBitmap(pixelsWithOffset, winWidth, winHeight);
 			stbi_write_png_to_func(Window__writeImagePNG, internal->ui,
-                                   winWidth, winHeight - y, 4, pixelsWithOffset, stride);
+                                   winWidth, winHeight, depth, pixelsWithOffset, stride);
 #else
-			stbi_write_png("screenshot.png", winWidth, winHeight - y, 4, pixelsWithOffset, stride);
+			stbi_write_png("screenshot.png", winWidth, winHeight, depth, pixelsWithOffset, stride);
 #endif
 
 			internal->generateScreenshotStep = kScreenshotStepNone;
