@@ -92,9 +92,8 @@ void Font::loadFile(const std::string& filename, NVGcontext* vg) {
 	// Transfer ownership of font data to font object
 	uint8_t* data = system::readFile(filename, &size);
 	// Don't use nvgCreateFont because it doesn't properly handle UTF-8 filenames on Windows.
-	handle = nvgCreateFontMem(vg, name.c_str(), data, size, 0);
+	handle = nvgCreateFontMem(vg, name.c_str(), data, size, 1);
 	if (handle < 0) {
-		std::free(data);
 		throw Exception("Failed to load font %s", filename.c_str());
 	}
 	INFO("Loaded font %s", filename.c_str());

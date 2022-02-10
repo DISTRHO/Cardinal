@@ -15,6 +15,7 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
+#include <app/MenuBar.hpp>
 #include <app/Scene.hpp>
 #include <asset.hpp>
 #include <context.hpp>
@@ -291,8 +292,11 @@ public:
 
         rack::window::WindowSetPluginUI(context->window, this);
 
-        if (context->scene->menuBar != nullptr)
-            context->scene->removeChild(context->scene->menuBar);
+        if (rack::widget::Widget* const menuBar = context->scene->menuBar)
+        {
+            context->scene->removeChild(menuBar);
+            delete menuBar;
+        }
 
         context->scene->menuBar = rack::app::createMenuBar(getApp().isStandalone());
         context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
@@ -336,9 +340,14 @@ public:
 
         context->nativeWindowId = 0;
 
-        rack::widget::Widget* const menuBar = context->scene->menuBar;
-        context->scene->menuBar = nullptr;
-        context->scene->removeChild(menuBar);
+        if (rack::widget::Widget* const menuBar = context->scene->menuBar)
+        {
+            context->scene->removeChild(menuBar);
+            delete menuBar;
+        }
+
+        context->scene->menuBar = rack::app::createMenuBar();
+        context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
 
         rack::window::WindowSetPluginUI(context->window, nullptr);
 
