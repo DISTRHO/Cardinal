@@ -306,8 +306,8 @@ $(TARGET_DIR)/$(NAME).lv2/mod%: ../MOD/$(NAME).lv2/mod%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-$(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf: ../../doc/MODDEVICES.md $(TARGET_DIR)/$(NAME).lv2/modgui
-	(cd ../../doc/ && pandoc MODDEVICES.md -f markdown+implicit_figures -o $(abspath $@))
+$(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf: ../../docs/MODDEVICES.md $(TARGET_DIR)/$(NAME).lv2/modgui
+	(cd ../../docs/ && pandoc MODDEVICES.md -f markdown+implicit_figures -o $(abspath $@))
 endif
 
 $(TARGET_DIR)/$(NAME).vst/resources/%: ../Rack/res/%

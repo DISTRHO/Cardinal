@@ -1,4 +1,4 @@
-# DISTRHO Cardinal
+<!-- # DISTRHO Cardinal -->
 
 *Cardinal, the Rack!*
 
@@ -11,7 +11,7 @@ plugin wrapper around [VCV Rack](https://github.com/VCVRack/Rack/),
 using its code directly instead of forking the project,
 with the target of having a **proper, self-contained, fully free and open-source plugin version of Rack**.  
 See the [why section](#Why) below for the reasons Cardinal exists,
-also perhaps the [project overview document](doc/OVERVIEW.md) for an overview on how the project source code is structured.
+also perhaps the [project overview document](docs/OVERVIEW.md) for an overview on how the project source code is structured.
 
 Cardinal contains Rack, some 3rd-party modules and a few internal utilities all in a single binary.  
 All "Core" modules from Rack have been replaced by Cardinal equivalents, simplified to better work for an audio plugin.
@@ -54,24 +54,25 @@ Plugin type is set as regular "effect".
 Because people will ask for it. It is, well... Rack.  
 But a couple of modules background's have their colors flipped, because damn we want proper dark mode!
 
-![screenshot1](doc/Screenshot1.png "Screenshot1")
-![screenshot2](doc/Screenshot2.png "Screenshot2")
+![screenshot1](docs/Screenshot1.png "Screenshot1")
+![screenshot2](docs/Screenshot2.png "Screenshot2")
 
 
 ## Current status
 
 With the exception of a few bugs, Cardinal can be considered stable.  
-Though currently the following features are known NOT to work:
+Though currently the following should be noted:
 
-- VST3 support incomplete/experimental [#41](https://github.com/DISTRHO/Cardinal/issues/41)
-- Factory (plugin-provided) presets [#58](https://github.com/DISTRHO/Cardinal/issues/58)
+- Keyboard input does not always work in some hosts [#24](https://github.com/DISTRHO/Cardinal/issues/24)
+- VST3 support incomplete/experimental [#41](https://github.com/DISTRHO/Cardinal/issues/41) [#126](https://github.com/DISTRHO/Cardinal/issues/126)
+- Windows 32bit builds do not work well [#80](https://github.com/DISTRHO/Cardinal/issues/80)
 
 ### Current builds
 
 If you want to try this out early, checkout the [GitHub actions tab](https://github.com/DISTRHO/Cardinal/actions/workflows/build.yml).  
 There is absolutely no warranty, use at your own risk and all that...
 
-Basic building instructions are available in [BUILDING.md](doc/BUILDING.md)
+Basic building instructions are available in [BUILDING.md](docs/BUILDING.md)
 
 ### Community chat
 
@@ -82,7 +83,7 @@ Come join us in your favorite IRC client or through a Matrix bridge.
 ## License
 
 Cardinal is licensed under GPLv3+, see [LICENSE](LICENSE) for more details.  
-An overview of the included code and linked submodules can be seen [here](doc/LICENSES.md#code-license--binary).
+An overview of the included code and linked submodules can be seen [here](docs/LICENSES.md#code-license--binary).
 
 
 ## Included modules
@@ -138,7 +139,7 @@ Online access (such as phone-home) is not allowed.
 
 Worth noting that a few modules have artwork licensed separately from their code.  
 These licenses range from CC-0 to CC-NC-ND to custom (used with permission).  
-An overview of the included artwork licenses can be seen [here](doc/LICENSES.md#artwork--panel-licenses).
+An overview of the included artwork licenses can be seen [here](docs/LICENSES.md#artwork--panel-licenses).
 
 Even though CC-NC is problematic for packaging (some linux distributions are commercial in nature),
 Cardinal allows their use because of how prevalent they are across many Rack modules.  
@@ -188,4 +189,4 @@ In fact, Cardinal wouldn't exist if not for Rack v2 release. (which has many nee
 Cardinal and Rack should be able to co-exist friendly and peacefully, as they clearly have different targets.  
 It is likely most people will prefer to use Rack Pro for its official support and its big module collection (including commercial ones).
 
-A feature comparison between Cardinal and Rack Pro can be seen [here](doc/DIFFERENCES.md).
+A feature comparison between Cardinal and Rack Pro can be seen [here](docs/DIFFERENCES.md).

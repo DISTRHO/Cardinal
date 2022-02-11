@@ -256,5 +256,8 @@ install:
 	cp -rL bin/Cardinal.lv2/resources/* $(DESTDIR)$(PREFIX)/share/Cardinal/
 
 # --------------------------------------------------------------
+# Install step
+
+# --------------------------------------------------------------
 
 .PHONY: carla deps plugins
