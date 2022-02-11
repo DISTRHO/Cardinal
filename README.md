@@ -11,7 +11,7 @@ plugin wrapper around [VCV Rack](https://github.com/VCVRack/Rack/),
 using its code directly instead of forking the project,
 with the target of having a **proper, self-contained, fully free and open-source plugin version of Rack**.  
 See the [why section](#Why) below for the reasons Cardinal exists,
-also perhaps the [project overview document](docs/OVERVIEW.md) for an overview on how the project source code is structured.
+also for frequently asked questions check this [FAQ document](docs/FAQ.md).
 
 Cardinal contains Rack, some 3rd-party modules and a few internal utilities all in a single binary.  
 All "Core" modules from Rack have been replaced by Cardinal equivalents, simplified to better work for an audio plugin.
@@ -128,6 +128,13 @@ At the moment the following 3rd-party modules are provided:
 - ZZC
 
 Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.
+
+### Adding modules
+
+Install new modules on a Cardinal build is not possible, but we can add new modules to the build.  
+Details on this are available [here](https://github.com/DISTRHO/Cardinal/discussions/28).  
+Also check [this wiki page](https://github.com/DISTRHO/Cardinal/wiki/Possible-modules-to-include)
+where we discuss possible modules to include.  
 
 ### Module restrictions
 

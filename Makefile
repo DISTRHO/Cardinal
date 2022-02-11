@@ -4,6 +4,11 @@
 # Created by falkTX
 #
 
+# also set in:
+# src/CardinalCommon.cpp `CARDINAL_VERSION`
+# src/CardinalPlugin.cpp `getVersion`
+VERSION = 22.02
+
 # --------------------------------------------------------------
 # Import base definitions
 
@@ -240,6 +245,7 @@ install:
 	install -d $(DESTDIR)$(PREFIX)/lib/vst
 	install -d $(DESTDIR)$(PREFIX)/lib/vst3
 	install -d $(DESTDIR)$(PREFIX)/share/Cardinal
+	install -d $(DESTDIR)$(PREFIX)/share/doc/Cardinal/docs
 
 	cp -rL bin/Cardinal.lv2  $(DESTDIR)$(PREFIX)/lib/lv2/
 	cp -rL bin/Cardinal.vst3 $(DESTDIR)$(PREFIX)/lib/vst3/
@@ -255,8 +261,49 @@ install:
 	install -m 755 bin/Cardinal$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
 	cp -rL bin/Cardinal.lv2/resources/* $(DESTDIR)$(PREFIX)/share/Cardinal/
 
+	install -m 644 README.md $(DESTDIR)$(PREFIX)/share/doc/Cardinal/
+	install -m 644 docs/*.md docs/*.png $(DESTDIR)$(PREFIX)/share/doc/Cardinal/docs/
+
 # --------------------------------------------------------------
-# Install step
+# Tarball step, for releases
+
+tarball:
+	rm -f ../Cardinal-$(VERSION).tar
+	tar -c --lzma \
+		--exclude=".git*" \
+		--exclude=".travis*" \
+		--exclude="*.kdev4" \
+		--exclude="carla/source/modules/juce_*" \
+		--exclude="src/Rack/icon.*" \
+		--exclude=bin \
+		--exclude=build \
+		--exclude=carla/data \
+		--exclude=carla/source/bridges-plugin \
+		--exclude=carla/source/discovery \
+		--exclude=carla/source/frontend \
+		--exclude=carla/source/jackbridge \
+		--exclude=carla/source/interposer \
+		--exclude=carla/source/libjack \
+		--exclude=carla/source/tests.old \
+		--exclude=carla/source/theme \
+		--exclude=carla/resources \
+		--exclude=deps/PawPaw \
+		--exclude=deps/sysroot \
+		--exclude=deps/unzipfx \
+		--exclude=docs/.generate-plugin-licenses.sh \
+		--exclude=docs/MODDEVICES.md \
+		--exclude=dpf/examples \
+		--exclude=jucewrapper \
+		--exclude=lv2export \
+		--exclude=patches \
+		--exclude=plugins/.kdev_include_paths \
+		--exclude=plugins/todo.txt \
+		--exclude=src/MOD \
+		--exclude=src/Rack/src/core \
+		--exclude=src/Rack/res/Core \
+		--exclude=src/Rack/res/icon.png \
+		--transform='s,^\.,Cardinal-$(VERSION),' \
+		-f ../Cardinal-$(VERSION).tar.xz .
 
 # --------------------------------------------------------------
 
