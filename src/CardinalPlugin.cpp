@@ -536,10 +536,11 @@ protected:
     const char* getDescription() const override
     {
         return ""
-        "Cardinal is an open-source plugin wrapper around VCV Rack.\n"
-        "It is NOT an official VCV project, and it is not affiliated with it in any way.\n"
+        "Cardinal is a free and open-source virtual modular synthesizer plugin.\n"
+        "It is based on the popular VCV Rack but with a focus on being a fully self-contained plugin version.\n"
+        "It is not an official VCV project, and it is not affiliated with it in any way.\n"
         "\n"
-        "Cardinal contains Rack, some 3rd-party modules and a few internal utilities all in a single binary.\n"
+        "Cardinal contains Rack, some 3rd-party modules and a few internal utilities.\n"
         "It does not load external modules and does not connect to the official Rack library/store.\n";
     }
 
