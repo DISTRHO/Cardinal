@@ -715,38 +715,30 @@ protected:
        #endif
     }
 
-    void initState(const uint32_t index, String& stateKey, String& defaultStateValue) override
+    void initState(const uint32_t index, State& state) override
     {
-        defaultStateValue = "";
-
         switch (index)
         {
         case 0:
-            stateKey = "patch";
+            state.hints = kStateIsBase64Blob | kStateIsOnlyForDSP;
+            state.key = "patch";
+            state.label = "Patch";
             break;
         case 1:
-            stateKey = "screenshot";
+            state.hints = kStateIsHostReadable | kStateIsBase64Blob;
+            state.key = "screenshot";
+            state.label = "Screenshot";
             break;
         case 2:
-            stateKey = "comment";
+            state.hints = kStateIsHostWritable;
+            state.key = "comment";
+            state.label = "Comment";
             break;
-       #ifndef HEADLESS
         case 3:
-            stateKey = "windowSize";
+            state.hints = kStateIsOnlyForUI;
+            state.key = "windowSize";
+            state.label = "Window size";
             break;
-       #endif
-        }
-    }
-
-    uint32_t getStateHints(const uint32_t index) override
-    {
-        switch (index)
-        {
-        case 1: // screenshot
-        case 2: // comment
-            return kStateIsHostVisible;
-        default:
-            return 0x0;
         }
     }
 
