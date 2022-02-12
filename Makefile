@@ -267,9 +267,11 @@ install:
 # --------------------------------------------------------------
 # Tarball step, for releases
 
+# --lzma
+
 tarball:
 	rm -f ../cardinal-$(VERSION).tar
-	tar -c --lzma \
+	tar -c \
 		--exclude=".appveyor*" \
 		--exclude=".ci*" \
 		--exclude=".clang*" \
@@ -286,10 +288,7 @@ tarball:
 		--exclude=bin \
 		--exclude=build \
 		--exclude=carla/data \
-		--exclude=carla/source/bridges-plugin \
-		--exclude=carla/source/discovery \
 		--exclude=carla/source/frontend \
-		--exclude=carla/source/jackbridge \
 		--exclude=carla/source/interposer \
 		--exclude=carla/source/libjack \
 		--exclude=carla/source/native-plugins/resources \
@@ -360,8 +359,10 @@ tarball:
 		--exclude=src/Rack/src/window/Window.cpp \
 		--exclude=src/Rack/res/Core \
 		--exclude=src/Rack/res/icon.png \
+		--transform='s,^\.\.,-.-.,' \
 		--transform='s,^\.,cardinal-$(VERSION),' \
-		-f ../cardinal-$(VERSION).tar.xz .
+		--transform='s,^-\.-\.,..,' \
+		-f ../cardinal-$(VERSION).tar .
 
 # --------------------------------------------------------------
 
