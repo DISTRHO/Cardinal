@@ -228,7 +228,7 @@ deps/unzipfx/unzipfx2cat.exe:
 # Clean step
 
 clean:
-	$(MAKE) distclean -C carla
+	$(MAKE) distclean -C carla $(CARLA_EXTRA_ARGS) CAN_GENERATE_LV2_TTL=false STATIC_PLUGIN_TARGET=true
 	$(MAKE) clean -C deps
 	$(MAKE) clean -C dpf/dgl
 	$(MAKE) clean -C dpf/utils/lv2-ttl-generator
@@ -267,26 +267,27 @@ install:
 # --------------------------------------------------------------
 # Tarball step, for releases
 
-# --lzma
-
 tarball:
 	rm -f ../cardinal-$(VERSION).tar
-	tar -c \
+	tar -c --lzma \
 		--exclude=".appveyor*" \
 		--exclude=".ci*" \
 		--exclude=".clang*" \
 		--exclude=".drone*" \
 		--exclude=".editor*" \
 		--exclude=".git*" \
+		--exclude="*.kdev*" \
 		--exclude=".travis*" \
 		--exclude=".vscode*" \
-		--exclude="*.kdev4" \
 		--exclude="carla/source/modules/juce_*" \
 		--exclude="carla/source/native-plugins/external/zynaddsubfx*" \
 		--exclude="src/Rack/dep/osdialog/osdialog_*" \
 		--exclude="src/Rack/icon.*" \
 		--exclude=bin \
 		--exclude=build \
+		--exclude=jucewrapper \
+		--exclude=lv2export \
+		--exclude=patches \
 		--exclude=carla/data \
 		--exclude=carla/source/frontend \
 		--exclude=carla/source/interposer \
@@ -305,9 +306,6 @@ tarball:
 		--exclude=dpf/examples \
 		--exclude=dpf/lac \
 		--exclude=dpf/tests \
-		--exclude=jucewrapper \
-		--exclude=lv2export \
-		--exclude=patches \
 		--exclude=plugins/.kdev_include_paths \
 		--exclude=plugins/todo.txt \
 		--exclude=plugins/AriaModules/res/Arcane \
@@ -362,7 +360,7 @@ tarball:
 		--transform='s,^\.\.,-.-.,' \
 		--transform='s,^\.,cardinal-$(VERSION),' \
 		--transform='s,^-\.-\.,..,' \
-		-f ../cardinal-$(VERSION).tar .
+		-f ../cardinal-$(VERSION).tar.xz .
 
 # --------------------------------------------------------------
 

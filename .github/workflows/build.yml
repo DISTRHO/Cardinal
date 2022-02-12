@@ -487,6 +487,24 @@ jobs:
           path: |
             *.zip
 
+  source-tarball:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Create source tarball
+        run: |
+          make tarball
+      - name: Set sha8
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          path: |
+            ../cardinal-*.tar.xz
+
   plugin-validation:
     runs-on: ubuntu-20.04
     steps:

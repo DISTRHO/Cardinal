@@ -50,7 +50,7 @@
 
 // used in Window::screenshot
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "../src/Rack/dep/glfw/deps/stb_image_write.h"
+#include "stb_image_write.h"
 
 #include "DistrhoUI.hpp"
 #include "Application.hpp"
