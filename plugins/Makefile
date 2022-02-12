@@ -845,6 +845,7 @@ RESOURCE_FILES += BaconPlugs/res/midi/chopin
 RESOURCE_FILES += BaconPlugs/res/midi/debussy
 RESOURCE_FILES += BaconPlugs/res/midi/goldberg
 RESOURCE_FILES += Cardinal/res/Miku/Miku.png
+RESOURCE_FILES += cf/playeroscs
 RESOURCE_FILES += DrumKit/res/samples
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes

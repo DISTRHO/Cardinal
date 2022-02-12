@@ -151,10 +151,10 @@ struct Initializer
                 // If source code dir does not exist use install target prefix as system dir
                 else
                #endif
-                if (system::exists(CARDINAL_PLUGIN_PREFIX "/share/Cardinal"))
+                if (system::exists(CARDINAL_PLUGIN_PREFIX "/share/cardinal"))
                 {
-                    asset::bundlePath = CARDINAL_PLUGIN_PREFIX "/share/Cardinal/PluginManifests";
-                    asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/Cardinal";
+                    asset::bundlePath = CARDINAL_PLUGIN_PREFIX "/share/cardinal/PluginManifests";
+                    asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/cardinal";
                     templatePath = system::join(asset::systemDir, "template.vcv");
                 }
             }
