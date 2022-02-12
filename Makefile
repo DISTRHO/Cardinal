@@ -360,7 +360,7 @@ tarball:
 		--exclude=src/Rack/src/window/Window.cpp \
 		--exclude=src/Rack/res/Core \
 		--exclude=src/Rack/res/icon.png \
-		--transform='s,^\.,Cardinal-$(VERSION),' \
+		--transform='s,^\.,cardinal-$(VERSION),' \
 		-f ../cardinal-$(VERSION).tar.xz .
 
 # --------------------------------------------------------------
