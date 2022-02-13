@@ -173,10 +173,6 @@ static const struct {
     { "/DrumKit/res/Tomi.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
     { "/ESeries/res/E340.svg", {}, -1 },
-    /*
-    // CC-BY-NC-ND-4.0, needs permission
-    { "/Fundamental/VCA.svg", {}, -1 },
-    */
     // CC0-1.0
     { "/HetrickCV/res/1OpChaos.svg", {}, -1},
     { "/HetrickCV/res/2OpChaos.svg", {}, -1},
