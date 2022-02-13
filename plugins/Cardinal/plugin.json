@@ -6,9 +6,9 @@
   "brand": "DISTRHO",
   "author": "DISTRHO",
   "authorEmail": "falktx@falktx.com",
+  "authorUrl": "https://falktx.com/",
   "pluginUrl": "https://github.com/DISTRHO/Cardinal",
-  "authorUrl": "https://github.com/DISTRHO/Cardinal",
-  "manualUrl": "https://github.com/DISTRHO/Cardinal/wiki",
+  "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md",
   "sourceUrl": "https://github.com/DISTRHO/Cardinal",
   "changelogUrl": "",
   "modules":
@@ -17,6 +17,7 @@
       "slug": "HostAudio2",
       "name": "Audio 2",
       "description": "Exposes host-provided audio ports in a module",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#host-audio",
       "tags": [
         "External"
       ]
@@ -25,6 +26,7 @@
       "slug": "HostAudio8",
       "name": "Audio 8",
       "description": "Exposes host-provided audio ports in a module",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#host-audio",
       "tags": [
         "External"
       ]
@@ -33,6 +35,7 @@
       "slug": "HostCV",
       "name": "Host CV",
       "description": "Exposes host-provided CV ports in a module",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#host-cv",
       "tags": [
         "External"
       ]
@@ -41,6 +44,7 @@
       "slug": "HostMIDI",
       "name": "Host MIDI",
       "description": "Exposes host-provided MIDI in a module",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#host-midi",
       "tags": [
         "External",
         "MIDI",
@@ -51,6 +55,7 @@
       "slug": "HostMIDICC",
       "name": "Host MIDI CC",
       "description": "Exposes host-provided MIDI CC, channel pressure and pitchbend in a module",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#host-midi-cc",
       "tags": [
         "External",
         "MIDI"
@@ -60,6 +65,7 @@
       "slug": "HostMIDIGate",
       "name": "Host MIDI Gate",
       "description": "Exposes host-provided MIDI notes as gates in a module",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#host-midi-gate",
       "tags": [
         "External",
         "MIDI"
@@ -69,6 +75,7 @@
       "slug": "HostMIDIMap",
       "name": "Host MIDI CC Map",
       "description": "Allows host-provided MIDI CC to control other module parameters",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#host-midi-map",
       "tags": [
         "External",
         "MIDI"
@@ -78,6 +85,7 @@
       "slug": "HostParameters",
       "name": "Host Parameters",
       "description": "Exposes host-controlled plugin parameters in a module",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#host-parameters",
       "tags": [
         "External"
       ]
@@ -86,6 +94,7 @@
       "slug": "HostTime",
       "name": "Host Time",
       "description": "Exposes host-provided time/transport information in a module",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#host-time",
       "tags": [
         "External"
       ]
@@ -94,6 +103,7 @@
       "slug": "glBars",
       "name": "glBars",
       "description": "OpenGL bars visualization, as seen in XMMS and XBMC/Kodi",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#glbars",
       "tags": [
         "Visual"
       ]
@@ -102,6 +112,7 @@
       "slug": "Blank",
       "name": "Blank",
       "description": "Cardinal's own blank panel, featuring Hatsune Miku",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#blank",
       "tags": [
         "Visual"
       ]
@@ -110,6 +121,7 @@
       "slug": "ExpanderInputMIDI",
       "name": "ExpanderInputMIDI",
       "description": "MIDI input (from CV) expander for Carla Plugin Host and Ildaeil",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#expanders-midi",
       "tags": [
         "Expander",
         "MIDI"
@@ -119,6 +131,7 @@
       "slug": "ExpanderOutputMIDI",
       "name": "ExpanderOutputMIDI",
       "description": "MIDI output (to CV) expander for Carla Plugin Host and Ildaeil",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#expanders-midi",
       "tags": [
         "Expander",
         "MIDI"
@@ -128,6 +141,7 @@
       "slug": "AudioFile",
       "name": "Audio File",
       "description": "Audio file player as a module",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#audio-file",
       "tags": [
         "Utility"
       ]
@@ -136,6 +150,7 @@
       "slug": "Carla",
       "name": "Carla Plugin Host",
       "description": "A modular plugin host within Cardinal",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#carla",
       "tags": [
         "Utility"
       ]
@@ -144,6 +159,7 @@
       "slug": "Ildaeil",
       "name": "Ildaeil Plugin Host",
       "description": "A mini plugin host within Cardinal for loading any FX",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#ildaeil",
       "tags": [
         "Utility"
       ]
@@ -152,6 +168,7 @@
       "slug": "MPV",
       "name": "MPV",
       "description": "An embed video player inside Cardinal",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#mpv",
       "tags": [
         "Visual"
       ]
@@ -160,6 +177,7 @@
       "slug": "TextEditor",
       "name": "Text Editor",
       "description": "An embed text editor inside Cardinal",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#text-editor",
       "tags": [
         "Utility"
       ]
