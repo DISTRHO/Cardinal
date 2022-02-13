@@ -449,7 +449,7 @@ public:
             return;
         }
 
-        setParameterValue(kModuleParameters + param, value * mult);
+        setParameterValue(kModuleParameters + param + 1, value * mult);
     }
 
 protected:
@@ -462,10 +462,11 @@ protected:
     */
     void parameterChanged(const uint32_t index, const float value) override
     {
-        if (index < kModuleParameters)
+        // host mapped parameters + bypass
+        if (index <= kModuleParameters)
             return;
 
-        switch (index - kModuleParameters)
+        switch (index - kModuleParameters - 1)
         {
         case kWindowParameterShowTooltips:
             windowParameters.tooltips = value > 0.5f;

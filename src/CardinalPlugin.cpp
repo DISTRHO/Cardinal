@@ -433,7 +433,7 @@ class CardinalPlugin : public CardinalBasePlugin
 
 public:
     CardinalPlugin()
-        : CardinalBasePlugin(kModuleParameters + kWindowParameterCount, 0, kCardinalStateCount),
+        : CardinalBasePlugin(kModuleParameters + kWindowParameterCount + 1, 0, kCardinalStateCount),
           fInitializer(this),
          #if DISTRHO_PLUGIN_NUM_INPUTS != 0
           fAudioBufferCopy(nullptr),
@@ -607,6 +607,12 @@ protected:
             return;
         }
 
+        if (index == kModuleParameters)
+        {
+            parameter.initDesignation(kParameterDesignationBypass);
+            return;
+        }
+
        #ifndef HEADLESS
         switch (index - kModuleParameters)
         {
@@ -748,11 +754,17 @@ protected:
 
     float getParameterValue(uint32_t index) const override
     {
+        // host mapped parameters
         if (index < kModuleParameters)
             return context->parameters[index];
 
+        // bypass
+        if (index == kModuleParameters)
+            return 0.0f;
+
        #ifndef HEADLESS
-        index -= kModuleParameters;
+        // window related parameters
+        index -= kModuleParameters + 1;
 
         if (index < kWindowParameterCount)
             return fWindowParameters[index];
@@ -763,14 +775,20 @@ protected:
 
     void setParameterValue(uint32_t index, float value) override
     {
+        // host mapped parameters
         if (index < kModuleParameters)
         {
             context->parameters[index] = value;
             return;
         }
 
+        // bypass
+        if (index == kModuleParameters)
+            return;
+
        #ifndef HEADLESS
-        index -= kModuleParameters;
+        // window related parameters
+        index -= kModuleParameters + 1;
 
         if (index < kWindowParameterCount)
         {
