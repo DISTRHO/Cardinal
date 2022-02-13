@@ -54,9 +54,21 @@ Plugin type is set as regular "effect".
 Because people will ask for it. It is, well... Rack.  
 But a couple of modules background's have their colors flipped, because damn we want proper dark mode!
 
-![screenshot1](docs/Screenshot1.png "Screenshot1")
-![screenshot2](docs/Screenshot2.png "Screenshot2")
+### Init / Default patch
 
+![screenshot](docs/Screenshot_Init-Patch.png "Screenshot")
+
+### Module browser
+
+![screenshot](docs/Screenshot_Module-Browser.png "Screenshot")
+
+### Basic patching
+
+![screenshot](docs/Screenshot_Basic-Patching.png "Screenshot")
+
+### Carla and Ildaeil plugin hosts
+
+![screenshot](docs/Screenshot_Carla+Ildaeil.png "Screenshot")
 
 ## Current status
 

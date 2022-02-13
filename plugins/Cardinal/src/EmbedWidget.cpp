@@ -15,7 +15,7 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#if defined(ARCH_LIN) && !defined(HEADLESS)
+#if defined(ARCH_LIN) && !defined(HEADLESS) && !defined(HAVE_X11)
 # define HAVE_X11
 #endif
 
@@ -193,15 +193,11 @@ struct EmbedWidget::PrivateData {
         {
             lastX = x;
             lastY = y;
-           #ifdef HAVE_X11
-           #endif
         }
         else if (diffSize)
         {
             lastWidth = width;
             lastHeight = height;
-           #ifdef HAVE_X11
-           #endif
         }
 
        #ifdef HAVE_X11
