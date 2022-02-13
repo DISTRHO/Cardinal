@@ -42,7 +42,7 @@ You can change this with right-click menu options, in case you want no offset to
 ![screenshot](Module_Ildaeil.png)
 
 [Ildaeil](https://github.com/DISTRHO/Ildaeil) is a mini-plugin host based on [Carla](https://kx.studio/Applications:Carla).  
-This is Cardinal/Rack module of Ildaeil with 2 audio IO.
+This is a Cardinal/Rack module of Ildaeil with 2 audio IO.
 
 Currently Ildaeil supports (Carla) internal and LV2 plugins.  
 More plugin support will be added in future releases.
@@ -55,7 +55,7 @@ MIDI input and output are possible with the use of expander modules.
 
 ![screenshot](Module_HostAudio.png)
 
-A module for getting audio from and to your Host/DAW.  
+A module for getting audio to and from your Host/DAW.  
 Works just like the Rack equivalent, including a DC filter that is enabled by default on the stereo version, disabled on the 8 IO variant.
 
 On the stereo version, connecting to the Left/Mono input jack will automatically mirror that signal on the Right, unconnected jack.  
@@ -67,7 +67,7 @@ Note that, unlike Rack, Cardinal does not provide a 16 IO audio module.
 
 ![screenshot](Module_HostCV.png)
 
-For getting CV from and to your Host/DAW.
+For getting CV to and from your Host/DAW.
 
 Just as with the Carla module, you can enable right-click menu options to automatically apply an offset to the CV signal.  
 For convenience this mode is split on the 1-5 and 6-10 ports, in case you need some to be bipolar and some unipolar.
@@ -78,7 +78,7 @@ Note that this module does nothing on Cardinal's FX and Synth variants, as they 
 
 ![screenshot](Module_HostMIDI.png)
 
-For getting regular MIDI from and to your Host/DAW.  
+For getting regular MIDI to and from your Host/DAW.  
 It has pretty much the same options and functionality as the Rack MIDI2CV and CV2MIDI modules, but combines them into one.
 
 Clock pulses are not available on this module in Cardinal, prefer to use Host Time module for that.
@@ -87,7 +87,7 @@ Clock pulses are not available on this module in Cardinal, prefer to use Host Ti
 
 ![screenshot](Module_HostMIDICC.png)
 
-For getting regular MIDI CCs from and to your Host/DAW.  
+For getting regular MIDI CCs to and from your Host/DAW.  
 It has pretty much the same options and functionality as the Rack MIDI-CC2CV and CV2MIDI-CC modules, but combines them into one.
 
 Direct channel pressure and pitchbend ports are available for convenience.
@@ -96,7 +96,7 @@ Direct channel pressure and pitchbend ports are available for convenience.
 
 ![screenshot](Module_HostMIDIGate.png)
 
-For getting regular MIDI Notes as Gates from and to your Host/DAW.  
+For getting regular MIDI Notes as Gates to and from your Host/DAW.  
 It has pretty much the same options and functionality as the Rack MIDI-Gate2CV and CV2MIDI-Gate modules, but combines them into one.
 
 ### Host MIDI CC Map
@@ -153,7 +153,7 @@ When connected (that is, standing next to them) the graphics on Carla/Ildaeil si
 
 ### MPV
 
-This is super experimental embed video player inside Cardinal.
+This is a super experimental embed video player inside Cardinal.
 
 It is mostly just a test for embedding external windows inside Cardinal, `mpv` simply provides a nice way to do it.
 
@@ -168,7 +168,7 @@ An OpenGL bars visualization, as seen in XMMS and XBMC/Kodi.
 It is purely cosmetic.
 
 This module was done early in Cardinal's development as a way to test drawing a module using OpenGL.  
-It remains as a test case and example for others to based new modules on.
+It remains as a test case and example for others to base new modules on.
 
 ### Text Editor
 
