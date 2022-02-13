@@ -241,22 +241,27 @@ clean:
 
 install:
 	install -d $(DESTDIR)$(PREFIX)/bin
-	install -d $(DESTDIR)$(PREFIX)/lib/lv2
-	install -d $(DESTDIR)$(PREFIX)/lib/vst
-	install -d $(DESTDIR)$(PREFIX)/lib/vst3
+	install -d $(DESTDIR)$(PREFIX)/lib/lv2/Cardinal.lv2
+	install -d $(DESTDIR)$(PREFIX)/lib/lv2/CardinalFX.lv2
+	install -d $(DESTDIR)$(PREFIX)/lib/lv2/CardinalSynth.lv2
+	install -d $(DESTDIR)$(PREFIX)/lib/vst/CardinalFX.vst
+	install -d $(DESTDIR)$(PREFIX)/lib/vst/CardinalSynth.vst
+	install -d $(DESTDIR)$(PREFIX)/lib/vst3/Cardinal.vst3/Contents
+	install -d $(DESTDIR)$(PREFIX)/lib/vst3/CardinalFX.vst3/Contents
+	install -d $(DESTDIR)$(PREFIX)/lib/vst3/CardinalSynth.vst3/Contents
 	install -d $(DESTDIR)$(PREFIX)/share/cardinal
 	install -d $(DESTDIR)$(PREFIX)/share/doc/cardinal/docs
 
-	cp -rL bin/Cardinal.lv2  $(DESTDIR)$(PREFIX)/lib/lv2/
-	cp -rL bin/Cardinal.vst3 $(DESTDIR)$(PREFIX)/lib/vst3/
+	install -m 644 bin/Cardinal.lv2/*.*      $(DESTDIR)$(PREFIX)/lib/lv2/Cardinal.lv2/
+	install -m 644 bin/CardinalFX.lv2/*.*    $(DESTDIR)$(PREFIX)/lib/lv2/CardinalFX.lv2/
+	install -m 644 bin/CardinalSynth.lv2/*.* $(DESTDIR)$(PREFIX)/lib/lv2/CardinalSynth.lv2/
 
-	cp -rL bin/CardinalFX.lv2  $(DESTDIR)$(PREFIX)/lib/lv2/
-	cp -rL bin/CardinalFX.vst  $(DESTDIR)$(PREFIX)/lib/vst/
-	cp -rL bin/CardinalFX.vst3 $(DESTDIR)$(PREFIX)/lib/vst3/
+	install -m 644 bin/CardinalFX.vst/*.*    $(DESTDIR)$(PREFIX)/lib/vst/CardinalFX.vst/
+	install -m 644 bin/CardinalSynth.vst/*.* $(DESTDIR)$(PREFIX)/lib/vst/CardinalSynth.vst/
 
-	cp -rL bin/CardinalSynth.lv2  $(DESTDIR)$(PREFIX)/lib/lv2/
-	cp -rL bin/CardinalSynth.vst  $(DESTDIR)$(PREFIX)/lib/vst/
-	cp -rL bin/CardinalSynth.vst3 $(DESTDIR)$(PREFIX)/lib/vst3/
+	cp -rL bin/Cardinal.vst3/Contents/*-*      $(DESTDIR)$(PREFIX)/lib/vst3/Cardinal.vst3/Contents/
+	cp -rL bin/CardinalFX.vst3/Contents/*-*    $(DESTDIR)$(PREFIX)/lib/vst3/CardinalFX.vst3/Contents/
+	cp -rL bin/CardinalSynth.vst3/Contents/*-* $(DESTDIR)$(PREFIX)/lib/vst3/CardinalSynth.vst3/Contents/
 
 	install -m 755 bin/Cardinal$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
 	cp -rL bin/Cardinal.lv2/resources/* $(DESTDIR)$(PREFIX)/share/cardinal/
