@@ -56,9 +56,12 @@ static const struct {
     { "/21kHz/res/Panels/D_Inf.svg", {}, -1 },
     { "/21kHz/res/Panels/PalmLoop.svg", {}, -1 },
     { "/21kHz/res/Panels/TachyonEntangler.svg", {}, -1 },
-    // CC-BY-NC-SA-4.0
+    // CC-BY-NC-SA-4.0, logo is meant to be removed and name changed on derivative works
+    /* Pending https://github.com/AnimatedCircuits/RackModules/issues/7
     { "/AnimatedCircuits/res/FoldingLight.svg", {}, -1 },
+    { "/AnimatedCircuits/res/LFoldLight.svg", {}, -1 },
     { "/AnimatedCircuits/res/Knob_Black_Light_21.svg", {}, -1 },
+    */
     // Custom, runtime dark mode used with permission
     { "/AudibleInstruments/res/Blinds.svg", {}, -1 },
     { "/AudibleInstruments/res/Braids.svg", {}, -1 },

@@ -30,8 +30,10 @@
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
+/*
 // AnimatedCircuits
 #include "AnimatedCircuits/src/plugin.hpp"
+*/
 
 // Aria
 /* NOTE too much noise in original include, do this a different way
@@ -522,9 +524,8 @@ Plugin* pluginInstance__Cardinal;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__AmalgamatedHarmonics;
-Plugin* pluginInstance__AnimatedCircuits;
+// Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
-// Plugin* pluginInstance__Atelier;
 Plugin* pluginInstance__AudibleInstruments;
 extern Plugin* pluginInstance__Autinn;
 Plugin* pluginInstance__Bacon;
@@ -748,6 +749,7 @@ static void initStatic__AmalgamatedHarmonics()
     }
 }
 
+/*
 static void initStatic__AnimatedCircuits()
 {
     Plugin* const p = new Plugin;
@@ -757,8 +759,10 @@ static void initStatic__AnimatedCircuits()
     if (spl.ok())
     {
         p->addModel(model_AC_Folding);
+        p->addModel(model_AC_LFold);
     }
 }
+*/
 
 static void initStatic__Aria()
 {
@@ -795,20 +799,6 @@ static void initStatic__Aria()
         spl.removeModule("Aleister");
     }
 }
-
-/*
-static void initStatic__Atelier()
-{
-    Plugin* const p = new Plugin;
-    pluginInstance__Atelier = p;
-
-    const StaticPluginLoader spl(p, "Atelier");
-    if (spl.ok())
-    {
-        p->addModel(modelPalette);
-    }
-}
-*/
 
 static void initStatic__AudibleInstruments()
 {
@@ -1863,9 +1853,8 @@ void initStaticPlugins()
 #ifndef NOPLUGINS
     initStatic__21kHz();
     initStatic__AmalgamatedHarmonics();
-    initStatic__AnimatedCircuits();
+    // initStatic__AnimatedCircuits();
     initStatic__Aria();
-    // initStatic__Atelier();
     initStatic__AudibleInstruments();
     initStatic__Autinn();
     initStatic__Bacon();

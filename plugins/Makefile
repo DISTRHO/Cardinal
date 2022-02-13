@@ -240,7 +240,8 @@ AMALGAMATEDHARMONICS_CUSTOM += bogaudio
 # --------------------------------------------------------------
 # AnimatedCircuits
 
-PLUGIN_FILES += $(wildcard AnimatedCircuits/src/Folding/*.cpp)
+# PLUGIN_FILES += $(wildcard AnimatedCircuits/src/Folding/*.cpp)
+# PLUGIN_FILES += $(wildcard AnimatedCircuits/src/LFold/*.cpp)
 
 # --------------------------------------------------------------
 # Aria
