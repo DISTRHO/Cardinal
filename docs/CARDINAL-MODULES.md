@@ -110,6 +110,11 @@ It has pretty much the same options and functionality as the Rack MIDI-Map.
 
 ![screenshot](Module_HostParameters.png)
 
+For automating CV sources from the host side, this module directly converts the 24 Cardinal host-exposed parameters into CV signals inside Cardinal.
+
+The parameters have an internal slew limiter in order to smooth out the changes over time.  
+The fall time of the smoothing filter is based on the current host block size and sample rate.
+
 ### Host Time
 
 ![screenshot](Module_HostTime.png)
@@ -172,3 +177,6 @@ It remains as a test case and example for others to based new modules on.
 A text editor inside Cardinal, with support for syntax highlighting.
 
 It supports the typical things you expect from an editor, such as copy&paste and undo&redo.
+
+The panel is resizable using the left and right borders.  
+Moving the panel around can be done by grabbing the top status bar of the editor.
