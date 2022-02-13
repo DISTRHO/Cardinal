@@ -158,6 +158,9 @@ endif
 $(DEP_PATH)/lib/%.a:
 	$(DEP_MAKE) -C $(DEP_PATH) lib/$*.a
 
+$(DEP_PATH)/jansson-2.12:
+	$(DEP_MAKE) -C $(DEP_PATH) jansson-2.12
+
 # libarchive: skip shared lib and ensure libzstd is enabled
 $(DEP_PATH)/lib/libarchive.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
 
@@ -256,6 +259,13 @@ clean:
 	rm -rf $(DEP_PATH)/libsamplerate-0.1.9
 	rm -rf $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3
 	rm -rf $(DEP_PATH)/zstd-1.4.5
+
+download: \
+	$(DEP_PATH)/jansson-2.12 \
+	$(DEP_PATH)/libarchive-3.4.3/.stamp-patched \
+	$(DEP_PATH)/libsamplerate-0.1.9/.stamp-patched \
+	$(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched \
+	$(DEP_PATH)/zstd-1.4.5/.stamp-patched
 
 quickjs: $(DEP_PATH)/lib/libquickjs.a
 

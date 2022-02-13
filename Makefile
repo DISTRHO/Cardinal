@@ -267,100 +267,109 @@ install:
 # --------------------------------------------------------------
 # Tarball step, for releases
 
+TAR_ARGS = \
+	--exclude=".appveyor*" \
+	--exclude=".ci*" \
+	--exclude=".clang*" \
+	--exclude=".drone*" \
+	--exclude=".editor*" \
+	--exclude=".git*" \
+	--exclude="*.kdev*" \
+	--exclude=".travis*" \
+	--exclude=".vscode*" \
+	--exclude="carla/source/modules/juce_*" \
+	--exclude="carla/source/native-plugins/external/zynaddsubfx*" \
+	--exclude="src/Rack/dep/osdialog/osdialog_*" \
+	--exclude="src/Rack/icon.*" \
+	--exclude=bin \
+	--exclude=build \
+	--exclude=jucewrapper \
+	--exclude=lv2export \
+	--exclude=patches \
+	--exclude=carla/data \
+	--exclude=carla/source/frontend \
+	--exclude=carla/source/interposer \
+	--exclude=carla/source/libjack \
+	--exclude=carla/source/native-plugins/resources \
+	--exclude=carla/source/rest \
+	--exclude=carla/source/tests.old \
+	--exclude=carla/source/theme \
+	--exclude=carla/resources \
+	--exclude=deps/PawPaw \
+	--exclude=deps/sysroot \
+	--exclude=deps/unzipfx \
+	--exclude=docs/.generate-plugin-licenses.sh \
+	--exclude=docs/MODDEVICES.md \
+	--exclude=dpf/cmake \
+	--exclude=dpf/examples \
+	--exclude=dpf/lac \
+	--exclude=dpf/tests \
+	--exclude=plugins/.kdev_include_paths \
+	--exclude=plugins/todo.txt \
+	--exclude=plugins/AriaModules/res/Arcane \
+	--exclude=plugins/AudibleInstruments/design \
+	--exclude=plugins/BaconPlugs/res/midi/beeth \
+	--exclude=plugins/BogaudioModules/res-pp \
+	--exclude=plugins/BogaudioModules/res-src \
+	--exclude=plugins/Cardinal/orig \
+	--exclude=plugins/GrandeModular/res-src \
+	--exclude=src/MOD \
+	--exclude=src/Rack/adapters \
+	--exclude=src/Rack/dep/filesystem/cmake \
+	--exclude=src/Rack/dep/filesystem/examples \
+	--exclude=src/Rack/dep/filesystem/test \
+	--exclude=src/Rack/dep/glfw/CMake \
+	--exclude=src/Rack/dep/glfw/deps \
+	--exclude=src/Rack/dep/glfw/docs \
+	--exclude=src/Rack/dep/glfw/examples \
+	--exclude=src/Rack/dep/glfw/src \
+	--exclude=src/Rack/dep/glfw/tests \
+	--exclude=src/Rack/dep/nanosvg/example \
+	--exclude=src/Rack/dep/nanovg \
+	--exclude=src/Rack/dep/rtaudio \
+	--exclude=src/Rack/include/audio.hpp \
+	--exclude=src/Rack/include/midi.hpp \
+	--exclude=src/Rack/include/engine/Port.hpp \
+	--exclude=src/Rack/src/core \
+	--exclude=src/Rack/src/asset.cpp \
+	--exclude=src/Rack/src/audio.cpp \
+	--exclude=src/Rack/src/common.cpp \
+	--exclude=src/Rack/src/context.cpp \
+	--exclude=src/Rack/src/dep.cpp \
+	--exclude=src/Rack/src/discord.cpp \
+	--exclude=src/Rack/src/gamepad.cpp \
+	--exclude=src/Rack/src/keyboard.cpp \
+	--exclude=src/Rack/src/library.cpp \
+	--exclude=src/Rack/src/midi.cpp \
+	--exclude=src/Rack/src/network.cpp \
+	--exclude=src/Rack/src/plugin.cpp \
+	--exclude=src/Rack/src/rtaudio.cpp \
+	--exclude=src/Rack/src/rtmidi.cpp \
+	--exclude=src/Rack/src/app/AudioDisplay.cpp \
+	--exclude=src/Rack/src/app/MenuBar.cpp \
+	--exclude=src/Rack/src/app/MidiDisplay.cpp \
+	--exclude=src/Rack/src/app/Scene.cpp \
+	--exclude=src/Rack/src/app/TipWindow.cpp \
+	--exclude=src/Rack/src/engine/Engine.cpp \
+	--exclude=src/Rack/src/plugin/Model.cpp \
+	--exclude=src/Rack/src/window/Window.cpp \
+	--exclude=src/Rack/res/Core \
+	--exclude=src/Rack/res/icon.png \
+	--transform='s,^\.\.,-.-.,' \
+	--transform='s,^\.,cardinal-$(VERSION),' \
+	--transform='s,^-\.-\.,..,' \
+
+download:
+	$(MAKE) download -C deps
+
 tarball:
-	rm -f ../cardinal-$(VERSION).tar
-	tar -c --lzma \
-		--exclude=".appveyor*" \
-		--exclude=".ci*" \
-		--exclude=".clang*" \
-		--exclude=".drone*" \
-		--exclude=".editor*" \
-		--exclude=".git*" \
-		--exclude="*.kdev*" \
-		--exclude=".travis*" \
-		--exclude=".vscode*" \
-		--exclude="carla/source/modules/juce_*" \
-		--exclude="carla/source/native-plugins/external/zynaddsubfx*" \
-		--exclude="src/Rack/dep/osdialog/osdialog_*" \
-		--exclude="src/Rack/icon.*" \
-		--exclude=bin \
-		--exclude=build \
-		--exclude=jucewrapper \
-		--exclude=lv2export \
-		--exclude=patches \
-		--exclude=carla/data \
-		--exclude=carla/source/frontend \
-		--exclude=carla/source/interposer \
-		--exclude=carla/source/libjack \
-		--exclude=carla/source/native-plugins/resources \
-		--exclude=carla/source/rest \
-		--exclude=carla/source/tests.old \
-		--exclude=carla/source/theme \
-		--exclude=carla/resources \
-		--exclude=deps/PawPaw \
-		--exclude=deps/sysroot \
-		--exclude=deps/unzipfx \
-		--exclude=docs/.generate-plugin-licenses.sh \
-		--exclude=docs/MODDEVICES.md \
-		--exclude=dpf/cmake \
-		--exclude=dpf/examples \
-		--exclude=dpf/lac \
-		--exclude=dpf/tests \
-		--exclude=plugins/.kdev_include_paths \
-		--exclude=plugins/todo.txt \
-		--exclude=plugins/AriaModules/res/Arcane \
-		--exclude=plugins/AudibleInstruments/design \
-		--exclude=plugins/BaconPlugs/res/midi/beeth \
-		--exclude=plugins/BogaudioModules/res-pp \
-		--exclude=plugins/BogaudioModules/res-src \
-		--exclude=plugins/Cardinal/orig \
-		--exclude=plugins/GrandeModular/res-src \
-		--exclude=src/MOD \
-		--exclude=src/Rack/adapters \
-		--exclude=src/Rack/dep/filesystem/cmake \
-		--exclude=src/Rack/dep/filesystem/examples \
-		--exclude=src/Rack/dep/filesystem/test \
-		--exclude=src/Rack/dep/glfw/CMake \
-		--exclude=src/Rack/dep/glfw/deps \
-		--exclude=src/Rack/dep/glfw/docs \
-		--exclude=src/Rack/dep/glfw/examples \
-		--exclude=src/Rack/dep/glfw/src \
-		--exclude=src/Rack/dep/glfw/tests \
-		--exclude=src/Rack/dep/nanosvg/example \
-		--exclude=src/Rack/dep/nanovg \
-		--exclude=src/Rack/dep/rtaudio \
-		--exclude=src/Rack/include/audio.hpp \
-		--exclude=src/Rack/include/midi.hpp \
-		--exclude=src/Rack/include/engine/Port.hpp \
-		--exclude=src/Rack/src/core \
-		--exclude=src/Rack/src/asset.cpp \
-		--exclude=src/Rack/src/audio.cpp \
-		--exclude=src/Rack/src/common.cpp \
-		--exclude=src/Rack/src/context.cpp \
-		--exclude=src/Rack/src/dep.cpp \
-		--exclude=src/Rack/src/discord.cpp \
-		--exclude=src/Rack/src/gamepad.cpp \
-		--exclude=src/Rack/src/keyboard.cpp \
-		--exclude=src/Rack/src/library.cpp \
-		--exclude=src/Rack/src/midi.cpp \
-		--exclude=src/Rack/src/network.cpp \
-		--exclude=src/Rack/src/plugin.cpp \
-		--exclude=src/Rack/src/rtaudio.cpp \
-		--exclude=src/Rack/src/rtmidi.cpp \
-		--exclude=src/Rack/src/app/AudioDisplay.cpp \
-		--exclude=src/Rack/src/app/MenuBar.cpp \
-		--exclude=src/Rack/src/app/MidiDisplay.cpp \
-		--exclude=src/Rack/src/app/Scene.cpp \
-		--exclude=src/Rack/src/app/TipWindow.cpp \
-		--exclude=src/Rack/src/engine/Engine.cpp \
-		--exclude=src/Rack/src/plugin/Model.cpp \
-		--exclude=src/Rack/src/window/Window.cpp \
-		--exclude=src/Rack/res/Core \
-		--exclude=src/Rack/res/icon.png \
-		--transform='s,^\.\.,-.-.,' \
-		--transform='s,^\.,cardinal-$(VERSION),' \
-		--transform='s,^-\.-\.,..,' \
-		-f ../cardinal-$(VERSION).tar.xz .
+	$(MAKE) clean -C deps
+	rm -f ../cardinal-$(VERSION).tar.xz
+	tar -c --lzma $(TAR_ARGS) -f ../cardinal-$(VERSION).tar.xz .
+
+tarball+deps: download
+	rm -f ../cardinal+deps-$(VERSION).tar.xz
+	tar -c --lzma $(TAR_ARGS) -f ../cardinal+deps-$(VERSION).tar.xz .
 
 # --------------------------------------------------------------
 

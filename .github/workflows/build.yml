@@ -496,6 +496,7 @@ jobs:
       - name: Create source tarball
         run: |
           make tarball
+          make tarball+deps
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
