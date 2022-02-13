@@ -10,9 +10,6 @@
 [submodule "plugins/Cardinal/sse2neon"]
 	path = include/sse2neon
 	url = https://github.com/DLTcollab/sse2neon.git
-[submodule "plugins/Fundamental"]
-	path = plugins/Fundamental
-	url = https://github.com/CardinalModules/Fundamental.git
 [submodule "plugins/AudibleInstruments"]
 	path = plugins/AudibleInstruments
 	url = https://github.com/CardinalModules/AudibleInstruments.git
