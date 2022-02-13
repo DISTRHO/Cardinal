@@ -53,10 +53,4 @@ __m64 _mm_set1_pi16(short w)
     return vreinterpret_s64_s16(vdup_n_s16(w));
 }
 
-static inline
-uint32_t _mm_getcsr()
-{
-    return 0;
-}
-
 #endif
