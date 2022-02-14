@@ -67,3 +67,17 @@ The save-file dialogs in Cardinal requires a working [xdg-desktop-portal](https:
 Typically your desktop already provides this, if not consider looking for a package to install with "desktop-portal" in the name.
 
 The open-file dialogs in Cardinal do not have this restriction, with a fallback in case desktop portal is not available.
+
+## Why IRC and not Discord?
+
+Discord terms of service are absolute garbage and have no place on a free open-source project.
+
+Don't take it from us, here are a few articles and discussions about it:
+
+- https://drewdevault.com/2021/12/28/Dont-use-Discord-for-FOSS.html
+- https://stallman.org/discord.html
+- https://discourse.ardour.org/t/ardour-discord-server/88399/
+- https://discuss.haiku-os.org/t/discord-server/6519/
+
+Maybe some Matrix channel could be setup, but it would need to bridge to IRC.  
+For now IRC works perfectly for Cardinal's authors, so there is no real reason to change.
