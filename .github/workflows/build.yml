@@ -2,11 +2,7 @@ name: build
 
 on:
   push:
-    branches:
-      - '*'
-  pull_request:
-    branches:
-      - '*'
+
 env:
   CACHE_VERSION: 6
   DEBIAN_FRONTEND: noninteractive
@@ -62,6 +58,15 @@ jobs:
           name: ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
             *.tar.gz
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: true
+          prerelease: true
+          files: |
+            *.tar.gz
 
   linux-armhf:
     runs-on: ubuntu-20.04
@@ -111,6 +116,15 @@ jobs:
           name: ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
             *.tar.gz
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: true
+          prerelease: true
+          files: |
+            *.tar.gz
 
   linux-i686:
     runs-on: ubuntu-20.04
@@ -156,6 +170,15 @@ jobs:
           name: ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
             *.tar.gz
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: true
+          prerelease: true
+          files: |
+            *.tar.gz
 
   linux-x86_64:
     runs-on: ubuntu-20.04
@@ -192,6 +215,15 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
+            *.tar.gz
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: true
+          prerelease: true
+          files: |
             *.tar.gz
 
   linux-x86_64-debug:
@@ -285,6 +317,15 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
+            *-macOS.pkg
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: true
+          prerelease: true
+          files: |
             *-macOS.pkg
 
   modduo:
@@ -445,6 +486,15 @@ jobs:
           name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
             *.zip
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: true
+          prerelease: true
+          files: |
+            *.zip
 
   win64:
     runs-on: ubuntu-20.04
@@ -486,6 +536,15 @@ jobs:
           name: ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
             *.zip
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: true
+          prerelease: true
+          files: |
+            *.zip
 
   source-tarball:
     runs-on: ubuntu-20.04
@@ -508,6 +567,17 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-source-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
+            /home/runner/cardinal*.tar.xz
+            /home/runner/*/cardinal*.tar.xz
+            /home/runner/*/*/cardinal*.tar.xz
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: true
+          prerelease: true
+          files: |
             /home/runner/cardinal*.tar.xz
             /home/runner/*/cardinal*.tar.xz
             /home/runner/*/*/cardinal*.tar.xz
