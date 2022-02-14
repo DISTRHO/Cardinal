@@ -249,29 +249,6 @@ static const struct {
     { "/LittleUtils/res/TeleportOut.svg", {}, -1 },
 };
 
-static inline void removeShape(NSVGimage* const handle, const char* const id)
-{
-    if (id == nullptr)
-        return;
-
-    for (NSVGshape *shape = handle->shapes, *old = nullptr; shape != nullptr; old = shape, shape = shape->next)
-    {
-        if (std::strcmp(shape->id, id) != 0)
-            continue;
-
-        if (old != nullptr)
-            old->next = shape->next;
-        else
-            handle->shapes = shape->next;
-
-        nsvg__deletePaths(shape->paths);
-        free(shape);
-        return;
-    }
-
-    printf("NOTICE: failed to find '%s' shape to remove\n", id);
-}
-
 static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
 {
     // Special case for DrumKit background grandient

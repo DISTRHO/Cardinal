@@ -479,6 +479,7 @@ struct ViewButton : MenuButton {
 
 		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
 
+#ifndef DISTRHO_OS_MAC
 		menu->addChild(new ui::MenuSeparator);
 
 		static const std::vector<std::string> rateLimitLabels = {
@@ -495,6 +496,7 @@ struct ViewButton : MenuButton {
 				));
 			}
 		}));
+#endif
 	}
 };
 
