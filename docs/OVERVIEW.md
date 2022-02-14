@@ -57,8 +57,6 @@ Only quick&dirty hacks so far, nothing interesting to see here yet.
 Public domain or CC0 licensed Rack patches, suitable for use in Cardinal.  
 Must be stored as plain text files (not zstd compressed) so they play nicely with git.
 
-Note: There are no such patches at the moment, but this is where will they be once available.
-
 ## plugins
 
 Module/Plugin related code and build setup.  
