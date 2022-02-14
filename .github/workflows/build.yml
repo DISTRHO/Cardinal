@@ -47,9 +47,17 @@ jobs:
           make features
           make NOOPT=true WITH_LTO=true -j $(nproc)
           make unzipfx
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        id: slug1
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        id: slug2
+        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst) ../Cardinal
@@ -105,9 +113,17 @@ jobs:
           make features
           make NOOPT=true WITH_LTO=true -j $(nproc)
           make unzipfx
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        id: slug1
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        id: slug2
+        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst) ../Cardinal
@@ -159,9 +175,17 @@ jobs:
           make features
           make NOOPT=true WITH_LTO=true -j $(nproc)
           make unzipfx
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        id: slug1
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        id: slug2
+        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst) ../Cardinal
@@ -205,9 +229,17 @@ jobs:
           make features
           make NOOPT=true WITH_LTO=true -j $(nproc)
           make unzipfx
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        id: slug1
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        id: slug2
+        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst) ../Cardinal
@@ -310,14 +342,25 @@ jobs:
           make features
           make NOOPT=true WITH_LTO=true -j $(sysctl -n hw.logicalcpu)
           ./dpf/utils/package-osx-bundles.sh
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        id: slug1
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        id: slug2
+        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+      - name: Rename macOS bundle
+        run: |
+          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
-            *-macOS.pkg
+            *.pkg
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
@@ -326,7 +369,7 @@ jobs:
           draft: true
           prerelease: true
           files: |
-            *-macOS.pkg
+            *.pkg
 
   modduo:
     runs-on: ubuntu-20.04
@@ -475,9 +518,17 @@ jobs:
           pushd deps/PawPaw; source local.env win32; popd
           make features
           make NOOPT=true WITH_LTO=true -j $(nproc)
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        id: slug1
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        id: slug2
+        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
           cd bin; zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst)
@@ -525,9 +576,17 @@ jobs:
           pushd deps/PawPaw; source local.env win64; popd
           make features
           make NOOPT=true WITH_LTO=true -j $(nproc)
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        id: slug1
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        id: slug2
+        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
           cd bin; zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst)
@@ -560,9 +619,17 @@ jobs:
         run: |
           make HEADLESS=true tarball
           make HEADLESS=true tarball+deps
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        id: slug1
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        id: slug2
+        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-source-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
