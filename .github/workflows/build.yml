@@ -71,8 +71,8 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
           files: |
             *.tar.gz
 
@@ -137,8 +137,8 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
           files: |
             *.tar.gz
 
@@ -199,8 +199,8 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
           files: |
             *.tar.gz
 
@@ -253,8 +253,8 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
           files: |
             *.tar.gz
 
@@ -366,8 +366,8 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
           files: |
             *.pkg
 
@@ -542,8 +542,8 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
           files: |
             *.zip
 
@@ -600,8 +600,8 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
           files: |
             *.zip
 
@@ -642,8 +642,8 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
           files: |
             /home/runner/cardinal*.tar.xz
             /home/runner/*/cardinal*.tar.xz
