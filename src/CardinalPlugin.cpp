@@ -614,7 +614,7 @@ protected:
         }
 
        #ifndef HEADLESS
-        switch (index - kModuleParameters)
+        switch (index - kModuleParameters - 1)
         {
         case kWindowParameterShowTooltips:
             parameter.name = "Show tooltips";
