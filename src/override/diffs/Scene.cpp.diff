@@ -1,5 +1,5 @@
---- ../Rack/src/app/Scene.cpp	2021-12-14 21:35:44.414568198 +0000
-+++ Scene.cpp	2022-02-06 14:11:59.259830276 +0000
+--- ../Rack/src/app/Scene.cpp	2021-12-04 09:46:43.912932319 +0000
++++ Scene.cpp	2022-02-11 05:30:49.567801073 +0000
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -39,7 +39,7 @@
  #include <system.hpp>
  #include <network.hpp>
  #include <history.hpp>
-@@ -14,6 +42,17 @@
+@@ -14,6 +42,18 @@
  #include <patch.hpp>
  #include <asset.hpp>
  
@@ -52,12 +52,13 @@
 +#endif
 +
 +#include "../CardinalCommon.hpp"
++#include "extra/Base64.hpp"
 +#include "DistrhoUtils.hpp"
 +
  
  namespace rack {
  namespace app {
-@@ -23,16 +62,55 @@
+@@ -23,16 +63,55 @@
  	math::Vec size;
  
  	void draw(const DrawArgs& args) override {
@@ -108,18 +109,18 @@
 +
 +	void onEnter(const EnterEvent& e) override {
 +		glfwSetCursor(nullptr, (GLFWcursor*)0x1);
++	}
++
++	void onLeave(const LeaveEvent& e) override {
++		glfwSetCursor(nullptr, nullptr);
  	}
  
 -	void onDragStart(const DragStartEvent& e) override {
-+	void onLeave(const LeaveEvent& e) override {
-+		glfwSetCursor(nullptr, nullptr);
-+	}
-+
 +	void onDragStart(const DragStartEvent&) override {
  		size = APP->window->getSize();
  	}
  
-@@ -46,9 +124,32 @@
+@@ -46,9 +125,32 @@
  struct Scene::Internal {
  	ResizeHandle* resizeHandle;
  
@@ -154,7 +155,7 @@
  };
  
  
-@@ -67,13 +168,8 @@
+@@ -67,13 +169,8 @@
  	browser->hide();
  	addChild(browser);
  
@@ -169,25 +170,8 @@
  	addChild(internal->resizeHandle);
  }
  
-@@ -89,32 +185,13 @@
- 
- 
- void Scene::step() {
--	if (APP->window->isFullScreen()) {
--		// Expand RackScrollWidget to cover entire screen if fullscreen
--		rackScroll->box.pos.y = 0;
--	}
--	else {
--		// Always show MenuBar if not fullscreen
--		menuBar->show();
--		rackScroll->box.pos.y = menuBar->box.size.y;
--	}
--
- 	internal->resizeHandle->box.pos = box.size.minus(internal->resizeHandle->box.size);
- 
- 	// Resize owned descendants
+@@ -105,16 +202,6 @@
  	menuBar->box.size.x = box.size.x;
-+	rackScroll->box.pos.y = menuBar->box.size.y;
  	rackScroll->box.size = box.size.minus(rackScroll->box.pos);
  
 -	// Autosave periodically
@@ -203,7 +187,7 @@
  	// Scroll RackScrollWidget with arrow keys
  	math::Vec arrowDelta;
  	if (internal->heldArrowKeys[0]) {
-@@ -143,6 +220,22 @@
+@@ -143,6 +230,23 @@
  		rackScroll->offset += arrowDelta * arrowSpeed;
  	}
  
@@ -218,6 +202,7 @@
 +				internal->historyActionIndex = actionIndex;
 +				internal->lastSceneChangeTime = time;
 +				patchUtils::deployToRemote();
++				window::generateScreenshot();
 +			}
 +		}
 +	}
@@ -226,7 +211,7 @@
  	Widget::step();
  }
  
-@@ -172,7 +265,7 @@
+@@ -172,7 +276,7 @@
  	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
  		// DEBUG("key '%d '%c' scancode %d '%c' keyName '%s'", e.key, e.key, e.scancode, e.scancode, e.keyName.c_str());
  		if (e.keyName == "n" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -235,7 +220,7 @@
  			e.consume(this);
  		}
  		if (e.keyName == "q" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -180,19 +273,20 @@
+@@ -180,19 +284,20 @@
  			e.consume(this);
  		}
  		if (e.keyName == "o" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -260,7 +245,7 @@
  			e.consume(this);
  		}
  		if (e.keyName == "z" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -220,10 +314,14 @@
+@@ -220,10 +325,14 @@
  			APP->scene->rackScroll->setZoom(std::pow(2.f, zoom));
  			e.consume(this);
  		}
@@ -276,7 +261,7 @@
  		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == 0) {
  			system::openBrowser("https://vcvrack.com/manual/");
  			e.consume(this);
-@@ -232,10 +330,8 @@
+@@ -232,10 +341,13 @@
  			settings::cpuMeter ^= true;
  			e.consume(this);
  		}
@@ -286,10 +271,15 @@
 -			// menuBar->hide();
 +		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
 +			patchUtils::deployToRemote();
++			window::generateScreenshot();
++			e.consume(this);
++		}
++		if (e.key == GLFW_KEY_F9 && (e.mods & RACK_MOD_MASK) == 0) {
++			window::generateScreenshot();
  			e.consume(this);
  		}
  
-@@ -326,13 +422,6 @@
+@@ -326,13 +438,6 @@
  
  	// Key commands that can be overridden by children
  	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -303,7 +293,7 @@
  		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
  			rack->pasteClipboardAction();
  			e.consume(this);
-@@ -351,7 +440,7 @@
+@@ -351,7 +456,7 @@
  		std::string extension = system::getExtension(path);
  
  		if (extension == ".vcv") {
@@ -312,7 +302,7 @@
  			e.consume(this);
  			return;
  		}
-@@ -368,3 +457,77 @@
+@@ -368,3 +473,94 @@
  
  } // namespace app
  } // namespace rack
@@ -381,6 +371,23 @@
 +
 +	if (const lo_blob blob = lo_blob_new(data.size(), data.data())) {
 +		lo_send(addr, "/load", "b", blob);
++		lo_blob_free(blob);
++	}
++
++	lo_address_free(addr);
++#endif
++}
++
++
++void sendScreenshotToRemote(const char* const screenshot) {
++#ifdef HAVE_LIBLO
++	const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
++	DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
++
++	std::vector<uint8_t> data(d_getChunkFromBase64String(screenshot));
++
++	if (const lo_blob blob = lo_blob_new(data.size(), data.data())) {
++		lo_send(addr, "/screenshot", "b", blob);
 +		lo_blob_free(blob);
 +	}
 +

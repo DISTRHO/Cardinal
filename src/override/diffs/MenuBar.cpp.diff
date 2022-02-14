@@ -1,5 +1,5 @@
---- ../Rack/src/app/MenuBar.cpp	2022-02-05 22:30:09.233392896 +0000
-+++ MenuBar.cpp	2022-02-05 18:08:00.272028714 +0000
+--- ../Rack/src/app/MenuBar.cpp	2022-01-15 11:59:46.188414546 +0000
++++ MenuBar.cpp	2022-02-14 03:38:00.935519007 +0000
 @@ -1,8 +1,33 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -218,10 +218,13 @@
  
  		static const std::vector<std::string> knobModeLabels = {
  			"Linear",
-@@ -467,6 +478,21 @@
+@@ -467,6 +478,25 @@
  		menu->addChild(knobScrollSensitivitySlider);
  
  		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
++
++#ifndef DISTRHO_OS_MAC
++		menu->addChild(new ui::MenuSeparator);
 +
 +		static const std::vector<std::string> rateLimitLabels = {
 +			"None",
@@ -237,10 +240,11 @@
 +				));
 +			}
 +		}));
++#endif
  	}
  };
  
-@@ -476,47 +502,6 @@
+@@ -476,47 +506,6 @@
  ////////////////////
  
  
@@ -288,7 +292,7 @@
  struct EngineButton : MenuButton {
  	void onAction(const ActionEvent& e) override {
  		ui::Menu* menu = createMenu();
-@@ -529,269 +514,6 @@
+@@ -529,269 +518,6 @@
  		menu->addChild(createMenuItem("Performance meters", cpuMeterText, [=]() {
  			settings::cpuMeter ^= true;
  		}));
@@ -558,7 +562,7 @@
  	}
  };
  
-@@ -802,63 +524,23 @@
+@@ -802,63 +528,23 @@
  
  
  struct HelpButton : MenuButton {
@@ -627,7 +631,7 @@
  	}
  };
  
-@@ -908,7 +590,9 @@
+@@ -908,7 +594,9 @@
  struct MenuBar : widget::OpaqueWidget {
  	MeterLabel* meterLabel;
  
@@ -638,7 +642,7 @@
  		const float margin = 5;
  		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
  
-@@ -917,7 +601,7 @@
+@@ -917,7 +605,7 @@
  		layout->spacing = math::Vec(0, 0);
  		addChild(layout);
  
@@ -647,7 +651,7 @@
  		fileButton->text = "File";
  		layout->addChild(fileButton);
  
-@@ -933,10 +617,6 @@
+@@ -933,10 +621,6 @@
  		engineButton->text = "Engine";
  		layout->addChild(engineButton);
  
@@ -658,7 +662,7 @@
  		HelpButton* helpButton = new HelpButton;
  		helpButton->text = "Help";
  		layout->addChild(helpButton);
-@@ -971,7 +651,11 @@
+@@ -971,7 +655,11 @@
  
  
  widget::Widget* createMenuBar() {

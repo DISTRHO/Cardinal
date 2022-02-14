@@ -7,7 +7,7 @@ On the root folder the following directories can be seen;
 
  * [carla](#carla)
  * [deps](#deps)
- * [doc](#doc)
+ * [docs](#docs)
  * [dpf](#dpf)
  * [include](#include)
  * [lv2export](#lv2export)
@@ -26,10 +26,10 @@ Being GPLv2+ the code license is compatible with Cardinal's GPLv3+.
 ## deps
 
 3rd-party libraries build setup.  
-No Cardinal specific code is hosted here, only external submodules and a Makefile with steps for fetching extra source code and build it.
+No Cardinal specific code is hosted here, only external submodules and a Makefile with steps for fetching extra source code and build it.  
 The Makefile overrides Rack's `dep.mk` things for a proper static build, and supporting more platforms.
 
-## doc
+## docs
 
 Here you find several files (like this one you are reading now) describing the Cardinal project.  
 It is intentionally not using something like GitHub Wiki so that rehosting does not lose any information.  
@@ -57,6 +57,8 @@ Only quick&dirty hacks so far, nothing interesting to see here yet.
 Public domain or CC0 licensed Rack patches, suitable for use in Cardinal.  
 Must be stored as plain text files (not zstd compressed) so they play nicely with git.
 
+Note: There are no such patches at the moment, but this is where will they be once available.
+
 ## plugins
 
 Module/Plugin related code and build setup.  
@@ -76,15 +78,20 @@ Everything is a symlink except `DistrhoPluginInfo.h` (setting plugin info) and `
 
 The source code is the same for all the variants, with compiler macros used to tweak behaviour and IO count.
 
+### custom
+
+Here are files that are originally from Rack but fully reimplemented in Cardinal.  
+Some of them are just stubs to define function symbols but without an actual implementation, for example disabling network features.
+
 ### extra
 
 A few extra files for having access to a few utilities, code borrowed from Carla, which in turn borrowed it from JUCE.  
 The important one is `SharedResourcePointer`, as a way to easily manage a shared class lifecycle.
 
-### custom
+### MOD
 
-Here are files that are originally from Rack but fully reimplemented in Cardinal.  
-Some of them are just stubs to define function symbols but without an actual implementation, for example disabling network features.
+Here are files related to packaging for [MOD Devices](https://moddevices.com/).  
+These are not used for regular/common builds, only for MOD, where we add a few extra properties to make Cardinal LV2 integrate better with their system.
 
 ### override
 
@@ -98,6 +105,14 @@ A git submodule reference to the official Rack source code repository.
 ### AsyncDialog.{cpp,hpp}
 
 Custom Cardinal code for showing a dialog in async fashion, optionally with a callback for when the user clicks "Ok".
+
+### CardinalCommon.{cpp,hpp}
+
+Common Cardinal code used by a few different files.
+
+### CardinalModuleWidget.cpp
+
+Some more common code and a custom `ModuleWidget::onButton` implementation.
 
 ### CardinalPlugin.cpp
 
@@ -122,15 +137,6 @@ This same file is used by all variants, changing behaviour based on the plugin v
 
 And handy but perhaps somewhat hacky `rack::Context` class extension, so internal modules can have direct access to DAW provided data.  
 This also extends the base `Plugin` and `UI` classes from DPF, to provide methods needed for Rack Audio/MIDI drivers.
-
-### PluginDriver.hpp
-
-Code that glues Rack Audio/MIDI drivers to the DPF side of things.
-
-### ResizeHandle.hpp
-
-A DPF-related Widget that does what you think it does.  
-Handles all the resizing for us.
 
 ### template.vcv
 
