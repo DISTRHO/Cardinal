@@ -722,7 +722,6 @@ BASE_FLAGS += -DARCH_LIN
 endif
 
 BASE_FLAGS += -DBUILDING_PLUGIN_MODULES
-BASE_FLAGS += -fno-finite-math-only
 BASE_FLAGS += -fno-strict-aliasing
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
