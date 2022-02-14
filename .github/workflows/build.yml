@@ -397,7 +397,7 @@ jobs:
           $(pwd)/deps/mod-plugin-builder/bootstrap.sh modduo-static minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduo-static
       - name: Build for modduo
         run: |
-          make modduo HEADLESS=true WITH_LTO=true -j $(nproc)
+          make modduo HEADLESS=true WITH_LTO=true MODDUO=true -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"

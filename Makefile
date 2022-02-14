@@ -111,8 +111,11 @@ endif
 # --------------------------------------------------------------
 # MOD builds
 
-EXTRA_MOD_FLAGS  = -I../include/single-precision -fsingle-precision-constant -mno-unaligned-access
+EXTRA_MOD_FLAGS  = -I../include/single-precision -fsingle-precision-constant
 
+ifeq ($(MODDUO),true)
+EXTRA_MOD_FLAGS += -mno-unaligned-access
+endif
 ifeq ($(WITH_LTO),true)
 EXTRA_MOD_FLAGS += -ffat-lto-objects
 endif
