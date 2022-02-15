@@ -360,7 +360,7 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
-            *.pkg
+            ${{ github.event.repository.name }}-*.pkg
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
@@ -369,7 +369,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            *.pkg
+            ${{ github.event.repository.name }}-*.pkg
 
   modduo:
     runs-on: ubuntu-20.04
