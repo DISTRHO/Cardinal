@@ -116,7 +116,7 @@ struct ResizeHandle : widget::OpaqueWidget {
 	}
 
 	void onDragMove(const DragMoveEvent& e) override {
-		size = size.plus(e.mouseDelta);
+		size = size.plus(e.mouseDelta.mult(APP->window->pixelRatio));
 		APP->window->setSize(size.round());
 	}
 };
