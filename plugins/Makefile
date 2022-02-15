@@ -1017,6 +1017,7 @@ $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 		-Dstbtt_fontinfo=stbtt_fontinfo_cardinal \
 		-Dstbrp_node=stbrp_node_cardinal \
 		-Dstbrp_rect=stbrp_rect_cardinal \
+		-DCARLA_BACKEND_NAMESPACE=Cardinal \
 		-DREAL_BUILD \
 		-DSTATIC_PLUGIN_TARGET \
 		-I../carla/source/backend \

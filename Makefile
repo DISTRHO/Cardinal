@@ -43,7 +43,7 @@ endif
 # --------------------------------------------------------------
 # Carla config
 
-CARLA_EXTRA_ARGS = \
+CARLA_EXTRA_ARGS = CARLA_BACKEND_NAMESPACE=Cardinal \
 	HAVE_FFMPEG=false \
 	HAVE_FLUIDSYNTH=false \
 	HAVE_PROJECTM=false \

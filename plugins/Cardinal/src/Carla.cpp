@@ -39,7 +39,7 @@ json_t *jsonp_stringn_nocheck_own(const char* value, size_t len);
 
 // --------------------------------------------------------------------------------------------------------------------
 
-using namespace CarlaBackend;
+using namespace CARLA_BACKEND_NAMESPACE;
 
 static uint32_t host_get_buffer_size(NativeHostHandle);
 static double host_get_sample_rate(NativeHostHandle);

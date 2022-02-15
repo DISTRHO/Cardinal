@@ -38,7 +38,7 @@ const NativePluginDescriptor* carla_getNativePluginDescriptor(const std::size_t 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-using namespace CarlaBackend;
+using namespace CARLA_BACKEND_NAMESPACE;
 
 static uint32_t host_get_buffer_size(NativeHostHandle);
 static double host_get_sample_rate(NativeHostHandle);
