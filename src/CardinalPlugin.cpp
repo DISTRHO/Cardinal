@@ -380,6 +380,9 @@ void CardinalPluginContext::writeMidiMessage(const rack::midi::Message& message,
             break;
         }
         break;
+    default:
+        // invalid
+        return;
     }
 
     DISTRHO_SAFE_ASSERT_RETURN(size >= event.size,);

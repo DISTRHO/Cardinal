@@ -32,6 +32,10 @@ else
 BASE_FLAGS += -DARCH_LIN
 endif
 
+ifeq ($(HAIKU),true)
+BASE_FLAGS += -I../include/haiku-compat
+endif
+
 BASE_FLAGS += -fno-strict-aliasing
 BASE_FLAGS += -DPRIVATE=
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
@@ -70,12 +74,16 @@ ifeq ($(BSD),true)
 BASE_FLAGS += -DCLOCK_MONOTONIC_RAW=CLOCK_MONOTONIC_PRECISE
 endif
 
+ifeq ($(HAIKU),true)
+BASE_FLAGS += -DCLOCK_MONOTONIC_RAW=CLOCK_MONOTONIC
+endif
+
 ifeq ($(WASM),true)
 BASE_FLAGS += -DNANOVG_GLES2=1
 BASE_FLAGS += -msse -msse2 -msse3 -msimd128
 # FIXME
 BASE_FLAGS += -DRTLD_DEEPBIND=0
-else
+else ifneq ($(HAIKU),true)
 BASE_FLAGS += -pthread
 endif
 

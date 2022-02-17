@@ -772,7 +772,7 @@ endif
 ifeq ($(WASM),true)
 BASE_FLAGS += -DNANOVG_GLES2=1
 BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-else
+else ifneq ($(HAIKU),true)
 BASE_FLAGS += -pthread
 endif
 

@@ -146,7 +146,6 @@ endif
 BASE_FLAGS += -I../Rack/dep/glfw/include
 BASE_FLAGS += -I../Rack/dep/nanosvg/src
 BASE_FLAGS += -I../Rack/dep/oui-blendish
-BASE_FLAGS += -pthread
 
 ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
@@ -159,7 +158,7 @@ endif
 ifeq ($(WASM),true)
 BASE_FLAGS += -DNANOVG_GLES2=1
 BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-else
+else ifneq ($(HAIKU),true)
 BASE_FLAGS += -pthread
 endif
 
@@ -183,7 +182,11 @@ BASE_FLAGS += -Wno-unused-variable
 # --------------------------------------------------------------
 # extra linker flags
 
+ifeq ($(HAIKU),true)
+LINK_FLAGS += -lpthread
+else
 LINK_FLAGS += -pthread
+endif
 
 ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
 ifneq ($(STATIC_BUILD),true)
