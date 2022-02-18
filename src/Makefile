@@ -102,7 +102,7 @@ BUILD_CXX_FLAGS += -fno-finite-math-only
 BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
 
 # Rack code is not tested for this flag, unset it
-BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS
+BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
 
 # --------------------------------------------------------------
 # Rack files to build
