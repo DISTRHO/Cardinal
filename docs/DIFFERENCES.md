@@ -19,7 +19,7 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 | Officially supported           | Yes, if you pay           | No, but you can fix it yourself | |
 | Contains internal modules      | Core only                 | Everything is internal          | |
 | Loads external modules         | Yes                       | No                              | |
-| Supports proprietary modules   | Yes                       | No                              | |
+| Supports closed-source modules | Yes                       | No                              | |
 | Supports physical devices      | Yes                       | No                              | Audio + MIDI only through the DAW/Host or via JACK in standalone |
 | Plugin in LV2 format           | No                        | Yes                             | |
 | Plugin in VST2 format          | Yes                       | Yes                             | |
