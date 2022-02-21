@@ -30,10 +30,8 @@
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
-/*
 // AnimatedCircuits
 #include "AnimatedCircuits/src/plugin.hpp"
-*/
 
 // Aria
 /* NOTE too much noise in original include, do this a different way
@@ -524,7 +522,7 @@ Plugin* pluginInstance__Cardinal;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__AmalgamatedHarmonics;
-// Plugin* pluginInstance__AnimatedCircuits;
+Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
 Plugin* pluginInstance__AudibleInstruments;
 extern Plugin* pluginInstance__Autinn;
@@ -749,7 +747,6 @@ static void initStatic__AmalgamatedHarmonics()
     }
 }
 
-/*
 static void initStatic__AnimatedCircuits()
 {
     Plugin* const p = new Plugin;
@@ -762,7 +759,6 @@ static void initStatic__AnimatedCircuits()
         p->addModel(model_AC_LFold);
     }
 }
-*/
 
 static void initStatic__Aria()
 {
@@ -1853,7 +1849,7 @@ void initStaticPlugins()
 #ifndef NOPLUGINS
     initStatic__21kHz();
     initStatic__AmalgamatedHarmonics();
-    // initStatic__AnimatedCircuits();
+    initStatic__AnimatedCircuits();
     initStatic__Aria();
     initStatic__AudibleInstruments();
     initStatic__Autinn();
