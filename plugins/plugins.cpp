@@ -512,9 +512,10 @@ extern Model* modelMaude_221;
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
 
-//substation
-// NOTE too much noise in original include, do this a different way
+// substation
+/* NOTE too much noise in original include, do this a different way
 // "substation-opensource/src/_plugin.hpp"
+*/
 namespace slime {
 namespace plugin {
 namespace substation {
