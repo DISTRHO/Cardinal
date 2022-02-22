@@ -132,4 +132,4 @@
 	url = https://github.com/NikolaiVChr/Autinn.git
 [submodule "plugins/substation-opensource"]
 	path = plugins/substation-opensource
-	url = https://gitlab.com/slimechild/substation-opensource.git
+	url = https://gitlab.com/falktx/substation-opensource.git

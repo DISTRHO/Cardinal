@@ -500,10 +500,9 @@ extern Model* modelMaude_221;
 //substation
 // NOTE too much noise in original include, do this a different way
 // "substation-opensource/src/_plugin.hpp"
-#define modelClock modelsubstationClock
-#define modelMixer modelsubstationMixer
-#define modelQuantizer modelsubstationQuantizer
-#define modelVCA modelsubstationVCA
+namespace slime {
+namespace plugin {
+namespace substation {
 extern Model* modelClock;
 extern Model* modelPolySequencer;
 extern Model* modelSubOscillator;
@@ -515,10 +514,7 @@ extern Model* modelVCA;
 extern Model* modelBlank4;
 extern Model* modelBlank7;
 extern Model* modelFilterPlus;
-#undef modelClock
-#undef modelMixer
-#undef modelQuantizer
-#undef modelVCA
+}}}
 
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
@@ -1854,25 +1850,17 @@ static void initStatic__substation()
     const StaticPluginLoader spl(p, "substation-opensource");
     if (spl.ok())
     {
-#define modelClock modelsubstationClock
-#define modelMixer modelsubstationMixer
-#define modelQuantizer modelsubstationQuantizer
-#define modelVCA modelsubstationVCA
-        p->addModel(modelClock);
-        p->addModel(modelEnvelopes);
-        p->addModel(modelFilter);
-        p->addModel(modelMixer);
-        p->addModel(modelQuantizer);
-        p->addModel(modelPolySequencer);
-        p->addModel(modelVCA);
-        p->addModel(modelSubOscillator);
-        p->addModel(modelBlank4);
-        p->addModel(modelBlank7);
-        p->addModel(modelFilterPlus);
-#undef modelClock
-#undef modelMixer
-#undef modelQuantizer
-#undef modelVCA
+        p->addModel(slime::plugin::substation::modelClock);
+        p->addModel(slime::plugin::substation::modelEnvelopes);
+        p->addModel(slime::plugin::substation::modelFilter);
+        p->addModel(slime::plugin::substation::modelMixer);
+        p->addModel(slime::plugin::substation::modelQuantizer);
+        p->addModel(slime::plugin::substation::modelPolySequencer);
+        p->addModel(slime::plugin::substation::modelVCA);
+        p->addModel(slime::plugin::substation::modelSubOscillator);
+        p->addModel(slime::plugin::substation::modelBlank4);
+        p->addModel(slime::plugin::substation::modelBlank7);
+        p->addModel(slime::plugin::substation::modelFilterPlus);
     }
 }
 
