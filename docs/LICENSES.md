@@ -8,48 +8,49 @@ the more restrictive of the **code licenses** will apply to the final binary.
 
 Bellow follows a list of all code licenses used in Cardinal and linked submodules.
 
-| Name                    | License(s)            | Additional notes |
-|-------------------------|-----------------------|------------------|
-| Carla                   | GPL-2.0-or-later      | Used as plugin host within Cardinal |
-| DPF                     | ISC, GPL-2.0-or-later | Used as the plugin framework, VST2 binary GPLv2+ licensed |
-| Rack                    | GPL-3.0-or-later      | The actual Rack code, internal dependencies are compatible with GPLv3+ |
-| 21kHz                   | MIT                   | |
-| Amalgamated Harmonics   | BSD-3-Clause          | |
-| Animated Circuits       | GPL-3.0-or-later      | |
-| Aria Salvatrice         | GPL-3.0-or-later      | |
-| Audible Instruments     | GPL-3.0-or-later      | |
-| Autinn                  | GPL-3.0-or-later      | |
-| Bacon Music             | GPL-3.0-or-later      | |
-| Befaco                  | GPL-3.0-or-later      | |
-| Bidoo                   | GPL-3.0-or-later      | |
-| Bogaudio                | GPL-3.0-or-later      | |
-| cf                      | BSD-3-Clause          | |
-| ChowDSP                 | GPL-3.0-or-later      | |
-| DrumKit                 | CC0-1.0               | |
-| E-Series                | GPL-3.0-or-later      | |
-| ExpertSleepers Encoders | MIT                   | |
-| Extratone               | GPL-3.0-or-later      | |
-| Fehler Fabrik           | GPL-3.0-or-later      | |
-| Glue the Giant          | GPL-3.0-or-later      | |
-| Grande                  | GPL-3.0-or-later      | |
-| HetrickCV               | CC0-1.0               | |
-| ihtsyn                  | GPL-3.0-or-later      | |
-| Impromptu               | GPL-3.0-or-later      | |
-| JW-Modules              | BSD-3-Clause          | |
-| LifeFormModular         | MIT                   | |
-| Little Utils            | EUPL-1.2              | |
-| Lomas Modules           | GPL-3.0-or-later      | |
-| Lyrae Modules           | GPL-3.0-or-later      | |
-| MindMeld                | GPL-3.0-or-later      | |
-| Mog                     | CC0-1.0               | |
-| mscHack                 | BSD-3-Clause          | |
-| Prism                   | BSD-3-Clause          | |
-| Rackwindows             | MIT                   | |
-| repelzen                | GPL-3.0-or-later      | |
-| Sonus Modular           | GPL-3.0-or-later      | |
-| Valley                  | GPL-3.0-or-later      | |
-| ZetaCarinae             | GPL-3.0-or-later      | |
-| ZZC                     | GPL-3.0-or-later      | |
+| Name                    | License(s)               | Additional notes |
+|-------------------------|--------------------------|------------------|
+| Carla                   | GPL-2.0-or-later         | Used as plugin host within Cardinal |
+| DPF                     | ISC, GPL-2.0-or-later    | Used as the plugin framework, VST2 binary GPLv2+ licensed |
+| Rack                    | GPL-3.0-or-later         | The actual Rack code, internal dependencies are compatible with GPLv3+ |
+| 21kHz                   | MIT                      | |
+| Amalgamated Harmonics   | BSD-3-Clause             | |
+| Animated Circuits       | GPL-3.0-or-later         | |
+| Aria Salvatrice         | GPL-3.0-or-later         | |
+| Audible Instruments     | GPL-3.0-or-later         | |
+| Autinn                  | GPL-3.0-or-later         | |
+| Bacon Music             | GPL-3.0-or-later         | |
+| Befaco                  | GPL-3.0-or-later         | |
+| Bidoo                   | GPL-3.0-or-later         | |
+| Bogaudio                | GPL-3.0-or-later         | |
+| cf                      | BSD-3-Clause             | |
+| ChowDSP                 | GPL-3.0-or-later         | |
+| DrumKit                 | CC0-1.0                  | |
+| E-Series                | GPL-3.0-or-later         | |
+| ExpertSleepers Encoders | MIT                      | |
+| Extratone               | GPL-3.0-or-later         | |
+| Fehler Fabrik           | GPL-3.0-or-later         | |
+| Glue the Giant          | GPL-3.0-or-later         | |
+| Grande                  | GPL-3.0-or-later         | |
+| HetrickCV               | CC0-1.0                  | |
+| ihtsyn                  | GPL-3.0-or-later         | |
+| Impromptu               | GPL-3.0-or-later         | |
+| JW-Modules              | BSD-3-Clause             | |
+| LifeFormModular         | MIT                      | |
+| Little Utils            | EUPL-1.2                 | |
+| Lomas Modules           | GPL-3.0-or-later         | |
+| Lyrae Modules           | GPL-3.0-or-later         | |
+| MindMeld                | GPL-3.0-or-later         | |
+| Mog                     | CC0-1.0                  | |
+| mscHack                 | BSD-3-Clause             | |
+| Prism                   | BSD-3-Clause             | |
+| Rackwindows             | MIT                      | |
+| repelzen                | GPL-3.0-or-later         | |
+| Substation Opensource   | BSD-3-Clause-Attribution | Need to check full compatibility with GPLv3+ |
+| Sonus Modular           | GPL-3.0-or-later         | |
+| Valley                  | GPL-3.0-or-later         | |
+| ZetaCarinae             | GPL-3.0-or-later         | |
+| ZZC                     | GPL-3.0-or-later         | |
 
 ## ARTWORK / PANEL LICENSES
 
@@ -133,6 +134,7 @@ Below is a list of artwork licenses from plugins
 | Prism/RobotoCondensed-Regular.ttf       | Apache-2.0       | |
 | Rackwindows/*                           | MIT              | [Same license as source code](https://github.com/n0jo/rackwindows/issues/15) |
 | repelzen/*                              | CC-BY-SA-4.0     | |
+| Substation Opensource                   | BSD-3-Clause-Attribution | No artwork specific license provided |
 | sonusmodular/*                          | GPL-3.0-or-later | [Same license as source code](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
 | ValleyAudio/*                           | GPL-3.0-or-later | [Same license as source code](https://github.com/ValleyAudio/ValleyRackFree/issues/73) |
 | ValleyAudio/din1451alt.ttf              | CC-BY-3.0-DE     | |
