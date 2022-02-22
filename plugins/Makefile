@@ -582,6 +582,14 @@ PLUGIN_FILES += $(wildcard MindMeldModular/src/Utilities/*.cpp)
 MINDMELD_CUSTOM = printNote
 
 # --------------------------------------------------------------
+# MockbaModular
+
+PLUGIN_FILES += $(filter-out MockbaModular/src/plugin.cpp MockbaModular/src/MockbaModular.cpp MockbaModular/src/UDPClockMaster.cpp MockbaModular/src/UDPClockSlave.cpp,$(wildcard MockbaModular/src/*.cpp))
+
+# modules/types which are present in other plugins
+MOCKBAMODULAR_CUSTOM = Blank Comparator
+
+# --------------------------------------------------------------
 # Mog
 
 PLUGIN_FILES += Mog/src/Network.cpp
@@ -598,7 +606,7 @@ MSCHACK_CUSTOM_PER_FILE = MAIN_SYNC_CLOCK FILTER_STRUCT FILTER_PARAM_STRUCT OSC_
 # --------------------------------------------------------------
 # Prism
 
-PLUGIN_FILES += $(filter-out Prism/src/plugin.cpp, $(wildcard Prism/src/*.cpp))
+PLUGIN_FILES += $(filter-out Prism/src/plugin.cpp,$(wildcard Prism/src/*.cpp))
 PLUGIN_FILES += $(wildcard Prism/src/scales/*.cpp)
 
 # modules/types which are present in other plugins
@@ -1356,6 +1364,13 @@ $(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),MindMeld)) \
 		-DpluginInstance=pluginInstance__MindMeld
+
+$(BUILD_DIR)/MockbaModular/%.cpp.o: MockbaModular/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MOCKBAMODULAR_CUSTOM),$(call custom_module_names,$(m),MockbaModular)) \
+		-DpluginInstance=pluginInstance__MockbaModular
 
 $(BUILD_DIR)/Mog/%.cpp.o: Mog/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

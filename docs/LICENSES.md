@@ -41,6 +41,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Lomas Modules           | GPL-3.0-or-later         | |
 | Lyrae Modules           | GPL-3.0-or-later         | |
 | MindMeld                | GPL-3.0-or-later         | |
+| Mockba Modular          | MIT                      | |
 | Mog                     | CC0-1.0                  | |
 | mscHack                 | BSD-3-Clause             | |
 | Prism                   | BSD-3-Clause             | |
@@ -126,6 +127,7 @@ Below is a list of artwork licenses from plugins
 | LyraeModules/*                          | CC-BY-NC-SA-4.0  | |
 | MindMeld/*                              | CC-BY-NC-ND-4.0  | |
 | MindMeld/fonts/RobotoCondensed-*.ttf    | Apache-2.0       | |
+| MockbaModular/*                         | MIT              | No artwork specific license provided |
 | Mog/*                                   | CC0-1.0          | |
 | Mog/components/*                        | CC-BY-NC-4.0     | |
 | Mog/Exo2-BoldItalic.ttf                 | OFL-1.1-RFN      | |
@@ -134,7 +136,7 @@ Below is a list of artwork licenses from plugins
 | Prism/RobotoCondensed-Regular.ttf       | Apache-2.0       | |
 | Rackwindows/*                           | MIT              | [Same license as source code](https://github.com/n0jo/rackwindows/issues/15) |
 | repelzen/*                              | CC-BY-SA-4.0     | |
-| Substation Opensource                   | BSD-3-Clause-Attribution | No artwork specific license provided |
+| substation-opensource/*                 | BSD-3-Clause-Attribution | No artwork specific license provided |
 | sonusmodular/*                          | GPL-3.0-or-later | [Same license as source code](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
 | ValleyAudio/*                           | GPL-3.0-or-later | [Same license as source code](https://github.com/ValleyAudio/ValleyRackFree/issues/73) |
 | ValleyAudio/din1451alt.ttf              | CC-BY-3.0-DE     | |

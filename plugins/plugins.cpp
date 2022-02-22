@@ -446,6 +446,21 @@ extern Model* modelBassMaster;
 extern Model* modelBassMasterJr;
 extern Model* modelShapeMaster;
 
+// MockbaModular
+#define modelBlank modelMockbaModularBlank
+#define modelComparator modelMockbaModularComparator
+#include "MockbaModular/src/plugin.hpp"
+#undef modelBlank
+#undef modelComparator
+#include "MockbaModular/src/MockbaModular.hpp"
+#undef min
+#define saveBack ignoreMockbaModular1
+#define loadBack ignoreMockbaModular2
+#include "MockbaModular/src/MockbaModular.cpp"
+#undef saveBack
+#undef loadBack
+std::string loadBack(int) { return "res/Empty_dark.svg"; }
+
 // Mog
 #include "Mog/src/plugin.hpp"
 
@@ -577,6 +592,7 @@ Plugin* pluginInstance__LittleUtils;
 Plugin* pluginInstance__Lomas;
 Plugin* pluginInstance__Lyrae;
 extern Plugin* pluginInstance__MindMeld;
+Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__Prism;
@@ -1703,6 +1719,65 @@ static void initStatic__Mog()
     }
 }
 
+static void initStatic__MockbaModular()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__MockbaModular = p;
+
+    const StaticPluginLoader spl(p, "MockbaModular");
+    if (spl.ok())
+    {
+#define modelBlank modelMockbaModularBlank
+#define modelComparator modelMockbaModularComparator
+        p->addModel(modelBlank);
+        p->addModel(modelFeidah);
+        p->addModel(modelFeidahS);
+        p->addModel(modelFiltah);
+        p->addModel(modelMixah);
+        p->addModel(modelMixah3);
+        p->addModel(modelDividah);
+        p->addModel(modelCountah);
+        p->addModel(modelSelectah);
+        p->addModel(modelShapah);
+        p->addModel(modelHoldah);
+        p->addModel(modelPannah);
+        p->addModel(modelReVoltah);
+        p->addModel(modelCZSaw);
+        p->addModel(modelCZSquare);
+        p->addModel(modelCZPulse);
+        p->addModel(modelCZDblSine);
+        p->addModel(modelCZSawPulse);
+        p->addModel(modelCZReso1);
+        p->addModel(modelCZReso2);
+        p->addModel(modelCZReso3);
+        p->addModel(modelCZOsc);
+        p->addModel(modelMaugTriangle);
+        p->addModel(modelMaugShark);
+        p->addModel(modelMaugSaw);
+        p->addModel(modelMaugSaw2);
+        p->addModel(modelMaugSquare);
+        p->addModel(modelMaugSquare2);
+        p->addModel(modelMaugSquare3);
+        p->addModel(modelMaugOsc);
+        p->addModel(modelComparator);
+        p->addModel(modelDualBUFFER);
+        p->addModel(modelDualNOT);
+        p->addModel(modelDualOR);
+        p->addModel(modelDualNOR);
+        p->addModel(modelDualAND);
+        p->addModel(modelDualNAND);
+        p->addModel(modelDualXOR);
+        p->addModel(modelDualXNOR);
+        p->addModel(modelPSelectah);
+
+        // require input files to work
+        spl.removeModule("UDPClockMaster");
+        spl.removeModule("UDPClockSlave");
+#undef modelBlank
+#undef modelComparator
+    }
+}
+
 static void initStatic__mscHack()
 {
     Plugin* const p = new Plugin;
@@ -1960,6 +2035,7 @@ void initStaticPlugins()
     initStatic__Lomas();
     initStatic__Lyrae();
     initStatic__MindMeld();
+    initStatic__MockbaModular();
     initStatic__Mog();
     initStatic__mscHack();
     initStatic__Prism();

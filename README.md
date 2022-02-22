@@ -130,6 +130,7 @@ At the moment the following 3rd-party modules are provided:
 - Lomas Modules
 - Lyrae Modules
 - MindMeld
+- Mockba Modular
 - Mog
 - mscHack
 - Prism

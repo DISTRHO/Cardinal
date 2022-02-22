@@ -133,3 +133,6 @@
 [submodule "plugins/substation-opensource"]
 	path = plugins/substation-opensource
 	url = https://gitlab.com/falktx/substation-opensource.git
+[submodule "plugins/MockbaModular"]
+	path = plugins/MockbaModular
+	url = https://github.com/MockbaTheBorg/MockbaModular.git
