@@ -459,7 +459,7 @@ extern Model* modelShapeMaster;
 #include "MockbaModular/src/MockbaModular.cpp"
 #undef saveBack
 #undef loadBack
-std::string loadBack(int) { return "res/Empty_dark.svg"; }
+std::string loadBack(int) { return "res/Empty_gray.svg"; }
 
 // Mog
 #include "Mog/src/plugin.hpp"
