@@ -103,6 +103,13 @@ extern Model* modelChord;
 #undef SCREW_WIDTH
 #undef RACK_HEIGHT
 
+// Befaco
+#define modelADSR modelBefacoADSR
+#define modelMixer modelBefacoMixer
+#include "Befaco/src/plugin.hpp"
+#undef modelADSR
+#undef modelMixer
+
 // Bidoo
 #include "Bidoo/src/plugin.hpp"
 
@@ -527,6 +534,7 @@ Plugin* pluginInstance__Aria;
 Plugin* pluginInstance__AudibleInstruments;
 extern Plugin* pluginInstance__Autinn;
 Plugin* pluginInstance__Bacon;
+Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__cf;
@@ -896,6 +904,38 @@ static void initStatic__Bacon()
         p->addModel(modelPhaser);
 #endif
         p->addModel(modelPolyGenerator);
+    }
+}
+
+static void initStatic__Befaco()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Befaco = p;
+
+    const StaticPluginLoader spl(p, "Befaco");
+    if (spl.ok())
+    {
+#define modelADSR modelBefacoADSR
+#define modelMixer modelBefacoMixer
+        p->addModel(modelEvenVCO);
+        p->addModel(modelRampage);
+        p->addModel(modelABC);
+        p->addModel(modelSpringReverb);
+        p->addModel(modelMixer);
+        p->addModel(modelSlewLimiter);
+        p->addModel(modelDualAtenuverter);
+        p->addModel(modelPercall);
+        p->addModel(modelHexmixVCA);
+        p->addModel(modelChoppingKinky);
+        p->addModel(modelKickall);
+        p->addModel(modelSamplingModulator);
+        p->addModel(modelMorphader);
+        p->addModel(modelADSR);
+        p->addModel(modelSTMix);
+        p->addModel(modelMuxlicer);
+        p->addModel(modelMex);
+#undef modelADSR
+#undef modelMixer
     }
 }
 
@@ -1854,6 +1894,7 @@ void initStaticPlugins()
     initStatic__AudibleInstruments();
     initStatic__Autinn();
     initStatic__Bacon();
+    initStatic__Befaco();
     initStatic__Bidoo();
     initStatic__BogaudioModules();
     initStatic__cf();

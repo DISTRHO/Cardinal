@@ -378,6 +378,15 @@ PLUGIN_FILES += $(wildcard BaconPlugs/libs/midifile/src/*.cpp)
 PLUGIN_FILES += $(wildcard BaconPlugs/libs/open303-code/Source/DSPCode/*.cpp)
 
 # --------------------------------------------------------------
+# Befaco
+
+PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
+PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
+
+# modules/types which are present in other plugins
+BEFACO_CUSTOM = ADSR Mixer
+
+# --------------------------------------------------------------
 # Bidoo
 
 PLUGIN_FILES += $(filter-out Bidoo/src/plugin.cpp Bidoo/src/ANTN.cpp,$(wildcard Bidoo/src/*.cpp))
@@ -1087,6 +1096,13 @@ $(BUILD_DIR)/BaconPlugs/%.cpp.o: BaconPlugs/%.cpp
 		-IBaconPlugs/libs/open303-code/Source/DSPCode \
 		-Wno-array-bounds \
 		-Wno-strict-aliasing
+
+$(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(BEFACO_CUSTOM),$(call custom_module_names,$(m),Befaco)) \
+		-DpluginInstance=pluginInstance__Befaco
 
 $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
