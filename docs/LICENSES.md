@@ -20,6 +20,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Audible Instruments     | GPL-3.0-or-later      | |
 | Autinn                  | GPL-3.0-or-later      | |
 | Bacon Music             | GPL-3.0-or-later      | |
+| Befaco                  | GPL-3.0-or-later      | |
 | Bidoo                   | GPL-3.0-or-later      | |
 | Bogaudio                | GPL-3.0-or-later      | |
 | cf                      | BSD-3-Clause          | |
@@ -86,6 +87,8 @@ Below is a list of artwork licenses from plugins
 | BaconPlugs/1f953.svg                    | CC-BY-4.0        | |
 | BaconPlugs/Keypunch029.json             | OFL-1.1          | |
 | Bidoo/*                                 | CC-BY-NC-ND-4.0  | [Special permission granted for runtime dark mode](https://github.com/sebastien-bouffier/Bidoo/issues/191) |
+| Befaco/components/*                     | CC-BY-NC-4.0     | |
+| Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), [used and distributed with permission](LICENSE-PERMISSIONS.md#befaco-manu-retamero--befaco) |
 | BogaudioModules/*                       | CC-BY-SA-4.0     | |
 | BogaudioModules/fonts/audiowide.ttf     | OFL-1.1-RFN      | |
 | BogaudioModules/fonts/inconsolata*.ttf  | OFL-1.1-no-RFN   | |

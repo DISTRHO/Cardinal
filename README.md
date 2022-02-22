@@ -109,6 +109,7 @@ At the moment the following 3rd-party modules are provided:
 - Audible Instruments
 - Autinn
 - Bacon Music
+- Befaco
 - Bidoo
 - Bogaudio
 - cf
