@@ -497,6 +497,29 @@ extern Model* modelMaude_221;
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
 
+//substation
+// NOTE too much noise in original include, do this a different way
+// "substation-opensource/src/_plugin.hpp"
+#define modelClock modelsubstationClock
+#define modelMixer modelsubstationMixer
+#define modelQuantizer modelsubstationQuantizer
+#define modelVCA modelsubstationVCA
+extern Model* modelClock;
+extern Model* modelPolySequencer;
+extern Model* modelSubOscillator;
+extern Model* modelMixer;
+extern Model* modelFilter;
+extern Model* modelEnvelopes;
+extern Model* modelQuantizer;
+extern Model* modelVCA;
+extern Model* modelBlank4;
+extern Model* modelBlank7;
+extern Model* modelFilterPlus;
+#undef modelClock
+#undef modelMixer
+#undef modelQuantizer
+#undef modelVCA
+
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
 
@@ -564,6 +587,7 @@ Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
+Plugin* pluginInstance__substation;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
 Plugin* pluginInstance__ZZC;
@@ -1822,6 +1846,36 @@ static void initStatic__sonusmodular()
     }
 }
 
+static void initStatic__substation()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__substation = p;
+
+    const StaticPluginLoader spl(p, "substation-opensource");
+    if (spl.ok())
+    {
+#define modelClock modelsubstationClock
+#define modelMixer modelsubstationMixer
+#define modelQuantizer modelsubstationQuantizer
+#define modelVCA modelsubstationVCA
+        p->addModel(modelClock);
+        p->addModel(modelEnvelopes);
+        p->addModel(modelFilter);
+        p->addModel(modelMixer);
+        p->addModel(modelQuantizer);
+        p->addModel(modelPolySequencer);
+        p->addModel(modelVCA);
+        p->addModel(modelSubOscillator);
+        p->addModel(modelBlank4);
+        p->addModel(modelBlank7);
+        p->addModel(modelFilterPlus);
+#undef modelClock
+#undef modelMixer
+#undef modelQuantizer
+#undef modelVCA
+    }
+}
+
 static void initStatic__ValleyAudio()
 {
     Plugin* const p = new Plugin;
@@ -1924,6 +1978,7 @@ void initStaticPlugins()
     initStatic__rackwindows();
     initStatic__repelzen();
     initStatic__sonusmodular();
+    initStatic__substation();
     initStatic__ValleyAudio();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();
