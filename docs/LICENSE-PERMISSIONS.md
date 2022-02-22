@@ -37,6 +37,24 @@ Below follows a direct copy and paste of each individual request.
 > Best,  
 > Émilie
 
+## Befaco (Manu Retamero @ Befaco)
+
+*On Wednesday, February 2, 2022, 12:21 PM CET, Alexander Chalikiopoulos wrote:*
+
+> As you may know, since the VCV Rack 2 source release we have been working on a stand-alone plugin based on upstream source repositories. In it we make a, fully opensource, statically compiled version of the Rack2 engine including many of the great available module sets.
+>
+> This poses several issues we are trying to resolve, one thing is that we try to adhere to any upstream licensing. For most projects that is not an issue, but with the Befaco modules we'd like to resolve a couple things. One is that in the VCV repo it says `used and distributed with permission`, but even though we directly use the source repository we mean to assume this permission is given to VCV explicitly. We would like to know if you would allow us to use these same panels, unmodified, in our project.
+>
+> cheers,
+> Alexander
+
+*On Monday, Februari 21, 2022, 10:28 AM CET, Manu Retamero wrote:*
+
+> From our point of view we are totally fine that you use Befaco modules, Befaco front panel designs and Befaco logo in your software.
+>
+> All the best,
+> Manu
+
 ## ESeries (Paul Schreiber @ SynthTech)
 
 *On Wednesday, January 19, 2022, 04:53:44 AM CST, Filipe Coelho wrote:*
