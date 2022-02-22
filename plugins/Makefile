@@ -614,6 +614,16 @@ REPELZEN_CUSTOM = Blank Mixer Werner tanh_pade
 PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular,$(wildcard sonusmodular/src/*.cpp))
 
 # --------------------------------------------------------------
+# Substation (Open source release)
+
+PLUGIN_FILES += $(wildcard substation-opensource/dep/slime4rack/src/slime/*.cpp)
+PLUGIN_FILES += $(wildcard substation-opensource/dep/slime4rack/src/slime/**/*.cpp)
+PLUGIN_FILES += $(filter-out substation-opensource/src/_plugin.cpp,$(wildcard substation-opensource/src/*.cpp))
+
+# modules/types which are present in other plugins
+SUBSTATION_CUSTOM = Clock Mixer Quantizer VCA init
+
+# --------------------------------------------------------------
 # ValleyAudio
 
 PLUGIN_FILES += $(filter-out ValleyAudio/src/Valley.cpp,$(wildcard ValleyAudio/src/*.cpp))
@@ -1380,6 +1390,16 @@ $(BUILD_DIR)/sonusmodular/%.cpp.o: sonusmodular/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(SONUSMODULAR_CUSTOM),$(call custom_module_names,$(m),sonusmodular)) \
 		-DpluginInstance=pluginInstance__sonusmodular
+
+$(BUILD_DIR)/substation-opensource/%.cpp.o: substation-opensource/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(SUBSTATION_CUSTOM),$(call custom_module_names,$(m),substation)) \
+		-DpluginInstance=pluginInstance__substation \
+		-D'PRIVATE=__attribute__((error("Using internal Rack function or symbol")))' \
+		-Werror \
+		-Isubstation-opensource/dep/slime4rack/include
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
