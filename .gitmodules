@@ -154,3 +154,6 @@
 [submodule "plugins/Orbits"]
 	path = plugins/Orbits
 	url = git@github.com:RareBreeds/Orbits.git
+[submodule "plugins/stocaudio"]
+	path = plugins/stocaudio
+	url = https://github.com/aptrn/stocaudio-modules.git
