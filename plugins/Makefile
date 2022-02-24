@@ -371,6 +371,11 @@ PLUGIN_FILES += $(wildcard Autinn/src/*.cpp)
 AUTINN_CUSTOM = Chord Vibrato
 
 # --------------------------------------------------------------
+# Axioma
+
+PLUGIN_FILES += $(wildcard Axioma/src/*.cpp)
+
+# --------------------------------------------------------------
 # BaconPlugs
 
 PLUGIN_FILES += $(filter-out BaconPlugs/src/BaconPlugs.cpp,$(wildcard BaconPlugs/src/*.cpp))
@@ -1100,6 +1105,14 @@ $(BUILD_DIR)/Autinn/%.cpp.o: Autinn/%.cpp
 		$(foreach m,$(AUTINN_CUSTOM),$(call custom_module_names,$(m),Autinn)) \
 		-DpluginInstance=pluginInstance__Autinn \
 		-Dinit=init__Autinn
+
+
+$(BUILD_DIR)/Axioma/%.cpp.o: Axioma/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(AXIOMA_CUSTOM),$(call custom_module_names,$(m),Axioma)) \
+		-DpluginInstance=pluginInstance__Axioma
 
 $(BUILD_DIR)/BaconPlugs/%.cpp.o: BaconPlugs/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

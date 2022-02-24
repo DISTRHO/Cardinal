@@ -19,6 +19,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Aria Salvatrice         | GPL-3.0-or-later         | |
 | Audible Instruments     | GPL-3.0-or-later         | |
 | Autinn                  | GPL-3.0-or-later         | |
+| Axioma                  | GPL-3.0-or-later         | |
 | Bacon Music             | GPL-3.0-or-later         | |
 | Befaco                  | GPL-3.0-or-later         | |
 | Bidoo                   | GPL-3.0-or-later         | |
@@ -83,6 +84,7 @@ Below is a list of artwork licenses from plugins
 | AriaModules/signature/*                 | Custom           | Removal required if modifying other files without author's permission |
 | AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, [used and distributed with permission](LICENSE-PERMISSIONS.md#audible-instruments-émilie-gillet--mutable-instruments) |
 | Autinn/*                                | GPL-3.0-or-later | No artwork specific license provided |
+| Axioma/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/*                            | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/midi/*                       | CC-BY-SA-3.0-DE  | |
 | BaconPlugs/midi/beeth/*                 | ???              | Unused in Cardinal, taken from http://www.jsbach.net/ |

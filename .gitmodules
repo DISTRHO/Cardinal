@@ -136,3 +136,6 @@
 [submodule "plugins/MockbaModular"]
 	path = plugins/MockbaModular
 	url = https://github.com/MockbaTheBorg/MockbaModular.git
+[submodule "plugins/Axioma"]
+	path = plugins/Axioma
+	url = https://github.com/kauewerner/Axioma.git
