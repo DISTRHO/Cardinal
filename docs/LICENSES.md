@@ -107,9 +107,9 @@ Below is a list of artwork licenses from plugins
 | cf/VT323-Regular.ttf                    | OFL-1.1-no-RFN   | |
 | ChowDSP/*                               | GPL-3.0-or-later | Same license as source code |
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
-| dBiz/Dark/*                             | CC BY-NC-ND 4.0  | |
-| dBiz/Light/*                            | CC BY-NC-ND 4.0  | |
-| dBiz/component/*                        | CC BY-NC-ND 4.0  | |
+| dBiz/Dark/*                             | CC-BY-NC-ND-4.0  | |
+| dBiz/Light/*                            | CC-BY-NC-ND-4.0  | |
+| dBiz/component/*                        | CC-BY-NC-ND-4.0  | |
 | dBiz/DejaVuSansMono.ttf                 | Bitstream-Vera   | |
 | dBiz/DOTMATRI.TTF                       | Unknown          | needs research |
 | dBiz/Rounded_elegance.ttf               | Unknown          | needs research |
