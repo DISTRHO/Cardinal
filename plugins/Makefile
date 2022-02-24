@@ -611,7 +611,7 @@ PLUGIN_FILES += $(filter-out ML_modules/src/plugin.cpp,$(wildcard ML_modules/src
 PLUGIN_FILES += ML_modules/freeverb/revmodel.cpp
 
 # modules/types which are present in other plugins
-ML_CUSTOM = Quant Quantizer QuantizerWidget SH8 allpass comb revmodel
+ML_CUSTOM = Mode Quant Quantizer QuantizerWidget SH8 allpass comb revmodel
 
 # --------------------------------------------------------------
 # MockbaModular
