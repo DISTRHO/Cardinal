@@ -569,6 +569,9 @@ extern Model* modelMaude_221;
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
 
+// stocaudio
+#include "stocaudio/src/plugin.hpp"
+
 // substation
 /* NOTE too much noise in original include, do this a different way
 // "substation-opensource/src/_plugin.hpp"
@@ -663,6 +666,7 @@ Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
+Plugin* pluginInstance__stocaudio;
 Plugin* pluginInstance__substation;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
@@ -2099,6 +2103,20 @@ static void initStatic__sonusmodular()
     }
 }
 
+static void initStatic__stocaudio()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__stocaudio = p;
+
+    const StaticPluginLoader spl(p, "stocaudio");
+    if (spl.ok())
+    {
+        p->addModel(modelPolyturing);
+        p->addModel(modelPolydelay);
+        p->addModel(modelSpread);
+    }
+}
+
 static void initStatic__substation()
 {
     Plugin* const p = new Plugin;
@@ -2230,6 +2248,7 @@ void initStaticPlugins()
     initStatic__rackwindows();
     initStatic__repelzen();
     initStatic__sonusmodular();
+    initStatic__stocaudio();
     initStatic__substation();
     initStatic__ValleyAudio();
     initStatic__ZetaCarinaeModules();

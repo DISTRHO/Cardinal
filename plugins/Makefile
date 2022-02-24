@@ -668,6 +668,11 @@ REPELZEN_CUSTOM = Blank Mixer Werner tanh_pade
 PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular,$(wildcard sonusmodular/src/*.cpp))
 
 # --------------------------------------------------------------
+# stocaudio
+
+PLUGIN_FILES += $(wildcard stocaudio/src/*.cpp)
+
+# --------------------------------------------------------------
 # Substation (Open source release)
 
 PLUGIN_FILES += $(wildcard substation-opensource/dep/slime4rack/src/slime/*.cpp)
@@ -1502,6 +1507,13 @@ $(BUILD_DIR)/sonusmodular/%.cpp.o: sonusmodular/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(SONUSMODULAR_CUSTOM),$(call custom_module_names,$(m),sonusmodular)) \
 		-DpluginInstance=pluginInstance__sonusmodular
+
+$(BUILD_DIR)/stocaudio/%.cpp.o: stocaudio/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(STOCAUDIO_CUSTOM),$(call custom_module_names,$(m),stocaudio)) \
+		-DpluginInstance=pluginInstance__stocaudio
 
 $(BUILD_DIR)/substation-%.cpp.o: substation-%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
