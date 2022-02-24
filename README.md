@@ -103,6 +103,7 @@ An overview of the included code and linked submodules can be seen [here](docs/L
 At the moment the following 3rd-party modules are provided:
 
 - 21kHz
+- 8Mode
 - Amalgamated Harmonics
 - Animated Circuits
 - Aria Salvatrice

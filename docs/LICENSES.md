@@ -14,6 +14,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | DPF                     | ISC, GPL-2.0-or-later    | Used as the plugin framework, VST2 binary GPLv2+ licensed |
 | Rack                    | GPL-3.0-or-later         | The actual Rack code, internal dependencies are compatible with GPLv3+ |
 | 21kHz                   | MIT                      | |
+| 8Mode                   | BSD-3-Clause             | |
 | Amalgamated Harmonics   | BSD-3-Clause             | |
 | Animated Circuits       | GPL-3.0-or-later         | |
 | Aria Salvatrice         | GPL-3.0-or-later         | |
@@ -71,6 +72,7 @@ Below is a list of artwork licenses from plugins
 | Name                                    | License(s)       | Additional notes |
 |-----------------------------------------|------------------|------------------|
 | 21kHz                                   | MIT              | No artwork specific license provided |
+| 8Mode                                   | BSD-3-Clause     | No artwork specific license provided |
 | AmalgamatedHarmonics/*                  | BSD-3-Clause     | No artwork specific license provided |
 | AmalgamatedHarmonics/DSEG*.ttf          | OFL-1.1-RFN      | |
 | AmalgamatedHarmonics/Roboto*.ttf        | Apache-2.0       | |
