@@ -25,7 +25,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Befaco                  | GPL-3.0-or-later         | |
 | Bidoo                   | GPL-3.0-or-later         | |
 | Bogaudio                | GPL-3.0-or-later         | |
-| CatroModulo             | BSD-3-Clause             | |
+| Catro/Modulo            | BSD-3-Clause             | |
 | cf                      | BSD-3-Clause             | |
 | ChowDSP                 | GPL-3.0-or-later         | |
 | DrumKit                 | CC0-1.0                  | |
