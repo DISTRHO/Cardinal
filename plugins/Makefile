@@ -636,6 +636,11 @@ PLUGIN_FILES += $(wildcard mscHack/src/*.cpp)
 MSCHACK_CUSTOM_PER_FILE = MAIN_SYNC_CLOCK FILTER_STRUCT FILTER_PARAM_STRUCT OSC_PARAM_STRUCT PHRASE_CHANGE_STRUCT
 
 # --------------------------------------------------------------
+# Orbits
+
+PLUGIN_FILES += $(wildcard Orbits/src/*.cpp)
+
+# --------------------------------------------------------------
 # Prism
 
 PLUGIN_FILES += $(filter-out Prism/src/plugin.cpp,$(wildcard Prism/src/*.cpp))
@@ -1470,6 +1475,13 @@ $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 		-Wno-format-overflow \
 		-Wno-non-c-typedef-for-linkage \
 		-Wno-unused-but-set-variable
+
+$(BUILD_DIR)/Orbits/%.cpp.o: Orbits/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ORBITS_CUSTOM),$(call custom_module_names,$(m),Orbits)) \
+		-DpluginInstance=pluginInstance__Orbits
 
 $(BUILD_DIR)/Prism/%.cpp.o: Prism/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

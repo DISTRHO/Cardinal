@@ -546,6 +546,9 @@ extern Model* modelAlienz;
 extern Model* modelOSC_WaveMorph_3;
 extern Model* modelMaude_221;
 
+// Orbits
+#include "Orbits/src/plugin.hpp"
+
 // Prism
 # include "Prism/src/plugin.hpp"
 
@@ -660,6 +663,7 @@ Plugin* pluginInstance__ML;
 Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
+Plugin* pluginInstance__Orbits;
 Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
@@ -1983,6 +1987,19 @@ static void initStatic__mscHack()
     }
 }
 
+static void initStatic__Orbits()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Orbits = p;
+
+    const StaticPluginLoader spl(p, "Orbits");
+    if (spl.ok())
+    {
+        p->addModel(modelRareBreeds_Orbits_Eugene);
+        p->addModel(modelRareBreeds_Orbits_Polygene);
+    }
+}
+
 static void initStatic__Prism()
 {
     Plugin* const p = new Plugin;
@@ -2236,6 +2253,7 @@ void initStaticPlugins()
     initStatic__MockbaModular();
     initStatic__Mog();
     initStatic__mscHack();
+    initStatic__Orbits();
     initStatic__Prism();
     initStatic__rackwindows();
     initStatic__repelzen();

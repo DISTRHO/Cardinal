@@ -49,6 +49,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Mockba Modular          | MIT                      | |
 | Mog                     | CC0-1.0                  | |
 | mscHack                 | BSD-3-Clause             | |
+| Orbits                  | GPL-3.0-or-later         | |
 | Prism                   | BSD-3-Clause             | |
 | Rackwindows             | MIT                      | |
 | repelzen                | GPL-3.0-or-later         | |
@@ -146,6 +147,8 @@ Below is a list of artwork licenses from plugins
 | Mog/components/*                        | CC-BY-NC-4.0     | |
 | Mog/Exo2-BoldItalic.ttf                 | OFL-1.1-RFN      | |
 | mscHack/*                               | BSD-3-Clause     | No artwork specific license provided, see [mschack#108](https://github.com/mschack/VCV-Rack-Plugins/issues/108) |
+| Orbits/*                                | CC-BY-NC-ND-4.0  | |
+| Orbits/fonts/ShareTechMono-Regular.ttf  | OFL-1.1-RFN      | |
 | Prism/*                                 | CC-BY-SA-4.0     | |
 | Prism/RobotoCondensed-Regular.ttf       | Apache-2.0       | |
 | Rackwindows/*                           | MIT              | [Same license as source code](https://github.com/n0jo/rackwindows/issues/15) |
