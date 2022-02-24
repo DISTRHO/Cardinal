@@ -487,6 +487,11 @@ endif
 PLUGIN_FILES += $(filter-out GlueTheGiant/src/plugin.cpp,$(wildcard GlueTheGiant/src/*.cpp))
 
 # --------------------------------------------------------------
+# GoodSheperd
+
+PLUGIN_FILES += $(wildcard GoodSheperd/src/*.cpp)
+
+# --------------------------------------------------------------
 # GrandeModular
 
 PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModular/src/*.cpp))
@@ -1273,6 +1278,13 @@ $(BUILD_DIR)/GlueTheGiant/src/gtgComponents.cpp.o: GlueTheGiant/src/gtgComponent
 		-DpluginInstance=pluginInstance__GlueTheGiant \
 		-DloadGtgPluginDefault=ignoredGlueTheGiant1 \
 		-DsaveGtgPluginDefault=ignoredGlueTheGiant2
+
+$(BUILD_DIR)/GoodSheperd/%.cpp.o: GoodSheperd/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(GOODSHEPERD_CUSTOM),$(call custom_module_names,$(m),GoodSheperd)) \
+		-DpluginInstance=pluginInstance__GoodSheperd
 
 $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

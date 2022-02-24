@@ -305,6 +305,9 @@ int gtg_default_theme = 1;
 int loadGtgPluginDefault(const char*, int) { return 1; }
 void saveGtgPluginDefault(const char*, int) {}
 
+// GoodSheperd
+#include "GoodSheperd/src/plugin.hpp"
+
 // GrandeModular
 #include "GrandeModular/src/plugin.hpp"
 
@@ -595,8 +598,9 @@ Plugin* pluginInstance__FehlerFabrik;
 #ifdef WITH_FUNDAMENTAL
 Plugin* pluginInstance__Fundamental;
 #endif
-Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__GlueTheGiant;
+Plugin* pluginInstance__GoodSheperd;
+Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__HamptonHarmonics;
 Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
@@ -1466,6 +1470,23 @@ static void initStatic__GlueTheGiant()
     }
 }
 
+static void initStatic__GoodSheperd()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__GoodSheperd = p;
+
+    const StaticPluginLoader spl(p, "GoodSheperd");
+    if (spl.ok())
+    {
+        p->addModel(modelHurdle);
+        p->addModel(modelSEQ3st);
+        p->addModel(modelStable16);
+        p->addModel(modelStall);
+        p->addModel(modelSwitch1);
+        p->addModel(modelSeqtrol);
+    }
+}
+
 static void initStatic__GrandeModular()
 {
     Plugin* const p = new Plugin;
@@ -2084,6 +2105,7 @@ void initStaticPlugins()
     initStatic__Fundamental();
    #endif
     initStatic__GlueTheGiant();
+    initStatic__GoodSheperd();
     initStatic__GrandeModular();
     initStatic__HamptonHarmonics();
     initStatic__HetrickCV();
