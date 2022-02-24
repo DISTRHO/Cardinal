@@ -605,6 +605,15 @@ PLUGIN_FILES += $(wildcard MindMeldModular/src/Utilities/*.cpp)
 MINDMELD_CUSTOM = printNote
 
 # --------------------------------------------------------------
+# ML_modules
+
+PLUGIN_FILES += $(filter-out ML_modules/src/plugin.cpp,$(wildcard ML_modules/src/*.cpp))
+PLUGIN_FILES += ML_modules/freeverb/revmodel.cpp
+
+# modules/types which are present in other plugins
+ML_CUSTOM = Quant Quantizer QuantizerWidget SH8 allpass comb revmodel
+
+# --------------------------------------------------------------
 # MockbaModular
 
 PLUGIN_FILES += $(filter-out MockbaModular/src/plugin.cpp MockbaModular/src/MockbaModular.cpp MockbaModular/src/UDPClockMaster.cpp MockbaModular/src/UDPClockSlave.cpp,$(wildcard MockbaModular/src/*.cpp))
@@ -1416,6 +1425,13 @@ $(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),MindMeld)) \
 		-DpluginInstance=pluginInstance__MindMeld
+
+$(BUILD_DIR)/ML_modules/%.cpp.o: ML_modules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ML_CUSTOM),$(call custom_module_names,$(m),ML)) \
+		-DpluginInstance=pluginInstance__ML
 
 $(BUILD_DIR)/MockbaModular/%.cpp.o: MockbaModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

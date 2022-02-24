@@ -462,6 +462,44 @@ extern Model* modelBassMaster;
 extern Model* modelBassMasterJr;
 extern Model* modelShapeMaster;
 
+// ML_modules
+/* NOTE too much noise in original include, do this a different way
+// #include "ML_modules/src/ML_modules.hpp"
+*/
+#define modelQuantizer modelMLQuantizer
+#define modelSH8 modelMLSH8
+extern Model* modelQuantizer;
+extern Model* modelQuantum;
+extern Model* modelTrigBuf;
+extern Model* modelSeqSwitch;
+extern Model* modelSeqSwitch2;
+extern Model* modelShiftRegister;
+extern Model* modelShiftRegister2;
+extern Model* modelFreeVerb;
+extern Model* modelSum8;
+extern Model* modelSum8mk2;
+extern Model* modelSum8mk3;
+extern Model* modelSH8;
+extern Model* modelConstants;
+extern Model* modelCounter;
+extern Model* modelTrigDelay;
+extern Model* modelBPMdetect;
+extern Model* modelVoltMeter;
+extern Model* modelOctaFlop;
+extern Model* modelOctaTrig;
+extern Model* modelOctaSwitch;
+extern Model* modelTrigSwitch;
+extern Model* modelTrigSwitch2;
+extern Model* modelTrigSwitch3;
+extern Model* modelTrigSwitch3_2;
+extern Model* modelOctaPlus;
+extern Model* modelOctaTimes;
+extern Model* modelCloner;
+extern Model* modelPolySplitter;
+extern Model* modelArpeggiator;
+#undef modelQuantizer
+#undef modelSH8
+
 // MockbaModular
 #define modelBlank modelMockbaModularBlank
 #define modelComparator modelMockbaModularComparator
@@ -613,6 +651,7 @@ Plugin* pluginInstance__LittleUtils;
 Plugin* pluginInstance__Lomas;
 Plugin* pluginInstance__Lyrae;
 extern Plugin* pluginInstance__MindMeld;
+Plugin* pluginInstance__ML;
 Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
@@ -1788,16 +1827,47 @@ static void initStatic__MindMeld()
     }
 }
 
-static void initStatic__Mog()
+static void initStatic__ML()
 {
     Plugin* const p = new Plugin;
-    pluginInstance__Mog = p;
+    pluginInstance__ML = p;
 
-    const StaticPluginLoader spl(p, "Mog");
+    const StaticPluginLoader spl(p, "ML_modules");
     if (spl.ok())
     {
-        p->addModel(modelNetwork);
-        p->addModel(modelNexus);
+#define modelQuantizer modelMLQuantizer
+#define modelSH8 modelMLSH8
+        p->addModel(modelQuantizer);
+        p->addModel(modelQuantum);
+        p->addModel(modelTrigBuf);
+        p->addModel(modelSeqSwitch);
+        p->addModel(modelSeqSwitch2);
+        p->addModel(modelShiftRegister);
+        p->addModel(modelShiftRegister2);
+        p->addModel(modelFreeVerb);
+        p->addModel(modelSum8);
+        p->addModel(modelSum8mk2);
+        p->addModel(modelSum8mk3);
+        p->addModel(modelSH8);
+        p->addModel(modelConstants);
+        p->addModel(modelCounter);
+        p->addModel(modelTrigDelay);
+        p->addModel(modelBPMdetect);
+        p->addModel(modelVoltMeter);
+        p->addModel(modelOctaFlop);
+        p->addModel(modelOctaTrig);
+        p->addModel(modelOctaSwitch);
+        p->addModel(modelTrigSwitch);
+        p->addModel(modelTrigSwitch2);
+        p->addModel(modelTrigSwitch3);
+        p->addModel(modelTrigSwitch3_2);
+        p->addModel(modelOctaPlus);
+        p->addModel(modelOctaTimes);
+        p->addModel(modelCloner);
+        p->addModel(modelPolySplitter);
+        p->addModel(modelArpeggiator);
+#undef modelQuantizer
+#undef modelSH8
     }
 }
 
@@ -1857,6 +1927,19 @@ static void initStatic__MockbaModular()
         spl.removeModule("UDPClockSlave");
 #undef modelBlank
 #undef modelComparator
+    }
+}
+
+static void initStatic__Mog()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Mog = p;
+
+    const StaticPluginLoader spl(p, "Mog");
+    if (spl.ok())
+    {
+        p->addModel(modelNetwork);
+        p->addModel(modelNexus);
     }
 }
 
@@ -2121,6 +2204,7 @@ void initStaticPlugins()
     initStatic__Lomas();
     initStatic__Lyrae();
     initStatic__MindMeld();
+    initStatic__ML();
     initStatic__MockbaModular();
     initStatic__Mog();
     initStatic__mscHack();

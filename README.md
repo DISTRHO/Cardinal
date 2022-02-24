@@ -134,6 +134,7 @@ At the moment the following 3rd-party modules are provided:
 - Lomas Modules
 - Lyrae Modules
 - MindMeld
+- ML Modules
 - Mockba Modular
 - Mog
 - mscHack

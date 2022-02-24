@@ -148,3 +148,6 @@
 [submodule "plugins/HamptonHarmonics"]
 	path = plugins/HamptonHarmonics
 	url = https://gitlab.com/hampton-harmonics/hampton-harmonics-modules.git
+[submodule "plugins/ML_modules"]
+	path = plugins/ML_modules
+	url = https://github.com/martin-lueders/ML_modules.git

@@ -45,6 +45,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Lomas Modules           | GPL-3.0-or-later         | |
 | Lyrae Modules           | GPL-3.0-or-later         | |
 | MindMeld                | GPL-3.0-or-later         | |
+| ML Modules              | BSD-3-Clause             | |
 | Mockba Modular          | MIT                      | |
 | Mog                     | CC0-1.0                  | |
 | mscHack                 | BSD-3-Clause             | |
@@ -136,6 +137,9 @@ Below is a list of artwork licenses from plugins
 | LyraeModules/*                          | CC-BY-NC-SA-4.0  | |
 | MindMeld/*                              | CC-BY-NC-ND-4.0  | |
 | MindMeld/fonts/RobotoCondensed-*.ttf    | Apache-2.0       | |
+| ML_modules/*                            | BSD-3-Clause     | No artwork specific license provided |
+| ML_modules/DejaVuSansMono.ttf           | Bitstream-Vera   | |
+| ML_modules/Segment7Standard.ttf         | OFL-1.1-RFN      | |
 | MockbaModular/*                         | MIT              | No artwork specific license provided |
 | Mog/*                                   | CC0-1.0          | |
 | Mog/components/*                        | CC-BY-NC-4.0     | |
