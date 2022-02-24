@@ -27,6 +27,9 @@
 // 21kHz
 #include "21kHz/src/21kHz.hpp"
 
+// 8Mode
+#include "8Mode/src/8mode.hpp"
+
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
@@ -563,6 +566,7 @@ void saveHighQualityAsDefault(bool) {}
 Plugin* pluginInstance__Cardinal;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
+Plugin* pluginInstance__8Mode;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
@@ -757,6 +761,18 @@ static void initStatic__21kHz()
         p->addModel(modelPalmLoop);
         p->addModel(modelD_Inf);
         p->addModel(modelTachyonEntangler);
+    }
+}
+
+static void initStatic__8Mode()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__8Mode = p;
+
+    const StaticPluginLoader spl(p, "8Mode");
+    if (spl.ok())
+    {
+        p->addModel(modelsoftSN);
     }
 }
 
@@ -2006,6 +2022,7 @@ void initStaticPlugins()
     initStatic__Cardinal();
 #ifndef NOPLUGINS
     initStatic__21kHz();
+    initStatic__8Mode();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__Aria();
