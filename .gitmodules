@@ -142,3 +142,6 @@
 [submodule "plugins/Axioma"]
 	path = plugins/Axioma
 	url = https://github.com/kauewerner/Axioma.git
+[submodule "plugins/GoodSheperd"]
+	path = plugins/GoodSheperd
+	url = https://github.com/jensschulze/GoodSheperd.git

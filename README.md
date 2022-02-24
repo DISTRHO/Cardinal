@@ -122,6 +122,7 @@ At the moment the following 3rd-party modules are provided:
 - Extratone
 - Fehler Fabrik
 - Glue the Giant
+- GoodSheperd
 - Grande
 - HetrickCV
 - ihtsyn
