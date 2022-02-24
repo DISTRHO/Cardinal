@@ -1571,11 +1571,13 @@ static void initStatic__GrandeModular()
     {
         p->addModel(modelClip);
         p->addModel(modelLFO3);
+        p->addModel(modelLogic);
         p->addModel(modelMerge8);
         p->addModel(modelMergeSplit4);
         p->addModel(modelMicrotonalChords);
         p->addModel(modelMicrotonalNotes);
         p->addModel(modelNoteMT);
+        p->addModel(modelPeak);
         p->addModel(modelPolyMergeResplit);
         p->addModel(modelPolySplit);
         p->addModel(modelQuant);
