@@ -157,3 +157,6 @@
 [submodule "plugins/stocaudio"]
 	path = plugins/stocaudio
 	url = https://github.com/aptrn/stocaudio-modules.git
+[submodule "plugins/CatroModulo"]
+	path = plugins/CatroModulo
+	url = https://github.com/catronomix/catro-modulo.git

@@ -430,6 +430,11 @@ PLUGIN_FILES += $(wildcard ChowDSP/src/*/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
 
 # --------------------------------------------------------------
+# CatroModulo
+
+PLUGIN_FILES += $(wildcard CatroModulo/src/*.cpp)
+
+# --------------------------------------------------------------
 # cf
 
 PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
@@ -1213,6 +1218,13 @@ $(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
 		-DSKIP_MINGW_FORMAT \
 		-IBogaudioModules/lib \
 		-IBogaudioModules/src/dsp
+
+$(BUILD_DIR)/CatroModulo/src/%.cpp.o: CatroModulo/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(CATROMODULO_CUSTOM),$(call custom_module_names,$(m),CatroModulo)) \
+		-DpluginInstance=pluginInstance__CatroModulo
 
 $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

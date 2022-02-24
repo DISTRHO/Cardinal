@@ -25,6 +25,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Befaco                  | GPL-3.0-or-later         | |
 | Bidoo                   | GPL-3.0-or-later         | |
 | Bogaudio                | GPL-3.0-or-later         | |
+| CatroModulo             | BSD-3-Clause             | |
 | cf                      | BSD-3-Clause             | |
 | ChowDSP                 | GPL-3.0-or-later         | |
 | DrumKit                 | CC0-1.0                  | |
@@ -105,6 +106,8 @@ Below is a list of artwork licenses from plugins
 | BogaudioModules/fonts/inconsolata*.ttf  | OFL-1.1-no-RFN   | |
 | Cardinal/*                              | CC0-1.0          | |
 | Cardinal/Miku/Miku.png                  | CC-BY-NC-3.0     | https://piapro.net/intl/en_for_creators.html |
+| CatroModulo/*                           | BSD-3-Clause     | No artwork specific license provided |
+| CatroModulo/Segment7Standard.ttf        | OFL-1.1-RFN      | |
 | cf/*                                    | BSD-3-Clause     | No artwork specific license provided |
 | cf/DejaVuSansMono.ttf                   | Bitstream-Vera   | |
 | cf/Segment7Standard.ttf                 | OFL-1.1-RFN      | |

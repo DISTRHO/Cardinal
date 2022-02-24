@@ -267,6 +267,9 @@ extern Model* modelTestVCF;
 #undef modelVCF
 #undef modelVCO
 
+// CatroModulo
+#include "CatroModulo/src/CatroModulo.hpp"
+
 // cf
 #include "cf/src/plugin.hpp"
 
@@ -634,6 +637,7 @@ Plugin* pluginInstance__Bacon;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
+Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
 extern Plugin* pluginInstance__DrumKit;
@@ -1276,6 +1280,27 @@ static void initStatic__BogaudioModules()
 #undef modelVCA
 #undef modelVCF
 #undef modelVCO
+    }
+}
+
+static void initStatic__CatroModulo()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__CatroModulo = p;
+
+    const StaticPluginLoader spl(p, "CatroModulo");
+    if (spl.ok())
+    {
+        p->addModel(modelCM1Module);
+        p->addModel(modelCM2Module);
+        p->addModel(modelCM3Module);
+        p->addModel(modelCM4Module);
+        p->addModel(modelCM5Module);
+        p->addModel(modelCM6Module);
+        p->addModel(modelCM7Module);
+        p->addModel(modelCM8Module);
+        p->addModel(modelCM9Module);
+        p->addModel(modelCM10Module);
     }
 }
 
@@ -2216,6 +2241,7 @@ void initStaticPlugins()
     initStatic__Befaco();
     initStatic__Bidoo();
     initStatic__BogaudioModules();
+    initStatic__CatroModulo();
     initStatic__cf();
     initStatic__ChowDSP();
     initStatic__DrumKit();
