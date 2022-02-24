@@ -114,6 +114,7 @@ At the moment the following 3rd-party modules are provided:
 - Befaco
 - Bidoo
 - Bogaudio
+- Catro/Modulo
 - cf
 - ChowDSP
 - DrumKit
