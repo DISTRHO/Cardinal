@@ -497,6 +497,14 @@ PLUGIN_FILES += $(wildcard GoodSheperd/src/*.cpp)
 PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModular/src/*.cpp))
 
 # --------------------------------------------------------------
+# Hampton Harmonics
+
+PLUGIN_FILES += $(wildcard HamptonHarmonics/src/*.cpp)
+
+# modules/types which are present in other plugins
+HAMPTONHARMONICS_CUSTOM = Arp Progress
+
+# --------------------------------------------------------------
 # HetrickCV
 
 PLUGIN_FILES += $(wildcard HetrickCV/src/*.cpp)
@@ -1289,6 +1297,13 @@ $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 		-DpluginInstance=pluginInstance__GrandeModular \
 		-Wno-missing-braces \
 		-Wno-self-assign
+
+$(BUILD_DIR)/HamptonHarmonics/%.cpp.o: HamptonHarmonics/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(HAMPTONHARMONICS_CUSTOM),$(call custom_module_names,$(m),HamptonHarmonics)) \
+		-DpluginInstance=pluginInstance__HamptonHarmonics
 
 $(BUILD_DIR)/HetrickCV/%.cpp.o: HetrickCV/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

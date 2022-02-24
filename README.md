@@ -124,6 +124,7 @@ At the moment the following 3rd-party modules are provided:
 - Glue the Giant
 - GoodSheperd
 - Grande
+- Hampton Harmonics
 - HetrickCV
 - ihtsyn
 - Impromptu

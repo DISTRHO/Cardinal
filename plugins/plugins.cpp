@@ -311,6 +311,13 @@ void saveGtgPluginDefault(const char*, int) {}
 // GrandeModular
 #include "GrandeModular/src/plugin.hpp"
 
+// Hampton Harmonics
+#define modelArp modelHamptonHarmonicsArp
+#define modelProgress modelHamptonHarmonicsProgress
+#include "HamptonHarmonics/src/plugin.hpp"
+#undef modelProgress
+#undef modelArp
+
 // HetrickCV
 #define modelASR modelHetrickCVASR
 #define modelBlankPanel modelHetrickCVBlankPanel
@@ -596,6 +603,7 @@ Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__GoodSheperd;
 Plugin* pluginInstance__GrandeModular;
+Plugin* pluginInstance__HamptonHarmonics;
 Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__ihtsyn;
@@ -1510,6 +1518,23 @@ static void initStatic__GrandeModular()
     }
 }
 
+static void initStatic__HamptonHarmonics()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__HamptonHarmonics = p;
+
+    const StaticPluginLoader spl(p, "HamptonHarmonics");
+    if (spl.ok())
+    {
+#define modelArp modelHamptonHarmonicsArp
+#define modelProgress modelHamptonHarmonicsProgress
+        p->addModel(modelArp);
+        p->addModel(modelProgress);
+#undef modelProgress
+#undef modelArp
+    }
+}
+
 static void initStatic__HetrickCV()
 {
     Plugin* const p = new Plugin;
@@ -2086,6 +2111,7 @@ void initStaticPlugins()
     initStatic__GlueTheGiant();
     initStatic__GoodSheperd();
     initStatic__GrandeModular();
+    initStatic__HamptonHarmonics();
     initStatic__HetrickCV();
     initStatic__ImpromptuModular();
     initStatic__ihtsyn();
