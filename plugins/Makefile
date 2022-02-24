@@ -434,6 +434,9 @@ PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
 
 PLUGIN_FILES += $(wildcard CatroModulo/src/*.cpp)
 
+# modules/types which are present in other plugins
+CATROMODULO_CUSTOM = LowFrequencyOscillator NumDisplayWidget
+
 # --------------------------------------------------------------
 # cf
 
@@ -449,6 +452,7 @@ PLUGIN_FILES += $(wildcard DrumKit/src/model/*.cpp)
 PLUGIN_FILES += $(wildcard DrumKit/deps/*.cpp)
 PLUGIN_FILES += $(wildcard DrumKit/deps/SynthDevKit/src/*.cpp)
 
+# modules/types which are present in other plugins
 DRUMKIT_CUSTOM = ADSR Envelope LowFrequencyOscillator
 
 # --------------------------------------------------------------
@@ -471,6 +475,7 @@ PLUGIN_FILES += $(filter-out Extratone/src/plugin.cpp,$(wildcard Extratone/src/*
 
 PLUGIN_FILES += $(filter-out FehlerFabrik/src/plugin.cpp,$(wildcard FehlerFabrik/src/*.cpp))
 
+# modules/types which are present in other plugins
 FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter
 
 # --------------------------------------------------------------
