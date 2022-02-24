@@ -566,6 +566,11 @@ extern Model* modelMaude_221;
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
 
+// Starling Via
+#define modelScanner modelStarlingViaScanner
+#include "StarlingVia/src/starling.hpp"
+#undef modelScanner
+
 // substation
 /* NOTE too much noise in original include, do this a different way
 // "substation-opensource/src/_plugin.hpp"
@@ -659,6 +664,7 @@ Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
+Plugin* pluginInstance__StarlingVia;
 Plugin* pluginInstance__substation;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
@@ -2082,6 +2088,28 @@ static void initStatic__sonusmodular()
     }
 }
 
+static void initStatic__StarlingVia()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__StarlingVia = p;
+
+    const StaticPluginLoader spl(p, "StarlingVia");
+    if (spl.ok())
+    {
+#define modelScanner modelStarlingViaScanner
+        p->addModel(modelMeta);
+        p->addModel(modelGateseq);
+        p->addModel(modelScanner);
+        p->addModel(modelSync);
+        p->addModel(modelAtsr);
+        p->addModel(modelOsc3);
+        p->addModel(modelSync3);
+        p->addModel(modelSync3XL);
+        p->addModel(modelSync3XLLevels);
+#undef modelScanner
+    }
+}
+
 static void initStatic__substation()
 {
     Plugin* const p = new Plugin;
@@ -2212,6 +2240,7 @@ void initStaticPlugins()
     initStatic__rackwindows();
     initStatic__repelzen();
     initStatic__sonusmodular();
+    initStatic__StarlingVia();
     initStatic__substation();
     initStatic__ValleyAudio();
     initStatic__ZetaCarinaeModules();

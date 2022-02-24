@@ -142,6 +142,7 @@ At the moment the following 3rd-party modules are provided:
 - rackwindows
 - repelzen
 - Sonus Modular
+- Starling Via
 - Substation Opensource
 - Valley
 - ZetaCarinae

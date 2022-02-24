@@ -663,6 +663,17 @@ REPELZEN_CUSTOM = Blank Mixer Werner tanh_pade
 PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular,$(wildcard sonusmodular/src/*.cpp))
 
 # --------------------------------------------------------------
+# Starling Via
+
+PLUGIN_FILES += $(wildcard StarlingVia/src/*.cpp)
+PLUGIN_FILES += $(wildcard StarlingVia/Via/io/src/*.cpp)
+PLUGIN_FILES += $(wildcard StarlingVia/Via/ui/src/*.cpp)
+PLUGIN_FILES += $(wildcard StarlingVia/Via/modules/*/*.cpp)
+
+# modules/types which are present in other plugins
+STARLINGVIA_CUSTOM = Scanner
+
+# --------------------------------------------------------------
 # Substation (Open source release)
 
 PLUGIN_FILES += $(wildcard substation-opensource/dep/slime4rack/src/slime/*.cpp)
@@ -1490,6 +1501,20 @@ $(BUILD_DIR)/sonusmodular/%.cpp.o: sonusmodular/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(SONUSMODULAR_CUSTOM),$(call custom_module_names,$(m),sonusmodular)) \
 		-DpluginInstance=pluginInstance__sonusmodular
+
+$(BUILD_DIR)/StarlingVia/%.cpp.o: StarlingVia/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(STARLINGVIA_CUSTOM),$(call custom_module_names,$(m),StarlingVia)) \
+		-DpluginInstance=pluginInstance__StarlingVia \
+		-DBUILD_VIRTUAL \
+		-IStarlingVia/dep/starling-dsp \
+		-IStarlingVia/Via/modules/inc \
+		-IStarlingVia/Via/synthesis/inc \
+		-IStarlingVia/Via/io/inc \
+		-IStarlingVia/Via/ui/inc \
+		-I./dep/starling-dsp
 
 $(BUILD_DIR)/substation-%.cpp.o: substation-%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
