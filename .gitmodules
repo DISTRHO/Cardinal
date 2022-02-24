@@ -136,3 +136,6 @@
 [submodule "plugins/MockbaModular"]
 	path = plugins/MockbaModular
 	url = https://github.com/MockbaTheBorg/MockbaModular.git
+[submodule "plugins/8Mode"]
+	path = plugins/8Mode
+	url = https://github.com/8Mode/8Mode-VCV_Modules.git
