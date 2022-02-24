@@ -151,3 +151,6 @@
 [submodule "plugins/ML_modules"]
 	path = plugins/ML_modules
 	url = https://github.com/martin-lueders/ML_modules.git
+[submodule "plugins/Orbits"]
+	path = plugins/Orbits
+	url = git@github.com:RareBreeds/Orbits.git

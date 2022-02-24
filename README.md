@@ -138,6 +138,7 @@ At the moment the following 3rd-party modules are provided:
 - Mockba Modular
 - Mog
 - mscHack
+- Orbits
 - Prism
 - rackwindows
 - repelzen
