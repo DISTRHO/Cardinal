@@ -109,6 +109,7 @@ At the moment the following 3rd-party modules are provided:
 - Aria Salvatrice
 - Audible Instruments
 - Autinn
+- Axioma
 - Bacon Music
 - Befaco
 - Bidoo

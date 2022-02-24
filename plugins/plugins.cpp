@@ -99,6 +99,9 @@ extern Model* modelChord;
 #undef modelChord
 #undef modelVibrato
 
+// Axioma
+#include "Axioma/src/plugin.hpp"
+
 // BaconPlugs
 #define INCLUDE_COMPONENTS_HPP
 #include "BaconPlugs/src/BaconPlugs.hpp"
@@ -572,6 +575,7 @@ Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
 Plugin* pluginInstance__AudibleInstruments;
 extern Plugin* pluginInstance__Autinn;
+Plugin* pluginInstance__Axioma;
 Plugin* pluginInstance__Bacon;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
@@ -924,6 +928,21 @@ static void initStatic__Autinn()
         p->addModel(modelChord);
 #undef modelChord
 #undef modelVibrato
+    }
+}
+
+static void initStatic__Axioma()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Axioma = p;
+
+    const StaticPluginLoader spl(p, "Axioma");
+    if (spl.ok())
+    {
+        p->addModel(modelTheBifurcator);
+        p->addModel(modelTesseract);
+        p->addModel(modelIkeda);
+        p->addModel(modelRhodonea);
     }
 }
 
@@ -2028,6 +2047,7 @@ void initStaticPlugins()
     initStatic__Aria();
     initStatic__AudibleInstruments();
     initStatic__Autinn();
+    initStatic__Axioma();
     initStatic__Bacon();
     initStatic__Befaco();
     initStatic__Bidoo();

@@ -139,3 +139,6 @@
 [submodule "plugins/8Mode"]
 	path = plugins/8Mode
 	url = https://github.com/8Mode/8Mode-VCV_Modules.git
+[submodule "plugins/Axioma"]
+	path = plugins/Axioma
+	url = https://github.com/kauewerner/Axioma.git
