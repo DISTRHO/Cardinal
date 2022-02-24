@@ -501,6 +501,9 @@ PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModul
 
 PLUGIN_FILES += $(wildcard HamptonHarmonics/src/*.cpp)
 
+# modules/types which are present in other plugins
+HAMPTONHARMONICS_CUSTOM = Arp
+
 # --------------------------------------------------------------
 # HetrickCV
 
