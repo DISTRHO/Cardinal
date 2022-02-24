@@ -142,3 +142,6 @@
 [submodule "plugins/Axioma"]
 	path = plugins/Axioma
 	url = https://github.com/kauewerner/Axioma.git
+[submodule "plugins/Dintree"]
+	path = plugins/Dintree
+	url = https://github.com/hires/Dintree-Virtual.git

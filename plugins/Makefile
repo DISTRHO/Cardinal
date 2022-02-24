@@ -435,6 +435,13 @@ PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
 PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 
 # --------------------------------------------------------------
+# Dintree
+
+PLUGIN_FILES += $(wildcard Dintree/src/*.cpp)
+PLUGIN_FILES += $(wildcard Dintree/src/components/*.cpp)
+PLUGIN_FILES += $(wildcard Dintree/src/utils/*.cpp)
+
+# --------------------------------------------------------------
 # DrumKit
 
 PLUGIN_FILES += $(wildcard DrumKit/src/*.cpp)
@@ -1201,6 +1208,13 @@ $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 		-IChowDSP/lib \
 		-IChowDSP/lib/chowdsp_utils/DSP/WDF \
 		-Wno-deprecated-copy
+
+$(BUILD_DIR)/Dintree/%.cpp.o: Dintree/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(DINTREE_CUSTOM),$(call custom_module_names,$(m),Dintree)) \
+		-DpluginInstance=pluginInstance__Dintree
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
