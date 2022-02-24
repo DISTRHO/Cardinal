@@ -313,7 +313,9 @@ void saveGtgPluginDefault(const char*, int) {}
 
 // Hampton Harmonics
 #define modelArp modelHamptonHarmonicsArp
+#define modelProgress modelHamptonHarmonicsProgress
 #include "HamptonHarmonics/src/plugin.hpp"
+#undef modelProgress
 #undef modelArp
 
 // HetrickCV
@@ -1525,8 +1527,10 @@ static void initStatic__HamptonHarmonics()
     if (spl.ok())
     {
 #define modelArp modelHamptonHarmonicsArp
+#define modelProgress modelHamptonHarmonicsProgress
         p->addModel(modelArp);
         p->addModel(modelProgress);
+#undef modelProgress
 #undef modelArp
     }
 }
