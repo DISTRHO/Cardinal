@@ -136,3 +136,6 @@
 [submodule "plugins/MockbaModular"]
 	path = plugins/MockbaModular
 	url = https://github.com/MockbaTheBorg/MockbaModular.git
+[submodule "plugins/dBiz"]
+	path = plugins/dBiz
+	url = https://github.com/dBiz/dBiz.git

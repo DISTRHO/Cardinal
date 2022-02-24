@@ -425,6 +425,11 @@ PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
 PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 
 # --------------------------------------------------------------
+# dBiz
+
+PLUGIN_FILES += $(wildcard dBiz/src/*.cpp)
+
+# --------------------------------------------------------------
 # DrumKit
 
 PLUGIN_FILES += $(wildcard DrumKit/src/*.cpp)
@@ -1176,6 +1181,14 @@ $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 		-IChowDSP/lib \
 		-IChowDSP/lib/chowdsp_utils/DSP/WDF \
 		-Wno-deprecated-copy
+
+
+$(BUILD_DIR)/dBiz/src/%.cpp.o: dBiz/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(DBIZ_CUSTOM),$(call custom_module_names,$(m),dBiz)) \
+		-DpluginInstance=pluginInstance__dBiz
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
