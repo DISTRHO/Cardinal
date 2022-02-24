@@ -123,6 +123,7 @@ At the moment the following 3rd-party modules are provided:
 - Fehler Fabrik
 - Glue the Giant
 - Grande
+- Hampton Harmonics
 - HetrickCV
 - ihtsyn
 - Impromptu

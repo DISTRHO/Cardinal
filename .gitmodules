@@ -142,3 +142,6 @@
 [submodule "plugins/Axioma"]
 	path = plugins/Axioma
 	url = https://github.com/kauewerner/Axioma.git
+[submodule "plugins/HamptonHarmonics"]
+	path = plugins/HamptonHarmonics
+	url = https://gitlab.com/hampton-harmonics/hampton-harmonics-modules.git

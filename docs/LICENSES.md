@@ -34,6 +34,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Fehler Fabrik           | GPL-3.0-or-later         | |
 | Glue the Giant          | GPL-3.0-or-later         | |
 | Grande                  | GPL-3.0-or-later         | |
+| Hampton Harmonics       | MIT                      | |
 | HetrickCV               | CC0-1.0                  | |
 | ihtsyn                  | GPL-3.0-or-later         | |
 | Impromptu               | GPL-3.0-or-later         | |
@@ -115,6 +116,8 @@ Below is a list of artwork licenses from plugins
 | GlueTheGiant/*                          | GPL-3.0-or-later | Same license as source code |
 | GlueTheGiant/fonts/DSEG7-*              | OFL-1.1-RFN      | |
 | GrandeModular/*                         | CC-BY-NC-ND-4.0  | |
+| HamptonHarmonics/*                      | MIT              | No artwork specific license provided |
+| HamptonHarmonics/PixelOperator.ttf      | CC0-1.0          | |
 | HetrickCV/*                             | CC0-1.0          | |
 | ihtsyn/*                                | GPL-3.0-or-later | [Same license as source code](https://github.com/nysthi/nysthi/issues/379#issuecomment-1027873902) |
 | ImpromptuModular/*                      | CC-BY-NC-ND-4.0  | |
