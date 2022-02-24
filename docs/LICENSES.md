@@ -14,11 +14,13 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | DPF                     | ISC, GPL-2.0-or-later    | Used as the plugin framework, VST2 binary GPLv2+ licensed |
 | Rack                    | GPL-3.0-or-later         | The actual Rack code, internal dependencies are compatible with GPLv3+ |
 | 21kHz                   | MIT                      | |
+| 8Mode                   | BSD-3-Clause             | |
 | Amalgamated Harmonics   | BSD-3-Clause             | |
 | Animated Circuits       | GPL-3.0-or-later         | |
 | Aria Salvatrice         | GPL-3.0-or-later         | |
 | Audible Instruments     | GPL-3.0-or-later         | |
 | Autinn                  | GPL-3.0-or-later         | |
+| Axioma                  | GPL-3.0-or-later         | |
 | Bacon Music             | GPL-3.0-or-later         | |
 | Befaco                  | GPL-3.0-or-later         | |
 | Bidoo                   | GPL-3.0-or-later         | |
@@ -71,6 +73,7 @@ Below is a list of artwork licenses from plugins
 | Name                                    | License(s)       | Additional notes |
 |-----------------------------------------|------------------|------------------|
 | 21kHz                                   | MIT              | No artwork specific license provided |
+| 8Mode                                   | BSD-3-Clause     | No artwork specific license provided |
 | AmalgamatedHarmonics/*                  | BSD-3-Clause     | No artwork specific license provided |
 | AmalgamatedHarmonics/DSEG*.ttf          | OFL-1.1-RFN      | |
 | AmalgamatedHarmonics/Roboto*.ttf        | Apache-2.0       | |
@@ -84,6 +87,7 @@ Below is a list of artwork licenses from plugins
 | AriaModules/signature/*                 | Custom           | Removal required if modifying other files without author's permission |
 | AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, [used and distributed with permission](LICENSE-PERMISSIONS.md#audible-instruments-émilie-gillet--mutable-instruments) |
 | Autinn/*                                | GPL-3.0-or-later | No artwork specific license provided |
+| Axioma/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/*                            | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/midi/*                       | CC-BY-SA-3.0-DE  | |
 | BaconPlugs/midi/beeth/*                 | ???              | Unused in Cardinal, taken from http://www.jsbach.net/ |

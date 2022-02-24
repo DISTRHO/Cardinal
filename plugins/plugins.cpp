@@ -27,6 +27,9 @@
 // 21kHz
 #include "21kHz/src/21kHz.hpp"
 
+// 8Mode
+#include "8Mode/src/8mode.hpp"
+
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
@@ -95,6 +98,9 @@ extern Model* modelMelody;
 extern Model* modelChord;
 #undef modelChord
 #undef modelVibrato
+
+// Axioma
+#include "Axioma/src/plugin.hpp"
 
 // BaconPlugs
 #define INCLUDE_COMPONENTS_HPP
@@ -566,11 +572,13 @@ void saveHighQualityAsDefault(bool) {}
 Plugin* pluginInstance__Cardinal;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
+Plugin* pluginInstance__8Mode;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
 Plugin* pluginInstance__AudibleInstruments;
 extern Plugin* pluginInstance__Autinn;
+Plugin* pluginInstance__Axioma;
 Plugin* pluginInstance__Bacon;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
@@ -764,6 +772,18 @@ static void initStatic__21kHz()
     }
 }
 
+static void initStatic__8Mode()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__8Mode = p;
+
+    const StaticPluginLoader spl(p, "8Mode");
+    if (spl.ok())
+    {
+        p->addModel(modelsoftSN);
+    }
+}
+
 static void initStatic__AmalgamatedHarmonics()
 {
     Plugin* const p = new Plugin;
@@ -912,6 +932,21 @@ static void initStatic__Autinn()
         p->addModel(modelChord);
 #undef modelChord
 #undef modelVibrato
+    }
+}
+
+static void initStatic__Axioma()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Axioma = p;
+
+    const StaticPluginLoader spl(p, "Axioma");
+    if (spl.ok())
+    {
+        p->addModel(modelTheBifurcator);
+        p->addModel(modelTesseract);
+        p->addModel(modelIkeda);
+        p->addModel(modelRhodonea);
     }
 }
 
@@ -2054,11 +2089,13 @@ void initStaticPlugins()
     initStatic__Cardinal();
 #ifndef NOPLUGINS
     initStatic__21kHz();
+    initStatic__8Mode();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__Aria();
     initStatic__AudibleInstruments();
     initStatic__Autinn();
+    initStatic__Axioma();
     initStatic__Bacon();
     initStatic__Befaco();
     initStatic__Bidoo();
