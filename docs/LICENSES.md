@@ -71,6 +71,7 @@ Below is a list of artwork licenses from plugins
 | Name                                    | License(s)       | Additional notes |
 |-----------------------------------------|------------------|------------------|
 | 21kHz                                   | MIT              | No artwork specific license provided |
+| 8Mode                                   | BSD-3-Clause     | No artwork specific license provided |
 | AmalgamatedHarmonics/*                  | BSD-3-Clause     | No artwork specific license provided |
 | AmalgamatedHarmonics/DSEG*.ttf          | OFL-1.1-RFN      | |
 | AmalgamatedHarmonics/Roboto*.ttf        | Apache-2.0       | |
