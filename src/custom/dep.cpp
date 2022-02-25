@@ -305,6 +305,30 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
         }
     }
 
+    // Special case for Lilac
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/LilacLoop/", 7) == 0)
+    {
+        switch (paint.color)
+        {
+        // main bg (custom)
+        case 0xffd5d5da:
+            paint.color = 0xff242228;
+            return true;
+        // main color (do nothing)
+        case 0xffbfb7d7:
+            return false;
+        // screws (hide)
+        case 0xffc8c8cf:
+        case 0xffbcbcbc:
+        case 0xffb1b1bb:
+        case 0xffacacac:
+        case 0xff898991:
+        case 0xff727272:
+            paint.color = 0x00000000;
+            return true;
+        }
+    }
+
     switch (paint.color)
     {
     // scopes or other special things (do nothing)
