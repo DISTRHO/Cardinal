@@ -574,6 +574,9 @@ JW_CUSTOM = PlayHead Quantizer
 
 PLUGIN_FILES += $(wildcard kocmoc/src/*.cpp)
 
+# modules/types which are present in other plugins
+KOCMOC_CUSTOM = Phasor __ct_base __ct_comp
+
 # --------------------------------------------------------------
 # LifeFormModular
 
@@ -586,6 +589,9 @@ LIFEFORMMODULAR_CUSTOM = IO MS __ct_base __ct_comp
 # Lilac Loop
 
 PLUGIN_FILES += $(wildcard LilacLoop/src/*.cpp)
+
+# modules/types which are present in other plugins
+LILACLOOP_CUSTOM = AudioFile Mode
 
 # --------------------------------------------------------------
 # LittleUtils
@@ -809,7 +815,6 @@ BASE_FLAGS += -DARCH_LIN
 endif
 
 BASE_FLAGS += -DBUILDING_PLUGIN_MODULES
-BASE_FLAGS += -fno-strict-aliasing
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
 
@@ -879,8 +884,8 @@ BASE_FLAGS += -DHAVE_SNDFILE
 endif
 
 BUILD_C_FLAGS += -std=gnu11
-BUILD_C_FLAGS += -fno-finite-math-only
-BUILD_CXX_FLAGS += -fno-finite-math-only
+BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
