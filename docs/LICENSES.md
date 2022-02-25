@@ -4,7 +4,7 @@
 
 While Cardinal itself is licensed under GPLv3+, some modules/plugins used by it are not.  
 And since Cardinal builds the entire Rack and modules as a static library,
-the more restrictive of the **code licenses** will apply to the final binary.  
+the more restrictive of the **code licenses** will apply to the final binary.
 
 Bellow follows a list of all code licenses used in Cardinal and linked submodules.
 
@@ -29,6 +29,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Catro/Modulo            | BSD-3-Clause             | |
 | cf                      | BSD-3-Clause             | |
 | ChowDSP                 | GPL-3.0-or-later         | |
+| Dintree                 | GPL-3.0-or-later         | |
 | DrumKit                 | CC0-1.0                  | |
 | E-Series                | GPL-3.0-or-later         | |
 | ExpertSleepers Encoders | MIT                      | |
@@ -42,7 +43,9 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | ihtsyn                  | GPL-3.0-or-later         | |
 | Impromptu               | GPL-3.0-or-later         | |
 | JW-Modules              | BSD-3-Clause             | |
+| kocmoc                  | GPL-3.0-or-later         | |
 | LifeFormModular         | MIT                      | |
+| Lilac Loop              | GPL-3.0-or-later         | |
 | Little Utils            | EUPL-1.2                 | |
 | Lomas Modules           | GPL-3.0-or-later         | |
 | Lyrae Modules           | GPL-3.0-or-later         | |
@@ -52,6 +55,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Mog                     | CC0-1.0                  | |
 | mscHack                 | BSD-3-Clause             | |
 | Orbits                  | GPL-3.0-or-later         | |
+| Path Set                | GPL-3.0-or-later         | |
 | Prism                   | BSD-3-Clause             | |
 | Rackwindows             | MIT                      | |
 | repelzen                | GPL-3.0-or-later         | |
@@ -117,6 +121,7 @@ Below is a list of artwork licenses from plugins
 | cf/VT323-Regular.ttf                    | OFL-1.1-no-RFN   | |
 | ChowDSP/*                               | GPL-3.0-or-later | Same license as source code |
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
+| Dintree/*                               | GPL-3.0-or-later | No artwork specific license provided |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
 | E-Series/*                              | Custom           | Copyright © Synthesis Technology, [used and distributed with permission](LICENSE-PERMISSIONS.md#eseries-paul-schreiber--synthtech) |
@@ -135,7 +140,9 @@ Below is a list of artwork licenses from plugins
 | ImpromptuModular/res/comp/complib/*     | CC-BY-NC-4.0     | |
 | JW-Modules/*                            | BSD-3-Clause     | No artwork specific license provided |
 | JW-Modules/DejaVuSansMono.ttf           | Bitstream-Vera   | Unused in Cardinal |
+| kocmoc/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | LifeFormModular/*                       | MIT              | No artwork specific license provided |
+| LilacLoop/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | LittleUtils/*                           | EUPL-1.2         | Same license as source code |
 | LittleUtils/fonts/CooperHewitt-*.ttf    | OFL-1.1-RFN      | |
 | LittleUtils/fonts/Overpass-*.ttf        | OFL-1.1-RFN      | |
@@ -155,6 +162,7 @@ Below is a list of artwork licenses from plugins
 | mscHack/*                               | BSD-3-Clause     | No artwork specific license provided, see [mschack#108](https://github.com/mschack/VCV-Rack-Plugins/issues/108) |
 | Orbits/*                                | CC-BY-NC-ND-4.0  | |
 | Orbits/fonts/ShareTechMono-Regular.ttf  | OFL-1.1-RFN      | |
+| PathSet/*                               | GPL-3.0-or-later | No artwork specific license provided |
 | Prism/*                                 | CC-BY-SA-4.0     | |
 | Prism/RobotoCondensed-Regular.ttf       | Apache-2.0       | |
 | Rackwindows/*                           | MIT              | [Same license as source code](https://github.com/n0jo/rackwindows/issues/15) |

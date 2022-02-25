@@ -282,6 +282,9 @@ extern Model* modelTestVCF;
 #include "ChowDSP/src/plugin.cpp"
 #undef init
 
+// Dintree
+#include "Dintree/src/plugin.hpp"
+
 // DrumKit
 #include "DrumKit/src/DrumKit.hpp"
 void setupSamples();
@@ -413,6 +416,9 @@ extern Model* modelBlankPanel;
 #include "JW-Modules/src/JWModules.hpp"
 #undef modelQuantizer
 
+// kocmoc
+#include "kocmoc/src/plugin.hpp"
+
 // LifeFormModular
 /* NOTE too much noise in original include, do this a different way
 // #include "LifeFormModular/src/plugin.hpp"
@@ -433,6 +439,13 @@ extern Model* modelDriftgen;
 
 // LittleUtils
 #include "LittleUtils/src/plugin.hpp"
+
+// Lilac Loop
+/* NOTE too much noise in original include, do this a different way
+// #include "LilacLoop/src/plugin.hpp"
+*/
+extern Model* modelLooperOne;
+extern Model* modelLooperTwo;
 
 // LomasModules
 #include "LomasModules/src/plugin.hpp"
@@ -555,6 +568,9 @@ extern Model* modelMaude_221;
 // Orbits
 #include "Orbits/src/plugin.hpp"
 
+// Path Set
+# include "PathSet/src/plugin.hpp"
+
 // Prism
 # include "Prism/src/plugin.hpp"
 
@@ -644,6 +660,7 @@ Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
+Plugin* pluginInstance__Dintree;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
@@ -660,7 +677,9 @@ Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__ihtsyn;
 Plugin* pluginInstance__JW;
+Plugin* pluginInstance__kocmoc;
 Plugin* pluginInstance__LifeFormModular;
+Plugin* pluginInstance__LilacLoop;
 Plugin* pluginInstance__LittleUtils;
 Plugin* pluginInstance__Lomas;
 Plugin* pluginInstance__Lyrae;
@@ -670,6 +689,7 @@ Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__Orbits;
+Plugin* pluginInstance__PathSet;
 Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
@@ -1390,6 +1410,26 @@ static void initStatic__ChowDSP()
     }
 }
 
+static void initStatic__Dintree()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Dintree = p;
+
+    const StaticPluginLoader spl(p, "Dintree");
+    if (spl.ok())
+    {
+        p->addModel(modelV100_Scanner);
+        p->addModel(modelV101_Dual_Envelope);
+        p->addModel(modelV102_Output_Mixer);
+        p->addModel(modelV103_Reverb_Delay);
+        p->addModel(modelV104_Four_Vs);
+        p->addModel(modelV105_Quad_CV_Proc);
+        p->addModel(modelV107_Dual_Slew);
+        p->addModel(modelV201_Tri_Comparator);
+        p->addModel(modelV218_SH_Clock_Noise);
+    }
+}
+
 static void initStatic__DrumKit()
 {
     Plugin* const p = new Plugin;
@@ -1785,6 +1825,25 @@ static void initStatic__JW()
     }
 }
 
+static void initStatic__kocmoc()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__kocmoc= p;
+
+    const StaticPluginLoader spl(p, "kocmoc");
+    if (spl.ok())
+    {
+        p->addModel(modelSVF_1);
+        p->addModel(modelTRG);
+        p->addModel(modelLADR);
+        p->addModel(modelOP);
+        p->addModel(modelPHASR);
+        p->addModel(modelMUL);
+        p->addModel(modelSKF);
+        p->addModel(modelDDLY);
+    }
+}
+
 static void initStatic__LifeFormModular()
 {
     Plugin* const p = new Plugin;
@@ -1806,6 +1865,18 @@ static void initStatic__LifeFormModular()
         p->addModel(modelAdditiveVibration);
         p->addModel(modelComplexOsc);
         p->addModel(modelDriftgen);
+    }
+}
+
+static void initStatic__LilacLoop()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__LilacLoop = p;
+
+    const StaticPluginLoader spl(p, "LilacLoop");
+    if (spl.ok())
+    {
+        p->addModel(modelLooperOne);
     }
 }
 
@@ -2044,6 +2115,20 @@ static void initStatic__Orbits()
     }
 }
 
+static void initStatic__PathSet()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__PathSet = p;
+
+    const StaticPluginLoader spl(p, "PathSet");
+    if (spl.ok())
+    {
+        p->addModel(modelShiftyMod);
+        p->addModel(modelIceTray);
+        p->addModel(modelAstroVibe);
+    }
+}
+
 static void initStatic__Prism()
 {
     Plugin* const p = new Plugin;
@@ -2266,6 +2351,7 @@ void initStaticPlugins()
     initStatic__CatroModulo();
     initStatic__cf();
     initStatic__ChowDSP();
+    initStatic__Dintree();
     initStatic__DrumKit();
     initStatic__ESeries();
     initStatic__ExpertSleepersEncoders();
@@ -2282,7 +2368,9 @@ void initStaticPlugins()
     initStatic__ImpromptuModular();
     initStatic__ihtsyn();
     initStatic__JW();
+    initStatic__kocmoc();
     initStatic__LifeFormModular();
+    initStatic__LilacLoop();
     initStatic__LittleUtils();
     initStatic__Lomas();
     initStatic__Lyrae();
@@ -2292,6 +2380,7 @@ void initStaticPlugins()
     initStatic__Mog();
     initStatic__mscHack();
     initStatic__Orbits();
+    initStatic__PathSet();
     initStatic__Prism();
     initStatic__rackwindows();
     initStatic__repelzen();
