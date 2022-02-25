@@ -435,7 +435,11 @@ extern Model* modelDriftgen;
 #include "LittleUtils/src/plugin.hpp"
 
 // Lilac Loop
-#include "LilacLoop/src/plugin.hpp"
+/* NOTE too much noise in original include, do this a different way
+// #include "LilacLoop/src/plugin.hpp"
+*/
+extern Model* modelLooperOne;
+extern Model* modelLooperTwo;
 
 // LomasModules
 #include "LomasModules/src/plugin.hpp"
