@@ -131,6 +131,7 @@ At the moment the following 3rd-party modules are provided:
 - Impromptu
 - JW-Modules
 - LifeFormModular
+- Lilac Loop
 - Little Utils
 - Lomas Modules
 - Lyrae Modules

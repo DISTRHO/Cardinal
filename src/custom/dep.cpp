@@ -234,6 +234,8 @@ static const struct {
     { "/JW-Modules/res/Trigs.svg", {}, -1 },
     { "/JW-Modules/res/WavHeadPanel.svg", {}, -1 },
     { "/JW-Modules/res/XYPad.svg", {}, -1 },
+    // GPL3.0-or-later
+    { "/LilacLoop/res/Looper.svg", {}, -1 },
     // EUPL-1.2
     { "/LittleUtils/res/Bias_Semitone.svg", {}, -1 },
     { "/LittleUtils/res/ButtonModule.svg", {}, -1 },
@@ -303,6 +305,30 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
         // make it more white
         case 0xffa0a0a0:
             paint.color = 0xffc0c0c0;
+            return true;
+        }
+    }
+
+    // Special case for Lilac
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/LilacLoop/", 11) == 0)
+    {
+        switch (paint.color)
+        {
+        // main bg (custom)
+        case 0xffd5d5da:
+            paint.color = 0xff242228;
+            return true;
+        // main color (do nothing)
+        case 0xffbfb7d7:
+            return false;
+        // screws (hide)
+        case 0xffc8c8cf:
+        case 0xffbcbcbc:
+        case 0xffb1b1bb:
+        case 0xffacacac:
+        case 0xff898991:
+        case 0xff727272:
+            paint.color = 0x00000000;
             return true;
         }
     }

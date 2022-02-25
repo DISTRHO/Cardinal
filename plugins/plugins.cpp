@@ -431,6 +431,9 @@ extern Model* modelDriftgen;
 // LittleUtils
 #include "LittleUtils/src/plugin.hpp"
 
+// Lilac Loop
+#include "LilacLoop/src/plugin.hpp"
+
 // LomasModules
 #include "LomasModules/src/plugin.hpp"
 #undef DR_WAV_IMPLEMENTATION
@@ -660,6 +663,7 @@ extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__ihtsyn;
 Plugin* pluginInstance__JW;
 Plugin* pluginInstance__LifeFormModular;
+Plugin* pluginInstance__LilacLoop;
 Plugin* pluginInstance__LittleUtils;
 Plugin* pluginInstance__Lomas;
 Plugin* pluginInstance__Lyrae;
@@ -1794,6 +1798,18 @@ static void initStatic__LifeFormModular()
     }
 }
 
+static void initStatic__LilacLoop()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__LilacLoop = p;
+
+    const StaticPluginLoader spl(p, "LilacLoop");
+    if (spl.ok())
+    {
+        p->addModel(modelLooperOne);
+    }
+}
+
 static void initStatic__LittleUtils()
 {
     Plugin* const p = new Plugin;
@@ -2281,6 +2297,7 @@ void initStaticPlugins()
     initStatic__ihtsyn();
     initStatic__JW();
     initStatic__LifeFormModular();
+    initStatic__LilacLoop();
     initStatic__LittleUtils();
     initStatic__Lomas();
     initStatic__Lyrae();
