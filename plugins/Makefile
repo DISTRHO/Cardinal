@@ -1444,7 +1444,8 @@ $(BUILD_DIR)/LilacLoop/%.cpp.o: LilacLoop/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(LILACLOOP_CUSTOM),$(call custom_module_names,$(m),LilacLoop)) \
-		-DpluginInstance=pluginInstance__LilacLoop
+		-DpluginInstance=pluginInstance__LilacLoop \
+		-DSKIP_MINGW_FORMAT
 
 $(BUILD_DIR)/LittleUtils/%.cpp.o: LittleUtils/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
