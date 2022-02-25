@@ -4,7 +4,7 @@
 
 While Cardinal itself is licensed under GPLv3+, some modules/plugins used by it are not.  
 And since Cardinal builds the entire Rack and modules as a static library,
-the more restrictive of the **code licenses** will apply to the final binary.  
+the more restrictive of the **code licenses** will apply to the final binary.
 
 Bellow follows a list of all code licenses used in Cardinal and linked submodules.
 
@@ -119,7 +119,6 @@ Below is a list of artwork licenses from plugins
 | ChowDSP/*                               | GPL-3.0-or-later | Same license as source code |
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
 | Dintree/*                               | GPL-3.0-or-later | No artwork specific license provided |
-| Dintree/components/fixedsys.ttf         | unknown | needs research |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
 | E-Series/*                              | Custom           | Copyright © Synthesis Technology, [used and distributed with permission](LICENSE-PERMISSIONS.md#eseries-paul-schreiber--synthtech) |
