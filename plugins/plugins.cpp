@@ -30,6 +30,9 @@
 // 8Mode
 #include "8Mode/src/8mode.hpp"
 
+// Aaron Static
+#include "AaronStatic/src/plugin.hpp"
+
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
@@ -627,6 +630,7 @@ Plugin* pluginInstance__Cardinal;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
+Plugin* pluginInstance__AaronStatic;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
@@ -840,6 +844,21 @@ static void initStatic__8Mode()
     if (spl.ok())
     {
         p->addModel(modelsoftSN);
+    }
+}
+
+static void initStatic__AaronStatic()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__AaronStatic = p;
+
+    const StaticPluginLoader spl(p, "AaronStatic");
+    if (spl.ok())
+    {
+        p->addModel(modelChordCV);
+        p->addModel(modelScaleCV);
+        p->addModel(modelRandomNoteCV);
+        p->addModel(modelDiatonicCV);
     }
 }
 
@@ -2233,6 +2252,7 @@ void initStaticPlugins()
 #ifndef NOPLUGINS
     initStatic__21kHz();
     initStatic__8Mode();
+    initStatic__AaronStatic();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__Aria();

@@ -160,3 +160,6 @@
 [submodule "plugins/CatroModulo"]
 	path = plugins/CatroModulo
 	url = https://github.com/catronomix/catro-modulo.git
+[submodule "plugins/AaronStatic"]
+	path = plugins/AaronStatic
+	url = https://github.com/aaronstatic/AaronStatic_modules.git

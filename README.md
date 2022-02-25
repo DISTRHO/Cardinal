@@ -104,6 +104,7 @@ At the moment the following 3rd-party modules are provided:
 
 - 21kHz
 - 8Mode
+- Aaron Static
 - Amalgamated Harmonics
 - Animated Circuits
 - Aria Salvatrice
