@@ -132,6 +132,7 @@ At the moment the following 3rd-party modules are provided:
 - JW-Modules
 - kocmoc
 - LifeFormModular
+- Lilac Loop
 - Little Utils
 - Lomas Modules
 - Lyrae Modules
