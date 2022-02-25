@@ -41,6 +41,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | ihtsyn                  | GPL-3.0-or-later         | |
 | Impromptu               | GPL-3.0-or-later         | |
 | JW-Modules              | BSD-3-Clause             | |
+| kocmoc                  | GPL-3.0-or-later         | |
 | LifeFormModular         | MIT                      | |
 | Lilac Loop              | GPL-3.0-or-later         | |
 | Little Utils            | EUPL-1.2                 | |
@@ -134,6 +135,7 @@ Below is a list of artwork licenses from plugins
 | ImpromptuModular/res/comp/complib/*     | CC-BY-NC-4.0     | |
 | JW-Modules/*                            | BSD-3-Clause     | No artwork specific license provided |
 | JW-Modules/DejaVuSansMono.ttf           | Bitstream-Vera   | Unused in Cardinal |
+| kocmoc/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | LifeFormModular/*                       | MIT              | No artwork specific license provided |
 | LilacLoop/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | LittleUtils/*                           | EUPL-1.2         | Same license as source code |

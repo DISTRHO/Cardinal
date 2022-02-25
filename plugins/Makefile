@@ -570,6 +570,11 @@ endif
 JW_CUSTOM = PlayHead Quantizer
 
 # --------------------------------------------------------------
+# kocmoc
+
+PLUGIN_FILES += $(wildcard kocmoc/src/*.cpp)
+
+# --------------------------------------------------------------
 # LifeFormModular
 
 PLUGIN_FILES += $(filter-out LifeFormModular/src/plugin.cpp,$(wildcard LifeFormModular/src/*.cpp))
@@ -1419,6 +1424,13 @@ $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 		-Wno-misleading-indentation \
 		-Wno-unused-but-set-variable \
 		-Wno-unused-result
+
+$(BUILD_DIR)/kocmoc/%.cpp.o: kocmoc/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(KOCMOC_CUSTOM),$(call custom_module_names,$(m),kocmoc)) \
+		-DpluginInstance=pluginInstance__kocmoc
 
 $(BUILD_DIR)/LifeFormModular/%.cpp.o: LifeFormModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
