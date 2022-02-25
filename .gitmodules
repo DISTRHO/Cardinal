@@ -160,3 +160,6 @@
 [submodule "plugins/CatroModulo"]
 	path = plugins/CatroModulo
 	url = https://github.com/catronomix/catro-modulo.git
+[submodule "plugins/LilacLoop"]
+	path = plugins/LilacLoop
+	url = https://github.com/grough/lilac-loop-vcv.git
