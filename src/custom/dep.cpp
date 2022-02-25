@@ -243,6 +243,15 @@ static const struct {
     { "/LittleUtils/res/PulseGenerator.svg", {}, -1 },
     { "/LittleUtils/res/TeleportIn.svg", {}, -1 },
     { "/LittleUtils/res/TeleportOut.svg", {}, -1 },
+    // GPL-3.0-or-later
+    { "/kocmoc/res/DDLY.svg", {}, -1 },
+    { "/kocmoc/res/LADR.svg", {}, -1 },
+    { "/kocmoc/res/MUL.svg", {}, -1 },
+    { "/kocmoc/res/OP.svg", {}, -1 },
+    { "/kocmoc/res/PHASR.svg", {}, -1 },
+    { "/kocmoc/res/SKF.svg", {}, -1 },
+    { "/kocmoc/res/SVF.svg", {}, -1 },
+    { "/kocmoc/res/TRG.svg", {}, -1 },
 };
 
 static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInvert = nullptr)

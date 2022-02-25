@@ -410,6 +410,9 @@ extern Model* modelBlankPanel;
 #include "JW-Modules/src/JWModules.hpp"
 #undef modelQuantizer
 
+// kocmoc
+#include "kocmoc/src/plugin.hpp"
+
 // LifeFormModular
 /* NOTE too much noise in original include, do this a different way
 // #include "LifeFormModular/src/plugin.hpp"
@@ -659,6 +662,7 @@ Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__ihtsyn;
 Plugin* pluginInstance__JW;
+Plugin* pluginInstance__kocmoc;
 Plugin* pluginInstance__LifeFormModular;
 Plugin* pluginInstance__LilacLoop;
 Plugin* pluginInstance__LittleUtils;
@@ -1770,6 +1774,25 @@ static void initStatic__JW()
     }
 }
 
+static void initStatic__kocmoc()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__kocmoc= p;
+
+    const StaticPluginLoader spl(p, "kocmoc");
+    if (spl.ok())
+    {
+        p->addModel(modelSVF_1);
+        p->addModel(modelTRG);
+        p->addModel(modelLADR);
+        p->addModel(modelOP);
+        p->addModel(modelPHASR);
+        p->addModel(modelMUL);
+        p->addModel(modelSKF);
+        p->addModel(modelDDLY);
+    }
+}
+
 static void initStatic__LifeFormModular()
 {
     Plugin* const p = new Plugin;
@@ -2278,6 +2301,7 @@ void initStaticPlugins()
     initStatic__ImpromptuModular();
     initStatic__ihtsyn();
     initStatic__JW();
+    initStatic__kocmoc();
     initStatic__LifeFormModular();
     initStatic__LilacLoop();
     initStatic__LittleUtils();

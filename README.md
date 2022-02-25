@@ -130,6 +130,7 @@ At the moment the following 3rd-party modules are provided:
 - ihtsyn
 - Impromptu
 - JW-Modules
+- kocmoc
 - LifeFormModular
 - Lilac Loop
 - Little Utils
