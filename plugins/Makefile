@@ -651,6 +651,11 @@ MSCHACK_CUSTOM_PER_FILE = MAIN_SYNC_CLOCK FILTER_STRUCT FILTER_PARAM_STRUCT OSC_
 PLUGIN_FILES += $(wildcard Orbits/src/*.cpp)
 
 # --------------------------------------------------------------
+# Path Set
+
+PLUGIN_FILES += $(wildcard PathSet/src/*.cpp)
+
+# --------------------------------------------------------------
 # Prism
 
 PLUGIN_FILES += $(filter-out Prism/src/plugin.cpp,$(wildcard Prism/src/*.cpp))
@@ -1493,6 +1498,13 @@ $(BUILD_DIR)/Orbits/%.cpp.o: Orbits/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ORBITS_CUSTOM),$(call custom_module_names,$(m),Orbits)) \
 		-DpluginInstance=pluginInstance__Orbits
+
+$(BUILD_DIR)/PathSet/%.cpp.o: PathSet/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(PATHSET_CUSTOM),$(call custom_module_names,$(m),PathSet)) \
+		-DpluginInstance=pluginInstance__PathSet
 
 $(BUILD_DIR)/Prism/%.cpp.o: Prism/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

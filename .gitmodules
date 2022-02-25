@@ -160,3 +160,6 @@
 [submodule "plugins/CatroModulo"]
 	path = plugins/CatroModulo
 	url = https://github.com/catronomix/catro-modulo.git
+[submodule "plugins/PathSet"]
+	path = plugins/PathSet
+	url = https://github.com/patheros/PathSetModules.git

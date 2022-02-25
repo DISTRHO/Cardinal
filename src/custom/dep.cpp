@@ -241,6 +241,10 @@ static const struct {
     { "/LittleUtils/res/PulseGenerator.svg", {}, -1 },
     { "/LittleUtils/res/TeleportIn.svg", {}, -1 },
     { "/LittleUtils/res/TeleportOut.svg", {}, -1 },
+    // GPL-3.0-or-later
+    { "/PathSet/res/AstroVibe.svg", {}, -1 },
+    { "/PathSet/res/IceTray.svg", {}, -1 },
+    { "/PathSet/res/ShiftyMod.svg", {}, -1 },
 };
 
 static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
@@ -299,6 +303,43 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
         // make it more white
         case 0xffa0a0a0:
             paint.color = 0xffc0c0c0;
+            return true;
+        }
+    }
+
+    // Special case for Path Set colors
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/PathSet/", 9) == 0)
+    {
+        switch (paint.color)
+        {
+        // do nothing
+        case 0xffdf7a1a:
+        case 0xffe3b080:
+        case 0xffe941e2:
+        case 0xffef73ea:
+        case 0xfff49ff0:
+        case 0xff698efb:
+        case 0xff787878:
+        case 0xfff5c99f:
+        case 0xffde944f:
+        case 0xffe1a265:
+        case 0xffe5cbb3:
+        case 0xffe6d2c0:
+        case 0xffffffff:
+            return false;
+        // set other colors
+        case 0xffe4cbb3:
+            paint.color = 0xffe3b080;
+            return false;
+        case 0xfff8dcc2:
+            paint.color = 0xffde944f;
+            return false;
+        case 0xffe5d9cd:
+            paint.color = 0xfff8dcc2;
+            return false;
+        // should be just the logo, but also changes the output outlines
+        case 0xff000000:
+            paint.color = 0xffffffff;
             return true;
         }
     }

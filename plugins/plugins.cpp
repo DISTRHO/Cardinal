@@ -552,6 +552,9 @@ extern Model* modelMaude_221;
 // Orbits
 #include "Orbits/src/plugin.hpp"
 
+// Path Set
+# include "PathSet/src/plugin.hpp"
+
 // Prism
 # include "Prism/src/plugin.hpp"
 
@@ -666,6 +669,7 @@ Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__Orbits;
+Plugin* pluginInstance__PathSet;
 Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
@@ -2025,6 +2029,20 @@ static void initStatic__Orbits()
     }
 }
 
+static void initStatic__PathSet()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__PathSet = p;
+
+    const StaticPluginLoader spl(p, "PathSet");
+    if (spl.ok())
+    {
+        p->addModel(modelShiftyMod);
+        p->addModel(modelIceTray);
+        p->addModel(modelAstroVibe);
+    }
+}
+
 static void initStatic__Prism()
 {
     Plugin* const p = new Plugin;
@@ -2272,6 +2290,7 @@ void initStaticPlugins()
     initStatic__Mog();
     initStatic__mscHack();
     initStatic__Orbits();
+    initStatic__PathSet();
     initStatic__Prism();
     initStatic__rackwindows();
     initStatic__repelzen();
