@@ -306,7 +306,7 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
     }
 
     // Special case for Lilac
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/LilacLoop/", 7) == 0)
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/LilacLoop/", 11) == 0)
     {
         switch (paint.color)
         {
