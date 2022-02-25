@@ -1295,7 +1295,8 @@ $(BUILD_DIR)/Dintree/%.cpp.o: Dintree/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(DINTREE_CUSTOM),$(call custom_module_names,$(m),Dintree)) \
-		-DpluginInstance=pluginInstance__Dintree
+		-DpluginInstance=pluginInstance__Dintree \
+		-DSKIP_MINGW_FORMAT
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
