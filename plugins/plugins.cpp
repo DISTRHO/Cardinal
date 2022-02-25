@@ -30,6 +30,9 @@
 // 8Mode
 #include "8Mode/src/8mode.hpp"
 
+// Algoritmarte
+#include "Algoritmarte/src/plugin.hpp"
+
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
@@ -643,6 +646,7 @@ Plugin* pluginInstance__Cardinal;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
+Plugin* pluginInstance__Algoritmarte;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
@@ -860,6 +864,24 @@ static void initStatic__8Mode()
     if (spl.ok())
     {
         p->addModel(modelsoftSN);
+    }
+}
+
+static void initStatic__Algoritmarte()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Algoritmarte = p;
+
+    const StaticPluginLoader spl(p, "Algoritmarte");
+    if (spl.ok())
+    {
+        p->addModel(modelClockkky);
+        p->addModel(modelPlanetz);
+        p->addModel(modelMusiFrog);
+        p->addModel(modelZefiro);
+        p->addModel(modelHoldMeTight);
+        p->addModel(modelCyclicCA);
+        p->addModel(modelMusiMath);
     }
 }
 
@@ -2318,6 +2340,7 @@ void initStaticPlugins()
 #ifndef NOPLUGINS
     initStatic__21kHz();
     initStatic__8Mode();
+    initStatic__Algoritmarte();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__Aria();

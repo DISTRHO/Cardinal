@@ -231,7 +231,12 @@ PLUGIN_FILES += $(filter-out 21kHz/src/21kHz.cpp,$(wildcard 21kHz/src/*.cpp))
 # --------------------------------------------------------------
 # 8Mode
 
-PLUGIN_FILES += $(wildcard 8Mode/src/*.cpp)
+PLUGIN_FILES += $(filter-out 8Mode/src/plugin.cpp,$(wildcard 8Mode/src/*.cpp))
+
+# --------------------------------------------------------------
+# AlgoritmArte
+
+PLUGIN_FILES += $(filter-out Algoritmarte/src/plugin.cpp,$(wildcard Algoritmarte/src/*.cpp))
 
 # --------------------------------------------------------------
 # AmalgamatedHarmonics
@@ -1145,6 +1150,13 @@ $(BUILD_DIR)/8Mode/%.cpp.o: 8Mode/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(8MODE_CUSTOM),$(call custom_module_names,$(m),8Mode)) \
 		-DpluginInstance=pluginInstance__8Mode
+
+$(BUILD_DIR)/Algoritmarte/%.cpp.o: Algoritmarte/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ALGORITMARTE_CUSTOM),$(call custom_module_names,$(m),Algoritmarte)) \
+		-DpluginInstance=pluginInstance__Algoritmarte
 
 $(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

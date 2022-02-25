@@ -172,3 +172,6 @@
 [submodule "plugins/Dintree"]
 	path = plugins/Dintree
 	url = https://github.com/hires/Dintree-Virtual.git
+[submodule "plugins/Algoritmarte"]
+	path = plugins/Algoritmarte
+	url = https://github.com/algoritmarte/AlgoritmarteVCVPlugin.git

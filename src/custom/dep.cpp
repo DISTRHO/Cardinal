@@ -56,6 +56,14 @@ static const struct {
     { "/21kHz/res/Panels/D_Inf.svg", {}, -1 },
     { "/21kHz/res/Panels/PalmLoop.svg", {}, -1 },
     { "/21kHz/res/Panels/TachyonEntangler.svg", {}, -1 },
+    // GPL3.0-or-later
+    { "/Algoritmarte/res/Clockkky.svg", {}, -1 },
+    { "/Algoritmarte/res/CyclicCA.svg", {}, -1 },
+    { "/Algoritmarte/res/HoldMeTight.svg", {}, -1 },
+    { "/Algoritmarte/res/MusiFrog.svg", {}, -1 },
+    { "/Algoritmarte/res/MusiMath.svg", {}, -1 },
+    { "/Algoritmarte/res/Planetz.svg", {}, -1 },
+    { "/Algoritmarte/res/Zefiro.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
     { "/AudibleInstruments/res/Blinds.svg", {}, -1 },
     { "/AudibleInstruments/res/Braids.svg", {}, -1 },
