@@ -430,9 +430,24 @@ PLUGIN_FILES += $(wildcard ChowDSP/src/*/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
 
 # --------------------------------------------------------------
+# CatroModulo
+
+PLUGIN_FILES += $(wildcard CatroModulo/src/*.cpp)
+
+# modules/types which are present in other plugins
+CATROMODULO_CUSTOM = LowFrequencyOscillator NumDisplayWidget
+
+# --------------------------------------------------------------
 # cf
 
 PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
+
+# --------------------------------------------------------------
+# Dintree
+
+PLUGIN_FILES += $(wildcard Dintree/src/*.cpp)
+PLUGIN_FILES += $(wildcard Dintree/src/components/*.cpp)
+PLUGIN_FILES += $(wildcard Dintree/src/utils/*.cpp)
 
 # --------------------------------------------------------------
 # DrumKit
@@ -444,6 +459,7 @@ PLUGIN_FILES += $(wildcard DrumKit/src/model/*.cpp)
 PLUGIN_FILES += $(wildcard DrumKit/deps/*.cpp)
 PLUGIN_FILES += $(wildcard DrumKit/deps/SynthDevKit/src/*.cpp)
 
+# modules/types which are present in other plugins
 DRUMKIT_CUSTOM = ADSR Envelope LowFrequencyOscillator
 
 # --------------------------------------------------------------
@@ -466,6 +482,7 @@ PLUGIN_FILES += $(filter-out Extratone/src/plugin.cpp,$(wildcard Extratone/src/*
 
 PLUGIN_FILES += $(filter-out FehlerFabrik/src/plugin.cpp,$(wildcard FehlerFabrik/src/*.cpp))
 
+# modules/types which are present in other plugins
 FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter
 
 # --------------------------------------------------------------
@@ -560,12 +577,28 @@ endif
 JW_CUSTOM = PlayHead Quantizer
 
 # --------------------------------------------------------------
+# kocmoc
+
+PLUGIN_FILES += $(wildcard kocmoc/src/*.cpp)
+
+# modules/types which are present in other plugins
+KOCMOC_CUSTOM = Phasor __ct_base __ct_comp
+
+# --------------------------------------------------------------
 # LifeFormModular
 
 PLUGIN_FILES += $(filter-out LifeFormModular/src/plugin.cpp,$(wildcard LifeFormModular/src/*.cpp))
 
 # modules/types which are present in other plugins
 LIFEFORMMODULAR_CUSTOM = IO MS __ct_base __ct_comp
+
+# --------------------------------------------------------------
+# Lilac Loop
+
+PLUGIN_FILES += $(wildcard LilacLoop/src/*.cpp)
+
+# modules/types which are present in other plugins
+LILACLOOP_CUSTOM = AudioFile Mode
 
 # --------------------------------------------------------------
 # LittleUtils
@@ -611,7 +644,7 @@ PLUGIN_FILES += $(filter-out ML_modules/src/plugin.cpp,$(wildcard ML_modules/src
 PLUGIN_FILES += ML_modules/freeverb/revmodel.cpp
 
 # modules/types which are present in other plugins
-ML_CUSTOM = Quant Quantizer QuantizerWidget SH8 allpass comb revmodel
+ML_CUSTOM = Mode Quant Quantizer QuantizerWidget SH8 allpass comb revmodel
 
 # --------------------------------------------------------------
 # MockbaModular
@@ -639,6 +672,11 @@ MSCHACK_CUSTOM_PER_FILE = MAIN_SYNC_CLOCK FILTER_STRUCT FILTER_PARAM_STRUCT OSC_
 # Orbits
 
 PLUGIN_FILES += $(wildcard Orbits/src/*.cpp)
+
+# --------------------------------------------------------------
+# Path Set
+
+PLUGIN_FILES += $(wildcard PathSet/src/*.cpp)
 
 # --------------------------------------------------------------
 # Prism
@@ -677,6 +715,10 @@ PLUGIN_FILES += $(wildcard StarlingVia/Via/modules/*/*.cpp)
 
 # modules/types which are present in other plugins
 STARLINGVIA_CUSTOM = Scanner
+
+# --------------------------------------------------------------
+# stocaudio
+PLUGIN_FILES += $(wildcard stocaudio/src/*.cpp)
 
 # --------------------------------------------------------------
 # Substation (Open source release)
@@ -795,7 +837,6 @@ BASE_FLAGS += -DARCH_LIN
 endif
 
 BASE_FLAGS += -DBUILDING_PLUGIN_MODULES
-BASE_FLAGS += -fno-strict-aliasing
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
 
@@ -865,8 +906,8 @@ BASE_FLAGS += -DHAVE_SNDFILE
 endif
 
 BUILD_C_FLAGS += -std=gnu11
-BUILD_C_FLAGS += -fno-finite-math-only
-BUILD_CXX_FLAGS += -fno-finite-math-only
+BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
@@ -1220,6 +1261,13 @@ $(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
 		-IBogaudioModules/lib \
 		-IBogaudioModules/src/dsp
 
+$(BUILD_DIR)/CatroModulo/src/%.cpp.o: CatroModulo/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(CATROMODULO_CUSTOM),$(call custom_module_names,$(m),CatroModulo)) \
+		-DpluginInstance=pluginInstance__CatroModulo
+
 $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -1239,6 +1287,13 @@ $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 		-IChowDSP/lib \
 		-IChowDSP/lib/chowdsp_utils/DSP/WDF \
 		-Wno-deprecated-copy
+
+$(BUILD_DIR)/Dintree/%.cpp.o: Dintree/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(DINTREE_CUSTOM),$(call custom_module_names,$(m),Dintree)) \
+		-DpluginInstance=pluginInstance__Dintree
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1399,12 +1454,27 @@ $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 		-Wno-unused-but-set-variable \
 		-Wno-unused-result
 
+$(BUILD_DIR)/kocmoc/%.cpp.o: kocmoc/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(KOCMOC_CUSTOM),$(call custom_module_names,$(m),kocmoc)) \
+		-DpluginInstance=pluginInstance__kocmoc
+
 $(BUILD_DIR)/LifeFormModular/%.cpp.o: LifeFormModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(LIFEFORMMODULAR_CUSTOM),$(call custom_module_names,$(m),LifeFormModular)) \
 		-DpluginInstance=pluginInstance__LifeFormModular
+
+$(BUILD_DIR)/LilacLoop/%.cpp.o: LilacLoop/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(LILACLOOP_CUSTOM),$(call custom_module_names,$(m),LilacLoop)) \
+		-DpluginInstance=pluginInstance__LilacLoop \
+		-DSKIP_MINGW_FORMAT
 
 $(BUILD_DIR)/LittleUtils/%.cpp.o: LittleUtils/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1483,6 +1553,13 @@ $(BUILD_DIR)/Orbits/%.cpp.o: Orbits/%.cpp
 		$(foreach m,$(ORBITS_CUSTOM),$(call custom_module_names,$(m),Orbits)) \
 		-DpluginInstance=pluginInstance__Orbits
 
+$(BUILD_DIR)/PathSet/%.cpp.o: PathSet/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(PATHSET_CUSTOM),$(call custom_module_names,$(m),PathSet)) \
+		-DpluginInstance=pluginInstance__PathSet
+
 $(BUILD_DIR)/Prism/%.cpp.o: Prism/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -1527,6 +1604,13 @@ $(BUILD_DIR)/StarlingVia/%.cpp.o: StarlingVia/%.cpp
 		-IStarlingVia/Via/io/inc \
 		-IStarlingVia/Via/ui/inc \
 		-I./dep/starling-dsp
+
+$(BUILD_DIR)/stocaudio/%.cpp.o: stocaudio/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(STOCAUDIO_CUSTOM),$(call custom_module_names,$(m),stocaudio)) \
+		-DpluginInstance=pluginInstance__stocaudio
 
 $(BUILD_DIR)/substation-%.cpp.o: substation-%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

@@ -36,7 +36,6 @@ ifeq ($(HAIKU),true)
 BASE_FLAGS += -I../include/haiku-compat
 endif
 
-BASE_FLAGS += -fno-strict-aliasing
 BASE_FLAGS += -DPRIVATE=
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
@@ -95,8 +94,8 @@ BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
 BUILD_C_FLAGS += -std=gnu11
-BUILD_C_FLAGS += -fno-finite-math-only
-BUILD_CXX_FLAGS += -fno-finite-math-only
+BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 
 # use our custom function to invert some colors
 BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal

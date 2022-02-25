@@ -234,6 +234,8 @@ static const struct {
     { "/JW-Modules/res/Trigs.svg", {}, -1 },
     { "/JW-Modules/res/WavHeadPanel.svg", {}, -1 },
     { "/JW-Modules/res/XYPad.svg", {}, -1 },
+    // GPL3.0-or-later
+    { "/LilacLoop/res/Looper.svg", {}, -1 },
     // EUPL-1.2
     { "/LittleUtils/res/Bias_Semitone.svg", {}, -1 },
     { "/LittleUtils/res/ButtonModule.svg", {}, -1 },
@@ -241,16 +243,39 @@ static const struct {
     { "/LittleUtils/res/PulseGenerator.svg", {}, -1 },
     { "/LittleUtils/res/TeleportIn.svg", {}, -1 },
     { "/LittleUtils/res/TeleportOut.svg", {}, -1 },
+    // GPL-3.0-or-later
+    { "/kocmoc/res/DDLY.svg", {}, -1 },
+    { "/kocmoc/res/LADR.svg", {}, -1 },
+    { "/kocmoc/res/MUL.svg", {}, -1 },
+    { "/kocmoc/res/OP.svg", {}, -1 },
+    { "/kocmoc/res/PHASR.svg", {}, -1 },
+    { "/kocmoc/res/SKF.svg", {}, -1 },
+    { "/kocmoc/res/SVF.svg", {}, -1 },
+    { "/kocmoc/res/TRG.svg", {}, -1 },
+    // GPL-3.0-or-later
+    { "/PathSet/res/AstroVibe.svg", {}, -1 },
+    { "/PathSet/res/IceTray.svg", {}, -1 },
+    { "/PathSet/res/ShiftyMod.svg", {}, -1 },
 };
 
-static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
+static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
 {
-    // Special case for DrumKit background grandient
-    if (paint.type == NSVG_PAINT_LINEAR_GRADIENT && svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/DrumKit/", 9) == 0)
+    if (paint.type == NSVG_PAINT_LINEAR_GRADIENT && svgFileToInvert != nullptr)
     {
-        paint.type = NSVG_PAINT_COLOR;
-        paint.color = 0xff191919;
-        return true;
+        // Special case for DrumKit background gradient
+        if (std::strncmp(svgFileToInvert, "/DrumKit/", 9) == 0)
+        {
+            paint.type = NSVG_PAINT_COLOR;
+            paint.color = 0xff191919;
+            return true;
+        }
+        // Special case for PathSet shifty gradient
+        if (std::strncmp(svgFileToInvert, "/PathSet/", 9) == 0)
+        {
+            paint.gradient->stops[0].color = 0xff7c4919; // 50% darker than main blue
+            paint.gradient->stops[1].color = 0xff5b3a1a; // 33.3% darker than main blue
+            return false;
+        }
     }
 
     if (paint.type == NSVG_PAINT_NONE)
@@ -299,6 +324,86 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
         // make it more white
         case 0xffa0a0a0:
             paint.color = 0xffc0c0c0;
+            return true;
+        }
+    }
+
+    // Special case for Lilac
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/LilacLoop/", 11) == 0)
+    {
+        switch (paint.color)
+        {
+        // main bg (custom)
+        case 0xffd5d5da:
+            paint.color = 0xff242228;
+            return true;
+        // main color (do nothing)
+        case 0xffbfb7d7:
+            return false;
+        // screws (hide)
+        case 0xffc8c8cf:
+        case 0xffbcbcbc:
+        case 0xffb1b1bb:
+        case 0xffacacac:
+        case 0xff898991:
+        case 0xff727272:
+            paint.color = 0x00000000;
+            return true;
+        }
+    }
+
+    // Special case for PathSet colors
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/PathSet/", 9) == 0)
+    {
+        switch (paint.color)
+        {
+        // main blue tone
+        case 0xffdf7a1a:
+            if (shape->opacity == 0.5f && std::strcmp(svgFileToInvert, "/PathSet/res/AstroVibe.svg") == 0)
+            {
+                shape->opacity = 0.2f;
+                return true;
+            }
+            if (shape->opacity == 0.25f)
+                shape->opacity = 0.75f;
+            return false;
+        // bottom logo stuff, set to full white
+        case 0xff000000:
+            if (shape->stroke.type != NSVG_PAINT_NONE)
+            {
+                paint.color = 0xffffffff;
+                return true;
+            }
+            break;
+        // pink step 2 (pink with 50% opacity on bg)
+        case 0xffef73ea:
+            paint.color = 0xff812d7d;
+            return true;
+        // pink step 3 (pink with 33.3% opacity on bg)
+        case 0xfff49ff0:
+            paint.color = 0xff4d234c;
+            return true;
+        // pink and orange
+        case 0xffe941e2:
+        case 0xff698efb:
+            return false;
+        // blue darker 1 (blue with 50% opacity on bg)
+        case 0xffde944f:
+        case 0xffe3b080:
+        case 0xffe4cbb3:
+        case 0xfff5c99f:
+        case 0xfff6d1b0:
+            paint.color = 0xff7c4919;
+            return true;
+        // blue darker 2 (blue with 33.3% opacity on bg)
+        case 0xffe5d9cd:
+        case 0xfff8dcc2:
+        case 0xffe1a265:
+            paint.color = 0xff5b3a1a;
+            return true;
+        // blue darker 3 (blue with 25% opacity on bg)
+        case 0xffe5cbb3:
+            paint.color = 0xff4b321a;
             return true;
         }
     }
@@ -384,8 +489,8 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
                 if (ignore)
                     continue;
 
-                if (invertPaint(shape->fill, svgFileToInvert))
-                    invertPaint(shape->stroke, svgFileToInvert);
+                if (invertPaint(shape, shape->fill, svgFileToInvert))
+                    invertPaint(shape, shape->stroke, svgFileToInvert);
             }
 
             return handle;

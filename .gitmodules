@@ -154,6 +154,24 @@
 [submodule "plugins/Orbits"]
 	path = plugins/Orbits
 	url = git@github.com:RareBreeds/Orbits.git
+[submodule "plugins/stocaudio"]
+	path = plugins/stocaudio
+	url = https://github.com/aptrn/stocaudio-modules.git
+[submodule "plugins/CatroModulo"]
+	path = plugins/CatroModulo
+	url = https://github.com/catronomix/catro-modulo.git
+[submodule "plugins/LilacLoop"]
+	path = plugins/LilacLoop
+	url = https://github.com/grough/lilac-loop-vcv.git
+[submodule "plugins/kocmoc"]
+	path = plugins/kocmoc
+	url = https://github.com/janne808/kocmoc-rack-modules.git
+[submodule "plugins/PathSet"]
+	path = plugins/PathSet
+	url = https://github.com/patheros/PathSetModules.git
+[submodule "plugins/Dintree"]
+	path = plugins/Dintree
+	url = https://github.com/hires/Dintree-Virtual.git
 [submodule "plugins/StarlingVia"]
 	path = plugins/StarlingVia
 	url = https://github.com/starlingcode/Via-for-Rack.git

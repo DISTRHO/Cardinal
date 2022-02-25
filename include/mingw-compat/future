@@ -16,5 +16,10 @@
  */
 
 #pragma once
+#include_next <future>
+#include "mingw.future.h"
 
-#include <shlwapi.h>
+#undef IN
+#undef OUT
+#undef far
+#undef near

@@ -267,6 +267,9 @@ extern Model* modelTestVCF;
 #undef modelVCF
 #undef modelVCO
 
+// CatroModulo
+#include "CatroModulo/src/CatroModulo.hpp"
+
 // cf
 #include "cf/src/plugin.hpp"
 
@@ -275,6 +278,9 @@ extern Model* modelTestVCF;
 #define init initChowDSP
 #include "ChowDSP/src/plugin.cpp"
 #undef init
+
+// Dintree
+#include "Dintree/src/plugin.hpp"
 
 // DrumKit
 #include "DrumKit/src/DrumKit.hpp"
@@ -407,6 +413,9 @@ extern Model* modelBlankPanel;
 #include "JW-Modules/src/JWModules.hpp"
 #undef modelQuantizer
 
+// kocmoc
+#include "kocmoc/src/plugin.hpp"
+
 // LifeFormModular
 /* NOTE too much noise in original include, do this a different way
 // #include "LifeFormModular/src/plugin.hpp"
@@ -427,6 +436,13 @@ extern Model* modelDriftgen;
 
 // LittleUtils
 #include "LittleUtils/src/plugin.hpp"
+
+// Lilac Loop
+/* NOTE too much noise in original include, do this a different way
+// #include "LilacLoop/src/plugin.hpp"
+*/
+extern Model* modelLooperOne;
+extern Model* modelLooperTwo;
 
 // LomasModules
 #include "LomasModules/src/plugin.hpp"
@@ -549,6 +565,9 @@ extern Model* modelMaude_221;
 // Orbits
 #include "Orbits/src/plugin.hpp"
 
+// Path Set
+# include "PathSet/src/plugin.hpp"
+
 // Prism
 # include "Prism/src/plugin.hpp"
 
@@ -569,10 +588,14 @@ extern Model* modelMaude_221;
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
 
+
 // Starling Via
 #define modelScanner modelStarlingViaScanner
 #include "StarlingVia/src/starling.hpp"
 #undef modelScanner
+
+// stocaudio
+#include "stocaudio/src/plugin.hpp"
 
 // substation
 /* NOTE too much noise in original include, do this a different way
@@ -636,8 +659,10 @@ Plugin* pluginInstance__Bacon;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
+Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
+Plugin* pluginInstance__Dintree;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
@@ -654,7 +679,9 @@ Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__ihtsyn;
 Plugin* pluginInstance__JW;
+Plugin* pluginInstance__kocmoc;
 Plugin* pluginInstance__LifeFormModular;
+Plugin* pluginInstance__LilacLoop;
 Plugin* pluginInstance__LittleUtils;
 Plugin* pluginInstance__Lomas;
 Plugin* pluginInstance__Lyrae;
@@ -664,11 +691,13 @@ Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__Orbits;
+Plugin* pluginInstance__PathSet;
 Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__StarlingVia;
+Plugin* pluginInstance__stocaudio;
 Plugin* pluginInstance__substation;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
@@ -1281,6 +1310,27 @@ static void initStatic__BogaudioModules()
     }
 }
 
+static void initStatic__CatroModulo()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__CatroModulo = p;
+
+    const StaticPluginLoader spl(p, "CatroModulo");
+    if (spl.ok())
+    {
+        p->addModel(modelCM1Module);
+        p->addModel(modelCM2Module);
+        p->addModel(modelCM3Module);
+        p->addModel(modelCM4Module);
+        p->addModel(modelCM5Module);
+        p->addModel(modelCM6Module);
+        p->addModel(modelCM7Module);
+        p->addModel(modelCM8Module);
+        p->addModel(modelCM9Module);
+        p->addModel(modelCM10Module);
+    }
+}
+
 static void initStatic__cf()
 {
     Plugin* const p = new Plugin;
@@ -1345,6 +1395,26 @@ static void initStatic__ChowDSP()
         // Credit crashes on save, see https://github.com/DISTRHO/Cardinal/issues/98
         // p->addModel(modelCredit);
         spl.removeModule("Credit");
+    }
+}
+
+static void initStatic__Dintree()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Dintree = p;
+
+    const StaticPluginLoader spl(p, "Dintree");
+    if (spl.ok())
+    {
+        p->addModel(modelV100_Scanner);
+        p->addModel(modelV101_Dual_Envelope);
+        p->addModel(modelV102_Output_Mixer);
+        p->addModel(modelV103_Reverb_Delay);
+        p->addModel(modelV104_Four_Vs);
+        p->addModel(modelV105_Quad_CV_Proc);
+        p->addModel(modelV107_Dual_Slew);
+        p->addModel(modelV201_Tri_Comparator);
+        p->addModel(modelV218_SH_Clock_Noise);
     }
 }
 
@@ -1548,11 +1618,13 @@ static void initStatic__GrandeModular()
     {
         p->addModel(modelClip);
         p->addModel(modelLFO3);
+        p->addModel(modelLogic);
         p->addModel(modelMerge8);
         p->addModel(modelMergeSplit4);
         p->addModel(modelMicrotonalChords);
         p->addModel(modelMicrotonalNotes);
         p->addModel(modelNoteMT);
+        p->addModel(modelPeak);
         p->addModel(modelPolyMergeResplit);
         p->addModel(modelPolySplit);
         p->addModel(modelQuant);
@@ -1741,6 +1813,25 @@ static void initStatic__JW()
     }
 }
 
+static void initStatic__kocmoc()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__kocmoc= p;
+
+    const StaticPluginLoader spl(p, "kocmoc");
+    if (spl.ok())
+    {
+        p->addModel(modelSVF_1);
+        p->addModel(modelTRG);
+        p->addModel(modelLADR);
+        p->addModel(modelOP);
+        p->addModel(modelPHASR);
+        p->addModel(modelMUL);
+        p->addModel(modelSKF);
+        p->addModel(modelDDLY);
+    }
+}
+
 static void initStatic__LifeFormModular()
 {
     Plugin* const p = new Plugin;
@@ -1762,6 +1853,18 @@ static void initStatic__LifeFormModular()
         p->addModel(modelAdditiveVibration);
         p->addModel(modelComplexOsc);
         p->addModel(modelDriftgen);
+    }
+}
+
+static void initStatic__LilacLoop()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__LilacLoop = p;
+
+    const StaticPluginLoader spl(p, "LilacLoop");
+    if (spl.ok())
+    {
+        p->addModel(modelLooperOne);
     }
 }
 
@@ -2000,6 +2103,20 @@ static void initStatic__Orbits()
     }
 }
 
+static void initStatic__PathSet()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__PathSet = p;
+
+    const StaticPluginLoader spl(p, "PathSet");
+    if (spl.ok())
+    {
+        p->addModel(modelShiftyMod);
+        p->addModel(modelIceTray);
+        p->addModel(modelAstroVibe);
+    }
+}
+
 static void initStatic__Prism()
 {
     Plugin* const p = new Plugin;
@@ -2105,6 +2222,7 @@ static void initStatic__sonusmodular()
     }
 }
 
+
 static void initStatic__StarlingVia()
 {
     Plugin* const p = new Plugin;
@@ -2124,6 +2242,20 @@ static void initStatic__StarlingVia()
         p->addModel(modelSync3XL);
         p->addModel(modelSync3XLLevels);
 #undef modelScanner
+    }
+}
+
+static void initStatic__stocaudio()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__stocaudio = p;
+
+    const StaticPluginLoader spl(p, "stocaudio");
+    if (spl.ok())
+    {
+        p->addModel(modelPolyturing);
+        p->addModel(modelPolydelay);
+        p->addModel(modelSpread);
     }
 }
 
@@ -2226,8 +2358,10 @@ void initStaticPlugins()
     initStatic__Befaco();
     initStatic__Bidoo();
     initStatic__BogaudioModules();
+    initStatic__CatroModulo();
     initStatic__cf();
     initStatic__ChowDSP();
+    initStatic__Dintree();
     initStatic__DrumKit();
     initStatic__ESeries();
     initStatic__ExpertSleepersEncoders();
@@ -2244,7 +2378,9 @@ void initStaticPlugins()
     initStatic__ImpromptuModular();
     initStatic__ihtsyn();
     initStatic__JW();
+    initStatic__kocmoc();
     initStatic__LifeFormModular();
+    initStatic__LilacLoop();
     initStatic__LittleUtils();
     initStatic__Lomas();
     initStatic__Lyrae();
@@ -2254,11 +2390,13 @@ void initStaticPlugins()
     initStatic__Mog();
     initStatic__mscHack();
     initStatic__Orbits();
+    initStatic__PathSet();
     initStatic__Prism();
     initStatic__rackwindows();
     initStatic__repelzen();
     initStatic__sonusmodular();
     initStatic__StarlingVia();
+    initStatic__stocaudio();
     initStatic__substation();
     initStatic__ValleyAudio();
     initStatic__ZetaCarinaeModules();

@@ -114,8 +114,10 @@ At the moment the following 3rd-party modules are provided:
 - Befaco
 - Bidoo
 - Bogaudio
+- Catro/Modulo
 - cf
 - ChowDSP
+- Dintree Virtual
 - DrumKit
 - E-Series
 - ExpertSleepers Encoders
@@ -129,7 +131,9 @@ At the moment the following 3rd-party modules are provided:
 - ihtsyn
 - Impromptu
 - JW-Modules
+- kocmoc
 - LifeFormModular
+- Lilac Loop
 - Little Utils
 - Lomas Modules
 - Lyrae Modules
@@ -139,11 +143,13 @@ At the moment the following 3rd-party modules are provided:
 - Mog
 - mscHack
 - Orbits
+- Path Set
 - Prism
 - rackwindows
 - repelzen
 - Sonus Modular
 - Starling Via
+- stocaudio
 - Substation Opensource
 - Valley
 - ZetaCarinae
