@@ -169,3 +169,6 @@
 [submodule "plugins/PathSet"]
 	path = plugins/PathSet
 	url = https://github.com/patheros/PathSetModules.git
+[submodule "plugins/Dintree"]
+	path = plugins/Dintree
+	url = https://github.com/hires/Dintree-Virtual.git
