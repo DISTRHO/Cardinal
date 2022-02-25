@@ -578,6 +578,11 @@ PLUGIN_FILES += $(filter-out LifeFormModular/src/plugin.cpp,$(wildcard LifeFormM
 LIFEFORMMODULAR_CUSTOM = IO MS __ct_base __ct_comp
 
 # --------------------------------------------------------------
+# Lilac Loop
+
+PLUGIN_FILES += $(wildcard LilacLoop/src/*.cpp)
+
+# --------------------------------------------------------------
 # LittleUtils
 
 PLUGIN_FILES += $(filter-out LittleUtils/src/plugin.cpp,$(wildcard LittleUtils/src/*.cpp))
@@ -1416,6 +1421,13 @@ $(BUILD_DIR)/LifeFormModular/%.cpp.o: LifeFormModular/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(LIFEFORMMODULAR_CUSTOM),$(call custom_module_names,$(m),LifeFormModular)) \
 		-DpluginInstance=pluginInstance__LifeFormModular
+
+$(BUILD_DIR)/LilacLoop/%.cpp.o: LilacLoop/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(LILACLOOP_CUSTOM),$(call custom_module_names,$(m),LilacLoop)) \
+		-DpluginInstance=pluginInstance__LilacLoop
 
 $(BUILD_DIR)/LittleUtils/%.cpp.o: LittleUtils/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

@@ -234,6 +234,8 @@ static const struct {
     { "/JW-Modules/res/Trigs.svg", {}, -1 },
     { "/JW-Modules/res/WavHeadPanel.svg", {}, -1 },
     { "/JW-Modules/res/XYPad.svg", {}, -1 },
+    // GPL3.0-or-later
+    { "/LilacLoop/res/Looper.svg", {}, -1 },
     // EUPL-1.2
     { "/LittleUtils/res/Bias_Semitone.svg", {}, -1 },
     { "/LittleUtils/res/ButtonModule.svg", {}, -1 },
