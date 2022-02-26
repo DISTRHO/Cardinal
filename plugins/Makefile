@@ -687,7 +687,7 @@ MSCHACK_CUSTOM_PER_FILE = MAIN_SYNC_CLOCK FILTER_STRUCT FILTER_PARAM_STRUCT OSC_
 PLUGIN_FILES += $(filter-out MSM/src/MSM.cpp,$(wildcard MSM/src/*.cpp))
 
 # modules/types which are present in other plugins
-MSM_CUSTOM = ADSR BlankPanel Delay LFO Mult Noise VCA VCO sawTable triTable
+MSM_CUSTOM = ADSR BlankPanel Delay LFO LowFrequencyOscillator Mult Noise OP VCA VCO sawTable triTable
 
 # --------------------------------------------------------------
 # Orbits
