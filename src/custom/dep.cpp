@@ -56,6 +56,11 @@ static const struct {
     { "/21kHz/res/Panels/D_Inf.svg", {}, -1 },
     { "/21kHz/res/Panels/PalmLoop.svg", {}, -1 },
     { "/21kHz/res/Panels/TachyonEntangler.svg", {}, -1 },
+    // MIT
+    {"/AaronStatic/res/ChordCV.svg", {}, -1 },
+    {"/AaronStatic/res/DiatonicCV.svg", {}, -1 },
+    {"/AaronStatic/res/RandomNoteCV.svg", {}, -1 },
+    {"/AaronStatic/res/ScaleCV.svg", {}, -1 },
     // GPL3.0-or-later
     { "/Algoritmarte/res/Clockkky.svg", {}, -1 },
     { "/Algoritmarte/res/CyclicCA.svg", {}, -1 },
@@ -442,6 +447,7 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
     case 0xff0095fe:
     case 0xff4d9a4d:
     case 0xff4d4d9a:
+    case 0xff0187fc:
         return false;
     // pure black (convert to not quite pure white)
     case 0xff000000:

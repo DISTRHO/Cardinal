@@ -175,3 +175,6 @@
 [submodule "plugins/Algoritmarte"]
 	path = plugins/Algoritmarte
 	url = https://github.com/algoritmarte/AlgoritmarteVCVPlugin.git
+[submodule "plugins/AaronStatic"]
+	path = plugins/AaronStatic
+	url = https://github.com/aaronstatic/AaronStatic_modules.git

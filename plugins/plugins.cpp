@@ -30,6 +30,13 @@
 // 8Mode
 #include "8Mode/src/8mode.hpp"
 
+// Aaron Static
+#include "AaronStatic/src/plugin.hpp"
+// Nasty override of this required function for now:
+NVGcolor prepareDisplay(NVGcontext *vg, Rect *box, int fontSize) {
+    return nvgRGB(0xaf, 0xd2, 0x2c);
+}
+
 // Algoritmarte
 #include "Algoritmarte/src/plugin.hpp"
 
@@ -646,6 +653,7 @@ Plugin* pluginInstance__Cardinal;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
+Plugin* pluginInstance__AaronStatic;
 Plugin* pluginInstance__Algoritmarte;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
@@ -864,6 +872,21 @@ static void initStatic__8Mode()
     if (spl.ok())
     {
         p->addModel(modelsoftSN);
+    }
+}
+
+static void initStatic__AaronStatic()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__AaronStatic = p;
+
+    const StaticPluginLoader spl(p, "AaronStatic");
+    if (spl.ok())
+    {
+        p->addModel(modelChordCV);
+        p->addModel(modelScaleCV);
+        p->addModel(modelRandomNoteCV);
+        p->addModel(modelDiatonicCV);
     }
 }
 
@@ -2340,6 +2363,7 @@ void initStaticPlugins()
 #ifndef NOPLUGINS
     initStatic__21kHz();
     initStatic__8Mode();
+    initStatic__AaronStatic();
     initStatic__Algoritmarte();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();

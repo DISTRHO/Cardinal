@@ -239,6 +239,11 @@ PLUGIN_FILES += $(filter-out 8Mode/src/plugin.cpp,$(wildcard 8Mode/src/*.cpp))
 PLUGIN_FILES += $(filter-out Algoritmarte/src/plugin.cpp,$(wildcard Algoritmarte/src/*.cpp))
 
 # --------------------------------------------------------------
+# Aaron Static
+
+PLUGIN_FILES += $(wildcard AaronStatic/src/*.cpp)
+
+# --------------------------------------------------------------
 # AmalgamatedHarmonics
 
 PLUGIN_FILES += $(filter-out AmalgamatedHarmonics/src/AH.cpp,$(wildcard AmalgamatedHarmonics/src/*.cpp))
@@ -1150,6 +1155,14 @@ $(BUILD_DIR)/8Mode/%.cpp.o: 8Mode/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(8MODE_CUSTOM),$(call custom_module_names,$(m),8Mode)) \
 		-DpluginInstance=pluginInstance__8Mode
+
+$(BUILD_DIR)/AaronStatic/%.cpp.o: AaronStatic/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(AARONSTATIC_CUSTOM),$(call custom_module_names,$(m),AaronStatic)) \
+		-DpluginInstance=pluginInstance__AaronStatic \
+		-Dinit=init__AaronStatic
 
 $(BUILD_DIR)/Algoritmarte/%.cpp.o: Algoritmarte/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
