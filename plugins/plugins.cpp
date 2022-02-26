@@ -32,10 +32,6 @@
 
 // Aaron Static
 #include "AaronStatic/src/plugin.hpp"
-// Nasty override of this required function for now:
-NVGcolor prepareDisplay(NVGcontext *vg, Rect *box, int fontSize) {
-    return nvgRGB(0xaf, 0xd2, 0x2c);
-}
 
 // Algoritmarte
 #include "Algoritmarte/src/plugin.hpp"
@@ -653,7 +649,7 @@ Plugin* pluginInstance__Cardinal;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
-Plugin* pluginInstance__AaronStatic;
+extern Plugin* pluginInstance__AaronStatic;
 Plugin* pluginInstance__Algoritmarte;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
