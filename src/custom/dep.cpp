@@ -296,12 +296,6 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
     if (paint.type != NSVG_PAINT_COLOR)
         return false;
 
-    // Special case for AaronStatic orange color
-    if (paint.color == 0xff0187fc && svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/AaronStatic/", 13) == 0)
-    {
-        return false;
-    }
-
     // Special case for Bidoo red color
     if (paint.color == 0xff001fcd && svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/Bidoo/", 7) == 0)
     {
@@ -453,6 +447,7 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
     case 0xff0095fe:
     case 0xff4d9a4d:
     case 0xff4d4d9a:
+    case 0xff0187fc:
         return false;
     // pure black (convert to not quite pure white)
     case 0xff000000:
