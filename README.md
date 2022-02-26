@@ -144,6 +144,7 @@ At the moment the following 3rd-party modules are provided:
 - Mockba Modular
 - Mog
 - mscHack
+- MSM
 - Orbits
 - Path Set
 - Prism

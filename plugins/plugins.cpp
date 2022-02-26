@@ -568,6 +568,48 @@ extern Model* modelAlienz;
 extern Model* modelOSC_WaveMorph_3;
 extern Model* modelMaude_221;
 
+// MSM
+/* NOTE too much noise in original include, do this a different way
+// #include "MSM/src/MSM.hpp"
+*/
+#define modelADSR modelMSMADSR
+#define modelBlankPanel modelMSMBlankPanel
+#define modelDelay modelMSMDelay
+#define modelLFO modelMSMLFO
+#define modelMult modelMSMMult
+#define modelNoise modelMSMNoise
+#define modelVCA modelMSMVCA
+#define modelVCO modelMSMVCO
+extern Model* modelVCO;
+extern Model* modelBVCO;
+extern Model* modelExperimentalVCO;
+extern Model* modelNoise;
+extern Model* modelLFO;
+extern Model* modelVCA;
+extern Model* modelADSR;
+extern Model* modelDelay;
+extern Model* modelWaveShaper;
+extern Model* modelWavefolder;
+extern Model* modelBitcrusher;
+extern Model* modelPhaserModule;
+extern Model* modelMorpher;
+extern Model* modelRingMod;
+extern Model* modelRandomSource;
+extern Model* modelMult;
+extern Model* modelCrazyMult;
+extern Model* modelFade;
+extern Model* modelSimpleSlider;
+extern Model* modelxseq;
+extern Model* modelBlankPanel;
+#undef modelADSR
+#undef modelBlankPanel
+#undef modelDelay
+#undef modelLFO
+#undef modelMult
+#undef modelNoise
+#undef modelVCA
+#undef modelVCO
+
 // Orbits
 #include "Orbits/src/plugin.hpp"
 
@@ -692,6 +734,7 @@ Plugin* pluginInstance__ML;
 Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
+Plugin* pluginInstance__MSM;
 Plugin* pluginInstance__Orbits;
 Plugin* pluginInstance__PathSet;
 Plugin* pluginInstance__Prism;
@@ -2124,6 +2167,54 @@ static void initStatic__mscHack()
     }
 }
 
+static void initStatic__MSM()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__MSM = p;
+
+    const StaticPluginLoader spl(p, "MSM");
+    if (spl.ok())
+    {
+#define modelADSR modelMSMADSR
+#define modelBlankPanel modelMSMBlankPanel
+#define modelDelay modelMSMDelay
+#define modelLFO modelMSMLFO
+#define modelMult modelMSMMult
+#define modelNoise modelMSMNoise
+#define modelVCA modelMSMVCA
+#define modelVCO modelMSMVCO
+        p->addModel(modelVCO);
+        p->addModel(modelBVCO);
+        p->addModel(modelExperimentalVCO);
+        p->addModel(modelNoise);
+        p->addModel(modelLFO);
+        p->addModel(modelVCA);
+        p->addModel(modelADSR);
+        p->addModel(modelDelay);
+        p->addModel(modelWaveShaper);
+        p->addModel(modelWavefolder);
+        p->addModel(modelBitcrusher);
+        p->addModel(modelPhaserModule);
+        p->addModel(modelMorpher);
+        p->addModel(modelRingMod);
+        p->addModel(modelRandomSource);
+        p->addModel(modelMult);
+        p->addModel(modelCrazyMult);
+        p->addModel(modelFade);
+        p->addModel(modelSimpleSlider);
+        p->addModel(modelxseq);
+        p->addModel(modelBlankPanel);
+#undef modelADSR
+#undef modelBlankPanel
+#undef modelDelay
+#undef modelLFO
+#undef modelMult
+#undef modelNoise
+#undef modelVCA
+#undef modelVCO
+    }
+}
+
 static void initStatic__Orbits()
 {
     Plugin* const p = new Plugin;
@@ -2402,6 +2493,7 @@ void initStaticPlugins()
     initStatic__MockbaModular();
     initStatic__Mog();
     initStatic__mscHack();
+    initStatic__MSM();
     initStatic__Orbits();
     initStatic__PathSet();
     initStatic__Prism();

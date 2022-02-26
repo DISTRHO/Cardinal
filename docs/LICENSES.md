@@ -55,6 +55,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Mockba Modular          | MIT                      | |
 | Mog                     | CC0-1.0                  | |
 | mscHack                 | BSD-3-Clause             | |
+| MSM                     | MIT                      | Repo's [LICENSE-dist.md](https://github.com/netboy3/MSM-vcvrack-plugin/issues/10) includes wrong information |
 | Orbits                  | GPL-3.0-or-later         | |
 | Path Set                | GPL-3.0-or-later         | |
 | Prism                   | BSD-3-Clause             | |
@@ -163,6 +164,10 @@ Below is a list of artwork licenses from plugins
 | Mog/components/*                        | CC-BY-NC-4.0     | |
 | Mog/Exo2-BoldItalic.ttf                 | OFL-1.1-RFN      | |
 | mscHack/*                               | BSD-3-Clause     | No artwork specific license provided, see [mschack#108](https://github.com/mschack/VCV-Rack-Plugins/issues/108) |
+| MSM/*                                   | MIT              | No artwork specific license provided |
+| MSM/Fonts/DejaVuSansMono.ttf            | Bitstream-Vera   | |
+| MSM/Fonts/Segment7Standard.ttf          | OFL-1.1-RFN      | |
+| MSM/Fonts/Sudo.ttf                      | OFL-1.1-no-RFN   | |
 | Orbits/*                                | CC-BY-NC-ND-4.0  | |
 | Orbits/fonts/ShareTechMono-Regular.ttf  | OFL-1.1-RFN      | |
 | PathSet/*                               | GPL-3.0-or-later | No artwork specific license provided |

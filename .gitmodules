@@ -178,3 +178,6 @@
 [submodule "plugins/AaronStatic"]
 	path = plugins/AaronStatic
 	url = https://github.com/aaronstatic/AaronStatic_modules.git
+[submodule "plugins/MSM"]
+	path = plugins/MSM
+	url = https://github.com/netboy3/MSM-vcvrack-plugin.git

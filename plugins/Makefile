@@ -682,6 +682,14 @@ PLUGIN_FILES += $(wildcard mscHack/src/*.cpp)
 MSCHACK_CUSTOM_PER_FILE = MAIN_SYNC_CLOCK FILTER_STRUCT FILTER_PARAM_STRUCT OSC_PARAM_STRUCT PHRASE_CHANGE_STRUCT
 
 # --------------------------------------------------------------
+# MSM
+
+PLUGIN_FILES += $(filter-out MSM/src/MSM.cpp,$(wildcard MSM/src/*.cpp))
+
+# modules/types which are present in other plugins
+MSM_CUSTOM = ADSR BlankPanel Delay LFO Mult Noise VCA VCO sawTable triTable
+
+# --------------------------------------------------------------
 # Orbits
 
 PLUGIN_FILES += $(wildcard Orbits/src/*.cpp)
@@ -1564,6 +1572,14 @@ $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 		-Wno-format-overflow \
 		-Wno-non-c-typedef-for-linkage \
 		-Wno-unused-but-set-variable
+
+$(BUILD_DIR)/MSM/%.cpp.o: MSM/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MSM_CUSTOM),$(call custom_module_names,$(m),MSM)) \
+		-DpluginInstance=pluginInstance__MSM \
+		-DDARKTHEME
 
 $(BUILD_DIR)/Orbits/%.cpp.o: Orbits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
