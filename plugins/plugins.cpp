@@ -641,7 +641,7 @@ extern Model* modelBlankPanel;
 
 // substation
 /* NOTE too much noise in original include, do this a different way
-// "substation-opensource/src/_plugin.hpp"
+// #include "substation-opensource/src/_plugin.hpp"
 */
 namespace slime {
 namespace plugin {
@@ -658,6 +658,53 @@ extern Model* modelBlank4;
 extern Model* modelBlank7;
 extern Model* modelFilterPlus;
 }}}
+
+// TheXOR
+/* NOTE custom implementation, no header file definition possible to include */
+namespace TheXOR {
+extern Model* modelKlee;
+extern Model* modelkExp;
+extern Model* modelM581;
+extern Model* modelM581TExp;
+extern Model* modelM581CExp;
+extern Model* modelM581MExp;
+extern Model* modelM581VExp;
+extern Model* modelZ8K;
+extern Model* modelZ8KVExp;
+extern Model* modelZ8KCExp;
+extern Model* modelZ8KMExp;
+extern Model* modelZ8KTExp;
+extern Model* modelZ8KXExp;
+extern Model* modelRenato;
+extern Model* modelSpiralone;
+extern Model* modelBurst;
+extern Model* modelUncertain;
+extern Model* modelPWMClock;
+extern Model* modelQuantizer;
+extern Model* modelAttAmp;
+extern Model* modelXSwitch;
+extern Model* modelBoole;
+extern Model* modelMplex;
+extern Model* modelDmplex;
+extern Model* modelCounter;
+extern Model* modelmidyQuant;
+extern Model* modelnag;
+extern Model* modelempty;
+extern Model* modelascii;
+extern Model* modelquattro;
+extern Model* modelflop;
+extern Model* modelo88o;
+extern Model* modelvolt;
+extern Model* modelNordschleife;
+extern Model* modelRR;
+extern Model* modelchords;
+extern Model* modelc2v;
+extern Model* modelc3v;
+extern Model* modeldice;
+extern Model* modelgate;
+extern Model* modelPWC;
+extern Model* modelcclk;
+}
 
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
@@ -743,6 +790,7 @@ Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__stocaudio;
 Plugin* pluginInstance__substation;
+Plugin* pluginInstance__TheXOR;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__ZetaCarinaeModules;
 Plugin* pluginInstance__ZZC;
@@ -2383,6 +2431,64 @@ static void initStatic__substation()
     }
 }
 
+static void initStatic__TheXOR()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__TheXOR = p;
+
+    const StaticPluginLoader spl(p, "TheXOR");
+    if (spl.ok())
+    {
+        p->addModel(TheXOR::modelempty);
+        p->addModel(TheXOR::modelascii);
+        /*
+        p->addModel(TheXOR::modelKlee);
+        p->addModel(TheXOR::modelkExp);
+        p->addModel(TheXOR::modelM581);
+        p->addModel(TheXOR::modelM581TExp);
+        p->addModel(TheXOR::modelM581CExp);
+        p->addModel(TheXOR::modelM581MExp);
+        p->addModel(TheXOR::modelM581VExp);
+        p->addModel(TheXOR::modelZ8K);
+        p->addModel(TheXOR::modelZ8KVExp);
+        p->addModel(TheXOR::modelZ8KCExp);
+        p->addModel(TheXOR::modelZ8KMExp);
+        p->addModel(TheXOR::modelZ8KTExp);
+        p->addModel(TheXOR::modelZ8KXExp);
+        p->addModel(TheXOR::modelRenato);
+        p->addModel(TheXOR::modelSpiralone);
+        p->addModel(TheXOR::modelBurst);
+        p->addModel(TheXOR::modelUncertain);
+        p->addModel(TheXOR::modelPWMClock);
+        p->addModel(TheXOR::modelQuantizer);
+        p->addModel(TheXOR::modelAttAmp);
+        p->addModel(TheXOR::modelXSwitch);
+        p->addModel(TheXOR::modelBoole);
+        p->addModel(TheXOR::modelMplex);
+        p->addModel(TheXOR::modelDmplex);
+        p->addModel(TheXOR::modelCounter);
+        p->addModel(TheXOR::modelmidyQuant);
+        p->addModel(TheXOR::modelnag);
+        p->addModel(TheXOR::modelempty);
+        p->addModel(TheXOR::modelascii);
+        p->addModel(TheXOR::modelquattro);
+        p->addModel(TheXOR::modelflop);
+        p->addModel(TheXOR::modelo88o);
+        p->addModel(TheXOR::modelvolt);
+        p->addModel(TheXOR::modelNordschleife);
+        p->addModel(TheXOR::modelRR);
+        p->addModel(TheXOR::modelchords);
+        p->addModel(TheXOR::modelc2v);
+        p->addModel(TheXOR::modelc3v);
+        p->addModel(TheXOR::modeldice);
+        p->addModel(TheXOR::modelgate);
+        p->addModel(TheXOR::modelPWC);
+        p->addModel(TheXOR::modelcclk);
+        */
+//         spl.removeModule("Str1ker");
+    }
+}
+
 static void initStatic__ValleyAudio()
 {
     Plugin* const p = new Plugin;
@@ -2502,6 +2608,7 @@ void initStaticPlugins()
     initStatic__sonusmodular();
     initStatic__stocaudio();
     initStatic__substation();
+    initStatic__TheXOR();
     initStatic__ValleyAudio();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();

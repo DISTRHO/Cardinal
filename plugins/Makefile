@@ -740,6 +740,14 @@ PLUGIN_FILES += $(filter-out substation-opensource/src/_plugin.cpp substation-op
 PLUGIN_FILES += substation-settings/Settings.cpp
 
 # --------------------------------------------------------------
+# TheXOR
+
+PLUGIN_FILES += TheXOR/src/Sequencers.cpp
+PLUGIN_FILES += TheXOR/src/common.cpp
+PLUGIN_FILES += TheXOR/src/ascii.cpp
+PLUGIN_FILES += TheXOR/src/empty.cpp
+
+# --------------------------------------------------------------
 # ValleyAudio
 
 PLUGIN_FILES += $(filter-out ValleyAudio/src/Valley.cpp,$(wildcard ValleyAudio/src/*.cpp))
@@ -1641,6 +1649,13 @@ $(BUILD_DIR)/substation-%.cpp.o: substation-%.cpp
 		-DpluginInstance=pluginInstance__substation \
 		-D'PRIVATE=__attribute__((error("Using internal Rack function or symbol")))' \
 		-Isubstation-opensource/dep/slime4rack/include
+
+$(BUILD_DIR)/TheXOR/%.cpp.o: TheXOR/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(THEXOR_CUSTOM),$(call custom_module_names,$(m),TheXOR)) \
+		-DpluginInstance=pluginInstance__TheXOR
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

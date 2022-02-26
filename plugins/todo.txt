@@ -2,14 +2,11 @@ List of plugins still to add, sorted by popularity
 
 - TODO, see list at https://github.com/VCVRack/library/tree/v2/repos
 
-Grayscale                 74754.0 (not opensource?)
+Grayscale                 74754.0 (not opensource)
 
-VultModulesFree           61804.0 (not opensource?)
+VultModulesFree           61804.0 (not opensource)
 
-NYSTHI                    58494.0 (not opensource?)
-
-ML_modules                55847.0
-https://github.com/martin-lueders/ML_modules/
+NYSTHI                    58494.0 (not opensource)
 
 FrozenWasteland           53690.0 (GPL-3.0-only)
 https://github.com/almostEric/FrozenWasteland/
@@ -17,10 +14,10 @@ https://github.com/almostEric/FrozenWasteland/
 ArableInstruments         48756.0
 https://github.com/adbrant/ArableInstruments/
 
-squinkylabs-plug1         48682.0
+squinkylabs-plug1         48682.0 (GPL-3.0-only)
 https://github.com/squinkylabs/SquinkyVCV
 
-LindenbergResearch        43959.0 (not opensource?)
+LindenbergResearch        43959.0 (not opensource)
 
 Geodesics                 42761.0 (GPL-3.0-only)
 https://github.com/MarcBoule/Geodesics
@@ -29,23 +26,41 @@ Alikins                   41798.0
 https://github.com/alikins/Alikins-rack-plugins
 
 dBiz                      40849.0
+https://github.com/DISTRHO/Cardinal/pull/166 WIP
+
 RJModules                 39972.0
+https://github.com/Miserlou/RJModules (needs v2 work)
+
 DHE-Modules               39582.0
-AlrightDevices            38307.0
+https://github.com/dhemery/DHE-Modules/
+
+AlrightDevices            38307.0 (not opensource)
+
 SynthKit                  38228.0
-SubmarineFree             38146.0
-Hora-treasureFree         37847.0
+https://github.com/SVModular/SynthKit/
+
+SubmarineFree             38146.0 (GPL-3.0-only)
+https://github.com/david-c14/SubmarineFree
+
+Hora-treasureFree         37847.0 (not opensource)
+
 ParableInstruments        37781.0
-CountModula               37759.0
-MSM                       37337.0
+https://github.com/adbrant/ArableInstruments/
+
+CountModula               37759.0 (GPL-3.0-only)
+https://github.com/countmodula/VCVRackPlugins/
+
 CharredDesert             36813.0
-EricaCopies               36556.0
-TheXOR                    36497.0
-Autinn                    34990.0
+https://github.com/SVModular/CharredDesert/
+
+EricaCopies               36556.0 (not opensource)
+
 trowaSoft                 34946.0
-Hora-VCO_VCF_VCA_Free     34770.0
+https://github.com/j4s0n-c/trowaSoft-VCV/
+
+Hora-VCO_VCF_VCA_Free     34770.0 (not opensource)
+
 moDllz                    34368.0
-21kHz                     34172.0
 Ohmer                     33950.0
 modular80                 33447.0
 Autodafe-DrumKit          33143.0

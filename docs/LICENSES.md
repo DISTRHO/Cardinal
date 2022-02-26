@@ -64,6 +64,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Substation Opensource   | BSD-3-Clause-Attribution | Need to check full compatibility with GPLv3+ |
 | Sonus Modular           | GPL-3.0-or-later         | |
 | stocaudio               | GPL-3.0-or-later         | |
+| TheXOR                  | CC0-1.0                  | |
 | Valley                  | GPL-3.0-or-later         | |
 | ZetaCarinae             | GPL-3.0-or-later         | |
 | ZZC                     | GPL-3.0-or-later         | |
@@ -178,6 +179,9 @@ Below is a list of artwork licenses from plugins
 | substation-opensource/*                 | BSD-3-Clause-Attribution | No artwork specific license provided |
 | sonusmodular/*                          | GPL-3.0-or-later | [Same license as source code](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
 | stocaudio/*                             | GPL-3.0-or-later | No artwork specific license provided |
+| TheXOR/*                                | CC0-1.0          | No artwork specific license provided |
+| TheXOR/FreeMonoBold.ttf                 | GPL-3.0-with-font-exception | |
+| TheXOR/Segment7Standard.ttf             | OFL-1.1-RFN      | |
 | ValleyAudio/*                           | GPL-3.0-or-later | [Same license as source code](https://github.com/ValleyAudio/ValleyRackFree/issues/73) |
 | ValleyAudio/din1451alt.ttf              | CC-BY-3.0-DE     | |
 | ValleyAudio/DSEG14Classic-*.ttf         | OFL-1.1-RFN      | |

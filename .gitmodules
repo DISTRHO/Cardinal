@@ -181,3 +181,6 @@
 [submodule "plugins/MSM"]
 	path = plugins/MSM
 	url = https://github.com/netboy3/MSM-vcvrack-plugin.git
+[submodule "plugins/TheXOR"]
+	path = plugins/TheXOR
+	url = https://github.com/CardinalModules/TheXOR.git
