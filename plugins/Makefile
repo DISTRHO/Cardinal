@@ -1156,7 +1156,8 @@ $(BUILD_DIR)/AaronStatic/%.cpp.o: AaronStatic/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(AARONSTATIC_CUSTOM),$(call custom_module_names,$(m),AaronStatic)) \
-		-DpluginInstance=pluginInstance__AaronStatic
+		-DpluginInstance=pluginInstance__AaronStatic \
+		-Dinit=init__AaronStatic
 
 $(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

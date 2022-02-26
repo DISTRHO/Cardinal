@@ -56,6 +56,11 @@ static const struct {
     { "/21kHz/res/Panels/D_Inf.svg", {}, -1 },
     { "/21kHz/res/Panels/PalmLoop.svg", {}, -1 },
     { "/21kHz/res/Panels/TachyonEntangler.svg", {}, -1 },
+    // MIT
+    {"/AaronStatic/res/ChordCV.svg", {}, -1 },
+    {"/AaronStatic/res/DiatonicCV.svg", {}, -1 },
+    {"/AaronStatic/res/RandomNoteCV.svg", {}, -1 },
+    {"/AaronStatic/res/ScaleCV.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
     { "/AudibleInstruments/res/Blinds.svg", {}, -1 },
     { "/AudibleInstruments/res/Braids.svg", {}, -1 },
@@ -282,6 +287,12 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
         return true;
     if (paint.type != NSVG_PAINT_COLOR)
         return false;
+
+    // Special case for AaronStatic orange color
+    if (paint.color == 0xff0187fc && svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/AaronStatic/", 13) == 0)
+    {
+        return false;
+    }
 
     // Special case for Bidoo red color
     if (paint.color == 0xff001fcd && svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/Bidoo/", 7) == 0)

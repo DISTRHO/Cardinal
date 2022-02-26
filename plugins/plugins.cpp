@@ -32,6 +32,10 @@
 
 // Aaron Static
 #include "AaronStatic/src/plugin.hpp"
+// Nasty override of this required function for now:
+NVGcolor prepareDisplay(NVGcontext *vg, Rect *box, int fontSize) {
+    return nvgRGB(0xaf, 0xd2, 0x2c);
+}
 
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
