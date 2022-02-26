@@ -243,6 +243,9 @@ PLUGIN_FILES += $(filter-out Algoritmarte/src/plugin.cpp,$(wildcard Algoritmarte
 
 PLUGIN_FILES += $(wildcard AaronStatic/src/*.cpp)
 
+# modules/types which are present in other plugins
+AARONSTATIC_CUSTOM = RefreshCounter
+
 # --------------------------------------------------------------
 # AmalgamatedHarmonics
 
