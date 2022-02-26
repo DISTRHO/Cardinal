@@ -37,6 +37,9 @@ NVGcolor prepareDisplay(NVGcontext *vg, Rect *box, int fontSize) {
     return nvgRGB(0xaf, 0xd2, 0x2c);
 }
 
+// Algoritmarte
+#include "Algoritmarte/src/plugin.hpp"
+
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
@@ -651,6 +654,7 @@ Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
 Plugin* pluginInstance__AaronStatic;
+Plugin* pluginInstance__Algoritmarte;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
@@ -883,6 +887,24 @@ static void initStatic__AaronStatic()
         p->addModel(modelScaleCV);
         p->addModel(modelRandomNoteCV);
         p->addModel(modelDiatonicCV);
+    }
+}
+
+static void initStatic__Algoritmarte()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Algoritmarte = p;
+
+    const StaticPluginLoader spl(p, "Algoritmarte");
+    if (spl.ok())
+    {
+        p->addModel(modelClockkky);
+        p->addModel(modelPlanetz);
+        p->addModel(modelMusiFrog);
+        p->addModel(modelZefiro);
+        p->addModel(modelHoldMeTight);
+        p->addModel(modelCyclicCA);
+        p->addModel(modelMusiMath);
     }
 }
 
@@ -2342,6 +2364,7 @@ void initStaticPlugins()
     initStatic__21kHz();
     initStatic__8Mode();
     initStatic__AaronStatic();
+    initStatic__Algoritmarte();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__Aria();

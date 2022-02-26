@@ -61,6 +61,14 @@ static const struct {
     {"/AaronStatic/res/DiatonicCV.svg", {}, -1 },
     {"/AaronStatic/res/RandomNoteCV.svg", {}, -1 },
     {"/AaronStatic/res/ScaleCV.svg", {}, -1 },
+    // GPL3.0-or-later
+    { "/Algoritmarte/res/Clockkky.svg", {}, -1 },
+    { "/Algoritmarte/res/CyclicCA.svg", {}, -1 },
+    { "/Algoritmarte/res/HoldMeTight.svg", {}, -1 },
+    { "/Algoritmarte/res/MusiFrog.svg", {}, -1 },
+    { "/Algoritmarte/res/MusiMath.svg", {}, -1 },
+    { "/Algoritmarte/res/Planetz.svg", {}, -1 },
+    { "/Algoritmarte/res/Zefiro.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
     { "/AudibleInstruments/res/Blinds.svg", {}, -1 },
     { "/AudibleInstruments/res/Braids.svg", {}, -1 },
