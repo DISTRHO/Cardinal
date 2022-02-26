@@ -962,7 +962,20 @@ else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 endif
 
-UNWANTED_FILES = HetrickCV/res/illustrator - deprecated/MyModule.svg
+UNWANTED_FILES  = HetrickCV/res/illustrator - deprecated/MyModule.svg
+UNWANTED_FILES += nonlinearcircuits/res/NLC - 1050 MIXER SEQUENCER.svg
+UNWANTED_FILES += 1050 MIXER SEQUENCER.svg
+UNWANTED_FILES += 32to1.svg
+UNWANTED_FILES += 4seq.svg
+UNWANTED_FILES += 8 BIT CIPHER.svg
+UNWANTED_FILES += DIVIDE & CONQUER.svg
+UNWANTED_FILES += DIVINE CMOS.svg
+UNWANTED_FILES += GENiE.svg
+UNWANTED_FILES += NEURON.svg
+UNWANTED_FILES += NUMBERWANG.svg
+UNWANTED_FILES += ROUTER.svg
+UNWANTED_FILES += SEGUE.svg
+UNWANTED_FILES += STATUES.svg
 
 RESOURCE_FILES = \
 	$(filter-out $(UNWANTED_FILES), \
@@ -985,6 +998,7 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
+RESOURCE_FILES += nonlinearcircuits/res
 
 # MOD builds only have LV2 FX variant for now
 ifeq ($(MOD_BUILD),true)
