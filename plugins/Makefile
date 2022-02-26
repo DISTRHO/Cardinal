@@ -388,7 +388,7 @@ AUTINN_CUSTOM = Chord Vibrato
 # --------------------------------------------------------------
 # Axioma
 
-PLUGIN_FILES += $(wildcard Axioma/src/*.cpp)
+PLUGIN_FILES += $(filter-out Axioma/src/plugin.cpp,$(wildcard Axioma/src/*.cpp))
 
 # --------------------------------------------------------------
 # BaconPlugs
