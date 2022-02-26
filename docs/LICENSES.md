@@ -56,6 +56,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Mog                     | CC0-1.0                  | |
 | mscHack                 | BSD-3-Clause             | |
 | MSM                     | MIT                      | Repo's [LICENSE-dist.md](https://github.com/netboy3/MSM-vcvrack-plugin/issues/10) includes wrong information |
+| Nonlinear Circuits      | CC0-1.0                  | |
 | Orbits                  | GPL-3.0-or-later         | |
 | Path Set                | GPL-3.0-or-later         | |
 | Prism                   | BSD-3-Clause             | |
@@ -168,6 +169,8 @@ Below is a list of artwork licenses from plugins
 | MSM/Fonts/DejaVuSansMono.ttf            | Bitstream-Vera   | |
 | MSM/Fonts/Segment7Standard.ttf          | OFL-1.1-RFN      | |
 | MSM/Fonts/Sudo.ttf                      | OFL-1.1-no-RFN   | |
+| nonlinearcircuits/*                     | CC0-1.0          | No artwork specific license provided |
+| nonlinearcircuits/Audiowide-Regular.ttf | OFL-1.1-RFN      | |
 | Orbits/*                                | CC-BY-NC-ND-4.0  | |
 | Orbits/fonts/ShareTechMono-Regular.ttf  | OFL-1.1-RFN      | |
 | PathSet/*                               | GPL-3.0-or-later | No artwork specific license provided |

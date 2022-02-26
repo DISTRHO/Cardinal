@@ -610,6 +610,9 @@ extern Model* modelBlankPanel;
 #undef modelVCA
 #undef modelVCO
 
+// Nonlinear Circuits
+#include "nonlinearcircuits/src/NLC.hpp"
+
 // Orbits
 #include "Orbits/src/plugin.hpp"
 
@@ -735,6 +738,7 @@ Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__MSM;
+Plugin* pluginInstance__nonlinearcircuits;
 Plugin* pluginInstance__Orbits;
 Plugin* pluginInstance__PathSet;
 Plugin* pluginInstance__Prism;
@@ -2215,6 +2219,30 @@ static void initStatic__MSM()
     }
 }
 
+static void initStatic__nonlinearcircuits()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__nonlinearcircuits = p;
+
+    const StaticPluginLoader spl(p, "nonlinearcircuits");
+    if (spl.ok())
+    {
+        p->addModel(model4Seq);
+        p->addModel(modelCipher);
+        p->addModel(modelBOOLs);
+        p->addModel(modelDivideConquer);
+        p->addModel(modelDivineCMOS);
+        p->addModel(modelDoubleNeuron);
+        p->addModel(modelGenie);
+        p->addModel(modelLetsSplosh);
+        p->addModel(modelNeuron);
+        p->addModel(modelNumberwang);
+        p->addModel(modelSegue);
+        p->addModel(modelSquidAxon);
+        p->addModel(modelStatues);
+    }
+}
+
 static void initStatic__Orbits()
 {
     Plugin* const p = new Plugin;
@@ -2494,6 +2522,7 @@ void initStaticPlugins()
     initStatic__Mog();
     initStatic__mscHack();
     initStatic__MSM();
+    initStatic__nonlinearcircuits();
     initStatic__Orbits();
     initStatic__PathSet();
     initStatic__Prism();

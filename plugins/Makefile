@@ -690,6 +690,11 @@ PLUGIN_FILES += $(filter-out MSM/src/MSM.cpp,$(wildcard MSM/src/*.cpp))
 MSM_CUSTOM = ADSR BlankPanel Delay LFO LowFrequencyOscillator Mult Noise OP VCA VCO sawTable triTable
 
 # --------------------------------------------------------------
+# Nonlinear Circuits
+
+PLUGIN_FILES += $(filter-out nonlinearcircuits/src/NLC.cpp,$(wildcard nonlinearcircuits/src/*.cpp))
+
+# --------------------------------------------------------------
 # Orbits
 
 PLUGIN_FILES += $(wildcard Orbits/src/*.cpp)
@@ -1580,6 +1585,13 @@ $(BUILD_DIR)/MSM/%.cpp.o: MSM/%.cpp
 		$(foreach m,$(MSM_CUSTOM),$(call custom_module_names,$(m),MSM)) \
 		-DpluginInstance=pluginInstance__MSM \
 		-DDARKTHEME
+
+$(BUILD_DIR)/nonlinearcircuits/%.cpp.o: nonlinearcircuits/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(NONLINEARCIRCUITS_CUSTOM),$(call custom_module_names,$(m),nonlinearcircuits)) \
+		-DpluginInstance=pluginInstance__nonlinearcircuits
 
 $(BUILD_DIR)/Orbits/%.cpp.o: Orbits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
