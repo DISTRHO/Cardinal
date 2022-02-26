@@ -145,6 +145,7 @@ At the moment the following 3rd-party modules are provided:
 - Mog
 - mscHack
 - MSM
+- Nonlinear Circuits
 - Orbits
 - Path Set
 - Prism

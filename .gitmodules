@@ -181,3 +181,6 @@
 [submodule "plugins/MSM"]
 	path = plugins/MSM
 	url = https://github.com/netboy3/MSM-vcvrack-plugin.git
+[submodule "plugins/nonlinearcircuits"]
+	path = plugins/nonlinearcircuits
+	url = https://github.com/mhetrick/nonlinearcircuits.git
