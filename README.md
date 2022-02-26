@@ -104,6 +104,8 @@ At the moment the following 3rd-party modules are provided:
 
 - 21kHz
 - 8Mode
+- Aaron Static
+- AlgoritmArte
 - Amalgamated Harmonics
 - Animated Circuits
 - Aria Salvatrice
@@ -142,6 +144,8 @@ At the moment the following 3rd-party modules are provided:
 - Mockba Modular
 - Mog
 - mscHack
+- MSM
+- Nonlinear Circuits
 - Orbits
 - Path Set
 - Prism

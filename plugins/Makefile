@@ -231,7 +231,20 @@ PLUGIN_FILES += $(filter-out 21kHz/src/21kHz.cpp,$(wildcard 21kHz/src/*.cpp))
 # --------------------------------------------------------------
 # 8Mode
 
-PLUGIN_FILES += $(wildcard 8Mode/src/*.cpp)
+PLUGIN_FILES += $(filter-out 8Mode/src/plugin.cpp,$(wildcard 8Mode/src/*.cpp))
+
+# --------------------------------------------------------------
+# AlgoritmArte
+
+PLUGIN_FILES += $(filter-out Algoritmarte/src/plugin.cpp,$(wildcard Algoritmarte/src/*.cpp))
+
+# --------------------------------------------------------------
+# Aaron Static
+
+PLUGIN_FILES += $(wildcard AaronStatic/src/*.cpp)
+
+# modules/types which are present in other plugins
+AARONSTATIC_CUSTOM = RefreshCounter
 
 # --------------------------------------------------------------
 # AmalgamatedHarmonics
@@ -378,7 +391,7 @@ AUTINN_CUSTOM = Chord Vibrato
 # --------------------------------------------------------------
 # Axioma
 
-PLUGIN_FILES += $(wildcard Axioma/src/*.cpp)
+PLUGIN_FILES += $(filter-out Axioma/src/plugin.cpp,$(wildcard Axioma/src/*.cpp))
 
 # --------------------------------------------------------------
 # BaconPlugs
@@ -669,6 +682,19 @@ PLUGIN_FILES += $(wildcard mscHack/src/*.cpp)
 MSCHACK_CUSTOM_PER_FILE = MAIN_SYNC_CLOCK FILTER_STRUCT FILTER_PARAM_STRUCT OSC_PARAM_STRUCT PHRASE_CHANGE_STRUCT
 
 # --------------------------------------------------------------
+# MSM
+
+PLUGIN_FILES += $(filter-out MSM/src/MSM.cpp,$(wildcard MSM/src/*.cpp))
+
+# modules/types which are present in other plugins
+MSM_CUSTOM = ADSR BlankPanel Delay LFO LowFrequencyOscillator Mult Noise OP VCA VCO sawTable triTable
+
+# --------------------------------------------------------------
+# Nonlinear Circuits
+
+PLUGIN_FILES += $(filter-out nonlinearcircuits/src/NLC.cpp,$(wildcard nonlinearcircuits/src/*.cpp))
+
+# --------------------------------------------------------------
 # Orbits
 
 PLUGIN_FILES += $(wildcard Orbits/src/*.cpp)
@@ -946,7 +972,20 @@ else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 endif
 
-UNWANTED_FILES = HetrickCV/res/illustrator - deprecated/MyModule.svg
+UNWANTED_FILES  = HetrickCV/res/illustrator - deprecated/MyModule.svg
+UNWANTED_FILES += nonlinearcircuits/res/NLC - 1050 MIXER SEQUENCER.svg
+UNWANTED_FILES += 1050 MIXER SEQUENCER.svg
+UNWANTED_FILES += 32to1.svg
+UNWANTED_FILES += 4seq.svg
+UNWANTED_FILES += 8 BIT CIPHER.svg
+UNWANTED_FILES += DIVIDE & CONQUER.svg
+UNWANTED_FILES += DIVINE CMOS.svg
+UNWANTED_FILES += GENiE.svg
+UNWANTED_FILES += NEURON.svg
+UNWANTED_FILES += NUMBERWANG.svg
+UNWANTED_FILES += ROUTER.svg
+UNWANTED_FILES += SEGUE.svg
+UNWANTED_FILES += STATUES.svg
 
 RESOURCE_FILES = \
 	$(filter-out $(UNWANTED_FILES), \
@@ -969,6 +1008,7 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
+RESOURCE_FILES += nonlinearcircuits/res
 
 # MOD builds only have LV2 FX variant for now
 ifeq ($(MOD_BUILD),true)
@@ -1156,6 +1196,21 @@ $(BUILD_DIR)/8Mode/%.cpp.o: 8Mode/%.cpp
 		$(foreach m,$(8MODE_CUSTOM),$(call custom_module_names,$(m),8Mode)) \
 		-DpluginInstance=pluginInstance__8Mode
 
+$(BUILD_DIR)/AaronStatic/%.cpp.o: AaronStatic/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(AARONSTATIC_CUSTOM),$(call custom_module_names,$(m),AaronStatic)) \
+		-DpluginInstance=pluginInstance__AaronStatic \
+		-Dinit=init__AaronStatic
+
+$(BUILD_DIR)/Algoritmarte/%.cpp.o: Algoritmarte/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ALGORITMARTE_CUSTOM),$(call custom_module_names,$(m),Algoritmarte)) \
+		-DpluginInstance=pluginInstance__Algoritmarte
+
 $(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -1293,7 +1348,8 @@ $(BUILD_DIR)/Dintree/%.cpp.o: Dintree/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(DINTREE_CUSTOM),$(call custom_module_names,$(m),Dintree)) \
-		-DpluginInstance=pluginInstance__Dintree
+		-DpluginInstance=pluginInstance__Dintree \
+		-DSKIP_MINGW_FORMAT
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1545,6 +1601,21 @@ $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 		-Wno-format-overflow \
 		-Wno-non-c-typedef-for-linkage \
 		-Wno-unused-but-set-variable
+
+$(BUILD_DIR)/MSM/%.cpp.o: MSM/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MSM_CUSTOM),$(call custom_module_names,$(m),MSM)) \
+		-DpluginInstance=pluginInstance__MSM \
+		-DDARKTHEME
+
+$(BUILD_DIR)/nonlinearcircuits/%.cpp.o: nonlinearcircuits/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(NONLINEARCIRCUITS_CUSTOM),$(call custom_module_names,$(m),nonlinearcircuits)) \
+		-DpluginInstance=pluginInstance__nonlinearcircuits
 
 $(BUILD_DIR)/Orbits/%.cpp.o: Orbits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

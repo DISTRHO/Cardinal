@@ -56,6 +56,19 @@ static const struct {
     { "/21kHz/res/Panels/D_Inf.svg", {}, -1 },
     { "/21kHz/res/Panels/PalmLoop.svg", {}, -1 },
     { "/21kHz/res/Panels/TachyonEntangler.svg", {}, -1 },
+    // MIT
+    {"/AaronStatic/res/ChordCV.svg", {}, -1 },
+    {"/AaronStatic/res/DiatonicCV.svg", {}, -1 },
+    {"/AaronStatic/res/RandomNoteCV.svg", {}, -1 },
+    {"/AaronStatic/res/ScaleCV.svg", {}, -1 },
+    // GPL3.0-or-later
+    { "/Algoritmarte/res/Clockkky.svg", {}, -1 },
+    { "/Algoritmarte/res/CyclicCA.svg", {}, -1 },
+    { "/Algoritmarte/res/HoldMeTight.svg", {}, -1 },
+    { "/Algoritmarte/res/MusiFrog.svg", {}, -1 },
+    { "/Algoritmarte/res/MusiMath.svg", {}, -1 },
+    { "/Algoritmarte/res/Planetz.svg", {}, -1 },
+    { "/Algoritmarte/res/Zefiro.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
     { "/AudibleInstruments/res/Blinds.svg", {}, -1 },
     { "/AudibleInstruments/res/Braids.svg", {}, -1 },
@@ -252,6 +265,20 @@ static const struct {
     { "/kocmoc/res/SKF.svg", {}, -1 },
     { "/kocmoc/res/SVF.svg", {}, -1 },
     { "/kocmoc/res/TRG.svg", {}, -1 },
+    // CC0-1.0
+    { "/nonlinearcircuits/res/NLC - 4seq.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - 8 BIT CIPHER.svg", {}, -1 },
+    { "/nonlinearcircuits/res/BOOLs2.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - DIVIDE & CONQUER.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - DIVINE CMOS.svg", {}, -1 },
+    { "/nonlinearcircuits/res/DoubleNeuronRef.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - GENiE.svg", {}, -1 },
+    { "/nonlinearcircuits/res/LetsSplosh.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - NEURON.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - NUMBERWANG.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - SEGUE.svg", {}, -1 },
+    { "/nonlinearcircuits/res/squid-axon-papernoise-panel2.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - STATUES.svg", {}, -1 },
     // GPL-3.0-or-later
     { "/PathSet/res/AstroVibe.svg", {}, -1 },
     { "/PathSet/res/IceTray.svg", {}, -1 },
@@ -352,6 +379,29 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
         }
     }
 
+    // Special case for Nonlinear Circuits
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/nonlinearcircuits/", 19) == 0)
+    {
+        switch (paint.color)
+        {
+            case 0xff9a7900:
+            case 0xff96782c:
+            case 0xff6a07ae:
+            case 0xffcf8044:
+            case 0xff2ac6ba:
+            case 0xff5ba85c:
+            case 0xffa97b00:
+            case 0xff9f7a00:
+            case 0xffff7300:
+            case 0xffa47b00:
+            case 0xffb09423:
+                return false;
+            case 0xffffffff:
+                paint.color = 0x00000000;
+                return true;
+        }
+    }
+
     // Special case for PathSet colors
     if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/PathSet/", 9) == 0)
     {
@@ -434,6 +484,7 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
     case 0xff0095fe:
     case 0xff4d9a4d:
     case 0xff4d4d9a:
+    case 0xff0187fc:
         return false;
     // pure black (convert to not quite pure white)
     case 0xff000000:

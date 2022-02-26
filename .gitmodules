@@ -153,7 +153,7 @@
 	url = https://github.com/martin-lueders/ML_modules.git
 [submodule "plugins/Orbits"]
 	path = plugins/Orbits
-	url = git@github.com:RareBreeds/Orbits.git
+	url = https://github.com/RareBreeds/Orbits.git
 [submodule "plugins/stocaudio"]
 	path = plugins/stocaudio
 	url = https://github.com/aptrn/stocaudio-modules.git
@@ -172,6 +172,18 @@
 [submodule "plugins/Dintree"]
 	path = plugins/Dintree
 	url = https://github.com/hires/Dintree-Virtual.git
+[submodule "plugins/Algoritmarte"]
+	path = plugins/Algoritmarte
+	url = https://github.com/algoritmarte/AlgoritmarteVCVPlugin.git
+[submodule "plugins/AaronStatic"]
+	path = plugins/AaronStatic
+	url = https://github.com/aaronstatic/AaronStatic_modules.git
+[submodule "plugins/MSM"]
+	path = plugins/MSM
+	url = https://github.com/netboy3/MSM-vcvrack-plugin.git
+[submodule "plugins/nonlinearcircuits"]
+	path = plugins/nonlinearcircuits
+	url = https://github.com/mhetrick/nonlinearcircuits.git
 [submodule "plugins/StarlingVia"]
 	path = plugins/StarlingVia
 	url = https://github.com/starlingcode/Via-for-Rack.git

@@ -30,6 +30,12 @@
 // 8Mode
 #include "8Mode/src/8mode.hpp"
 
+// Aaron Static
+#include "AaronStatic/src/plugin.hpp"
+
+// Algoritmarte
+#include "Algoritmarte/src/plugin.hpp"
+
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
@@ -562,6 +568,51 @@ extern Model* modelAlienz;
 extern Model* modelOSC_WaveMorph_3;
 extern Model* modelMaude_221;
 
+// MSM
+/* NOTE too much noise in original include, do this a different way
+// #include "MSM/src/MSM.hpp"
+*/
+#define modelADSR modelMSMADSR
+#define modelBlankPanel modelMSMBlankPanel
+#define modelDelay modelMSMDelay
+#define modelLFO modelMSMLFO
+#define modelMult modelMSMMult
+#define modelNoise modelMSMNoise
+#define modelVCA modelMSMVCA
+#define modelVCO modelMSMVCO
+extern Model* modelVCO;
+extern Model* modelBVCO;
+extern Model* modelExperimentalVCO;
+extern Model* modelNoise;
+extern Model* modelLFO;
+extern Model* modelVCA;
+extern Model* modelADSR;
+extern Model* modelDelay;
+extern Model* modelWaveShaper;
+extern Model* modelWavefolder;
+extern Model* modelBitcrusher;
+extern Model* modelPhaserModule;
+extern Model* modelMorpher;
+extern Model* modelRingMod;
+extern Model* modelRandomSource;
+extern Model* modelMult;
+extern Model* modelCrazyMult;
+extern Model* modelFade;
+extern Model* modelSimpleSlider;
+extern Model* modelxseq;
+extern Model* modelBlankPanel;
+#undef modelADSR
+#undef modelBlankPanel
+#undef modelDelay
+#undef modelLFO
+#undef modelMult
+#undef modelNoise
+#undef modelVCA
+#undef modelVCO
+
+// Nonlinear Circuits
+#include "nonlinearcircuits/src/NLC.hpp"
+
 // Orbits
 #include "Orbits/src/plugin.hpp"
 
@@ -649,6 +700,8 @@ Plugin* pluginInstance__Cardinal;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
+extern Plugin* pluginInstance__AaronStatic;
+Plugin* pluginInstance__Algoritmarte;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
@@ -690,6 +743,8 @@ Plugin* pluginInstance__ML;
 Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
+Plugin* pluginInstance__MSM;
+Plugin* pluginInstance__nonlinearcircuits;
 Plugin* pluginInstance__Orbits;
 Plugin* pluginInstance__PathSet;
 Plugin* pluginInstance__Prism;
@@ -867,6 +922,39 @@ static void initStatic__8Mode()
     if (spl.ok())
     {
         p->addModel(modelsoftSN);
+    }
+}
+
+static void initStatic__AaronStatic()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__AaronStatic = p;
+
+    const StaticPluginLoader spl(p, "AaronStatic");
+    if (spl.ok())
+    {
+        p->addModel(modelChordCV);
+        p->addModel(modelScaleCV);
+        p->addModel(modelRandomNoteCV);
+        p->addModel(modelDiatonicCV);
+    }
+}
+
+static void initStatic__Algoritmarte()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Algoritmarte = p;
+
+    const StaticPluginLoader spl(p, "Algoritmarte");
+    if (spl.ok())
+    {
+        p->addModel(modelClockkky);
+        p->addModel(modelPlanetz);
+        p->addModel(modelMusiFrog);
+        p->addModel(modelZefiro);
+        p->addModel(modelHoldMeTight);
+        p->addModel(modelCyclicCA);
+        p->addModel(modelMusiMath);
     }
 }
 
@@ -2090,6 +2178,78 @@ static void initStatic__mscHack()
     }
 }
 
+static void initStatic__MSM()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__MSM = p;
+
+    const StaticPluginLoader spl(p, "MSM");
+    if (spl.ok())
+    {
+#define modelADSR modelMSMADSR
+#define modelBlankPanel modelMSMBlankPanel
+#define modelDelay modelMSMDelay
+#define modelLFO modelMSMLFO
+#define modelMult modelMSMMult
+#define modelNoise modelMSMNoise
+#define modelVCA modelMSMVCA
+#define modelVCO modelMSMVCO
+        p->addModel(modelVCO);
+        p->addModel(modelBVCO);
+        p->addModel(modelExperimentalVCO);
+        p->addModel(modelNoise);
+        p->addModel(modelLFO);
+        p->addModel(modelVCA);
+        p->addModel(modelADSR);
+        p->addModel(modelDelay);
+        p->addModel(modelWaveShaper);
+        p->addModel(modelWavefolder);
+        p->addModel(modelBitcrusher);
+        p->addModel(modelPhaserModule);
+        p->addModel(modelMorpher);
+        p->addModel(modelRingMod);
+        p->addModel(modelRandomSource);
+        p->addModel(modelMult);
+        p->addModel(modelCrazyMult);
+        p->addModel(modelFade);
+        p->addModel(modelSimpleSlider);
+        p->addModel(modelxseq);
+        p->addModel(modelBlankPanel);
+#undef modelADSR
+#undef modelBlankPanel
+#undef modelDelay
+#undef modelLFO
+#undef modelMult
+#undef modelNoise
+#undef modelVCA
+#undef modelVCO
+    }
+}
+
+static void initStatic__nonlinearcircuits()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__nonlinearcircuits = p;
+
+    const StaticPluginLoader spl(p, "nonlinearcircuits");
+    if (spl.ok())
+    {
+        p->addModel(model4Seq);
+        p->addModel(modelCipher);
+        p->addModel(modelBOOLs);
+        p->addModel(modelDivideConquer);
+        p->addModel(modelDivineCMOS);
+        p->addModel(modelDoubleNeuron);
+        p->addModel(modelGenie);
+        p->addModel(modelLetsSplosh);
+        p->addModel(modelNeuron);
+        p->addModel(modelNumberwang);
+        p->addModel(modelSegue);
+        p->addModel(modelSquidAxon);
+        p->addModel(modelStatues);
+    }
+}
+
 static void initStatic__Orbits()
 {
     Plugin* const p = new Plugin;
@@ -2348,6 +2508,8 @@ void initStaticPlugins()
 #ifndef NOPLUGINS
     initStatic__21kHz();
     initStatic__8Mode();
+    initStatic__AaronStatic();
+    initStatic__Algoritmarte();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__Aria();
@@ -2389,6 +2551,8 @@ void initStaticPlugins()
     initStatic__MockbaModular();
     initStatic__Mog();
     initStatic__mscHack();
+    initStatic__MSM();
+    initStatic__nonlinearcircuits();
     initStatic__Orbits();
     initStatic__PathSet();
     initStatic__Prism();
