@@ -54,7 +54,6 @@ struct ModuleWidget::Internal {
     math::Vec dragOffset;
     math::Vec dragRackPos;
     bool dragEnabled;
-    math::Vec oldPos;
     widget::Widget* panel;
 };
 
