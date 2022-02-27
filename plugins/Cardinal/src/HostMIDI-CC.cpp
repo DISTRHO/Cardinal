@@ -425,7 +425,7 @@ struct HostMIDICC : TerminalModule {
         if (isBypassed())
             return;
 
-        for (int id = 0; id < 16; id)
+        for (int id = 0; id < 16; ++id)
         {
             if (learnedCcs[id] < 0)
                 continue;
