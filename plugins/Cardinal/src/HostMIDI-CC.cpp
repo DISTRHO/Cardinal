@@ -68,7 +68,7 @@ struct HostMIDICC : TerminalModule {
         uint8_t chPressure[16];
         uint16_t pitchbend[16];
 
-        // stuff from Rack
+        // adapted from Rack
         /** [cc][channel] */
         uint8_t ccValues[128][16];
         /** When LSB is enabled for CC 0-31, the MSB is stored here until the LSB is received.
@@ -85,10 +85,11 @@ struct HostMIDICC : TerminalModule {
         MidiInput(CardinalPluginContext* const pc)
             : pcontext(pc)
         {
-            for (int i = 0; i < NUM_OUTPUTS; i++) {
-                for (int c = 0; c < 16; c++) {
-                    valueFilters[i][c].setTau(1 / 30.f);
-                }
+            // adapted from Rack
+            for (int id = 0; id < NUM_OUTPUTS; ++id)
+            {
+                for (int c = 0; c < 16; ++c)
+                    valueFilters[id][c].setTau(1 / 30.f);
             }
             reset();
         }
@@ -101,20 +102,14 @@ struct HostMIDICC : TerminalModule {
             lastBlockFrame = -1;
             channel = 0;
 
-            for (uint8_t cc = 0; cc < 128; cc++) {
-                for (int c = 0; c < 16; c++) {
-                    ccValues[cc][c] = 0;
-                }
-            }
-            for (uint8_t cc = 0; cc < 32; cc++) {
-                for (int c = 0; c < 16; c++) {
-                    msbValues[cc][c] = 0;
-                }
-            }
-            for (int c = 0; c < 16; c++) {
-                chPressure[c] = 0;
+            // adapted from Rack
+            std::memset(ccValues, 0, sizeof(ccValues));
+            std::memset(msbValues, 0, sizeof(msbValues));
+            std::memset(chPressure, 0, sizeof(chPressure));
+
+            for (int c = 0; c < 16; ++c)
                 pitchbend[c] = 8192;
-            }
+
             learningId = -1;
             smooth = true;
             mpeMode = false;
@@ -181,7 +176,7 @@ struct HostMIDICC : TerminalModule {
                     continue;
                 }
 
-                // adapted from Rack
+                // adapted from Rack `processCC`
                 const uint8_t c = mpeMode ? chan : 0;
                 const int8_t cc = data[1];
                 const uint8_t value = data[2];
@@ -207,7 +202,7 @@ struct HostMIDICC : TerminalModule {
                     // Don't set MSB yet. Wait for LSB to be received.
                     msbValues[cc][c] = value;
                 }
-                else if (lsbMode && 32 <= cc && cc < 64)
+                else if (lsbMode && cc >= 32 && cc < 64)
                 {
                     // Apply MSB when LSB is received
                     ccValues[cc - 32][c] = msbValues[cc - 32][c];
@@ -224,18 +219,21 @@ struct HostMIDICC : TerminalModule {
             // Rack stuff
             const int channels = mpeMode ? 16 : 1;
 
-            for (int i = 0; i < 16; i++)
+            for (int id = 0; id < 16; ++id)
             {
-                if (!outputs[CC_OUTPUT + i].isConnected())
+                if (!outputs[CC_OUTPUT + id].isConnected())
                     continue;
-                outputs[CC_OUTPUT + i].setChannels(channels);
+                outputs[CC_OUTPUT + id].setChannels(channels);
 
-                const int8_t cc = learnedCcs[i];
+                const int8_t cc = learnedCcs[id];
 
                 if (cc < 0)
+                {
+                    outputs[CC_OUTPUT + id].clearVoltages();
                     continue;
+                }
 
-                for (int c = 0; c < channels; c++)
+                for (int c = 0; c < channels; ++c)
                 {
                     int16_t cellValue = int16_t(ccValues[cc][c]) * 128;
                     if (lsbMode && cc < 32)
@@ -245,18 +243,18 @@ struct HostMIDICC : TerminalModule {
                     const float value = static_cast<float>(cellValue) / (128.0f * 127.0f);
 
                     // Detect behavior from MIDI buttons.
-                    if (smooth && std::fabs(valueFilters[i][c].out - value) < 1.f)
+                    if (smooth && std::fabs(valueFilters[id][c].out - value) < 1.f)
                     {
                         // Smooth value with filter
-                        valueFilters[i][c].process(args.sampleTime, value);
+                        valueFilters[id][c].process(args.sampleTime, value);
                     }
                     else
                     {
                         // Jump value
-                        valueFilters[i][c].out = value;
+                        valueFilters[id][c].out = value;
                     }
 
-                    outputs[CC_OUTPUT + i].setVoltage(valueFilters[i][c].out * 10.f, c);
+                    outputs[CC_OUTPUT + id].setVoltage(valueFilters[id][c].out * 10.f, c);
                 }
             }
 
@@ -264,7 +262,7 @@ struct HostMIDICC : TerminalModule {
             {
                 outputs[CC_OUTPUT_CH_PRESSURE].setChannels(channels);
 
-                for (int c = 0; c < channels; c++)
+                for (int c = 0; c < channels; ++c)
                 {
                     const float value = static_cast<float>(chPressure[c]) / 128.0f;
 
@@ -288,7 +286,7 @@ struct HostMIDICC : TerminalModule {
             {
                 outputs[CC_OUTPUT_PITCHBEND].setChannels(channels);
 
-                for (int c = 0; c < channels; c++)
+                for (int c = 0; c < channels; ++c)
                 {
                     const float value = static_cast<float>(pitchbend[c]) / 16384.0f;
 
