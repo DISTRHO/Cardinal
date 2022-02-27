@@ -166,15 +166,17 @@ struct HostMIDICC : TerminalModule {
                 const uint8_t status = data[0] & 0xF0;
                 const uint8_t chan = data[0] & 0x0F;
 
-                /**/ if (status == 0xD0)
+                if (status == 0xD0)
                 {
                     chPressure[chan] = data[1];
+                    continue;
                 }
-                else if (status == 0xE0)
+                if (status == 0xE0)
                 {
                     pitchbend[chan] = (data[2] << 7) | data[1];
+                    continue;
                 }
-                else if (status != 0xB0)
+                if (status != 0xB0)
                 {
                     continue;
                 }
