@@ -427,13 +427,13 @@ struct HostMIDICC : TerminalModule {
         if (isBypassed())
             return;
 
-        for (int i = 0; i < 16; i++)
+        for (int id = 0; id < 16; id)
         {
             if (learnedCcs[id] < 0)
                 continue;
 
             uint8_t value = (uint8_t) clamp(std::round(inputs[CC_INPUTS + id].getVoltage() / 10.f * 127), 0.f, 127.f);
-            midiOutput.sendCC(learnedCcs[i], value);
+            midiOutput.sendCC(learnedCcs[id], value);
         }
 
         {
