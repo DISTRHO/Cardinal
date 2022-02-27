@@ -86,6 +86,8 @@ struct HostMIDI : TerminalModule {
         uint8_t channel;
 
         // stuff from Rack
+        /** Number of semitones to bend up/down by pitch wheel */
+        float pwRange;
         bool smooth;
         int channels;
         enum PolyMode {
@@ -144,6 +146,7 @@ struct HostMIDI : TerminalModule {
             smooth = true;
             channels = 1;
             polyMode = ROTATE_MODE;
+            pwRange = 2;
             panic();
         }
 
@@ -246,30 +249,20 @@ struct HostMIDI : TerminalModule {
             ++midiEventFrame;
 
             // Rack stuff
-            outputs[PITCH_OUTPUT].setChannels(channels);
-            outputs[GATE_OUTPUT].setChannels(channels);
-            outputs[VELOCITY_OUTPUT].setChannels(channels);
-            outputs[AFTERTOUCH_OUTPUT].setChannels(channels);
-
-            for (int c = 0; c < channels; c++) {
-                outputs[PITCH_OUTPUT].setVoltage((notes[c] - 60.f) / 12.f, c);
-                outputs[GATE_OUTPUT].setVoltage(gates[c] ? 10.f : 0.f, c);
-                outputs[VELOCITY_OUTPUT].setVoltage(rescale(velocities[c], 0, 127, 0.f, 10.f), c);
-                outputs[AFTERTOUCH_OUTPUT].setVoltage(rescale(aftertouches[c], 0, 127, 0.f, 10.f), c);
-            }
-
             // Set pitch and mod wheel
             const int wheelChannels = (polyMode == MPE_MODE) ? 16 : 1;
+            float pwValues[16] = {};
             outputs[PITCHBEND_OUTPUT].setChannels(wheelChannels);
             outputs[MODWHEEL_OUTPUT].setChannels(wheelChannels);
             for (int c = 0; c < wheelChannels; c++) {
-                float pw = ((int) pws[c] - 8192) / 8191.f;
+                float pw = (int16_t(pws[c]) - 8192) / 8191.f;
                 pw = clamp(pw, -1.f, 1.f);
                 if (smooth)
                     pw = pwFilters[c].process(args.sampleTime, pw);
                 else
                     pwFilters[c].out = pw;
-                outputs[PITCHBEND_OUTPUT].setVoltage(pw * 5.f);
+                pwValues[c] = pw;
+                outputs[PITCHBEND_OUTPUT].setVoltage(pw * 5.f, c);
 
                 float mod = mods[c] / 127.f;
                 mod = clamp(mod, 0.f, 1.f);
@@ -277,7 +270,22 @@ struct HostMIDI : TerminalModule {
                     mod = modFilters[c].process(args.sampleTime, mod);
                 else
                     modFilters[c].out = mod;
-                outputs[MODWHEEL_OUTPUT].setVoltage(mod * 10.f);
+                outputs[MODWHEEL_OUTPUT].setVoltage(mod * 10.f, c);
+            }
+
+            // Set note outputs
+            outputs[PITCH_OUTPUT].setChannels(channels);
+            outputs[GATE_OUTPUT].setChannels(channels);
+            outputs[VELOCITY_OUTPUT].setChannels(channels);
+            outputs[AFTERTOUCH_OUTPUT].setChannels(channels);
+
+            for (int c = 0; c < channels; c++) {
+                float pw = pwValues[(polyMode == MPE_MODE) ? c : 0];
+                float pitch = (notes[c] - 60.f + pw * pwRange) / 12.f;
+                outputs[PITCH_OUTPUT].setVoltage(pitch, c);
+                outputs[GATE_OUTPUT].setVoltage(gates[c] ? 10.f : 0.f, c);
+                outputs[VELOCITY_OUTPUT].setVoltage(rescale(velocities[c], 0, 127, 0.f, 10.f), c);
+                outputs[AFTERTOUCH_OUTPUT].setVoltage(rescale(aftertouches[c], 0, 127, 0.f, 10.f), c);
             }
 
             outputs[START_OUTPUT].setVoltage(startPulse.process(args.sampleTime) ? 10.f : 0.f);
@@ -636,6 +644,7 @@ struct HostMIDI : TerminalModule {
         json_t* const rootJ = json_object();
         DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr, nullptr);
 
+        json_object_set_new(rootJ, "pwRange", json_real(midiInput.pwRange));
         json_object_set_new(rootJ, "smooth", json_boolean(midiInput.smooth));
         json_object_set_new(rootJ, "channels", json_integer(midiInput.channels));
         json_object_set_new(rootJ, "polyMode", json_integer(midiInput.polyMode));
@@ -655,6 +664,12 @@ struct HostMIDI : TerminalModule {
 
     void dataFromJson(json_t* const rootJ) override
     {
+        if (json_t* const pwRangeJ = json_object_get(rootJ, "pwRange"))
+            midiInput.pwRange = json_number_value(pwRangeJ);
+        // For backwards compatibility, set to 0 if undefined in JSON.
+        else
+            midiInput.pwRange = 0;
+
         if (json_t* const smoothJ = json_object_get(rootJ, "smooth"))
             midiInput.smooth = json_boolean_value(smoothJ);
 
@@ -738,6 +753,16 @@ struct HostMIDIWidget : ModuleWidgetWith9HP {
 
         menu->addChild(createBoolPtrMenuItem("Smooth pitch/mod wheel", "", &module->midiInput.smooth));
 
+        static const std::vector<float> pwRanges = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 24, 36, 48};
+        menu->addChild(createSubmenuItem("Pitch bend range", string::f("%g", module->midiInput.pwRange), [=](Menu* menu) {
+            for (size_t i = 0; i < pwRanges.size(); i++) {
+                menu->addChild(createCheckMenuItem(string::f("%g", pwRanges[i]), "",
+                    [=]() {return module->midiInput.pwRange == pwRanges[i];},
+                    [=]() {module->midiInput.pwRange = pwRanges[i];}
+                ));
+            }
+        }));
+
         struct InputChannelItem : MenuItem {
             HostMIDI* module;
             Menu* createChildMenu() override {
@@ -758,24 +783,14 @@ struct HostMIDIWidget : ModuleWidgetWith9HP {
         inputChannelItem->module = module;
         menu->addChild(inputChannelItem);
 
-        struct PolyphonyChannelItem : MenuItem {
-            HostMIDI* module;
-            Menu* createChildMenu() override {
-                Menu* menu = new Menu;
-                for (int c = 1; c <= 16; c++) {
-                    menu->addChild(createCheckMenuItem((c == 1) ? "Monophonic" : string::f("%d", c), "",
-                        [=]() {return module->midiInput.channels == c;},
-                        [=]() {module->midiInput.setChannels(c);}
-                    ));
-                }
-                return menu;
+        menu->addChild(createSubmenuItem("Polyphony channels", string::f("%d", module->midiInput.channels), [=](Menu* menu) {
+            for (int c = 1; c <= 16; c++) {
+                menu->addChild(createCheckMenuItem((c == 1) ? "Monophonic" : string::f("%d", c), "",
+                    [=]() {return module->midiInput.channels == c;},
+                    [=]() {module->midiInput.setChannels(c);}
+                ));
             }
-        };
-        PolyphonyChannelItem* const polyphonyChannelItem = new PolyphonyChannelItem;
-        polyphonyChannelItem->text = "Polyphony channels";
-        polyphonyChannelItem->rightText = string::f("%d", module->midiInput.channels) + "  " + RIGHT_ARROW;
-        polyphonyChannelItem->module = module;
-        menu->addChild(polyphonyChannelItem);
+        }));
 
         menu->addChild(createIndexPtrSubmenuItem("Polyphony mode", {
             "Rotate",

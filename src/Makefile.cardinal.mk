@@ -206,7 +206,7 @@ ifeq ($(MACOS),true)
 LINK_FLAGS += -framework IOKit
 else ifeq ($(WINDOWS),true)
 # needed by VCVRack
-EXTRA_LIBS += -ldbghelp -lshlwapi
+EXTRA_LIBS += -ldbghelp -lshlwapi -Wl,--stack,0x100000
 # needed by JW-Modules
 EXTRA_LIBS += -lws2_32 -lwinmm
 endif

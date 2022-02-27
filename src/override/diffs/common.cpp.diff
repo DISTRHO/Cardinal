@@ -1,5 +1,5 @@
---- ../Rack/src/common.cpp	2021-12-04 09:46:43.912932319 +0000
-+++ common.cpp	2022-01-24 00:11:36.628498885 +0000
+--- ../Rack/src/common.cpp	2021-11-23 19:57:23.719015894 +0000
++++ common.cpp	2022-02-27 00:17:50.908149000 +0000
 @@ -1,6 +1,38 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -52,7 +52,7 @@
 +const std::string APP_EDITION_NAME = "Audio Plugin";
  const std::string APP_VERSION_MAJOR = "2";
 -const std::string APP_VERSION = TOSTRING(_APP_VERSION);
-+const std::string APP_VERSION = "2.0";
++const std::string APP_VERSION = "2.1";
  #if defined ARCH_WIN
  	const std::string APP_OS = "win";
  #elif ARCH_MAC

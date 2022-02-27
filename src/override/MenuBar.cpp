@@ -534,7 +534,7 @@ struct HelpButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 		menu->addChild(createMenuItem("Rack User manual", "F1", [=]() {
-			system::openBrowser("https://vcvrack.com/manual/");
+			system::openBrowser("https://vcvrack.com/manual");
 		}));
 
 		menu->addChild(createMenuItem("Cardinal Project page", "", [=]() {

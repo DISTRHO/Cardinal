@@ -104,7 +104,7 @@ struct HostMIDIGate : TerminalModule {
         }
 
         bool process(const ProcessArgs& args, std::vector<rack::engine::Output>& outputs,
-                     const bool velocityMode, uint8_t learnedNotes[18], const bool isBypassed)
+                     const bool velocityMode, int8_t learnedNotes[18], const bool isBypassed)
         {
             // Cardinal specific
             const int64_t blockFrame = pcontext->engine->getBlockFrame();
@@ -153,17 +153,30 @@ struct HostMIDIGate : TerminalModule {
                     if (data[2] > 0)
                     {
                         const int c = mpeMode ? (data[0] & 0x0F) : 0;
+                        const int8_t note = data[1];
                         // Learn
-                        if (learningId >= 0) {
-                            learnedNotes[learningId] = data[1];
+                        if (learningId >= 0)
+                        {
+                            // NOTE: does the same as `setLearnedNote`
+                            if (note >= 0)
+                            {
+                                for (int id = 0; id < 18; ++id)
+                                {
+                                    if (learnedNotes[id] == note)
+                                        learnedNotes[id] = -1;
+                                }
+                            }
+                            learnedNotes[learningId] = note;
                             learningId = -1;
                         }
                         // Find id
-                        for (int i = 0; i < 18; i++) {
-                            if (learnedNotes[i] == data[1]) {
-                                gates[i][c] = true;
-                                gateTimes[i][c] = 1e-3f;
-                                velocities[i][c] = data[2];
+                        for (int id = 0; id < 18; ++id)
+                        {
+                            if (learnedNotes[id] == note)
+                            {
+                                gates[id][c] = true;
+                                gateTimes[id][c] = 1e-3f;
+                                velocities[id][c] = data[2];
                             }
                         }
                         break;
@@ -172,11 +185,12 @@ struct HostMIDIGate : TerminalModule {
                 // note off
                 case 0x80:
                     const int c = mpeMode ? (data[0] & 0x0F) : 0;
+                    const int8_t note = data[1];
                     // Find id
-                    for (int i = 0; i < 18; i++) {
-                        if (learnedNotes[i] == data[1]) {
-                            gates[i][c] = false;
-                        }
+                    for (int id = 0; id < 18; ++id)
+                    {
+                        if (learnedNotes[id] == note)
+                            gates[id][c] = false;
                     }
                     break;
                 }
@@ -217,7 +231,7 @@ struct HostMIDIGate : TerminalModule {
         uint8_t channel = 0;
 
         // base class vars
-        int vels[128];
+        uint8_t vels[128];
         bool lastGates[128];
         int64_t frame = 0;
 
@@ -230,7 +244,7 @@ struct HostMIDIGate : TerminalModule {
         void reset()
         {
             // base class vars
-            for (int note = 0; note < 128; ++note)
+            for (uint8_t note = 0; note < 128; ++note)
             {
                 vels[note] = 100;
                 lastGates[note] = false;
@@ -245,7 +259,7 @@ struct HostMIDIGate : TerminalModule {
             // TODO send all notes off CC
 
             // Send all note off commands
-            for (int note = 0; note < 128; note++)
+            for (uint8_t note = 0; note < 128; note++)
             {
                 // Note off
                 midi::Message m;
@@ -258,12 +272,12 @@ struct HostMIDIGate : TerminalModule {
             }
         }
 
-        void setVelocity(int vel, int note)
+        void setVelocity(uint8_t note, uint8_t vel)
         {
             vels[note] = vel;
         }
 
-        void setGate(bool gate, int note)
+        void setGate(uint8_t note, bool gate)
         {
             if (gate && !lastGates[note])
             {
@@ -296,7 +310,8 @@ struct HostMIDIGate : TerminalModule {
     } midiOutput;
 
     bool velocityMode = false;
-    uint8_t learnedNotes[18] = {};
+    int8_t learnedNotes[18] = {};
+    dsp::SchmittTrigger cellTriggers[18];
 
     HostMIDIGate()
         : pcontext(static_cast<CardinalPluginContext*>(APP)),
@@ -308,19 +323,19 @@ struct HostMIDIGate : TerminalModule {
 
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
-        for (int i = 0; i < 18; i++)
-            configInput(GATE_INPUTS + i, string::f("Gate %d", i + 1));
+        for (int id = 0; id < 18; ++id)
+            configInput(GATE_INPUTS + id, string::f("Gate %d", id + 1));
 
-        for (int i = 0; i < 18; i++)
-            configOutput(GATE_OUTPUTS + i, string::f("Gate %d", i + 1));
+        for (int id = 0; id < 18; ++id)
+            configOutput(GATE_OUTPUTS + id, string::f("Gate %d", id + 1));
 
         onReset();
     }
 
     void onReset() override
     {
-        for (int i = 0; i < 18; ++i)
-            learnedNotes[i] = 36 + i;
+        for (int id = 0; id < 18; ++id)
+            learnedNotes[id] = 36 + id;
 
         velocityMode = false;
 
@@ -341,24 +356,39 @@ struct HostMIDIGate : TerminalModule {
         if (isBypassed())
             return;
 
-        for (int i = 0; i < 18; ++i)
+        for (int id = 0; id < 18; ++id)
         {
-            const int note = learnedNotes[i];
+            const int8_t note = learnedNotes[id];
+
+            if (note < 0)
+                continue;
 
             if (velocityMode)
             {
-                int vel = (int) std::round(inputs[GATE_INPUTS + i].getVoltage() / 10.f * 127);
-                vel = clamp(vel, 0, 127);
-                midiOutput.setVelocity(vel, note);
-                midiOutput.setGate(vel > 0, note);
+                uint8_t vel = (uint8_t) clamp(std::round(inputs[GATE_INPUTS + id].getVoltage() / 10.f * 127), 0.f, 127.f);
+                midiOutput.setVelocity(note, vel);
+                midiOutput.setGate(note, vel > 0);
             }
             else
             {
-                const bool gate = inputs[GATE_INPUTS + i].getVoltage() >= 1.f;
-                midiOutput.setVelocity(100, note);
-                midiOutput.setGate(gate, note);
+                const bool gate = inputs[GATE_INPUTS + id].getVoltage() >= 1.f;
+                midiOutput.setVelocity(note, 100);
+                midiOutput.setGate(note, gate);
             }
         }
+    }
+
+    void setLearnedNote(const int id, const int8_t note) {
+        // Unset IDs of similar note
+        if (note >= 0)
+        {
+            for (int idx = 0; idx < 18; ++idx)
+            {
+                if (learnedNotes[idx] == note)
+                    learnedNotes[idx] = -1;
+            }
+        }
+        learnedNotes[id] = note;
     }
 
     json_t* dataToJson() override
@@ -369,8 +399,8 @@ struct HostMIDIGate : TerminalModule {
         // input and output
         if (json_t* const notesJ = json_array())
         {
-            for (int i = 0; i < 18; i++)
-                json_array_append_new(notesJ, json_integer(learnedNotes[i]));
+            for (int id = 0; id < 18; ++id)
+                json_array_append_new(notesJ, json_integer(learnedNotes[id]));
             json_object_set_new(rootJ, "notes", notesJ);
         }
         json_object_set_new(rootJ, "velocity", json_boolean(velocityMode));
@@ -390,12 +420,12 @@ struct HostMIDIGate : TerminalModule {
         // input and output
         if (json_t* const notesJ = json_object_get(rootJ, "notes"))
         {
-            for (int i = 0; i < 18; i++)
+            for (int id = 0; id < 18; ++id)
             {
-                if (json_t* const noteJ = json_array_get(notesJ, i))
-                    learnedNotes[i] = json_integer_value(noteJ);
+                if (json_t* const noteJ = json_array_get(notesJ, id))
+                    setLearnedNote(id, json_integer_value(noteJ));
                 else
-                    learnedNotes[i] = -1;
+                    learnedNotes[id] = -1;
             }
         }
 
@@ -430,7 +460,7 @@ struct HostMIDIGate : TerminalModule {
 struct CardinalNoteChoice : CardinalLedDisplayChoice {
     HostMIDIGate* const module;
     const int id;
-    int focusNote = -1;
+    int8_t focusNote = -1;
 
     CardinalNoteChoice(HostMIDIGate* const m, const int i)
       : CardinalLedDisplayChoice(),
@@ -439,7 +469,7 @@ struct CardinalNoteChoice : CardinalLedDisplayChoice {
 
     void step() override
     {
-        int note;
+        int8_t note;
 
         if (module == nullptr)
         {
@@ -489,8 +519,8 @@ struct CardinalNoteChoice : CardinalLedDisplayChoice {
 
         if (module->midiInput.learningId == id)
         {
-            if (0 <= focusNote && focusNote < 128)
-                module->learnedNotes[id] = focusNote;
+            if (focusNote >= 0)
+                module->setLearnedNote(id, focusNote);
             module->midiInput.learningId = -1;
         }
     }
@@ -518,7 +548,7 @@ struct CardinalNoteChoice : CardinalLedDisplayChoice {
             }
         }
 
-        if (focusNote >= 128)
+        if (focusNote < 0)
             focusNote = -1;
 
         e.consume(this);
