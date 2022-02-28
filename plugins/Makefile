@@ -277,7 +277,7 @@ PLUGIN_FILES += ArableInstruments/eurorack/stmlib/dsp/atan.cc
 PLUGIN_FILES += ArableInstruments/eurorack/stmlib/dsp/units.cc
 
 # modules/types which are present in other plugins
-ARABLE_CUSTOM = Clouds clouds stmlib
+ARABLE_CUSTOM = Clouds FreezeLight clouds stmlib
 
 # --------------------------------------------------------------
 # Aria
@@ -862,7 +862,8 @@ VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
 
 # modules/types which are present in other plugins
-VOXGLITCH_CUSTOM = $(DRWAV) AudioBuffer AudioFile GateSequencer Looper Readout Sequencer SequencerDisplay
+VOXGLITCH_CUSTOM = $(DRWAV) AudioFile GateSequencer Looper Readout
+VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer Grain Sequencer SequencerDisplay
 
 # --------------------------------------------------------------
 # ZetaCarinaeModules
@@ -1753,6 +1754,7 @@ $(BUILD_DIR)/voxglitch/%.cpp.o: voxglitch/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(VOXGLITCH_CUSTOM),$(call custom_module_names,$(m),Voxglitch)) \
+		$(foreach m,$(VOXGLITCH_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Voxglitch_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__Voxglitch
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
