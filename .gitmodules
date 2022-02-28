@@ -187,3 +187,6 @@
 [submodule "plugins/voxglitch"]
 	path = plugins/voxglitch
 	url = https://github.com/clone45/voxglitch.git
+[submodule "plugins/ArableInstruments"]
+	path = plugins/ArableInstruments
+	url = https://github.com/CardinalModules/ArableInstruments.git

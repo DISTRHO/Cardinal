@@ -108,6 +108,7 @@ At the moment the following 3rd-party modules are provided:
 - AlgoritmArte
 - Amalgamated Harmonics
 - Animated Circuits
+- Arable Instruments
 - Aria Salvatrice
 - Audible Instruments
 - Autinn
@@ -147,6 +148,7 @@ At the moment the following 3rd-party modules are provided:
 - MSM
 - Nonlinear Circuits
 - Orbits
+- Parable Instruments
 - Path Set
 - Prism
 - rackwindows

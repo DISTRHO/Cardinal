@@ -19,6 +19,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | AlgoritmArte            | GPL-3.0-or-later         | |
 | Amalgamated Harmonics   | BSD-3-Clause             | |
 | Animated Circuits       | GPL-3.0-or-later         | |
+| Arable Instruments      | GPL-3.0-or-later         | |
 | Aria Salvatrice         | GPL-3.0-or-later         | |
 | Audible Instruments     | GPL-3.0-or-later         | |
 | Autinn                  | GPL-3.0-or-later         | |
@@ -58,6 +59,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | MSM                     | MIT                      | Repo's [LICENSE-dist.md](https://github.com/netboy3/MSM-vcvrack-plugin/issues/10) includes wrong information |
 | Nonlinear Circuits      | CC0-1.0                  | |
 | Orbits                  | GPL-3.0-or-later         | |
+| Parable Instruments     | GPL-3.0-or-later         | |
 | Path Set                | GPL-3.0-or-later         | |
 | Prism                   | BSD-3-Clause             | |
 | Rackwindows             | MIT                      | |
@@ -96,6 +98,7 @@ Below is a list of artwork licenses from plugins
 | AmalgamatedHarmonics/DSEG*.ttf          | OFL-1.1-RFN      | |
 | AmalgamatedHarmonics/Roboto*.ttf        | Apache-2.0       | |
 | AnimatedCircuits/*                      | CC-BY-NC-SA-4.0  | |
+| ArableInstruments/*                     | Custom           | Copyright © Alex Brandt, [used and distributed with permission](https://github.com/adbrant/ArableInstruments/issues/21) |
 | AriaModules/*                           | CC-BY-SA-4.0     | |
 | AriaModules/Arcane/*                    | CC-BY-NC-SA-3.0  | Unused in Cardinal |
 | AriaModules/components/*                | WTFPL            | |
@@ -174,6 +177,7 @@ Below is a list of artwork licenses from plugins
 | nonlinearcircuits/Audiowide-Regular.ttf | OFL-1.1-RFN      | |
 | Orbits/*                                | CC-BY-NC-ND-4.0  | |
 | Orbits/fonts/ShareTechMono-Regular.ttf  | OFL-1.1-RFN      | |
+| ParableInstruments/*                    | Custom           | Copyright © Alex Brandt, [used and distributed with permission](https://github.com/adbrant/ArableInstruments/issues/21) |
 | PathSet/*                               | GPL-3.0-or-later | No artwork specific license provided |
 | Prism/*                                 | CC-BY-SA-4.0     | |
 | Prism/RobotoCondensed-Regular.ttf       | Apache-2.0       | |

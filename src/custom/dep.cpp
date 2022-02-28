@@ -70,6 +70,8 @@ static const struct {
     { "/Algoritmarte/res/Planetz.svg", {}, -1 },
     { "/Algoritmarte/res/Zefiro.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
+    { "/ArableInstruments/res/Joni.svg", {}, -1 },
+    // Custom, runtime dark mode used with permission
     { "/AudibleInstruments/res/Blinds.svg", {}, -1 },
     { "/AudibleInstruments/res/Braids.svg", {}, -1 },
     { "/AudibleInstruments/res/Branches.svg", {}, -1 },
@@ -279,6 +281,8 @@ static const struct {
     { "/nonlinearcircuits/res/NLC - SEGUE.svg", {}, -1 },
     { "/nonlinearcircuits/res/squid-axon-papernoise-panel2.svg", {}, -1 },
     { "/nonlinearcircuits/res/NLC - STATUES.svg", {}, -1 },
+    // Custom, runtime dark mode used with permission
+    { "/ParableInstruments/res/Neil.svg", {}, -1 },
     // GPL-3.0-or-later
     { "/PathSet/res/AstroVibe.svg", {}, -1 },
     { "/PathSet/res/IceTray.svg", {}, -1 },

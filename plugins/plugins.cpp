@@ -42,6 +42,11 @@
 // AnimatedCircuits
 #include "AnimatedCircuits/src/plugin.hpp"
 
+// ArableInstruments
+#define modelClouds modelArableClouds
+#include "ArableInstruments/src/ArableInstruments.hpp"
+#undef modelClouds
+
 // Aria
 /* NOTE too much noise in original include, do this a different way
 // #include "AriaModules/src/plugin.hpp"
@@ -616,11 +621,16 @@ extern Model* modelBlankPanel;
 // Orbits
 #include "Orbits/src/plugin.hpp"
 
+// ParableInstruments
+#define modelClouds modelParableClouds
+#include "ParableInstruments/src/ArableInstruments.hpp"
+#undef modelClouds
+
 // Path Set
-# include "PathSet/src/plugin.hpp"
+#include "PathSet/src/plugin.hpp"
 
 // Prism
-# include "Prism/src/plugin.hpp"
+#include "Prism/src/plugin.hpp"
 
 // rackwindows
 #include "rackwindows/src/plugin.hpp"
@@ -666,7 +676,9 @@ extern Model* modelFilterPlus;
 #include "ValleyAudio/src/Valley.hpp"
 
 // Voxglitch
+#define modelLooper modelVoxglitchLooper
 #include "voxglitch/src/plugin.hpp"
+#undef modelLooper
 
 // ZetaCarinaeModules
 #include "ZetaCarinaeModules/src/plugin.hpp"
@@ -700,6 +712,7 @@ Plugin* pluginInstance__8Mode;
 extern Plugin* pluginInstance__AaronStatic;
 Plugin* pluginInstance__Algoritmarte;
 Plugin* pluginInstance__AmalgamatedHarmonics;
+Plugin* pluginInstance__ArableInstruments;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
 Plugin* pluginInstance__AudibleInstruments;
@@ -743,6 +756,7 @@ extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__MSM;
 Plugin* pluginInstance__nonlinearcircuits;
 Plugin* pluginInstance__Orbits;
+Plugin* pluginInstance__ParableInstruments;
 Plugin* pluginInstance__PathSet;
 Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
@@ -997,6 +1011,20 @@ static void initStatic__AnimatedCircuits()
     {
         p->addModel(model_AC_Folding);
         p->addModel(model_AC_LFold);
+    }
+}
+
+static void initStatic__ArableInstruments()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__ArableInstruments = p;
+
+    const StaticPluginLoader spl(p, "ArableInstruments");
+    if (spl.ok())
+    {
+#define modelClouds modelArableClouds
+        p->addModel(modelClouds);
+#undef modelClouds
     }
 }
 
@@ -2260,6 +2288,20 @@ static void initStatic__Orbits()
     }
 }
 
+static void initStatic__ParableInstruments()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__ParableInstruments = p;
+
+    const StaticPluginLoader spl(p, "ParableInstruments");
+    if (spl.ok())
+    {
+#define modelClouds modelParableClouds
+        p->addModel(modelClouds);
+#undef modelClouds
+    }
+}
+
 static void initStatic__PathSet()
 {
     Plugin* const p = new Plugin;
@@ -2442,6 +2484,7 @@ static void initStatic__Voxglitch()
     const StaticPluginLoader spl(p, "voxglitch");
     if (spl.ok())
     {
+#define modelLooper modelVoxglitchLooper
       p->addModel(modelAutobreak);
       p->addModel(modelByteBeat);
       p->addModel(modelDigitalProgrammer);
@@ -2462,6 +2505,7 @@ static void initStatic__Voxglitch()
       p->addModel(modelWavBank);
       p->addModel(modelWavBankMC);
       p->addModel(modelXY);
+#undef modelLooper
     }
 }
 
@@ -2517,6 +2561,7 @@ void initStaticPlugins()
     initStatic__Algoritmarte();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
+    initStatic__ArableInstruments();
     initStatic__Aria();
     initStatic__AudibleInstruments();
     initStatic__Autinn();
@@ -2559,6 +2604,7 @@ void initStaticPlugins()
     initStatic__MSM();
     initStatic__nonlinearcircuits();
     initStatic__Orbits();
+    initStatic__ParableInstruments();
     initStatic__PathSet();
     initStatic__Prism();
     initStatic__rackwindows();

@@ -262,6 +262,24 @@ PLUGIN_FILES += $(wildcard AnimatedCircuits/src/Folding/*.cpp)
 PLUGIN_FILES += $(wildcard AnimatedCircuits/src/LFold/*.cpp)
 
 # --------------------------------------------------------------
+# ArableInstruments
+
+PLUGIN_FILES += ArableInstruments/src/Clouds.cpp
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/dsp/correlator.cc
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/dsp/granular_processor.cc
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/dsp/mu_law.cc
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/dsp/pvoc/frame_transformation.cc
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/dsp/pvoc/phase_vocoder.cc
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/dsp/pvoc/stft.cc
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/resources.cc
+PLUGIN_FILES += ArableInstruments/eurorack/stmlib/utils/random.cc
+PLUGIN_FILES += ArableInstruments/eurorack/stmlib/dsp/atan.cc
+PLUGIN_FILES += ArableInstruments/eurorack/stmlib/dsp/units.cc
+
+# modules/types which are present in other plugins
+ARABLE_CUSTOM = Clouds clouds stmlib
+
+# --------------------------------------------------------------
 # Aria
 
 PLUGIN_FILES += AriaModules/src/Blank.cpp
@@ -700,6 +718,24 @@ PLUGIN_FILES += $(filter-out nonlinearcircuits/src/NLC.cpp,$(wildcard nonlinearc
 PLUGIN_FILES += $(wildcard Orbits/src/*.cpp)
 
 # --------------------------------------------------------------
+# ParableInstruments
+
+PLUGIN_FILES += ParableInstruments/src/Clouds.cpp
+PLUGIN_FILES += ParableInstruments/parasites/clouds/dsp/correlator.cc
+PLUGIN_FILES += ParableInstruments/parasites/clouds/dsp/granular_processor.cc
+PLUGIN_FILES += ParableInstruments/parasites/clouds/dsp/mu_law.cc
+PLUGIN_FILES += ParableInstruments/parasites/clouds/dsp/pvoc/frame_transformation.cc
+PLUGIN_FILES += ParableInstruments/parasites/clouds/dsp/pvoc/phase_vocoder.cc
+PLUGIN_FILES += ParableInstruments/parasites/clouds/dsp/pvoc/stft.cc
+PLUGIN_FILES += ParableInstruments/parasites/clouds/resources.cc
+PLUGIN_FILES += ParableInstruments/parasites/stmlib/utils/random.cc
+PLUGIN_FILES += ParableInstruments/parasites/stmlib/dsp/atan.cc
+PLUGIN_FILES += ParableInstruments/parasites/stmlib/dsp/units.cc
+
+# modules/types which are present in other plugins
+PARABLE_CUSTOM = Clouds CustomPanel CloudsWidget FreezeLight clouds stmlib
+
+# --------------------------------------------------------------
 # Path Set
 
 PLUGIN_FILES += $(wildcard PathSet/src/*.cpp)
@@ -826,7 +862,7 @@ VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
 
 # modules/types which are present in other plugins
-VOXGLITCH_CUSTOM = $(DRWAV) Readout
+VOXGLITCH_CUSTOM = $(DRWAV) AudioBuffer AudioFile GateSequencer Looper Readout Sequencer SequencerDisplay
 
 # --------------------------------------------------------------
 # ZetaCarinaeModules
@@ -995,6 +1031,7 @@ RESOURCE_FILES = \
 		$(wildcard */res/*/*/*.ttf))
 
 RESOURCE_FILES += $(wildcard */presets)
+RESOURCE_FILES += ArableInstruments/res/Joni.png
 RESOURCE_FILES += BaconPlugs/res/Keypunch029.json
 RESOURCE_FILES += BaconPlugs/res/midi/chopin
 RESOURCE_FILES += BaconPlugs/res/midi/debussy
@@ -1007,6 +1044,7 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
 RESOURCE_FILES += nonlinearcircuits/res
+RESOURCE_FILES += ParableInstruments/res/Neil.png
 
 # MOD builds only have LV2 FX variant for now
 ifeq ($(MOD_BUILD),true)
@@ -1222,6 +1260,17 @@ $(BUILD_DIR)/AnimatedCircuits/%.cpp.o: AnimatedCircuits/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ANIMATEDCIRCUITS_CUSTOM),$(call custom_module_names,$(m),AnimatedCircuits)) \
 		-DpluginInstance=pluginInstance__AnimatedCircuits
+
+$(BUILD_DIR)/ArableInstruments/%.o: ArableInstruments/%
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ARABLE_CUSTOM),$(call custom_module_names,$(m),Arable)) \
+		-DpluginInstance=pluginInstance__ArableInstruments \
+		-DTEST \
+		-IArableInstruments/eurorack \
+		-Wno-class-memaccess \
+		-Wno-unused-local-typedefs
 
 $(BUILD_DIR)/AriaModules/%.cpp.o: AriaModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1621,6 +1670,18 @@ $(BUILD_DIR)/Orbits/%.cpp.o: Orbits/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ORBITS_CUSTOM),$(call custom_module_names,$(m),Orbits)) \
 		-DpluginInstance=pluginInstance__Orbits
+
+$(BUILD_DIR)/ParableInstruments/%.o: ParableInstruments/%
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(PARABLE_CUSTOM),$(call custom_module_names,$(m),Parable)) \
+		-DpluginInstance=pluginInstance__ParableInstruments \
+		-DPARASITES \
+		-DTEST \
+		-IArableInstruments/parasites \
+		-Wno-class-memaccess \
+		-Wno-unused-local-typedefs
 
 $(BUILD_DIR)/PathSet/%.cpp.o: PathSet/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
