@@ -382,13 +382,11 @@ public:
             filebrowserhandle = nullptr;
         }
 
-       #ifndef DISTRHO_OS_MAC
         if (windowParameters.rateLimit != 0 && ++rateLimitStep % (windowParameters.rateLimit * 2))
             return;
 
         rateLimitStep = 0;
         repaint();
-       #endif
     }
 
     void WindowParametersChanged(const WindowParameterList param, float value) override
