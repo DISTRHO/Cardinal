@@ -66,6 +66,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Sonus Modular           | GPL-3.0-or-later         | |
 | stocaudio               | GPL-3.0-or-later         | |
 | Valley                  | GPL-3.0-or-later         | |
+| Voxglitch               | GPL-3.0-or-later         | [License still to be applied in the repo](https://github.com/clone45/voxglitch/issues/123) |
 | ZetaCarinae             | GPL-3.0-or-later         | |
 | ZZC                     | GPL-3.0-or-later         | |
 
@@ -185,6 +186,8 @@ Below is a list of artwork licenses from plugins
 | ValleyAudio/din1451alt.ttf              | CC-BY-3.0-DE     | |
 | ValleyAudio/DSEG14Classic-*.ttf         | OFL-1.1-RFN      | |
 | ValleyAudio/ShareTechMono-*.ttf         | OFL-1.1-RFN      | |
+| voxglitch/*                             | BSD-3-Clause     | No artwork specific license provided |
+| voxglitch/ShareTechMono-Regular.ttf     | OFL-1.1-RFN      | |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | [Same license as source code](https://github.com/mhampton/ZetaCarinaeModules/issues/8) |
 | ZZC/*                                   | CC-BY-NC-SA-4.0  | |
 | ZZC/panels/*                            | CC-BY-NC-SA-4.0  | NOTE: The ZZC Logo is Copyright (c) 2019 Sergey Ukolov and cannot be used in derivative works; Cardinal's use does not officially constitute derivative work. |

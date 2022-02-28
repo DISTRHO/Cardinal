@@ -184,3 +184,6 @@
 [submodule "plugins/nonlinearcircuits"]
 	path = plugins/nonlinearcircuits
 	url = https://github.com/mhetrick/nonlinearcircuits.git
+[submodule "plugins/voxglitch"]
+	path = plugins/voxglitch
+	url = https://github.com/clone45/voxglitch.git

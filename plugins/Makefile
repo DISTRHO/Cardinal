@@ -821,6 +821,14 @@ VALLEYAUDIO_CUSTOM = $(DRWAV) DigitalDisplay
 VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 
 # --------------------------------------------------------------
+# Voxglitch
+
+PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
+
+# modules/types which are present in other plugins
+VOXGLITCH_CUSTOM = $(DRWAV) Readout
+
+# --------------------------------------------------------------
 # ZetaCarinaeModules
 
 PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCarinaeModules/src/*.cpp))
@@ -1678,6 +1686,13 @@ $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 		-DSTDIO_OVERRIDE=ValleyAudio \
 		-Wno-sign-compare \
 		-Wno-unused-but-set-variable
+
+$(BUILD_DIR)/voxglitch/%.cpp.o: voxglitch/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(VOXGLITCH_CUSTOM),$(call custom_module_names,$(m),Voxglitch)) \
+		-DpluginInstance=pluginInstance__Voxglitch
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

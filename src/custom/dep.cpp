@@ -283,6 +283,26 @@ static const struct {
     { "/PathSet/res/AstroVibe.svg", {}, -1 },
     { "/PathSet/res/IceTray.svg", {}, -1 },
     { "/PathSet/res/ShiftyMod.svg", {}, -1 },
+    // BSD-3-Clause
+    { "/voxglitch/res/autobreak_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/bytebeat_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/digital_programmer_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/digital_sequencer_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/digital_sequencer_xp_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/ghosts_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/glitch_sequencer_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/goblins_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/grain_engine_mk2_expander_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/grain_engine_mk2_front_panel_r3.svg", {}, -1 },
+    { "/voxglitch/res/grain_fx_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/hazumi_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/looper_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/repeater_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/samplerx8_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/satanonaut_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/wav_bank_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/wav_bank_mc_front_panel_v2.svg", {}, -1 },
+    { "/voxglitch/res/xy_front_panel.svg", {}, -1 },
 };
 
 static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
@@ -454,6 +474,24 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
         // blue darker 3 (blue with 25% opacity on bg)
         case 0xffe5cbb3:
             paint.color = 0xff4b321a;
+            return true;
+        }
+    }
+
+    // Special case for voxglitch colors
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/voxglitch/", 11) == 0)
+    {
+        switch (paint.color)
+        {
+        // wavbank blue
+        case 0xffc5ae8a:
+        // various black
+        case 0xff121212:
+        case 0xff2a2828:
+            return false;
+        // satanonaut
+        case 0xff595959:
+            paint.color = 0x7f3219ac;
             return true;
         }
     }

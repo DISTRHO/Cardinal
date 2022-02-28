@@ -665,6 +665,9 @@ extern Model* modelFilterPlus;
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
 
+// Voxglitch
+#include "voxglitch/src/plugin.hpp"
+
 // ZetaCarinaeModules
 #include "ZetaCarinaeModules/src/plugin.hpp"
 
@@ -748,6 +751,7 @@ Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__stocaudio;
 Plugin* pluginInstance__substation;
 Plugin* pluginInstance__ValleyAudio;
+Plugin* pluginInstance__Voxglitch;
 Plugin* pluginInstance__ZetaCarinaeModules;
 Plugin* pluginInstance__ZZC;
 #endif // NOPLUGINS
@@ -2430,6 +2434,37 @@ static void initStatic__ValleyAudio()
     }
 }
 
+static void initStatic__Voxglitch()
+{
+    Plugin* p = new Plugin;
+    pluginInstance__Voxglitch = p;
+
+    const StaticPluginLoader spl(p, "voxglitch");
+    if (spl.ok())
+    {
+      p->addModel(modelAutobreak);
+      p->addModel(modelByteBeat);
+      p->addModel(modelDigitalProgrammer);
+      p->addModel(modelDigitalSequencer);
+      p->addModel(modelDigitalSequencerXP);
+      p->addModel(modelGlitchSequencer);
+      p->addModel(modelGhosts);
+      p->addModel(modelGoblins);
+      p->addModel(modelGrainEngine);
+      p->addModel(modelGrainEngineMK2);
+      p->addModel(modelGrainEngineMK2Expander);
+      p->addModel(modelGrainFx);
+      p->addModel(modelHazumi);
+      p->addModel(modelLooper);
+      p->addModel(modelRepeater);
+      p->addModel(modelSamplerX8);
+      p->addModel(modelSatanonaut);
+      p->addModel(modelWavBank);
+      p->addModel(modelWavBankMC);
+      p->addModel(modelXY);
+    }
+}
+
 static void initStatic__ZetaCarinaeModules()
 {
     Plugin* p = new Plugin;
@@ -2532,6 +2567,7 @@ void initStaticPlugins()
     initStatic__stocaudio();
     initStatic__substation();
     initStatic__ValleyAudio();
+    initStatic__Voxglitch();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();
 #endif // NOPLUGINS
