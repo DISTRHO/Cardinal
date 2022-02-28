@@ -862,8 +862,8 @@ VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
 
 # modules/types which are present in other plugins
-VOXGLITCH_CUSTOM = $(DRWAV) AudioFile GateSequencer Looper Readout
-VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer Grain Sequencer SequencerDisplay
+VOXGLITCH_CUSTOM = $(DRWAV) AudioFile Looper Readout
+VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain Sequencer SequencerDisplay VoltageSequencer
 
 # --------------------------------------------------------------
 # ZetaCarinaeModules
