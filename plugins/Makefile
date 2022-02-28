@@ -1755,7 +1755,8 @@ $(BUILD_DIR)/voxglitch/%.cpp.o: voxglitch/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(VOXGLITCH_CUSTOM),$(call custom_module_names,$(m),Voxglitch)) \
 		$(foreach m,$(VOXGLITCH_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Voxglitch_$(shell basename $*))) \
-		-DpluginInstance=pluginInstance__Voxglitch
+		-DpluginInstance=pluginInstance__Voxglitch \
+		-DSKIP_MINGW_FORMAT
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
