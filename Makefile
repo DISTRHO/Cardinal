@@ -119,8 +119,7 @@ endif
 # --------------------------------------------------------------
 # MOD builds
 
-EXTRA_MOD_FLAGS  = 
-# -I../include/single-precision -fsingle-precision-constant
+EXTRA_MOD_FLAGS  = -I../include/single-precision -fsingle-precision-constant
 
 ifeq ($(MODDUO),true)
 EXTRA_MOD_FLAGS += -mno-unaligned-access
