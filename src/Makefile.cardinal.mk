@@ -257,6 +257,8 @@ BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 
 ifeq ($(CARDINAL_VARIANT),main)
 all: jack lv2 vst3
+else ifeq ($(CARDINAL_VARIANT),fx)
+all: lv2 vst2 vst3 static
 else
 all: lv2 vst2 vst3
 endif
