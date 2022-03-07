@@ -231,7 +231,7 @@ PLUGIN_FILES += $(filter-out 21kHz/src/21kHz.cpp,$(wildcard 21kHz/src/*.cpp))
 # --------------------------------------------------------------
 # 8Mode
 
-PLUGIN_FILES += $(filter-out 8Mode/src/plugin.cpp,$(wildcard 8Mode/src/*.cpp))
+PLUGIN_FILES += $(filter-out 8Mode/src/8mode.cpp,$(wildcard 8Mode/src/*.cpp))
 
 # --------------------------------------------------------------
 # AlgoritmArte
@@ -463,7 +463,7 @@ PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
 # --------------------------------------------------------------
 # CatroModulo
 
-PLUGIN_FILES += $(wildcard CatroModulo/src/*.cpp)
+PLUGIN_FILES += $(filter-out CatroModulo/src/CatroModulo.cpp,$(wildcard CatroModulo/src/*.cpp))
 
 # modules/types which are present in other plugins
 CATROMODULO_CUSTOM = LowFrequencyOscillator NumDisplayWidget
@@ -476,7 +476,7 @@ PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 # --------------------------------------------------------------
 # Dintree
 
-PLUGIN_FILES += $(wildcard Dintree/src/*.cpp)
+PLUGIN_FILES += $(filter-out Dintree/src/plugin.cpp,$(wildcard Dintree/src/*.cpp))
 PLUGIN_FILES += $(wildcard Dintree/src/components/*.cpp)
 PLUGIN_FILES += $(wildcard Dintree/src/utils/*.cpp)
 
@@ -537,7 +537,7 @@ PLUGIN_FILES += $(filter-out GlueTheGiant/src/plugin.cpp,$(wildcard GlueTheGiant
 # --------------------------------------------------------------
 # GoodSheperd
 
-PLUGIN_FILES += $(wildcard GoodSheperd/src/*.cpp)
+PLUGIN_FILES += $(filter-out GoodSheperd/src/plugin.cpp,$(wildcard GoodSheperd/src/*.cpp))
 
 # --------------------------------------------------------------
 # GrandeModular
@@ -547,7 +547,7 @@ PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModul
 # --------------------------------------------------------------
 # Hampton Harmonics
 
-PLUGIN_FILES += $(wildcard HamptonHarmonics/src/*.cpp)
+PLUGIN_FILES += $(filter-out HamptonHarmonics/src/plugin.cpp,$(wildcard HamptonHarmonics/src/*.cpp))
 
 # modules/types which are present in other plugins
 HAMPTONHARMONICS_CUSTOM = Arp Progress
@@ -555,7 +555,7 @@ HAMPTONHARMONICS_CUSTOM = Arp Progress
 # --------------------------------------------------------------
 # HetrickCV
 
-PLUGIN_FILES += $(wildcard HetrickCV/src/*.cpp)
+PLUGIN_FILES += $(filter-out HetrickCV/src/HetrickCV.cpp,$(wildcard HetrickCV/src/*.cpp))
 PLUGIN_FILES += $(wildcard HetrickCV/src/DSP/*.cpp)
 PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/arr.cpp)
 PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/Domain.cpp)
@@ -610,7 +610,7 @@ JW_CUSTOM = PlayHead Quantizer
 # --------------------------------------------------------------
 # kocmoc
 
-PLUGIN_FILES += $(wildcard kocmoc/src/*.cpp)
+PLUGIN_FILES += $(filter-out kocmoc/src/plugin.cpp,$(wildcard kocmoc/src/*.cpp))
 
 # modules/types which are present in other plugins
 KOCMOC_CUSTOM = Phasor __ct_base __ct_comp
@@ -626,7 +626,7 @@ LIFEFORMMODULAR_CUSTOM = IO MS __ct_base __ct_comp
 # --------------------------------------------------------------
 # Lilac Loop
 
-PLUGIN_FILES += $(wildcard LilacLoop/src/*.cpp)
+PLUGIN_FILES += $(filter-out LilacLoop/src/plugin.cpp,$(wildcard LilacLoop/src/*.cpp))
 
 # modules/types which are present in other plugins
 LILACLOOP_CUSTOM = AudioFile Mode
@@ -671,7 +671,7 @@ MINDMELD_CUSTOM = printNote
 # --------------------------------------------------------------
 # ML_modules
 
-PLUGIN_FILES += $(filter-out ML_modules/src/plugin.cpp,$(wildcard ML_modules/src/*.cpp))
+PLUGIN_FILES += $(filter-out ML_modules/src/ML_modules.cpp,$(wildcard ML_modules/src/*.cpp))
 PLUGIN_FILES += ML_modules/freeverb/revmodel.cpp
 
 # modules/types which are present in other plugins
@@ -715,7 +715,7 @@ PLUGIN_FILES += $(filter-out nonlinearcircuits/src/NLC.cpp,$(wildcard nonlinearc
 # --------------------------------------------------------------
 # Orbits
 
-PLUGIN_FILES += $(wildcard Orbits/src/*.cpp)
+PLUGIN_FILES += $(filter-out Orbits/src/plugin.cpp,$(wildcard Orbits/src/*.cpp))
 
 # --------------------------------------------------------------
 # ParableInstruments
@@ -738,7 +738,7 @@ PARABLE_CUSTOM = Clouds CustomPanel CloudsWidget FreezeLight clouds stmlib
 # --------------------------------------------------------------
 # Path Set
 
-PLUGIN_FILES += $(wildcard PathSet/src/*.cpp)
+PLUGIN_FILES += $(filter-out PathSet/src/plugin.cpp,$(wildcard PathSet/src/*.cpp))
 
 # --------------------------------------------------------------
 # Prism
@@ -765,12 +765,12 @@ REPELZEN_CUSTOM = Blank Mixer Werner tanh_pade
 # --------------------------------------------------------------
 # sonusmodular
 
-PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular,$(wildcard sonusmodular/src/*.cpp))
+PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular.cpp,$(wildcard sonusmodular/src/*.cpp))
 
 # --------------------------------------------------------------
 # stocaudio
 
-PLUGIN_FILES += $(wildcard stocaudio/src/*.cpp)
+PLUGIN_FILES += $(filter-out stocaudio/src/plugin.cpp,$(wildcard stocaudio/src/*.cpp))
 
 # --------------------------------------------------------------
 # Substation (Open source release)
@@ -1601,7 +1601,7 @@ $(BUILD_DIR)/LyraeModules/%.cpp.o: LyraeModules/%.cpp
 		$(foreach m,$(LYRAE_CUSTOM),$(call custom_module_names,$(m),Lyrae)) \
 		-DpluginInstance=pluginInstance__Lyrae
 
-$(BUILD_DIR)/MindMeldModular/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
+$(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
