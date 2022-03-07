@@ -36,11 +36,6 @@ struct HostAudio : TerminalModule {
     dsp::RCFilter dcFilters[numIO];
     bool dcFilterEnabled = (numIO == 2);
 
-    // for stereo meter
-    volatile bool resetMeters = true;
-    float gainMeterL = 0.0f;
-    float gainMeterR = 0.0f;
-
     HostAudio()
         : pcontext(static_cast<CardinalPluginContext*>(APP)),
           numParams(numIO == 2 ? 1 : 0),
@@ -63,13 +58,10 @@ struct HostAudio : TerminalModule {
     void onReset() override
     {
         dcFilterEnabled = (numIO == 2);
-        resetMeters = true;
     }
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override
     {
-        resetMeters = true;
-
         for (int i=0; i<numIO; ++i)
             dcFilters[i].setCutoffFreq(10.f * e.sampleTime);
     }
@@ -103,74 +95,6 @@ struct HostAudio : TerminalModule {
         }
     }
 
-    void processTerminalOutput(const ProcessArgs&) override
-    {
-        const int blockFrames = pcontext->engine->getBlockFrames();
-
-        // only incremented on output
-        const int k = dataFrame++;
-        DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
-
-        if (isBypassed())
-            return;
-
-        float** const dataOuts = pcontext->dataOuts;
-
-        // stereo version gain
-        const float gain = numParams != 0 ? std::pow(params[0].getValue(), 2.f) : 1.0f;
-
-        // read first value, special case for mono mode
-        float valueL = inputs[0].getVoltageSum() * 0.1f;
-
-        // Apply DC filter
-        if (dcFilterEnabled)
-        {
-            dcFilters[0].process(valueL);
-            valueL = dcFilters[0].highpass();
-        }
-
-        valueL = clamp(valueL * gain, -1.0f, 1.0f);
-        dataOuts[0][k] += valueL;
-
-        // read everything else
-        for (int i=1; i<numInputs; ++i)
-        {
-            float v = inputs[i].getVoltageSum() * 0.1f;
-
-            // Apply DC filter
-            if (dcFilterEnabled)
-            {
-                dcFilters[i].process(v);
-                v = dcFilters[i].highpass();
-            }
-
-            dataOuts[i][k] += clamp(v * gain, -1.0f, 1.0f);
-        }
-
-        if (numInputs == 2)
-        {
-            const bool connected = inputs[1].isConnected();
-
-            if (! connected)
-                dataOuts[1][k] += valueL;
-
-            if (dataFrame == blockFrames)
-            {
-                if (resetMeters)
-                    gainMeterL = gainMeterR = 0.0f;
-
-                gainMeterL = std::max(gainMeterL, d_findMaxNormalizedFloat(dataOuts[0], blockFrames));
-
-                if (connected)
-                    gainMeterR = std::max(gainMeterR, d_findMaxNormalizedFloat(dataOuts[1], blockFrames));
-                else
-                    gainMeterR = gainMeterL;
-
-                resetMeters = false;
-            }
-        }
-    }
-
     json_t* dataToJson() override
     {
         json_t* const rootJ = json_object();
@@ -189,27 +113,138 @@ struct HostAudio : TerminalModule {
     }
 };
 
-template<int numIO>
-struct HostAudioNanoMeter : NanoMeter {
-    HostAudio<numIO>* const module;
+struct HostAudio2 : HostAudio<2> {
+    // for stereo meter
+    int internalDataFrame = 0;
+    float internalDataBuffer[2][128];
+    volatile bool resetMeters = true;
+    float gainMeterL = 0.0f;
+    float gainMeterR = 0.0f;
 
-    HostAudioNanoMeter(HostAudio<numIO>* const m)
-        : module(m)
+    HostAudio2()
+        : HostAudio<2>()
     {
-        hasGainKnob = true;
+        std::memset(internalDataBuffer, 0, sizeof(internalDataBuffer));
     }
 
-    void updateMeters() override
+    void onReset() override
     {
-        if (module == nullptr || module->resetMeters)
+        HostAudio<2>::onReset();
+        resetMeters = true;
+    }
+
+    void onSampleRateChange(const SampleRateChangeEvent& e) override
+    {
+        HostAudio<2>::onSampleRateChange(e);
+        resetMeters = true;
+    }
+
+    void processTerminalOutput(const ProcessArgs&)
+    {
+        const int blockFrames = pcontext->engine->getBlockFrames();
+
+        // only incremented on output
+        const int k = dataFrame++;
+        DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
+
+        if (isBypassed())
             return;
 
-        // Only fetch new values once DSP side is updated
-        gainMeterL = module->gainMeterL;
-        gainMeterR = module->gainMeterR;
-        module->resetMeters = true;
+        float** const dataOuts = pcontext->dataOuts;
+
+        // gain (stereo variant only)
+        const float gain = std::pow(params[0].getValue(), 2.f);
+
+        // left/mono check
+        const bool in2connected = inputs[1].isConnected();
+
+        // read stereo values
+        float valueL = inputs[0].getVoltageSum() * 0.1f;
+        float valueR = inputs[1].getVoltageSum() * 0.1f;
+
+        // Apply DC filter
+        if (dcFilterEnabled)
+        {
+            dcFilters[0].process(valueL);
+            valueL = dcFilters[0].highpass();
+        }
+
+        valueL = clamp(valueL * gain, -1.0f, 1.0f);
+        dataOuts[0][k] += valueL;
+
+        if (in2connected)
+        {
+            if (dcFilterEnabled)
+            {
+                dcFilters[1].process(valueR);
+                valueR = dcFilters[1].highpass();
+            }
+
+            valueR = clamp(valueR * gain, -1.0f, 1.0f);
+            dataOuts[1][k] += valueR;
+        }
+        else
+        {
+            valueR = valueL;
+            dataOuts[1][k] += valueL;
+        }
+
+        const int j = internalDataFrame++;
+        internalDataBuffer[0][j] = valueL;
+        internalDataBuffer[1][j] = valueR;
+
+        if (internalDataFrame == 128)
+        {
+            internalDataFrame = 0;
+
+            if (resetMeters)
+                gainMeterL = gainMeterR = 0.0f;
+
+            gainMeterL = std::max(gainMeterL, d_findMaxNormalizedFloat(internalDataBuffer[0], 128));
+
+            if (in2connected)
+                gainMeterR = std::max(gainMeterR, d_findMaxNormalizedFloat(internalDataBuffer[1], 128));
+            else
+                gainMeterR = gainMeterL;
+
+            resetMeters = false;
+        }
     }
 };
+
+struct HostAudio8 : HostAudio<8> {
+    // no meters in this variant
+
+    void processTerminalOutput(const ProcessArgs&) override
+    {
+        const int blockFrames = pcontext->engine->getBlockFrames();
+
+        // only incremented on output
+        const int k = dataFrame++;
+        DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
+
+        if (isBypassed())
+            return;
+
+        float** const dataOuts = pcontext->dataOuts;
+
+        for (int i=0; i<numInputs; ++i)
+        {
+            float v = inputs[i].getVoltageSum() * 0.1f;
+
+            if (dcFilterEnabled)
+            {
+                dcFilters[i].process(v);
+                v = dcFilters[i].highpass();
+            }
+
+            dataOuts[i][k] += clamp(v, -1.0f, 1.0f);
+        }
+    }
+
+};
+
+// --------------------------------------------------------------------------------------------------------------------
 
 template<int numIO>
 struct HostAudioWidget : ModuleWidgetWith8HP {
@@ -228,41 +263,6 @@ struct HostAudioWidget : ModuleWidgetWith8HP {
             createAndAddInput(i);
             createAndAddOutput(i);
         }
-
-        if (numIO == 2)
-        {
-            // FIXME
-            const float middleX = box.size.x * 0.5f;
-            addParam(createParamCentered<NanoKnob>(Vec(middleX, 310.0f), m, 0));
-
-            HostAudioNanoMeter<numIO>* const meter = new HostAudioNanoMeter<numIO>(m);
-            meter->box.pos = Vec(middleX - padding + 2.75f, startY + padding * 2);
-            meter->box.size = Vec(padding * 2.0f - 4.0f, 136.0f);
-            addChild(meter);
-        }
-    }
-
-    void draw(const DrawArgs& args) override
-    {
-        drawBackground(args.vg);
-        drawOutputJacksArea(args.vg, numIO);
-        setupTextLines(args.vg);
-
-        if (numIO == 2)
-        {
-            drawTextLine(args.vg, 0, "Left/M");
-            drawTextLine(args.vg, 1, "Right");
-        }
-        else
-        {
-            for (int i=0; i<numIO; ++i)
-            {
-                char text[] = {'A','u','d','i','o',' ',static_cast<char>('0'+i+1),'\0'};
-                drawTextLine(args.vg, i, text);
-            }
-        }
-
-        ModuleWidgetWith8HP::draw(args);
     }
 
     void appendContextMenu(Menu* const menu) override {
@@ -273,7 +273,79 @@ struct HostAudioWidget : ModuleWidgetWith8HP {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-Model* modelHostAudio2 = createModel<HostAudio<2>, HostAudioWidget<2>>("HostAudio2");
-Model* modelHostAudio8 = createModel<HostAudio<8>, HostAudioWidget<8>>("HostAudio8");
+struct HostAudioNanoMeter : NanoMeter {
+    HostAudio2* const module;
+
+    HostAudioNanoMeter(HostAudio2* const m)
+        : module(m)
+    {
+        hasGainKnob = true;
+    }
+
+    void updateMeters() override
+    {
+        if (module == nullptr || module->resetMeters)
+            return;
+
+        // Only fetch new values once DSP side is updated
+        gainMeterL = module->gainMeterL;
+        gainMeterR = module->gainMeterR;
+        module->resetMeters = true;
+    }
+};
+
+// --------------------------------------------------------------------------------------------------------------------
+
+struct HostAudioWidget2 : HostAudioWidget<2> {
+    HostAudioWidget2(HostAudio2* const m)
+        : HostAudioWidget<2>(m)
+    {
+        // FIXME
+        const float middleX = box.size.x * 0.5f;
+        addParam(createParamCentered<NanoKnob>(Vec(middleX, 310.0f), m, 0));
+
+        HostAudioNanoMeter* const meter = new HostAudioNanoMeter(m);
+        meter->box.pos = Vec(middleX - padding + 2.75f, startY + padding * 2);
+        meter->box.size = Vec(padding * 2.0f - 4.0f, 136.0f);
+        addChild(meter);
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        drawBackground(args.vg);
+        drawOutputJacksArea(args.vg, 2);
+        setupTextLines(args.vg);
+
+        drawTextLine(args.vg, 0, "Left/M");
+        drawTextLine(args.vg, 1, "Right");
+
+        ModuleWidgetWith8HP::draw(args);
+    }
+};
+
+struct HostAudioWidget8 : HostAudioWidget<8> {
+    HostAudioWidget8(HostAudio8* const m)
+        : HostAudioWidget<8>(m) {}
+
+    void draw(const DrawArgs& args) override
+    {
+        drawBackground(args.vg);
+        drawOutputJacksArea(args.vg, 8);
+        setupTextLines(args.vg);
+
+        for (int i=0; i<8; ++i)
+        {
+            char text[] = {'A','u','d','i','o',' ',static_cast<char>('0'+i+1),'\0'};
+            drawTextLine(args.vg, i, text);
+        }
+
+        ModuleWidgetWith8HP::draw(args);
+    }
+};
+
+// --------------------------------------------------------------------------------------------------------------------
+
+Model* modelHostAudio2 = createModel<HostAudio2, HostAudioWidget2>("HostAudio2");
+Model* modelHostAudio8 = createModel<HostAudio8, HostAudioWidget8>("HostAudio8");
 
 // --------------------------------------------------------------------------------------------------------------------
