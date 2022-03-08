@@ -116,6 +116,7 @@ Below is a list of artwork licenses from plugins
 | BaconPlugs/Keypunch029.json             | OFL-1.1          | |
 | Bidoo/*                                 | CC-BY-NC-ND-4.0  | [Special permission granted for runtime dark mode](https://github.com/sebastien-bouffier/Bidoo/issues/191) |
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
+| Befaco/fonts/Segment7Standard.otf       | OFL-1.1-RFN      | |
 | Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), [used and distributed with permission](LICENSE-PERMISSIONS.md#befaco-manu-retamero--befaco) |
 | BogaudioModules/*                       | CC-BY-SA-4.0     | |
 | BogaudioModules/fonts/audiowide.ttf     | OFL-1.1-RFN      | |

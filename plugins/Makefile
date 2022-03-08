@@ -422,6 +422,7 @@ PLUGIN_FILES += $(wildcard BaconPlugs/libs/open303-code/Source/DSPCode/*.cpp)
 # Befaco
 
 PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
+PLUGIN_FILES += $(wildcard Befaco/src/noise-plethora/*/*.cpp)
 PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 
 # modules/types which are present in other plugins
