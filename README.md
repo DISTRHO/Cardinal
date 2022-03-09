@@ -120,7 +120,6 @@ At the moment the following 3rd-party modules are provided:
 - Catro/Modulo
 - cf
 - ChowDSP
-- Dintree Virtual
 - DrumKit
 - E-Series
 - ExpertSleepers Encoders

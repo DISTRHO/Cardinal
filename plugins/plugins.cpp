@@ -290,9 +290,6 @@ extern Model* modelTestVCF;
 #include "ChowDSP/src/plugin.cpp"
 #undef init
 
-// Dintree
-#include "Dintree/src/plugin.hpp"
-
 // DrumKit
 #include "DrumKit/src/DrumKit.hpp"
 void setupSamples();
@@ -725,7 +722,6 @@ Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
-Plugin* pluginInstance__Dintree;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
@@ -1509,26 +1505,6 @@ static void initStatic__ChowDSP()
         // Credit crashes on save, see https://github.com/DISTRHO/Cardinal/issues/98
         // p->addModel(modelCredit);
         spl.removeModule("Credit");
-    }
-}
-
-static void initStatic__Dintree()
-{
-    Plugin* const p = new Plugin;
-    pluginInstance__Dintree = p;
-
-    const StaticPluginLoader spl(p, "Dintree");
-    if (spl.ok())
-    {
-        p->addModel(modelV100_Scanner);
-        p->addModel(modelV101_Dual_Envelope);
-        p->addModel(modelV102_Output_Mixer);
-        p->addModel(modelV103_Reverb_Delay);
-        p->addModel(modelV104_Four_Vs);
-        p->addModel(modelV105_Quad_CV_Proc);
-        p->addModel(modelV107_Dual_Slew);
-        p->addModel(modelV201_Tri_Comparator);
-        p->addModel(modelV218_SH_Clock_Noise);
     }
 }
 
@@ -2574,7 +2550,6 @@ void initStaticPlugins()
     initStatic__CatroModulo();
     initStatic__cf();
     initStatic__ChowDSP();
-    initStatic__Dintree();
     initStatic__DrumKit();
     initStatic__ESeries();
     initStatic__ExpertSleepersEncoders();
