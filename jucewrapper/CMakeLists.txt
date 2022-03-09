@@ -55,10 +55,12 @@ set_property(TARGET sPlugins PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/.
 add_library(sRack STATIC IMPORTED)
 set_property(TARGET sRack PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../src/rack.a")
 
-#ifeq ($(WINDOWS),true)
-#RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libarchive_static.a
 add_library(libarchive STATIC IMPORTED)
+if (WIN32)
+set_property(TARGET libarchive PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../src/Rack/dep/lib/libarchive_static.a")
+else (WIN32)
 set_property(TARGET libarchive PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../src/Rack/dep/lib/libarchive.a")
+endif (WIN32)
 
 add_library(libjansson STATIC IMPORTED)
 set_property(TARGET libjansson PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../src/Rack/dep/lib/libjansson.a")
@@ -75,9 +77,29 @@ set_property(TARGET libspeexdsp PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR
 add_library(libzstd STATIC IMPORTED)
 set_property(TARGET libzstd PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../src/Rack/dep/lib/libzstd.a")
 
-#find_package(Dbus)
-find_package(OpenGL)
-find_package(X11)
+# dependencies
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBLO REQUIRED liblo)
+pkg_check_modules(SNDFILE REQUIRED sndfile)
+
+if (NOT APPLE OR WIN32)
+pkg_check_modules(X11 REQUIRED x11)
+pkg_check_modules(XCURSOR REQUIRED Xcursor)
+pkg_check_modules(XEXT REQUIRED Xext)
+pkg_check_modules(XRANDR REQUIRED Xrandr)
+pkg_check_modules(DBUS REQUIRED dbus-1)
+set(EXTRA_LIBS "-lrt")
+endif (NOT APPLE OR WIN32)
+
+if (APPLE)
+set(EXTRA_LIBS "-lz")
+set(GL_LIBRARIES "-framework OpenGL")
+else (APPLE)
+pkg_check_modules(GL REQUIRED gl)
+set(STATIC_LIBS_START "-Wl,--whole-archive")
+set(STATIC_LIBS_END "-Wl,--no-whole-archive")
+endif (APPLE)
 
 # FX variant
 
@@ -89,7 +111,7 @@ juce_add_plugin(CardinalFX
     EDITOR_WANTS_KEYBOARD_FOCUS TRUE
     PLUGIN_MANUFACTURER_CODE Dstr
     PLUGIN_CODE dCnF
-    FORMATS Standalone AU
+    FORMATS Standalone VST3 AU
     PRODUCT_NAME "CardinalFX")
 
 target_sources(CardinalFX
@@ -98,23 +120,20 @@ target_sources(CardinalFX
 
 target_include_directories(CardinalFX
     PRIVATE
-        .
-        ../dpf/distrho)
+        ../dpf/distrho
+        ../src/CardinalFX)
 
 target_compile_definitions(CardinalFX
     PUBLIC
         JUCE_DISPLAY_SPLASH_SCREEN=0
         JUCE_USE_CURL=0
+        JUCE_VST3_CAN_REPLACE_VST2=0
         JUCE_WEB_BROWSER=0)
-
-target_link_directories(CardinalFX
-    PUBLIC
-        /opt/kxstudio/lib)
 
 target_link_libraries(CardinalFX
     PRIVATE
         juce::juce_audio_utils
-        -Wl,--whole-archive
+        ${STATIC_LIBS_START}
         sCardinalFX
         sPlugins
         sRack
@@ -136,19 +155,18 @@ target_link_libraries(CardinalFX
         libsamplerate
         libspeexdsp
         libzstd
-        -Wl,--no-whole-archive
-        GLX
-        OpenGL
-        X11
-        Xcursor
-        Xext
-        Xrandr
-    PUBLIC
-        -ldbus-1
-        -llo
+        ${STATIC_LIBS_END}
+        ${GL_LIBRARIES}
+        ${DBUS_LIBRARIES}
+        ${LIBLO_LIBRARIES}
+        ${SNDFILE_LIBRARIES}
+        ${X11_LIBRARIES}
+        ${XCURSOR_LIBRARIES}
+        ${XEXT_LIBRARIES}
+        ${XRANDR_LIBRARIES}
+        ${EXTRA_LIBS}
         -lmagic
-        -lsndfile -lFLAC -lvorbisenc -lvorbis -logg
-        -lrt
+    PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)

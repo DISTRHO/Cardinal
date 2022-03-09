@@ -77,6 +77,7 @@ class CardinalWrapperProcessor  : public juce::AudioProcessor
     friend class CardinalWrapperEditor;
 
     PluginExporter plugin;
+    TimePosition timePosition;
 
     static bool writeMidi(void* ptr, const MidiEvent& midiEvent)
     {
@@ -137,7 +138,55 @@ public:
     void processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages) override
     {
         midiMessages.clear();
-        // AudioPlayHead* getPlayHead()
+
+        juce::AudioPlayHead* const playhead = getPlayHead();
+        juce::AudioPlayHead::CurrentPositionInfo posInfo;
+
+        if (playhead != nullptr && playhead->getCurrentPosition(posInfo))
+        {
+            timePosition.playing   = posInfo.isPlaying;
+            timePosition.bbt.valid = true;
+
+            // ticksPerBeat is not possible with JUCE
+            timePosition.bbt.ticksPerBeat = 1920.0;
+
+            if (posInfo.timeInSamples >= 0)
+                timePosition.frame = posInfo.timeInSamples;
+            else
+                timePosition.frame = 0;
+
+            timePosition.bbt.beatsPerMinute = posInfo.bpm;
+
+            const double ppqPos    = std::abs(posInfo.ppqPosition);
+            const int    ppqPerBar = posInfo.timeSigNumerator * 4 / posInfo.timeSigDenominator;
+            const double barBeats  = (std::fmod(ppqPos, ppqPerBar) / ppqPerBar) * posInfo.timeSigNumerator;
+            const double rest      =  std::fmod(barBeats, 1.0);
+
+            timePosition.bbt.bar         = static_cast<int32_t>(ppqPos) / ppqPerBar + 1;
+            timePosition.bbt.beat        = static_cast<int32_t>(barBeats - rest + 0.5) + 1;
+            timePosition.bbt.tick        = rest * timePosition.bbt.ticksPerBeat;
+            timePosition.bbt.beatsPerBar = posInfo.timeSigNumerator;
+            timePosition.bbt.beatType    = posInfo.timeSigDenominator;
+
+            if (posInfo.ppqPosition < 0.0)
+            {
+                --timePosition.bbt.bar;
+                timePosition.bbt.beat = posInfo.timeSigNumerator - timePosition.bbt.beat + 1;
+                timePosition.bbt.tick = timePosition.bbt.ticksPerBeat - timePosition.bbt.tick - 1;
+            }
+
+            timePosition.bbt.barStartTick = timePosition.bbt.ticksPerBeat*
+                                            timePosition.bbt.beatsPerBar*
+                                            (timePosition.bbt.bar-1);
+        }
+        else
+        {
+            timePosition.frame     = 0;
+            timePosition.playing   = false;
+            timePosition.bbt.valid = false;
+        }
+
+        plugin.setTimePosition(timePosition);
 
         const int numSamples = buffer.getNumSamples();
         DISTRHO_SAFE_ASSERT_INT_RETURN(numSamples > 0, numSamples,);
@@ -222,7 +271,19 @@ class CardinalWrapperEditor : public juce::AudioProcessorEditor
 
     static void setSizeFunc(void* ptr, uint width, uint height)
     {
-        static_cast<CardinalWrapperEditor*>(ptr)->setSize(width, height);
+        CardinalWrapperEditor* const editor = static_cast<CardinalWrapperEditor*>(ptr);
+        DISTRHO_SAFE_ASSERT_RETURN(editor != nullptr,);
+
+       #ifdef DISTRHO_OS_MAC
+        UIExporter* const ui = editor->ui;
+        DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
+
+        const double scaleFactor = ui->getScaleFactor();
+        width /= scaleFactor;
+        height /= scaleFactor;
+       #endif
+
+        editor->setSize(width, height);
     }
 
     static bool fileRequestFunc(void* ptr, const char* key) { return false; }
