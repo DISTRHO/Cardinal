@@ -649,26 +649,6 @@ extern Model* modelBlankPanel;
 // stocaudio
 #include "stocaudio/src/plugin.hpp"
 
-// substation
-/* NOTE too much noise in original include, do this a different way
-// "substation-opensource/src/_plugin.hpp"
-*/
-namespace slime {
-namespace plugin {
-namespace substation {
-extern Model* modelClock;
-extern Model* modelPolySequencer;
-extern Model* modelSubOscillator;
-extern Model* modelMixer;
-extern Model* modelFilter;
-extern Model* modelEnvelopes;
-extern Model* modelQuantizer;
-extern Model* modelVCA;
-extern Model* modelBlank4;
-extern Model* modelBlank7;
-extern Model* modelFilterPlus;
-}}}
-
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
 
@@ -759,7 +739,6 @@ Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__stocaudio;
-Plugin* pluginInstance__substation;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__Voxglitch;
 Plugin* pluginInstance__ZetaCarinaeModules;
@@ -2412,28 +2391,6 @@ static void initStatic__stocaudio()
     }
 }
 
-static void initStatic__substation()
-{
-    Plugin* const p = new Plugin;
-    pluginInstance__substation = p;
-
-    const StaticPluginLoader spl(p, "substation-opensource");
-    if (spl.ok())
-    {
-        p->addModel(slime::plugin::substation::modelClock);
-        p->addModel(slime::plugin::substation::modelEnvelopes);
-        p->addModel(slime::plugin::substation::modelFilter);
-        p->addModel(slime::plugin::substation::modelMixer);
-        p->addModel(slime::plugin::substation::modelQuantizer);
-        p->addModel(slime::plugin::substation::modelPolySequencer);
-        p->addModel(slime::plugin::substation::modelVCA);
-        p->addModel(slime::plugin::substation::modelSubOscillator);
-        p->addModel(slime::plugin::substation::modelBlank4);
-        p->addModel(slime::plugin::substation::modelBlank7);
-        p->addModel(slime::plugin::substation::modelFilterPlus);
-    }
-}
-
 static void initStatic__ValleyAudio()
 {
     Plugin* const p = new Plugin;
@@ -2587,7 +2544,6 @@ void initStaticPlugins()
     initStatic__repelzen();
     initStatic__sonusmodular();
     initStatic__stocaudio();
-    initStatic__substation();
     initStatic__ValleyAudio();
     initStatic__Voxglitch();
     initStatic__ZetaCarinaeModules();

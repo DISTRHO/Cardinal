@@ -130,9 +130,6 @@
 [submodule "plugins/Autinn"]
 	path = plugins/Autinn
 	url = https://github.com/NikolaiVChr/Autinn.git
-[submodule "plugins/substation-opensource"]
-	path = plugins/substation-opensource
-	url = https://gitlab.com/falktx/substation-opensource.git
 [submodule "plugins/MockbaModular"]
 	path = plugins/MockbaModular
 	url = https://github.com/MockbaTheBorg/MockbaModular.git

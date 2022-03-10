@@ -767,14 +767,6 @@ PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular.cpp,$(wildcard sonusm
 PLUGIN_FILES += $(filter-out stocaudio/src/plugin.cpp,$(wildcard stocaudio/src/*.cpp))
 
 # --------------------------------------------------------------
-# Substation (Open source release)
-
-PLUGIN_FILES += $(wildcard substation-opensource/dep/slime4rack/src/slime/*.cpp)
-PLUGIN_FILES += $(wildcard substation-opensource/dep/slime4rack/src/slime/**/*.cpp)
-PLUGIN_FILES += $(filter-out substation-opensource/src/_plugin.cpp substation-opensource/src/Settings.cpp,$(wildcard substation-opensource/src/*.cpp))
-PLUGIN_FILES += substation-settings/Settings.cpp
-
-# --------------------------------------------------------------
 # ValleyAudio
 
 PLUGIN_FILES += $(filter-out ValleyAudio/src/Valley.cpp,$(wildcard ValleyAudio/src/*.cpp))
@@ -1714,15 +1706,6 @@ $(BUILD_DIR)/stocaudio/%.cpp.o: stocaudio/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(STOCAUDIO_CUSTOM),$(call custom_module_names,$(m),stocaudio)) \
 		-DpluginInstance=pluginInstance__stocaudio
-
-$(BUILD_DIR)/substation-%.cpp.o: substation-%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(SUBSTATION_CUSTOM),$(call custom_module_names,$(m),substation)) \
-		-DpluginInstance=pluginInstance__substation \
-		-D'PRIVATE=__attribute__((error("Using internal Rack function or symbol")))' \
-		-Isubstation-opensource/dep/slime4rack/include
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
