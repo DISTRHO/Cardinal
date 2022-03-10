@@ -7,7 +7,7 @@
 # also set in:
 # src/CardinalCommon.cpp `CARDINAL_VERSION`
 # src/CardinalPlugin.cpp `getVersion`
-VERSION = 22.02
+VERSION = 22.03
 
 # --------------------------------------------------------------
 # Import base definitions
