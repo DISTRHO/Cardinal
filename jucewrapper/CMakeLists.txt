@@ -85,9 +85,9 @@ pkg_check_modules(SNDFILE REQUIRED sndfile)
 
 if (NOT APPLE OR WIN32)
 pkg_check_modules(X11 REQUIRED x11)
-pkg_check_modules(XCURSOR REQUIRED Xcursor)
-pkg_check_modules(XEXT REQUIRED Xext)
-pkg_check_modules(XRANDR REQUIRED Xrandr)
+pkg_check_modules(XCURSOR REQUIRED xcursor)
+pkg_check_modules(XEXT REQUIRED xext)
+pkg_check_modules(XRANDR REQUIRED xrandr)
 pkg_check_modules(DBUS REQUIRED dbus-1)
 set(EXTRA_LIBS "-lrt")
 endif (NOT APPLE OR WIN32)
@@ -158,6 +158,7 @@ target_link_libraries(CardinalFX
         ${STATIC_LIBS_END}
         ${GL_LIBRARIES}
         ${DBUS_LIBRARIES}
+        -L${LIBLO_LIBRARY_DIRS}
         ${LIBLO_LIBRARIES}
         ${SNDFILE_LIBRARIES}
         ${X11_LIBRARIES}
