@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(Cardinal VERSION 0.0.0)
+project(Cardinal VERSION 22.03)
 
 add_subdirectory(JUCE)
 
@@ -104,14 +104,19 @@ endif (APPLE)
 # FX variant
 
 juce_add_plugin(CardinalFX
-    IS_SYNTH FALSE
-    NEEDS_MIDI_INPUT FALSE
-    NEEDS_MIDI_OUTPUT FALSE
-    IS_MIDI_EFFECT FALSE
+    AU_MAIN_TYPE kAudioUnitType_Effect
+    COMPANY_COPYRIGHT "GPL-3.0-or-later"
+    COMPANY_NAME "DISTRHO"
+    COMPANY_WEBSITE "https://github.com/DISTRHO/Cardinal"
+    DESCRIPTION "Virtual modular synthesizer plugin"
     EDITOR_WANTS_KEYBOARD_FOCUS TRUE
+    FORMATS Standalone AU
+    IS_MIDI_EFFECT FALSE
+    IS_SYNTH FALSE
+    NEEDS_MIDI_INPUT TRUE
+    NEEDS_MIDI_OUTPUT TRUE
+    PLUGIN_CODE DcnF
     PLUGIN_MANUFACTURER_CODE Dstr
-    PLUGIN_CODE dCnF
-    FORMATS Standalone VST3 AU
     PRODUCT_NAME "CardinalFX")
 
 target_sources(CardinalFX
@@ -125,9 +130,19 @@ target_include_directories(CardinalFX
 
 target_compile_definitions(CardinalFX
     PUBLIC
+        JUCE_CHECK_MEMORY_LEAKS=0
+        JUCE_DISABLE_NATIVE_FILECHOOSERS=0
         JUCE_DISPLAY_SPLASH_SCREEN=0
+        JUCE_MODAL_LOOPS_PERMITTED=0
         JUCE_USE_CURL=0
+        JUCE_USE_FLAC=0
+        JUCE_USE_OGGVORBIS=0
+        JUCE_USE_XINERAMA=0
         JUCE_VST3_CAN_REPLACE_VST2=0
+        JUCE_ALSA=1
+        JUCE_DIRECTSOUND=0
+        JUCE_JACK=1
+        JUCE_WASAPI=0
         JUCE_WEB_BROWSER=0)
 
 target_link_libraries(CardinalFX
