@@ -304,61 +304,62 @@ void CardinalModuleWidget::onButton(const ButtonEvent& e)
 
     if (selected) {
         if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			if (e.action == GLFW_PRESS) {
+            if (e.action == GLFW_PRESS) {
+                // Open selection context menu on right-click
                 ui::Menu* menu = createMenu();
                 patchUtils::appendSelectionContextMenu(menu);
             }
             e.consume(this);
         }
 
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
-			if (e.action == GLFW_PRESS) {
-				// Toggle selection on Shift-click
-				if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
-					APP->scene->rack->select(this, false);
-					e.consume(NULL);
-					return;
-				}
+        if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+            if (e.action == GLFW_PRESS) {
+                // Toggle selection on Shift-click
+                if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+                    APP->scene->rack->select(this, false);
+                    e.consume(NULL);
+                    return;
+                }
 
-				internal->dragOffset = e.pos;
-			}
+                internal->dragOffset = e.pos;
+            }
 
-			e.consume(this);
-		}
+            e.consume(this);
+        }
 
-		return;
+        return;
     }
 
-	// Dispatch event to children
-	Widget::onButton(e);
-	e.stopPropagating();
-	if (e.isConsumed())
-		return;
+    // Dispatch event to children
+    Widget::onButton(e);
+    e.stopPropagating();
+    if (e.isConsumed())
+        return;
 
-	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (e.action == GLFW_PRESS) {
-			// Toggle selection on Shift-click
-			if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
-				APP->scene->rack->select(this, true);
-				e.consume(NULL);
-				return;
-			}
+    if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+        if (e.action == GLFW_PRESS) {
+            // Toggle selection on Shift-click
+            if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+                APP->scene->rack->select(this, true);
+                e.consume(NULL);
+                return;
+            }
 
-			// If module positions are locked, don't consume left-click
-			if (settings::lockModules) {
-				return;
-			}
+            // If module positions are locked, don't consume left-click
+            if (settings::lockModules) {
+                return;
+            }
 
-			internal->dragOffset = e.pos;
-		}
-		e.consume(this);
-	}
+            internal->dragOffset = e.pos;
+        }
+        e.consume(this);
+    }
 
-	// Open context menu on right-click
-	if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
-		CardinalModuleWidget__createContextMenu(this, model, module);
-		e.consume(this);
-	}
+    // Open context menu on right-click
+    if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
+        CardinalModuleWidget__createContextMenu(this, model, module);
+        e.consume(this);
+    }
 }
 
 }
