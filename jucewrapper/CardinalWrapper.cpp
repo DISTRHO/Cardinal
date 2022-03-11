@@ -259,7 +259,8 @@ public:
 
 // -----------------------------------------------------------------------------------------------------------
 
-class CardinalWrapperEditor : public juce::AudioProcessorEditor
+class CardinalWrapperEditor : public juce::AudioProcessorEditor,
+                              private juce::Timer
 {
     UIExporter* ui;
     void* const dspPtr;
@@ -298,14 +299,22 @@ public:
         setResizable(true, false);
         // setResizeLimits(648, 538, -1, -1);
         setSize(1228, 666);
+
+        startTimer(1000.0 / 60.0);
     }
 
     ~CardinalWrapperEditor() override
     {
+        stopTimer();
         delete ui;
     }
 
-    void paint(juce::Graphics&)
+    void timerCallback() override
+    {
+        repaint();
+    }
+
+    void paint(juce::Graphics&) override
     {
         if (ui == nullptr)
         {
@@ -331,10 +340,15 @@ public:
                 dspPtr,
                 0.0 // scaleFactor
             );
+
+            if (getAudioProcessor()->wrapperType == juce::AudioProcessor::wrapperType_Standalone)
+            {
+                const double scaleFactor = ui->getScaleFactor();
+                ui->setWindowOffset(4 * scaleFactor, 30 * scaleFactor);
+            }
         }
 
         ui->plugin_idle();
-        repaint();
     }
 };
 
