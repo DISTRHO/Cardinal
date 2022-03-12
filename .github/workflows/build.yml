@@ -343,17 +343,17 @@ jobs:
           make features
           #make CIBUILD=true NOOPT=true WITH_LTO=true -j $(sysctl -n hw.logicalcpu)
           make CIBUILD=true NOOPT=true NOPLUGINS=true STATIC_BUILD=true -j $(sysctl -n hw.logicalcpu)
-      #- name: Build macOS universal (AU using juce)
-        #run: |
-          #pushd deps/PawPaw; source local.env macos-universal; popd
-          #git clone --depth=1 -b master https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
-          #mkdir jucewrapper/build
-          #pushd jucewrapper/build; cmake .. && make -j $(sysctl -n hw.logicalcpu); popd
-          #mv jucewrapper/build/*_artefacts/AU/*.component bin/
-      #- name: Build macOS universal (packaging)
-        #run: |
-          #pushd deps/PawPaw; source local.env macos-universal; popd
-          #./dpf/utils/package-osx-bundles.sh
+      - name: Build macOS universal (AU using juce)
+        run: |
+          pushd deps/PawPaw; source local.env macos-universal; popd
+          git clone --depth=1 -b master https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
+          mkdir jucewrapper/build
+          pushd jucewrapper/build; cmake .. && make -j $(sysctl -n hw.logicalcpu); popd
+          mv jucewrapper/build/*_artefacts/AU/*.component bin/
+      - name: Build macOS universal (packaging)
+        run: |
+          pushd deps/PawPaw; source local.env macos-universal; popd
+          ./utils/package-osx-bundles.sh
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
