@@ -348,7 +348,7 @@ jobs:
           pushd deps/PawPaw; source local.env macos-universal; popd
           git clone --depth=1 -b master https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
           mkdir jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES=arm64;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_BUILD_TYPE=Release .. && make -j $(sysctl -n hw.logicalcpu); popd
+          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_BUILD_TYPE=Release .. && make -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/AU/*.component bin/
       - name: Build macOS universal (packaging)
         run: |
@@ -578,6 +578,7 @@ jobs:
           sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
       - name: Set up dependencies
         run: |
+          sudo dpkg --add-architecture i386
           sudo apt-get update -qq
           sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable
       - name: Build extra dependencies
