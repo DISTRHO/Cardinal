@@ -3,7 +3,7 @@
 *Cardinal, the Rack!*
 
 Cardinal is a free and open-source virtual modular synthesizer plugin,
-available as JACK standalone and LV2, VST2 and VST3 audio plugin for FreeBSD, Linux, macOS and Windows.  
+available as JACK standalone and AU, LV2, VST2 and VST3 audio plugin for FreeBSD, Linux, macOS and Windows.  
 It is based on the popular [VCV Rack](https://vcvrack.com/) but with a focus on being a fully self-contained plugin version.
 
 More specifically, this is a [DPF-based](https://github.com/DISTRHO/DPF/)
@@ -19,7 +19,6 @@ All "Core" modules from Rack have been replaced by Cardinal equivalents, simplif
 Cardinal does not load external modules and does not connect to the official Rack library/store.  
 All VCV branding has been removed (to the best of our knowledge) in order to avoid any trademark issues.
 
-Because it is using DPF, Cardinal already supports LV2 and VST2 with an extra JACK standalone mode for some systems.  
 The VST3 version is in progress, already part of the build but still experimental.
 
 
@@ -36,7 +35,7 @@ All variants have MIDI input and output support.
 
 This variant provides 8 audio inputs and outputs and 10 CV inputs and outputs.  
 
-NOTE: Due to VST2 format not supporting CV ports, this variant is not available for VST2.
+NOTE: Due to AU and VST2 formats not supporting CV ports, this variant is not available for those formats.
 
 ### Synth
 
