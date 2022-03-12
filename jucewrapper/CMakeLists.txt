@@ -133,7 +133,7 @@ target_include_directories(CardinalFX
 
 target_compile_definitions(CardinalFX
     PUBLIC
-        JucePlugin_PreferredChannelConfigurations={2,2}
+        JucePlugin_PreferredChannelConfigurations=2,2
         JUCE_CHECK_MEMORY_LEAKS=0
         JUCE_DISABLE_NATIVE_FILECHOOSERS=0
         JUCE_DISPLAY_SPLASH_SCREEN=0
@@ -220,7 +220,7 @@ target_include_directories(CardinalSynth
 
 target_compile_definitions(CardinalSynth
     PUBLIC
-        JucePlugin_PreferredChannelConfigurations={0,2}
+        JucePlugin_PreferredChannelConfigurations=0,2
         JUCE_CHECK_MEMORY_LEAKS=0
         JUCE_DISABLE_NATIVE_FILECHOOSERS=0
         JUCE_DISPLAY_SPLASH_SCREEN=0
