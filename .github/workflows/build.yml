@@ -348,7 +348,7 @@ jobs:
           pushd deps/PawPaw; source local.env macos-universal; popd
           git clone --depth=1 -b master https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
           mkdir jucewrapper/build
-          pushd jucewrapper/build; cmake .. && make -j $(sysctl -n hw.logicalcpu); popd
+          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES=arm64;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_BUILD_TYPE=Release .. && make -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/AU/*.component bin/
       - name: Build macOS universal (packaging)
         run: |
@@ -593,7 +593,15 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env win64; popd
           make distclean -C carla
-          make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_HYLIA=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false -j $(nproc)
+          make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_HYLIA=false HAVE_JACK=false HAVE_LIBLO=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false all win32r -j $(nproc)
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+      - name: Build win64 cross-compiled (packaging)
+        run: |
+          pushd deps/PawPaw; source local.env win64; popd
+          ./utils/create-windows-installer.sh 64
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1

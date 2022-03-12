@@ -15,4 +15,5 @@
 bin/
 build/
 documentation.pdf
+utils/inno/resources.iss
 utils/inno/version.iss
