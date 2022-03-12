@@ -695,6 +695,8 @@ jobs:
               /usr/lib/lv2/kx-programs.lv2/*.ttl \
               ./bin/*.lv2/*.ttl
       - name: Validate LV2 metadata and binaries
+        env:
+          RUNNING_UNDER_LV2LINT: 1
         run: |
           export LV2_PATH=/tmp/lv2-path
           mkdir ${LV2_PATH}
