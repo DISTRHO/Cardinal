@@ -365,23 +365,23 @@ jobs:
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - name: Rename macOS bundle
-        run: |
-          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            ${{ github.event.repository.name }}-*.pkg
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            ${{ github.event.repository.name }}-*.pkg
+      #- name: Rename macOS bundle
+        #run: |
+          #mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
+      #- uses: actions/upload-artifact@v2
+        #with:
+          #name: ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          #path: |
+            #${{ github.event.repository.name }}-*.pkg
+      #- uses: softprops/action-gh-release@v1
+        #if: startsWith(github.ref, 'refs/tags/')
+        #with:
+          #tag_name: ${{ github.ref_name }}
+          #name: ${{ github.ref_name }}
+          #draft: false
+          #prerelease: false
+          #files: |
+            #${{ github.event.repository.name }}-*.pkg
 
   #modduo:
     #runs-on: ubuntu-20.04
@@ -678,12 +678,13 @@ jobs:
           sudo apt-get install -yqq libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
           # runtime testing
           sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint valgrind
-      - name: Build plugins
+      - name: Build Cardinal
         env:
           CFLAGS: -g
           CXXFLAGS: -g -DDPF_ABORT_ON_ERROR
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
+          touch bin/Cardinal
           make features
           make NOOPT=true NOPLUGINS=true STATIC_BUILD=true SKIP_STRIPPING=true -j $(nproc)
       - name: Validate LV2 ttl syntax
