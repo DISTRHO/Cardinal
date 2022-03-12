@@ -684,8 +684,6 @@ jobs:
           CXXFLAGS: -g -DDPF_ABORT_ON_ERROR
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
-          mkdir bin
-          touch bin/Cardinal
           make features
           make NOOPT=true NOPLUGINS=true STATIC_BUILD=true SKIP_STRIPPING=true -j $(nproc)
       - name: Validate LV2 ttl syntax
