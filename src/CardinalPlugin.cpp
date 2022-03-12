@@ -138,7 +138,7 @@ struct Initializer
                 }
             }
 
-            if (asset::systemDir.empty())
+            if (asset::systemDir.empty() || ! system::exists(asset::systemDir))
             {
                #ifdef CARDINAL_PLUGIN_SOURCE_DIR
                 // Make system dir point to source code location as fallback
@@ -151,11 +151,21 @@ struct Initializer
                 // If source code dir does not exist use install target prefix as system dir
                 else
                #endif
-                if (system::exists(CARDINAL_PLUGIN_PREFIX "/share/cardinal"))
                 {
-                    asset::bundlePath = CARDINAL_PLUGIN_PREFIX "/share/cardinal/PluginManifests";
+                   #if defined(ARCH_MAC)
+                    asset::systemDir = "/Library/Application Support/Cardinal";
+                   #elif defined(ARCH_WIN)
+                    if (const char* const commonprogfiles = std::getenv("COMMONPROGRAMFILES"))
+                        asset::systemDir = system::join(commonprogfiles, "Cardinal");
+                   #else
                     asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/cardinal";
-                    templatePath = system::join(asset::systemDir, "template.vcv");
+                   #endif
+
+                    if (! asset::systemDir.empty())
+                    {
+                        asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
+                        templatePath = system::join(asset::systemDir, "template.vcv");
+                    }
                 }
             }
 

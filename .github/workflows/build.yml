@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 7
+  CACHE_VERSION: 8
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -45,7 +45,7 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env linux-aarch64; popd
           make features
-          make NOOPT=true WITH_LTO=true -j $(nproc)
+          make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -111,7 +111,7 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env linux-armhf; popd
           make features
-          make NOOPT=true WITH_LTO=true -j $(nproc)
+          make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -173,7 +173,7 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env linux-i686; popd
           make features
-          make NOOPT=true WITH_LTO=true -j $(nproc)
+          make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -227,7 +227,7 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env linux; popd
           make features
-          make NOOPT=true WITH_LTO=true -j $(nproc)
+          make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -340,18 +340,18 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env macos-universal; popd
           make features
-          make NOOPT=true WITH_LTO=true -j $(sysctl -n hw.logicalcpu)
+          make CIBUILD=true NOOPT=true WITH_LTO=true -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS universal (AU using juce)
         run: |
           pushd deps/PawPaw; source local.env macos-universal; popd
           git clone --depth=1 -b master https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
           mkdir jucewrapper/build
-          pushd jucewrapper/build; cmake .. && make -j $(sysctl -n hw.logicalcpu); popd
-          mv jucewrapper/build/*_artefacts/AU/*.component bin/
+          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_BUILD_TYPE=Release .. && make -j $(sysctl -n hw.logicalcpu); popd
+          mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS universal (packaging)
         run: |
           pushd deps/PawPaw; source local.env macos-universal; popd
-          ./dpf/utils/package-osx-bundles.sh
+          ./utils/create-macos-installer.sh
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -519,15 +519,27 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386
+          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 xvfb
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh win32
-      - name: Build win32 cross-compiled
+      - name: Build win32 cross-compiled (base)
         run: |
           pushd deps/PawPaw; source local.env win32; popd
           make features
-          make NOOPT=true WITH_LTO=true -j $(nproc)
+          make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
+      - name: Build win64 cross-compiled (carla)
+        run: |
+          pushd deps/PawPaw; source local.env win32; popd
+          make distclean -C carla
+          make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_HYLIA=false HAVE_JACK=false HAVE_LIBLO=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false -j $(nproc)
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+      - name: Build win64 cross-compiled (packaging)
+        run: |
+          pushd deps/PawPaw; source local.env win32; popd
+          xvfb-run ./utils/create-windows-installer.sh 32
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -546,6 +558,7 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
+            *.exe
             *.zip
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -555,6 +568,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
+            *.exe
             *.zip
 
   win64:
@@ -576,16 +590,29 @@ jobs:
           sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
       - name: Set up dependencies
         run: |
+          sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable
+          sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable xvfb
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh win64
-      - name: Build win64 cross-compiled
+      - name: Build win64 cross-compiled (base)
         run: |
           pushd deps/PawPaw; source local.env win64; popd
           make features
-          make NOOPT=true WITH_LTO=true -j $(nproc)
+          make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
+      - name: Build win64 cross-compiled (carla)
+        run: |
+          pushd deps/PawPaw; source local.env win64; popd
+          make distclean -C carla
+          make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_HYLIA=false HAVE_JACK=false HAVE_LIBLO=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false all win32r -j $(nproc)
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+      - name: Build win64 cross-compiled (packaging)
+        run: |
+          pushd deps/PawPaw; source local.env win64; popd
+          xvfb-run ./utils/create-windows-installer.sh 64
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -604,6 +631,7 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
+            *.exe
             *.zip
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -613,6 +641,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
+            *.exe
             *.zip
 
   source-tarball:
@@ -672,17 +701,17 @@ jobs:
           sudo dpkg -i kxstudio-repos_10.0.3_all.deb
           sudo apt-get update -qq
           # build-deps
-          sudo apt-get install -yqq libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+          sudo apt-get install -yqq liblo-dev
           # runtime testing
           sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint valgrind
-      - name: Build plugins
+      - name: Build Cardinal
         env:
           CFLAGS: -g
           CXXFLAGS: -g -DDPF_ABORT_ON_ERROR
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
-          make features
-          make NOOPT=true SKIP_STRIPPING=true -j $(nproc)
+          make HEADLESS=true features
+          make HEADLESS=true NOOPT=true NOPLUGINS=true STATIC_BUILD=true SKIP_STRIPPING=true -j $(nproc)
       - name: Validate LV2 ttl syntax
         run: |
           lv2_validate \
@@ -691,14 +720,14 @@ jobs:
               /usr/lib/lv2/kx-control-input-port-change-request.lv2/*.ttl \
               /usr/lib/lv2/kx-programs.lv2/*.ttl \
               ./bin/*.lv2/*.ttl
-      #- name: Validate LV2 metadata and binaries
-        #run: |
-          #export LV2_PATH=/tmp/lv2-path
-          #mkdir ${LV2_PATH}
-          #cp -r bin/*.lv2 \
-              #/usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,instance-access,midi,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 \
-              #${LV2_PATH}
-          #lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
+      - name: Validate LV2 metadata and binaries
+        run: |
+          export LV2_PATH=/tmp/lv2-path
+          mkdir ${LV2_PATH}
+          cp -r bin/CardinalFX.lv2 bin/CardinalSynth.lv2 \
+              /usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,instance-access,midi,mod,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 \
+              ${LV2_PATH}
+          lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
       - name: Test LV2 plugin
         run: |
             export LV2_PATH=/tmp/lv2-path
@@ -711,27 +740,25 @@ jobs:
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
                     /usr/lib/carla/carla-bridge-native lv2 "" ${p} 1>/dev/null; \
             done
-      # - name: Test VST2 plugin
-      #   env:
-      #     CARLA_DO_NOT_USE_JUCE_FOR_VST2: 1
-      #   run: |
-      #       for p in $(ls bin/*.vst/*.so); do \
-      #           env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
-      #               valgrind \
-      #               --error-exitcode=255 \
-      #               --leak-check=no \
-      #               --track-origins=yes \
-      #               --suppressions=./dpf/utils/valgrind-dpf.supp \
-      #               /usr/lib/carla/carla-bridge-native vst2 ./${p} "" 1>/dev/null; \
-      #       done
-      # - name: Test VST3 plugin
-      #   run: |
-      #       for p in $(ls bin/ | grep vst3); do \
-      #           env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
-      #               valgrind \
-      #               --error-exitcode=255 \
-      #               --leak-check=no \
-      #               --track-origins=yes \
-      #               --suppressions=./dpf/utils/valgrind-dpf.supp \
-      #               /usr/lib/carla/carla-bridge-native vst3 ./bin/${p} "" 1>/dev/null; \
-      #       done
+      - name: Test VST2 plugin
+        run: |
+            for p in $(ls bin/*.vst/*.so); do \
+                env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
+                    valgrind \
+                    --error-exitcode=255 \
+                    --leak-check=no \
+                    --track-origins=yes \
+                    --suppressions=./dpf/utils/valgrind-dpf.supp \
+                    /usr/lib/carla/carla-bridge-native vst2 ./${p} "" 1>/dev/null; \
+            done
+      - name: Test VST3 plugin
+        run: |
+            for p in $(ls bin/ | grep vst3); do \
+                env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
+                    valgrind \
+                    --error-exitcode=255 \
+                    --leak-check=no \
+                    --track-origins=yes \
+                    --suppressions=./dpf/utils/valgrind-dpf.supp \
+                    /usr/lib/carla/carla-bridge-native vst3 ./bin/${p} "" 1>/dev/null; \
+            done

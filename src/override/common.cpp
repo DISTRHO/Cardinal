@@ -53,7 +53,7 @@ const std::string APP_VERSION_MAJOR = "2";
 const std::string APP_VERSION = "2.1";
 #if defined ARCH_WIN
 	const std::string APP_OS = "win";
-#elif ARCH_MAC
+#elif defined ARCH_MAC
 	const std::string APP_OS = "mac";
 #elif defined ARCH_LIN
 	const std::string APP_OS = "lin";

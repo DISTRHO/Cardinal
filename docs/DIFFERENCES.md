@@ -21,6 +21,7 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 | Loads external modules         | Yes                       | No                              | |
 | Supports closed-source modules | Yes                       | No                              | |
 | Supports physical devices      | Yes                       | No                              | Audio + MIDI only through the DAW/Host or via JACK in standalone |
+| Plugin in AU format            | No                        | Yes                             | |
 | Plugin in LV2 format           | No                        | Yes                             | |
 | Plugin in VST2 format          | Yes                       | Yes                             | |
 | Plugin in VST3 format          | No                        | WIP                             | |
@@ -42,7 +43,6 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 
 Additionally, Cardinal contains the following built-in modules not present in the official plugin or standalone:
 
- * Amalgamated Harmonics
  * Aria Salvatrice modules (except Arcane related modules, due to their online requirement)
  * Mog (never updated to v2)
  * mscHack (never updated to v2)

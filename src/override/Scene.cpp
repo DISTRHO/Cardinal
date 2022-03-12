@@ -46,6 +46,10 @@
 # undef DEBUG
 #endif
 
+#ifdef STATIC_BUILD
+# undef HAVE_LIBLO
+#endif
+
 #ifdef HAVE_LIBLO
 # include <lo/lo.h>
 #endif

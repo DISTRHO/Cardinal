@@ -325,7 +325,15 @@ public:
         }
 
         if (! errorMessage.empty())
-            asyncDialog::create(errorMessage.c_str());
+        {
+            static bool shown = false;
+
+            if (! shown)
+            {
+                shown = true;
+                asyncDialog::create(errorMessage.c_str());
+            }
+        }
 
         context->window->step();
 

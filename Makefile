@@ -404,6 +404,9 @@ tarball+deps: download
 	rm -f ../cardinal+deps-$(VERSION).tar.xz
 	tar -c --lzma $(TAR_ARGS) -f ../cardinal+deps-$(VERSION).tar.xz .
 
+version:
+	@echo $(VERSION)
+
 # --------------------------------------------------------------
 
 .PHONY: carla deps plugins
