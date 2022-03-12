@@ -258,7 +258,11 @@ BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 # Enable all possible plugin types and setup resources
 
 ifeq ($(CARDINAL_VARIANT),main)
+ifneq ($(STATIC_BUILD),true)
 all: jack lv2 vst3
+else
+all: lv2 vst3
+endif # STATIC_BUILD
 else
 all: lv2 vst2 vst3 static
 endif
