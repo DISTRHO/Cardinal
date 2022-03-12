@@ -500,64 +500,78 @@ jobs:
           #path: |
             #*.tar.gz
 
-  #win32:
-    #runs-on: ubuntu-20.04
-    #steps:
-      #- uses: actions/checkout@v2
-        #with:
-          #submodules: recursive
-      #- name: Set up cache
-        #uses: actions/cache@v2
-        #with:
-          #path: |
-            #~/PawPawBuilds
-          #key: win32-v${{ env.CACHE_VERSION }}
-      #- name: Fix GitHub's mess
-        #run: |
-          #sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          #sudo apt-get update -qq
-          #sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-      #- name: Set up dependencies
-        #run: |
-          #sudo dpkg --add-architecture i386
-          #sudo apt-get update -qq
-          #sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386
-      #- name: Build extra dependencies
-        #run: |
-          #./deps/PawPaw/bootstrap-cardinal.sh win32
-      #- name: Build win32 cross-compiled
-        #run: |
-          #pushd deps/PawPaw; source local.env win32; popd
-          #make features
+  win32:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Set up cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/PawPawBuilds
+          key: win32-v${{ env.CACHE_VERSION }}
+      - name: Fix GitHub's mess
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update -qq
+          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+      - name: Set up dependencies
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
+          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 xvfb
+      - name: Build extra dependencies
+        run: |
+          ./deps/PawPaw/bootstrap-cardinal.sh win32
+      - name: Build win32 cross-compiled (base)
+        run: |
+          pushd deps/PawPaw; source local.env win32; popd
+          make features
           #make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
-      #- name: Set sha8 (non-release)
-        #if: startsWith(github.ref, 'refs/tags/') != true
-        #id: slug1
-        #run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      #- name: Set sha8 (release)
-        #if: startsWith(github.ref, 'refs/tags/')
-        #id: slug2
-        #run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      #- name: Set sha8
-        #id: slug
-        #run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      #- name: Pack binaries
-        #run: |
-          #cd bin; zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst)
-      #- uses: actions/upload-artifact@v2
-        #with:
-          #name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          #path: |
-            #*.zip
-      #- uses: softprops/action-gh-release@v1
-        #if: startsWith(github.ref, 'refs/tags/')
-        #with:
-          #tag_name: ${{ github.ref_name }}
-          #name: ${{ github.ref_name }}
-          #draft: false
-          #prerelease: false
-          #files: |
-            #*.zip
+          make CIBUILD=true NOOPT=true NOPLUGINS=true -j $(nproc)
+      - name: Build win64 cross-compiled (carla)
+        run: |
+          pushd deps/PawPaw; source local.env win32; popd
+          make distclean -C carla
+          make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_HYLIA=false HAVE_JACK=false HAVE_LIBLO=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false all -j $(nproc)
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+      - name: Build win64 cross-compiled (packaging)
+        run: |
+          pushd deps/PawPaw; source local.env win32; popd
+          xvfb-run ./utils/create-windows-installer.sh 32
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        id: slug1
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        id: slug2
+        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
+      - name: Set sha8
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+      - name: Pack binaries
+        run: |
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst)
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          path: |
+            *.zip
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            *.exe
+            *.zip
 
   win64:
     runs-on: ubuntu-20.04
@@ -629,6 +643,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
+            *.exe
             *.zip
 
   #source-tarball:

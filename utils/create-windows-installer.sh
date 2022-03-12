@@ -7,6 +7,10 @@ if [ ! -d bin ]; then
   exit
 fi
 
+# args
+bit=${1}
+bit=${bit:=64}
+
 # setup innosetup
 dlfile="${PWD}/bin/innosetup-6.0.5.exe"
 innodir="${PWD}/build/innosetup-6.0.5"
@@ -34,7 +38,7 @@ IFS='
 '
 for f in $(find -L bin/Cardinal.lv2/resources/ -type f); do
     d=$(dirname $(echo ${f} | sed "s|bin/Cardinal.lv2/resources/||"))
-    echo "Source: \"..\\..\\$(echo ${f} | tr '/' '\\')\"; DestDir: \"{commoncf64}\\Cardinal\\$(echo ${d} | tr '/' '\\')\"; Components: resources; Flags: ignoreversion;" >> utils/inno/resources.iss
+    echo "Source: \"..\\..\\$(echo ${f} | tr '/' '\\')\"; DestDir: \"{commoncf${bit}}\\Cardinal\\$(echo ${d} | tr '/' '\\')\"; Components: resources; Flags: ignoreversion;" >> utils/inno/resources.iss
 done
 
 # generate version
@@ -42,7 +46,7 @@ echo "#define VERSION \"$(make version)\"" > utils/inno/version.iss
 
 # create the installer file
 pushd "utils/inno"
-env WINEPREFIX="${innodir}" wine "${iscc}" "win64.iss"
+env WINEPREFIX="${innodir}" wine "${iscc}" "win${bit}.iss"
 popd
 
 # move installer file where CI expects it to be
