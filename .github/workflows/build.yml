@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: test1
+  CACHE_VERSION: test2
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -684,6 +684,7 @@ jobs:
           CXXFLAGS: -g -DDPF_ABORT_ON_ERROR
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
+          mkdir bin
           touch bin/Cardinal
           make features
           make NOOPT=true NOPLUGINS=true STATIC_BUILD=true SKIP_STRIPPING=true -j $(nproc)
