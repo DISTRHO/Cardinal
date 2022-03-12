@@ -235,6 +235,7 @@ endif
 # --------------------------------------------------------------
 # fallback path to resource files
 
+ifneq ($(CIBUILD),true)
 ifneq ($(SYSDEPS),true)
 
 ifeq ($(EXE_WRAPPER),wine)
@@ -245,6 +246,7 @@ endif
 
 BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_SOURCE_DIR='"$(SOURCE_DIR)"'
 
+endif
 endif
 
 # --------------------------------------------------------------
