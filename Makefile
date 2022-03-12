@@ -56,7 +56,6 @@ endif
 
 CARLA_EXTRA_ARGS += USING_JUCE=false
 CARLA_EXTRA_ARGS += USING_JUCE_GUI_EXTRA=false
-CARLA_EXTRA_ARGS += USING_RTAUDIO=false
 
 # --------------------------------------------------------------
 # Check for system-wide dependencies
