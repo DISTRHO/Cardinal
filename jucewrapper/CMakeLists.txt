@@ -107,7 +107,7 @@ endif (APPLE)
 # FX variant
 
 juce_add_plugin(CardinalFX
-    AU_MAIN_TYPE kAudioUnitType_Effect
+    AU_MAIN_TYPE kAudioUnitType_MusicEffect
     COMPANY_COPYRIGHT "GPL-3.0-or-later"
     COMPANY_NAME "DISTRHO"
     COMPANY_WEBSITE "https://github.com/DISTRHO/Cardinal"
@@ -194,7 +194,7 @@ target_link_libraries(CardinalFX
 # Synth variant
 
 juce_add_plugin(CardinalSynth
-    AU_MAIN_TYPE kAudioUnitType_Generator
+    AU_MAIN_TYPE kAudioUnitType_MusicDevice
     COMPANY_COPYRIGHT "GPL-3.0-or-later"
     COMPANY_NAME "DISTRHO"
     COMPANY_WEBSITE "https://github.com/DISTRHO/Cardinal"
