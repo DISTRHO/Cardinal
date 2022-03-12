@@ -583,12 +583,16 @@ jobs:
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh win64
-      - name: Build win64 cross-compiled
+      - name: Build win64 cross-compiled (base)
         run: |
           pushd deps/PawPaw; source local.env win64; popd
           make features
           #make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
           make CIBUILD=true NOOPT=true NOPLUGINS=true -j $(nproc)
+      - name: Build win64 cross-compiled (carla)
+          pushd deps/PawPaw; source local.env win64; popd
+          make distclean -C carla
+          make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_HYLIA=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false -j $(nproc)
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -684,8 +688,8 @@ jobs:
           CXXFLAGS: -g -DDPF_ABORT_ON_ERROR
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
-          make features
-          make NOOPT=true HEADLESS=true NOPLUGINS=true STATIC_BUILD=true SKIP_STRIPPING=true -j $(nproc)
+          make HEADLESS=true features
+          make HEADLESS=true NOOPT=true NOPLUGINS=true STATIC_BUILD=true SKIP_STRIPPING=true -j $(nproc)
       - name: Validate LV2 ttl syntax
         run: |
           lv2_validate \
