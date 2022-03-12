@@ -342,7 +342,7 @@ jobs:
           pushd deps/PawPaw; source local.env macos-universal; popd
           make features
           #make CIBUILD=true NOOPT=true WITH_LTO=true -j $(sysctl -n hw.logicalcpu)
-          make CIBUILD=true NOOPT=true NOPLUGINS=true STATIC_BUILD=true -j $(sysctl -n hw.logicalcpu)
+          make CIBUILD=true NOOPT=true NOPLUGINS=true -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS universal (AU using juce)
         run: |
           pushd deps/PawPaw; source local.env macos-universal; popd
@@ -705,6 +705,8 @@ jobs:
               ${LV2_PATH}
           lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
       - name: Test LV2 plugin
+        env:
+          RUNNING_UNDER_LV2LINT: 1
         run: |
             export LV2_PATH=/tmp/lv2-path
             for p in $(lv2ls); do \
@@ -719,6 +721,7 @@ jobs:
       - name: Test VST2 plugin
         env:
           CARLA_DO_NOT_USE_JUCE_FOR_VST2: 1
+          RUNNING_UNDER_LV2LINT: 1
         run: |
             for p in $(ls bin/*.vst/*.so); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
@@ -730,6 +733,8 @@ jobs:
                     /usr/lib/carla/carla-bridge-native vst2 ./${p} "" 1>/dev/null; \
             done
       - name: Test VST3 plugin
+        env:
+          RUNNING_UNDER_LV2LINT: 1
         run: |
             for p in $(ls bin/ | grep vst3); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
