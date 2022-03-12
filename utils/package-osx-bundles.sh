@@ -34,7 +34,7 @@ pkgbuild \
 pkgbuild \
   --identifier "studio.kx.distrho.plugins.cardinal.components" \
   --install-location "/Library/Audio/Plug-Ins/Components/" \
-  --root "${PWD}/components/" \
+  --root "${PWD}/au/" \
   ../dpf-cardinal-components.pkg
 
 pkgbuild \
