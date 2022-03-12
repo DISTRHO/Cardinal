@@ -209,10 +209,14 @@ struct IldaeilModule : Module {
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/Applications/Carla.app/Contents/MacOS");
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/Applications/Carla.app/Contents/MacOS/resources");
         }
-#elif defined(CARLA_OS_WINDOWS)
-        // Carla does not support system-wide install on Windows right now
-        if (false)
+#elif defined(CARLA_OS_WIN)
+        const std::string winBinaryDir = system::join(asset::systemDir, "Carla");
+
+        if (system::exists(winBinaryDir))
         {
+            const std::string winResourceDir = system::join(winBinaryDir, "resources");
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, winBinaryDir.c_str());
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, winResourceDir.c_str());
         }
 #else
         if (system::exists("/usr/local/lib/carla"))

@@ -99,6 +99,11 @@ struct CarlaModule : Module {
     CardinalExpanderFromCarlaMIDIToCV* midiOutExpander = nullptr;
     std::string patchStorage;
 
+#ifdef CARLA_OS_WIN
+    // must keep string pointer valid
+    std::string winResourceDir;
+#endif
+
     CarlaModule()
         : pcontext(static_cast<CardinalPluginContext*>(APP))
     {
@@ -138,10 +143,14 @@ struct CarlaModule : Module {
             binaryDir = "/Applications/Carla.app/Contents/MacOS";
             resourceDir = "/Applications/Carla.app/Contents/MacOS/resources";
         }
-#elif defined(CARLA_OS_WINDOWS)
-        // Carla does not support system-wide install on Windows right now
-        if (false)
+#elif defined(CARLA_OS_WIN)
+        const std::string winBinaryDir = system::join(asset::systemDir, "Carla");
+
+        if (system::exists(winBinaryDir))
         {
+            winResourceDir = system::join(winBinaryDir, "resources");
+            binaryDir = winBinaryDir.c_str();
+            resourceDir = winResourceDir.c_str();
         }
 #else
         if (system::exists("/usr/local/lib/carla"))
