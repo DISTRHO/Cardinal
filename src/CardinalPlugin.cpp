@@ -138,7 +138,7 @@ struct Initializer
                 }
             }
 
-            if (asset::systemDir.empty())
+            if (asset::systemDir.empty() || ! system::exists(asset::systemDir))
             {
                #ifdef CARDINAL_PLUGIN_SOURCE_DIR
                 // Make system dir point to source code location as fallback
