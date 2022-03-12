@@ -23,39 +23,55 @@
 
 START_NAMESPACE_DISTRHO
 
-#if 0
+// --------------------------------------------------------------------------------------------------------------------
 
-// -----------------------------------------------------------------------------------------------------------
-
-class ParameterForDPF : public juce::AudioProcessorParameter
+class ParameterFromDPF : public juce::AudioProcessorParameter
 {
     PluginExporter& plugin;
+    const ParameterEnumerationValues& enumValues;
+    const ParameterRanges& ranges;
+    const uint32_t hints;
     const uint index;
+    bool* const updatedPtr;
+    mutable juce::StringArray dpfValueStrings;
 
 public:
-    ParameterForDPF(PluginExporter& plugin_, const uint index_)
+    ParameterFromDPF(PluginExporter& plugin_, const uint index_, bool* const updatedPtr_)
         : plugin(plugin_),
-          index(index_) {}
+          enumValues(plugin_.getParameterEnumValues(index_)),
+          ranges(plugin_.getParameterRanges(index_)),
+          hints(plugin_.getParameterHints(index_)),
+          index(index_),
+          updatedPtr(updatedPtr_) {}
+
+    void setValueNotifyingHostFromDPF(const float newValue)
+    {
+        setValueNotifyingHost(ranges.getNormalizedValue(newValue));
+        *updatedPtr = false;
+    }
 
 protected:
     float getValue() const override
     {
-        return plugin.getParameterRanges(index).getNormalizedValue(plugin.getParameterValue(index));
+        return ranges.getNormalizedValue(plugin.getParameterValue(index));
     }
 
     void setValue(const float newValue) override
     {
-        plugin.setParameterValue(index, plugin.getParameterRanges(index).getUnnormalizedValue(newValue));
+        *updatedPtr = true;
+        plugin.setParameterValue(index, ranges.getUnnormalizedValue(newValue));
     }
 
     float getDefaultValue() const override
     {
-        return plugin.getParameterDefault(index);
+        return ranges.getNormalizedValue(plugin.getParameterDefault(index));
     }
 
-    juce::String getName(int) const override
+    juce::String getName(const int maximumStringLength) const override
     {
-        return plugin.getParameterName(index).buffer();
+        DISTRHO_SAFE_ASSERT_RETURN(maximumStringLength > 0, {});
+
+        return juce::String(plugin.getParameterName(index).buffer(), static_cast<size_t>(maximumStringLength));
     }
 
     juce::String getLabel() const override
@@ -63,55 +79,214 @@ protected:
         return plugin.getParameterUnit(index).buffer();
     }
 
+    int getNumSteps() const override
+    {
+        if (hints & kParameterIsBoolean)
+            return 2;
+
+        if (enumValues.restrictedMode)
+            return enumValues.count;
+
+        if (hints & kParameterIsInteger)
+            return ranges.max - ranges.min;
+
+        return juce::AudioProcessorParameter::getNumSteps();
+    }
+
+    bool isDiscrete() const override
+    {
+        if (hints & (kParameterIsBoolean|kParameterIsInteger))
+            return true;
+
+        if (enumValues.restrictedMode)
+            return true;
+
+        return false;
+    }
+
+    bool isBoolean() const override
+    {
+        return (hints & kParameterIsBoolean) != 0x0;
+    }
+
+    juce::String getText(const float normalizedValue, const int maximumStringLength) const override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(maximumStringLength > 0, {});
+
+        float value = ranges.getUnnormalizedValue(normalizedValue);
+
+        if (hints & kParameterIsBoolean)
+        {
+            const float midRange = ranges.min + (ranges.max - ranges.min) * 0.5f;
+            value = value > midRange ? ranges.max : ranges.min;
+        }
+        else if (hints & kParameterIsInteger)
+        {
+            value = std::round(value);
+        }
+
+        if (enumValues.restrictedMode)
+        {
+            for (uint32_t i=0; i < enumValues.count; ++i)
+            {
+                if (d_isEqual(enumValues.values[i].value, value))
+                    return juce::String(enumValues.values[i].label, static_cast<size_t>(maximumStringLength));
+            }
+        }
+
+        juce::String text;
+        if (hints & kParameterIsInteger)
+            text = juce::String(static_cast<int>(value));
+        else
+            text = juce::String(value);
+
+        return juce::String(text.toRawUTF8(), static_cast<size_t>(maximumStringLength));
+    }
+
     float getValueForText(const juce::String& text) const override
     {
-        return 0.0f;
+        if (enumValues.restrictedMode)
+        {
+            for (uint32_t i=0; i < enumValues.count; ++i)
+            {
+                if (text == enumValues.values[i].label.buffer())
+                    return ranges.getNormalizedValue(enumValues.values[i].value);
+            }
+        }
+
+        float value;
+        if (hints & kParameterIsInteger)
+            value = std::atoi(text.toRawUTF8());
+        else
+            value = std::atof(text.toRawUTF8());
+
+        return ranges.getFixedAndNormalizedValue(value);
+    }
+
+    bool isAutomatable() const override
+    {
+        return (hints & kParameterIsAutomatable) != 0x0;
+    }
+
+    juce::String getCurrentValueAsText() const override
+    {
+        const float value = plugin.getParameterValue(index);
+
+        if (enumValues.restrictedMode)
+        {
+            for (uint32_t i=0; i < enumValues.count; ++i)
+            {
+                if (d_isEqual(enumValues.values[i].value, value))
+                    return juce::String(enumValues.values[i].label);
+            }
+        }
+
+        if (hints & kParameterIsInteger)
+            return juce::String(static_cast<int>(value));
+
+        return juce::String(value);
+    }
+
+    juce::StringArray getAllValueStrings() const override
+    {
+        if (dpfValueStrings.size() != 0)
+            return dpfValueStrings;
+
+        if (enumValues.restrictedMode)
+        {
+            for (uint32_t i=0; i < enumValues.count; ++i)
+                dpfValueStrings.add(enumValues.values[i].label.buffer());
+
+            return dpfValueStrings;
+        }
+
+        if (hints & kParameterIsBoolean)
+        {
+            if (hints & kParameterIsInteger)
+            {
+                dpfValueStrings.add(juce::String(static_cast<int>(ranges.min)));
+                dpfValueStrings.add(juce::String(static_cast<int>(ranges.max)));
+            }
+            else
+            {
+                dpfValueStrings.add(juce::String(ranges.min));
+                dpfValueStrings.add(juce::String(ranges.max));
+            }
+        }
+        else if (hints & kParameterIsInteger)
+        {
+            const int imin = static_cast<int>(ranges.min);
+            const int imax = static_cast<int>(ranges.max);
+
+            for (int i=imin; i<=imax; ++i)
+                dpfValueStrings.add(juce::String(i));
+        }
+
+        return dpfValueStrings;
     }
 };
-#endif
 
-// -----------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
-class CardinalWrapperProcessor  : public juce::AudioProcessor
+// unused in cardinal
+static constexpr const requestParameterValueChangeFunc nullRequestParameterValueChangeFunc = nullptr;
+
+// only needed for headless builds, which this wrapper never builds for
+static constexpr const updateStateValueFunc nullUpdateStateValueFunc = nullptr;
+
+// DSP/processor implementation
+class CardinalWrapperProcessor : public juce::AudioProcessor
 {
     friend class CardinalWrapperEditor;
 
     PluginExporter plugin;
+    MidiEvent midiEvents[kMaxMidiEvents];
     TimePosition timePosition;
+    const uint32_t parameterCount;
 
-    static bool writeMidi(void* ptr, const MidiEvent& midiEvent)
-    {
-        return false;
-    }
-
-    static bool requestParameterValueChange(void* ptr, uint32_t index, float value)
-    {
-        return false;
-    }
-
-    static bool updateStateValue(void* ptr, const char* key, const char* value)
-    {
-        return false;
-    }
+    juce::AudioProcessorParameter* bypassParameter;
+    juce::MidiBuffer* currentMidiMessages;
+    bool* updatedParameters;
 
 public:
     CardinalWrapperProcessor()
-        : plugin(this, writeMidi, requestParameterValueChange, updateStateValue)
+        : plugin(this, writeMidiFunc, nullRequestParameterValueChangeFunc, nullUpdateStateValueFunc),
+          parameterCount(plugin.getParameterCount()),
+          bypassParameter(nullptr),
+          currentMidiMessages(nullptr),
+          updatedParameters(nullptr)
     {
         if (const double sampleRate = getSampleRate())
             plugin.setSampleRate(sampleRate);
 
-        if (const int blockSize = getBlockSize())
-            plugin.setBufferSize(blockSize);
+        if (const int samplesPerBlock = getBlockSize())
+            if (samplesPerBlock > 0)
+                plugin.setBufferSize(static_cast<uint32_t>(samplesPerBlock));
 
-//         for (uint i=0; i<plugin.getParameterCount(); ++i)
-//             addParameter(new ParameterForDPF(plugin, i));
+        getBypassParameter();
+
+        if (parameterCount != 0)
+        {
+            updatedParameters = new bool[parameterCount];
+            std::memset(updatedParameters, 0, sizeof(bool)*parameterCount);
+
+            for (uint i=0; i<parameterCount; ++i)
+            {
+                ParameterFromDPF* const param = new ParameterFromDPF(plugin, i, updatedParameters + i);
+                addParameter(param);
+
+                if (plugin.getParameterDesignation(i) == kParameterDesignationBypass)
+                    bypassParameter = param;
+            }
+        }
     }
 
     ~CardinalWrapperProcessor() override
     {
+        delete[] updatedParameters;
     }
 
+protected:
     const juce::String getName() const override
     {
         return plugin.getName();
@@ -122,11 +297,13 @@ public:
         return juce::StringArray(plugin.getLabel());
     }
 
-    void prepareToPlay(double sampleRate, int samplesPerBlock) override
+    void prepareToPlay(const double sampleRate, const int samplesPerBlock) override
     {
+        DISTRHO_SAFE_ASSERT_RETURN(samplesPerBlock > 0,);
+
         plugin.deactivateIfNeeded();
         plugin.setSampleRate(sampleRate);
-        plugin.setBufferSize(samplesPerBlock);
+        plugin.setBufferSize(static_cast<uint32_t>(samplesPerBlock));
         plugin.activate();
     }
 
@@ -137,7 +314,32 @@ public:
 
     void processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages) override
     {
+        const int numSamples = buffer.getNumSamples();
+        DISTRHO_SAFE_ASSERT_INT_RETURN(numSamples > 0, numSamples, midiMessages.clear());
+
+        uint32_t midiEventCount = 0;
+
+        for (const juce::MidiMessageMetadata midiMessage : midiMessages)
+        {
+            DISTRHO_SAFE_ASSERT_CONTINUE(midiMessage.numBytes > 0);
+            DISTRHO_SAFE_ASSERT_CONTINUE(midiMessage.samplePosition >= 0);
+
+            if (midiMessage.numBytes > static_cast<int>(MidiEvent::kDataSize))
+                continue;
+
+            MidiEvent& midiEvent(midiEvents[midiEventCount++]);
+
+            midiEvent.frame = static_cast<uint32_t>(midiMessage.samplePosition);
+            midiEvent.size = (static_cast<uint8_t>(midiMessage.numBytes));
+            std::memcpy(midiEvent.data, midiMessage.data, midiEvent.size);
+
+            if (midiEventCount == kMaxMidiEvents)
+                break;
+        }
+
         midiMessages.clear();
+
+        const juce::ScopedValueSetter<juce::MidiBuffer*> cvs(currentMidiMessages, &midiMessages, nullptr);
 
         juce::AudioPlayHead* const playhead = getPlayHead();
         juce::AudioPlayHead::CurrentPositionInfo posInfo;
@@ -151,7 +353,7 @@ public:
             timePosition.bbt.ticksPerBeat = 1920.0;
 
             if (posInfo.timeInSamples >= 0)
-                timePosition.frame = posInfo.timeInSamples;
+                timePosition.frame = static_cast<uint64_t>(posInfo.timeInSamples);
             else
                 timePosition.frame = 0;
 
@@ -188,9 +390,6 @@ public:
 
         plugin.setTimePosition(timePosition);
 
-        const int numSamples = buffer.getNumSamples();
-        DISTRHO_SAFE_ASSERT_INT_RETURN(numSamples > 0, numSamples,);
-
         DISTRHO_SAFE_ASSERT_RETURN(buffer.getNumChannels() == 2,);
 
         const float* audioBufferIn[2];
@@ -200,8 +399,11 @@ public:
         audioBufferOut[0] = buffer.getWritePointer(0);
         audioBufferOut[1] = buffer.getWritePointer(1);
 
-        plugin.run(audioBufferIn, audioBufferOut, numSamples, nullptr, 0);
+        plugin.run(audioBufferIn, audioBufferOut, static_cast<uint32_t>(numSamples), midiEvents, midiEventCount);
     }
+
+    // fix compiler warning
+    void processBlock(juce::AudioBuffer<double>&, juce::MidiBuffer&) override {}
 
     double getTailLengthSeconds() const override
     {
@@ -218,6 +420,11 @@ public:
         return true;
     }
 
+    juce::AudioProcessorParameter* getBypassParameter() const override
+    {
+        return nullptr;
+    }
+
     juce::AudioProcessorEditor* createEditor() override;
 
     bool hasEditor() const override
@@ -227,7 +434,7 @@ public:
 
     int getNumPrograms() override
     {
-        return 0;
+        return 1;
     }
 
     int getCurrentProgram() override
@@ -241,7 +448,7 @@ public:
 
     const juce::String getProgramName(int) override
     {
-        return {};
+        return "Default";
     }
 
     void changeProgramName(int, const juce::String&) override
@@ -250,50 +457,80 @@ public:
 
     void getStateInformation(juce::MemoryBlock& destData) override
     {
+        juce::XmlElement xmlState("CardinalState");
+
+        for (uint32_t i=0; i<parameterCount; ++i)
+            xmlState.setAttribute(plugin.getParameterSymbol(i).buffer(), plugin.getParameterValue(i));
+
+        for (uint32_t i=0, stateCount=plugin.getStateCount(); i<stateCount; ++i)
+        {
+            const String& key(plugin.getStateKey(i));
+            xmlState.setAttribute(key.buffer(), plugin.getStateValue(key).buffer());
+        }
+
+        copyXmlToBinary(xmlState, destData);
     }
 
-    void setStateInformation(const void* data, int sizeInBytes) override
+    void setStateInformation(const void* const data, const int sizeInBytes) override
     {
+        std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+        DISTRHO_SAFE_ASSERT_RETURN(xmlState.get() != nullptr,);
+
+        const juce::Array<juce::AudioProcessorParameter*>& parameters(getParameters());
+
+        for (uint32_t i=0; i<parameterCount; ++i)
+        {
+            const double value = xmlState->getDoubleAttribute(plugin.getParameterSymbol(i).buffer(),
+                                                              plugin.getParameterDefault(i));
+            const float normalizedValue = plugin.getParameterRanges(i).getFixedAndNormalizedValue(value);
+            parameters.getUnchecked(static_cast<int>(i))->setValueNotifyingHost(normalizedValue);
+        }
+
+        for (uint32_t i=0, stateCount=plugin.getStateCount(); i<stateCount; ++i)
+        {
+            const String& key(plugin.getStateKey(i));
+            const juce::String value = xmlState->getStringAttribute(key.buffer(),
+                                                                    plugin.getStateDefaultValue(i).buffer());
+            plugin.setState(key, value.toRawUTF8());
+        }
+    }
+
+private:
+    static bool writeMidiFunc(void* const ptr, const MidiEvent& midiEvent)
+    {
+        CardinalWrapperProcessor* const processor = static_cast<CardinalWrapperProcessor*>(ptr);
+        DISTRHO_SAFE_ASSERT_RETURN(processor != nullptr, false);
+
+        const uint8_t* const data = midiEvent.size > MidiEvent::kDataSize ? midiEvent.dataExt : midiEvent.data;
+        return processor->currentMidiMessages->addEvent(data,
+                                                        static_cast<int>(midiEvent.size),
+                                                        static_cast<int>(midiEvent.frame));
     }
 };
 
-// -----------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
+// unused in cardinal
+static constexpr const sendNoteFunc nullSendNoteFunc = nullptr;
+
+// unwanted, juce file dialogs are ugly
+static constexpr const fileRequestFunc nullFileRequestFunc = nullptr;
+
+// UI/editor implementation
 class CardinalWrapperEditor : public juce::AudioProcessorEditor,
                               private juce::Timer
 {
+    CardinalWrapperProcessor& cardinalProcessor;
+
     UIExporter* ui;
     void* const dspPtr;
 
-    static void editParamFunc(void* ptr, uint32_t rindex, bool started) {}
-    static void setParamFunc(void* ptr, uint32_t rindex, float value) {}
-    static void setStateFunc(void* ptr, const char* key, const char* value) {}
-    static void sendNoteFunc(void* ptr, uint8_t channel, uint8_t note, uint8_t velo) {}
-
-    static void setSizeFunc(void* ptr, uint width, uint height)
-    {
-        CardinalWrapperEditor* const editor = static_cast<CardinalWrapperEditor*>(ptr);
-        DISTRHO_SAFE_ASSERT_RETURN(editor != nullptr,);
-
-       #ifdef DISTRHO_OS_MAC
-        UIExporter* const ui = editor->ui;
-        DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
-
-        const double scaleFactor = ui->getScaleFactor();
-        width /= scaleFactor;
-        height /= scaleFactor;
-       #endif
-
-        editor->setSize(width, height);
-    }
-
-    static bool fileRequestFunc(void* ptr, const char* key) { return false; }
-
 public:
-    CardinalWrapperEditor(CardinalWrapperProcessor& cardinalProcessor)
-        : juce::AudioProcessorEditor(cardinalProcessor),
+    CardinalWrapperEditor(CardinalWrapperProcessor& cardinalProc)
+        : juce::AudioProcessorEditor(cardinalProc),
+          cardinalProcessor(cardinalProc),
           ui(nullptr),
-          dspPtr(cardinalProcessor.plugin.getInstancePointer())
+          dspPtr(cardinalProc.plugin.getInstancePointer())
     {
         setOpaque(true);
         setResizable(true, false);
@@ -309,8 +546,21 @@ public:
         delete ui;
     }
 
+protected:
     void timerCallback() override
     {
+        if (ui == nullptr)
+            return;
+
+        for (uint32_t i=0; i<cardinalProcessor.parameterCount; ++i)
+        {
+            if (cardinalProcessor.updatedParameters[i])
+            {
+                cardinalProcessor.updatedParameters[i] = false;
+                ui->parameterChanged(i, cardinalProcessor.plugin.getParameterValue(i));
+            }
+        }
+
         repaint();
     }
 
@@ -318,30 +568,27 @@ public:
     {
         if (ui == nullptr)
         {
-            auto peer = getPeer();
-            d_stdout("peer is %p", peer);
+            juce::ComponentPeer* const peer = getPeer();
+            DISTRHO_SAFE_ASSERT_RETURN(peer != nullptr,);
 
-            auto handle = peer->getNativeHandle();
-            d_stdout("handle is %p", handle);
-
-            auto proc = getAudioProcessor();
-            d_stdout("proc is %p", proc);
+            void* const nativeHandle = peer->getNativeHandle();
+            DISTRHO_SAFE_ASSERT_RETURN(nativeHandle != nullptr,);
 
             ui = new UIExporter(this,
-                (uintptr_t)handle,
-                proc->getSampleRate(),
+                (uintptr_t)nativeHandle,
+                cardinalProcessor.getSampleRate(),
                 editParamFunc,
                 setParamFunc,
                 setStateFunc,
-                sendNoteFunc,
+                nullSendNoteFunc,
                 setSizeFunc,
-                fileRequestFunc,
+                nullFileRequestFunc,
                 nullptr, // bundlePath
                 dspPtr,
                 0.0 // scaleFactor
             );
 
-            if (getAudioProcessor()->wrapperType == juce::AudioProcessor::wrapperType_Standalone)
+            if (cardinalProcessor.wrapperType == juce::AudioProcessor::wrapperType_Standalone)
             {
                 const double scaleFactor = ui->getScaleFactor();
                 ui->setWindowOffset(4 * scaleFactor, 30 * scaleFactor);
@@ -350,6 +597,57 @@ public:
 
         ui->plugin_idle();
     }
+
+private:
+    static void editParamFunc(void* const ptr, const uint32_t index, const bool started)
+    {
+        CardinalWrapperEditor* const editor = static_cast<CardinalWrapperEditor*>(ptr);
+        DISTRHO_SAFE_ASSERT_RETURN(editor != nullptr,);
+
+        CardinalWrapperProcessor& cardinalProcessor(editor->cardinalProcessor);
+
+        if (started)
+            cardinalProcessor.getParameters().getUnchecked(static_cast<int>(index))->beginChangeGesture();
+        else
+            cardinalProcessor.getParameters().getUnchecked(static_cast<int>(index))->endChangeGesture();
+    }
+
+    static void setParamFunc(void* const ptr, const uint32_t index, const float value)
+    {
+        CardinalWrapperEditor* const editor = static_cast<CardinalWrapperEditor*>(ptr);
+        DISTRHO_SAFE_ASSERT_RETURN(editor != nullptr,);
+
+        CardinalWrapperProcessor& cardinalProcessor(editor->cardinalProcessor);
+        const juce::Array<juce::AudioProcessorParameter*>& parameters(cardinalProcessor.getParameters());
+        juce::AudioProcessorParameter* const parameter = parameters.getUnchecked(static_cast<int>(index));
+        static_cast<ParameterFromDPF*>(parameter)->setValueNotifyingHostFromDPF(value);
+    }
+
+    static void setStateFunc(void* const ptr, const char* const key, const char* const value)
+    {
+        CardinalWrapperEditor* const editor = static_cast<CardinalWrapperEditor*>(ptr);
+        DISTRHO_SAFE_ASSERT_RETURN(editor != nullptr,);
+
+        CardinalWrapperProcessor& cardinalProcessor(editor->cardinalProcessor);
+        cardinalProcessor.plugin.setState(key, value);
+    }
+
+    static void setSizeFunc(void* const ptr, uint width, uint height)
+    {
+        CardinalWrapperEditor* const editor = static_cast<CardinalWrapperEditor*>(ptr);
+        DISTRHO_SAFE_ASSERT_RETURN(editor != nullptr,);
+
+       #ifdef DISTRHO_OS_MAC
+        UIExporter* const ui = editor->ui;
+        DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
+
+        const double scaleFactor = ui->getScaleFactor();
+        width /= scaleFactor;
+        height /= scaleFactor;
+       #endif
+
+        editor->setSize(static_cast<int>(width), static_cast<int>(height));
+    }
 };
 
 juce::AudioProcessorEditor* CardinalWrapperProcessor::createEditor()
@@ -357,11 +655,11 @@ juce::AudioProcessorEditor* CardinalWrapperProcessor::createEditor()
     return new CardinalWrapperEditor(*this);
 }
 
-// -----------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 END_NAMESPACE_DISTRHO
 
-// -----------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 juce::AudioProcessor* createPluginFilter()
 {
@@ -371,4 +669,4 @@ juce::AudioProcessor* createPluginFilter()
     return new DISTRHO_NAMESPACE::CardinalWrapperProcessor;
 }
 
-// -----------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
