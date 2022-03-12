@@ -284,7 +284,7 @@ ifneq ($(CARDINAL_VARIANT),main)
 ifeq ($(MACOS),true)
 VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%)
 else
-VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/resources/%)
+VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.vst/resources/%)
 endif
 endif
 
@@ -294,7 +294,7 @@ vst3: $(VST3_RESOURCES)
 
 # --------------------------------------------------------------
 
-$(TARGET_DIR)/$(NAME).%/template.vcv: ../template.vcv
+$(TARGET_DIR)/%/template.vcv: ../template.vcv
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
@@ -315,7 +315,7 @@ $(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf: ../../docs/MODDEVICES.md $(T
 	(cd ../../docs/ && pandoc MODDEVICES.md -f markdown+implicit_figures -o $(abspath $@))
 endif
 
-$(TARGET_DIR)/$(NAME).vst/resources/%: ../Rack/res/%
+$(TARGET_DIR)/Cardinal.vst/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 

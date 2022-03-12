@@ -171,21 +171,26 @@ endif
 
 TARGET = rack.a
 
+ifneq ($(MACOS),true)
+CARDINAL_FX_ARGS = VST2_FILENAME=Cardinal.vst/CardinalFX$(LIB_EXT)
+CARDINAL_SYNTH_ARGS = VST2_FILENAME=Cardinal.vst/CardinalSynth$(LIB_EXT)
+endif
+
 all: $(TARGET)
 ifeq ($(MOD_BUILD),true)
 	$(MAKE) -C CardinalFX lv2
 else
 	$(MAKE) -C Cardinal
-	$(MAKE) -C CardinalFX
-	$(MAKE) -C CardinalSynth
+	$(MAKE) -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 endif
 
 clean:
 	rm -f $(TARGET)
 	rm -rf $(BUILD_DIR)
 	$(MAKE) clean -C Cardinal
-	$(MAKE) clean -C CardinalFX
-	$(MAKE) clean -C CardinalSynth
+	$(MAKE) clean -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) clean -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 
 # --------------------------------------------------------------
 # Build commands
