@@ -590,6 +590,7 @@ jobs:
           #make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
           make CIBUILD=true NOOPT=true NOPLUGINS=true -j $(nproc)
       - name: Build win64 cross-compiled (carla)
+        run: |
           pushd deps/PawPaw; source local.env win64; popd
           make distclean -C carla
           make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_HYLIA=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false -j $(nproc)
