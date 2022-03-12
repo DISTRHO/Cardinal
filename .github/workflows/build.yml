@@ -675,7 +675,7 @@ jobs:
           sudo dpkg -i kxstudio-repos_10.0.3_all.deb
           sudo apt-get update -qq
           # build-deps
-          sudo apt-get install -yqq libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+          sudo apt-get install -yqq liblo-dev
           # runtime testing
           sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint valgrind
       - name: Build Cardinal
@@ -685,7 +685,7 @@ jobs:
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
           make features
-          make NOOPT=true NOPLUGINS=true STATIC_BUILD=true SKIP_STRIPPING=true -j $(nproc)
+          make NOOPT=true HEADLESS=true NOPLUGINS=true STATIC_BUILD=true SKIP_STRIPPING=true -j $(nproc)
       - name: Validate LV2 ttl syntax
         run: |
           lv2_validate \
@@ -695,8 +695,6 @@ jobs:
               /usr/lib/lv2/kx-programs.lv2/*.ttl \
               ./bin/*.lv2/*.ttl
       - name: Validate LV2 metadata and binaries
-        env:
-          RUNNING_UNDER_LV2LINT: 1
         run: |
           export LV2_PATH=/tmp/lv2-path
           mkdir ${LV2_PATH}
@@ -705,8 +703,6 @@ jobs:
               ${LV2_PATH}
           lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
       - name: Test LV2 plugin
-        env:
-          RUNNING_UNDER_LV2LINT: 1
         run: |
             export LV2_PATH=/tmp/lv2-path
             for p in $(lv2ls); do \
@@ -719,9 +715,6 @@ jobs:
                     /usr/lib/carla/carla-bridge-native lv2 "" ${p} 1>/dev/null; \
             done
       - name: Test VST2 plugin
-        env:
-          CARLA_DO_NOT_USE_JUCE_FOR_VST2: 1
-          RUNNING_UNDER_LV2LINT: 1
         run: |
             for p in $(ls bin/*.vst/*.so); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
@@ -733,8 +726,6 @@ jobs:
                     /usr/lib/carla/carla-bridge-native vst2 ./${p} "" 1>/dev/null; \
             done
       - name: Test VST3 plugin
-        env:
-          RUNNING_UNDER_LV2LINT: 1
         run: |
             for p in $(ls bin/ | grep vst3); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
