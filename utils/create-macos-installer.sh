@@ -57,7 +57,7 @@ pkgbuild \
 
 cd ..
 
-sed -e "s|@builddir@|${PWD}/build|" utils/plugin.pkg/package.xml.in > build/package.xml
+sed -e "s|@builddir@|${PWD}/build|" utils/macOS/package.xml.in > build/package.xml
 
 productbuild \
   --distribution build/package.xml \

@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 8
+  CACHE_VERSION: 9
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -532,7 +532,7 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env win32; popd
           make distclean -C carla
-          make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_HYLIA=false HAVE_JACK=false HAVE_LIBLO=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false -j $(nproc)
+          make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_FLUIDSYNTH=false HAVE_HYLIA=false HAVE_JACK=false HAVE_LIBLO=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false -j $(nproc)
           make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
           make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
           make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
@@ -605,7 +605,7 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env win64; popd
           make distclean -C carla
-          make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_HYLIA=false HAVE_JACK=false HAVE_LIBLO=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false all win32r -j $(nproc)
+          make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_FLUIDSYNTH=false HAVE_HYLIA=false HAVE_JACK=false HAVE_LIBLO=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false all win32r -j $(nproc)
           make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
           make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
           make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
