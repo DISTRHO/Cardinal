@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 9
+  CACHE_VERSION: 10
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -532,10 +532,9 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env win32; popd
           make distclean -C carla
-          make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_FLUIDSYNTH=false HAVE_HYLIA=false HAVE_JACK=false HAVE_LIBLO=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false -j $(nproc)
-          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
-          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
-          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+          make -C carla CARLA_BACKEND_NAMESPACE=Cardinal EXTERNAL_PLUGINS=true HAVE_FLUIDSYNTH=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false HAVE_PYQT=true HAVE_QT5=true HAVE_QT5PKG=true STATIC_PLUGIN_TARGET=true USING_JUCE=false USING_JUCE_GUI_EXTRA=false -j $(nproc)
+          make -C carla EMBED_TARGET=true TESTING=true dist
+          make -C carla EMBED_TARGET=true TESTING=true dist
       - name: Build win64 cross-compiled (packaging)
         run: |
           pushd deps/PawPaw; source local.env win32; popd
@@ -605,10 +604,9 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env win64; popd
           make distclean -C carla
-          make -C carla EXTERNAL_PLUGINS=true HAVE_DGL=false HAVE_FLUIDSYNTH=false HAVE_HYLIA=false HAVE_JACK=false HAVE_LIBLO=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false USING_JUCE=false USING_JUCE_AUDIO_DEVICES=false USING_JUCE_GUI_EXTRA=false USING_RTAUDIO=false all win32r -j $(nproc)
-          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
-          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
-          make -C carla TESTING=true _CARLA_LV2_PLUGIN_FILES= _CARLA_VST2_PLUGIN_FILES= dist
+          make -C carla CARLA_BACKEND_NAMESPACE=Cardinal EXTERNAL_PLUGINS=true HAVE_FLUIDSYNTH=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false HAVE_PYQT=true HAVE_QT5=true HAVE_QT5PKG=true STATIC_PLUGIN_TARGET=true USING_JUCE=false USING_JUCE_GUI_EXTRA=false all win32r -j $(nproc)
+          make -C carla EMBED_TARGET=true TESTING=true dist
+          make -C carla EMBED_TARGET=true TESTING=true dist
       - name: Build win64 cross-compiled (packaging)
         run: |
           pushd deps/PawPaw; source local.env win64; popd

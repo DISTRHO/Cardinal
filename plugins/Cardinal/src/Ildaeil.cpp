@@ -97,12 +97,14 @@ static void projectLoadedFromDSP(void* ui);
 
 static Mutex sPluginInfoLoadMutex;
 
+/*
 #ifndef HEADLESS
 struct JuceInitializer {
     JuceInitializer() { carla_juce_init(); }
     ~JuceInitializer() { carla_juce_cleanup(); }
 };
 #endif
+*/
 
 struct IldaeilModule : Module {
     enum ParamIds {
@@ -122,9 +124,11 @@ struct IldaeilModule : Module {
         NUM_LIGHTS
     };
 
+    /*
 #ifndef HEADLESS
     SharedResourcePointer<JuceInitializer> juceInitializer;
 #endif
+    */
 
     const CardinalPluginContext* const pcontext;
 
@@ -977,7 +981,9 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         const CarlaHostHandle handle = module->fCarlaHostHandle;
         DISTRHO_SAFE_ASSERT_RETURN(handle != nullptr,);
 
+        /*
         carla_juce_idle();
+        */
 
         if (fileBrowserHandle != nullptr && fileBrowserIdle(fileBrowserHandle))
         {
