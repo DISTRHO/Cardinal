@@ -1013,6 +1013,9 @@ RESOURCE_FILES = \
 		$(wildcard */res/*.svg) \
 		$(wildcard */res/*/*.svg) \
 		$(wildcard */res/*/*/*.svg) \
+		$(wildcard */res/*.otf) \
+		$(wildcard */res/*/*.otf) \
+		$(wildcard */res/*/*/*.otf) \
 		$(wildcard */res/*.ttf) \
 		$(wildcard */res/*/*.ttf) \
 		$(wildcard */res/*/*/*.ttf))
