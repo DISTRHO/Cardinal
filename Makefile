@@ -255,8 +255,7 @@ install:
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/Cardinal.lv2
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/CardinalFX.lv2
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/CardinalSynth.lv2
-	install -d $(DESTDIR)$(PREFIX)/lib/vst/CardinalFX.vst
-	install -d $(DESTDIR)$(PREFIX)/lib/vst/CardinalSynth.vst
+	install -d $(DESTDIR)$(PREFIX)/lib/vst/Cardinal.vst
 ifeq ($(VST3_SUPPORTED),true)
 	install -d $(DESTDIR)$(PREFIX)/lib/vst3/Cardinal.vst3/Contents
 	install -d $(DESTDIR)$(PREFIX)/lib/vst3/CardinalFX.vst3/Contents
@@ -269,8 +268,7 @@ endif
 	install -m 644 bin/CardinalFX.lv2/*.*    $(DESTDIR)$(PREFIX)/lib/lv2/CardinalFX.lv2/
 	install -m 644 bin/CardinalSynth.lv2/*.* $(DESTDIR)$(PREFIX)/lib/lv2/CardinalSynth.lv2/
 
-	install -m 644 bin/CardinalFX.vst/*.*    $(DESTDIR)$(PREFIX)/lib/vst/CardinalFX.vst/
-	install -m 644 bin/CardinalSynth.vst/*.* $(DESTDIR)$(PREFIX)/lib/vst/CardinalSynth.vst/
+	install -m 644 bin/Cardinal.vst/*.*      $(DESTDIR)$(PREFIX)/lib/vst/Cardinal.vst/
 
 ifeq ($(VST3_SUPPORTED),true)
 	cp -rL bin/Cardinal.vst3/Contents/*-*      $(DESTDIR)$(PREFIX)/lib/vst3/Cardinal.vst3/Contents/
@@ -283,19 +281,6 @@ endif
 
 	install -m 644 README.md $(DESTDIR)$(PREFIX)/share/doc/cardinal/
 	install -m 644 docs/*.md docs/*.png $(DESTDIR)$(PREFIX)/share/doc/cardinal/docs/
-
-	ln -sf $(PREFIX)/share/cardinal $(DESTDIR)$(PREFIX)/lib/lv2/Cardinal.lv2/resources
-	ln -sf $(PREFIX)/share/cardinal $(DESTDIR)$(PREFIX)/lib/lv2/CardinalFX.lv2/resources
-	ln -sf $(PREFIX)/share/cardinal $(DESTDIR)$(PREFIX)/lib/lv2/CardinalSynth.lv2/resources
-
-	ln -sf $(PREFIX)/share/cardinal $(DESTDIR)$(PREFIX)/lib/vst/CardinalFX.vst/resources
-	ln -sf $(PREFIX)/share/cardinal $(DESTDIR)$(PREFIX)/lib/vst/CardinalSynth.vst/resources
-
-ifeq ($(VST3_SUPPORTED),true)
-	ln -sf $(PREFIX)/share/cardinal $(DESTDIR)$(PREFIX)/lib/vst3/Cardinal.vst3/Contents/Resources
-	ln -sf $(PREFIX)/share/cardinal $(DESTDIR)$(PREFIX)/lib/vst3/CardinalFX.vst3/Contents/Resources
-	ln -sf $(PREFIX)/share/cardinal $(DESTDIR)$(PREFIX)/lib/vst3/CardinalSynth.vst3/Contents/Resources
-endif
 
 # --------------------------------------------------------------
 # Tarball step, for releases
