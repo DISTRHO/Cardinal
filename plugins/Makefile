@@ -954,7 +954,7 @@ endif
 
 BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing -faligned-new
 
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS

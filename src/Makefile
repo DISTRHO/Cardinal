@@ -95,7 +95,7 @@ endif
 
 BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing -faligned-new
 
 # use our custom function to invert some colors
 BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
@@ -115,6 +115,7 @@ RACK_FILES += custom/network.cpp
 RACK_FILES += custom/osdialog.cpp
 RACK_FILES += override/blendish.c
 RACK_FILES += override/context.cpp
+RACK_FILES += override/minblep.cpp
 RACK_FILES += override/plugin.cpp
 RACK_FILES += override/Engine.cpp
 RACK_FILES += override/MenuBar.cpp
@@ -144,6 +145,7 @@ IGNORED_FILES += Rack/src/app/MenuBar.cpp
 IGNORED_FILES += Rack/src/app/MidiDisplay.cpp
 IGNORED_FILES += Rack/src/app/Scene.cpp
 IGNORED_FILES += Rack/src/app/TipWindow.cpp
+IGNORED_FILES += Rack/src/dsp/minblep.cpp
 IGNORED_FILES += Rack/src/engine/Engine.cpp
 IGNORED_FILES += Rack/src/plugin/Model.cpp
 IGNORED_FILES += Rack/src/window/Window.cpp
