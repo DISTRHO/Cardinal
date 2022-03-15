@@ -98,10 +98,12 @@ endif (NOT APPLE OR WIN32)
 if (APPLE)
 set(EXTRA_LIBS "-lz")
 set(GL_LIBRARIES "-framework OpenGL")
+set(PLUGIN_FORMATS AU)
 else (APPLE)
 pkg_check_modules(GL REQUIRED gl)
 set(STATIC_LIBS_START "-Wl,--whole-archive")
 set(STATIC_LIBS_END "-Wl,--no-whole-archive")
+set(PLUGIN_FORMATS Standalone VST3)
 endif (APPLE)
 
 # FX variant
@@ -113,7 +115,7 @@ juce_add_plugin(CardinalFX
     COMPANY_WEBSITE "https://github.com/DISTRHO/Cardinal"
     DESCRIPTION "Virtual modular synthesizer plugin"
     EDITOR_WANTS_KEYBOARD_FOCUS TRUE
-    FORMATS Standalone VST3 AU
+    FORMATS ${PLUGIN_FORMATS}
     IS_MIDI_EFFECT FALSE
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT TRUE
