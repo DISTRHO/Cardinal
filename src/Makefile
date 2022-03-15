@@ -187,6 +187,20 @@ else
 	$(MAKE) -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 endif
 
+lv2: $(TARGET)
+	$(MAKE) lv2 -C Cardinal
+	$(MAKE) lv2 -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) lv2 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
+
+vst2: $(TARGET)
+	$(MAKE) vst2 -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) vst2 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
+
+vst3: $(TARGET)
+	$(MAKE) vst3 -C Cardinal
+	$(MAKE) vst3 -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) vst3 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
+
 clean:
 	rm -f $(TARGET)
 	rm -rf $(BUILD_DIR)
