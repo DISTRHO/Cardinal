@@ -1,7 +1,6 @@
 #include "version.iss"
 
 [Setup]
-ArchitecturesInstallIn64BitMode=x64
 AppName=Cardinal
 AppPublisher=DISTRHO
 AppPublisherURL=https://github.com/DISTRHO/Cardinal/
@@ -49,6 +48,6 @@ Source: "..\..\bin\CardinalSynth.lv2\*.*"; DestDir: "{commoncf32}\LV2\CardinalSy
 ; vst2
 Source: "..\..\bin\Cardinal.vst\*.*"; DestDir: "{commoncf32}\VST2\Cardinal.vst"; Components: vst2; Flags: ignoreversion;
 ; vst3
-Source: "..\..\bin\Cardinal.vst3\Contents\x86-win\Cardinal.vst3"; DestDir: "{commoncf64}\VST3\Cardinal.vst3\Contents\x86-win"; Components: vst3; Flags: ignoreversion;
-Source: "..\..\bin\CardinalFX.vst3\Contents\x86-win\CardinalFX.vst3"; DestDir: "{commoncf64}\VST3\CardinalFX.vst3\Contents\x86-win"; Components: vst3; Flags: ignoreversion;
-Source: "..\..\bin\CardinalSynth.vst3\Contents\x86-win\CardinalSynth.vst3"; DestDir: "{commoncf64}\VST3\CardinalSynth.vst3\Contents\x86-win"; Components: vst3; Flags: ignoreversion;
+Source: "..\..\bin\Cardinal.vst3\Contents\x86-win\Cardinal.vst3"; DestDir: "{commoncf32}\VST3\Cardinal.vst3\Contents\x86-win"; Components: vst3; Flags: ignoreversion;
+Source: "..\..\bin\CardinalFX.vst3\Contents\x86-win\CardinalFX.vst3"; DestDir: "{commoncf32}\VST3\CardinalFX.vst3\Contents\x86-win"; Components: vst3; Flags: ignoreversion;
+Source: "..\..\bin\CardinalSynth.vst3\Contents\x86-win\CardinalSynth.vst3"; DestDir: "{commoncf32}\VST3\CardinalSynth.vst3\Contents\x86-win"; Components: vst3; Flags: ignoreversion;
