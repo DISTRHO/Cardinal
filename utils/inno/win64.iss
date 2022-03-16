@@ -22,7 +22,7 @@ Name: "custom"; Description: "Custom installation"; Flags: iscustom;
 
 [Components]
 Name: resources; Description: "Resources"; Types: full custom; Flags: fixed;
-; Name: carla; Description: "Carla/Ildaeil host tools"; Types: full;
+Name: carla; Description: "Carla/Ildaeil host tools"; Types: full;
 Name: lv2; Description: "LV2 plugin"; Types: full;
 Name: vst2; Description: "VST2 plugin"; Types: full;
 Name: vst3; Description: "VST3 plugin"; Types: full;
@@ -30,18 +30,18 @@ Name: vst3; Description: "VST3 plugin"; Types: full;
 [Files]
 #include "resources.iss"
 ; carla
-; Source: "..\..\carla\bin\carla-bridge-*.*"; DestDir: "{commoncf64}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
-; Source: "..\..\carla\bin\carla-discovery-*.exe"; DestDir: "{commoncf64}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
-; Source: "..\..\carla\bin\libcarla_utils.dll"; DestDir: "{commoncf64}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
-; Source: "..\..\carla\build\Carla\libpython3.8.dll"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
-; Source: "..\..\carla\build\Carla\Qt5*.dll"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
-; Source: "..\..\carla\build\Carla\iconengines\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
-; Source: "..\..\carla\build\Carla\imageformats\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
-; Source: "..\..\carla\build\Carla\platforms\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
-; Source: "..\..\carla\build\Carla\resources\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
-; Source: "..\..\carla\build\Carla\styles\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
-; Source: "..\..\carla\build\Carla\resources\lib\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources\lib"; Components: carla; Flags: ignoreversion;
-; Source: "..\..\carla\build\Carla\resources\lib\PyQt5\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources\lib\PyQt5"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\bin\carla-bridge-*.*"; DestDir: "{commoncf64}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\bin\carla-discovery-*.exe"; DestDir: "{commoncf64}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\bin\libcarla_utils.dll"; DestDir: "{commoncf64}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\libpython3.8.dll"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\Qt5*.dll"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\iconengines\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\imageformats\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\platforms\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\resources\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\styles\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\resources\lib\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources\lib"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\resources\lib\PyQt5\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources\lib\PyQt5"; Components: carla; Flags: ignoreversion;
 ; lv2
 Source: "..\..\bin\Cardinal.lv2\*.*"; DestDir: "{commoncf64}\LV2\Cardinal.lv2"; Components: lv2; Flags: ignoreversion;
 Source: "..\..\bin\CardinalFX.lv2\*.*"; DestDir: "{commoncf64}\LV2\CardinalFX.lv2"; Components: lv2; Flags: ignoreversion;
