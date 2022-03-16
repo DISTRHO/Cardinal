@@ -69,6 +69,7 @@ But a couple of modules background's have their colors flipped, because damn we 
 
 ![screenshot](docs/Screenshot_Carla+Ildaeil.png "Screenshot")
 
+
 ## Current status
 
 With the exception of a few bugs, Cardinal can be considered stable.  
@@ -78,12 +79,25 @@ Though currently the following should be noted:
 - VST3 support incomplete/experimental [#41](https://github.com/DISTRHO/Cardinal/issues/41)
 - Windows 32bit builds do not work well [#80](https://github.com/DISTRHO/Cardinal/issues/80)
 
-### Current builds
+### Stable release
 
-If you want to try this out early, checkout the [GitHub actions tab](https://github.com/DISTRHO/Cardinal/actions/workflows/build.yml).  
-There is absolutely no warranty, use at your own risk and all that...
+Cardinal releases have official builds for Linux, macOS and Windows.  
+You can find these under https://github.com/DISTRHO/Cardinal/releases.
 
-Basic building instructions are available in [BUILDING.md](docs/BUILDING.md)
+There are Linux builds for various architectures (armhf, arm64, i686 and x86_64), macOS "universal" (arm64 + intel) and Windows 32 and 64bit builds.  
+Both macOS and Windows builds have an installer.
+
+Install instructions are available [here](https://github.com/DISTRHO/Cardinal/wiki/Install).
+
+Note: Neither the macOS or Windows builds are signed, so expect warnings saying they are from an "untrusted developer".
+
+### Nightly builds
+
+You can find builds for pretty much any recent Cardinal commit [here](https://github.com/DISTRHO/Cardinal/actions/workflows/build.yml).  
+Just click on any successful build, and scroll to the bottom to find the builds.  
+(note the canvas-like area in the middle prevents mouse wheel scrolling)
+
+A GitHub account is required in order to download these builds.
 
 ### Community chat
 
