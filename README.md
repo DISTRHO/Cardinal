@@ -84,9 +84,8 @@ Though currently the following should be noted:
 Cardinal releases have official builds for Linux, macOS and Windows.  
 You can find these under https://github.com/DISTRHO/Cardinal/releases.
 
-There are Linux builds for various architectures (armhf, arm64, i686 and x86_64), macOS "universal" (arm64 + intel) and Windows 32 and 64bit builds.  
-Both macOS and Windows builds have an installer.
-
+There are Linux builds for various architectures (armhf, arm64, i686 and x86_64), macOS "universal" (arm64 + intel) and Windows 32 and 64bit builds.
+Both macOS and Windows builds have an installer.  
 Install instructions are available [here](https://github.com/DISTRHO/Cardinal/wiki/Install).
 
 Note: Neither the macOS or Windows builds are signed, so expect warnings saying they are from an "untrusted developer".
