@@ -69,7 +69,8 @@ protected:
 
     juce::String getName(const int maximumStringLength) const override
     {
-        DISTRHO_SAFE_ASSERT_RETURN(maximumStringLength > 0, {});
+        if (maximumStringLength <= 0)
+            return juce::String(plugin.getParameterName(index).buffer());
 
         return juce::String(plugin.getParameterName(index).buffer(), static_cast<size_t>(maximumStringLength));
     }
@@ -111,8 +112,6 @@ protected:
 
     juce::String getText(const float normalizedValue, const int maximumStringLength) const override
     {
-        DISTRHO_SAFE_ASSERT_RETURN(maximumStringLength > 0, {});
-
         float value = ranges.getUnnormalizedValue(normalizedValue);
 
         if (hints & kParameterIsBoolean)
@@ -130,7 +129,12 @@ protected:
             for (uint32_t i=0; i < enumValues.count; ++i)
             {
                 if (d_isEqual(enumValues.values[i].value, value))
+                {
+                    if (maximumStringLength <= 0)
+                        return juce::String(enumValues.values[i].label);
+
                     return juce::String(enumValues.values[i].label, static_cast<size_t>(maximumStringLength));
+                }
             }
         }
 
@@ -139,6 +143,9 @@ protected:
             text = juce::String(static_cast<int>(value));
         else
             text = juce::String(value);
+
+        if (maximumStringLength <= 0)
+            return text;
 
         return juce::String(text.toRawUTF8(), static_cast<size_t>(maximumStringLength));
     }
