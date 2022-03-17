@@ -35,11 +35,11 @@ Source: "..\..\carla\bin\carla-discovery-*.exe"; DestDir: "{commoncf64}\Cardinal
 Source: "..\..\carla\bin\libcarla_utils.dll"; DestDir: "{commoncf64}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\build\Carla\libpython3.8.dll"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\build\Carla\Qt5*.dll"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
-Source: "..\..\carla\build\Carla\iconengines\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
-Source: "..\..\carla\build\Carla\imageformats\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
-Source: "..\..\carla\build\Carla\platforms\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\build\Carla\resources\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
-Source: "..\..\carla\build\Carla\styles\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\iconengines\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources\iconengines"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\imageformats\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources\imageformats"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\platforms\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources\platforms"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\build\Carla\styles\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources\styles"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\build\Carla\resources\lib\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources\lib"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\build\Carla\resources\lib\PyQt5\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources\lib\PyQt5"; Components: carla; Flags: ignoreversion;
 ; lv2
