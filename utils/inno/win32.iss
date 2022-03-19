@@ -22,12 +22,15 @@ Name: "custom"; Description: "Custom installation"; Flags: iscustom;
 [Components]
 Name: resources; Description: "Resources"; Types: full custom; Flags: fixed;
 Name: carla; Description: "Carla/Ildaeil host tools"; Types: full;
+Name: jack; Description: "JACK Standalone"; Types: full;
 Name: lv2; Description: "LV2 plugin"; Types: full;
 Name: vst2; Description: "VST2 plugin"; Types: full;
 Name: vst3; Description: "VST3 plugin"; Types: full;
 
 [Files]
 #include "resources.iss"
+; icon
+Source: "..\..\utils\distrho.ico"; DestDir: "{app}"; Components: resources; Flags: ignoreversion;
 ; carla
 Source: "..\..\carla\bin\carla-bridge-*.*"; DestDir: "{commoncf32}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\bin\carla-discovery-*.exe"; DestDir: "{commoncf32}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
@@ -41,6 +44,8 @@ Source: "..\..\carla\build\Carla\platforms\*.*"; DestDir: "{commoncf32}\Cardinal
 Source: "..\..\carla\build\Carla\styles\*.*"; DestDir: "{commoncf32}\Cardinal\Carla\resources\styles"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\build\Carla\resources\lib\*.*"; DestDir: "{commoncf32}\Cardinal\Carla\resources\lib"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\build\Carla\resources\lib\PyQt5\*.*"; DestDir: "{commoncf32}\Cardinal\Carla\resources\lib\PyQt5"; Components: carla; Flags: ignoreversion;
+; jack
+Source: "..\..\bin\Cardinal.exe"; DestDir: "{app}"; Components: jack; Flags: ignoreversion;
 ; lv2
 Source: "..\..\bin\Cardinal.lv2\*.*"; DestDir: "{commoncf32}\LV2\Cardinal.lv2"; Components: lv2; Flags: ignoreversion;
 Source: "..\..\bin\CardinalFX.lv2\*.*"; DestDir: "{commoncf32}\LV2\CardinalFX.lv2"; Components: lv2; Flags: ignoreversion;
@@ -51,3 +56,6 @@ Source: "..\..\bin\Cardinal.vst\*.*"; DestDir: "{commoncf32}\VST2\Cardinal.vst";
 Source: "..\..\bin\Cardinal.vst3\Contents\x86-win\Cardinal.vst3"; DestDir: "{commoncf32}\VST3\Cardinal.vst3\Contents\x86-win"; Components: vst3; Flags: ignoreversion;
 Source: "..\..\bin\CardinalFX.vst3\Contents\x86-win\CardinalFX.vst3"; DestDir: "{commoncf32}\VST3\CardinalFX.vst3\Contents\x86-win"; Components: vst3; Flags: ignoreversion;
 Source: "..\..\bin\CardinalSynth.vst3\Contents\x86-win\CardinalSynth.vst3"; DestDir: "{commoncf32}\VST3\CardinalSynth.vst3\Contents\x86-win"; Components: vst3; Flags: ignoreversion;
+
+[Icons]
+Name: "{commonprograms}\Cardinal"; Filename: "{app}\Cardinal.exe"; IconFilename: "{app}\distrho.ico"; WorkingDir: "{app}"; Comment: "Virtual modular synthesizer plugin"; Components: jack;

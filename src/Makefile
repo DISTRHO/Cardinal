@@ -187,6 +187,9 @@ else
 	$(MAKE) -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 endif
 
+jack: $(TARGET)
+	$(MAKE) jack -C Cardinal
+
 lv2: $(TARGET)
 	$(MAKE) lv2 -C Cardinal
 	$(MAKE) lv2 -C CardinalFX $(CARDINAL_FX_ARGS)

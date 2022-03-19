@@ -58,6 +58,15 @@ CARLA_EXTRA_ARGS += USING_JUCE=false
 CARLA_EXTRA_ARGS += USING_JUCE_GUI_EXTRA=false
 
 # --------------------------------------------------------------
+# DGL config
+
+DGL_EXTRA_ARGS = \
+	NVG_DISABLE_SKIPPING_WHITESPACE=true \
+	NVG_FONT_TEXTURE_FLAGS=NVG_IMAGE_NEAREST \
+	USE_NANOVG_FBO=true \
+	WINDOWS_ICON_ID=401
+
+# --------------------------------------------------------------
 # Check for system-wide dependencies
 
 ifeq ($(SYSDEPS),true)
@@ -196,7 +205,7 @@ endif
 
 dgl:
 ifneq ($(HEADLESS),true)
-	$(MAKE) -C dpf/dgl opengl NVG_DISABLE_SKIPPING_WHITESPACE=true NVG_FONT_TEXTURE_FLAGS=NVG_IMAGE_NEAREST USE_NANOVG_FBO=true
+	$(MAKE) -C dpf/dgl opengl $(DGL_EXTRA_ARGS)
 endif
 
 plugins: deps

@@ -85,6 +85,10 @@ FILES_UI  = CardinalUI.cpp
 FILES_UI += Window.cpp
 endif
 
+ifeq ($(WINDOWS),true)
+FILES_UI += distrho.rc
+endif
+
 # --------------------------------------------------------------
 # Extra libraries to link against
 
@@ -297,6 +301,18 @@ endif
 lv2: $(LV2_RESOURCES)
 vst2: $(VST2_RESOURCES)
 vst3: $(VST3_RESOURCES)
+
+# --------------------------------------------------------------
+# Extra rules for Windows icon
+
+ifeq ($(WINDOWS),true)
+JACK_LIBS += -Wl,-subsystem,windows
+
+$(BUILD_DIR)/distrho.rc.o: ../../utils/distrho.rc ../../utils/distrho.ico
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling distrho.rc"
+	$(SILENT)$(WINDRES) $< -O coff -o $@
+endif
 
 # --------------------------------------------------------------
 
