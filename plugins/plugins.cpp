@@ -697,7 +697,7 @@ extern Plugin* pluginInstance__Autinn;
 Plugin* pluginInstance__Axioma;
 Plugin* pluginInstance__Bacon;
 Plugin* pluginInstance__Befaco;
-Plugin* pluginInstance__Bidoo;
+extern Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
@@ -1204,6 +1204,7 @@ static void initStatic__Bidoo()
         p->addModel(modelDTROY);
         p->addModel(modelBORDL);
         p->addModel(modelZOUMAI);
+        p->addModel(modelZOUMAIExpander);
         p->addModel(modelMU);
         p->addModel(modelCHUTE);
         p->addModel(modelLOURDE);
@@ -1687,6 +1688,7 @@ static void initStatic__GrandeModular()
     {
         p->addModel(modelClip);
         p->addModel(modelLFO3);
+        p->addModel(modelLFO4);
         p->addModel(modelLogic);
         p->addModel(modelMerge8);
         p->addModel(modelMergeSplit4);
@@ -1696,6 +1698,7 @@ static void initStatic__GrandeModular()
         p->addModel(modelPeak);
         p->addModel(modelPolyMergeResplit);
         p->addModel(modelPolySplit);
+        p->addModel(modelPush);
         p->addModel(modelQuant);
         p->addModel(modelQuantIntervals);
         p->addModel(modelQuantMT);

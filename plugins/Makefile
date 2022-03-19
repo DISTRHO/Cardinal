@@ -431,7 +431,7 @@ BEFACO_CUSTOM = ADSR Mixer
 # --------------------------------------------------------------
 # Bidoo
 
-PLUGIN_FILES += $(filter-out Bidoo/src/plugin.cpp Bidoo/src/ANTN.cpp,$(wildcard Bidoo/src/*.cpp))
+PLUGIN_FILES += $(filter-out Bidoo/src/ANTN.cpp,$(wildcard Bidoo/src/*.cpp))
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
@@ -439,7 +439,7 @@ PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
 PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/src/dep/resampler/*.cpp))
 
 # modules/types which are present in other plugins
-BIDOO_CUSTOM = ChannelDisplay LadderFilter $(DRWAV)
+BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter $(DRWAV)
 BIDOO_CUSTOM_PER_FILE = channel channel filterType
 
 # --------------------------------------------------------------
@@ -1294,6 +1294,20 @@ $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(BEFACO_CUSTOM),$(call custom_module_names,$(m),Befaco)) \
 		-DpluginInstance=pluginInstance__Befaco
+
+$(BUILD_DIR)/Bidoo/src/plugin.cpp.o: Bidoo/src/plugin.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) \
+		-DpluginInstance=pluginInstance__Bidoo \
+		-Dinit=init__Bidoo \
+		-DSKIP_MINGW_FORMAT \
+		-IBidoo/src/dep/gverb/include \
+		-Wno-ignored-qualifiers \
+		-Wno-sign-compare \
+		-Wno-unused-function \
+		-UBUILDING_PLUGIN_MODULES
 
 $(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
