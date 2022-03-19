@@ -264,13 +264,12 @@ public:
           updatedParameters(nullptr)
     {
         if (const double sampleRate = getSampleRate())
-            plugin.setSampleRate(sampleRate);
+            if (sampleRate > 0.0)
+                plugin.setSampleRate(sampleRate);
 
         if (const int samplesPerBlock = getBlockSize())
             if (samplesPerBlock > 0)
                 plugin.setBufferSize(static_cast<uint32_t>(samplesPerBlock));
-
-        getBypassParameter();
 
         if (parameterCount != 0)
         {
@@ -429,7 +428,7 @@ protected:
 
     juce::AudioProcessorParameter* getBypassParameter() const override
     {
-        return nullptr;
+        return bypassParameter;
     }
 
     juce::AudioProcessorEditor* createEditor() override;
@@ -508,10 +507,13 @@ private:
         CardinalWrapperProcessor* const processor = static_cast<CardinalWrapperProcessor*>(ptr);
         DISTRHO_SAFE_ASSERT_RETURN(processor != nullptr, false);
 
+        juce::MidiBuffer* const currentMidiMessages = processor->currentMidiMessages;
+        DISTRHO_SAFE_ASSERT_RETURN(currentMidiMessages != nullptr, false);
+
         const uint8_t* const data = midiEvent.size > MidiEvent::kDataSize ? midiEvent.dataExt : midiEvent.data;
-        return processor->currentMidiMessages->addEvent(data,
-                                                        static_cast<int>(midiEvent.size),
-                                                        static_cast<int>(midiEvent.frame));
+        return currentMidiMessages->addEvent(data,
+                                             static_cast<int>(midiEvent.size),
+                                             static_cast<int>(midiEvent.frame));
     }
 };
 
