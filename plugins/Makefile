@@ -996,6 +996,7 @@ endif
 
 UNWANTED_FILES  = HetrickCV/res/illustrator - deprecated/MyModule.svg
 UNWANTED_FILES += $(wildcard Mog/res/*)
+UNWANTED_FILES += $(wildcard Mog/res/*/*)
 UNWANTED_FILES += $(wildcard nonlinearcircuits/res/*)
 
 RESOURCE_FILES = \
