@@ -336,10 +336,25 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
         return false;
 
     // Special case for Bidoo red color
-    if (paint.color == 0xff001fcd && svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/Bidoo/", 7) == 0)
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/Bidoo/", 7) == 0)
     {
-        paint.color = 0xcf8b94c4;
-        return true;
+        if (paint.color == 0xff001fcd)
+        {
+            paint.color = 0xcf8b94c4;
+            return true;
+        }
+        if (paint.color == 0xff000000 && shape->stroke.type == NSVG_PAINT_COLOR)
+        {
+            switch (shape->stroke.color)
+            {
+            case 0xff777777:
+            case 0xff7c7c7c:
+            case 0xff828282:
+            case 0xffb1b1b1:
+            case 0xffb2b2b2:
+                return false;
+            }
+        }
     }
 
     // Special case for JW-Modules colors
