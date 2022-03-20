@@ -527,7 +527,6 @@ static constexpr const fileRequestFunc nullFileRequestFunc = nullptr;
 
 // UI/editor implementation
 class CardinalWrapperEditor : public juce::AudioProcessorEditor,
-                              private juce::AsyncUpdater,
                               private juce::Timer
 {
     CardinalWrapperProcessor& cardinalProcessor;
@@ -557,22 +556,6 @@ public:
     }
 
 protected:
-    void handleAsyncUpdate() override
-    {
-        DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
-
-        int width = static_cast<int>(ui->getWidth());
-        int height = static_cast<int>(ui->getHeight());
-
-       #ifdef DISTRHO_OS_MAC
-        const double scaleFactor = ui->getScaleFactor();
-        width /= scaleFactor;
-        height /= scaleFactor;
-       #endif
-
-        setSize(width, height);
-    }
-
     void timerCallback() override
     {
         if (ui == nullptr)
@@ -658,12 +641,21 @@ private:
         cardinalProcessor.plugin.setState(key, value);
     }
 
-    static void setSizeFunc(void* const ptr, uint, uint)
+    static void setSizeFunc(void* const ptr, uint width, uint height)
     {
         CardinalWrapperEditor* const editor = static_cast<CardinalWrapperEditor*>(ptr);
         DISTRHO_SAFE_ASSERT_RETURN(editor != nullptr,);
 
-        editor->triggerAsyncUpdate();
+       #ifdef DISTRHO_OS_MAC
+        UIExporter* const ui = editor->ui;
+        DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
+
+        const double scaleFactor = ui->getScaleFactor();
+        width /= scaleFactor;
+        height /= scaleFactor;
+       #endif
+
+        editor->setSize(static_cast<int>(width), static_cast<int>(height));
     }
 };
 
