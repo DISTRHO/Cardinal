@@ -431,12 +431,13 @@ BEFACO_CUSTOM = ADSR Mixer
 # --------------------------------------------------------------
 # Bidoo
 
-PLUGIN_FILES += $(filter-out Bidoo/src/ANTN.cpp,$(wildcard Bidoo/src/*.cpp))
+PLUGIN_FILES += $(filter-out Bidoo/src/plugin.cpp Bidoo/src/ANTN.cpp,$(wildcard Bidoo/src/*.cpp))
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
 PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/src/dep/resampler/*.cpp))
+PLUGIN_FILES += BidooDark/plugin.cpp
 
 # modules/types which are present in other plugins
 BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter $(DRWAV)
@@ -1297,21 +1298,7 @@ $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 		$(foreach m,$(BEFACO_CUSTOM),$(call custom_module_names,$(m),Befaco)) \
 		-DpluginInstance=pluginInstance__Befaco
 
-$(BUILD_DIR)/Bidoo/src/plugin.cpp.o: Bidoo/src/plugin.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(BIDOO_CUSTOM),$(call custom_module_names,$(m),Bidoo)) \
-		-DpluginInstance=pluginInstance__Bidoo \
-		-Dinit=init__Bidoo \
-		-DSKIP_MINGW_FORMAT \
-		-IBidoo/src/dep/gverb/include \
-		-Wno-ignored-qualifiers \
-		-Wno-sign-compare \
-		-Wno-unused-function \
-		-UBUILDING_PLUGIN_MODULES
-
-$(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
+$(BUILD_DIR)/Bidoo%.cpp.o: Bidoo%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
@@ -1456,6 +1443,7 @@ $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 		$(foreach m,$(GRANDEMODULAR_CUSTOM),$(call custom_module_names,$(m),GrandeModular)) \
 		-DpluginInstance=pluginInstance__GrandeModular \
 		-Wno-missing-braces \
+		-Wno-narrowing \
 		-Wno-self-assign
 
 $(BUILD_DIR)/HamptonHarmonics/%.cpp.o: HamptonHarmonics/%.cpp

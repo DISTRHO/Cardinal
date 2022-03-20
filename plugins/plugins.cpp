@@ -697,7 +697,7 @@ extern Plugin* pluginInstance__Autinn;
 Plugin* pluginInstance__Axioma;
 Plugin* pluginInstance__Bacon;
 Plugin* pluginInstance__Befaco;
-extern Plugin* pluginInstance__Bidoo;
+Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
