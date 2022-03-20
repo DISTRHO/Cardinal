@@ -55,7 +55,7 @@ struct CardinalPluginContext : rack::Context {
     double sampleRate;
     float parameters[kModuleParameters];
     CardinalVariant variant;
-    bool playing, reset, bbtValid;
+    bool bypassed, playing, reset, bbtValid;
     int32_t bar, beat, beatsPerBar, beatType;
     uint64_t frame;
     double barStartTick, beatsPerMinute;

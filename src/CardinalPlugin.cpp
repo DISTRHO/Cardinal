@@ -343,6 +343,9 @@ struct Initializer
 
 void CardinalPluginContext::writeMidiMessage(const rack::midi::Message& message, const uint8_t channel)
 {
+    if (bypassed)
+        return;
+
     const size_t size = message.bytes.size();
     DISTRHO_SAFE_ASSERT_RETURN(size > 0,);
     DISTRHO_SAFE_ASSERT_RETURN(message.frame >= 0,);
@@ -429,6 +432,7 @@ class CardinalPlugin : public CardinalBasePlugin
    #if DISTRHO_PLUGIN_NUM_INPUTS != 0
     /* If host audio ins == outs we can get issues for inplace processing.
      * So allocate a float array that will serve as safe copy for those cases.
+     * Also used for bypass, so inputs are fully zero.
      */
     float** fAudioBufferCopy;
    #endif
@@ -438,6 +442,10 @@ class CardinalPlugin : public CardinalBasePlugin
     String fStateComment;
     String fStateScreenshot;
     String fWindowSize;
+
+    // bypass handling
+    bool fWasBypassed;
+    MidiEvent bypassMidiEvents[16];
 
    #ifndef HEADLESS
     // real values, not VCV interpreted ones
@@ -451,7 +459,8 @@ public:
          #if DISTRHO_PLUGIN_NUM_INPUTS != 0
           fAudioBufferCopy(nullptr),
          #endif
-          fPreviousFrame(0)
+          fPreviousFrame(0),
+          fWasBypassed(false)
     {
        #ifndef HEADLESS
         fWindowParameters[kWindowParameterShowTooltips] = 1.0f;
@@ -484,6 +493,16 @@ public:
                 }
             }
         } DISTRHO_SAFE_EXCEPTION("create unique temporary path");
+
+        // initialize midi events used when entering bypassed state
+        std::memset(bypassMidiEvents, 0, sizeof(bypassMidiEvents));
+
+        for (uint8_t i=0; i<16; ++i)
+        {
+            bypassMidiEvents[i].size = 3;
+            bypassMidiEvents[i].data[0] = 0xB0 + i;
+            bypassMidiEvents[i].data[1] = 0x7B;
+        }
 
         const float sampleRate = getSampleRate();
         rack::settings::sampleRate = sampleRate;
@@ -773,7 +792,7 @@ protected:
 
         // bypass
         if (index == kModuleParameters)
-            return 0.0f;
+            return context->bypassed ? 1.0f : 0.0f;
 
        #ifndef HEADLESS
         // window related parameters
@@ -797,7 +816,10 @@ protected:
 
         // bypass
         if (index == kModuleParameters)
+        {
+            context->bypassed = value > 0.5f;
             return;
+        }
 
        #ifndef HEADLESS
         // window related parameters
@@ -924,6 +946,8 @@ protected:
     {
         rack::contextSet(context);
 
+        const bool bypassed = context->bypassed;
+
         {
             const TimePosition& timePos(getTimePosition());
 
@@ -977,10 +1001,28 @@ protected:
         for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
             std::memset(outputs[i], 0, sizeof(float)*frames);
 
-        context->midiEvents = midiEvents;
-        context->midiEventCount = midiEventCount;
+        if (bypassed)
+        {
+            if (fWasBypassed != bypassed)
+            {
+                context->midiEvents = bypassMidiEvents;
+                context->midiEventCount = 16;
+            }
+            else
+            {
+                context->midiEvents = nullptr;
+                context->midiEventCount = 0;
+            }
+        }
+        else
+        {
+            context->midiEvents = midiEvents;
+            context->midiEventCount = midiEventCount;
+        }
 
         context->engine->stepBlock(frames);
+
+        fWasBypassed = bypassed;
     }
 
     void bufferSizeChanged(const uint32_t newBufferSize) override

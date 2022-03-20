@@ -139,7 +139,7 @@ struct HostAudio2 : HostAudio<2> {
         resetMeters = true;
     }
 
-    void processTerminalOutput(const ProcessArgs&)
+    void processTerminalOutput(const ProcessArgs&) override
     {
         const int blockFrames = pcontext->engine->getBlockFrames();
 
