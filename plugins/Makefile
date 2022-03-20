@@ -994,6 +994,7 @@ PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 endif
 
 UNWANTED_FILES  = HetrickCV/res/illustrator - deprecated/MyModule.svg
+UNWANTED_FILES += $(wildcard Mog/res/*)
 UNWANTED_FILES += $(wildcard nonlinearcircuits/res/*)
 
 RESOURCE_FILES = \
@@ -1022,6 +1023,7 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
+RESOURCE_FILES += Mog/res
 RESOURCE_FILES += nonlinearcircuits/res
 RESOURCE_FILES += ParableInstruments/res/Neil.png
 
