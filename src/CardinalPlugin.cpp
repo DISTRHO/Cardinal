@@ -432,7 +432,6 @@ class CardinalPlugin : public CardinalBasePlugin
    #if DISTRHO_PLUGIN_NUM_INPUTS != 0
     /* If host audio ins == outs we can get issues for inplace processing.
      * So allocate a float array that will serve as safe copy for those cases.
-     * Also used for bypass, so inputs are fully zero.
      */
     float** fAudioBufferCopy;
    #endif
