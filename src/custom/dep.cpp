@@ -140,6 +140,7 @@ static const struct {
     { "/Bidoo/res/VOID.svg", {}, -1 },
     { "/Bidoo/res/ZINC.svg", {}, -1 },
     { "/Bidoo/res/ZOUMAI.svg", {}, -1 },
+    { "/Bidoo/res/ZOUMAIExpander.svg", {}, -1 },
     // BSD-3-Clause
     { "/cf/res/ALGEBRA.svg", {}, -1 },
     { "/cf/res/BUFFER.svg", {}, -1 },
