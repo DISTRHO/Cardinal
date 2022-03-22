@@ -48,7 +48,7 @@ enum CardinalVariant {
 // -----------------------------------------------------------------------------------------------------------
 
 struct CardinalPluginContext : rack::Context {
-    uint32_t bufferSize;
+    uint32_t bufferSize, processCounter;
     double sampleRate;
     float parameters[kModuleParameters];
     CardinalVariant variant;
@@ -69,6 +69,7 @@ struct CardinalPluginContext : rack::Context {
 
     CardinalPluginContext(Plugin* const p)
         : bufferSize(p->getBufferSize()),
+          processCounter(0),
           sampleRate(p->getSampleRate()),
          #if CARDINAL_VARIANT_MAIN
           variant(kCardinalVariantMain),

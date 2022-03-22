@@ -62,7 +62,7 @@ struct HostMIDICC : TerminalModule {
         const MidiEvent* midiEvents;
         uint32_t midiEventsLeft;
         uint32_t midiEventFrame;
-        int64_t lastBlockFrame;
+        uint32_t lastProcessCounter;
         uint8_t channel;
 
         uint8_t chPressure[16];
@@ -99,7 +99,7 @@ struct HostMIDICC : TerminalModule {
             midiEvents = nullptr;
             midiEventsLeft = 0;
             midiEventFrame = 0;
-            lastBlockFrame = -1;
+            lastProcessCounter = 0;
             channel = 0;
 
             // adapted from Rack
@@ -120,13 +120,12 @@ struct HostMIDICC : TerminalModule {
                      const bool isBypassed)
         {
             // Cardinal specific
-            const int64_t blockFrame = pcontext->engine->getBlockFrame();
-            const bool blockFrameChanged = lastBlockFrame != blockFrame;
+            const uint32_t processCounter = pcontext->processCounter;
+            const bool processCounterChanged = lastProcessCounter != processCounter;
 
-            if (blockFrameChanged)
+            if (processCounterChanged)
             {
-                lastBlockFrame = blockFrame;
-
+                lastProcessCounter = processCounter;
                 midiEvents = pcontext->midiEvents;
                 midiEventsLeft = pcontext->midiEventCount;
                 midiEventFrame = 0;
@@ -306,7 +305,7 @@ struct HostMIDICC : TerminalModule {
                 }
             }
 
-            return blockFrameChanged;
+            return processCounterChanged;
         }
 
     } midiInput;

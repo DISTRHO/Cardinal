@@ -1019,6 +1019,7 @@ protected:
             context->midiEventCount = midiEventCount;
         }
 
+        ++context->processCounter;
         context->engine->stepBlock(frames);
 
         fWasBypassed = bypassed;

@@ -30,9 +30,10 @@ struct HostAudio : TerminalModule {
     const int numInputs;
     const int numOutputs;
     bool bypassed = false;
+    bool in1connected = false;
     bool in2connected = false;
-    int dataFrame = 0;
-    int64_t lastBlockFrame = -1;
+    uint32_t dataFrame = 0;
+    uint32_t lastProcessCounter = 0;
 
     // for rack core audio module compatibility
     dsp::RCFilter dcFilters[numIO];
@@ -70,23 +71,26 @@ struct HostAudio : TerminalModule {
 
     void processTerminalInput(const ProcessArgs&) override
     {
-        const int blockFrames = pcontext->engine->getBlockFrames();
-        const int64_t blockFrame = pcontext->engine->getBlockFrame();
+        const uint32_t bufferSize = pcontext->bufferSize;
+        const uint32_t processCounter = pcontext->processCounter;
 
         // only checked on input
-        if (lastBlockFrame != blockFrame)
+        if (lastProcessCounter != processCounter)
         {
             bypassed = isBypassed();
             dataFrame = 0;
-            lastBlockFrame = blockFrame;
+            lastProcessCounter = processCounter;
 
             if (numIO == 2)
+            {
+                in1connected = inputs[0].isConnected();
                 in2connected = inputs[1].isConnected();
+            }
         }
 
         // only incremented on output
-        const int k = dataFrame;
-        DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
+        const uint32_t k = dataFrame;
+        DISTRHO_SAFE_ASSERT_INT2_RETURN(k < bufferSize, k, bufferSize,);
 
         // from host into cardinal, shows as output plug
         if (bypassed)
@@ -122,7 +126,7 @@ struct HostAudio : TerminalModule {
 struct HostAudio2 : HostAudio<2> {
 #ifndef HEADLESS
     // for stereo meter
-    int internalDataFrame = 0;
+    uint32_t internalDataFrame = 0;
     float internalDataBuffer[2][128];
     volatile bool resetMeters = true;
     float gainMeterL = 0.0f;
@@ -153,11 +157,14 @@ struct HostAudio2 : HostAudio<2> {
 
     void processTerminalOutput(const ProcessArgs&) override
     {
-        const int blockFrames = pcontext->engine->getBlockFrames();
+        if (!in1connected && !in2connected)
+            return;
+
+        const uint32_t bufferSize = pcontext->bufferSize;
 
         // only incremented on output
-        const int k = dataFrame++;
-        DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
+        const uint32_t k = dataFrame++;
+        DISTRHO_SAFE_ASSERT_INT2_RETURN(k < bufferSize, k, bufferSize,);
 
         if (bypassed)
             return;
@@ -168,21 +175,30 @@ struct HostAudio2 : HostAudio<2> {
         const float gain = std::pow(params[0].getValue(), 2.f);
 
         // read stereo values
-        float valueL = inputs[0].getVoltageSum() * 0.1f;
-        float valueR = inputs[1].getVoltageSum() * 0.1f;
+        float valueL, valueR;
 
-        // Apply DC filter
-        if (dcFilterEnabled)
+        if (in1connected)
         {
-            dcFilters[0].process(valueL);
-            valueL = dcFilters[0].highpass();
-        }
+            valueL = inputs[0].getVoltageSum() * 0.1f;
 
-        valueL = clamp(valueL * gain, -1.0f, 1.0f);
-        dataOuts[0][k] += valueL;
+            if (dcFilterEnabled)
+            {
+                dcFilters[0].process(valueL);
+                valueL = dcFilters[0].highpass();
+            }
+
+            valueL = clamp(valueL * gain, -1.0f, 1.0f);
+            dataOuts[0][k] += valueL;
+        }
+        else
+        {
+            valueL = 0.0f;
+        }
 
         if (in2connected)
         {
+            valueR = inputs[1].getVoltageSum() * 0.1f;
+
             if (dcFilterEnabled)
             {
                 dcFilters[1].process(valueR);
@@ -192,14 +208,18 @@ struct HostAudio2 : HostAudio<2> {
             valueR = clamp(valueR * gain, -1.0f, 1.0f);
             dataOuts[1][k] += valueR;
         }
-        else
+        else if (in1connected)
         {
             valueR = valueL;
             dataOuts[1][k] += valueL;
         }
-
 #ifndef HEADLESS
-        const int j = internalDataFrame++;
+        else
+        {
+            valueR = 0.0f;
+        }
+
+        const uint32_t j = internalDataFrame++;
         internalDataBuffer[0][j] = valueL;
         internalDataBuffer[1][j] = valueR;
 
@@ -228,11 +248,11 @@ struct HostAudio8 : HostAudio<8> {
 
     void processTerminalOutput(const ProcessArgs&) override
     {
-        const int blockFrames = pcontext->engine->getBlockFrames();
+        const uint32_t bufferSize = pcontext->bufferSize;
 
         // only incremented on output
-        const int k = dataFrame++;
-        DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
+        const uint32_t k = dataFrame++;
+        DISTRHO_SAFE_ASSERT_INT2_RETURN(k < bufferSize, k, bufferSize,);
 
         if (bypassed)
             return;

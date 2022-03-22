@@ -55,7 +55,7 @@ struct HostMIDIMap : TerminalModule {
     const MidiEvent* midiEvents;
     uint32_t midiEventsLeft;
     uint32_t midiEventFrame;
-    int64_t lastBlockFrame;
+    uint32_t lastProcessCounter;
     int nextLearningId;
     uint8_t channel;
 
@@ -117,7 +117,7 @@ struct HostMIDIMap : TerminalModule {
         midiEvents = nullptr;
         midiEventsLeft = 0;
         midiEventFrame = 0;
-        lastBlockFrame = -1;
+        lastProcessCounter = 0;
         nextLearningId = -1;
         channel = 0;
 
@@ -134,13 +134,12 @@ struct HostMIDIMap : TerminalModule {
     void processTerminalInput(const ProcessArgs& args) override
     {
         // Cardinal specific
-        const int64_t blockFrame = pcontext->engine->getBlockFrame();
-        const bool blockFrameChanged = lastBlockFrame != blockFrame;
+        const uint32_t processCounter = pcontext->processCounter;
+        const bool processCounterChanged = lastProcessCounter != processCounter;
 
-        if (blockFrameChanged)
+        if (processCounterChanged)
         {
-            lastBlockFrame = blockFrame;
-
+            lastProcessCounter = processCounter;
             midiEvents = pcontext->midiEvents;
             midiEventsLeft = pcontext->midiEventCount;
             midiEventFrame = 0;

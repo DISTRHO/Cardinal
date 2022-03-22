@@ -27,7 +27,7 @@ USE_NAMESPACE_DISTRHO;
 struct HostCV : TerminalModule {
     CardinalPluginContext* const pcontext;
     int dataFrame = 0;
-    int64_t lastBlockFrame = -1;
+    uint32_t lastProcessCounter = 0;
 
     enum ParamIds {
         BIPOLAR_INPUTS_1_5,
@@ -64,18 +64,19 @@ struct HostCV : TerminalModule {
         if (pcontext->variant != kCardinalVariantMain)
             return;
 
-        const int64_t blockFrame = pcontext->engine->getBlockFrame();
+        const uint32_t bufferSize = pcontext->bufferSize;
+        const uint32_t processCounter = pcontext->processCounter;
 
         // only checked on input
-        if (lastBlockFrame != blockFrame)
+        if (lastProcessCounter != processCounter)
         {
             dataFrame = 0;
-            lastBlockFrame = blockFrame;
+            lastProcessCounter = processCounter;
         }
 
         // only incremented on output
-        const int k = dataFrame;
-        DISTRHO_SAFE_ASSERT_RETURN(k < pcontext->engine->getBlockFrames(),);
+        const uint32_t k = dataFrame;
+        DISTRHO_SAFE_ASSERT_RETURN(k < bufferSize,);
 
         if (isBypassed())
         {
@@ -102,9 +103,11 @@ struct HostCV : TerminalModule {
         if (pcontext->variant != kCardinalVariantMain)
             return;
 
+        const uint32_t bufferSize = pcontext->bufferSize;
+
         // only incremented on output
-        const int k = dataFrame++;
-        DISTRHO_SAFE_ASSERT_RETURN(k < pcontext->engine->getBlockFrames(),);
+        const uint32_t k = dataFrame++;
+        DISTRHO_SAFE_ASSERT_RETURN(k < bufferSize,);
 
         if (isBypassed())
             return;

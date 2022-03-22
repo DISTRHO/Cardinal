@@ -51,7 +51,7 @@ struct MidiEvent {
 };
 
 struct CardinalPluginContext : rack::Context {
-    uint32_t bufferSize;
+    uint32_t bufferSize, processCounter;
     double sampleRate;
     float parameters[kModuleParameters];
     CardinalVariant variant;
