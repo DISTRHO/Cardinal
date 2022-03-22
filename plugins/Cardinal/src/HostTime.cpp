@@ -17,6 +17,8 @@
 
 #include "plugincontext.hpp"
 
+// --------------------------------------------------------------------------------------------------------------------
+
 struct HostTime : TerminalModule {
     enum ParamIds {
         NUM_PARAMS
@@ -166,6 +168,9 @@ struct HostTime : TerminalModule {
     {}
 };
 
+// --------------------------------------------------------------------------------------------------------------------
+
+#ifndef HEADLESS
 struct HostTimeWidget : ModuleWidget {
     static constexpr const float startX = 10.0f;
     static constexpr const float startY_top = 71.0f;
@@ -285,5 +290,18 @@ struct HostTimeWidget : ModuleWidget {
         ModuleWidget::drawLayer(args, layer);
     }
 };
+#else
+struct HostTimeWidget : ModuleWidget {
+    HostTimeWidget(HostTime* const module) {
+        setModule(module);
+        for (uint i=0; i<HostTime::kHostTimeCount; ++i)
+            addOutput(createOutput<PJ301MPort>({}, module, i));
+    }
+};
+#endif
+
+// --------------------------------------------------------------------------------------------------------------------
 
 Model* modelHostTime = createModel<HostTime, HostTimeWidget>("HostTime");
+
+// --------------------------------------------------------------------------------------------------------------------

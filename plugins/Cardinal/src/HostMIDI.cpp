@@ -695,6 +695,7 @@ struct HostMIDI : TerminalModule {
 
 // --------------------------------------------------------------------------------------------------------------------
 
+#ifndef HEADLESS
 struct HostMIDIWidget : ModuleWidgetWith9HP {
     HostMIDI* const module;
 
@@ -829,6 +830,17 @@ struct HostMIDIWidget : ModuleWidgetWith9HP {
         ));
     }
 };
+#else
+struct HostMIDIWidget : ModuleWidget {
+    HostMIDIWidget(HostMIDI* const module) {
+        setModule(module);
+        for (uint i=0; i<HostMIDI::NUM_INPUTS; ++i)
+            addInput(createInput<PJ301MPort>({}, module, i));
+        for (uint i=0; i<HostMIDI::NUM_OUTPUTS; ++i)
+            addOutput(createOutput<PJ301MPort>({}, module, i));
+    }
+};
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 

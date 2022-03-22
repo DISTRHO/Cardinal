@@ -124,6 +124,7 @@ struct HostCV : TerminalModule {
     }
 };
 
+#ifndef HEADLESS
 struct HostCVWidget : ModuleWidgetWith8HP {
     HostCVWidget(HostCV* const module)
     {
@@ -184,6 +185,17 @@ struct HostCVWidget : ModuleWidgetWith8HP {
         ));
     }
 };
+#else
+struct HostCVWidget : ModuleWidget {
+    HostCVWidget(HostCV* const module) {
+        setModule(module);
+        for (uint i=0; i<HostCV::NUM_INPUTS; ++i)
+            addInput(createInput<PJ301MPort>({}, module, i));
+        for (uint i=0; i<HostCV::NUM_OUTPUTS; ++i)
+            addOutput(createOutput<PJ301MPort>({}, module, i));
+    }
+};
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 

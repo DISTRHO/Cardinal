@@ -29,6 +29,8 @@ struct HostAudio : TerminalModule {
     const int numParams;
     const int numInputs;
     const int numOutputs;
+    bool bypassed = false;
+    bool in2connected = false;
     int dataFrame = 0;
     int64_t lastBlockFrame = -1;
 
@@ -74,8 +76,12 @@ struct HostAudio : TerminalModule {
         // only checked on input
         if (lastBlockFrame != blockFrame)
         {
+            bypassed = isBypassed();
             dataFrame = 0;
             lastBlockFrame = blockFrame;
+
+            if (numIO == 2)
+                in2connected = inputs[1].isConnected();
         }
 
         // only incremented on output
@@ -83,7 +89,7 @@ struct HostAudio : TerminalModule {
         DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
 
         // from host into cardinal, shows as output plug
-        if (isBypassed())
+        if (bypassed)
         {
             for (int i=0; i<numOutputs; ++i)
                 outputs[i].setVoltage(0.0f);
@@ -114,19 +120,24 @@ struct HostAudio : TerminalModule {
 };
 
 struct HostAudio2 : HostAudio<2> {
+#ifndef HEADLESS
     // for stereo meter
     int internalDataFrame = 0;
     float internalDataBuffer[2][128];
     volatile bool resetMeters = true;
     float gainMeterL = 0.0f;
     float gainMeterR = 0.0f;
+#endif
 
     HostAudio2()
         : HostAudio<2>()
     {
+#ifndef HEADLESS
         std::memset(internalDataBuffer, 0, sizeof(internalDataBuffer));
+#endif
     }
 
+#ifndef HEADLESS
     void onReset() override
     {
         HostAudio<2>::onReset();
@@ -138,6 +149,7 @@ struct HostAudio2 : HostAudio<2> {
         HostAudio<2>::onSampleRateChange(e);
         resetMeters = true;
     }
+#endif
 
     void processTerminalOutput(const ProcessArgs&) override
     {
@@ -147,16 +159,13 @@ struct HostAudio2 : HostAudio<2> {
         const int k = dataFrame++;
         DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
 
-        if (isBypassed())
+        if (bypassed)
             return;
 
         float** const dataOuts = pcontext->dataOuts;
 
         // gain (stereo variant only)
         const float gain = std::pow(params[0].getValue(), 2.f);
-
-        // left/mono check
-        const bool in2connected = inputs[1].isConnected();
 
         // read stereo values
         float valueL = inputs[0].getVoltageSum() * 0.1f;
@@ -189,6 +198,7 @@ struct HostAudio2 : HostAudio<2> {
             dataOuts[1][k] += valueL;
         }
 
+#ifndef HEADLESS
         const int j = internalDataFrame++;
         internalDataBuffer[0][j] = valueL;
         internalDataBuffer[1][j] = valueR;
@@ -209,6 +219,7 @@ struct HostAudio2 : HostAudio<2> {
 
             resetMeters = false;
         }
+#endif
     }
 };
 
@@ -223,7 +234,7 @@ struct HostAudio8 : HostAudio<8> {
         const int k = dataFrame++;
         DISTRHO_SAFE_ASSERT_INT2_RETURN(k < blockFrames, k, blockFrames,);
 
-        if (isBypassed())
+        if (bypassed)
             return;
 
         float** const dataOuts = pcontext->dataOuts;
@@ -244,6 +255,7 @@ struct HostAudio8 : HostAudio<8> {
 
 };
 
+#ifndef HEADLESS
 // --------------------------------------------------------------------------------------------------------------------
 
 template<int numIO>
@@ -343,7 +355,30 @@ struct HostAudioWidget8 : HostAudioWidget<8> {
     }
 };
 
+#else
 // --------------------------------------------------------------------------------------------------------------------
+
+struct HostAudioWidget2 : ModuleWidget {
+    HostAudioWidget2(HostAudio2* const module) {
+        setModule(module);
+        for (uint i=0; i<2; ++i) {
+            addInput(createInput<PJ301MPort>({}, module, i));
+            addOutput(createOutput<PJ301MPort>({}, module, i));
+        }
+    }
+};
+struct HostAudioWidget8 : ModuleWidget {
+    HostAudioWidget8(HostAudio8* const module) {
+        setModule(module);
+        for (uint i=0; i<8; ++i) {
+            addInput(createInput<PJ301MPort>({}, module, i));
+            addOutput(createOutput<PJ301MPort>({}, module, i));
+        }
+    }
+};
+
+// --------------------------------------------------------------------------------------------------------------------
+#endif
 
 Model* modelHostAudio2 = createModel<HostAudio2, HostAudioWidget2>("HostAudio2");
 Model* modelHostAudio8 = createModel<HostAudio8, HostAudioWidget8>("HostAudio8");
