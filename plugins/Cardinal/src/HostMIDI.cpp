@@ -143,10 +143,10 @@ struct HostMIDI : TerminalModule {
             lastProcessCounter = 0;
             wasPlaying = false;
             channel = 0;
-            smooth = true;
+            smooth = false;
             channels = 1;
             polyMode = ROTATE_MODE;
-            pwRange = 2;
+            pwRange = 0;
             panic();
         }
 
