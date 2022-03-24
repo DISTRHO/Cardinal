@@ -307,9 +307,7 @@ void setupSamples();
 #include "FehlerFabrik/src/plugin.hpp"
 
 // Fundamental
-#ifdef WITH_FUNDAMENTAL
 #include "Fundamental/src/plugin.hpp"
-#endif
 
 // GlueTheGiant
 #include "GlueTheGiant/src/plugin.hpp"
@@ -707,9 +705,7 @@ Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
 Plugin* pluginInstance__Extratone;
 Plugin* pluginInstance__FehlerFabrik;
-#ifdef WITH_FUNDAMENTAL
 Plugin* pluginInstance__Fundamental;
-#endif
 Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__GoodSheperd;
 Plugin* pluginInstance__GrandeModular;
@@ -1589,7 +1585,6 @@ static void initStatic__FehlerFabrik()
     }
 }
 
-#ifdef WITH_FUNDAMENTAL
 static void initStatic__Fundamental()
 {
     Plugin* const p = new Plugin;
@@ -1598,48 +1593,38 @@ static void initStatic__Fundamental()
     const StaticPluginLoader spl(p, "Fundamental");
     if (spl.ok())
     {
-        p->addModel(modelVCO);
-        p->addModel(modelVCO2);
         p->addModel(modelVCF);
-        p->addModel(modelVCA_1);
-        p->addModel(modelVCA);
-        p->addModel(modelLFO);
-        p->addModel(modelLFO2);
-        p->addModel(modelDelay);
-        p->addModel(modelADSR);
-        p->addModel(modelMixer);
-        p->addModel(modelVCMixer);
-        p->addModel(model_8vert);
-        p->addModel(modelUnity);
-        p->addModel(modelMutes);
-        p->addModel(modelPulses);
-        p->addModel(modelScope);
-        p->addModel(modelSEQ3);
-        p->addModel(modelSequentialSwitch1);
-        p->addModel(modelSequentialSwitch2);
-        p->addModel(modelOctave);
-        p->addModel(modelQuantizer);
-        p->addModel(modelSplit);
-        p->addModel(modelMerge);
-        p->addModel(modelSum);
-        p->addModel(modelViz);
-        p->addModel(modelMidSide);
-        p->addModel(modelNoise);
-        p->addModel(modelRandom);
 
-        // show all plugins, helping those familiar with v1 Rack modules
-        if (json_t* const modules = json_object_get(spl.rootJ, "modules"))
-        {
-            size_t i;
-            json_t* v;
-            json_array_foreach(modules, i, v)
-            {
-                json_object_set(v, "hidden", json_false());
-            }
-        }
+        // TODO
+        spl.removeModule("VCO");
+        spl.removeModule("VCO2");
+        spl.removeModule("VCA");
+        spl.removeModule("VCA-1");
+        spl.removeModule("LFO");
+        spl.removeModule("LFO2");
+        spl.removeModule("Delay");
+        spl.removeModule("ADSR");
+        spl.removeModule("Mixer");
+        spl.removeModule("VCMixer");
+        spl.removeModule("8vert");
+        spl.removeModule("Unity");
+        spl.removeModule("Mutes");
+        spl.removeModule("Pulses");
+        spl.removeModule("Scope");
+        spl.removeModule("SEQ3");
+        spl.removeModule("SequentialSwitch1");
+        spl.removeModule("SequentialSwitch2");
+        spl.removeModule("Octave");
+        spl.removeModule("Quantizer");
+        spl.removeModule("Split");
+        spl.removeModule("Merge");
+        spl.removeModule("Sum");
+        spl.removeModule("Viz");
+        spl.removeModule("MidSide");
+        spl.removeModule("Noise");
+        spl.removeModule("Random");
     }
 }
-#endif
 
 static void initStatic__GlueTheGiant()
 {
@@ -2515,9 +2500,7 @@ void initStaticPlugins()
     initStatic__ExpertSleepersEncoders();
     initStatic__Extratone();
     initStatic__FehlerFabrik();
-   #ifdef WITH_FUNDAMENTAL
     initStatic__Fundamental();
-   #endif
     initStatic__GlueTheGiant();
     initStatic__GoodSheperd();
     initStatic__GrandeModular();

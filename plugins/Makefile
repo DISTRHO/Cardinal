@@ -514,15 +514,11 @@ FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter
 # --------------------------------------------------------------
 # Fundamental
 
-ifeq ($(WITH_FUNDAMENTAL),true)
-BASE_FLAGS += -DWITH_FUNDAMENTAL
-
 PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
 PLUGIN_FILES += Fundamental/src/dr_wav.c
 
 # modules/types which are present in other plugins
 FUNDAMENTAL_CUSTOM = $(DRWAV)
-endif
 
 # --------------------------------------------------------------
 # GlueTheGiant

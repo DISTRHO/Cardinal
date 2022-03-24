@@ -184,3 +184,6 @@
 [submodule "plugins/ArableInstruments"]
 	path = plugins/ArableInstruments
 	url = https://github.com/CardinalModules/ArableInstruments.git
+[submodule "plugins/Fundamental"]
+	path = plugins/Fundamental
+	url = https://github.com/CardinalModules/Fundamental.git
