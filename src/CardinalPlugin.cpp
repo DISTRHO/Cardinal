@@ -155,7 +155,8 @@ struct Initializer
                    #if defined(ARCH_MAC)
                     asset::systemDir = "/Library/Application Support/Cardinal";
                    #elif defined(ARCH_WIN)
-                    if (const char* const commonprogfiles = std::getenv("COMMONPROGRAMFILES"))
+                    const std::string commonprogfiles = getSpecialPath(kSpecialPathCommonProgramFiles);
+                    if (! commonprogfiles.empty())
                         asset::systemDir = system::join(commonprogfiles, "Cardinal");
                    #else
                     asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/cardinal";

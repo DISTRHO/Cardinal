@@ -41,6 +41,14 @@ namespace window {
 void generateScreenshot();
 }
 
+#ifdef ARCH_WIN
+enum SpecialPath {
+    kSpecialPathUserProfile,
+    kSpecialPathCommonProgramFiles,
+};
+std::string getSpecialPath(SpecialPath type);
+#endif
+
 } // namespace rack
 
 namespace patchUtils {
