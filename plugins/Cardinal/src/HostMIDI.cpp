@@ -122,6 +122,7 @@ struct HostMIDI : TerminalModule {
         dsp::PulseGenerator startPulse;
         dsp::PulseGenerator stopPulse;
         dsp::PulseGenerator continuePulse;
+        dsp::PulseGenerator retriggerPulses[16];
 
         MidiInput(CardinalPluginContext* const pc)
             : pcontext(pc)
@@ -278,6 +279,7 @@ struct HostMIDI : TerminalModule {
             outputs[GATE_OUTPUT].setChannels(channels);
             outputs[VELOCITY_OUTPUT].setChannels(channels);
             outputs[AFTERTOUCH_OUTPUT].setChannels(channels);
+            outputs[RETRIGGER_OUTPUT].setChannels(channels);
 
             for (int c = 0; c < channels; c++) {
                 float pw = pwValues[(polyMode == MPE_MODE) ? c : 0];
@@ -286,6 +288,7 @@ struct HostMIDI : TerminalModule {
                 outputs[GATE_OUTPUT].setVoltage(gates[c] ? 10.f : 0.f, c);
                 outputs[VELOCITY_OUTPUT].setVoltage(rescale(velocities[c], 0, 127, 0.f, 10.f), c);
                 outputs[AFTERTOUCH_OUTPUT].setVoltage(rescale(aftertouches[c], 0, 127, 0.f, 10.f), c);
+                outputs[RETRIGGER_OUTPUT].setVoltage(retriggerPulses[c].process(args.sampleTime) ? 10.f : 0.f, c);
             }
 
             outputs[START_OUTPUT].setVoltage(startPulse.process(args.sampleTime) ? 10.f : 0.f);
@@ -460,6 +463,7 @@ struct HostMIDI : TerminalModule {
             // Set note
             notes[*channel] = note;
             gates[*channel] = true;
+            retriggerPulses[*channel].trigger(1e-3);
         }
 
         void releaseNote(uint8_t note) {
@@ -780,12 +784,13 @@ struct HostMIDIWidget : ModuleWidgetWith9HP {
         createAndAddOutput(6, HostMIDI::START_OUTPUT);
         createAndAddOutput(7, HostMIDI::STOP_OUTPUT);
         createAndAddOutput(8, HostMIDI::CONTINUE_OUTPUT);
+        createAndAddOutput(9, HostMIDI::RETRIGGER_OUTPUT);
     }
 
     void draw(const DrawArgs& args) override
     {
         drawBackground(args.vg);
-        drawOutputJacksArea(args.vg, 9);
+        drawOutputJacksArea(args.vg, 10);
         setupTextLines(args.vg);
 
         drawTextLine(args.vg, 0, "V/Oct");
@@ -797,6 +802,7 @@ struct HostMIDIWidget : ModuleWidgetWith9HP {
         drawTextLine(args.vg, 6, "Start");
         drawTextLine(args.vg, 7, "Stop");
         drawTextLine(args.vg, 8, "Cont");
+        drawTextLine(args.vg, 9, "Retrigger");
 
         ModuleWidgetWith9HP::draw(args);
     }
