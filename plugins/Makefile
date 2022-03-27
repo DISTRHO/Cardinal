@@ -457,8 +457,7 @@ BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 # --------------------------------------------------------------
 # ChowDSP
 
-# Credit module crashes on save, see https://github.com/DISTRHO/Cardinal/issues/98
-PLUGIN_FILES += $(filter-out ChowDSP/src/Credit.cpp,$(wildcard ChowDSP/src/*/*.cpp))
+PLUGIN_FILES += $(wildcard ChowDSP/src/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/src/*/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
 
