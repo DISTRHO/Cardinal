@@ -131,6 +131,7 @@ void loadDialog()
         FileBrowserOptions opts;
         opts.startDir = dir.c_str();
         opts.saving = ui->saving = false;
+        opts.title = "Open patch";
         ui->openFileBrowser(opts);
     });
 #endif
@@ -227,6 +228,7 @@ static void saveAsDialog(const bool uncompressed)
     FileBrowserOptions opts;
     opts.startDir = dir.c_str();
     opts.saving = ui->saving = true;
+    opts.title = "Save patch";
     ui->savingUncompressed = uncompressed;
     ui->openFileBrowser(opts);
 }
