@@ -41,6 +41,8 @@ namespace window {
 void generateScreenshot();
 }
 
+bool isStandalone();
+
 #ifdef ARCH_WIN
 enum SpecialPath {
     kSpecialPathUserProfile,

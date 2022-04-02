@@ -29,6 +29,7 @@
 
 #include "AsyncDialog.hpp"
 #include "PluginContext.hpp"
+#include "DistrhoPluginUtils.hpp"
 
 #include <asset.hpp>
 #include <context.hpp>
@@ -56,6 +57,11 @@ const std::string CARDINAL_VERSION = "22.03";
 namespace rack {
 namespace settings {
 int rateLimit = 0;
+}
+
+bool isStandalone()
+{
+    return std::strstr(getPluginFormatName(), "JACK") != nullptr;
 }
 
 #ifdef ARCH_WIN
