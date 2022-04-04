@@ -1582,6 +1582,7 @@ static void initStatic__FehlerFabrik()
     }
 }
 
+/* TODO enable this when ready, WIP
 static void initStatic__Fundamental()
 {
     Plugin* const p = new Plugin;
@@ -1622,6 +1623,7 @@ static void initStatic__Fundamental()
         spl.removeModule("Random");
     }
 }
+*/
 
 static void initStatic__GlueTheGiant()
 {
@@ -2497,7 +2499,9 @@ void initStaticPlugins()
     initStatic__ExpertSleepersEncoders();
     initStatic__Extratone();
     initStatic__FehlerFabrik();
+    /* TODO enable this when ready, WIP
     initStatic__Fundamental();
+    */
     initStatic__GlueTheGiant();
     initStatic__GoodSheperd();
     initStatic__GrandeModular();
