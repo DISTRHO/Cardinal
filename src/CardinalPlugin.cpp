@@ -57,6 +57,14 @@ static const constexpr uint kCardinalStateCount = 4; // patch, screenshot, comme
 static const constexpr uint kCardinalStateCount = 3; // patch, screenshot, comment
 #endif
 
+#if CARDINAL_VARIANT_FX
+# define CARDINAL_TEMPLATE_NAME "template-fx.vcv"
+#elif CARDINAL_VARIANT_SYNTH
+# define CARDINAL_TEMPLATE_NAME "template-synth.vcv"
+#else
+# define CARDINAL_TEMPLATE_NAME "template.vcv"
+#endif
+
 namespace rack {
 namespace plugin {
     void initStaticPlugins();
@@ -134,7 +142,7 @@ struct Initializer
                 {
                     asset::bundlePath = system::join(resourcePath, "PluginManifests");
                     asset::systemDir = resourcePath;
-                    templatePath = system::join(asset::systemDir, "template.vcv");
+                    templatePath = system::join(asset::systemDir, CARDINAL_TEMPLATE_NAME);
                 }
             }
 
@@ -146,7 +154,7 @@ struct Initializer
 
                 if (system::exists(system::join(asset::systemDir, "res")))
                 {
-                    templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
+                    templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR CARDINAL_TEMPLATE_NAME;
                 }
                 // If source code dir does not exist use install target prefix as system dir
                 else
@@ -165,7 +173,7 @@ struct Initializer
                     if (! asset::systemDir.empty())
                     {
                         asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
-                        templatePath = system::join(asset::systemDir, "template.vcv");
+                        templatePath = system::join(asset::systemDir, CARDINAL_TEMPLATE_NAME);
                     }
                 }
             }
