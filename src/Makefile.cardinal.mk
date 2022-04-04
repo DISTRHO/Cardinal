@@ -320,6 +320,14 @@ $(TARGET_DIR)/%/template.vcv: ../template.vcv
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
+$(TARGET_DIR)/%/template-fx.vcv: ../template-fx.vcv
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+$(TARGET_DIR)/%/template-synth.vcv: ../template-synth.vcv
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
 $(TARGET_DIR)/$(NAME).lv2/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
