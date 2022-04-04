@@ -274,8 +274,6 @@ endif
 CORE_RESOURCES  = $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
 CORE_RESOURCES += $(subst ../,,$(wildcard ../template*.vcv))
 
-$(error $(CORE_RESOURCES))
-
 LV2_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
 VST3_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
 
