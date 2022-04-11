@@ -647,6 +647,10 @@ extern Model* modelBlankPanel;
 // stocaudio
 #include "stocaudio/src/plugin.hpp"
 
+// unless_modules
+#include "unless_modules/src/unless.hpp"
+
+
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
 
@@ -735,6 +739,7 @@ Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__stocaudio;
+Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__Voxglitch;
 Plugin* pluginInstance__ZetaCarinaeModules;
@@ -2377,6 +2382,29 @@ static void initStatic__stocaudio()
         p->addModel(modelSpread);
     }
 }
+static void initStatic__unless_modules()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__unless_modules = p;
+
+    const StaticPluginLoader spl(p, "unless_modules");
+    if (spl.ok())
+    {
+      // unless_modules::init_theme();
+      // theme = _less::Theme();
+      p->addModel(modelPiong);
+      p->addModel(modelChainkov);
+      p->addModel(modelAtoms);
+      p->addModel(modelCantor);
+      p->addModel(modelRoom);
+      p->addModel(modelSnake);
+      p->addModel(modelTowers);
+      p->addModel(modelPianoid);
+      p->addModel(modelPremuter);
+      p->addModel(modelAvoider);
+    }
+}
+
 
 static void initStatic__ValleyAudio()
 {
@@ -2531,6 +2559,7 @@ void initStaticPlugins()
     initStatic__repelzen();
     initStatic__sonusmodular();
     initStatic__stocaudio();
+    initStatic__unless_modules();
     initStatic__ValleyAudio();
     initStatic__Voxglitch();
     initStatic__ZetaCarinaeModules();
