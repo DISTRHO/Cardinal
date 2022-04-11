@@ -30,7 +30,6 @@ Though currently the following should be noted:
 - Keyboard input does not always work in some hosts [#24](https://github.com/DISTRHO/Cardinal/issues/24)
 - VST3 support incomplete/experimental [#41](https://github.com/DISTRHO/Cardinal/issues/41)
 - Windows 32bit builds do not work well [#80](https://github.com/DISTRHO/Cardinal/issues/80)
-- Windows High-DPI issues [#186](https://github.com/DISTRHO/Cardinal/issues/186)
 
 ### Stable release
 

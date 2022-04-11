@@ -64,9 +64,15 @@ As a plugin, the state will be saved together with the host/DAW project.
 ## On BSD/Linux/X11 the menu item "Save As/Export..." does nothing
 
 The save-file dialogs in Cardinal requires a working [xdg-desktop-portal](https://github.com/flatpak/xdg-desktop-portal) DBus implementation from your desktop environment.  
-Typically your desktop already provides this, if not consider looking for a package to install with "desktop-portal" in the name.
+Typically your desktop already provides this, if not consider looking for a package to install with "desktop-portal" in the name.  
+If you are running a window manager without a "real" desktop environment (like custom X11 or i3 setups),
+you will need to manually activate the systemd unit that provides these DBus services, like so:
 
-The open-file dialogs in Cardinal do not have this restriction, with a fallback in case desktop portal is not available.
+```
+systemctl enable xdg-desktop-portal --user --now
+```
+
+Note: The open-file dialogs in Cardinal do not have this restriction, with a fallback in case the desktop portal is not available.
 
 ## Why IRC and not Discord?
 
