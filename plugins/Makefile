@@ -768,6 +768,9 @@ PLUGIN_FILES += $(filter-out stocaudio/src/plugin.cpp,$(wildcard stocaudio/src/*
 
 PLUGIN_FILES += $(filter-out unless_modules/src/unless.cpp,$(wildcard unless_modules/src/*.cpp))
 
+# modules/types which are present in other plugins
+UNLESS_MODULES_CUSTOM = Selection
+
 # --------------------------------------------------------------
 # ValleyAudio
 

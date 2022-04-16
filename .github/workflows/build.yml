@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 13
+  CACHE_VERSION: 14
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -25,6 +25,15 @@ jobs:
             build
             carla/build
             dpf/build
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+            src/Rack/dep/zstd-1.4.5
           key: linux-arm64-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
@@ -104,6 +113,15 @@ jobs:
             build
             carla/build
             dpf/build
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+            src/Rack/dep/zstd-1.4.5
           key: linux-armhf-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
@@ -183,6 +201,15 @@ jobs:
             build
             carla/build
             dpf/build
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+            src/Rack/dep/zstd-1.4.5
           key: linux-i686-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
@@ -258,6 +285,15 @@ jobs:
             build
             carla/build
             dpf/build
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+            src/Rack/dep/zstd-1.4.5
           key: linux-x86_64-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
@@ -385,6 +421,15 @@ jobs:
             carla/build
             dpf/build
             jucewrapper/build
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+            src/Rack/dep/zstd-1.4.5
           key: macos-universal-v${{ env.CACHE_VERSION }}
       - name: Fix up Xcode
         run: |
@@ -579,6 +624,15 @@ jobs:
             build
             carla/build
             dpf/build
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+            src/Rack/dep/zstd-1.4.5
           key: win32-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
@@ -663,6 +717,15 @@ jobs:
             build
             carla/build
             dpf/build
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+            src/Rack/dep/zstd-1.4.5
           key: win64-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
