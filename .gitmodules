@@ -187,3 +187,6 @@
 [submodule "plugins/Fundamental"]
 	path = plugins/Fundamental
 	url = https://github.com/CardinalModules/Fundamental.git
+[submodule "plugins/unless_modules"]
+	path = plugins/unless_modules
+	url = https://gitlab.com/unlessgames/unless_modules

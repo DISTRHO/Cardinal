@@ -159,6 +159,7 @@ At the moment the following 3rd-party modules are provided:
 - repelzen
 - Sonus Modular
 - stocaudio
+- unless_modules
 - Valley
 - Voxglitch
 - ZetaCarinae
