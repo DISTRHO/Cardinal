@@ -1029,6 +1029,10 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
 RESOURCE_FILES += Mog/res
 RESOURCE_FILES += nonlinearcircuits/res
 RESOURCE_FILES += ParableInstruments/res/Neil.png
+RESOURCE_FILES += $(wildcard unless_modules/art/*.art)
+RESOURCE_FILES += $(wildcard unless_modules/art/svg/*/*.svg)
+RESOURCE_FILES += $(wildcard unless_modules/font/*.ttf)
+# RESOURCE_FILES += $(wildcard unless_modules/manual/*)
 
 # MOD builds only have LV2 FX variant for now
 ifeq ($(MOD_BUILD),true)
