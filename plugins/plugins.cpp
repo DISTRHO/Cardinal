@@ -650,7 +650,6 @@ extern Model* modelBlankPanel;
 // unless_modules
 #include "unless_modules/src/unless.hpp"
 
-
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
 
@@ -2382,6 +2381,7 @@ static void initStatic__stocaudio()
         p->addModel(modelSpread);
     }
 }
+
 static void initStatic__unless_modules()
 {
     Plugin* const p = new Plugin;
@@ -2390,21 +2390,20 @@ static void initStatic__unless_modules()
     const StaticPluginLoader spl(p, "unless_modules");
     if (spl.ok())
     {
-      // unless_modules::init_theme();
-      // theme = _less::Theme();
-      p->addModel(modelPiong);
-      p->addModel(modelChainkov);
-      p->addModel(modelAtoms);
-      p->addModel(modelCantor);
-      p->addModel(modelRoom);
-      p->addModel(modelSnake);
-      p->addModel(modelTowers);
-      p->addModel(modelPianoid);
-      p->addModel(modelPremuter);
-      p->addModel(modelAvoider);
+        // unless_modules::init_theme();
+        // theme = _less::Theme();
+        p->addModel(modelPiong);
+        p->addModel(modelChainkov);
+        p->addModel(modelAtoms);
+        p->addModel(modelCantor);
+        p->addModel(modelRoom);
+        p->addModel(modelSnake);
+        p->addModel(modelTowers);
+        p->addModel(modelPianoid);
+        p->addModel(modelPremuter);
+        p->addModel(modelAvoider);
     }
 }
-
 
 static void initStatic__ValleyAudio()
 {

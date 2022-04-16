@@ -184,9 +184,9 @@ Below is a list of artwork licenses from plugins
 | repelzen/*                              | CC-BY-SA-4.0     | |
 | sonusmodular/*                          | GPL-3.0-or-later | [Same license as source code](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
 | stocaudio/*                             | GPL-3.0-or-later | No artwork specific license provided |
-| unless_modules/*                        | CC BY-NC-ND 4.0  | |
+| unless_modules/*                        | CC-BY-NC-ND-4.0  | |
 | unless_modules/font/CuteFont-Regular.ttf| OFL-1.1          | |
-| unless_modules/font/Terminus.ttf        | GPL-2.0          | |
+| unless_modules/font/Terminus.ttf        | GPL-2.0-or-later | [Starting from v4.32, font license is OFL-1.1](https://files.ax86.net/terminus-ttf/#license) |
 | ValleyAudio/*                           | GPL-3.0-or-later | [Same license as source code](https://github.com/ValleyAudio/ValleyRackFree/issues/73) |
 | ValleyAudio/din1451alt.ttf              | CC-BY-3.0-DE     | |
 | ValleyAudio/DSEG14Classic-*.ttf         | OFL-1.1-RFN      | |
