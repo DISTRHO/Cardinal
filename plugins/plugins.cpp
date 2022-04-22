@@ -23,6 +23,9 @@
 // Cardinal (built-in)
 #include "Cardinal/src/plugin.hpp"
 
+// Fundamental (always enabled)
+#include "Fundamental/src/plugin.hpp"
+
 #ifndef NOPLUGINS
 // 21kHz
 #include "21kHz/src/21kHz.hpp"
@@ -305,9 +308,6 @@ void setupSamples();
 
 // FehlerFabrik
 #include "FehlerFabrik/src/plugin.hpp"
-
-// Fundamental
-#include "Fundamental/src/plugin.hpp"
 
 // GlueTheGiant
 #include "GlueTheGiant/src/plugin.hpp"
@@ -684,6 +684,7 @@ void saveHighQualityAsDefault(bool) {}
 
 // plugin instances
 Plugin* pluginInstance__Cardinal;
+Plugin* pluginInstance__Fundamental;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
@@ -708,7 +709,6 @@ Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
 Plugin* pluginInstance__Extratone;
 Plugin* pluginInstance__FehlerFabrik;
-Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__GoodSheperd;
 Plugin* pluginInstance__GrandeModular;
@@ -881,6 +881,98 @@ static void initStatic__Cardinal()
             modelHostParameters,
             modelHostTime,
         };
+    }
+}
+
+static void initStatic__Fundamental()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Fundamental = p;
+
+    const StaticPluginLoader spl(p, "Fundamental");
+    if (spl.ok())
+    {
+        p->addModel(model_8vert);
+        p->addModel(modelVCF);
+
+        spl.removeModule("ADSR");
+        // p->addModel(modelADSR);
+
+        spl.removeModule("Delay");
+        // p->addModel(modelDelay);
+
+        spl.removeModule("LFO");
+        // p->addModel(modelLFO);
+
+        spl.removeModule("LFO2");
+        // p->addModel(modelLFO2);
+
+        spl.removeModule("Merge");
+        // p->addModel(modelMerge);
+
+        spl.removeModule("MidSide");
+        // p->addModel(modelMidSide);
+
+        spl.removeModule("Mixer");
+        // p->addModel(modelMixer);
+
+        spl.removeModule("Mutes");
+        // p->addModel(modelMutes);
+
+        spl.removeModule("Noise");
+        // p->addModel(modelNoise);
+
+        spl.removeModule("Octave");
+        // p->addModel(modelOctave);
+
+        spl.removeModule("Pulses");
+        // p->addModel(modelPulses);
+
+        spl.removeModule("Quantizer");
+        // p->addModel(modelQuantizer);
+
+        spl.removeModule("Random");
+        // p->addModel(modelRandom);
+
+        spl.removeModule("Scope");
+        // p->addModel(modelScope);
+
+        spl.removeModule("SEQ3");
+        // p->addModel(modelSEQ3);
+
+        spl.removeModule("SequentialSwitch1");
+        // p->addModel(modelSequentialSwitch1);
+
+        spl.removeModule("SequentialSwitch2");
+        // p->addModel(modelSequentialSwitch2);
+
+        spl.removeModule("Split");
+        // p->addModel(modelSplit);
+
+        spl.removeModule("Sum");
+        // p->addModel(modelSum);
+
+        spl.removeModule("Unity");
+        // p->addModel(modelUnity);
+
+        spl.removeModule("VCA");
+        // p->addModel(modelVCA);
+
+        spl.removeModule("VCA-1");
+        // p->addModel(modelVCA_1);
+
+        spl.removeModule("VCO");
+        // p->addModel(modelVCO);
+
+        spl.removeModule("VCO2");
+        // p->addModel(modelVCO2);
+
+        spl.removeModule("VCMixer");
+        // p->addModel(modelVCMixer);
+
+        spl.removeModule("Viz");
+        // p->addModel(modelViz);
+
     }
 }
 
@@ -1585,49 +1677,6 @@ static void initStatic__FehlerFabrik()
         p->addModel(modelBotzinger);
     }
 }
-
-/* TODO enable this when ready, WIP
-static void initStatic__Fundamental()
-{
-    Plugin* const p = new Plugin;
-    pluginInstance__Fundamental = p;
-
-    const StaticPluginLoader spl(p, "Fundamental");
-    if (spl.ok())
-    {
-        p->addModel(modelVCF);
-
-        // TODO
-        spl.removeModule("VCO");
-        spl.removeModule("VCO2");
-        spl.removeModule("VCA");
-        spl.removeModule("VCA-1");
-        spl.removeModule("LFO");
-        spl.removeModule("LFO2");
-        spl.removeModule("Delay");
-        spl.removeModule("ADSR");
-        spl.removeModule("Mixer");
-        spl.removeModule("VCMixer");
-        spl.removeModule("8vert");
-        spl.removeModule("Unity");
-        spl.removeModule("Mutes");
-        spl.removeModule("Pulses");
-        spl.removeModule("Scope");
-        spl.removeModule("SEQ3");
-        spl.removeModule("SequentialSwitch1");
-        spl.removeModule("SequentialSwitch2");
-        spl.removeModule("Octave");
-        spl.removeModule("Quantizer");
-        spl.removeModule("Split");
-        spl.removeModule("Merge");
-        spl.removeModule("Sum");
-        spl.removeModule("Viz");
-        spl.removeModule("MidSide");
-        spl.removeModule("Noise");
-        spl.removeModule("Random");
-    }
-}
-*/
 
 static void initStatic__GlueTheGiant()
 {
@@ -2502,6 +2551,7 @@ static void initStatic__ZZC()
 void initStaticPlugins()
 {
     initStatic__Cardinal();
+    initStatic__Fundamental();
 #ifndef NOPLUGINS
     initStatic__21kHz();
     initStatic__8Mode();
@@ -2526,9 +2576,7 @@ void initStaticPlugins()
     initStatic__ExpertSleepersEncoders();
     initStatic__Extratone();
     initStatic__FehlerFabrik();
-    /* TODO enable this when ready, WIP
     initStatic__Fundamental();
-    */
     initStatic__GlueTheGiant();
     initStatic__GoodSheperd();
     initStatic__GrandeModular();

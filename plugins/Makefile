@@ -222,6 +222,15 @@ PLUGIN_FILES += $(wildcard Cardinal/src/DearImGui/*.cpp)
 PLUGIN_FILES += $(wildcard Cardinal/src/DearImGuiColorTextEditor/*.cpp)
 endif
 
+# --------------------------------------------------------------
+# Fundamental (always enabled)
+
+PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
+PLUGIN_FILES += Fundamental/src/dr_wav.c
+
+# modules/types which are present in other plugins
+FUNDAMENTAL_CUSTOM = $(DRWAV)
+
 ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------
 # 21kHz
@@ -509,15 +518,6 @@ PLUGIN_FILES += $(filter-out FehlerFabrik/src/plugin.cpp,$(wildcard FehlerFabrik
 
 # modules/types which are present in other plugins
 FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter
-
-# --------------------------------------------------------------
-# Fundamental
-
-PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
-PLUGIN_FILES += Fundamental/src/dr_wav.c
-
-# modules/types which are present in other plugins
-FUNDAMENTAL_CUSTOM = $(DRWAV)
 
 # --------------------------------------------------------------
 # GlueTheGiant
