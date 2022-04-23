@@ -2521,7 +2521,6 @@ void initStaticPlugins()
     initStatic__ExpertSleepersEncoders();
     initStatic__Extratone();
     initStatic__FehlerFabrik();
-    initStatic__Fundamental();
     initStatic__GlueTheGiant();
     initStatic__GoodSheperd();
     initStatic__GrandeModular();
