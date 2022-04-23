@@ -894,22 +894,16 @@ static void initStatic__Fundamental()
     {
         p->addModel(model_8vert);
         p->addModel(modelADSR);
+        p->addModel(modelDelay);
+        p->addModel(modelLFO);
+        p->addModel(modelMerge);
         p->addModel(modelScope);
         p->addModel(modelVCA_1);
         p->addModel(modelVCF);
         p->addModel(modelVCO);
 
-        spl.removeModule("Delay");
-        // p->addModel(modelDelay);
-
-        spl.removeModule("LFO");
-        // p->addModel(modelLFO);
-
         spl.removeModule("LFO2");
         // p->addModel(modelLFO2);
-
-        spl.removeModule("Merge");
-        // p->addModel(modelMerge);
 
         spl.removeModule("MidSide");
         // p->addModel(modelMidSide);
