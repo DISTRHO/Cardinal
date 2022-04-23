@@ -896,69 +896,28 @@ static void initStatic__Fundamental()
         p->addModel(modelADSR);
         p->addModel(modelDelay);
         p->addModel(modelLFO);
+        p->addModel(modelLFO2);
         p->addModel(modelMerge);
+        p->addModel(modelMidSide);
+        p->addModel(modelMixer);
+        p->addModel(modelMutes);
+        p->addModel(modelNoise);
+        p->addModel(modelOctave);
+        p->addModel(modelPulses);
+        p->addModel(modelQuantizer);
+        p->addModel(modelRandom);
         p->addModel(modelScope);
+        p->addModel(modelSEQ3);
+        p->addModel(modelSequentialSwitch1);
+        p->addModel(modelSequentialSwitch2);
+        p->addModel(modelSplit);
+        p->addModel(modelSum);
+        p->addModel(modelVCA);
         p->addModel(modelVCA_1);
         p->addModel(modelVCF);
+        p->addModel(modelVCMixer);
         p->addModel(modelVCO);
-
-        spl.removeModule("LFO2");
-        // p->addModel(modelLFO2);
-
-        spl.removeModule("MidSide");
-        // p->addModel(modelMidSide);
-
-        spl.removeModule("Mixer");
-        // p->addModel(modelMixer);
-
-        spl.removeModule("Mutes");
-        // p->addModel(modelMutes);
-
-        spl.removeModule("Noise");
-        // p->addModel(modelNoise);
-
-        spl.removeModule("Octave");
-        // p->addModel(modelOctave);
-
-        spl.removeModule("Pulses");
-        // p->addModel(modelPulses);
-
-        spl.removeModule("Quantizer");
-        // p->addModel(modelQuantizer);
-
-        spl.removeModule("Random");
-        // p->addModel(modelRandom);
-
-        spl.removeModule("SEQ3");
-        // p->addModel(modelSEQ3);
-
-        spl.removeModule("SequentialSwitch1");
-        // p->addModel(modelSequentialSwitch1);
-
-        spl.removeModule("SequentialSwitch2");
-        // p->addModel(modelSequentialSwitch2);
-
-        spl.removeModule("Split");
-        // p->addModel(modelSplit);
-
-        spl.removeModule("Sum");
-        // p->addModel(modelSum);
-
-        spl.removeModule("Unity");
-        // p->addModel(modelUnity);
-
-        spl.removeModule("VCA");
-        // p->addModel(modelVCA);
-
-        spl.removeModule("VCO2");
-        // p->addModel(modelVCO2);
-
-        spl.removeModule("VCMixer");
-        // p->addModel(modelVCMixer);
-
-        spl.removeModule("Viz");
-        // p->addModel(modelViz);
-
+        p->addModel(modelVCO2);
     }
 }
 
