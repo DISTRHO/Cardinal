@@ -893,12 +893,11 @@ static void initStatic__Fundamental()
     if (spl.ok())
     {
         p->addModel(model_8vert);
+        p->addModel(modelADSR);
         p->addModel(modelScope);
+        p->addModel(modelVCA_1);
         p->addModel(modelVCF);
         p->addModel(modelVCO);
-
-        spl.removeModule("ADSR");
-        // p->addModel(modelADSR);
 
         spl.removeModule("Delay");
         // p->addModel(modelDelay);
@@ -956,9 +955,6 @@ static void initStatic__Fundamental()
 
         spl.removeModule("VCA");
         // p->addModel(modelVCA);
-
-        spl.removeModule("VCA-1");
-        // p->addModel(modelVCA_1);
 
         spl.removeModule("VCO2");
         // p->addModel(modelVCO2);
