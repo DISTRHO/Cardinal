@@ -893,6 +893,7 @@ static void initStatic__Fundamental()
     if (spl.ok())
     {
         p->addModel(model_8vert);
+        p->addModel(modelScope);
         p->addModel(modelVCF);
 
         spl.removeModule("ADSR");
@@ -933,9 +934,6 @@ static void initStatic__Fundamental()
 
         spl.removeModule("Random");
         // p->addModel(modelRandom);
-
-        spl.removeModule("Scope");
-        // p->addModel(modelScope);
 
         spl.removeModule("SEQ3");
         // p->addModel(modelSEQ3);

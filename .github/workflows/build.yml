@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 14
+  CACHE_VERSION: 15
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -22,6 +22,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin
             build
             carla/build
             dpf/build
@@ -110,6 +111,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin
             build
             carla/build
             dpf/build
@@ -198,6 +200,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin
             build
             carla/build
             dpf/build
@@ -282,6 +285,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin
             build
             carla/build
             dpf/build
@@ -417,6 +421,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin
             build
             carla/build
             dpf/build
@@ -621,6 +626,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin
             build
             carla/build
             dpf/build
@@ -714,6 +720,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin
             build
             carla/build
             dpf/build
