@@ -895,6 +895,7 @@ static void initStatic__Fundamental()
         p->addModel(model_8vert);
         p->addModel(modelScope);
         p->addModel(modelVCF);
+        p->addModel(modelVCO);
 
         spl.removeModule("ADSR");
         // p->addModel(modelADSR);
@@ -958,9 +959,6 @@ static void initStatic__Fundamental()
 
         spl.removeModule("VCA-1");
         // p->addModel(modelVCA_1);
-
-        spl.removeModule("VCO");
-        // p->addModel(modelVCO);
 
         spl.removeModule("VCO2");
         // p->addModel(modelVCO2);
