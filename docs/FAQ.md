@@ -9,19 +9,6 @@ But basically we want an open-source plugin version of "Rack Pro",
 where we are free to change things as we see fit, work on new features and fix bugs.  
 This is simply not possible with proprietary software, which is the case of "Rack Pro".
 
-## Where is Fundamental?
-
-There are some artwork license issues that prevent us from using Fundamental exactly as we want.  
-We could in theory use it as-is, VCV logo and everything, but it looks out of place with Cardinal's general dark mode theme.  
-The artwork license does not allow modifications, and that VCV logo being present on the panels makes Cardinal's authors unease.  
-Cardinal is not a VCV product in any way, or endorsed by it. Would be quite bad to give that impression.
-
-Current plan is to redo Fundamental panel graphics in a more liberal license, so it then can be included in Cardinal.  
-In the mean time, check [this wiki page](https://github.com/DISTRHO/Cardinal/wiki/Fundamental-replacements)
-for a list of module replacements for Fundamental stuff.
-
-PS: Don't forget to contribute back as well! ;)
-
 ## Can I install extra modules?
 
 No, Cardinal is intentionally a fully self-contained plugin.  

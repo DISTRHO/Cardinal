@@ -130,6 +130,7 @@ At the moment the following 3rd-party modules are provided:
 - ExpertSleepers Encoders
 - Extratone
 - Fehler Fabrik
+- Fundamental
 - Glue the Giant
 - GoodSheperd
 - Grande
