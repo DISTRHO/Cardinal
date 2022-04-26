@@ -473,6 +473,10 @@ jobs:
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: macos-intel-v${{ env.CACHE_VERSION }}
+      - name: Fix up Xcode
+        run: |
+          sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*
+          sudo xcode-select -s "/Applications/Xcode_12.3.app"
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh macos && ./deps/PawPaw/.cleanup.sh macos
