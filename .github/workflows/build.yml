@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 18
+  CACHE_VERSION: 19
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -454,6 +454,9 @@ jobs:
           path: |
             ~/PawPawBuilds
             */*.a
+            bin/*.*/*.dylib
+            bin/*.*/Contents/MacOS/*
+            bin/Cardinal
             build/Cardinal
             build/CardinalFX
             build/CardinalSynth
@@ -473,10 +476,6 @@ jobs:
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: macos-intel-v${{ env.CACHE_VERSION }}
-      - name: Fix up Xcode
-        run: |
-          sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*
-          sudo xcode-select -s "/Applications/Xcode_12.3.app"
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh macos && ./deps/PawPaw/.cleanup.sh macos
@@ -495,6 +494,7 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env macos; popd
           git clone --depth=1 -b master https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
+          sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
           mkdir -p jucewrapper/build
           pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_BUILD_TYPE=Release .. && make -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
@@ -547,6 +547,9 @@ jobs:
           path: |
             ~/PawPawBuilds
             */*.a
+            bin/*.*/*.dylib
+            bin/*.*/Contents/MacOS/*
+            bin/Cardinal
             build/Cardinal
             build/CardinalFX
             build/CardinalSynth
@@ -757,6 +760,9 @@ jobs:
           path: |
             ~/PawPawBuilds
             */*.a
+            bin/*.*/*.dll
+            bin/*.vst3/Contents/*/*.vst3
+            bin/Cardinal.exe
             build/Cardinal
             build/CardinalFX
             build/CardinalSynth
@@ -856,6 +862,9 @@ jobs:
           path: |
             ~/PawPawBuilds
             */*.a
+            bin/*.*/*.dll
+            bin/*.vst3/Contents/*/*.vst3
+            bin/Cardinal.exe
             build/Cardinal
             build/CardinalFX
             build/CardinalSynth
