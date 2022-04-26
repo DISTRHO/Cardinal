@@ -199,7 +199,7 @@ juce_add_plugin(CardinalSynth
     COMPANY_WEBSITE "https://github.com/DISTRHO/Cardinal"
     DESCRIPTION "Virtual modular synthesizer plugin"
     EDITOR_WANTS_KEYBOARD_FOCUS TRUE
-    FORMATS Standalone VST3 AU
+    FORMATS ${PLUGIN_FORMATS}
     IS_MIDI_EFFECT FALSE
     IS_SYNTH TRUE
     NEEDS_MIDI_INPUT TRUE

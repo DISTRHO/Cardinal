@@ -63,12 +63,12 @@ jobs:
           PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64
-      #- name: Restore build timestamp
-        #if: steps.cache.outputs.cache-hit == 'true'
-        #shell: bash
-        #run: |
-          #TS=$(cat build/timestamp)
-          #find . -type f -exec touch -a -m -t ${TS} {} \;
+      - name: Restore build timestamp
+        if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
+        run: |
+          TS=$(cat build/timestamp)
+          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build linux arm64 cross-compiled
         run: |
           pushd deps/PawPaw; source local.env linux-aarch64; popd
@@ -160,12 +160,12 @@ jobs:
           PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh linux-armhf
-      #- name: Restore build timestamp
-        #if: steps.cache.outputs.cache-hit == 'true'
-        #shell: bash
-        #run: |
-          #TS=$(cat build/timestamp)
-          #find . -type f -exec touch -a -m -t ${TS} {} \;
+      - name: Restore build timestamp
+        if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
+        run: |
+          TS=$(cat build/timestamp)
+          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build linux armhf cross-compiled
         run: |
           pushd deps/PawPaw; source local.env linux-armhf; popd
@@ -253,12 +253,12 @@ jobs:
           PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh linux-i686
-      #- name: Restore build timestamp
-        #if: steps.cache.outputs.cache-hit == 'true'
-        #shell: bash
-        #run: |
-          #TS=$(cat build/timestamp)
-          #find . -type f -exec touch -a -m -t ${TS} {} \;
+      - name: Restore build timestamp
+        if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
+        run: |
+          TS=$(cat build/timestamp)
+          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build linux i686
         run: |
           pushd deps/PawPaw; source local.env linux-i686; popd
@@ -480,12 +480,12 @@ jobs:
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh macos-universal
-      #- name: Restore build timestamp
-        #if: steps.cache.outputs.cache-hit == 'true'
-        #shell: bash
-        #run: |
-          #TS=$(cat build/timestamp)
-          #find . -type f -exec touch -a -m -t ${TS} {} \;
+      - name: Restore build timestamp
+        if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
+        run: |
+          TS=$(cat build/timestamp)
+          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build macOS universal (base)
         run: |
           pushd deps/PawPaw; source local.env macos-universal; popd
@@ -695,12 +695,12 @@ jobs:
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh win32
-      #- name: Restore build timestamp
-        #if: steps.cache.outputs.cache-hit == 'true'
-        #shell: bash
-        #run: |
-          #TS=$(cat build/timestamp)
-          #find . -type f -exec touch -a -m -t ${TS} {} \;
+      - name: Restore build timestamp
+        if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
+        run: |
+          TS=$(cat build/timestamp)
+          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build win32 cross-compiled (base)
         run: |
           pushd deps/PawPaw; source local.env win32; popd
@@ -794,12 +794,12 @@ jobs:
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh win64
-      #- name: Restore build timestamp
-        #if: steps.cache.outputs.cache-hit == 'true'
-        #shell: bash
-        #run: |
-          #TS=$(cat build/timestamp)
-          #find . -type f -exec touch -a -m -t ${TS} {} \;
+      - name: Restore build timestamp
+        if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
+        run: |
+          TS=$(cat build/timestamp)
+          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build win64 cross-compiled (base)
         run: |
           pushd deps/PawPaw; source local.env win64; popd
