@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 16
+  CACHE_VERSION: 17
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -22,6 +22,16 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin/*.a
+            bin/*.*/*.so
+            bin/*.vst3/Contents/*/*.so
+            bin/Cardinal
+            build/Cardinal
+            build/CardinalFX
+            build/CardinalSynth
+            build/plugins
+            build/rack
+            build/timestamp
             carla/build
             dpf/build
             src/Rack/dep/bin
@@ -109,6 +119,16 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin/*.a
+            bin/*.*/*.so
+            bin/*.vst3/Contents/*/*.so
+            bin/Cardinal
+            build/Cardinal
+            build/CardinalFX
+            build/CardinalSynth
+            build/plugins
+            build/rack
+            build/timestamp
             carla/build
             dpf/build
             src/Rack/dep/bin
@@ -196,6 +216,16 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin/*.a
+            bin/*.*/*.so
+            bin/*.vst3/Contents/*/*.so
+            bin/Cardinal
+            build/Cardinal
+            build/CardinalFX
+            build/CardinalSynth
+            build/plugins
+            build/rack
+            build/timestamp
             carla/build
             dpf/build
             src/Rack/dep/bin
@@ -279,6 +309,16 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin/*.a
+            bin/*.*/*.so
+            bin/*.vst3/Contents/*/*.so
+            bin/Cardinal
+            build/Cardinal
+            build/CardinalFX
+            build/CardinalSynth
+            build/plugins
+            build/rack
+            build/timestamp
             carla/build
             dpf/build
             src/Rack/dep/bin
@@ -298,12 +338,12 @@ jobs:
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh linux
-      #- name: Restore build timestamp
-        #if: steps.cache.outputs.cache-hit == 'true'
-        #shell: bash
-        #run: |
-          #TS=$(cat build/timestamp)
-          #find . -type f -exec touch -a -m -t ${TS} {} \;
+      - name: Restore build timestamp
+        if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
+        run: |
+          TS=$(cat build/timestamp)
+          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build linux x86_64
         run: |
           pushd deps/PawPaw; source local.env linux; popd
@@ -413,6 +453,13 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin/*.a
+            build/Cardinal
+            build/CardinalFX
+            build/CardinalSynth
+            build/plugins
+            build/rack
+            build/timestamp
             carla/build
             dpf/build
             jucewrapper/build
@@ -616,6 +663,13 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin/*.a
+            build/Cardinal
+            build/CardinalFX
+            build/CardinalSynth
+            build/plugins
+            build/rack
+            build/timestamp
             carla/build
             dpf/build
             src/Rack/dep/bin
@@ -708,6 +762,13 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
+            bin/*.a
+            build/Cardinal
+            build/CardinalFX
+            build/CardinalSynth
+            build/plugins
+            build/rack
+            build/timestamp
             carla/build
             dpf/build
             src/Rack/dep/bin

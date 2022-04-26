@@ -47,7 +47,6 @@ Additionally, Cardinal contains the following built-in modules not present in th
  * Mog (never updated to v2)
  * mscHack (never updated to v2)
  * rackwindows
- * repelzen
  * Audio File
  * Carla Plugin Host
  * Ildaeil Host
