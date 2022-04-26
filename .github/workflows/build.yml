@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 17
+  CACHE_VERSION: 18
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -22,7 +22,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            bin/*.a
+            */*.a
             bin/*.*/*.so
             bin/*.vst3/Contents/*/*.so
             bin/Cardinal
@@ -62,7 +62,7 @@ jobs:
         env:
           PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
         run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64 && ./deps/PawPaw/.cleanup.sh linux-aarch64
       - name: Restore build timestamp
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
@@ -119,7 +119,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            bin/*.a
+            */*.a
             bin/*.*/*.so
             bin/*.vst3/Contents/*/*.so
             bin/Cardinal
@@ -159,7 +159,7 @@ jobs:
         env:
           PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
         run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh linux-armhf
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-armhf && ./deps/PawPaw/.cleanup.sh linux-armhf
       - name: Restore build timestamp
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
@@ -216,7 +216,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            bin/*.a
+            */*.a
             bin/*.*/*.so
             bin/*.vst3/Contents/*/*.so
             bin/Cardinal
@@ -252,7 +252,7 @@ jobs:
         env:
           PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
         run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh linux-i686
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-i686 && ./deps/PawPaw/.cleanup.sh linux-i686
       - name: Restore build timestamp
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
@@ -309,7 +309,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            bin/*.a
+            */*.a
             bin/*.*/*.so
             bin/*.vst3/Contents/*/*.so
             bin/Cardinal
@@ -337,7 +337,7 @@ jobs:
           sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev libglib2.0-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
       - name: Build extra dependencies
         run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh linux
+          ./deps/PawPaw/bootstrap-cardinal.sh linux && ./deps/PawPaw/.cleanup.sh linux
       - name: Restore build timestamp
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
@@ -441,6 +441,95 @@ jobs:
           make features
           make SYSDEPS=true -j $(nproc)
 
+  macos-intel:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Set up cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/PawPawBuilds
+            */*.a
+            build/Cardinal
+            build/CardinalFX
+            build/CardinalSynth
+            build/plugins
+            build/rack
+            build/timestamp
+            carla/build
+            dpf/build
+            jucewrapper/build
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+            src/Rack/dep/zstd-1.4.5
+          key: macos-intel-v${{ env.CACHE_VERSION }}
+      - name: Build extra dependencies
+        run: |
+          ./deps/PawPaw/bootstrap-cardinal.sh macos && ./deps/PawPaw/.cleanup.sh macos
+      - name: Restore build timestamp
+        if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
+        run: |
+          TS=$(cat build/timestamp)
+          find . -type f -exec touch -a -m -t ${TS} {} \;
+      - name: Build macOS intel (base)
+        run: |
+          pushd deps/PawPaw; source local.env macos; popd
+          make features
+          make CIBUILD=true NOOPT=true WITH_LTO=true -j $(sysctl -n hw.logicalcpu)
+      - name: Build macOS intel (AU using juce)
+        run: |
+          pushd deps/PawPaw; source local.env macos; popd
+          git clone --depth=1 -b master https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
+          mkdir -p jucewrapper/build
+          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_BUILD_TYPE=Release .. && make -j $(sysctl -n hw.logicalcpu); popd
+          mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
+      - name: Build macOS intel (packaging)
+        run: |
+          pushd deps/PawPaw; source local.env macos; popd
+          ./utils/create-macos-installer.sh
+      - name: Set build timestamp
+        run: |
+          date +%Y%m%d%H%M > build/timestamp
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        id: slug1
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        id: slug2
+        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
+      - name: Set sha8
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+      - name: Rename macOS bundle
+        run: |
+          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          path: |
+            ${{ github.event.repository.name }}-*.pkg
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            ${{ github.event.repository.name }}-*.pkg
+
   macos-universal:
     runs-on: macos-10.15
     steps:
@@ -453,7 +542,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            bin/*.a
+            */*.a
             build/Cardinal
             build/CardinalFX
             build/CardinalSynth
@@ -479,7 +568,7 @@ jobs:
           sudo xcode-select -s "/Applications/Xcode_12.3.app"
       - name: Build extra dependencies
         run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh macos-universal
+          ./deps/PawPaw/bootstrap-cardinal.sh macos-universal && ./deps/PawPaw/.cleanup.sh macos-universal
       - name: Restore build timestamp
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
@@ -518,7 +607,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Rename macOS bundle
         run: |
-          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
+          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -663,7 +752,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            bin/*.a
+            */*.a
             build/Cardinal
             build/CardinalFX
             build/CardinalSynth
@@ -694,7 +783,7 @@ jobs:
           sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 qttools5-dev qttools5-dev-tools xvfb
       - name: Build extra dependencies
         run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh win32
+          ./deps/PawPaw/bootstrap-cardinal.sh win32 && ./deps/PawPaw/.cleanup.sh win32
       - name: Restore build timestamp
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
@@ -762,7 +851,7 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            bin/*.a
+            */*.a
             build/Cardinal
             build/CardinalFX
             build/CardinalSynth
@@ -793,7 +882,7 @@ jobs:
           sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable qttools5-dev qttools5-dev-tools xvfb
       - name: Build extra dependencies
         run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh win64
+          ./deps/PawPaw/bootstrap-cardinal.sh win64 && ./deps/PawPaw/.cleanup.sh win64
       - name: Restore build timestamp
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
