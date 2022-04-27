@@ -1,5 +1,5 @@
 --- ../Rack/src/plugin/Model.cpp	2021-10-17 13:57:23.257633662 +0100
-+++ Model.cpp	2022-01-23 17:13:22.080013846 +0000
++++ Model.cpp	2022-04-27 17:55:57.362107553 +0100
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -61,15 +61,6 @@
  	return plugin->getBrand() + " " + name;
  }
  
-@@ -95,7 +117,7 @@
- }
- 
- 
--void Model::appendContextMenu(ui::Menu* menu, bool inBrowser) {
-+void Model::appendContextMenu(ui::Menu* menu, bool) {
- 	// plugin
- 	menu->addChild(createMenuItem("Plugin: " + plugin->name, "", [=]() {
- 		system::openBrowser(plugin->pluginUrl);
 @@ -132,18 +154,6 @@
  
  	menu->addChild(new ui::MenuSeparator);
@@ -89,11 +80,10 @@
  	// manual
  	std::string manualUrl = getManualUrl();
  	if (manualUrl != "") {
-@@ -172,35 +182,15 @@
- 			system::openBrowser(plugin->changelogUrl);
+@@ -173,13 +183,6 @@
  		}));
  	}
--
+ 
 -	// plugin folder
 -	if (plugin->path != "") {
 -		menu->addChild(createMenuItem("Open plugin folder", "", [=]() {
@@ -101,29 +91,6 @@
 -		}));
 -	}
 -
--	// Favorite
--	std::string favoriteRightText = inBrowser ? (RACK_MOD_CTRL_NAME "+click") : "";
--	if (isFavorite())
--		favoriteRightText += " " CHECKMARK_STRING;
--	menu->addChild(createMenuItem("Favorite", favoriteRightText,
--		[=]() {
--			setFavorite(!isFavorite());
--		}
--	));
- }
- 
- 
- bool Model::isFavorite() {
--	const settings::ModuleInfo* mi = settings::getModuleInfo(plugin->slug, slug);
--	return mi && mi->favorite;
-+	return false;
- }
- 
- 
--void Model::setFavorite(bool favorite) {
--	settings::ModuleInfo& mi = settings::moduleInfos[plugin->slug][slug];
--	mi.favorite = favorite;
-+void Model::setFavorite(bool) {
- }
- 
- 
+ 	// Favorite
+ 	std::string favoriteRightText = inBrowser ? (RACK_MOD_CTRL_NAME "+click") : "";
+ 	if (isFavorite())

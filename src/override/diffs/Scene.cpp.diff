@@ -1,5 +1,5 @@
 --- ../Rack/src/app/Scene.cpp	2022-02-26 23:08:06.701192797 +0000
-+++ Scene.cpp	2022-02-17 23:13:46.013018500 +0000
++++ Scene.cpp	2022-04-02 03:13:14.856813800 +0100
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -39,12 +39,16 @@
  #include <system.hpp>
  #include <network.hpp>
  #include <history.hpp>
-@@ -14,6 +42,18 @@
+@@ -14,6 +42,22 @@
  #include <patch.hpp>
  #include <asset.hpp>
  
 +#ifdef NDEBUG
 +# undef DEBUG
++#endif
++
++#ifdef STATIC_BUILD
++# undef HAVE_LIBLO
 +#endif
 +
 +#ifdef HAVE_LIBLO
@@ -58,7 +62,7 @@
  
  namespace rack {
  namespace app {
-@@ -23,21 +63,60 @@
+@@ -23,32 +67,94 @@
  	math::Vec size;
  
  	void draw(const DrawArgs& args) override {
@@ -126,12 +130,14 @@
  		APP->window->setSize(size.round());
  	}
  };
-@@ -46,9 +125,32 @@
- struct Scene::Internal {
- 	ResizeHandle* resizeHandle;
  
--	double lastAutosaveTime = 0.0;
+ 
+ struct Scene::Internal {
+-	ResizeHandle* resizeHandle;
 -
+-	double lastAutosaveTime = 0.0;
++	ResizeHandle* resizeHandle = nullptr;
+ 
  	bool heldArrowKeys[4] = {};
 +
 +#ifdef HAVE_LIBLO
@@ -161,14 +167,16 @@
  };
  
  
-@@ -67,13 +169,8 @@
+@@ -67,13 +173,11 @@
  	browser->hide();
  	addChild(browser);
  
 -	if (settings::showTipsOnLaunch) {
 -		addChild(tipWindowCreate());
 -	}
--
++	if (isStandalone())
++		return;
+ 
  	internal->resizeHandle = new ResizeHandle;
 -	internal->resizeHandle->box.size = math::Vec(15, 15);
 -	internal->resizeHandle->hide();
@@ -176,7 +184,15 @@
  	addChild(internal->resizeHandle);
  }
  
-@@ -105,16 +202,6 @@
+@@ -99,22 +203,13 @@
+ 		rackScroll->box.pos.y = menuBar->box.size.y;
+ 	}
+ 
+-	internal->resizeHandle->box.pos = box.size.minus(internal->resizeHandle->box.size);
++	if (internal->resizeHandle != nullptr)
++		internal->resizeHandle->box.pos = box.size.minus(internal->resizeHandle->box.size);
+ 
+ 	// Resize owned descendants
  	menuBar->box.size.x = box.size.x;
  	rackScroll->box.size = box.size.minus(rackScroll->box.pos);
  
@@ -193,7 +209,7 @@
  	// Scroll RackScrollWidget with arrow keys
  	math::Vec arrowDelta;
  	if (internal->heldArrowKeys[0]) {
-@@ -143,6 +230,23 @@
+@@ -143,6 +238,23 @@
  		rackScroll->offset += arrowDelta * arrowSpeed;
  	}
  
@@ -217,7 +233,7 @@
  	Widget::step();
  }
  
-@@ -172,7 +276,7 @@
+@@ -172,7 +284,7 @@
  	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
  		// DEBUG("key '%d '%c' scancode %d '%c' keyName '%s'", e.key, e.key, e.scancode, e.scancode, e.keyName.c_str());
  		if (e.keyName == "n" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -226,7 +242,7 @@
  			e.consume(this);
  		}
  		if (e.keyName == "q" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -180,19 +284,20 @@
+@@ -180,19 +292,20 @@
  			e.consume(this);
  		}
  		if (e.keyName == "o" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -251,7 +267,7 @@
  			e.consume(this);
  		}
  		if (e.keyName == "z" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -220,10 +325,14 @@
+@@ -220,10 +333,14 @@
  			APP->scene->rackScroll->setZoom(std::pow(2.f, zoom));
  			e.consume(this);
  		}
@@ -267,7 +283,7 @@
  		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == 0) {
  			system::openBrowser("https://vcvrack.com/manual/");
  			e.consume(this);
-@@ -232,10 +341,13 @@
+@@ -232,10 +349,13 @@
  			settings::cpuMeter ^= true;
  			e.consume(this);
  		}
@@ -285,7 +301,7 @@
  			e.consume(this);
  		}
  
-@@ -326,13 +438,6 @@
+@@ -326,13 +446,6 @@
  
  	// Key commands that can be overridden by children
  	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -299,7 +315,7 @@
  		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
  			rack->pasteClipboardAction();
  			e.consume(this);
-@@ -351,7 +456,7 @@
+@@ -351,7 +464,7 @@
  		std::string extension = system::getExtension(path);
  
  		if (extension == ".vcv") {
@@ -308,7 +324,7 @@
  			e.consume(this);
  			return;
  		}
-@@ -368,3 +473,94 @@
+@@ -368,3 +481,94 @@
  
  } // namespace app
  } // namespace rack

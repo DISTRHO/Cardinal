@@ -1,5 +1,5 @@
 --- ../Rack/src/app/MenuBar.cpp	2022-02-26 23:08:06.697192725 +0000
-+++ MenuBar.cpp	2022-02-26 23:19:38.779828613 +0000
++++ MenuBar.cpp	2022-04-27 17:30:16.653341980 +0100
 @@ -1,8 +1,33 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -218,35 +218,20 @@
  
  		static const std::vector<std::string> knobModeLabels = {
  			"Linear",
-@@ -467,6 +478,25 @@
+@@ -467,56 +478,34 @@
  		menu->addChild(knobScrollSensitivitySlider);
  
  		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
-+
-+#ifndef DISTRHO_OS_MAC
+-	}
+-};
+-
+ 
+-////////////////////
+-// Engine
+-////////////////////
++		menu->addChild(createBoolPtrMenuItem("Invert zoom", "", &settings::invertZoom));
+ 
 +		menu->addChild(new ui::MenuSeparator);
-+
-+		static const std::vector<std::string> rateLimitLabels = {
-+			"None",
-+			"2x",
-+			"4x",
-+		};
-+		static const std::vector<int> rateLimits = {0, 1, 2};
-+		menu->addChild(createSubmenuItem("Update rate limit", rateLimitLabels[settings::rateLimit], [=](ui::Menu* menu) {
-+			for (int rateLimit : rateLimits) {
-+				menu->addChild(createCheckMenuItem(rateLimitLabels[rateLimit], "",
-+					[=]() {return settings::rateLimit == rateLimit;},
-+					[=]() {settings::rateLimit = rateLimit;}
-+				));
-+			}
-+		}));
-+#endif
- 	}
- };
- 
-@@ -476,47 +506,6 @@
- ////////////////////
- 
  
 -struct SampleRateItem : ui::MenuItem {
 -	ui::Menu* createChildMenu() override {
@@ -281,14 +266,31 @@
 -				menu->addChild(createCheckMenuItem(text, rightText,
 -					[=]() {return settings::sampleRate == sampleRate;},
 -					[=]() {settings::sampleRate = sampleRate;}
--				));
--			}
++		static const std::vector<std::string> rateLimitLabels = {
++			"None",
++			"2x",
++			"4x",
++		};
++		static const std::vector<int> rateLimits = {0, 1, 2};
++		menu->addChild(createSubmenuItem("Update rate limit", rateLimitLabels[settings::rateLimit], [=](ui::Menu* menu) {
++			for (int rateLimit : rateLimits) {
++				menu->addChild(createCheckMenuItem(rateLimitLabels[rateLimit], "",
++					[=]() {return settings::rateLimit == rateLimit;},
++					[=]() {settings::rateLimit = rateLimit;}
+ 				));
+ 			}
 -		}
 -		return menu;
--	}
--};
--
--
++		}));
+ 	}
+ };
+ 
+ 
++////////////////////
++// Engine
++////////////////////
++
++
  struct EngineButton : MenuButton {
  	void onAction(const ActionEvent& e) override {
  		ui::Menu* menu = createMenu();

@@ -304,9 +304,7 @@ public:
         // hide "Browse VCV Library" button
         rack::widget::Widget* const browser = context->scene->browser->children.back();
         rack::widget::Widget* const headerLayout = browser->children.front();
-        rack::widget::Widget* const favoriteButton = *std::next(headerLayout->children.begin(), 3);
         rack::widget::Widget* const libraryButton = headerLayout->children.back();
-        favoriteButton->hide();
         libraryButton->hide();
 
         // Report to user if something is wrong with the installation
@@ -453,6 +451,16 @@ public:
             windowParameters.rateLimit = static_cast<int>(value + 0.5f);
             rateLimitStep = 0;
             break;
+        case kWindowParameterBrowserSort:
+            windowParameters.browserSort = static_cast<int>(value + 0.5f);
+            break;
+        case kWindowParameterBrowserZoom:
+            windowParameters.browserZoom = value;
+            value = std::pow(2.f, value) * 100.0f;
+            break;
+        case kWindowParameterInvertZoom:
+            windowParameters.invertZoom = value > 0.5f;
+            break;
         default:
             return;
         }
@@ -518,6 +526,37 @@ protected:
             windowParameters.rateLimit = static_cast<int>(value + 0.5f);
             rateLimitStep = 0;
             break;
+        case kWindowParameterBrowserSort:
+            windowParameters.browserSort = static_cast<int>(value + 0.5f);
+            break;
+        case kWindowParameterBrowserZoom:
+            // round up to nearest valid value
+            {
+                float rvalue = value - 1.0f;
+
+                if (rvalue <= 25.0f)
+                    rvalue = -2.0f;
+                else if (rvalue <= 35.0f)
+                    rvalue = -1.5f;
+                else if (rvalue <= 50.0f)
+                    rvalue = -1.0f;
+                else if (rvalue <= 71.0f)
+                    rvalue = -0.5f;
+                else if (rvalue <= 100.0f)
+                    rvalue = 0.0f;
+                else if (rvalue <= 141.0f)
+                    rvalue = 0.5f;
+                else if (rvalue <= 200.0f)
+                    rvalue = 1.0f;
+                else
+                    rvalue = 0.0f;
+
+                windowParameters.browserZoom = rvalue;
+            }
+            break;
+        case kWindowParameterInvertZoom:
+            windowParameters.invertZoom = value > 0.5f;
+            break;
         default:
             return;
         }
@@ -525,7 +564,7 @@ protected:
         WindowParametersSetValues(context->window, windowParameters);
     }
 
-    void stateChanged(const char* key, const char* value) override
+    void stateChanged(const char* const key, const char* const value) override
     {
         if (std::strcmp(key, "windowSize") != 0)
             return;
