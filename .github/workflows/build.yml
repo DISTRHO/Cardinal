@@ -31,7 +31,6 @@ jobs:
             build/CardinalSynth
             build/plugins
             build/rack
-            build/timestamp
             carla/build
             dpf/build
             src/Rack/dep/bin
@@ -63,21 +62,12 @@ jobs:
           PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64 && ./deps/PawPaw/.cleanup.sh linux-aarch64
-      - name: Restore build timestamp
-        if: steps.cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: |
-          TS=$(cat build/timestamp)
-          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build linux arm64 cross-compiled
         run: |
           pushd deps/PawPaw; source local.env linux-aarch64; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
           make unzipfx
-      - name: Set build timestamp
-        run: |
-          date +%Y%m%d%H%M > build/timestamp
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -128,7 +118,6 @@ jobs:
             build/CardinalSynth
             build/plugins
             build/rack
-            build/timestamp
             carla/build
             dpf/build
             src/Rack/dep/bin
@@ -160,21 +149,12 @@ jobs:
           PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh linux-armhf && ./deps/PawPaw/.cleanup.sh linux-armhf
-      - name: Restore build timestamp
-        if: steps.cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: |
-          TS=$(cat build/timestamp)
-          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build linux armhf cross-compiled
         run: |
           pushd deps/PawPaw; source local.env linux-armhf; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
           make unzipfx
-      - name: Set build timestamp
-        run: |
-          date +%Y%m%d%H%M > build/timestamp
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -225,7 +205,6 @@ jobs:
             build/CardinalSynth
             build/plugins
             build/rack
-            build/timestamp
             carla/build
             dpf/build
             src/Rack/dep/bin
@@ -253,21 +232,12 @@ jobs:
           PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh linux-i686 && ./deps/PawPaw/.cleanup.sh linux-i686
-      - name: Restore build timestamp
-        if: steps.cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: |
-          TS=$(cat build/timestamp)
-          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build linux i686
         run: |
           pushd deps/PawPaw; source local.env linux-i686; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
           make unzipfx
-      - name: Set build timestamp
-        run: |
-          date +%Y%m%d%H%M > build/timestamp
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -318,7 +288,6 @@ jobs:
             build/CardinalSynth
             build/plugins
             build/rack
-            build/timestamp
             carla/build
             dpf/build
             src/Rack/dep/bin
@@ -338,21 +307,12 @@ jobs:
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh linux && ./deps/PawPaw/.cleanup.sh linux
-      - name: Restore build timestamp
-        if: steps.cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: |
-          TS=$(cat build/timestamp)
-          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build linux x86_64
         run: |
           pushd deps/PawPaw; source local.env linux; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
           make unzipfx
-      - name: Set build timestamp
-        run: |
-          date +%Y%m%d%H%M > build/timestamp
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -462,7 +422,6 @@ jobs:
             build/CardinalSynth
             build/plugins
             build/rack
-            build/timestamp
             carla/build
             dpf/build
             jucewrapper/build
@@ -479,12 +438,6 @@ jobs:
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh macos && ./deps/PawPaw/.cleanup.sh macos
-      - name: Restore build timestamp
-        if: steps.cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: |
-          TS=$(cat build/timestamp)
-          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build macOS intel (base)
         run: |
           pushd deps/PawPaw; source local.env macos; popd
@@ -502,9 +455,6 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env macos; popd
           ./utils/create-macos-installer.sh
-      - name: Set build timestamp
-        run: |
-          date +%Y%m%d%H%M > build/timestamp
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -555,7 +505,6 @@ jobs:
             build/CardinalSynth
             build/plugins
             build/rack
-            build/timestamp
             carla/build
             dpf/build
             jucewrapper/build
@@ -576,12 +525,6 @@ jobs:
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh macos-universal && ./deps/PawPaw/.cleanup.sh macos-universal
-      - name: Restore build timestamp
-        if: steps.cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: |
-          TS=$(cat build/timestamp)
-          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build macOS universal (base)
         run: |
           pushd deps/PawPaw; source local.env macos-universal; popd
@@ -598,9 +541,6 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env macos-universal; popd
           ./utils/create-macos-installer.sh
-      - name: Set build timestamp
-        run: |
-          date +%Y%m%d%H%M > build/timestamp
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -768,7 +708,6 @@ jobs:
             build/CardinalSynth
             build/plugins
             build/rack
-            build/timestamp
             carla/build
             dpf/build
             src/Rack/dep/bin
@@ -794,12 +733,6 @@ jobs:
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh win32 && ./deps/PawPaw/.cleanup.sh win32
-      - name: Restore build timestamp
-        if: steps.cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: |
-          TS=$(cat build/timestamp)
-          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build win32 cross-compiled (base)
         run: |
           pushd deps/PawPaw; source local.env win32; popd
@@ -815,9 +748,6 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env win32; popd
           xvfb-run ./utils/create-windows-installer.sh 32
-      - name: Set build timestamp
-        run: |
-          date +%Y%m%d%H%M > build/timestamp
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -870,7 +800,6 @@ jobs:
             build/CardinalSynth
             build/plugins
             build/rack
-            build/timestamp
             carla/build
             dpf/build
             src/Rack/dep/bin
@@ -896,12 +825,6 @@ jobs:
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh win64 && ./deps/PawPaw/.cleanup.sh win64
-      - name: Restore build timestamp
-        if: steps.cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: |
-          TS=$(cat build/timestamp)
-          find . -type f -exec touch -a -m -t ${TS} {} \;
       - name: Build win64 cross-compiled (base)
         run: |
           pushd deps/PawPaw; source local.env win64; popd
@@ -917,9 +840,6 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env win64; popd
           xvfb-run ./utils/create-windows-installer.sh 64
-      - name: Set build timestamp
-        run: |
-          date +%Y%m%d%H%M > build/timestamp
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
