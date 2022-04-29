@@ -467,6 +467,9 @@ extern Model* modelBD383238;
 extern Model* modelZeta;
 #undef modelDelta
 
+// Meander
+#include "Meander/src/plugin.hpp"
+
 // MindMeldModular
 /* NOTE too much noise in original include, do this a different way
 // #include "MindMeldModular/src/MindMeldModular.hpp"
@@ -726,6 +729,7 @@ Plugin* pluginInstance__LilacLoop;
 Plugin* pluginInstance__LittleUtils;
 Plugin* pluginInstance__Lomas;
 Plugin* pluginInstance__Lyrae;
+Plugin* pluginInstance__Meander;
 extern Plugin* pluginInstance__MindMeld;
 Plugin* pluginInstance__ML;
 Plugin* pluginInstance__MockbaModular;
@@ -1976,6 +1980,18 @@ static void initStatic__Lyrae()
     }
 }
 
+static void initStatic__Meander()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Meander = p;
+
+    const StaticPluginLoader spl(p, "Meander");
+    if (spl.ok())
+    {
+        p->addModel(modelMeander);
+    }
+}
+
 static void initStatic__MindMeld()
 {
     Plugin* const p = new Plugin;
@@ -2552,6 +2568,7 @@ void initStaticPlugins()
     initStatic__LittleUtils();
     initStatic__Lomas();
     initStatic__Lyrae();
+    initStatic__Meander();
     initStatic__MindMeld();
     initStatic__ML();
     initStatic__MockbaModular();

@@ -51,6 +51,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Little Utils            | EUPL-1.2                 | |
 | Lomas Modules           | GPL-3.0-or-later         | |
 | Lyrae Modules           | GPL-3.0-or-later         | |
+| Meander                 | GPL-3.0-or-later         | |
 | MindMeld                | GPL-3.0-or-later         | |
 | ML Modules              | BSD-3-Clause             | |
 | Mockba Modular          | MIT                      | |
@@ -161,6 +162,8 @@ Below is a list of artwork licenses from plugins
 | LomasModules/*                          | GPL-3.0-or-later | [Same license as source code](https://github.com/LomasModules/LomasModules/issues/26) |
 | LomasModules/Fonts/FiraMono-Bold.ttf    | OFL-1.1-RFN      | |
 | LyraeModules/*                          | CC-BY-NC-SA-4.0  | |
+| Meander/*                               | GPL-3.0-or-later | No artwork specific license provided |
+| Meander/*.ttf                           | unknown          | Contains a number of font files not all of which have resolved licenses |
 | MindMeld/*                              | CC-BY-NC-ND-4.0  | |
 | MindMeld/fonts/RobotoCondensed-*.ttf    | Apache-2.0       | |
 | ML_modules/*                            | BSD-3-Clause     | No artwork specific license provided |
