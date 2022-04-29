@@ -125,6 +125,7 @@ At the moment the following 3rd-party modules are provided:
 - Catro/Modulo
 - cf
 - ChowDSP
+- dBiz
 - DrumKit
 - E-Series
 - ExpertSleepers Encoders
