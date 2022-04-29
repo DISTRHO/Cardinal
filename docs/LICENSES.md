@@ -66,6 +66,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Rackwindows             | MIT                      | |
 | repelzen                | GPL-3.0-or-later         | |
 | Sonus Modular           | GPL-3.0-or-later         | |
+| Starling Via            | MIT                      | |
 | stocaudio               | GPL-3.0-or-later         | |
 | unless_modules          | GPL-3.0-or-later         | |
 | Valley                  | GPL-3.0-or-later         | |
@@ -187,6 +188,7 @@ Below is a list of artwork licenses from plugins
 | Rackwindows/*                           | MIT              | [Same license as source code](https://github.com/n0jo/rackwindows/issues/15) |
 | repelzen/*                              | CC-BY-SA-4.0     | |
 | sonusmodular/*                          | GPL-3.0-or-later | [Same license as source code](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
+| StarlingVia/*                           | MIT              | No artwork specific license provided |
 | stocaudio/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | unless_modules/*                        | CC-BY-NC-ND-4.0  | |
 | unless_modules/font/CuteFont-Regular.ttf| OFL-1.1          | |

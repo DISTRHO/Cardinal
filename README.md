@@ -160,6 +160,7 @@ At the moment the following 3rd-party modules are provided:
 - rackwindows
 - repelzen
 - Sonus Modular
+- Starling Via
 - stocaudio
 - unless_modules
 - Valley

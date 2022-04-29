@@ -193,3 +193,6 @@
 [submodule "plugins/PinkTrombone"]
 	path = plugins/PinkTrombone
 	url = https://github.com/VegaDeftwing/PinkTromboneVCV.git
+[submodule "plugins/StarlingVia"]
+	path = plugins/StarlingVia
+	url = https://github.com/starlingcode/Via-for-Rack.git

@@ -647,6 +647,12 @@ extern Model* modelBlankPanel;
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
 
+
+// Starling Via
+#define modelScanner modelStarlingViaScanner
+#include "StarlingVia/src/starling.hpp"
+#undef modelScanner
+
 // stocaudio
 #include "stocaudio/src/plugin.hpp"
 
@@ -741,6 +747,7 @@ Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
+Plugin* pluginInstance__StarlingVia;
 Plugin* pluginInstance__stocaudio;
 Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
@@ -2378,6 +2385,29 @@ static void initStatic__sonusmodular()
     }
 }
 
+
+static void initStatic__StarlingVia()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__StarlingVia = p;
+
+    const StaticPluginLoader spl(p, "StarlingVia");
+    if (spl.ok())
+    {
+#define modelScanner modelStarlingViaScanner
+        p->addModel(modelMeta);
+        p->addModel(modelGateseq);
+        p->addModel(modelScanner);
+        p->addModel(modelSync);
+        p->addModel(modelAtsr);
+        p->addModel(modelOsc3);
+        p->addModel(modelSync3);
+        p->addModel(modelSync3XL);
+        p->addModel(modelSync3XLLevels);
+#undef modelScanner
+    }
+}
+
 static void initStatic__stocaudio()
 {
     Plugin* const p = new Plugin;
@@ -2566,6 +2596,7 @@ void initStaticPlugins()
     initStatic__rackwindows();
     initStatic__repelzen();
     initStatic__sonusmodular();
+    initStatic__StarlingVia();
     initStatic__stocaudio();
     initStatic__unless_modules();
     initStatic__ValleyAudio();
