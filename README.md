@@ -155,6 +155,7 @@ At the moment the following 3rd-party modules are provided:
 - Orbits
 - Parable Instruments
 - Path Set
+- PinkTrombone
 - Prism
 - rackwindows
 - repelzen
