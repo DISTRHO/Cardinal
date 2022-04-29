@@ -624,6 +624,9 @@ extern Model* modelBlankPanel;
 // Path Set
 #include "PathSet/src/plugin.hpp"
 
+// PinkTrombone
+#include "PinkTrombone/src/plugin.hpp"
+
 // Prism
 #include "Prism/src/plugin.hpp"
 
@@ -733,6 +736,7 @@ Plugin* pluginInstance__nonlinearcircuits;
 Plugin* pluginInstance__Orbits;
 Plugin* pluginInstance__ParableInstruments;
 Plugin* pluginInstance__PathSet;
+Plugin* pluginInstance__PinkTrombone;
 Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
@@ -2257,6 +2261,18 @@ static void initStatic__PathSet()
     }
 }
 
+static void initStatic__PinkTrombone()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__PinkTrombone = p;
+
+    const StaticPluginLoader spl(p, "PinkTrombone");
+    if (spl.ok())
+    {
+        p->addModel(modelPinkTrombone);
+    }
+}
+
 static void initStatic__Prism()
 {
     Plugin* const p = new Plugin;
@@ -2545,6 +2561,7 @@ void initStaticPlugins()
     initStatic__Orbits();
     initStatic__ParableInstruments();
     initStatic__PathSet();
+    initStatic__PinkTrombone();
     initStatic__Prism();
     initStatic__rackwindows();
     initStatic__repelzen();

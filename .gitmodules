@@ -190,3 +190,6 @@
 [submodule "plugins/unless_modules"]
 	path = plugins/unless_modules
 	url = https://gitlab.com/unlessgames/unless_modules.git
+[submodule "plugins/PinkTrombone"]
+	path = plugins/PinkTrombone
+	url = https://github.com/VegaDeftwing/PinkTromboneVCV.git
