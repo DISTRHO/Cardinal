@@ -479,7 +479,8 @@ struct ViewButton : MenuButton {
 
 		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
 
-#ifndef DISTRHO_OS_MAC
+		menu->addChild(createBoolPtrMenuItem("Invert zoom", "", &settings::invertZoom));
+
 		menu->addChild(new ui::MenuSeparator);
 
 		static const std::vector<std::string> rateLimitLabels = {
@@ -496,7 +497,6 @@ struct ViewButton : MenuButton {
 				));
 			}
 		}));
-#endif
 	}
 };
 
@@ -534,7 +534,7 @@ struct HelpButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 		menu->addChild(createMenuItem("Rack User manual", "F1", [=]() {
-			system::openBrowser("https://vcvrack.com/manual/");
+			system::openBrowser("https://vcvrack.com/manual");
 		}));
 
 		menu->addChild(createMenuItem("Cardinal Project page", "", [=]() {

@@ -1,0 +1,25 @@
+{
+  "slug": "ParableInstruments",
+  "name": "Parable Instruments",
+  "version": "2.0.0",
+  "license": "GPL-3.0-or-later",
+  "brand": "Parable Instruments",
+  "author": "adbrant",
+  "authorEmail": "",
+  "authorUrl": "https://github.com/adbrant/ArableInstruments/blob/master/README.md",
+  "pluginUrl": "https://github.com/adbrant/ArableInstruments/blob/master/README.md",
+  "manualUrl": "https://github.com/adbrant/ArableInstruments/blob/master/README.md",
+  "sourceUrl": "https://github.com/adbrant/ArableInstruments.git",
+  "donateUrl": "",
+  "modules": [
+    {
+      "slug": "Neil",
+      "name": "Neil",
+      "description": "",
+      "tags": [
+        "Granular",
+        "Reverb"
+      ]
+    }
+  ]
+}

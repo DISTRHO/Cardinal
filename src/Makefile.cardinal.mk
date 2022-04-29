@@ -85,6 +85,10 @@ FILES_UI  = CardinalUI.cpp
 FILES_UI += Window.cpp
 endif
 
+ifeq ($(WINDOWS),true)
+FILES_UI += distrho.rc
+endif
+
 # --------------------------------------------------------------
 # Extra libraries to link against
 
@@ -170,7 +174,7 @@ endif
 
 BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing -faligned-new
 
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
@@ -206,7 +210,7 @@ ifeq ($(MACOS),true)
 LINK_FLAGS += -framework IOKit
 else ifeq ($(WINDOWS),true)
 # needed by VCVRack
-EXTRA_LIBS += -ldbghelp -lshlwapi
+EXTRA_LIBS += -ldbghelp -lshlwapi -Wl,--stack,0x100000
 # needed by JW-Modules
 EXTRA_LIBS += -lws2_32 -lwinmm
 endif
@@ -235,6 +239,7 @@ endif
 # --------------------------------------------------------------
 # fallback path to resource files
 
+ifneq ($(CIBUILD),true)
 ifneq ($(SYSDEPS),true)
 
 ifeq ($(EXE_WRAPPER),wine)
@@ -246,6 +251,7 @@ endif
 BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_SOURCE_DIR='"$(SOURCE_DIR)"'
 
 endif
+endif
 
 # --------------------------------------------------------------
 # install path prefix for resource files
@@ -256,13 +262,17 @@ BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 # Enable all possible plugin types and setup resources
 
 ifeq ($(CARDINAL_VARIANT),main)
+ifneq ($(STATIC_BUILD),true)
 all: jack lv2 vst3
 else
-all: lv2 vst2 vst3
+all: lv2 vst3
+endif # STATIC_BUILD
+else
+all: lv2 vst2 vst3 static
 endif
 
 CORE_RESOURCES  = $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
-CORE_RESOURCES += template.vcv
+CORE_RESOURCES += $(subst ../,,$(wildcard ../template*.vcv))
 
 LV2_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
 VST3_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
@@ -284,7 +294,7 @@ ifneq ($(CARDINAL_VARIANT),main)
 ifeq ($(MACOS),true)
 VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%)
 else
-VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/resources/%)
+VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.vst/resources/%)
 endif
 endif
 
@@ -293,8 +303,28 @@ vst2: $(VST2_RESOURCES)
 vst3: $(VST3_RESOURCES)
 
 # --------------------------------------------------------------
+# Extra rules for Windows icon
 
-$(TARGET_DIR)/$(NAME).%/template.vcv: ../template.vcv
+ifeq ($(WINDOWS),true)
+JACK_LIBS += -Wl,-subsystem,windows
+
+$(BUILD_DIR)/distrho.rc.o: ../../utils/distrho.rc ../../utils/distrho.ico
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling distrho.rc"
+	$(SILENT)$(WINDRES) $< -O coff -o $@
+endif
+
+# --------------------------------------------------------------
+
+$(TARGET_DIR)/%/template.vcv: ../template.vcv
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+$(TARGET_DIR)/%/template-fx.vcv: ../template-fx.vcv
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+$(TARGET_DIR)/%/template-synth.vcv: ../template-synth.vcv
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
@@ -315,7 +345,7 @@ $(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf: ../../docs/MODDEVICES.md $(T
 	(cd ../../docs/ && pandoc MODDEVICES.md -f markdown+implicit_figures -o $(abspath $@))
 endif
 
-$(TARGET_DIR)/$(NAME).vst/resources/%: ../Rack/res/%
+$(TARGET_DIR)/Cardinal.vst/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 

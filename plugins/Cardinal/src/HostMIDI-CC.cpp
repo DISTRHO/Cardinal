@@ -62,13 +62,13 @@ struct HostMIDICC : TerminalModule {
         const MidiEvent* midiEvents;
         uint32_t midiEventsLeft;
         uint32_t midiEventFrame;
-        int64_t lastBlockFrame;
+        uint32_t lastProcessCounter;
         uint8_t channel;
 
         uint8_t chPressure[16];
         uint16_t pitchbend[16];
 
-        // stuff from Rack
+        // adapted from Rack
         /** [cc][channel] */
         uint8_t ccValues[128][16];
         /** When LSB is enabled for CC 0-31, the MSB is stored here until the LSB is received.
@@ -85,10 +85,11 @@ struct HostMIDICC : TerminalModule {
         MidiInput(CardinalPluginContext* const pc)
             : pcontext(pc)
         {
-            for (int i = 0; i < NUM_OUTPUTS; i++) {
-                for (int c = 0; c < 16; c++) {
-                    valueFilters[i][c].setTau(1 / 30.f);
-                }
+            // adapted from Rack
+            for (int id = 0; id < NUM_OUTPUTS; ++id)
+            {
+                for (int c = 0; c < 16; ++c)
+                    valueFilters[id][c].setTau(1 / 30.f);
             }
             reset();
         }
@@ -98,40 +99,33 @@ struct HostMIDICC : TerminalModule {
             midiEvents = nullptr;
             midiEventsLeft = 0;
             midiEventFrame = 0;
-            lastBlockFrame = -1;
+            lastProcessCounter = 0;
             channel = 0;
 
-            for (int cc = 0; cc < 128; cc++) {
-                for (int c = 0; c < 16; c++) {
-                    ccValues[cc][c] = 0;
-                }
-            }
-            for (int cc = 0; cc < 32; cc++) {
-                for (int c = 0; c < 16; c++) {
-                    msbValues[cc][c] = 0;
-                }
-            }
-            for (int c = 0; c < 16; c++) {
-                chPressure[c] = 0;
+            // adapted from Rack
+            std::memset(ccValues, 0, sizeof(ccValues));
+            std::memset(msbValues, 0, sizeof(msbValues));
+            std::memset(chPressure, 0, sizeof(chPressure));
+
+            for (int c = 0; c < 16; ++c)
                 pitchbend[c] = 8192;
-            }
+
             learningId = -1;
             smooth = true;
             mpeMode = false;
             lsbMode = false;
         }
 
-        bool process(const ProcessArgs& args, std::vector<rack::engine::Output>& outputs, int learnedCcs[16],
+        bool process(const ProcessArgs& args, std::vector<rack::engine::Output>& outputs, int8_t learnedCcs[16],
                      const bool isBypassed)
         {
             // Cardinal specific
-            const int64_t blockFrame = pcontext->engine->getBlockFrame();
-            const bool blockFrameChanged = lastBlockFrame != blockFrame;
+            const uint32_t processCounter = pcontext->processCounter;
+            const bool processCounterChanged = lastProcessCounter != processCounter;
 
-            if (blockFrameChanged)
+            if (processCounterChanged)
             {
-                lastBlockFrame = blockFrame;
-
+                lastProcessCounter = processCounter;
                 midiEvents = pcontext->midiEvents;
                 midiEventsLeft = pcontext->midiEventCount;
                 midiEventFrame = 0;
@@ -166,27 +160,38 @@ struct HostMIDICC : TerminalModule {
                 const uint8_t status = data[0] & 0xF0;
                 const uint8_t chan = data[0] & 0x0F;
 
-                /**/ if (status == 0xD0)
+                if (status == 0xD0)
                 {
                     chPressure[chan] = data[1];
+                    continue;
                 }
-                else if (status == 0xE0)
+                if (status == 0xE0)
                 {
                     pitchbend[chan] = (data[2] << 7) | data[1];
+                    continue;
                 }
-                else if (status != 0xB0)
+                if (status != 0xB0)
                 {
                     continue;
                 }
 
-                // adapted from Rack
+                // adapted from Rack `processCC`
                 const uint8_t c = mpeMode ? chan : 0;
-                const uint8_t cc = data[1];
+                const int8_t cc = data[1];
                 const uint8_t value = data[2];
 
                 // Learn
                 if (learningId >= 0 && ccValues[cc][c] != value)
                 {
+                    // NOTE: does the same as `setLearnedCc`
+                    if (cc >= 0)
+                    {
+                        for (int id = 0; id < 16; ++id)
+                        {
+                            if (learnedCcs[id] == cc)
+                                learnedCcs[id] = -1;
+                        }
+                    }
                     learnedCcs[learningId] = cc;
                     learningId = -1;
                 }
@@ -196,7 +201,7 @@ struct HostMIDICC : TerminalModule {
                     // Don't set MSB yet. Wait for LSB to be received.
                     msbValues[cc][c] = value;
                 }
-                else if (lsbMode && 32 <= cc && cc < 64)
+                else if (lsbMode && cc >= 32 && cc < 64)
                 {
                     // Apply MSB when LSB is received
                     ccValues[cc - 32][c] = msbValues[cc - 32][c];
@@ -213,15 +218,21 @@ struct HostMIDICC : TerminalModule {
             // Rack stuff
             const int channels = mpeMode ? 16 : 1;
 
-            for (int i = 0; i < 16; i++)
+            for (int id = 0; id < 16; ++id)
             {
-                if (!outputs[CC_OUTPUT + i].isConnected())
+                if (!outputs[CC_OUTPUT + id].isConnected())
                     continue;
-                outputs[CC_OUTPUT + i].setChannels(channels);
+                outputs[CC_OUTPUT + id].setChannels(channels);
 
-                int cc = learnedCcs[i];
+                const int8_t cc = learnedCcs[id];
 
-                for (int c = 0; c < channels; c++)
+                if (cc < 0)
+                {
+                    outputs[CC_OUTPUT + id].clearVoltages();
+                    continue;
+                }
+
+                for (int c = 0; c < channels; ++c)
                 {
                     int16_t cellValue = int16_t(ccValues[cc][c]) * 128;
                     if (lsbMode && cc < 32)
@@ -231,18 +242,18 @@ struct HostMIDICC : TerminalModule {
                     const float value = static_cast<float>(cellValue) / (128.0f * 127.0f);
 
                     // Detect behavior from MIDI buttons.
-                    if (smooth && std::fabs(valueFilters[i][c].out - value) < 1.f)
+                    if (smooth && std::fabs(valueFilters[id][c].out - value) < 1.f)
                     {
                         // Smooth value with filter
-                        valueFilters[i][c].process(args.sampleTime, value);
+                        valueFilters[id][c].process(args.sampleTime, value);
                     }
                     else
                     {
                         // Jump value
-                        valueFilters[i][c].out = value;
+                        valueFilters[id][c].out = value;
                     }
 
-                    outputs[CC_OUTPUT + i].setVoltage(valueFilters[i][c].out * 10.f, c);
+                    outputs[CC_OUTPUT + id].setVoltage(valueFilters[id][c].out * 10.f, c);
                 }
             }
 
@@ -250,7 +261,7 @@ struct HostMIDICC : TerminalModule {
             {
                 outputs[CC_OUTPUT_CH_PRESSURE].setChannels(channels);
 
-                for (int c = 0; c < channels; c++)
+                for (int c = 0; c < channels; ++c)
                 {
                     const float value = static_cast<float>(chPressure[c]) / 128.0f;
 
@@ -274,7 +285,7 @@ struct HostMIDICC : TerminalModule {
             {
                 outputs[CC_OUTPUT_PITCHBEND].setChannels(channels);
 
-                for (int c = 0; c < channels; c++)
+                for (int c = 0; c < channels; ++c)
                 {
                     const float value = static_cast<float>(pitchbend[c]) / 16384.0f;
 
@@ -294,7 +305,7 @@ struct HostMIDICC : TerminalModule {
                 }
             }
 
-            return blockFrameChanged;
+            return processCounterChanged;
         }
 
     } midiInput;
@@ -365,7 +376,7 @@ struct HostMIDICC : TerminalModule {
 
     } midiOutput;
 
-    int learnedCcs[16];
+    int8_t learnedCcs[16];
 
     HostMIDICC()
         : pcontext(static_cast<CardinalPluginContext*>(APP)),
@@ -377,14 +388,14 @@ struct HostMIDICC : TerminalModule {
 
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
-        for (int i = 0; i < 16; i++)
-            configInput(CC_INPUTS + i, string::f("Cell %d", i + 1));
+        for (int id = 0; id < 16; ++id)
+            configInput(CC_INPUTS + id, string::f("Cell %d", id + 1));
 
         configInput(CC_INPUT_CH_PRESSURE, "Channel pressure");
         configInput(CC_INPUT_PITCHBEND, "Pitchbend");
 
-        for (int i = 0; i < 16; i++)
-            configOutput(CC_OUTPUT + i, string::f("Cell %d", i + 1));
+        for (int id = 0; id < 16; ++id)
+            configOutput(CC_OUTPUT + id, string::f("Cell %d", id + 1));
 
         configOutput(CC_OUTPUT_CH_PRESSURE, "Channel pressure");
         configOutput(CC_OUTPUT_PITCHBEND, "Pitchbend");
@@ -394,9 +405,8 @@ struct HostMIDICC : TerminalModule {
 
     void onReset() override
     {
-        for (int i = 0; i < 16; i++) {
-            learnedCcs[i] = i + 1;
-        }
+        for (int id = 0; id < 16; ++id)
+            learnedCcs[id] = id + 1;
         midiInput.reset();
         midiOutput.reset();
     }
@@ -414,11 +424,13 @@ struct HostMIDICC : TerminalModule {
         if (isBypassed())
             return;
 
-        for (int i = 0; i < 16; i++)
+        for (int id = 0; id < 16; ++id)
         {
-            int value = (int) std::round(inputs[CC_INPUTS + i].getVoltage() / 10.f * 127);
-            value = clamp(value, 0, 127);
-            midiOutput.sendCC(learnedCcs[i], value);
+            if (learnedCcs[id] < 0)
+                continue;
+
+            uint8_t value = (uint8_t) clamp(std::round(inputs[CC_INPUTS + id].getVoltage() / 10.f * 127), 0.f, 127.f);
+            midiOutput.sendCC(learnedCcs[id], value);
         }
 
         {
@@ -434,6 +446,20 @@ struct HostMIDICC : TerminalModule {
         }
     }
 
+    void setLearnedCc(const int id, const int8_t cc)
+    {
+        // Unset IDs of similar CCs
+        if (cc >= 0)
+        {
+            for (int idx = 0; idx < 16; ++idx)
+            {
+                if (learnedCcs[idx] == cc)
+                    learnedCcs[idx] = -1;
+            }
+        }
+        learnedCcs[id] = cc;
+    }
+
     json_t* dataToJson() override
     {
         json_t* const rootJ = json_object();
@@ -442,8 +468,8 @@ struct HostMIDICC : TerminalModule {
         // input and output
         if (json_t* const ccsJ = json_array())
         {
-            for (int i = 0; i < 16; i++)
-                json_array_append_new(ccsJ, json_integer(learnedCcs[i]));
+            for (int id = 0; id < 16; ++id)
+                json_array_append_new(ccsJ, json_integer(learnedCcs[id]));
             json_object_set_new(rootJ, "ccs", ccsJ);
         }
 
@@ -473,12 +499,12 @@ struct HostMIDICC : TerminalModule {
         // input and output
         if (json_t* const ccsJ = json_object_get(rootJ, "ccs"))
         {
-            for (int i = 0; i < 16; i++)
+            for (int id = 0; id < 16; ++id)
             {
-                if (json_t* const ccJ = json_array_get(ccsJ, i))
-                    learnedCcs[i] = json_integer_value(ccJ);
+                if (json_t* const ccJ = json_array_get(ccsJ, id))
+                    setLearnedCc(id, json_integer_value(ccJ));
                 else
-                    learnedCcs[i] = i + 1;
+                    learnedCcs[id] = -1;
             }
         }
 
@@ -524,7 +550,7 @@ struct HostMIDICC : TerminalModule {
 struct CardinalCcChoice : CardinalLedDisplayChoice {
     HostMIDICC* const module;
     const int id;
-    int focusCc = -1;
+    int8_t focusCc = -1;
 
     CardinalCcChoice(HostMIDICC* const m, const int i)
       : CardinalLedDisplayChoice(),
@@ -540,7 +566,7 @@ struct CardinalCcChoice : CardinalLedDisplayChoice {
 
     void step() override
     {
-        int cc;
+        int8_t cc;
 
         if (module == nullptr)
         {
@@ -583,8 +609,8 @@ struct CardinalCcChoice : CardinalLedDisplayChoice {
 
         if (module->midiInput.learningId == id)
         {
-            if (0 <= focusCc && focusCc < 128)
-                module->learnedCcs[id] = focusCc;
+            if (focusCc >= 0)
+                module->setLearnedCc(id, focusCc);
             module->midiInput.learningId = -1;
         }
     }
@@ -600,7 +626,7 @@ struct CardinalCcChoice : CardinalLedDisplayChoice {
             focusCc = focusCc * 10 + (c - '0');
         }
 
-        if (focusCc >= 128)
+        if (focusCc < 0)
             focusCc = -1;
 
         e.consume(this);

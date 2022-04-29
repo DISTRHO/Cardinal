@@ -3,7 +3,7 @@
 *Cardinal, the Rack!*
 
 Cardinal is a free and open-source virtual modular synthesizer plugin,
-available as JACK standalone and LV2, VST2 and VST3 audio plugin for FreeBSD, Linux, macOS and Windows.  
+available as JACK standalone and AU, LV2, VST2 and VST3 audio plugin for FreeBSD, Linux, macOS and Windows.  
 It is based on the popular [VCV Rack](https://vcvrack.com/) but with a focus on being a fully self-contained plugin version.
 
 More specifically, this is a [DPF-based](https://github.com/DISTRHO/DPF/)
@@ -19,8 +19,40 @@ All "Core" modules from Rack have been replaced by Cardinal equivalents, simplif
 Cardinal does not load external modules and does not connect to the official Rack library/store.  
 All VCV branding has been removed (to the best of our knowledge) in order to avoid any trademark issues.
 
-Because it is using DPF, Cardinal already supports LV2 and VST2 with an extra JACK standalone mode for some systems.  
 The VST3 version is in progress, already part of the build but still experimental.
+
+
+## Current status
+
+With the exception of a few bugs, Cardinal can be considered stable.  
+Though currently the following should be noted:
+
+- Keyboard input does not always work in some hosts [#24](https://github.com/DISTRHO/Cardinal/issues/24)
+- VST3 support incomplete/experimental [#41](https://github.com/DISTRHO/Cardinal/issues/41)
+- Windows 32bit builds do not work well [#80](https://github.com/DISTRHO/Cardinal/issues/80)
+
+### Stable release
+
+Cardinal releases have official builds for Linux, macOS and Windows.  
+You can find these under https://github.com/DISTRHO/Cardinal/releases.
+
+There are Linux builds for various architectures (armhf, arm64, i686 and x86_64), macOS "universal" (arm64 + intel) and Windows 32 and 64bit builds.
+Both macOS and Windows builds have an installer.  
+Install instructions are available [here](https://github.com/DISTRHO/Cardinal/wiki/Install).
+
+Note: Neither the macOS or Windows builds are signed, so expect warnings saying they are from an "untrusted developer".
+
+### Nightly builds
+
+You can find builds for pretty much any recent Cardinal commit [here](https://github.com/DISTRHO/Cardinal/actions/workflows/build.yml).  
+Just click on any successful build, and scroll to the bottom to find the builds.  
+(note the canvas-like area in the middle prevents mouse wheel scrolling)
+
+A GitHub account is required in order to download these builds.
+
+### Building
+
+Basic building instructions are available in [BUILDING.md](docs/BUILDING.md).
 
 
 ## Plugin variants
@@ -36,7 +68,7 @@ All variants have MIDI input and output support.
 
 This variant provides 8 audio inputs and outputs and 10 CV inputs and outputs.  
 
-NOTE: Due to VST2 format not supporting CV ports, this variant is not available for VST2.
+NOTE: Due to AU and VST2 formats not supporting CV ports, this variant is not available for those formats.
 
 ### Synth
 
@@ -70,33 +102,6 @@ But a couple of modules background's have their colors flipped, because damn we 
 
 ![screenshot](docs/Screenshot_Carla+Ildaeil.png "Screenshot")
 
-## Current status
-
-With the exception of a few bugs, Cardinal can be considered stable.  
-Though currently the following should be noted:
-
-- Keyboard input does not always work in some hosts [#24](https://github.com/DISTRHO/Cardinal/issues/24)
-- VST3 support incomplete/experimental [#41](https://github.com/DISTRHO/Cardinal/issues/41)
-- Windows 32bit builds do not work well [#80](https://github.com/DISTRHO/Cardinal/issues/80)
-
-### Current builds
-
-If you want to try this out early, checkout the [GitHub actions tab](https://github.com/DISTRHO/Cardinal/actions/workflows/build.yml).  
-There is absolutely no warranty, use at your own risk and all that...
-
-Basic building instructions are available in [BUILDING.md](docs/BUILDING.md)
-
-### Community chat
-
-Currently we are all on #cardinal IRC room in irc.libera.chat server.  
-Come join us in your favorite IRC client or through a Matrix bridge.
-
-
-## License
-
-Cardinal is licensed under GPLv3+, see [LICENSE](LICENSE) for more details.  
-An overview of the included code and linked submodules can be seen [here](docs/LICENSES.md#code-license--binary).
-
 
 ## Included modules
 
@@ -108,6 +113,7 @@ At the moment the following 3rd-party modules are provided:
 - AlgoritmArte
 - Amalgamated Harmonics
 - Animated Circuits
+- Arable Instruments
 - Aria Salvatrice
 - Audible Instruments
 - Autinn
@@ -119,12 +125,12 @@ At the moment the following 3rd-party modules are provided:
 - Catro/Modulo
 - cf
 - ChowDSP
-- Dintree Virtual
 - DrumKit
 - E-Series
 - ExpertSleepers Encoders
 - Extratone
 - Fehler Fabrik
+- Fundamental
 - Glue the Giant
 - GoodSheperd
 - Grande
@@ -147,15 +153,18 @@ At the moment the following 3rd-party modules are provided:
 - MSM
 - Nonlinear Circuits
 - Orbits
+- Parable Instruments
 - Path Set
+- PinkTrombone
 - Prism
 - rackwindows
 - repelzen
 - Sonus Modular
 - Starling Via
 - stocaudio
-- Substation Opensource
+- unless_modules
 - Valley
+- Voxglitch
 - ZetaCarinae
 - ZZC
 
@@ -229,3 +238,15 @@ Cardinal and Rack should be able to co-exist friendly and peacefully, as they cl
 It is likely most people will prefer to use Rack Pro for its official support and its big module collection (including commercial ones).
 
 A feature comparison between Cardinal and Rack Pro can be seen [here](docs/DIFFERENCES.md).
+
+
+## License
+
+Cardinal is licensed under GPLv3+, see [LICENSE](LICENSE) for more details.  
+An overview of the included code and linked submodules can be seen [here](docs/LICENSES.md#code-license--binary).
+
+
+## Community chat
+
+Currently we are all on #cardinal IRC room in irc.libera.chat server.  
+Come join us in your favorite IRC client or through a Matrix bridge.

@@ -97,12 +97,14 @@ static void projectLoadedFromDSP(void* ui);
 
 static Mutex sPluginInfoLoadMutex;
 
+/*
 #ifndef HEADLESS
 struct JuceInitializer {
     JuceInitializer() { carla_juce_init(); }
     ~JuceInitializer() { carla_juce_cleanup(); }
 };
 #endif
+*/
 
 struct IldaeilModule : Module {
     enum ParamIds {
@@ -122,9 +124,11 @@ struct IldaeilModule : Module {
         NUM_LIGHTS
     };
 
+    /*
 #ifndef HEADLESS
     SharedResourcePointer<JuceInitializer> juceInitializer;
 #endif
+    */
 
     const CardinalPluginContext* const pcontext;
 
@@ -144,7 +148,7 @@ struct IldaeilModule : Module {
     float audioDataOut1[BUFFER_SIZE];
     float audioDataOut2[BUFFER_SIZE];
     unsigned audioDataFill = 0;
-    int64_t lastBlockFrame = -1;
+    uint32_t lastProcessCounter = 0;
     CardinalExpanderFromCarlaMIDIToCV* midiOutExpander = nullptr;
 
     volatile bool resetMeterIn = true;
@@ -209,10 +213,14 @@ struct IldaeilModule : Module {
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/Applications/Carla.app/Contents/MacOS");
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/Applications/Carla.app/Contents/MacOS/resources");
         }
-#elif defined(CARLA_OS_WINDOWS)
-        // Carla does not support system-wide install on Windows right now
-        if (false)
+#elif defined(CARLA_OS_WIN)
+        const std::string winBinaryDir = system::join(asset::systemDir, "Carla");
+
+        if (system::exists(winBinaryDir))
         {
+            const std::string winResourceDir = system::join(winBinaryDir, "resources");
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, winBinaryDir.c_str());
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, winResourceDir.c_str());
         }
 #else
         if (system::exists("/usr/local/lib/carla"))
@@ -351,12 +359,12 @@ struct IldaeilModule : Module {
 
         if (audioDataFill == BUFFER_SIZE)
         {
-            const int64_t blockFrame = pcontext->engine->getBlockFrame();
+            const uint32_t processCounter = pcontext->processCounter;
 
             // Update time position if running a new audio block
-            if (lastBlockFrame != blockFrame)
+            if (lastProcessCounter != processCounter)
             {
-                lastBlockFrame = blockFrame;
+                lastProcessCounter = processCounter;
                 fCarlaTimeInfo.playing = pcontext->playing;
                 fCarlaTimeInfo.frame = pcontext->frame;
                 fCarlaTimeInfo.bbt.valid = pcontext->bbtValid;
@@ -973,7 +981,9 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         const CarlaHostHandle handle = module->fCarlaHostHandle;
         DISTRHO_SAFE_ASSERT_RETURN(handle != nullptr,);
 
+        /*
         carla_juce_idle();
+        */
 
         if (fileBrowserHandle != nullptr && fileBrowserIdle(fileBrowserHandle))
         {

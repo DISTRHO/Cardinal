@@ -29,6 +29,7 @@
 
 #include "AsyncDialog.hpp"
 #include "PluginContext.hpp"
+#include "DistrhoPluginUtils.hpp"
 
 #include <asset.hpp>
 #include <context.hpp>
@@ -43,18 +44,50 @@
 # undef DEBUG
 #endif
 
-// for finding home dir
-#ifndef ARCH_WIN
+// for finding special paths
+#ifdef ARCH_WIN
+# include <shlobj.h>
+#else
 # include <pwd.h>
 # include <unistd.h>
 #endif
 
-const std::string CARDINAL_VERSION = "22.02";
+const std::string CARDINAL_VERSION = "22.04";
 
 namespace rack {
 namespace settings {
 int rateLimit = 0;
 }
+
+bool isStandalone()
+{
+    return std::strstr(getPluginFormatName(), "JACK") != nullptr;
+}
+
+#ifdef ARCH_WIN
+std::string getSpecialPath(const SpecialPath type)
+{
+    int csidl;
+    switch (type)
+    {
+    case kSpecialPathUserProfile:
+        csidl = CSIDL_PROFILE;
+        break;
+    case kSpecialPathCommonProgramFiles:
+        csidl = CSIDL_PROGRAM_FILES_COMMON;
+        break;
+    default:
+        return {};
+    }
+
+    WCHAR path[MAX_PATH + 256];
+
+    if (SHGetSpecialFolderPathW(nullptr, path, csidl, FALSE))
+        return string::UTF16toUTF8(path);
+
+    return {};
+}
+#endif
 }
 
 namespace patchUtils
@@ -74,19 +107,11 @@ static void promptClear(const char* const message, const std::function<void()> a
 static std::string homeDir()
 {
 # ifdef ARCH_WIN
-    if (const char* const userprofile = getenv("USERPROFILE"))
-    {
-        return userprofile;
-    }
-    else if (const char* const homedrive = getenv("HOMEDRIVE"))
-    {
-        if (const char* const homepath = getenv("HOMEPATH"))
-            return system::join(homedrive, homepath);
-    }
+    return getSpecialPath(kSpecialPathUserProfile);
 # else
     if (const char* const home = getenv("HOME"))
         return home;
-    else if (struct passwd* const pwd = getpwuid(getuid()))
+    if (struct passwd* const pwd = getpwuid(getuid()))
         return pwd->pw_dir;
 # endif
     return {};
@@ -112,6 +137,7 @@ void loadDialog()
         FileBrowserOptions opts;
         opts.startDir = dir.c_str();
         opts.saving = ui->saving = false;
+        opts.title = "Open patch";
         ui->openFileBrowser(opts);
     });
 #endif
@@ -208,6 +234,7 @@ static void saveAsDialog(const bool uncompressed)
     FileBrowserOptions opts;
     opts.startDir = dir.c_str();
     opts.saving = ui->saving = true;
+    opts.title = "Save patch";
     ui->savingUncompressed = uncompressed;
     ui->openFileBrowser(opts);
 }

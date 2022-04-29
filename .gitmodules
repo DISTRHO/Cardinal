@@ -84,7 +84,7 @@
 	url = https://gitlab.com/sonusdept/sonusmodular.git
 [submodule "plugins/Mog"]
 	path = plugins/Mog
-	url = https://github.com/CardinalModules/Mog-VCV.git
+	url = https://github.com/JustMog/Mog-VCV.git
 [submodule "plugins/ChowDSP"]
 	path = plugins/ChowDSP
 	url = https://github.com/jatinchowdhury18/ChowDSP-VCV.git
@@ -130,9 +130,6 @@
 [submodule "plugins/Autinn"]
 	path = plugins/Autinn
 	url = https://github.com/NikolaiVChr/Autinn.git
-[submodule "plugins/substation-opensource"]
-	path = plugins/substation-opensource
-	url = https://gitlab.com/falktx/substation-opensource.git
 [submodule "plugins/MockbaModular"]
 	path = plugins/MockbaModular
 	url = https://github.com/MockbaTheBorg/MockbaModular.git
@@ -169,9 +166,6 @@
 [submodule "plugins/PathSet"]
 	path = plugins/PathSet
 	url = https://github.com/patheros/PathSetModules.git
-[submodule "plugins/Dintree"]
-	path = plugins/Dintree
-	url = https://github.com/hires/Dintree-Virtual.git
 [submodule "plugins/Algoritmarte"]
 	path = plugins/Algoritmarte
 	url = https://github.com/algoritmarte/AlgoritmarteVCVPlugin.git
@@ -184,6 +178,21 @@
 [submodule "plugins/nonlinearcircuits"]
 	path = plugins/nonlinearcircuits
 	url = https://github.com/mhetrick/nonlinearcircuits.git
+[submodule "plugins/voxglitch"]
+	path = plugins/voxglitch
+	url = https://github.com/clone45/voxglitch.git
+[submodule "plugins/ArableInstruments"]
+	path = plugins/ArableInstruments
+	url = https://github.com/CardinalModules/ArableInstruments.git
+[submodule "plugins/Fundamental"]
+	path = plugins/Fundamental
+	url = https://github.com/CardinalModules/Fundamental.git
+[submodule "plugins/unless_modules"]
+	path = plugins/unless_modules
+	url = https://gitlab.com/unlessgames/unless_modules.git
+[submodule "plugins/PinkTrombone"]
+	path = plugins/PinkTrombone
+	url = https://github.com/VegaDeftwing/PinkTromboneVCV.git
 [submodule "plugins/StarlingVia"]
 	path = plugins/StarlingVia
 	url = https://github.com/starlingcode/Via-for-Rack.git

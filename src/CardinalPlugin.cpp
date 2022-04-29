@@ -49,12 +49,22 @@
 #include "extra/Base64.hpp"
 #include "extra/SharedResourcePointer.hpp"
 
+static const constexpr uint kCardinalStateBaseCount = 3; // patch, screenshot, comment
+
 #ifndef HEADLESS
 # include "WindowParameters.hpp"
-static const constexpr uint kCardinalStateCount = 4; // patch, screenshot, comment, windowSize
+static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount + 2; // moduleInfos, windowSize
 #else
 # define kWindowParameterCount 0
-static const constexpr uint kCardinalStateCount = 3; // patch, screenshot, comment
+static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount;
+#endif
+
+#if CARDINAL_VARIANT_FX
+# define CARDINAL_TEMPLATE_NAME "template-fx.vcv"
+#elif CARDINAL_VARIANT_SYNTH
+# define CARDINAL_TEMPLATE_NAME "template-synth.vcv"
+#else
+# define CARDINAL_TEMPLATE_NAME "template.vcv"
 #endif
 
 namespace rack {
@@ -134,11 +144,11 @@ struct Initializer
                 {
                     asset::bundlePath = system::join(resourcePath, "PluginManifests");
                     asset::systemDir = resourcePath;
-                    templatePath = system::join(asset::systemDir, "template.vcv");
+                    templatePath = system::join(asset::systemDir, CARDINAL_TEMPLATE_NAME);
                 }
             }
 
-            if (asset::systemDir.empty())
+            if (asset::systemDir.empty() || ! system::exists(asset::systemDir))
             {
                #ifdef CARDINAL_PLUGIN_SOURCE_DIR
                 // Make system dir point to source code location as fallback
@@ -146,16 +156,27 @@ struct Initializer
 
                 if (system::exists(system::join(asset::systemDir, "res")))
                 {
-                    templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "template.vcv";
+                    templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR CARDINAL_TEMPLATE_NAME;
                 }
                 // If source code dir does not exist use install target prefix as system dir
                 else
                #endif
-                if (system::exists(CARDINAL_PLUGIN_PREFIX "/share/cardinal"))
                 {
-                    asset::bundlePath = CARDINAL_PLUGIN_PREFIX "/share/cardinal/PluginManifests";
+                   #if defined(ARCH_MAC)
+                    asset::systemDir = "/Library/Application Support/Cardinal";
+                   #elif defined(ARCH_WIN)
+                    const std::string commonprogfiles = getSpecialPath(kSpecialPathCommonProgramFiles);
+                    if (! commonprogfiles.empty())
+                        asset::systemDir = system::join(commonprogfiles, "Cardinal");
+                   #else
                     asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/cardinal";
-                    templatePath = system::join(asset::systemDir, "template.vcv");
+                   #endif
+
+                    if (! asset::systemDir.empty())
+                    {
+                        asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
+                        templatePath = system::join(asset::systemDir, CARDINAL_TEMPLATE_NAME);
+                    }
                 }
             }
 
@@ -333,6 +354,9 @@ struct Initializer
 
 void CardinalPluginContext::writeMidiMessage(const rack::midi::Message& message, const uint8_t channel)
 {
+    if (bypassed)
+        return;
+
     const size_t size = message.bytes.size();
     DISTRHO_SAFE_ASSERT_RETURN(size > 0,);
     DISTRHO_SAFE_ASSERT_RETURN(message.frame >= 0,);
@@ -425,9 +449,18 @@ class CardinalPlugin : public CardinalBasePlugin
 
     std::string fAutosavePath;
     uint64_t fPreviousFrame;
-    String fStateComment;
-    String fStateScreenshot;
-    String fWindowSize;
+
+    struct {
+        String comment;
+        String screenshot;
+       #ifndef HEADLESS
+        String windowSize;
+       #endif
+    } fState;
+
+    // bypass handling
+    bool fWasBypassed;
+    MidiEvent bypassMidiEvents[16];
 
    #ifndef HEADLESS
     // real values, not VCV interpreted ones
@@ -441,7 +474,8 @@ public:
          #if DISTRHO_PLUGIN_NUM_INPUTS != 0
           fAudioBufferCopy(nullptr),
          #endif
-          fPreviousFrame(0)
+          fPreviousFrame(0),
+          fWasBypassed(false)
     {
        #ifndef HEADLESS
         fWindowParameters[kWindowParameterShowTooltips] = 1.0f;
@@ -454,6 +488,9 @@ public:
         fWindowParameters[kWindowParameterWheelSensitivity] = 1.0f;
         fWindowParameters[kWindowParameterLockModulePositions] = 0.0f;
         fWindowParameters[kWindowParameterUpdateRateLimit] = 0.0f;
+        fWindowParameters[kWindowParameterBrowserSort] = 3.0f;
+        fWindowParameters[kWindowParameterBrowserZoom] = 50.0f;
+        fWindowParameters[kWindowParameterInvertZoom] = 0.0f;
        #endif
 
         // create unique temporary path for this instance
@@ -474,6 +511,16 @@ public:
                 }
             }
         } DISTRHO_SAFE_EXCEPTION("create unique temporary path");
+
+        // initialize midi events used when entering bypassed state
+        std::memset(bypassMidiEvents, 0, sizeof(bypassMidiEvents));
+
+        for (uint8_t i=0; i<16; ++i)
+        {
+            bypassMidiEvents[i].size = 3;
+            bypassMidiEvents[i].data[0] = 0xB0 + i;
+            bypassMidiEvents[i].data[1] = 0x7B;
+        }
 
         const float sampleRate = getSampleRate();
         rack::settings::sampleRate = sampleRate;
@@ -564,7 +611,7 @@ protected:
 
     uint32_t getVersion() const override
     {
-        return d_version(0, 22, 2);
+        return d_version(0, 22, 4);
     }
 
     int64_t getUniqueId() const override
@@ -721,6 +768,63 @@ protected:
             parameter.enumValues.values[2].label = "4x";
             parameter.enumValues.values[2].value = 2.0f;
             break;
+        case kWindowParameterBrowserSort:
+            parameter.name = "Browser sort";
+            parameter.symbol = "browserSort";
+            parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
+            parameter.ranges.def = 3.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 5.0f;
+            parameter.enumValues.count = 6;
+            parameter.enumValues.restrictedMode = true;
+            parameter.enumValues.values = new ParameterEnumerationValue[6];
+            parameter.enumValues.values[0].label = "Updated";
+            parameter.enumValues.values[0].value = 0.0f;
+            parameter.enumValues.values[1].label = "Last used";
+            parameter.enumValues.values[1].value = 1.0f;
+            parameter.enumValues.values[2].label = "Most used";
+            parameter.enumValues.values[2].value = 2.0f;
+            parameter.enumValues.values[3].label = "Brand";
+            parameter.enumValues.values[3].value = 3.0f;
+            parameter.enumValues.values[4].label = "Name";
+            parameter.enumValues.values[4].value = 4.0f;
+            parameter.enumValues.values[5].label = "Random";
+            parameter.enumValues.values[5].value = 5.0f;
+            break;
+        case kWindowParameterBrowserZoom:
+            parameter.name = "Browser zoom";
+            parameter.symbol = "browserZoom";
+            parameter.hints = kParameterIsAutomatable;
+            parameter.unit = "%";
+            parameter.ranges.def = 50.0f;
+            parameter.ranges.min = 25.0f;
+            parameter.ranges.max = 200.0f;
+            parameter.enumValues.count = 7;
+            parameter.enumValues.restrictedMode = true;
+            parameter.enumValues.values = new ParameterEnumerationValue[7];
+            parameter.enumValues.values[0].label = "25";
+            parameter.enumValues.values[0].value = 25.0f;
+            parameter.enumValues.values[1].label = "35";
+            parameter.enumValues.values[1].value = 35.0f;
+            parameter.enumValues.values[2].label = "50";
+            parameter.enumValues.values[2].value = 50.0f;
+            parameter.enumValues.values[3].label = "71";
+            parameter.enumValues.values[3].value = 71.0f;
+            parameter.enumValues.values[4].label = "100";
+            parameter.enumValues.values[4].value = 100.0f;
+            parameter.enumValues.values[5].label = "141";
+            parameter.enumValues.values[5].value = 141.0f;
+            parameter.enumValues.values[6].label = "200";
+            parameter.enumValues.values[6].value = 200.0f;
+            break;
+        case kWindowParameterInvertZoom:
+            parameter.name = "Invert zoom";
+            parameter.symbol = "invertZoom";
+            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 1.0f;
+            break;
         }
        #endif
     }
@@ -746,6 +850,11 @@ protected:
             break;
         case 3:
             state.hints = kStateIsOnlyForUI;
+            state.key = "moduleInfos";
+            state.label = "moduleInfos";
+            break;
+        case 4:
+            state.hints = kStateIsOnlyForUI;
             state.key = "windowSize";
             state.label = "Window size";
             break;
@@ -763,7 +872,7 @@ protected:
 
         // bypass
         if (index == kModuleParameters)
-            return 0.0f;
+            return context->bypassed ? 1.0f : 0.0f;
 
        #ifndef HEADLESS
         // window related parameters
@@ -787,7 +896,10 @@ protected:
 
         // bypass
         if (index == kModuleParameters)
+        {
+            context->bypassed = value > 0.5f;
             return;
+        }
 
        #ifndef HEADLESS
         // window related parameters
@@ -804,14 +916,57 @@ protected:
     String getState(const char* const key) const override
     {
        #ifndef HEADLESS
+        if (std::strcmp(key, "moduleInfos") == 0)
+        {
+            json_t* const rootJ = json_object();
+            DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr, String());
+
+            for (const auto& pluginPair : rack::settings::moduleInfos)
+            {
+                json_t* const pluginJ = json_object();
+                DISTRHO_SAFE_ASSERT_CONTINUE(pluginJ != nullptr);
+
+                for (const auto& modulePair : pluginPair.second)
+                {
+                    json_t* const moduleJ = json_object();
+                    DISTRHO_SAFE_ASSERT_CONTINUE(moduleJ != nullptr);
+
+                    const rack::settings::ModuleInfo& m(modulePair.second);
+
+                    // To make setting.json smaller, only set properties if not default values.
+                    if (m.favorite)
+                        json_object_set_new(moduleJ, "favorite", json_boolean(m.favorite));
+                    if (m.added > 0)
+                        json_object_set_new(moduleJ, "added", json_integer(m.added));
+                    if (std::isfinite(m.lastAdded))
+                        json_object_set_new(moduleJ, "lastAdded", json_real(m.lastAdded));
+
+                    if (json_object_size(moduleJ))
+                        json_object_set_new(pluginJ, modulePair.first.c_str(), moduleJ);
+                    else
+                        json_decref(moduleJ);
+                }
+
+                if (json_object_size(pluginJ))
+                    json_object_set_new(rootJ, pluginPair.first.c_str(), pluginJ);
+                else
+                    json_decref(pluginJ);
+            }
+
+            const String info(json_dumps(rootJ, JSON_COMPACT), false);
+            json_decref(rootJ);
+
+            return info;
+        }
+
         if (std::strcmp(key, "windowSize") == 0)
-            return fWindowSize;
+            return fState.windowSize;
        #endif
 
         if (std::strcmp(key, "comment") == 0)
-            return fStateComment;
+            return fState.comment;
         if (std::strcmp(key, "screenshot") == 0)
-            return fStateScreenshot;
+            return fState.screenshot;
 
         if (std::strcmp(key, "patch") != 0)
             return String();
@@ -839,22 +994,56 @@ protected:
     void setState(const char* const key, const char* const value) override
     {
        #ifndef HEADLESS
+        if (std::strcmp(key, "moduleInfos") == 0)
+        {
+            json_error_t error;
+            json_t* const rootJ = json_loads(value, 0, &error);
+            DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr,);
+
+            const char* pluginSlug;
+            json_t* pluginJ;
+
+            json_object_foreach(rootJ, pluginSlug, pluginJ)
+            {
+                const char* moduleSlug;
+                json_t* moduleJ;
+
+                json_object_foreach(pluginJ, moduleSlug, moduleJ)
+                {
+                    rack::settings::ModuleInfo m;
+
+                    if (json_t* const favoriteJ = json_object_get(moduleJ, "favorite"))
+                        m.favorite = json_boolean_value(favoriteJ);
+
+                    if (json_t* const addedJ = json_object_get(moduleJ, "added"))
+                        m.added = json_integer_value(addedJ);
+
+                    if (json_t* const lastAddedJ = json_object_get(moduleJ, "lastAdded"))
+                        m.lastAdded = json_number_value(lastAddedJ);
+
+                    rack::settings::moduleInfos[pluginSlug][moduleSlug] = m;
+                }
+            }
+
+            json_decref(rootJ);
+            return;
+        }
         if (std::strcmp(key, "windowSize") == 0)
         {
-            fWindowSize = value;
+            fState.windowSize = value;
             return;
         }
        #endif
 
         if (std::strcmp(key, "comment") == 0)
         {
-            fStateComment = value;
+            fState.comment = value;
             return;
         }
 
         if (std::strcmp(key, "screenshot") == 0)
         {
-            fStateScreenshot = value;
+            fState.screenshot = value;
            #if defined(HAVE_LIBLO) && !defined(HEADLESS)
             patchUtils::sendScreenshotToRemote(value);
            #endif
@@ -914,6 +1103,8 @@ protected:
     {
         rack::contextSet(context);
 
+        const bool bypassed = context->bypassed;
+
         {
             const TimePosition& timePos(getTimePosition());
 
@@ -967,10 +1158,29 @@ protected:
         for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
             std::memset(outputs[i], 0, sizeof(float)*frames);
 
-        context->midiEvents = midiEvents;
-        context->midiEventCount = midiEventCount;
+        if (bypassed)
+        {
+            if (fWasBypassed != bypassed)
+            {
+                context->midiEvents = bypassMidiEvents;
+                context->midiEventCount = 16;
+            }
+            else
+            {
+                context->midiEvents = nullptr;
+                context->midiEventCount = 0;
+            }
+        }
+        else
+        {
+            context->midiEvents = midiEvents;
+            context->midiEventCount = midiEventCount;
+        }
 
+        ++context->processCounter;
         context->engine->stepBlock(frames);
+
+        fWasBypassed = bypassed;
     }
 
     void bufferSizeChanged(const uint32_t newBufferSize) override

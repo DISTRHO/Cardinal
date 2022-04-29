@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -52,6 +52,19 @@
 // Cardinal specific API
 #include <functional>
 #define USING_CARDINAL_NOT_RACK
+
+// OS separator macros
+#ifdef ARCH_WIN
+# define CARDINAL_OS_SEP       '\\'
+# define CARDINAL_OS_SEP_STR   "\\"
+# define CARDINAL_OS_SPLIT     ';'
+# define CARDINAL_OS_SPLIT_STR ";"
+#else
+# define CARDINAL_OS_SEP       '/'
+# define CARDINAL_OS_SEP_STR   "/"
+# define CARDINAL_OS_SPLIT     ':'
+# define CARDINAL_OS_SPLIT_STR ":"
+#endif
 
 // opens a file browser, startDir and title can be null
 // action is always triggered on close (path can be null), must be freed if not null

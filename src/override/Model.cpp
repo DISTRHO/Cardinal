@@ -117,7 +117,7 @@ std::string Model::getManualUrl() {
 }
 
 
-void Model::appendContextMenu(ui::Menu* menu, bool) {
+void Model::appendContextMenu(ui::Menu* menu, bool inBrowser) {
 	// plugin
 	menu->addChild(createMenuItem("Plugin: " + plugin->name, "", [=]() {
 		system::openBrowser(plugin->pluginUrl);
@@ -182,15 +182,28 @@ void Model::appendContextMenu(ui::Menu* menu, bool) {
 			system::openBrowser(plugin->changelogUrl);
 		}));
 	}
+
+	// Favorite
+	std::string favoriteRightText = inBrowser ? (RACK_MOD_CTRL_NAME "+click") : "";
+	if (isFavorite())
+		favoriteRightText += " " CHECKMARK_STRING;
+	menu->addChild(createMenuItem("Favorite", favoriteRightText,
+		[=]() {
+			setFavorite(!isFavorite());
+		}
+	));
 }
 
 
 bool Model::isFavorite() {
-	return false;
+	const settings::ModuleInfo* mi = settings::getModuleInfo(plugin->slug, slug);
+	return mi && mi->favorite;
 }
 
 
-void Model::setFavorite(bool) {
+void Model::setFavorite(bool favorite) {
+	settings::ModuleInfo& mi = settings::moduleInfos[plugin->slug][slug];
+	mi.favorite = favorite;
 }
 
 

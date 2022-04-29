@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -37,6 +37,7 @@
 #include <asset.hpp>
 #include <context.hpp>
 #include <helpers.hpp>
+#include <settings.hpp>
 #include <system.hpp>
 
 namespace rack {
@@ -54,7 +55,6 @@ struct ModuleWidget::Internal {
     math::Vec dragOffset;
     math::Vec dragRackPos;
     bool dragEnabled;
-    math::Vec oldPos;
     widget::Widget* panel;
 };
 
@@ -300,36 +300,65 @@ static void CardinalModuleWidget__saveSelectionDialog(RackWidget* const w)
 
 void CardinalModuleWidget::onButton(const ButtonEvent& e)
 {
-    bool selected = APP->scene->rack->isSelected(this);
+    const bool selected = APP->scene->rack->isSelected(this);
 
     if (selected) {
-        if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-            ui::Menu* menu = createMenu();
-            patchUtils::appendSelectionContextMenu(menu);
+        if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+            if (e.action == GLFW_PRESS) {
+                // Open selection context menu on right-click
+                ui::Menu* menu = createMenu();
+                patchUtils::appendSelectionContextMenu(menu);
+            }
+            e.consume(this);
         }
 
+        if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+            if (e.action == GLFW_PRESS) {
+                // Toggle selection on Shift-click
+                if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+                    APP->scene->rack->select(this, false);
+                    e.consume(NULL);
+                    return;
+                }
+
+                internal->dragOffset = e.pos;
+            }
+
+            e.consume(this);
+        }
+
+        return;
+    }
+
+    // Dispatch event to children
+    Widget::onButton(e);
+    e.stopPropagating();
+    if (e.isConsumed())
+        return;
+
+    if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+        if (e.action == GLFW_PRESS) {
+            // Toggle selection on Shift-click
+            if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+                APP->scene->rack->select(this, true);
+                e.consume(NULL);
+                return;
+            }
+
+            // If module positions are locked, don't consume left-click
+            if (settings::lockModules) {
+                return;
+            }
+
+            internal->dragOffset = e.pos;
+        }
         e.consume(this);
     }
 
-    OpaqueWidget::onButton(e);
-
-    if (e.getTarget() == this) {
-        // Set starting drag position
-        if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-            internal->dragOffset = e.pos;
-        }
-        // Toggle selection on Shift-click
-        if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
-            APP->scene->rack->select(this, !selected);
-        }
-    }
-
-    if (!e.isConsumed() && !selected) {
-        // Open context menu on right-click
-        if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-            CardinalModuleWidget__createContextMenu(this, model, module);
-            e.consume(this);
-        }
+    // Open context menu on right-click
+    if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
+        CardinalModuleWidget__createContextMenu(this, model, module);
+        e.consume(this);
     }
 }
 

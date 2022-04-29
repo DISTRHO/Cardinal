@@ -95,7 +95,7 @@ endif
 
 BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing -faligned-new
 
 # use our custom function to invert some colors
 BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
@@ -115,6 +115,7 @@ RACK_FILES += custom/network.cpp
 RACK_FILES += custom/osdialog.cpp
 RACK_FILES += override/blendish.c
 RACK_FILES += override/context.cpp
+RACK_FILES += override/minblep.cpp
 RACK_FILES += override/plugin.cpp
 RACK_FILES += override/Engine.cpp
 RACK_FILES += override/MenuBar.cpp
@@ -144,6 +145,7 @@ IGNORED_FILES += Rack/src/app/MenuBar.cpp
 IGNORED_FILES += Rack/src/app/MidiDisplay.cpp
 IGNORED_FILES += Rack/src/app/Scene.cpp
 IGNORED_FILES += Rack/src/app/TipWindow.cpp
+IGNORED_FILES += Rack/src/dsp/minblep.cpp
 IGNORED_FILES += Rack/src/engine/Engine.cpp
 IGNORED_FILES += Rack/src/plugin/Model.cpp
 IGNORED_FILES += Rack/src/window/Window.cpp
@@ -171,21 +173,43 @@ endif
 
 TARGET = rack.a
 
+ifneq ($(MACOS),true)
+CARDINAL_FX_ARGS = VST2_FILENAME=Cardinal.vst/CardinalFX$(LIB_EXT)
+CARDINAL_SYNTH_ARGS = VST2_FILENAME=Cardinal.vst/CardinalSynth$(LIB_EXT)
+endif
+
 all: $(TARGET)
 ifeq ($(MOD_BUILD),true)
 	$(MAKE) -C CardinalFX lv2
 else
 	$(MAKE) -C Cardinal
-	$(MAKE) -C CardinalFX
-	$(MAKE) -C CardinalSynth
+	$(MAKE) -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 endif
+
+jack: $(TARGET)
+	$(MAKE) jack -C Cardinal
+
+lv2: $(TARGET)
+	$(MAKE) lv2 -C Cardinal
+	$(MAKE) lv2 -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) lv2 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
+
+vst2: $(TARGET)
+	$(MAKE) vst2 -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) vst2 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
+
+vst3: $(TARGET)
+	$(MAKE) vst3 -C Cardinal
+	$(MAKE) vst3 -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) vst3 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 
 clean:
 	rm -f $(TARGET)
 	rm -rf $(BUILD_DIR)
 	$(MAKE) clean -C Cardinal
-	$(MAKE) clean -C CardinalFX
-	$(MAKE) clean -C CardinalSynth
+	$(MAKE) clean -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) clean -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 
 # --------------------------------------------------------------
 # Build commands

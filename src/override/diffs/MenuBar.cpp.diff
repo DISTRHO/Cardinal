@@ -1,5 +1,5 @@
---- ../Rack/src/app/MenuBar.cpp	2022-01-15 11:59:46.188414546 +0000
-+++ MenuBar.cpp	2022-02-14 03:38:00.935519007 +0000
+--- ../Rack/src/app/MenuBar.cpp	2022-02-26 23:08:06.697192725 +0000
++++ MenuBar.cpp	2022-04-27 17:30:16.653341980 +0100
 @@ -1,8 +1,33 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -218,35 +218,20 @@
  
  		static const std::vector<std::string> knobModeLabels = {
  			"Linear",
-@@ -467,6 +478,25 @@
+@@ -467,56 +478,34 @@
  		menu->addChild(knobScrollSensitivitySlider);
  
  		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
-+
-+#ifndef DISTRHO_OS_MAC
+-	}
+-};
+-
+ 
+-////////////////////
+-// Engine
+-////////////////////
++		menu->addChild(createBoolPtrMenuItem("Invert zoom", "", &settings::invertZoom));
+ 
 +		menu->addChild(new ui::MenuSeparator);
-+
-+		static const std::vector<std::string> rateLimitLabels = {
-+			"None",
-+			"2x",
-+			"4x",
-+		};
-+		static const std::vector<int> rateLimits = {0, 1, 2};
-+		menu->addChild(createSubmenuItem("Update rate limit", rateLimitLabels[settings::rateLimit], [=](ui::Menu* menu) {
-+			for (int rateLimit : rateLimits) {
-+				menu->addChild(createCheckMenuItem(rateLimitLabels[rateLimit], "",
-+					[=]() {return settings::rateLimit == rateLimit;},
-+					[=]() {settings::rateLimit = rateLimit;}
-+				));
-+			}
-+		}));
-+#endif
- 	}
- };
- 
-@@ -476,47 +506,6 @@
- ////////////////////
- 
  
 -struct SampleRateItem : ui::MenuItem {
 -	ui::Menu* createChildMenu() override {
@@ -281,14 +266,31 @@
 -				menu->addChild(createCheckMenuItem(text, rightText,
 -					[=]() {return settings::sampleRate == sampleRate;},
 -					[=]() {settings::sampleRate = sampleRate;}
--				));
--			}
++		static const std::vector<std::string> rateLimitLabels = {
++			"None",
++			"2x",
++			"4x",
++		};
++		static const std::vector<int> rateLimits = {0, 1, 2};
++		menu->addChild(createSubmenuItem("Update rate limit", rateLimitLabels[settings::rateLimit], [=](ui::Menu* menu) {
++			for (int rateLimit : rateLimits) {
++				menu->addChild(createCheckMenuItem(rateLimitLabels[rateLimit], "",
++					[=]() {return settings::rateLimit == rateLimit;},
++					[=]() {settings::rateLimit = rateLimit;}
+ 				));
+ 			}
 -		}
 -		return menu;
--	}
--};
--
--
++		}));
+ 	}
+ };
+ 
+ 
++////////////////////
++// Engine
++////////////////////
++
++
  struct EngineButton : MenuButton {
  	void onAction(const ActionEvent& e) override {
  		ui::Menu* menu = createMenu();
@@ -562,7 +564,7 @@
  	}
  };
  
-@@ -802,63 +528,23 @@
+@@ -802,65 +528,23 @@
  
  
  struct HelpButton : MenuButton {
@@ -584,28 +586,34 @@
 -
 -		menu->addChild(createMenuItem("User manual", "F1", [=]() {
 +		menu->addChild(createMenuItem("Rack User manual", "F1", [=]() {
- 			system::openBrowser("https://vcvrack.com/manual/");
+ 			system::openBrowser("https://vcvrack.com/manual");
  		}));
  
+-		menu->addChild(createMenuItem("Support", "", [=]() {
+-			system::openBrowser("https://vcvrack.com/support");
+-		}));
+-
 -		menu->addChild(createMenuItem("VCVRack.com", "", [=]() {
 -			system::openBrowser("https://vcvrack.com/");
 +		menu->addChild(createMenuItem("Cardinal Project page", "", [=]() {
 +			system::openBrowser("https://github.com/DISTRHO/Cardinal/");
  		}));
  
+ 		menu->addChild(new ui::MenuSeparator);
+ 
+-		menu->addChild(createMenuLabel(APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION));
+-
 -		menu->addChild(createMenuItem("Open user folder", "", [=]() {
 -			system::openDirectory(asset::user(""));
 -		}));
 -
--		if (library::isAppUpdateAvailable()) {
--			menu->addChild(new ui::MenuSeparator);
+-		menu->addChild(createMenuItem("Changelog", "", [=]() {
+-			system::openBrowser("https://github.com/VCVRack/Rack/blob/v2/CHANGELOG.md");
+-		}));
 -
+-		if (library::isAppUpdateAvailable()) {
 -			menu->addChild(createMenuItem("Update " + APP_NAME, APP_VERSION + " → " + library::appVersion, [=]() {
 -				system::openBrowser(library::appDownloadUrl);
--			}));
--
--			menu->addChild(createMenuItem("Review changelog", "", [=]() {
--				system::openBrowser(library::appChangelogUrl);
 -			}));
 -		}
 -		else if (!settings::autoCheckUpdates && !settings::devMode) {
@@ -616,10 +624,6 @@
 -				t.detach();
 -			}, false, true));
 -		}
--
- 		menu->addChild(new ui::MenuSeparator);
- 
--		menu->addChild(createMenuLabel(APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION));
 -	}
 -
 -	void step() override {
@@ -631,7 +635,7 @@
  	}
  };
  
-@@ -908,7 +594,9 @@
+@@ -910,7 +594,9 @@
  struct MenuBar : widget::OpaqueWidget {
  	MeterLabel* meterLabel;
  
@@ -642,7 +646,7 @@
  		const float margin = 5;
  		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
  
-@@ -917,7 +605,7 @@
+@@ -919,7 +605,7 @@
  		layout->spacing = math::Vec(0, 0);
  		addChild(layout);
  
@@ -651,7 +655,7 @@
  		fileButton->text = "File";
  		layout->addChild(fileButton);
  
-@@ -933,10 +621,6 @@
+@@ -935,10 +621,6 @@
  		engineButton->text = "Engine";
  		layout->addChild(engineButton);
  
@@ -662,7 +666,7 @@
  		HelpButton* helpButton = new HelpButton;
  		helpButton->text = "Help";
  		layout->addChild(helpButton);
-@@ -971,7 +655,11 @@
+@@ -973,7 +655,11 @@
  
  
  widget::Widget* createMenuBar() {

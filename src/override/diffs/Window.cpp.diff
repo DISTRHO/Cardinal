@@ -1,5 +1,5 @@
---- ../Rack/src/window/Window.cpp	2022-01-01 15:50:17.777305924 +0000
-+++ Window.cpp	2022-02-13 02:07:46.554983286 +0000
+--- ../Rack/src/window/Window.cpp	2022-02-09 15:35:19.238863170 +0000
++++ Window.cpp	2022-04-27 16:53:59.743671091 +0100
 @@ -1,33 +1,83 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -162,8 +162,12 @@
  
  	bool fbDirtyOnSubpixelChange = true;
  	int fbCount = 0;
--};
--
++
++	Internal()
++		: hiddenApp(false),
++		  hiddenWindow(hiddenApp) { hiddenApp.idle(); }
+ };
+ 
  
 -static void windowPosCallback(GLFWwindow* win, int x, int y) {
 -	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED))
@@ -175,11 +179,14 @@
 -	settings::windowPos = math::Vec(x, y);
 -	// DEBUG("windowPosCallback %d %d", x, y);
 -}
-+	Internal()
-+		: hiddenApp(false),
-+		  hiddenWindow(hiddenApp) { hiddenApp.idle(); }
-+};
++#ifndef DGL_NO_SHARED_RESOURCES
++static int loadFallbackFont(NVGcontext* const vg)
++{
++	const int font = nvgFindFont(vg, NANOVG_DEJAVU_SANS_TTF);
++	if (font >= 0)
++		return font;
  
++	using namespace dpf_resources;
  
 -static void windowSizeCallback(GLFWwindow* win, int width, int height) {
 -	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED))
@@ -190,22 +197,15 @@
 -		return;
 -	settings::windowSize = math::Vec(width, height);
 -	// DEBUG("windowSizeCallback %d %d", width, height);
--}
-+#ifndef DGL_NO_SHARED_RESOURCES
-+static int loadFallbackFont(NVGcontext* const vg)
-+{
-+	const int font = nvgFindFont(vg, NANOVG_DEJAVU_SANS_TTF);
-+	if (font >= 0)
-+		return font;
- 
-+	using namespace dpf_resources;
- 
--static void windowMaximizeCallback(GLFWwindow* win, int maximized) {
--	settings::windowMaximized = maximized;
--	// DEBUG("windowMaximizeCallback %d", maximized);
 +	return nvgCreateFontMem(vg, NANOVG_DEJAVU_SANS_TTF,
 +	                        (uchar*)dejavusans_ttf, dejavusans_ttf_size, 0);
  }
+-
+-
+-static void windowMaximizeCallback(GLFWwindow* win, int maximized) {
+-	settings::windowMaximized = maximized;
+-	// DEBUG("windowMaximizeCallback %d", maximized);
+-}
 -
 -
 -static void mouseButtonCallback(GLFWwindow* win, int button, int action, int mods) {
@@ -225,15 +225,15 @@
  
 -	APP->event->handleButton(APP->window->internal->lastMousePos, button, action, mods);
 -}
- 
-+Window::Window() {
-+	internal = new Internal;
+-
  
 -static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
 -	contextSet((Context*) glfwGetWindowUserPointer(win));
 -	math::Vec mousePos = math::Vec(xpos, ypos).div(APP->window->pixelRatio / APP->window->windowRatio).round();
 -	math::Vec mouseDelta = mousePos.minus(APP->window->internal->lastMousePos);
--
++Window::Window() {
++	internal = new Internal;
+ 
 -	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
 -	if (APP->window->internal->ignoreNextMouseDelta) {
 -		APP->window->internal->ignoreNextMouseDelta = false;
@@ -435,8 +435,8 @@
 +#endif
  	}
 -}
- 
 -
+ 
 -static void dropCallback(GLFWwindow* win, int count, const char** paths) {
 -	contextSet((Context*) glfwGetWindowUserPointer(win));
 -	std::vector<std::string> pathsVec;
@@ -1069,7 +1069,7 @@
  	}
  	internal->imageCache[filename] = image;
  	return image;
-@@ -766,28 +662,122 @@
+@@ -766,28 +662,146 @@
  }
  
  
@@ -1143,12 +1143,26 @@
 +			window->internal->callback->WindowParametersChanged(kWindowParameterWheelSensitivity,
 +			                                                    rack::settings::knobScrollSensitivity);
 +	}
++	if (d_isNotEqual(window->internal->params.browserZoom, rack::settings::browserZoom))
++	{
++		window->internal->params.browserZoom = rack::settings::browserZoom;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterBrowserZoom,
++			                                                    rack::settings::browserZoom);
++	}
 +	if (window->internal->params.knobMode != rack::settings::knobMode)
 +	{
 +		window->internal->params.knobMode = rack::settings::knobMode;
 +		if (window->internal->callback != nullptr)
 +			window->internal->callback->WindowParametersChanged(kWindowParameterKnobMode,
 +			                                                    rack::settings::knobMode);
++	}
++	if (window->internal->params.browserSort != rack::settings::browserSort)
++	{
++		window->internal->params.browserSort = rack::settings::browserSort;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterBrowserSort,
++			                                                    rack::settings::browserSort);
 +	}
 +	if (window->internal->params.tooltips != rack::settings::tooltips)
 +	{
@@ -1171,6 +1185,13 @@
 +			window->internal->callback->WindowParametersChanged(kWindowParameterLockModulePositions,
 +			                                                    rack::settings::lockModules);
 +	}
++	if (window->internal->params.invertZoom != rack::settings::invertZoom)
++	{
++		window->internal->params.invertZoom = rack::settings::invertZoom;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterInvertZoom,
++			                                                    rack::settings::invertZoom);
++	}
 +	if (window->internal->params.rateLimit != rack::settings::rateLimit)
 +	{
 +		window->internal->params.rateLimit = rack::settings::rateLimit;
@@ -1187,10 +1208,13 @@
 +	rack::settings::rackBrightness = window->internal->params.rackBrightness;
 +	rack::settings::haloBrightness = window->internal->params.haloBrightness;
 +	rack::settings::knobScrollSensitivity = window->internal->params.knobScrollSensitivity;
++	rack::settings::browserZoom = window->internal->params.browserZoom;
 +	rack::settings::knobMode = static_cast<rack::settings::KnobMode>(window->internal->params.knobMode);
++	rack::settings::browserSort = static_cast<rack::settings::BrowserSort>(window->internal->params.browserSort);
 +	rack::settings::tooltips = window->internal->params.tooltips;
 +	rack::settings::knobScroll = window->internal->params.knobScroll;
 +	rack::settings::lockModules = window->internal->params.lockModules;
++	rack::settings::invertZoom = window->internal->params.invertZoom;
 +	rack::settings::rateLimit = window->internal->params.rateLimit;
 +}
 +

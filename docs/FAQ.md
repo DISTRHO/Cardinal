@@ -9,19 +9,6 @@ But basically we want an open-source plugin version of "Rack Pro",
 where we are free to change things as we see fit, work on new features and fix bugs.  
 This is simply not possible with proprietary software, which is the case of "Rack Pro".
 
-## Where is Fundamental?
-
-There are some artwork license issues that prevent us from using Fundamental exactly as we want.  
-We could in theory use it as-is, VCV logo and everything, but it looks out of place with Cardinal's general dark mode theme.  
-The artwork license does not allow modifications, and that VCV logo being present on the panels makes Cardinal's authors unease.  
-Cardinal is not a VCV product in any way, or endorsed by it. Would be quite bad to give that impression.
-
-Current plan is to redo Fundamental panel graphics in a more liberal license, so it then can be included in Cardinal.  
-In the mean time, check [this wiki page](https://github.com/DISTRHO/Cardinal/wiki/Fundamental-replacements)
-for a list of module replacements for Fundamental stuff.
-
-PS: Don't forget to contribute back as well! ;)
-
 ## Can I install extra modules?
 
 No, Cardinal is intentionally a fully self-contained plugin.  
@@ -64,9 +51,15 @@ As a plugin, the state will be saved together with the host/DAW project.
 ## On BSD/Linux/X11 the menu item "Save As/Export..." does nothing
 
 The save-file dialogs in Cardinal requires a working [xdg-desktop-portal](https://github.com/flatpak/xdg-desktop-portal) DBus implementation from your desktop environment.  
-Typically your desktop already provides this, if not consider looking for a package to install with "desktop-portal" in the name.
+Typically your desktop already provides this, if not consider looking for a package to install with "desktop-portal" in the name.  
+If you are running a window manager without a "real" desktop environment (like custom X11 or i3 setups),
+you will need to manually activate the systemd unit that provides these DBus services, like so:
 
-The open-file dialogs in Cardinal do not have this restriction, with a fallback in case desktop portal is not available.
+```
+systemctl enable xdg-desktop-portal --user --now
+```
+
+Note: The open-file dialogs in Cardinal do not have this restriction, with a fallback in case the desktop portal is not available.
 
 ## Why IRC and not Discord?
 

@@ -17,6 +17,8 @@
 
 #include "plugincontext.hpp"
 
+// --------------------------------------------------------------------------------------------------------------------
+
 struct HostTime : TerminalModule {
     enum ParamIds {
         NUM_PARAMS
@@ -39,7 +41,7 @@ struct HostTime : TerminalModule {
 
     rack::dsp::PulseGenerator pulseReset, pulseBar, pulseBeat, pulseClock;
     float sampleTime = 0.0f;
-    int64_t lastBlockFrame = -1;
+    uint32_t lastProcessCounter = 0;
     // cached time values
     struct {
         bool reset = true;
@@ -61,15 +63,15 @@ struct HostTime : TerminalModule {
 
     void processTerminalInput(const ProcessArgs& args) override
     {
-        const int64_t blockFrame = pcontext->engine->getBlockFrame();
+        const uint32_t processCounter = pcontext->processCounter;
 
         // local variables for faster access
         double tick, tickClock;
 
         // Update time position if running a new audio block
-        if (lastBlockFrame != blockFrame)
+        if (lastProcessCounter != processCounter)
         {
-            lastBlockFrame = blockFrame;
+            lastProcessCounter = processCounter;
             timeInfo.reset = pcontext->reset;
             timeInfo.bar = pcontext->bar;
             timeInfo.beat = pcontext->beat;
@@ -127,6 +129,13 @@ struct HostTime : TerminalModule {
             }
         }
 
+        // store back the local values
+        timeInfo.tick = tick;
+        timeInfo.tickClock = tickClock;
+
+        if (isBypassed())
+            return;
+
         const bool hasReset = pulseReset.process(args.sampleTime);
         const bool hasBar = pulseBar.process(args.sampleTime);
         const bool hasBeat = pulseBeat.process(args.sampleTime);
@@ -137,13 +146,6 @@ struct HostTime : TerminalModule {
         const float barPhase = playingWithBBT && pcontext->beatsPerBar > 0
                               ? ((float) (timeInfo.beat - 1) + beatPhase) / pcontext->beatsPerBar
                               : 0.0f;
-
-        // store back the local values
-        timeInfo.tick = tick;
-        timeInfo.tickClock = tickClock;
-
-        if (isBypassed())
-            return;
 
         lights[kHostTimeRolling].setBrightness(playing ? 1.0f : 0.0f);
         lights[kHostTimeReset].setBrightnessSmooth(hasReset ? 1.0f : 0.0f, args.sampleTime * 0.5f);
@@ -166,6 +168,9 @@ struct HostTime : TerminalModule {
     {}
 };
 
+// --------------------------------------------------------------------------------------------------------------------
+
+#ifndef HEADLESS
 struct HostTimeWidget : ModuleWidget {
     static constexpr const float startX = 10.0f;
     static constexpr const float startY_top = 71.0f;
@@ -285,5 +290,18 @@ struct HostTimeWidget : ModuleWidget {
         ModuleWidget::drawLayer(args, layer);
     }
 };
+#else
+struct HostTimeWidget : ModuleWidget {
+    HostTimeWidget(HostTime* const module) {
+        setModule(module);
+        for (uint i=0; i<HostTime::kHostTimeCount; ++i)
+            addOutput(createOutput<PJ301MPort>({}, module, i));
+    }
+};
+#endif
+
+// --------------------------------------------------------------------------------------------------------------------
 
 Model* modelHostTime = createModel<HostTime, HostTimeWidget>("HostTime");
+
+// --------------------------------------------------------------------------------------------------------------------

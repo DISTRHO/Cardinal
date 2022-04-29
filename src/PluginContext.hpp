@@ -48,11 +48,11 @@ enum CardinalVariant {
 // -----------------------------------------------------------------------------------------------------------
 
 struct CardinalPluginContext : rack::Context {
-    uint32_t bufferSize;
+    uint32_t bufferSize, processCounter;
     double sampleRate;
     float parameters[kModuleParameters];
     CardinalVariant variant;
-    bool playing, reset, bbtValid;
+    bool bypassed, playing, reset, bbtValid;
     int32_t bar, beat, beatsPerBar, beatType;
     uint64_t frame;
     double barStartTick, beatsPerMinute;
@@ -69,6 +69,7 @@ struct CardinalPluginContext : rack::Context {
 
     CardinalPluginContext(Plugin* const p)
         : bufferSize(p->getBufferSize()),
+          processCounter(0),
           sampleRate(p->getSampleRate()),
          #if CARDINAL_VARIANT_MAIN
           variant(kCardinalVariantMain),
@@ -79,6 +80,7 @@ struct CardinalPluginContext : rack::Context {
          #else
           #error cardinal variant not set
          #endif
+          bypassed(false),
           playing(false),
           reset(false),
           bbtValid(false),
