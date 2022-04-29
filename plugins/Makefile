@@ -646,6 +646,10 @@ PLUGIN_FILES += $(filter-out LyraeModules/src/plugin.cpp,$(wildcard LyraeModules
 LYRAE_CUSTOM = Delta
 
 # --------------------------------------------------------------
+# Meander
+PLUGIN_FILES += $(filter-out Meander/src/plugin.cpp,$(wildcard Meander/src/*.cpp))
+
+# --------------------------------------------------------------
 # MindMeld
 
 PLUGIN_FILES += $(wildcard MindMeldModular/src/*.cpp)
@@ -1582,6 +1586,13 @@ $(BUILD_DIR)/LyraeModules/%.cpp.o: LyraeModules/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(LYRAE_CUSTOM),$(call custom_module_names,$(m),Lyrae)) \
 		-DpluginInstance=pluginInstance__Lyrae
+
+$(BUILD_DIR)/Meander/src/Meander.cpp.o: Meander/src/Meander.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MEANDER_CUSTOM),$(call custom_module_names,$(m),Meander)) \
+		-DpluginInstance=pluginInstance__Meander
 
 $(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

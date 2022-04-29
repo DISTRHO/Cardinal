@@ -145,6 +145,7 @@ At the moment the following 3rd-party modules are provided:
 - Little Utils
 - Lomas Modules
 - Lyrae Modules
+- Meander
 - MindMeld
 - ML Modules
 - Mockba Modular
