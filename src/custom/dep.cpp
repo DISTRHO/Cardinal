@@ -56,6 +56,21 @@ static const struct {
     { "/21kHz/res/Panels/D_Inf.svg", {}, -1 },
     { "/21kHz/res/Panels/PalmLoop.svg", {}, -1 },
     { "/21kHz/res/Panels/TachyonEntangler.svg", {}, -1 },
+    // MIT
+    {"/AaronStatic/res/ChordCV.svg", {}, -1 },
+    {"/AaronStatic/res/DiatonicCV.svg", {}, -1 },
+    {"/AaronStatic/res/RandomNoteCV.svg", {}, -1 },
+    {"/AaronStatic/res/ScaleCV.svg", {}, -1 },
+    // GPL3.0-or-later
+    { "/Algoritmarte/res/Clockkky.svg", {}, -1 },
+    { "/Algoritmarte/res/CyclicCA.svg", {}, -1 },
+    { "/Algoritmarte/res/HoldMeTight.svg", {}, -1 },
+    { "/Algoritmarte/res/MusiFrog.svg", {}, -1 },
+    { "/Algoritmarte/res/MusiMath.svg", {}, -1 },
+    { "/Algoritmarte/res/Planetz.svg", {}, -1 },
+    { "/Algoritmarte/res/Zefiro.svg", {}, -1 },
+    // Custom, runtime dark mode used with permission
+    { "/ArableInstruments/res/Joni.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
     { "/AudibleInstruments/res/Blinds.svg", {}, -1 },
     { "/AudibleInstruments/res/Braids.svg", {}, -1 },
@@ -125,6 +140,7 @@ static const struct {
     { "/Bidoo/res/VOID.svg", {}, -1 },
     { "/Bidoo/res/ZINC.svg", {}, -1 },
     { "/Bidoo/res/ZOUMAI.svg", {}, -1 },
+    { "/Bidoo/res/ZOUMAIExpander.svg", {}, -1 },
     // BSD-3-Clause
     { "/cf/res/ALGEBRA.svg", {}, -1 },
     { "/cf/res/BUFFER.svg", {}, -1 },
@@ -234,6 +250,8 @@ static const struct {
     { "/JW-Modules/res/Trigs.svg", {}, -1 },
     { "/JW-Modules/res/WavHeadPanel.svg", {}, -1 },
     { "/JW-Modules/res/XYPad.svg", {}, -1 },
+    // GPL3.0-or-later
+    { "/LilacLoop/res/Looper.svg", {}, -1 },
     // EUPL-1.2
     { "/LittleUtils/res/Bias_Semitone.svg", {}, -1 },
     { "/LittleUtils/res/ButtonModule.svg", {}, -1 },
@@ -241,16 +259,75 @@ static const struct {
     { "/LittleUtils/res/PulseGenerator.svg", {}, -1 },
     { "/LittleUtils/res/TeleportIn.svg", {}, -1 },
     { "/LittleUtils/res/TeleportOut.svg", {}, -1 },
+    // GPL-3.0-or-later
+    { "/kocmoc/res/DDLY.svg", {}, -1 },
+    { "/kocmoc/res/LADR.svg", {}, -1 },
+    { "/kocmoc/res/MUL.svg", {}, -1 },
+    { "/kocmoc/res/OP.svg", {}, -1 },
+    { "/kocmoc/res/PHASR.svg", {}, -1 },
+    { "/kocmoc/res/SKF.svg", {}, -1 },
+    { "/kocmoc/res/SVF.svg", {}, -1 },
+    { "/kocmoc/res/TRG.svg", {}, -1 },
+    // CC0-1.0
+    { "/nonlinearcircuits/res/NLC - 4seq.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - 8 BIT CIPHER.svg", {}, -1 },
+    { "/nonlinearcircuits/res/BOOLs2.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - DIVIDE & CONQUER.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - DIVINE CMOS.svg", {}, -1 },
+    { "/nonlinearcircuits/res/DoubleNeuronRef.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - GENiE.svg", {}, -1 },
+    { "/nonlinearcircuits/res/LetsSplosh.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - NEURON.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - NUMBERWANG.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - SEGUE.svg", {}, -1 },
+    { "/nonlinearcircuits/res/squid-axon-papernoise-panel2.svg", {}, -1 },
+    { "/nonlinearcircuits/res/NLC - STATUES.svg", {}, -1 },
+    // Custom, runtime dark mode used with permission
+    { "/ParableInstruments/res/Neil.svg", {}, -1 },
+    // GPL-3.0-or-later
+    { "/PathSet/res/AstroVibe.svg", {}, -1 },
+    { "/PathSet/res/IceTray.svg", {}, -1 },
+    { "/PathSet/res/ShiftyMod.svg", {}, -1 },
+    // BSD-3-Clause
+    { "/voxglitch/res/autobreak_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/bytebeat_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/digital_programmer_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/digital_sequencer_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/digital_sequencer_xp_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/ghosts_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/glitch_sequencer_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/goblins_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/grain_engine_mk2_expander_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/grain_engine_mk2_front_panel_r3.svg", {}, -1 },
+    { "/voxglitch/res/grain_fx_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/hazumi_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/looper_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/repeater_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/samplerx8_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/satanonaut_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/wav_bank_front_panel.svg", {}, -1 },
+    { "/voxglitch/res/wav_bank_mc_front_panel_v2.svg", {}, -1 },
+    { "/voxglitch/res/xy_front_panel.svg", {}, -1 },
 };
 
-static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
+static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
 {
-    // Special case for DrumKit background grandient
-    if (paint.type == NSVG_PAINT_LINEAR_GRADIENT && svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/DrumKit/", 9) == 0)
+    if (paint.type == NSVG_PAINT_LINEAR_GRADIENT && svgFileToInvert != nullptr)
     {
-        paint.type = NSVG_PAINT_COLOR;
-        paint.color = 0xff191919;
-        return true;
+        // Special case for DrumKit background gradient
+        if (std::strncmp(svgFileToInvert, "/DrumKit/", 9) == 0)
+        {
+            paint.type = NSVG_PAINT_COLOR;
+            paint.color = 0xff191919;
+            return true;
+        }
+        // Special case for PathSet shifty gradient
+        if (std::strncmp(svgFileToInvert, "/PathSet/", 9) == 0)
+        {
+            paint.gradient->stops[0].color = 0xff7c4919; // 50% darker than main blue
+            paint.gradient->stops[1].color = 0xff5b3a1a; // 33.3% darker than main blue
+            return false;
+        }
     }
 
     if (paint.type == NSVG_PAINT_NONE)
@@ -259,10 +336,25 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
         return false;
 
     // Special case for Bidoo red color
-    if (paint.color == 0xff001fcd && svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/Bidoo/", 7) == 0)
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/Bidoo/", 7) == 0)
     {
-        paint.color = 0xcf8b94c4;
-        return true;
+        if (paint.color == 0xff001fcd)
+        {
+            paint.color = 0xcf8b94c4;
+            return true;
+        }
+        if (paint.color == 0xff000000 && shape->stroke.type == NSVG_PAINT_COLOR)
+        {
+            switch (shape->stroke.color)
+            {
+            case 0xff777777:
+            case 0xff7c7c7c:
+            case 0xff828282:
+            case 0xffb1b1b1:
+            case 0xffb2b2b2:
+                return false;
+            }
+        }
     }
 
     // Special case for JW-Modules colors
@@ -303,6 +395,127 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
         }
     }
 
+    // Special case for Lilac
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/LilacLoop/", 11) == 0)
+    {
+        switch (paint.color)
+        {
+        // main bg (custom)
+        case 0xffd5d5da:
+            paint.color = 0xff242228;
+            return true;
+        // main color (do nothing)
+        case 0xffbfb7d7:
+            return false;
+        // screws (hide)
+        case 0xffc8c8cf:
+        case 0xffbcbcbc:
+        case 0xffb1b1bb:
+        case 0xffacacac:
+        case 0xff898991:
+        case 0xff727272:
+            paint.color = 0x00000000;
+            return true;
+        }
+    }
+
+    // Special case for Nonlinear Circuits
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/nonlinearcircuits/", 19) == 0)
+    {
+        switch (paint.color)
+        {
+            case 0xff9a7900:
+            case 0xff96782c:
+            case 0xff6a07ae:
+            case 0xffcf8044:
+            case 0xff2ac6ba:
+            case 0xff5ba85c:
+            case 0xffa97b00:
+            case 0xff9f7a00:
+            case 0xffff7300:
+            case 0xffa47b00:
+            case 0xffb09423:
+                return false;
+            case 0xffffffff:
+                paint.color = 0x00000000;
+                return true;
+        }
+    }
+
+    // Special case for PathSet colors
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/PathSet/", 9) == 0)
+    {
+        switch (paint.color)
+        {
+        // main blue tone
+        case 0xffdf7a1a:
+            if (shape->opacity == 0.5f && std::strcmp(svgFileToInvert, "/PathSet/res/AstroVibe.svg") == 0)
+            {
+                shape->opacity = 0.2f;
+                return true;
+            }
+            if (shape->opacity == 0.25f)
+                shape->opacity = 0.75f;
+            return false;
+        // bottom logo stuff, set to full white
+        case 0xff000000:
+            if (shape->stroke.type != NSVG_PAINT_NONE)
+            {
+                paint.color = 0xffffffff;
+                return true;
+            }
+            break;
+        // pink step 2 (pink with 50% opacity on bg)
+        case 0xffef73ea:
+            paint.color = 0xff812d7d;
+            return true;
+        // pink step 3 (pink with 33.3% opacity on bg)
+        case 0xfff49ff0:
+            paint.color = 0xff4d234c;
+            return true;
+        // pink and orange
+        case 0xffe941e2:
+        case 0xff698efb:
+            return false;
+        // blue darker 1 (blue with 50% opacity on bg)
+        case 0xffde944f:
+        case 0xffe3b080:
+        case 0xffe4cbb3:
+        case 0xfff5c99f:
+        case 0xfff6d1b0:
+            paint.color = 0xff7c4919;
+            return true;
+        // blue darker 2 (blue with 33.3% opacity on bg)
+        case 0xffe5d9cd:
+        case 0xfff8dcc2:
+        case 0xffe1a265:
+            paint.color = 0xff5b3a1a;
+            return true;
+        // blue darker 3 (blue with 25% opacity on bg)
+        case 0xffe5cbb3:
+            paint.color = 0xff4b321a;
+            return true;
+        }
+    }
+
+    // Special case for voxglitch colors
+    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/voxglitch/", 11) == 0)
+    {
+        switch (paint.color)
+        {
+        // wavbank blue
+        case 0xffc5ae8a:
+        // various black
+        case 0xff121212:
+        case 0xff2a2828:
+            return false;
+        // satanonaut
+        case 0xff595959:
+            paint.color = 0x7f3219ac;
+            return true;
+        }
+    }
+
     switch (paint.color)
     {
     // scopes or other special things (do nothing)
@@ -329,6 +542,7 @@ static inline bool invertPaint(NSVGpaint& paint, const char* const svgFileToInve
     case 0xff0095fe:
     case 0xff4d9a4d:
     case 0xff4d4d9a:
+    case 0xff0187fc:
         return false;
     // pure black (convert to not quite pure white)
     case 0xff000000:
@@ -384,8 +598,8 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
                 if (ignore)
                     continue;
 
-                if (invertPaint(shape->fill, svgFileToInvert))
-                    invertPaint(shape->stroke, svgFileToInvert);
+                if (invertPaint(shape, shape->fill, svgFileToInvert))
+                    invertPaint(shape, shape->stroke, svgFileToInvert);
             }
 
             return handle;

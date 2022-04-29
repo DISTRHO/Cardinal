@@ -95,9 +95,14 @@ struct CarlaModule : Module {
     float* dataInPtr[NUM_INPUTS];
     float* dataOutPtr[NUM_OUTPUTS];
     unsigned audioDataFill = 0;
-    int64_t lastBlockFrame = -1;
+    uint32_t lastProcessCounter = 0;
     CardinalExpanderFromCarlaMIDIToCV* midiOutExpander = nullptr;
     std::string patchStorage;
+
+#ifdef CARLA_OS_WIN
+    // must keep string pointer valid
+    std::string winResourceDir;
+#endif
 
     CarlaModule()
         : pcontext(static_cast<CardinalPluginContext*>(APP))
@@ -138,10 +143,14 @@ struct CarlaModule : Module {
             binaryDir = "/Applications/Carla.app/Contents/MacOS";
             resourceDir = "/Applications/Carla.app/Contents/MacOS/resources";
         }
-#elif defined(CARLA_OS_WINDOWS)
-        // Carla does not support system-wide install on Windows right now
-        if (false)
+#elif defined(CARLA_OS_WIN)
+        const std::string winBinaryDir = system::join(asset::systemDir, "Carla");
+
+        if (system::exists(winBinaryDir))
         {
+            winResourceDir = system::join(winBinaryDir, "resources");
+            binaryDir = winBinaryDir.c_str();
+            resourceDir = winResourceDir.c_str();
         }
 #else
         if (system::exists("/usr/local/lib/carla"))
@@ -318,12 +327,12 @@ struct CarlaModule : Module {
 
         if (audioDataFill == BUFFER_SIZE)
         {
-            const int64_t blockFrame = pcontext->engine->getBlockFrame();
+            const uint32_t processCounter = pcontext->processCounter;
 
             // Update time position if running a new audio block
-            if (lastBlockFrame != blockFrame)
+            if (lastProcessCounter != processCounter)
             {
-                lastBlockFrame = blockFrame;
+                lastProcessCounter = processCounter;
                 fCarlaTimeInfo.playing = pcontext->playing;
                 fCarlaTimeInfo.frame = pcontext->frame;
                 fCarlaTimeInfo.bbt.valid = pcontext->bbtValid;

@@ -23,6 +23,9 @@
 // Cardinal (built-in)
 #include "Cardinal/src/plugin.hpp"
 
+// Fundamental (always enabled)
+#include "Fundamental/src/plugin.hpp"
+
 #ifndef NOPLUGINS
 // 21kHz
 #include "21kHz/src/21kHz.hpp"
@@ -30,11 +33,22 @@
 // 8Mode
 #include "8Mode/src/8mode.hpp"
 
+// Aaron Static
+#include "AaronStatic/src/plugin.hpp"
+
+// Algoritmarte
+#include "Algoritmarte/src/plugin.hpp"
+
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
 // AnimatedCircuits
 #include "AnimatedCircuits/src/plugin.hpp"
+
+// ArableInstruments
+#define modelClouds modelArableClouds
+#include "ArableInstruments/src/ArableInstruments.hpp"
+#undef modelClouds
 
 // Aria
 /* NOTE too much noise in original include, do this a different way
@@ -267,6 +281,9 @@ extern Model* modelTestVCF;
 #undef modelVCF
 #undef modelVCO
 
+// CatroModulo
+#include "CatroModulo/src/CatroModulo.hpp"
+
 // cf
 #include "cf/src/plugin.hpp"
 
@@ -295,11 +312,6 @@ void setupSamples();
 // FehlerFabrik
 #include "FehlerFabrik/src/plugin.hpp"
 
-// Fundamental
-#ifdef WITH_FUNDAMENTAL
-#include "Fundamental/src/plugin.hpp"
-#endif
-
 // GlueTheGiant
 #include "GlueTheGiant/src/plugin.hpp"
 bool audition_mixer = false;
@@ -308,8 +320,18 @@ int gtg_default_theme = 1;
 int loadGtgPluginDefault(const char*, int) { return 1; }
 void saveGtgPluginDefault(const char*, int) {}
 
+// GoodSheperd
+#include "GoodSheperd/src/plugin.hpp"
+
 // GrandeModular
 #include "GrandeModular/src/plugin.hpp"
+
+// Hampton Harmonics
+#define modelArp modelHamptonHarmonicsArp
+#define modelProgress modelHamptonHarmonicsProgress
+#include "HamptonHarmonics/src/plugin.hpp"
+#undef modelProgress
+#undef modelArp
 
 // HetrickCV
 #define modelASR modelHetrickCVASR
@@ -400,6 +422,9 @@ extern Model* modelBlankPanel;
 #include "JW-Modules/src/JWModules.hpp"
 #undef modelQuantizer
 
+// kocmoc
+#include "kocmoc/src/plugin.hpp"
+
 // LifeFormModular
 /* NOTE too much noise in original include, do this a different way
 // #include "LifeFormModular/src/plugin.hpp"
@@ -420,6 +445,13 @@ extern Model* modelDriftgen;
 
 // LittleUtils
 #include "LittleUtils/src/plugin.hpp"
+
+// Lilac Loop
+/* NOTE too much noise in original include, do this a different way
+// #include "LilacLoop/src/plugin.hpp"
+*/
+extern Model* modelLooperOne;
+extern Model* modelLooperTwo;
 
 // LomasModules
 #include "LomasModules/src/plugin.hpp"
@@ -454,6 +486,44 @@ extern Model* modelEqExpander;
 extern Model* modelBassMaster;
 extern Model* modelBassMasterJr;
 extern Model* modelShapeMaster;
+
+// ML_modules
+/* NOTE too much noise in original include, do this a different way
+// #include "ML_modules/src/ML_modules.hpp"
+*/
+#define modelQuantizer modelMLQuantizer
+#define modelSH8 modelMLSH8
+extern Model* modelQuantizer;
+extern Model* modelQuantum;
+extern Model* modelTrigBuf;
+extern Model* modelSeqSwitch;
+extern Model* modelSeqSwitch2;
+extern Model* modelShiftRegister;
+extern Model* modelShiftRegister2;
+extern Model* modelFreeVerb;
+extern Model* modelSum8;
+extern Model* modelSum8mk2;
+extern Model* modelSum8mk3;
+extern Model* modelSH8;
+extern Model* modelConstants;
+extern Model* modelCounter;
+extern Model* modelTrigDelay;
+extern Model* modelBPMdetect;
+extern Model* modelVoltMeter;
+extern Model* modelOctaFlop;
+extern Model* modelOctaTrig;
+extern Model* modelOctaSwitch;
+extern Model* modelTrigSwitch;
+extern Model* modelTrigSwitch2;
+extern Model* modelTrigSwitch3;
+extern Model* modelTrigSwitch3_2;
+extern Model* modelOctaPlus;
+extern Model* modelOctaTimes;
+extern Model* modelCloner;
+extern Model* modelPolySplitter;
+extern Model* modelArpeggiator;
+#undef modelQuantizer
+#undef modelSH8
 
 // MockbaModular
 #define modelBlank modelMockbaModularBlank
@@ -501,8 +571,67 @@ extern Model* modelAlienz;
 extern Model* modelOSC_WaveMorph_3;
 extern Model* modelMaude_221;
 
+// MSM
+/* NOTE too much noise in original include, do this a different way
+// #include "MSM/src/MSM.hpp"
+*/
+#define modelADSR modelMSMADSR
+#define modelBlankPanel modelMSMBlankPanel
+#define modelDelay modelMSMDelay
+#define modelLFO modelMSMLFO
+#define modelMult modelMSMMult
+#define modelNoise modelMSMNoise
+#define modelVCA modelMSMVCA
+#define modelVCO modelMSMVCO
+extern Model* modelVCO;
+extern Model* modelBVCO;
+extern Model* modelExperimentalVCO;
+extern Model* modelNoise;
+extern Model* modelLFO;
+extern Model* modelVCA;
+extern Model* modelADSR;
+extern Model* modelDelay;
+extern Model* modelWaveShaper;
+extern Model* modelWavefolder;
+extern Model* modelBitcrusher;
+extern Model* modelPhaserModule;
+extern Model* modelMorpher;
+extern Model* modelRingMod;
+extern Model* modelRandomSource;
+extern Model* modelMult;
+extern Model* modelCrazyMult;
+extern Model* modelFade;
+extern Model* modelSimpleSlider;
+extern Model* modelxseq;
+extern Model* modelBlankPanel;
+#undef modelADSR
+#undef modelBlankPanel
+#undef modelDelay
+#undef modelLFO
+#undef modelMult
+#undef modelNoise
+#undef modelVCA
+#undef modelVCO
+
+// Nonlinear Circuits
+#include "nonlinearcircuits/src/NLC.hpp"
+
+// Orbits
+#include "Orbits/src/plugin.hpp"
+
+// ParableInstruments
+#define modelClouds modelParableClouds
+#include "ParableInstruments/src/ArableInstruments.hpp"
+#undef modelClouds
+
+// Path Set
+#include "PathSet/src/plugin.hpp"
+
+// PinkTrombone
+#include "PinkTrombone/src/plugin.hpp"
+
 // Prism
-# include "Prism/src/plugin.hpp"
+#include "Prism/src/plugin.hpp"
 
 // rackwindows
 #include "rackwindows/src/plugin.hpp"
@@ -521,28 +650,19 @@ extern Model* modelMaude_221;
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
 
-// substation
-/* NOTE too much noise in original include, do this a different way
-// "substation-opensource/src/_plugin.hpp"
-*/
-namespace slime {
-namespace plugin {
-namespace substation {
-extern Model* modelClock;
-extern Model* modelPolySequencer;
-extern Model* modelSubOscillator;
-extern Model* modelMixer;
-extern Model* modelFilter;
-extern Model* modelEnvelopes;
-extern Model* modelQuantizer;
-extern Model* modelVCA;
-extern Model* modelBlank4;
-extern Model* modelBlank7;
-extern Model* modelFilterPlus;
-}}}
+// stocaudio
+#include "stocaudio/src/plugin.hpp"
+
+// unless_modules
+#include "unless_modules/src/unless.hpp"
 
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
+
+// Voxglitch
+#define modelLooper modelVoxglitchLooper
+#include "voxglitch/src/plugin.hpp"
+#undef modelLooper
 
 // ZetaCarinaeModules
 #include "ZetaCarinaeModules/src/plugin.hpp"
@@ -570,10 +690,14 @@ void saveHighQualityAsDefault(bool) {}
 
 // plugin instances
 Plugin* pluginInstance__Cardinal;
+Plugin* pluginInstance__Fundamental;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
+extern Plugin* pluginInstance__AaronStatic;
+Plugin* pluginInstance__Algoritmarte;
 Plugin* pluginInstance__AmalgamatedHarmonics;
+Plugin* pluginInstance__ArableInstruments;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
 Plugin* pluginInstance__AudibleInstruments;
@@ -583,6 +707,7 @@ Plugin* pluginInstance__Bacon;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
 Plugin* pluginInstance__BogaudioModules;
+Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
 Plugin* pluginInstance__dBiz;
@@ -591,29 +716,39 @@ Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
 Plugin* pluginInstance__Extratone;
 Plugin* pluginInstance__FehlerFabrik;
-#ifdef WITH_FUNDAMENTAL
-Plugin* pluginInstance__Fundamental;
-#endif
-Plugin* pluginInstance__GrandeModular;
 Plugin* pluginInstance__GlueTheGiant;
+Plugin* pluginInstance__GoodSheperd;
+Plugin* pluginInstance__GrandeModular;
+Plugin* pluginInstance__HamptonHarmonics;
 Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
 Plugin* pluginInstance__ihtsyn;
 Plugin* pluginInstance__JW;
+Plugin* pluginInstance__kocmoc;
 Plugin* pluginInstance__LifeFormModular;
+Plugin* pluginInstance__LilacLoop;
 Plugin* pluginInstance__LittleUtils;
 Plugin* pluginInstance__Lomas;
 Plugin* pluginInstance__Lyrae;
 extern Plugin* pluginInstance__MindMeld;
+Plugin* pluginInstance__ML;
 Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
+Plugin* pluginInstance__MSM;
+Plugin* pluginInstance__nonlinearcircuits;
+Plugin* pluginInstance__Orbits;
+Plugin* pluginInstance__ParableInstruments;
+Plugin* pluginInstance__PathSet;
+Plugin* pluginInstance__PinkTrombone;
 Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
-Plugin* pluginInstance__substation;
+Plugin* pluginInstance__stocaudio;
+Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
+Plugin* pluginInstance__Voxglitch;
 Plugin* pluginInstance__ZetaCarinaeModules;
 Plugin* pluginInstance__ZZC;
 #endif // NOPLUGINS
@@ -757,6 +892,43 @@ static void initStatic__Cardinal()
     }
 }
 
+static void initStatic__Fundamental()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Fundamental = p;
+
+    const StaticPluginLoader spl(p, "Fundamental");
+    if (spl.ok())
+    {
+        p->addModel(model_8vert);
+        p->addModel(modelADSR);
+        p->addModel(modelDelay);
+        p->addModel(modelLFO);
+        p->addModel(modelLFO2);
+        p->addModel(modelMerge);
+        p->addModel(modelMidSide);
+        p->addModel(modelMixer);
+        p->addModel(modelMutes);
+        p->addModel(modelNoise);
+        p->addModel(modelOctave);
+        p->addModel(modelPulses);
+        p->addModel(modelQuantizer);
+        p->addModel(modelRandom);
+        p->addModel(modelScope);
+        p->addModel(modelSEQ3);
+        p->addModel(modelSequentialSwitch1);
+        p->addModel(modelSequentialSwitch2);
+        p->addModel(modelSplit);
+        p->addModel(modelSum);
+        p->addModel(modelVCA);
+        p->addModel(modelVCA_1);
+        p->addModel(modelVCF);
+        p->addModel(modelVCMixer);
+        p->addModel(modelVCO);
+        p->addModel(modelVCO2);
+    }
+}
+
 #ifndef NOPLUGINS
 static void initStatic__21kHz()
 {
@@ -781,6 +953,39 @@ static void initStatic__8Mode()
     if (spl.ok())
     {
         p->addModel(modelsoftSN);
+    }
+}
+
+static void initStatic__AaronStatic()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__AaronStatic = p;
+
+    const StaticPluginLoader spl(p, "AaronStatic");
+    if (spl.ok())
+    {
+        p->addModel(modelChordCV);
+        p->addModel(modelScaleCV);
+        p->addModel(modelRandomNoteCV);
+        p->addModel(modelDiatonicCV);
+    }
+}
+
+static void initStatic__Algoritmarte()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Algoritmarte = p;
+
+    const StaticPluginLoader spl(p, "Algoritmarte");
+    if (spl.ok())
+    {
+        p->addModel(modelClockkky);
+        p->addModel(modelPlanetz);
+        p->addModel(modelMusiFrog);
+        p->addModel(modelZefiro);
+        p->addModel(modelHoldMeTight);
+        p->addModel(modelCyclicCA);
+        p->addModel(modelMusiMath);
     }
 }
 
@@ -826,6 +1031,20 @@ static void initStatic__AnimatedCircuits()
     {
         p->addModel(model_AC_Folding);
         p->addModel(model_AC_LFold);
+    }
+}
+
+static void initStatic__ArableInstruments()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__ArableInstruments = p;
+
+    const StaticPluginLoader spl(p, "ArableInstruments");
+    if (spl.ok())
+    {
+#define modelClouds modelArableClouds
+        p->addModel(modelClouds);
+#undef modelClouds
     }
 }
 
@@ -1010,6 +1229,7 @@ static void initStatic__Befaco()
         p->addModel(modelSTMix);
         p->addModel(modelMuxlicer);
         p->addModel(modelMex);
+        p->addModel(modelNoisePlethora);
 #undef modelADSR
 #undef modelMixer
     }
@@ -1029,6 +1249,7 @@ static void initStatic__Bidoo()
         p->addModel(modelDTROY);
         p->addModel(modelBORDL);
         p->addModel(modelZOUMAI);
+        p->addModel(modelZOUMAIExpander);
         p->addModel(modelMU);
         p->addModel(modelCHUTE);
         p->addModel(modelLOURDE);
@@ -1224,6 +1445,27 @@ static void initStatic__BogaudioModules()
     }
 }
 
+static void initStatic__CatroModulo()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__CatroModulo = p;
+
+    const StaticPluginLoader spl(p, "CatroModulo");
+    if (spl.ok())
+    {
+        p->addModel(modelCM1Module);
+        p->addModel(modelCM2Module);
+        p->addModel(modelCM3Module);
+        p->addModel(modelCM4Module);
+        p->addModel(modelCM5Module);
+        p->addModel(modelCM6Module);
+        p->addModel(modelCM7Module);
+        p->addModel(modelCM8Module);
+        p->addModel(modelCM9Module);
+        p->addModel(modelCM10Module);
+    }
+}
+
 static void initStatic__cf()
 {
     Plugin* const p = new Plugin;
@@ -1278,16 +1520,13 @@ static void initStatic__ChowDSP()
         p->addModel(modelChowDer);
         p->addModel(modelWarp);
         p->addModel(modelWerner);
+        p->addModel(modelCredit);
         p->addModel(modelChowPulse);
         p->addModel(modelChowTapeCompression);
         p->addModel(modelChowTapeChew);
         p->addModel(modelChowTapeDegrade);
         p->addModel(modelChowTapeLoss);
         p->addModel(modelChowChorus);
-
-        // Credit crashes on save, see https://github.com/DISTRHO/Cardinal/issues/98
-        // p->addModel(modelCredit);
-        spl.removeModule("Credit");
     }
 }
 
@@ -1436,58 +1675,6 @@ static void initStatic__FehlerFabrik()
     }
 }
 
-#ifdef WITH_FUNDAMENTAL
-static void initStatic__Fundamental()
-{
-    Plugin* const p = new Plugin;
-    pluginInstance__Fundamental = p;
-
-    const StaticPluginLoader spl(p, "Fundamental");
-    if (spl.ok())
-    {
-        p->addModel(modelVCO);
-        p->addModel(modelVCO2);
-        p->addModel(modelVCF);
-        p->addModel(modelVCA_1);
-        p->addModel(modelVCA);
-        p->addModel(modelLFO);
-        p->addModel(modelLFO2);
-        p->addModel(modelDelay);
-        p->addModel(modelADSR);
-        p->addModel(modelMixer);
-        p->addModel(modelVCMixer);
-        p->addModel(model_8vert);
-        p->addModel(modelUnity);
-        p->addModel(modelMutes);
-        p->addModel(modelPulses);
-        p->addModel(modelScope);
-        p->addModel(modelSEQ3);
-        p->addModel(modelSequentialSwitch1);
-        p->addModel(modelSequentialSwitch2);
-        p->addModel(modelOctave);
-        p->addModel(modelQuantizer);
-        p->addModel(modelSplit);
-        p->addModel(modelMerge);
-        p->addModel(modelSum);
-        p->addModel(modelViz);
-        p->addModel(modelMidSide);
-        p->addModel(modelNoise);
-        p->addModel(modelRandom);
-
-        // show all plugins, helping those familiar with v1 Rack modules
-        if (json_t* const modules = json_object_get(spl.rootJ, "modules"))
-        {
-            size_t i;
-            json_t* v;
-            json_array_foreach(modules, i, v)
-            {
-                json_object_set(v, "hidden", json_false());
-            }
-        }
-    }
-}
-#endif
-
 static void initStatic__GlueTheGiant()
 {
     Plugin* const p = new Plugin;
@@ -1508,6 +1695,23 @@ static void initStatic__GlueTheGiant()
     }
 }
 
+static void initStatic__GoodSheperd()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__GoodSheperd = p;
+
+    const StaticPluginLoader spl(p, "GoodSheperd");
+    if (spl.ok())
+    {
+        p->addModel(modelHurdle);
+        p->addModel(modelSEQ3st);
+        p->addModel(modelStable16);
+        p->addModel(modelStall);
+        p->addModel(modelSwitch1);
+        p->addModel(modelSeqtrol);
+    }
+}
+
 static void initStatic__GrandeModular()
 {
     Plugin* const p = new Plugin;
@@ -1518,13 +1722,17 @@ static void initStatic__GrandeModular()
     {
         p->addModel(modelClip);
         p->addModel(modelLFO3);
+        p->addModel(modelLFO4);
+        p->addModel(modelLogic);
         p->addModel(modelMerge8);
         p->addModel(modelMergeSplit4);
         p->addModel(modelMicrotonalChords);
         p->addModel(modelMicrotonalNotes);
         p->addModel(modelNoteMT);
+        p->addModel(modelPeak);
         p->addModel(modelPolyMergeResplit);
         p->addModel(modelPolySplit);
+        p->addModel(modelPush);
         p->addModel(modelQuant);
         p->addModel(modelQuantIntervals);
         p->addModel(modelQuantMT);
@@ -1534,6 +1742,23 @@ static void initStatic__GrandeModular()
         p->addModel(modelTails);
         p->addModel(modelVarSampleDelays);
         p->addModel(modelVCA3);
+    }
+}
+
+static void initStatic__HamptonHarmonics()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__HamptonHarmonics = p;
+
+    const StaticPluginLoader spl(p, "HamptonHarmonics");
+    if (spl.ok())
+    {
+#define modelArp modelHamptonHarmonicsArp
+#define modelProgress modelHamptonHarmonicsProgress
+        p->addModel(modelArp);
+        p->addModel(modelProgress);
+#undef modelProgress
+#undef modelArp
     }
 }
 
@@ -1694,6 +1919,25 @@ static void initStatic__JW()
     }
 }
 
+static void initStatic__kocmoc()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__kocmoc= p;
+
+    const StaticPluginLoader spl(p, "kocmoc");
+    if (spl.ok())
+    {
+        p->addModel(modelSVF_1);
+        p->addModel(modelTRG);
+        p->addModel(modelLADR);
+        p->addModel(modelOP);
+        p->addModel(modelPHASR);
+        p->addModel(modelMUL);
+        p->addModel(modelSKF);
+        p->addModel(modelDDLY);
+    }
+}
+
 static void initStatic__LifeFormModular()
 {
     Plugin* const p = new Plugin;
@@ -1715,6 +1959,18 @@ static void initStatic__LifeFormModular()
         p->addModel(modelAdditiveVibration);
         p->addModel(modelComplexOsc);
         p->addModel(modelDriftgen);
+    }
+}
+
+static void initStatic__LilacLoop()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__LilacLoop = p;
+
+    const StaticPluginLoader spl(p, "LilacLoop");
+    if (spl.ok())
+    {
+        p->addModel(modelLooperOne);
     }
 }
 
@@ -1790,16 +2046,47 @@ static void initStatic__MindMeld()
     }
 }
 
-static void initStatic__Mog()
+static void initStatic__ML()
 {
     Plugin* const p = new Plugin;
-    pluginInstance__Mog = p;
+    pluginInstance__ML = p;
 
-    const StaticPluginLoader spl(p, "Mog");
+    const StaticPluginLoader spl(p, "ML_modules");
     if (spl.ok())
     {
-        p->addModel(modelNetwork);
-        p->addModel(modelNexus);
+#define modelQuantizer modelMLQuantizer
+#define modelSH8 modelMLSH8
+        p->addModel(modelQuantizer);
+        p->addModel(modelQuantum);
+        p->addModel(modelTrigBuf);
+        p->addModel(modelSeqSwitch);
+        p->addModel(modelSeqSwitch2);
+        p->addModel(modelShiftRegister);
+        p->addModel(modelShiftRegister2);
+        p->addModel(modelFreeVerb);
+        p->addModel(modelSum8);
+        p->addModel(modelSum8mk2);
+        p->addModel(modelSum8mk3);
+        p->addModel(modelSH8);
+        p->addModel(modelConstants);
+        p->addModel(modelCounter);
+        p->addModel(modelTrigDelay);
+        p->addModel(modelBPMdetect);
+        p->addModel(modelVoltMeter);
+        p->addModel(modelOctaFlop);
+        p->addModel(modelOctaTrig);
+        p->addModel(modelOctaSwitch);
+        p->addModel(modelTrigSwitch);
+        p->addModel(modelTrigSwitch2);
+        p->addModel(modelTrigSwitch3);
+        p->addModel(modelTrigSwitch3_2);
+        p->addModel(modelOctaPlus);
+        p->addModel(modelOctaTimes);
+        p->addModel(modelCloner);
+        p->addModel(modelPolySplitter);
+        p->addModel(modelArpeggiator);
+#undef modelQuantizer
+#undef modelSH8
     }
 }
 
@@ -1862,6 +2149,19 @@ static void initStatic__MockbaModular()
     }
 }
 
+static void initStatic__Mog()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Mog = p;
+
+    const StaticPluginLoader spl(p, "Mog");
+    if (spl.ok())
+    {
+        p->addModel(modelNetwork);
+        p->addModel(modelNexus);
+    }
+}
+
 static void initStatic__mscHack()
 {
     Plugin* const p = new Plugin;
@@ -1893,6 +2193,131 @@ static void initStatic__mscHack()
         p->addModel(modelAlienz);
         p->addModel(modelOSC_WaveMorph_3);
         p->addModel(modelMaude_221);
+    }
+}
+
+static void initStatic__MSM()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__MSM = p;
+
+    const StaticPluginLoader spl(p, "MSM");
+    if (spl.ok())
+    {
+#define modelADSR modelMSMADSR
+#define modelBlankPanel modelMSMBlankPanel
+#define modelDelay modelMSMDelay
+#define modelLFO modelMSMLFO
+#define modelMult modelMSMMult
+#define modelNoise modelMSMNoise
+#define modelVCA modelMSMVCA
+#define modelVCO modelMSMVCO
+        p->addModel(modelVCO);
+        p->addModel(modelBVCO);
+        p->addModel(modelExperimentalVCO);
+        p->addModel(modelNoise);
+        p->addModel(modelLFO);
+        p->addModel(modelVCA);
+        p->addModel(modelADSR);
+        p->addModel(modelDelay);
+        p->addModel(modelWaveShaper);
+        p->addModel(modelWavefolder);
+        p->addModel(modelBitcrusher);
+        p->addModel(modelPhaserModule);
+        p->addModel(modelMorpher);
+        p->addModel(modelRingMod);
+        p->addModel(modelRandomSource);
+        p->addModel(modelMult);
+        p->addModel(modelCrazyMult);
+        p->addModel(modelFade);
+        p->addModel(modelSimpleSlider);
+        p->addModel(modelxseq);
+        p->addModel(modelBlankPanel);
+#undef modelADSR
+#undef modelBlankPanel
+#undef modelDelay
+#undef modelLFO
+#undef modelMult
+#undef modelNoise
+#undef modelVCA
+#undef modelVCO
+    }
+}
+
+static void initStatic__nonlinearcircuits()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__nonlinearcircuits = p;
+
+    const StaticPluginLoader spl(p, "nonlinearcircuits");
+    if (spl.ok())
+    {
+        p->addModel(model4Seq);
+        p->addModel(modelCipher);
+        p->addModel(modelBOOLs);
+        p->addModel(modelDivideConquer);
+        p->addModel(modelDivineCMOS);
+        p->addModel(modelDoubleNeuron);
+        p->addModel(modelGenie);
+        p->addModel(modelLetsSplosh);
+        p->addModel(modelNeuron);
+        p->addModel(modelNumberwang);
+        p->addModel(modelSegue);
+        p->addModel(modelSquidAxon);
+        p->addModel(modelStatues);
+    }
+}
+
+static void initStatic__Orbits()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Orbits = p;
+
+    const StaticPluginLoader spl(p, "Orbits");
+    if (spl.ok())
+    {
+        p->addModel(modelRareBreeds_Orbits_Eugene);
+        p->addModel(modelRareBreeds_Orbits_Polygene);
+    }
+}
+
+static void initStatic__ParableInstruments()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__ParableInstruments = p;
+
+    const StaticPluginLoader spl(p, "ParableInstruments");
+    if (spl.ok())
+    {
+#define modelClouds modelParableClouds
+        p->addModel(modelClouds);
+#undef modelClouds
+    }
+}
+
+static void initStatic__PathSet()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__PathSet = p;
+
+    const StaticPluginLoader spl(p, "PathSet");
+    if (spl.ok())
+    {
+        p->addModel(modelShiftyMod);
+        p->addModel(modelIceTray);
+        p->addModel(modelAstroVibe);
+    }
+}
+
+static void initStatic__PinkTrombone()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__PinkTrombone = p;
+
+    const StaticPluginLoader spl(p, "PinkTrombone");
+    if (spl.ok())
+    {
+        p->addModel(modelPinkTrombone);
     }
 }
 
@@ -2001,25 +2426,40 @@ static void initStatic__sonusmodular()
     }
 }
 
-static void initStatic__substation()
+static void initStatic__stocaudio()
 {
     Plugin* const p = new Plugin;
-    pluginInstance__substation = p;
+    pluginInstance__stocaudio = p;
 
-    const StaticPluginLoader spl(p, "substation-opensource");
+    const StaticPluginLoader spl(p, "stocaudio");
     if (spl.ok())
     {
-        p->addModel(slime::plugin::substation::modelClock);
-        p->addModel(slime::plugin::substation::modelEnvelopes);
-        p->addModel(slime::plugin::substation::modelFilter);
-        p->addModel(slime::plugin::substation::modelMixer);
-        p->addModel(slime::plugin::substation::modelQuantizer);
-        p->addModel(slime::plugin::substation::modelPolySequencer);
-        p->addModel(slime::plugin::substation::modelVCA);
-        p->addModel(slime::plugin::substation::modelSubOscillator);
-        p->addModel(slime::plugin::substation::modelBlank4);
-        p->addModel(slime::plugin::substation::modelBlank7);
-        p->addModel(slime::plugin::substation::modelFilterPlus);
+        p->addModel(modelPolyturing);
+        p->addModel(modelPolydelay);
+        p->addModel(modelSpread);
+    }
+}
+
+static void initStatic__unless_modules()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__unless_modules = p;
+
+    const StaticPluginLoader spl(p, "unless_modules");
+    if (spl.ok())
+    {
+        // unless_modules::init_theme();
+        // theme = _less::Theme();
+        p->addModel(modelPiong);
+        p->addModel(modelChainkov);
+        p->addModel(modelAtoms);
+        p->addModel(modelCantor);
+        p->addModel(modelRoom);
+        p->addModel(modelSnake);
+        p->addModel(modelTowers);
+        p->addModel(modelPianoid);
+        p->addModel(modelPremuter);
+        p->addModel(modelAvoider);
     }
 }
 
@@ -2039,6 +2479,39 @@ static void initStatic__ValleyAudio()
         p->addModel(modelAmalgam);
         p->addModel(modelFeline);
         p->addModel(modelTerrorform);
+    }
+}
+
+static void initStatic__Voxglitch()
+{
+    Plugin* p = new Plugin;
+    pluginInstance__Voxglitch = p;
+
+    const StaticPluginLoader spl(p, "voxglitch");
+    if (spl.ok())
+    {
+#define modelLooper modelVoxglitchLooper
+      p->addModel(modelAutobreak);
+      p->addModel(modelByteBeat);
+      p->addModel(modelDigitalProgrammer);
+      p->addModel(modelDigitalSequencer);
+      p->addModel(modelDigitalSequencerXP);
+      p->addModel(modelGlitchSequencer);
+      p->addModel(modelGhosts);
+      p->addModel(modelGoblins);
+      p->addModel(modelGrainEngine);
+      p->addModel(modelGrainEngineMK2);
+      p->addModel(modelGrainEngineMK2Expander);
+      p->addModel(modelGrainFx);
+      p->addModel(modelHazumi);
+      p->addModel(modelLooper);
+      p->addModel(modelRepeater);
+      p->addModel(modelSamplerX8);
+      p->addModel(modelSatanonaut);
+      p->addModel(modelWavBank);
+      p->addModel(modelWavBankMC);
+      p->addModel(modelXY);
+#undef modelLooper
     }
 }
 
@@ -2087,11 +2560,15 @@ static void initStatic__ZZC()
 void initStaticPlugins()
 {
     initStatic__Cardinal();
+    initStatic__Fundamental();
 #ifndef NOPLUGINS
     initStatic__21kHz();
     initStatic__8Mode();
+    initStatic__AaronStatic();
+    initStatic__Algoritmarte();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
+    initStatic__ArableInstruments();
     initStatic__Aria();
     initStatic__AudibleInstruments();
     initStatic__Autinn();
@@ -2100,6 +2577,7 @@ void initStaticPlugins()
     initStatic__Befaco();
     initStatic__Bidoo();
     initStatic__BogaudioModules();
+    initStatic__CatroModulo();
     initStatic__cf();
     initStatic__ChowDSP();
     initStatic__dBiz();
@@ -2108,29 +2586,39 @@ void initStaticPlugins()
     initStatic__ExpertSleepersEncoders();
     initStatic__Extratone();
     initStatic__FehlerFabrik();
-   #ifdef WITH_FUNDAMENTAL
-    initStatic__Fundamental();
-   #endif
     initStatic__GlueTheGiant();
+    initStatic__GoodSheperd();
     initStatic__GrandeModular();
+    initStatic__HamptonHarmonics();
     initStatic__HetrickCV();
     initStatic__ImpromptuModular();
     initStatic__ihtsyn();
     initStatic__JW();
+    initStatic__kocmoc();
     initStatic__LifeFormModular();
+    initStatic__LilacLoop();
     initStatic__LittleUtils();
     initStatic__Lomas();
     initStatic__Lyrae();
     initStatic__MindMeld();
+    initStatic__ML();
     initStatic__MockbaModular();
     initStatic__Mog();
     initStatic__mscHack();
+    initStatic__MSM();
+    initStatic__nonlinearcircuits();
+    initStatic__Orbits();
+    initStatic__ParableInstruments();
+    initStatic__PathSet();
+    initStatic__PinkTrombone();
     initStatic__Prism();
     initStatic__rackwindows();
     initStatic__repelzen();
     initStatic__sonusmodular();
-    initStatic__substation();
+    initStatic__stocaudio();
+    initStatic__unless_modules();
     initStatic__ValleyAudio();
+    initStatic__Voxglitch();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();
 #endif // NOPLUGINS

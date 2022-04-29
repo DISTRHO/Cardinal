@@ -718,12 +718,26 @@ void WindowParametersSave(rack::window::Window* const window)
 			window->internal->callback->WindowParametersChanged(kWindowParameterWheelSensitivity,
 			                                                    rack::settings::knobScrollSensitivity);
 	}
+	if (d_isNotEqual(window->internal->params.browserZoom, rack::settings::browserZoom))
+	{
+		window->internal->params.browserZoom = rack::settings::browserZoom;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterBrowserZoom,
+			                                                    rack::settings::browserZoom);
+	}
 	if (window->internal->params.knobMode != rack::settings::knobMode)
 	{
 		window->internal->params.knobMode = rack::settings::knobMode;
 		if (window->internal->callback != nullptr)
 			window->internal->callback->WindowParametersChanged(kWindowParameterKnobMode,
 			                                                    rack::settings::knobMode);
+	}
+	if (window->internal->params.browserSort != rack::settings::browserSort)
+	{
+		window->internal->params.browserSort = rack::settings::browserSort;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterBrowserSort,
+			                                                    rack::settings::browserSort);
 	}
 	if (window->internal->params.tooltips != rack::settings::tooltips)
 	{
@@ -746,6 +760,13 @@ void WindowParametersSave(rack::window::Window* const window)
 			window->internal->callback->WindowParametersChanged(kWindowParameterLockModulePositions,
 			                                                    rack::settings::lockModules);
 	}
+	if (window->internal->params.invertZoom != rack::settings::invertZoom)
+	{
+		window->internal->params.invertZoom = rack::settings::invertZoom;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterInvertZoom,
+			                                                    rack::settings::invertZoom);
+	}
 	if (window->internal->params.rateLimit != rack::settings::rateLimit)
 	{
 		window->internal->params.rateLimit = rack::settings::rateLimit;
@@ -762,10 +783,13 @@ void WindowParametersRestore(rack::window::Window* const window)
 	rack::settings::rackBrightness = window->internal->params.rackBrightness;
 	rack::settings::haloBrightness = window->internal->params.haloBrightness;
 	rack::settings::knobScrollSensitivity = window->internal->params.knobScrollSensitivity;
+	rack::settings::browserZoom = window->internal->params.browserZoom;
 	rack::settings::knobMode = static_cast<rack::settings::KnobMode>(window->internal->params.knobMode);
+	rack::settings::browserSort = static_cast<rack::settings::BrowserSort>(window->internal->params.browserSort);
 	rack::settings::tooltips = window->internal->params.tooltips;
 	rack::settings::knobScroll = window->internal->params.knobScroll;
 	rack::settings::lockModules = window->internal->params.lockModules;
+	rack::settings::invertZoom = window->internal->params.invertZoom;
 	rack::settings::rateLimit = window->internal->params.rateLimit;
 }
 

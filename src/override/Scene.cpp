@@ -46,6 +46,10 @@
 # undef DEBUG
 #endif
 
+#ifdef STATIC_BUILD
+# undef HAVE_LIBLO
+#endif
+
 #ifdef HAVE_LIBLO
 # include <lo/lo.h>
 #endif
@@ -123,7 +127,7 @@ struct ResizeHandle : widget::OpaqueWidget {
 
 
 struct Scene::Internal {
-	ResizeHandle* resizeHandle;
+	ResizeHandle* resizeHandle = nullptr;
 
 	bool heldArrowKeys[4] = {};
 
@@ -169,6 +173,9 @@ Scene::Scene() {
 	browser->hide();
 	addChild(browser);
 
+	if (isStandalone())
+		return;
+
 	internal->resizeHandle = new ResizeHandle;
 	internal->resizeHandle->box.size = math::Vec(16, 16);
 	addChild(internal->resizeHandle);
@@ -196,7 +203,8 @@ void Scene::step() {
 		rackScroll->box.pos.y = menuBar->box.size.y;
 	}
 
-	internal->resizeHandle->box.pos = box.size.minus(internal->resizeHandle->box.size);
+	if (internal->resizeHandle != nullptr)
+		internal->resizeHandle->box.pos = box.size.minus(internal->resizeHandle->box.size);
 
 	// Resize owned descendants
 	menuBar->box.size.x = box.size.x;

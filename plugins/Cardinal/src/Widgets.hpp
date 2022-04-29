@@ -25,6 +25,7 @@
 
 using namespace rack;
 
+#ifndef HEADLESS
 struct CardinalLedDisplayChoice : LedDisplayChoice {
     bool alignTextCenter = true;
 
@@ -403,3 +404,4 @@ struct OpenGlWidgetWithBrowserPreview : OpenGlWidget {
 
     virtual void drawFramebufferForBrowserPreview() = 0;
 };
+#endif

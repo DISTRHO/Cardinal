@@ -44,6 +44,9 @@ enum WindowParameterList {
     kWindowParameterWheelSensitivity,
     kWindowParameterLockModulePositions,
     kWindowParameterUpdateRateLimit,
+    kWindowParameterBrowserSort,
+    kWindowParameterBrowserZoom,
+    kWindowParameterInvertZoom,
     kWindowParameterCount,
 };
 
@@ -53,10 +56,13 @@ struct WindowParameters {
     float rackBrightness = 1.0f;
     float haloBrightness = 0.25f;
     float knobScrollSensitivity = 0.001f;
+    float browserZoom = -1.0f;
     int knobMode = 0;
+    int browserSort = 3;
     bool tooltips = true;
     bool knobScroll = false;
     bool lockModules = false;
+    bool invertZoom = false;
     // cardinal specific
     int rateLimit = 0;
 };

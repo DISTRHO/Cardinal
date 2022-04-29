@@ -99,7 +99,7 @@ struct CarlaInternalPluginModule : Module, Thread {
     float dataOut[NUM_OUTPUTS][BUFFER_SIZE];
     float* dataOutPtr[NUM_OUTPUTS];
     unsigned audioDataFill = 0;
-    int64_t lastBlockFrame = -1;
+    uint32_t lastProcessCounter = 0;
     bool fileChanged = false;
     std::string currentFile;
 
@@ -300,12 +300,12 @@ struct CarlaInternalPluginModule : Module, Thread {
 
         if (audioDataFill == BUFFER_SIZE)
         {
-            const int64_t blockFrame = pcontext->engine->getBlockFrame();
+            const uint32_t processCounter = pcontext->processCounter;
 
             // Update time position if running a new audio block
-            if (lastBlockFrame != blockFrame)
+            if (lastProcessCounter != processCounter)
             {
-                lastBlockFrame = blockFrame;
+                lastProcessCounter = processCounter;
                 fCarlaTimeInfo.playing = pcontext->playing;
                 fCarlaTimeInfo.frame = pcontext->frame;
             }

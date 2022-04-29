@@ -84,7 +84,7 @@
 	url = https://gitlab.com/sonusdept/sonusmodular.git
 [submodule "plugins/Mog"]
 	path = plugins/Mog
-	url = https://github.com/CardinalModules/Mog-VCV.git
+	url = https://github.com/JustMog/Mog-VCV.git
 [submodule "plugins/ChowDSP"]
 	path = plugins/ChowDSP
 	url = https://github.com/jatinchowdhury18/ChowDSP-VCV.git
@@ -130,9 +130,6 @@
 [submodule "plugins/Autinn"]
 	path = plugins/Autinn
 	url = https://github.com/NikolaiVChr/Autinn.git
-[submodule "plugins/substation-opensource"]
-	path = plugins/substation-opensource
-	url = https://gitlab.com/falktx/substation-opensource.git
 [submodule "plugins/MockbaModular"]
 	path = plugins/MockbaModular
 	url = https://github.com/MockbaTheBorg/MockbaModular.git
@@ -142,6 +139,60 @@
 [submodule "plugins/Axioma"]
 	path = plugins/Axioma
 	url = https://github.com/kauewerner/Axioma.git
+[submodule "plugins/GoodSheperd"]
+	path = plugins/GoodSheperd
+	url = https://github.com/jensschulze/GoodSheperd.git
+[submodule "plugins/HamptonHarmonics"]
+	path = plugins/HamptonHarmonics
+	url = https://gitlab.com/hampton-harmonics/hampton-harmonics-modules.git
+[submodule "plugins/ML_modules"]
+	path = plugins/ML_modules
+	url = https://github.com/martin-lueders/ML_modules.git
+[submodule "plugins/Orbits"]
+	path = plugins/Orbits
+	url = https://github.com/RareBreeds/Orbits.git
+[submodule "plugins/stocaudio"]
+	path = plugins/stocaudio
+	url = https://github.com/aptrn/stocaudio-modules.git
+[submodule "plugins/CatroModulo"]
+	path = plugins/CatroModulo
+	url = https://github.com/catronomix/catro-modulo.git
+[submodule "plugins/LilacLoop"]
+	path = plugins/LilacLoop
+	url = https://github.com/grough/lilac-loop-vcv.git
+[submodule "plugins/kocmoc"]
+	path = plugins/kocmoc
+	url = https://github.com/janne808/kocmoc-rack-modules.git
+[submodule "plugins/PathSet"]
+	path = plugins/PathSet
+	url = https://github.com/patheros/PathSetModules.git
+[submodule "plugins/Algoritmarte"]
+	path = plugins/Algoritmarte
+	url = https://github.com/algoritmarte/AlgoritmarteVCVPlugin.git
+[submodule "plugins/AaronStatic"]
+	path = plugins/AaronStatic
+	url = https://github.com/aaronstatic/AaronStatic_modules.git
+[submodule "plugins/MSM"]
+	path = plugins/MSM
+	url = https://github.com/netboy3/MSM-vcvrack-plugin.git
+[submodule "plugins/nonlinearcircuits"]
+	path = plugins/nonlinearcircuits
+	url = https://github.com/mhetrick/nonlinearcircuits.git
+[submodule "plugins/voxglitch"]
+	path = plugins/voxglitch
+	url = https://github.com/clone45/voxglitch.git
+[submodule "plugins/ArableInstruments"]
+	path = plugins/ArableInstruments
+	url = https://github.com/CardinalModules/ArableInstruments.git
+[submodule "plugins/Fundamental"]
+	path = plugins/Fundamental
+	url = https://github.com/CardinalModules/Fundamental.git
+[submodule "plugins/unless_modules"]
+	path = plugins/unless_modules
+	url = https://gitlab.com/unlessgames/unless_modules.git
+[submodule "plugins/PinkTrombone"]
+	path = plugins/PinkTrombone
+	url = https://github.com/VegaDeftwing/PinkTromboneVCV.git
 [submodule "plugins/dBiz"]
 	path = plugins/dBiz
 	url = https://github.com/dBiz/dBiz.git

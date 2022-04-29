@@ -54,8 +54,8 @@ BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
-BUILD_C_FLAGS += -fno-finite-math-only
-BUILD_CXX_FLAGS += -fno-finite-math-only
+BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
@@ -190,7 +190,10 @@ $(DEP_PATH)/libsamplerate-0.1.9/.stamp-patched:
 $(DEP_PATH)/lib/libspeexdsp.a: $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched
 
 $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched:
-	$(DEP_MAKE) -C $(DEP_PATH) speexdsp-SpeexDSP-1.2rc3
+	$(DEP_MAKE) -C $(DEP_PATH) speexdsp-SpeexDSP-1.2rc3 \
+		WGET="wget -c http://downloads.xiph.org/releases/speex/speexdsp-1.2rc3.tar.gz && mv speexdsp-1.2rc3.tar.gz speexdsp-SpeexDSP-1.2rc3.tgz #" \
+		SHA256SUM="true" \
+		UNTAR="mkdir -p speexdsp-SpeexDSP-1.2rc3 && tar -x --strip-components=1 --directory=$(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3 -f"
 	sed -i -e "s/#pragma GCC visibility push/#error we dont want this/" $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/configure
 	touch $@
 

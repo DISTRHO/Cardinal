@@ -222,6 +222,15 @@ PLUGIN_FILES += $(wildcard Cardinal/src/DearImGui/*.cpp)
 PLUGIN_FILES += $(wildcard Cardinal/src/DearImGuiColorTextEditor/*.cpp)
 endif
 
+# --------------------------------------------------------------
+# Fundamental (always enabled)
+
+PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
+PLUGIN_FILES += Fundamental/src/dr_wav.c
+
+# modules/types which are present in other plugins
+FUNDAMENTAL_CUSTOM = $(DRWAV)
+
 ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------
 # 21kHz
@@ -231,7 +240,20 @@ PLUGIN_FILES += $(filter-out 21kHz/src/21kHz.cpp,$(wildcard 21kHz/src/*.cpp))
 # --------------------------------------------------------------
 # 8Mode
 
-PLUGIN_FILES += $(wildcard 8Mode/src/*.cpp)
+PLUGIN_FILES += $(filter-out 8Mode/src/8mode.cpp,$(wildcard 8Mode/src/*.cpp))
+
+# --------------------------------------------------------------
+# AlgoritmArte
+
+PLUGIN_FILES += $(filter-out Algoritmarte/src/plugin.cpp,$(wildcard Algoritmarte/src/*.cpp))
+
+# --------------------------------------------------------------
+# Aaron Static
+
+PLUGIN_FILES += $(wildcard AaronStatic/src/*.cpp)
+
+# modules/types which are present in other plugins
+AARONSTATIC_CUSTOM = RefreshCounter
 
 # --------------------------------------------------------------
 # AmalgamatedHarmonics
@@ -247,6 +269,24 @@ AMALGAMATEDHARMONICS_CUSTOM += bogaudio
 
 PLUGIN_FILES += $(wildcard AnimatedCircuits/src/Folding/*.cpp)
 PLUGIN_FILES += $(wildcard AnimatedCircuits/src/LFold/*.cpp)
+
+# --------------------------------------------------------------
+# ArableInstruments
+
+PLUGIN_FILES += ArableInstruments/src/Clouds.cpp
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/dsp/correlator.cc
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/dsp/granular_processor.cc
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/dsp/mu_law.cc
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/dsp/pvoc/frame_transformation.cc
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/dsp/pvoc/phase_vocoder.cc
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/dsp/pvoc/stft.cc
+PLUGIN_FILES += ArableInstruments/eurorack/clouds/resources.cc
+PLUGIN_FILES += ArableInstruments/eurorack/stmlib/utils/random.cc
+PLUGIN_FILES += ArableInstruments/eurorack/stmlib/dsp/atan.cc
+PLUGIN_FILES += ArableInstruments/eurorack/stmlib/dsp/units.cc
+
+# modules/types which are present in other plugins
+ARABLE_CUSTOM = Clouds FreezeLight clouds stmlib
 
 # --------------------------------------------------------------
 # Aria
@@ -378,7 +418,7 @@ AUTINN_CUSTOM = Chord Vibrato
 # --------------------------------------------------------------
 # Axioma
 
-PLUGIN_FILES += $(wildcard Axioma/src/*.cpp)
+PLUGIN_FILES += $(filter-out Axioma/src/plugin.cpp,$(wildcard Axioma/src/*.cpp))
 
 # --------------------------------------------------------------
 # BaconPlugs
@@ -391,6 +431,7 @@ PLUGIN_FILES += $(wildcard BaconPlugs/libs/open303-code/Source/DSPCode/*.cpp)
 # Befaco
 
 PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
+PLUGIN_FILES += $(wildcard Befaco/src/noise-plethora/*/*.cpp)
 PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 
 # modules/types which are present in other plugins
@@ -405,9 +446,10 @@ PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
 PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/src/dep/resampler/*.cpp))
+PLUGIN_FILES += BidooDark/plugin.cpp
 
 # modules/types which are present in other plugins
-BIDOO_CUSTOM = ChannelDisplay LadderFilter $(DRWAV)
+BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter $(DRWAV)
 BIDOO_CUSTOM_PER_FILE = channel channel filterType
 
 # --------------------------------------------------------------
@@ -424,10 +466,17 @@ BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 # --------------------------------------------------------------
 # ChowDSP
 
-# Credit module crashes on save, see https://github.com/DISTRHO/Cardinal/issues/98
-PLUGIN_FILES += $(filter-out ChowDSP/src/Credit.cpp,$(wildcard ChowDSP/src/*/*.cpp))
+PLUGIN_FILES += $(wildcard ChowDSP/src/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/src/*/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
+
+# --------------------------------------------------------------
+# CatroModulo
+
+PLUGIN_FILES += $(filter-out CatroModulo/src/CatroModulo.cpp,$(wildcard CatroModulo/src/*.cpp))
+
+# modules/types which are present in other plugins
+CATROMODULO_CUSTOM = LowFrequencyOscillator NumDisplayWidget
 
 # --------------------------------------------------------------
 # cf
@@ -449,6 +498,7 @@ PLUGIN_FILES += $(wildcard DrumKit/src/model/*.cpp)
 PLUGIN_FILES += $(wildcard DrumKit/deps/*.cpp)
 PLUGIN_FILES += $(wildcard DrumKit/deps/SynthDevKit/src/*.cpp)
 
+# modules/types which are present in other plugins
 DRUMKIT_CUSTOM = ADSR Envelope LowFrequencyOscillator
 
 # --------------------------------------------------------------
@@ -471,20 +521,8 @@ PLUGIN_FILES += $(filter-out Extratone/src/plugin.cpp,$(wildcard Extratone/src/*
 
 PLUGIN_FILES += $(filter-out FehlerFabrik/src/plugin.cpp,$(wildcard FehlerFabrik/src/*.cpp))
 
-FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter
-
-# --------------------------------------------------------------
-# Fundamental
-
-ifeq ($(WITH_FUNDAMENTAL),true)
-BASE_FLAGS += -DWITH_FUNDAMENTAL
-
-PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
-PLUGIN_FILES += Fundamental/src/dr_wav.c
-
 # modules/types which are present in other plugins
-FUNDAMENTAL_CUSTOM = $(DRWAV)
-endif
+FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter
 
 # --------------------------------------------------------------
 # GlueTheGiant
@@ -492,14 +530,27 @@ endif
 PLUGIN_FILES += $(filter-out GlueTheGiant/src/plugin.cpp,$(wildcard GlueTheGiant/src/*.cpp))
 
 # --------------------------------------------------------------
+# GoodSheperd
+
+PLUGIN_FILES += $(filter-out GoodSheperd/src/plugin.cpp,$(wildcard GoodSheperd/src/*.cpp))
+
+# --------------------------------------------------------------
 # GrandeModular
 
 PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModular/src/*.cpp))
 
 # --------------------------------------------------------------
+# Hampton Harmonics
+
+PLUGIN_FILES += $(filter-out HamptonHarmonics/src/plugin.cpp,$(wildcard HamptonHarmonics/src/*.cpp))
+
+# modules/types which are present in other plugins
+HAMPTONHARMONICS_CUSTOM = Arp Progress
+
+# --------------------------------------------------------------
 # HetrickCV
 
-PLUGIN_FILES += $(wildcard HetrickCV/src/*.cpp)
+PLUGIN_FILES += $(filter-out HetrickCV/src/HetrickCV.cpp,$(wildcard HetrickCV/src/*.cpp))
 PLUGIN_FILES += $(wildcard HetrickCV/src/DSP/*.cpp)
 PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/arr.cpp)
 PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/Domain.cpp)
@@ -552,12 +603,28 @@ endif
 JW_CUSTOM = PlayHead Quantizer
 
 # --------------------------------------------------------------
+# kocmoc
+
+PLUGIN_FILES += $(filter-out kocmoc/src/plugin.cpp,$(wildcard kocmoc/src/*.cpp))
+
+# modules/types which are present in other plugins
+KOCMOC_CUSTOM = Phasor __ct_base __ct_comp
+
+# --------------------------------------------------------------
 # LifeFormModular
 
 PLUGIN_FILES += $(filter-out LifeFormModular/src/plugin.cpp,$(wildcard LifeFormModular/src/*.cpp))
 
 # modules/types which are present in other plugins
 LIFEFORMMODULAR_CUSTOM = IO MS __ct_base __ct_comp
+
+# --------------------------------------------------------------
+# Lilac Loop
+
+PLUGIN_FILES += $(filter-out LilacLoop/src/plugin.cpp,$(wildcard LilacLoop/src/*.cpp))
+
+# modules/types which are present in other plugins
+LILACLOOP_CUSTOM = AudioFile Mode
 
 # --------------------------------------------------------------
 # LittleUtils
@@ -597,6 +664,15 @@ PLUGIN_FILES += $(wildcard MindMeldModular/src/Utilities/*.cpp)
 MINDMELD_CUSTOM = printNote
 
 # --------------------------------------------------------------
+# ML_modules
+
+PLUGIN_FILES += $(filter-out ML_modules/src/ML_modules.cpp,$(wildcard ML_modules/src/*.cpp))
+PLUGIN_FILES += ML_modules/freeverb/revmodel.cpp
+
+# modules/types which are present in other plugins
+ML_CUSTOM = Mode Quant Quantizer QuantizerWidget SH8 allpass comb revmodel
+
+# --------------------------------------------------------------
 # MockbaModular
 
 PLUGIN_FILES += $(filter-out MockbaModular/src/plugin.cpp MockbaModular/src/MockbaModular.cpp MockbaModular/src/UDPClockMaster.cpp MockbaModular/src/UDPClockSlave.cpp,$(wildcard MockbaModular/src/*.cpp))
@@ -617,6 +693,53 @@ PLUGIN_FILES += $(wildcard mscHack/src/*.cpp)
 
 # modules/types which are present in other plugins
 MSCHACK_CUSTOM_PER_FILE = MAIN_SYNC_CLOCK FILTER_STRUCT FILTER_PARAM_STRUCT OSC_PARAM_STRUCT PHRASE_CHANGE_STRUCT
+
+# --------------------------------------------------------------
+# MSM
+
+PLUGIN_FILES += $(filter-out MSM/src/MSM.cpp,$(wildcard MSM/src/*.cpp))
+
+# modules/types which are present in other plugins
+MSM_CUSTOM = ADSR BlankPanel Delay LFO LowFrequencyOscillator Mult Noise OP VCA VCO sawTable triTable
+
+# --------------------------------------------------------------
+# Nonlinear Circuits
+
+PLUGIN_FILES += $(filter-out nonlinearcircuits/src/NLC.cpp,$(wildcard nonlinearcircuits/src/*.cpp))
+
+# --------------------------------------------------------------
+# Orbits
+
+PLUGIN_FILES += $(filter-out Orbits/src/plugin.cpp,$(wildcard Orbits/src/*.cpp))
+
+# --------------------------------------------------------------
+# ParableInstruments
+
+PLUGIN_FILES += ParableInstruments/src/Clouds.cpp
+PLUGIN_FILES += ParableInstruments/parasites/clouds/dsp/correlator.cc
+PLUGIN_FILES += ParableInstruments/parasites/clouds/dsp/granular_processor.cc
+PLUGIN_FILES += ParableInstruments/parasites/clouds/dsp/mu_law.cc
+PLUGIN_FILES += ParableInstruments/parasites/clouds/dsp/pvoc/frame_transformation.cc
+PLUGIN_FILES += ParableInstruments/parasites/clouds/dsp/pvoc/phase_vocoder.cc
+PLUGIN_FILES += ParableInstruments/parasites/clouds/dsp/pvoc/stft.cc
+PLUGIN_FILES += ParableInstruments/parasites/clouds/resources.cc
+PLUGIN_FILES += ParableInstruments/parasites/stmlib/utils/random.cc
+PLUGIN_FILES += ParableInstruments/parasites/stmlib/dsp/atan.cc
+PLUGIN_FILES += ParableInstruments/parasites/stmlib/dsp/units.cc
+
+# modules/types which are present in other plugins
+PARABLE_CUSTOM = Clouds CustomPanel CloudsWidget FreezeLight clouds stmlib
+
+# --------------------------------------------------------------
+# Path Set
+
+PLUGIN_FILES += $(filter-out PathSet/src/plugin.cpp,$(wildcard PathSet/src/*.cpp))
+
+# --------------------------------------------------------------
+# PinkTrombone
+
+PLUGIN_FILES += $(filter-out PinkTrombone/src/plugin.cpp,$(wildcard PinkTrombone/src/*.cpp))
+PLUGIN_FILES += $(wildcard PinkTrombone/src/PinkTrombone/*.cpp)
 
 # --------------------------------------------------------------
 # Prism
@@ -643,15 +766,21 @@ REPELZEN_CUSTOM = Blank Mixer Werner tanh_pade
 # --------------------------------------------------------------
 # sonusmodular
 
-PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular,$(wildcard sonusmodular/src/*.cpp))
+PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular.cpp,$(wildcard sonusmodular/src/*.cpp))
 
 # --------------------------------------------------------------
-# Substation (Open source release)
+# stocaudio
 
-PLUGIN_FILES += $(wildcard substation-opensource/dep/slime4rack/src/slime/*.cpp)
-PLUGIN_FILES += $(wildcard substation-opensource/dep/slime4rack/src/slime/**/*.cpp)
-PLUGIN_FILES += $(filter-out substation-opensource/src/_plugin.cpp substation-opensource/src/Settings.cpp,$(wildcard substation-opensource/src/*.cpp))
-PLUGIN_FILES += substation-settings/Settings.cpp
+PLUGIN_FILES += $(filter-out stocaudio/src/plugin.cpp,$(wildcard stocaudio/src/*.cpp))
+
+# --------------------------------------------------------------
+
+# unless_modules
+
+PLUGIN_FILES += $(filter-out unless_modules/src/unless.cpp,$(wildcard unless_modules/src/*.cpp))
+
+# modules/types which are present in other plugins
+UNLESS_MODULES_CUSTOM = Selection
 
 # --------------------------------------------------------------
 # ValleyAudio
@@ -730,6 +859,15 @@ VALLEYAUDIO_CUSTOM = $(DRWAV) DigitalDisplay
 VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 
 # --------------------------------------------------------------
+# Voxglitch
+
+PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
+
+# modules/types which are present in other plugins
+VOXGLITCH_CUSTOM = $(DRWAV) AudioFile Looper Readout
+VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain Sequencer SequencerDisplay VoltageSequencer
+
+# --------------------------------------------------------------
 # ZetaCarinaeModules
 
 PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCarinaeModules/src/*.cpp))
@@ -762,7 +900,6 @@ BASE_FLAGS += -DARCH_LIN
 endif
 
 BASE_FLAGS += -DBUILDING_PLUGIN_MODULES
-BASE_FLAGS += -fno-strict-aliasing
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
 
@@ -832,8 +969,8 @@ BASE_FLAGS += -DHAVE_SNDFILE
 endif
 
 BUILD_C_FLAGS += -std=gnu11
-BUILD_C_FLAGS += -fno-finite-math-only
-BUILD_CXX_FLAGS += -fno-finite-math-only
+BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing -faligned-new
 
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
@@ -872,18 +1009,26 @@ else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 endif
 
-UNWANTED_FILES = HetrickCV/res/illustrator - deprecated/MyModule.svg
+UNWANTED_FILES  = HetrickCV/res/illustrator - deprecated/MyModule.svg
+UNWANTED_FILES += $(wildcard Mog/res/*)
+UNWANTED_FILES += $(wildcard Mog/res/*/*)
+UNWANTED_FILES += $(wildcard nonlinearcircuits/res/*)
 
 RESOURCE_FILES = \
 	$(filter-out $(UNWANTED_FILES), \
 		$(wildcard */res/*.svg) \
 		$(wildcard */res/*/*.svg) \
 		$(wildcard */res/*/*/*.svg) \
+		$(wildcard */res/*.otf) \
+		$(wildcard */res/*/*.otf) \
+		$(wildcard */res/*/*/*.otf) \
 		$(wildcard */res/*.ttf) \
 		$(wildcard */res/*/*.ttf) \
 		$(wildcard */res/*/*/*.ttf))
 
 RESOURCE_FILES += $(wildcard */presets)
+RESOURCE_FILES += $(wildcard Orbits/res/*.json)
+RESOURCE_FILES += ArableInstruments/res/Joni.png
 RESOURCE_FILES += BaconPlugs/res/Keypunch029.json
 RESOURCE_FILES += BaconPlugs/res/midi/chopin
 RESOURCE_FILES += BaconPlugs/res/midi/debussy
@@ -895,6 +1040,13 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
+RESOURCE_FILES += Mog/res
+RESOURCE_FILES += nonlinearcircuits/res
+RESOURCE_FILES += ParableInstruments/res/Neil.png
+RESOURCE_FILES += $(wildcard unless_modules/art/*.art)
+RESOURCE_FILES += $(wildcard unless_modules/art/svg/*/*.svg)
+RESOURCE_FILES += $(wildcard unless_modules/font/*.ttf)
+# RESOURCE_FILES += $(wildcard unless_modules/manual/*)
 
 # MOD builds only have LV2 FX variant for now
 ifeq ($(MOD_BUILD),true)
@@ -914,10 +1066,8 @@ VST2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst/Contents/Resources/Pl
 VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/Contents/Resources/%)
 VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst/Contents/Resources/%)
 else
-VST2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalFX.vst/resources/PluginManifests/%.json)
-VST2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst/resources/PluginManifests/%.json)
-VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/resources/%)
-VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst/resources/%)
+VST2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.vst/resources/PluginManifests/%.json)
+VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.vst/resources/%)
 endif
 
 VST3_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.vst3/Contents/Resources/PluginManifests/%.json)
@@ -1001,19 +1151,11 @@ ifeq ($(MACOS),true)
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 else
-../bin/CardinalFX.vst/resources/%: %
+../bin/Cardinal.vst/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/CardinalSynth.vst/resources/%: %
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
-
-../bin/CardinalFX.vst/resources/PluginManifests/%.json: %/plugin.json
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
-
-../bin/CardinalSynth.vst/resources/PluginManifests/%.json: %/plugin.json
+../bin/Cardinal.vst/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 endif
@@ -1082,6 +1224,21 @@ $(BUILD_DIR)/8Mode/%.cpp.o: 8Mode/%.cpp
 		$(foreach m,$(8MODE_CUSTOM),$(call custom_module_names,$(m),8Mode)) \
 		-DpluginInstance=pluginInstance__8Mode
 
+$(BUILD_DIR)/AaronStatic/%.cpp.o: AaronStatic/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(AARONSTATIC_CUSTOM),$(call custom_module_names,$(m),AaronStatic)) \
+		-DpluginInstance=pluginInstance__AaronStatic \
+		-Dinit=init__AaronStatic
+
+$(BUILD_DIR)/Algoritmarte/%.cpp.o: Algoritmarte/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ALGORITMARTE_CUSTOM),$(call custom_module_names,$(m),Algoritmarte)) \
+		-DpluginInstance=pluginInstance__Algoritmarte
+
 $(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -1095,6 +1252,17 @@ $(BUILD_DIR)/AnimatedCircuits/%.cpp.o: AnimatedCircuits/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ANIMATEDCIRCUITS_CUSTOM),$(call custom_module_names,$(m),AnimatedCircuits)) \
 		-DpluginInstance=pluginInstance__AnimatedCircuits
+
+$(BUILD_DIR)/ArableInstruments/%.o: ArableInstruments/%
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ARABLE_CUSTOM),$(call custom_module_names,$(m),Arable)) \
+		-DpluginInstance=pluginInstance__ArableInstruments \
+		-DTEST \
+		-IArableInstruments/eurorack \
+		-Wno-class-memaccess \
+		-Wno-unused-local-typedefs
 
 $(BUILD_DIR)/AriaModules/%.cpp.o: AriaModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1150,7 +1318,7 @@ $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 		$(foreach m,$(BEFACO_CUSTOM),$(call custom_module_names,$(m),Befaco)) \
 		-DpluginInstance=pluginInstance__Befaco
 
-$(BUILD_DIR)/Bidoo/%.cpp.o: Bidoo/%.cpp
+$(BUILD_DIR)/Bidoo%.cpp.o: Bidoo%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
@@ -1186,6 +1354,13 @@ $(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
 		-DSKIP_MINGW_FORMAT \
 		-IBogaudioModules/lib \
 		-IBogaudioModules/src/dsp
+
+$(BUILD_DIR)/CatroModulo/src/%.cpp.o: CatroModulo/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(CATROMODULO_CUSTOM),$(call custom_module_names,$(m),CatroModulo)) \
+		-DpluginInstance=pluginInstance__CatroModulo
 
 $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1282,6 +1457,13 @@ $(BUILD_DIR)/GlueTheGiant/src/gtgComponents.cpp.o: GlueTheGiant/src/gtgComponent
 		-DloadGtgPluginDefault=ignoredGlueTheGiant1 \
 		-DsaveGtgPluginDefault=ignoredGlueTheGiant2
 
+$(BUILD_DIR)/GoodSheperd/%.cpp.o: GoodSheperd/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(GOODSHEPERD_CUSTOM),$(call custom_module_names,$(m),GoodSheperd)) \
+		-DpluginInstance=pluginInstance__GoodSheperd
+
 $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -1289,7 +1471,15 @@ $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 		$(foreach m,$(GRANDEMODULAR_CUSTOM),$(call custom_module_names,$(m),GrandeModular)) \
 		-DpluginInstance=pluginInstance__GrandeModular \
 		-Wno-missing-braces \
+		-Wno-narrowing \
 		-Wno-self-assign
+
+$(BUILD_DIR)/HamptonHarmonics/%.cpp.o: HamptonHarmonics/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(HAMPTONHARMONICS_CUSTOM),$(call custom_module_names,$(m),HamptonHarmonics)) \
+		-DpluginInstance=pluginInstance__HamptonHarmonics
 
 $(BUILD_DIR)/HetrickCV/%.cpp.o: HetrickCV/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1360,12 +1550,27 @@ $(BUILD_DIR)/JW-Modules/%.cpp.o: JW-Modules/%.cpp
 		-Wno-unused-but-set-variable \
 		-Wno-unused-result
 
+$(BUILD_DIR)/kocmoc/%.cpp.o: kocmoc/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(KOCMOC_CUSTOM),$(call custom_module_names,$(m),kocmoc)) \
+		-DpluginInstance=pluginInstance__kocmoc
+
 $(BUILD_DIR)/LifeFormModular/%.cpp.o: LifeFormModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(LIFEFORMMODULAR_CUSTOM),$(call custom_module_names,$(m),LifeFormModular)) \
 		-DpluginInstance=pluginInstance__LifeFormModular
+
+$(BUILD_DIR)/LilacLoop/%.cpp.o: LilacLoop/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(LILACLOOP_CUSTOM),$(call custom_module_names,$(m),LilacLoop)) \
+		-DpluginInstance=pluginInstance__LilacLoop \
+		-DSKIP_MINGW_FORMAT
 
 $(BUILD_DIR)/LittleUtils/%.cpp.o: LittleUtils/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1388,7 +1593,7 @@ $(BUILD_DIR)/LyraeModules/%.cpp.o: LyraeModules/%.cpp
 		$(foreach m,$(LYRAE_CUSTOM),$(call custom_module_names,$(m),Lyrae)) \
 		-DpluginInstance=pluginInstance__Lyrae
 
-$(BUILD_DIR)/MindMeldModular/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
+$(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
@@ -1402,6 +1607,13 @@ $(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),MindMeld)) \
 		-DpluginInstance=pluginInstance__MindMeld
+
+$(BUILD_DIR)/ML_modules/%.cpp.o: ML_modules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ML_CUSTOM),$(call custom_module_names,$(m),ML)) \
+		-DpluginInstance=pluginInstance__ML
 
 $(BUILD_DIR)/MockbaModular/%.cpp.o: MockbaModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1429,6 +1641,54 @@ $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 		-Wno-format-overflow \
 		-Wno-non-c-typedef-for-linkage \
 		-Wno-unused-but-set-variable
+
+$(BUILD_DIR)/MSM/%.cpp.o: MSM/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MSM_CUSTOM),$(call custom_module_names,$(m),MSM)) \
+		-DpluginInstance=pluginInstance__MSM \
+		-DDARKTHEME
+
+$(BUILD_DIR)/nonlinearcircuits/%.cpp.o: nonlinearcircuits/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(NONLINEARCIRCUITS_CUSTOM),$(call custom_module_names,$(m),nonlinearcircuits)) \
+		-DpluginInstance=pluginInstance__nonlinearcircuits
+
+$(BUILD_DIR)/Orbits/%.cpp.o: Orbits/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ORBITS_CUSTOM),$(call custom_module_names,$(m),Orbits)) \
+		-DpluginInstance=pluginInstance__Orbits
+
+$(BUILD_DIR)/ParableInstruments/%.o: ParableInstruments/%
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(PARABLE_CUSTOM),$(call custom_module_names,$(m),Parable)) \
+		-DpluginInstance=pluginInstance__ParableInstruments \
+		-DPARASITES \
+		-DTEST \
+		-IArableInstruments/parasites \
+		-Wno-class-memaccess \
+		-Wno-unused-local-typedefs
+
+$(BUILD_DIR)/PathSet/%.cpp.o: PathSet/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(PATHSET_CUSTOM),$(call custom_module_names,$(m),PathSet)) \
+		-DpluginInstance=pluginInstance__PathSet
+
+$(BUILD_DIR)/PinkTrombone/%.cpp.o: PinkTrombone/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(PINKTROMBONE_CUSTOM),$(call custom_module_names,$(m),PinkTrombone)) \
+		-DpluginInstance=pluginInstance__PinkTrombone
 
 $(BUILD_DIR)/Prism/%.cpp.o: Prism/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1461,14 +1721,19 @@ $(BUILD_DIR)/sonusmodular/%.cpp.o: sonusmodular/%.cpp
 		$(foreach m,$(SONUSMODULAR_CUSTOM),$(call custom_module_names,$(m),sonusmodular)) \
 		-DpluginInstance=pluginInstance__sonusmodular
 
-$(BUILD_DIR)/substation-%.cpp.o: substation-%.cpp
+$(BUILD_DIR)/stocaudio/%.cpp.o: stocaudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(SUBSTATION_CUSTOM),$(call custom_module_names,$(m),substation)) \
-		-DpluginInstance=pluginInstance__substation \
-		-D'PRIVATE=__attribute__((error("Using internal Rack function or symbol")))' \
-		-Isubstation-opensource/dep/slime4rack/include
+		$(foreach m,$(STOCAUDIO_CUSTOM),$(call custom_module_names,$(m),stocaudio)) \
+		-DpluginInstance=pluginInstance__stocaudio
+
+$(BUILD_DIR)/unless_modules/%.cpp.o: unless_modules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(UNLESS_MODULES_CUSTOM),$(call custom_module_names,$(m),unless_modules)) \
+		-DpluginInstance=pluginInstance__unless_modules
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1480,6 +1745,15 @@ $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 		-DSTDIO_OVERRIDE=ValleyAudio \
 		-Wno-sign-compare \
 		-Wno-unused-but-set-variable
+
+$(BUILD_DIR)/voxglitch/%.cpp.o: voxglitch/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(VOXGLITCH_CUSTOM),$(call custom_module_names,$(m),Voxglitch)) \
+		$(foreach m,$(VOXGLITCH_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Voxglitch_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__Voxglitch \
+		-DSKIP_MINGW_FORMAT
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

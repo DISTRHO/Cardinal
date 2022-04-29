@@ -15,21 +15,17 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#include "../substation-opensource/src/Settings.hpp"
+#pragma once
 
-namespace slime {
-namespace plugin {
-namespace substation {
+#define SCHEME_YELLOW SCHEME_YELLOW_OldVCV
+#include_next "componentlibrary.hpp"
+#undef SCHEME_YELLOW
 
-PluginSettings::PluginSettings(void) {}
-PluginSettings::~PluginSettings(void) {}
-void PluginSettings::save() {}
-void PluginSettings::load() {}
-void PluginSettings::appendContextMenu(rack::ui::Menu* menu) {}
-void PluginSettings::updateCableColors(const bool& value) {}
+namespace rack {
+namespace componentlibrary {
 
-PluginSettings settings;
+// Yellow? What's that?
+static const NVGcolor SCHEME_YELLOW = nvgRGBf(0.76f, 0.11f, 0.22f);
 
-}  // namespace substation
-}  // namespace plugin
-}  // namespace slime
+}
+}

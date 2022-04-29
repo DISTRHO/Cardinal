@@ -20,8 +20,6 @@
 
 // -----------------------------------------------------------------------------------------------------------
 
-USE_NAMESPACE_DISTRHO;
-
 struct HostParameters : TerminalModule {
     enum ParamIds {
         NUM_PARAMS
@@ -91,6 +89,8 @@ struct HostParameters : TerminalModule {
     }
 };
 
+// --------------------------------------------------------------------------------------------------------------------
+
 #ifndef HEADLESS
 struct CardinalParameterPJ301MPort : PJ301MPort {
 	void onDragStart(const DragStartEvent& e) override {
@@ -159,11 +159,14 @@ struct HostParametersWidget : ModuleWidgetWith9HP {
 struct HostParametersWidget : ModuleWidget {
     HostParametersWidget(HostParameters* const module) {
         setModule(module);
-
-        for (int i=0; i<24; ++i)
+        for (uint i=0; i<HostParameters::NUM_OUTPUTS; ++i)
             addOutput(createOutput<PJ301MPort>({}, module, i));
     }
 };
 #endif
 
+// --------------------------------------------------------------------------------------------------------------------
+
 Model* modelHostParameters = createModel<HostParameters, HostParametersWidget>("HostParameters");
+
+// --------------------------------------------------------------------------------------------------------------------
