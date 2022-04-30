@@ -52,7 +52,7 @@
 # include <unistd.h>
 #endif
 
-const std::string CARDINAL_VERSION = "22.04";
+const std::string CARDINAL_VERSION = "22.05";
 
 namespace rack {
 namespace settings {
