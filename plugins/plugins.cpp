@@ -1230,6 +1230,7 @@ static void initStatic__Befaco()
         p->addModel(modelMuxlicer);
         p->addModel(modelMex);
         p->addModel(modelNoisePlethora);
+        p->addModel(modelChannelStrip);
 #undef modelADSR
 #undef modelMixer
     }

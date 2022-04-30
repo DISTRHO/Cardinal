@@ -736,6 +736,9 @@ PLUGIN_FILES += $(filter-out PathSet/src/plugin.cpp,$(wildcard PathSet/src/*.cpp
 PLUGIN_FILES += $(filter-out PinkTrombone/src/plugin.cpp,$(wildcard PinkTrombone/src/*.cpp))
 PLUGIN_FILES += $(wildcard PinkTrombone/src/PinkTrombone/*.cpp)
 
+# modules/types which are present in other plugins
+PINKTROMBONE_CUSTOM = WhiteNoise
+
 # --------------------------------------------------------------
 # Prism
 
