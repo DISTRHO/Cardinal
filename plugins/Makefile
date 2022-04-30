@@ -647,6 +647,7 @@ LYRAE_CUSTOM = Delta
 
 # --------------------------------------------------------------
 # Meander
+
 PLUGIN_FILES += $(filter-out Meander/src/plugin.cpp,$(wildcard Meander/src/*.cpp))
 
 # --------------------------------------------------------------
@@ -1012,6 +1013,7 @@ PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 endif
 
 UNWANTED_FILES  = HetrickCV/res/illustrator - deprecated/MyModule.svg
+UNWANTED_FILES += $(wildcard Meander/res/*)
 UNWANTED_FILES += $(wildcard Mog/res/*)
 UNWANTED_FILES += $(wildcard Mog/res/*/*)
 UNWANTED_FILES += $(wildcard nonlinearcircuits/res/*)
@@ -1042,6 +1044,7 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
+RESOURCE_FILES += Meander/res
 RESOURCE_FILES += Mog/res
 RESOURCE_FILES += nonlinearcircuits/res
 RESOURCE_FILES += ParableInstruments/res/Neil.png
@@ -1592,7 +1595,9 @@ $(BUILD_DIR)/Meander/src/Meander.cpp.o: Meander/src/Meander.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MEANDER_CUSTOM),$(call custom_module_names,$(m),Meander)) \
-		-DpluginInstance=pluginInstance__Meander
+		-DpluginInstance=pluginInstance__Meander \
+		-Wno-format-security \
+		-Wno-format-zero-length
 
 $(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

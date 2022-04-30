@@ -468,6 +468,7 @@ extern Model* modelZeta;
 #undef modelDelta
 
 // Meander
+extern int panelTheme;
 #include "Meander/src/plugin.hpp"
 
 // MindMeldModular
@@ -1988,6 +1989,8 @@ static void initStatic__Meander()
     const StaticPluginLoader spl(p, "Meander");
     if (spl.ok())
     {
+        // for dark theme
+        panelTheme = 1;
         p->addModel(modelMeander);
     }
 }
