@@ -859,13 +859,12 @@ VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 # --------------------------------------------------------------
 # Voxglitch
 
-PLUGIN_FILES += $(filter-out voxglitch/src/WhatTheRack.cpp,$(wildcard voxglitch/src/*.cpp))
+PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
 
 # --------------------------------------------------------------
 # WhatTheRack
 
 PLUGIN_FILES += $(filter-out WhatTheRack/src/plugin.cpp,$(wildcard WhatTheRack/src/*.cpp))
-
 
 # modules/types which are present in other plugins
 VOXGLITCH_CUSTOM = $(DRWAV) AudioFile Looper Readout
