@@ -200,7 +200,6 @@ Below is a list of artwork licenses from plugins
 | voxglitch/ShareTechMono-Regular.ttf     | OFL-1.1-RFN      | |
 | WhatTheRack/*                           | WTFPL            | |
 | WhatTheRack/BoomButton/*                | CC-BY-3.0        | |
-| WhatTheRack/fonts/*                     | <not valid>      | Needs clarification/modification! |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | [Same license as source code](https://github.com/mhampton/ZetaCarinaeModules/issues/8) |
 | ZZC/*                                   | CC-BY-NC-SA-4.0  | |
 | ZZC/panels/*                            | CC-BY-NC-SA-4.0  | NOTE: The ZZC Logo is Copyright (c) 2019 Sergey Ukolov and cannot be used in derivative works; Cardinal's use does not officially constitute derivative work. |
