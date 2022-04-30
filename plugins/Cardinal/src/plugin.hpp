@@ -58,7 +58,7 @@ float d_findMaxNormalizedFloat(const float floats[], const std::size_t count)
     DISTRHO_SAFE_ASSERT_RETURN(floats != nullptr, 0.0f);
     DISTRHO_SAFE_ASSERT_RETURN(count > 0, 0.0f);
 
-    static const float kEmptyFloats[8192] = {};
+    static constexpr const float kEmptyFloats[8192] = {};
 
     if (count <= 8192 && std::memcmp(floats, kEmptyFloats, count) == 0)
         return 0.0f;
