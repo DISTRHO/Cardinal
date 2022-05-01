@@ -120,7 +120,7 @@ struct AudioToCVPitch : Module {
 
             if (detectedPitchInHz > 0.f && pitchConfidence >=  params[PARAM_CONFIDENCETHRESHOLD].getValue() * 0.01f)
             {
-                const float linearPitch = 12.f * (log2f(detectedPitchInHz / 440.f) + octave - 6) + 69.f;
+                const float linearPitch = 12.f * (log2f(detectedPitchInHz / 440.f) + octave - 5) + 69.f;
                 cvPitch = std::max(-10.f, std::min(10.f, linearPitch * (1.f/12.f)));
                 lastKnownPitchInHz = detectedPitchInHz;
                 cvSignal = 10.f;
