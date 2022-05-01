@@ -637,6 +637,9 @@ extern Model* modelBlankPanel;
 // rackwindows
 #include "rackwindows/src/plugin.hpp"
 
+// RebelTech
+#include "RebelTech/src/plugin.hpp"
+
 // repelzen
 #define modelBlank modelrepelzenBlank
 #define modelMixer modelrepelzenMixer
@@ -747,6 +750,7 @@ Plugin* pluginInstance__PathSet;
 Plugin* pluginInstance__PinkTrombone;
 Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
+Plugin* pluginInstance__RebelTech;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__stocaudio;
@@ -2341,6 +2345,23 @@ static void initStatic__rackwindows()
     }
 }
 
+static void initStatic__RebelTech()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__RebelTech = p;
+
+    const StaticPluginLoader spl(p, "RebelTech");
+    if (spl.ok())
+    {
+        p->addModel(modelStoicheia);
+        p->addModel(modelTonic);
+        p->addModel(modelKlasmata);
+        p->addModel(modelCLK);
+        p->addModel(modelLogoi);
+        p->addModel(modelPhoreo);
+    }
+}
+
 static void initStatic__repelzen()
 {
     Plugin* const p = new Plugin;
@@ -2603,6 +2624,7 @@ void initStaticPlugins()
     initStatic__PinkTrombone();
     initStatic__Prism();
     initStatic__rackwindows();
+    initStatic__RebelTech();
     initStatic__repelzen();
     initStatic__sonusmodular();
     initStatic__stocaudio();
