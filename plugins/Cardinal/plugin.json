@@ -147,6 +147,15 @@
       ]
     },
     {
+      "slug": "AudioToCVPitch",
+      "name": "Audio To CV Pitch",
+      "description": "Converts a monophonic audio signal to CV pitch",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#audio-to-cv-pitch",
+      "tags": [
+        "Utility"
+      ]
+    },
+    {
       "slug": "Carla",
       "name": "Carla Plugin Host",
       "description": "A modular plugin host within Cardinal",

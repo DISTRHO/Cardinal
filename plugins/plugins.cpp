@@ -882,6 +882,11 @@ static void initStatic__Cardinal()
        #else
         spl.removeModule("MPV");
        #endif
+       #ifdef HAVE_FFTW3F
+        p->addModel(modelAudioToCVPitch);
+       #else
+        spl.removeModule("AudioToCVPitch");
+       #endif
 
         hostTerminalModels = {
             modelHostAudio2,

@@ -29,6 +29,7 @@ using namespace rack;
 extern Plugin* pluginInstance;
 
 extern Model* modelAudioFile;
+extern Model* modelAudioToCVPitch;
 extern Model* modelCarla;
 extern Model* modelCardinalBlank;
 extern Model* modelExpanderInputMIDI;

@@ -329,12 +329,14 @@ struct HostAudioNanoMeter : NanoMeter {
 // --------------------------------------------------------------------------------------------------------------------
 
 struct HostAudioWidget2 : HostAudioWidget<2> {
+    typedef NanoKnob<> Knob;
+
     HostAudioWidget2(HostAudio2* const m)
         : HostAudioWidget<2>(m)
     {
         // FIXME
         const float middleX = box.size.x * 0.5f;
-        addParam(createParamCentered<NanoKnob>(Vec(middleX, 310.0f), m, 0));
+        addParam(createParamCentered<Knob>(Vec(middleX, 310.0f), m, 0));
 
         HostAudioNanoMeter* const meter = new HostAudioNanoMeter(m);
         meter->box.pos = Vec(middleX - padding + 2.75f, startY + padding * 2);

@@ -61,9 +61,8 @@ struct CardinalLedDisplayChoice : LedDisplayChoice {
     }
 };
 
+template<int ringSize = 4, int heightPadding = 2>
 struct NanoKnob : Knob {
-    static const int ringSize = 4;
-
     std::string displayLabel = "Level";
     std::string displayString = "0 dB";
     float normalizedValue = 0.5f;
@@ -81,14 +80,14 @@ struct NanoKnob : Knob {
         const float w = box.size.x;
         const float h = box.size.y;
 
-        const int knobSize = std::min(w, h - BND_WIDGET_HEIGHT * 2) - ringSize;
+        const int knobSize = std::min(w, h - BND_WIDGET_HEIGHT * heightPadding) - ringSize;
 
         const int knobStartX = w / 2 - knobSize / 2;
         const int knobStartY = ringSize;
         const int knobCenterX = knobStartX + knobSize / 2;
         const int knobCenterY = knobStartY + knobSize / 2;
 
-        const NVGcolor testing = nvgRGBf(0.76f, 0.11f, 0.22f);
+        const NVGcolor cardinalColor = nvgRGBf(0.76f, 0.11f, 0.22f);
 
         nvgLineCap(args.vg, NVG_ROUND);
 
@@ -102,7 +101,7 @@ struct NanoKnob : Knob {
               nvgDegToRad(135.0f) + nvgDegToRad(270.0f * normalizedValue),
               NVG_CW);
         nvgStrokeWidth(args.vg, ringSize);
-        nvgStrokeColor(args.vg, testing);
+        nvgStrokeColor(args.vg, cardinalColor);
         nvgStroke(args.vg);
 
         // simulate color bleeding
@@ -115,7 +114,7 @@ struct NanoKnob : Knob {
               nvgDegToRad(135.0f) + nvgDegToRad(270.0f * normalizedValue),
               NVG_CW);
         nvgStrokeWidth(args.vg, 5);
-        nvgStrokeColor(args.vg, nvgRGBAf(testing.r, testing.g, testing.b, 0.1f));
+        nvgStrokeColor(args.vg, nvgRGBAf(cardinalColor.r, cardinalColor.g, cardinalColor.b, 0.1f));
         nvgStroke(args.vg);
 
         // line indicator
@@ -136,7 +135,7 @@ struct NanoKnob : Knob {
             float radius = knobSize * 0.5f;
             float oradius = radius + std::min(radius * 4.f, 15.f);
 
-            NVGcolor icol = color::mult(nvgRGBAf(testing.r, testing.g, testing.b, 0.2f), halo);
+            NVGcolor icol = color::mult(nvgRGBAf(cardinalColor.r, cardinalColor.g, cardinalColor.b, 0.2f), halo);
             NVGcolor ocol = nvgRGBA(0, 0, 0, 0);
             NVGpaint paint = nvgRadialGradient(args.vg, knobCenterX, knobCenterY, radius, oradius, icol, ocol);
 
@@ -146,10 +145,13 @@ struct NanoKnob : Knob {
             nvgFill(args.vg);
         }
 
-        // bottom label (value)
-        bndIconLabelValue(args.vg, 0, knobSize + ringSize, w, BND_WIDGET_HEIGHT, -1,
-                          testing, BND_CENTER,
-                          BND_LABEL_FONT_SIZE, displayString.c_str(), nullptr);
+        if (! displayString.empty())
+        {
+            // bottom label (value)
+            bndIconLabelValue(args.vg, -w, knobSize + ringSize, w*3, BND_WIDGET_HEIGHT, -1,
+                              cardinalColor, BND_CENTER,
+                              BND_LABEL_FONT_SIZE, displayString.c_str(), nullptr);
+        }
 
         Knob::drawLayer(args, layer);
     }
@@ -162,7 +164,7 @@ struct NanoKnob : Knob {
         const float w = box.size.x;
         const float h = box.size.y;
 
-        const int knobSize = std::min(w, h - BND_WIDGET_HEIGHT * 2) - ringSize;
+        const int knobSize = std::min(w, h - BND_WIDGET_HEIGHT * heightPadding) - ringSize;
 
         const int knobStartX = w / 2 - knobSize / 2;
         const int knobStartY = ringSize;
@@ -224,10 +226,14 @@ struct NanoKnob : Knob {
         nvgStrokeColor(args.vg, nvgRGBf(0.5f, 0.5f, 0.5f));
         nvgStroke(args.vg);
 
-        // bottom label (name)
-        bndIconLabelValue(args.vg, 0, knobStartY + knobSize + BND_WIDGET_HEIGHT * 0.75f, w, BND_WIDGET_HEIGHT, -1,
-                          SCHEME_WHITE, BND_CENTER,
-                          BND_LABEL_FONT_SIZE, displayLabel.c_str(), nullptr);
+        if (! displayLabel.empty())
+        {
+            // bottom label (name)
+            bndIconLabelValue(args.vg, -w, knobStartY + knobSize + BND_WIDGET_HEIGHT * 0.75f,
+                              w*3, BND_WIDGET_HEIGHT, -1,
+                              SCHEME_WHITE, BND_CENTER,
+                              BND_LABEL_FONT_SIZE, displayLabel.c_str(), nullptr);
+        }
 
         Knob::draw(args);
     }

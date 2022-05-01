@@ -222,6 +222,11 @@ PLUGIN_FILES += $(wildcard Cardinal/src/DearImGui/*.cpp)
 PLUGIN_FILES += $(wildcard Cardinal/src/DearImGuiColorTextEditor/*.cpp)
 endif
 
+ifeq ($(shell pkg-config --exists fftw3f && echo true),true)
+PLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
+BASE_FLAGS += -DHAVE_FFTW3F
+endif
+
 # --------------------------------------------------------------
 # Fundamental (always enabled)
 
@@ -1215,6 +1220,7 @@ $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 		-DCARLA_BACKEND_NAMESPACE=Cardinal \
 		-DREAL_BUILD \
 		-DSTATIC_PLUGIN_TARGET \
+		-I../deps/aubio/src \
 		-I../carla/source/backend \
 		-I../carla/source/includes \
 		-I../carla/source/modules \

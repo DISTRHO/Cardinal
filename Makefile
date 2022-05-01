@@ -67,7 +67,7 @@ DGL_EXTRA_ARGS = \
 	WINDOWS_ICON_ID=401
 
 # --------------------------------------------------------------
-# Check for system-wide dependencies
+# Check for required system-wide dependencies
 
 ifeq ($(SYSDEPS),true)
 
@@ -123,6 +123,15 @@ CARLA_EXTRA_ARGS += HAVE_XRANDR=false
 
 endif
 endif
+endif
+
+# --------------------------------------------------------------
+# Check for optional system-wide dependencies
+
+ifeq ($(shell pkg-config --exists fftw3f && echo true),true)
+HAVE_FFTW3F = true
+else
+$(warning fftw3f dependency not installed/available)
 endif
 
 # --------------------------------------------------------------
@@ -202,6 +211,9 @@ ifeq ($(SYSDEPS),true)
 else
 	$(MAKE) all -C deps
 endif
+ifeq ($(HAVE_FFTW3F),true)
+	$(MAKE) all -C deps/aubio
+endif
 
 dgl:
 ifneq ($(HEADLESS),true)
@@ -250,6 +262,7 @@ deps/unzipfx/unzipfx2cat.exe:
 clean:
 	$(MAKE) distclean -C carla $(CARLA_EXTRA_ARGS) CAN_GENERATE_LV2_TTL=false STATIC_PLUGIN_TARGET=true
 	$(MAKE) clean -C deps
+	$(MAKE) clean -C deps/aubio
 	$(MAKE) clean -C dpf/dgl
 	$(MAKE) clean -C dpf/utils/lv2-ttl-generator
 	$(MAKE) clean -C plugins

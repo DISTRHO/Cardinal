@@ -113,6 +113,12 @@ endif
 EXTRA_DEPENDENCIES = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS)
 EXTRA_LIBS = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS) $(STATIC_CARLA_PLUGIN_LIBS)
 
+ifeq ($(shell pkg-config --exists fftw3f && echo true),true)
+EXTRA_DEPENDENCIES += ../../deps/aubio/libaubio.a
+EXTRA_LIBS += ../../deps/aubio/libaubio.a
+EXTRA_LIBS += $(shell $(PKG_CONFIG) --libs fftw3f)
+endif
+
 # --------------------------------------------------------------
 # Do some magic
 

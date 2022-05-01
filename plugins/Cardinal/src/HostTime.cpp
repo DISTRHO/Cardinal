@@ -214,7 +214,7 @@ struct HostTimeWidget : ModuleWidget {
     {
         const float y = startY_cv + offset * padding;
         nvgBeginPath(vg);
-        nvgRoundedRect(vg, startX - 1.0f, y - 2.0f, box.size.x - (startX + 1) * 2, 28.0f, 4);
+        nvgRoundedRect(vg, startX - 1.0f, y - 2.f, box.size.x - startX * 2 + 2.f, 28.f, 4);
         nvgFillColor(vg, nvgRGB(0xd0, 0xd0, 0xd0));
         nvgFill(vg);
         nvgBeginPath(vg);
