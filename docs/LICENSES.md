@@ -71,6 +71,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | unless_modules          | GPL-3.0-or-later         | |
 | Valley                  | GPL-3.0-or-later         | |
 | Voxglitch               | GPL-3.0-or-later         | |
+| WhatTheRack             | WTFPL                    | |
 | ZetaCarinae             | GPL-3.0-or-later         | |
 | ZZC                     | GPL-3.0-or-later         | |
 
@@ -204,6 +205,8 @@ Below is a list of artwork licenses from plugins
 | ValleyAudio/ShareTechMono-*.ttf         | OFL-1.1-RFN      | |
 | voxglitch/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | voxglitch/ShareTechMono-Regular.ttf     | OFL-1.1-RFN      | |
+| WhatTheRack/*                           | WTFPL            | |
+| WhatTheRack/BoomButton/*                | CC-BY-3.0        | |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | [Same license as source code](https://github.com/mhampton/ZetaCarinaeModules/issues/8) |
 | ZZC/*                                   | CC-BY-NC-SA-4.0  | |
 | ZZC/panels/*                            | CC-BY-NC-SA-4.0  | NOTE: The ZZC Logo is Copyright (c) 2019 Sergey Ukolov and cannot be used in derivative works; Cardinal's use does not officially constitute derivative work. |

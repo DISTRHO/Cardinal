@@ -197,3 +197,6 @@
 	path = plugins/Meander
 	url = https://github.com/knchaffin/Meander.git
 	branch = master-V2
+[submodule "plugins/WhatTheRack"]
+	path = plugins/WhatTheRack
+	url = https://github.com/korfuri/WhatTheRack.git

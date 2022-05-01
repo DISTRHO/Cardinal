@@ -308,6 +308,10 @@ static const struct {
     { "/voxglitch/res/wav_bank_front_panel.svg", {}, -1 },
     { "/voxglitch/res/wav_bank_mc_front_panel_v2.svg", {}, -1 },
     { "/voxglitch/res/xy_front_panel.svg", {}, -1 },
+    // WTFPL
+    { "/WhatTheRack/res/WhatTheJack.svg", {}, -1 },
+    { "/WhatTheRack/res/WhatTheMod.svg", {}, -1 },
+    { "/WhatTheRack/res/WhatTheRack.svg", {}, -1 },
 };
 
 static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const char* const svgFileToInvert = nullptr)

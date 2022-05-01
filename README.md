@@ -165,6 +165,7 @@ At the moment the following 3rd-party modules are provided:
 - unless_modules
 - Valley
 - Voxglitch
+- WhatTheRack
 - ZetaCarinae
 - ZZC
 

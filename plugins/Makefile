@@ -866,6 +866,11 @@ VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 
 PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
 
+# --------------------------------------------------------------
+# WhatTheRack
+
+PLUGIN_FILES += $(filter-out WhatTheRack/src/plugin.cpp,$(wildcard WhatTheRack/src/*.cpp))
+
 # modules/types which are present in other plugins
 VOXGLITCH_CUSTOM = $(DRWAV) AudioFile Looper Readout
 VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain Sequencer SequencerDisplay VoltageSequencer
@@ -1760,6 +1765,13 @@ $(BUILD_DIR)/voxglitch/%.cpp.o: voxglitch/%.cpp
 		$(foreach m,$(VOXGLITCH_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Voxglitch_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__Voxglitch \
 		-DSKIP_MINGW_FORMAT
+
+$(BUILD_DIR)/WhatTheRack/%.cpp.o: WhatTheRack/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(WHATTHERACK_CUSTOM),$(call custom_module_names,$(m),WhatTheRack)) \
+		-DpluginInstance=pluginInstance__WhatTheRack
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

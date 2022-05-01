@@ -665,6 +665,9 @@ extern Model* modelBlankPanel;
 #include "voxglitch/src/plugin.hpp"
 #undef modelLooper
 
+// WhatTheRack
+#include "WhatTheRack/src/WhatTheRack.hpp"
+
 // ZetaCarinaeModules
 #include "ZetaCarinaeModules/src/plugin.hpp"
 
@@ -750,6 +753,7 @@ Plugin* pluginInstance__stocaudio;
 Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__Voxglitch;
+Plugin* pluginInstance__WhatTheRack;
 Plugin* pluginInstance__ZetaCarinaeModules;
 Plugin* pluginInstance__ZZC;
 #endif // NOPLUGINS
@@ -2487,6 +2491,20 @@ static void initStatic__Voxglitch()
     }
 }
 
+static void initStatic__WhatTheRack()
+{
+    Plugin* p = new Plugin;
+    pluginInstance__WhatTheRack = p;
+
+    const StaticPluginLoader spl(p, "WhatTheRack");
+    if (spl.ok())
+    {
+      p->addModel(modelWhatTheRack);
+      p->addModel(modelWhatTheMod);
+      p->addModel(modelWhatTheJack);
+    }
+}
+
 static void initStatic__ZetaCarinaeModules()
 {
     Plugin* p = new Plugin;
@@ -2591,6 +2609,7 @@ void initStaticPlugins()
     initStatic__unless_modules();
     initStatic__ValleyAudio();
     initStatic__Voxglitch();
+    initStatic__WhatTheRack();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();
 #endif // NOPLUGINS
