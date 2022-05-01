@@ -166,7 +166,6 @@ Below is a list of artwork licenses from plugins
 | Meander/*                               | GPL-3.0-or-later | No artwork specific license provided |
 | Meander/Bravura.otf                     | OFL-1.1-RFN      | |
 | Meander/DejaVuSansMono.ttf              | Bitstream-Vera   | |
-| Meander/Michroma-Regular.ttf            | OFL-1.1-RFN      | |
 | Meander/Segment7Standard.ttf            | OFL-1.1-RFN      | |
 | Meander/Ubuntu Condensed 400.ttf        | UFL-1.0          | Ubuntu Font License, based on OFL-1.1 |
 | MindMeld/*                              | CC-BY-NC-ND-4.0  | |
