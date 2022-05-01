@@ -612,39 +612,37 @@ protected:
     bool onMouse(const MouseEvent& ev) override
     {
         const int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
-        const int mods = glfwMods(ev.mod);
+        int mods = glfwMods(ev.mod);
 
         int button;
 
         switch (ev.button)
         {
         case 1: button = GLFW_MOUSE_BUTTON_LEFT;   break;
-#ifdef DISTRHO_OS_MAC
+       #ifdef DISTRHO_OS_MAC
         case 2: button = GLFW_MOUSE_BUTTON_RIGHT;  break;
         case 3: button = GLFW_MOUSE_BUTTON_MIDDLE; break;
-#else
+       #else
         case 2: button = GLFW_MOUSE_BUTTON_MIDDLE; break;
         case 3: button = GLFW_MOUSE_BUTTON_RIGHT;  break;
-#endif
+       #endif
         default:
             button = ev.button;
             break;
         }
 
-        /*
-        #if defined ARCH_MAC
-        // Remap Ctrl-left click to right click on Mac
+       #ifdef DISTRHO_OS_MAC
+        // Remap Ctrl-left click to right click on macOS
         if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & RACK_MOD_MASK) == GLFW_MOD_CONTROL) {
             button = GLFW_MOUSE_BUTTON_RIGHT;
             mods &= ~GLFW_MOD_CONTROL;
         }
-        // Remap Ctrl-shift-left click to middle click on Mac
+        // Remap Ctrl-shift-left click to middle click on macOS
         if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & RACK_MOD_MASK) == (GLFW_MOD_CONTROL | GLFW_MOD_SHIFT)) {
             button = GLFW_MOUSE_BUTTON_MIDDLE;
             mods &= ~(GLFW_MOD_CONTROL | GLFW_MOD_SHIFT);
         }
-        #endif
-        */
+       #endif
 
         const ScopedContext sc(this, mods);
         return context->event->handleButton(lastMousePos, button, action, mods);
