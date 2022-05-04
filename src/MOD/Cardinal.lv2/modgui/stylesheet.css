@@ -1,0 +1,205 @@
+/* main pedal */
+.cardinal-main.mod-pedal {
+    background: #333333;
+    background: linear-gradient(to bottom, #181919, #333333);
+    color: white;
+    width: 540px;
+    height: 590px;
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+}
+.cardinal-main.mod-pedal .border {
+    border: 2px solid #4c4d4d;
+    width: 540px;
+    height: 590px;
+    position: absolute;
+}
+
+.cardinal-main.mod-pedal .mod-control-group {
+    position: relative;
+    z-index: 35;
+}
+
+/* top and bottom area split */
+.cardinal-main.mod-pedal .cardinal-main-top {
+    width: 100%;
+    height: 240px;
+    position: absolute;
+    top: 0px;
+}
+
+.cardinal-main.mod-pedal .cardinal-main-bottom {
+    width: 100%;
+    height: 180px;
+    position: absolute;
+    top: 240px;
+}
+
+/* top area split */
+.cardinal-main.mod-pedal .cardinal-main-top-left {
+    width: 180px;
+    height: 240px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.cardinal-main.mod-pedal .cardinal-main-top-right {
+    width: 350px;
+    height: 240px;
+    position: absolute;
+    top: 0px;
+    left: 180px;
+}
+
+.cardinal-main.mod-pedal .cardinal-patch-comment,
+.cardinal-main.mod-pedal .cardinal-patch-screeenshot {
+    width: 340px;
+    height: 210px;
+    margin: 20px 20px 10px 0px;
+}
+
+.cardinal-main.mod-pedal .visibility-buttons {
+    width: 180px;
+    height: 40px;
+    font-size: 17px;
+    display: flex;
+    justify-content: space-evenly;
+    justify-content: space-between;
+}
+
+.cardinal-main.mod-pedal .visibility-buttons span {
+    cursor: pointer;
+}
+
+.cardinal-main.mod-pedal .cardinal-main-knobs {
+    margin: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    background-color: #181919;
+    border: 2px solid #4c4d4d;
+    border-radius: 10px;
+}
+
+/* widgets */
+.cardinal-main.mod-pedal .mod-switch-image {
+    background-image: url(/resources/switch.png{{{ns}}});
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-size: auto 50px;
+    font-weight: bold;
+    width: 100px;
+    height: 50px;
+    cursor: pointer;
+    margin: 0 auto;
+}
+.cardinal-main.mod-pedal .mod-switch-image.off {
+    background-position: right center !important;
+}
+.cardinal-main.mod-pedal .mod-switch-image.on {
+    background-position: left center !important;
+}
+
+.cardinal-main.mod-pedal .title {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.cardinal-main.mod-pedal .mod-knob {
+    padding: 0px 5px;
+    width: 85px;
+}
+
+.cardinal-main.mod-pedal .mod-knob-image {
+    background-image: url(/resources/orange-knob.png{{{ns}}});
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-size: auto 52px;
+    font-weight: bold;
+    height: 52px;
+    width: 52px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.cardinal-main.mod-pedal .distrho-logo {
+    background-image: url(/resources/distrho.svg{{{ns}}});
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 48px;
+    width: 48px;
+    margin: 0 auto;
+}
+
+.cardinal-main.mod-pedal .cardinal-text {
+    font-size: 24px;
+}
+
+.cardinal-main.mod-pedal .mod-string-value {
+    border: 2px solid #4c4d4d;
+}
+
+.cardinal-main.mod-pedal .mod-string-content,
+.cardinal-main.mod-pedal .mod-string-value {
+    height: 100%;
+    width: 100%;
+}
+
+.cardinal-main.mod-pedal textarea {
+    background: black;
+    color: white;
+    resize: none;
+    white-space: pre-wrap;
+}
+ .cardinal-main.mod-pedal textarea::selection {
+    background: #4c4d4d;
+}
+
+.cardinal-main.mod-pedal .screenshot {
+    /* 1x1px black png */
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2NgYGD4DwABBAEAwS2OUAAAAABJRU5ErkJggg==);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 100%;
+    height: 100%;
+}
+
+.cardinal-main.mod-pedal .mod-pedal-input,
+.cardinal-main.mod-pedal .mod-pedal-output {
+    top: 10px;
+}
+
+.cardinal-main.mod-pedal .jack-disconnected {
+    top: 0px !important;
+}
+
+.cardinal-main.mod-pedal .mod-pedal-input .mod-audio-input,
+.cardinal-main.mod-pedal .mod-pedal-input .mod-midi-input,
+.cardinal-main.mod-pedal .mod-pedal-input .mod-cv-input,
+.cardinal-main.mod-pedal .mod-pedal-output .mod-audio-output,
+.cardinal-main.mod-pedal .mod-pedal-output .mod-midi-output,
+.cardinal-main.mod-pedal .mod-pedal-output .mod-cv-output {
+    margin-bottom: 0px;
+}
+
+.cardinal-main.mod-pedal .mod-pedal-input .mod-audio-input.input-disconnected:not(.cardinal-expanded),
+.cardinal-main.mod-pedal .mod-pedal-input .mod-cv-input.input-disconnected:not(.cardinal-expanded),
+.cardinal-main.mod-pedal .mod-pedal-output .mod-audio-output.output-disconnected:not(.cardinal-expanded),
+.cardinal-main.mod-pedal .mod-pedal-output .mod-cv-output.output-disconnected:not(.cardinal-expanded) {
+    display: none;
+}
+
+/* initial state */
+/*.cardinal-main.mod-pedal .cardinal-patch-comment,*/
+.cardinal-main.mod-pedal .cardinal-patch-screeenshot {
+    display: none;
+}

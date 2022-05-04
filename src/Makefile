@@ -180,6 +180,7 @@ endif
 
 all: $(TARGET)
 ifeq ($(MOD_BUILD),true)
+	$(MAKE) -C Cardinal lv2
 	$(MAKE) -C CardinalFX lv2
 else
 	$(MAKE) -C Cardinal
@@ -225,11 +226,6 @@ $(BUILD_DIR)/%.c.o: %.c
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@
-
-$(BUILD_DIR)/override/MIDI_CV.cpp.o: override/MIDI_CV.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -UPRIVATE -c -o $@
 
 $(BUILD_DIR)/%.cpp.o: %.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
