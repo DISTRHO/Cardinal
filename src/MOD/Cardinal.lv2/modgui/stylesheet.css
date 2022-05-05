@@ -2,7 +2,6 @@
 .cardinal-main.mod-pedal {
     background: #333333;
     background: linear-gradient(to bottom, #181919, #333333);
-    color: white;
     width: 540px;
     height: 590px;
     font-size: 20px;
@@ -27,6 +26,7 @@
     height: 240px;
     position: absolute;
     top: 0px;
+    color: white;
 }
 
 .cardinal-main.mod-pedal .cardinal-main-bottom {
@@ -34,6 +34,7 @@
     height: 180px;
     position: absolute;
     top: 240px;
+    color: white;
 }
 
 /* top area split */
