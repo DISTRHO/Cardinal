@@ -602,10 +602,10 @@ struct CardinalMIDIMapChoice : CardinalLedDisplayChoice {
         ParamHandle* const paramHandle = &module->paramHandles[id];
 
         Module* const paramModule = paramHandle->module;
-        DISTRHO_SAFE_ASSERT_RETURN(paramModule != nullptr, "error");
+        DISTRHO_CUSTOM_SAFE_ASSERT_ONCE_RETURN(paramModule != nullptr, "error");
 
         const int paramId = paramHandle->paramId;
-        DISTRHO_SAFE_ASSERT_RETURN(paramId < (int) paramModule->params.size(), "error");
+        DISTRHO_CUSTOM_SAFE_ASSERT_ONCE_RETURN(paramId < (int) paramModule->params.size(), "error");
 
         ParamQuantity* const paramQuantity = paramModule->paramQuantities[paramId];
         std::string s = paramQuantity->name;
