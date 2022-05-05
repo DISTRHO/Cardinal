@@ -198,6 +198,13 @@
     display: none;
 }
 
+.dummy > .cardinal-main.mod-pedal .mod-pedal-input > .mod-audio-input:not(.cardinal-expanded),
+.dummy > .cardinal-main.mod-pedal .mod-pedal-input > .mod-cv-input:not(.cardinal-expanded),
+.dummy > .cardinal-main.mod-pedal .mod-pedal-output > .mod-audio-output:not(.cardinal-expanded),
+.dummy > .cardinal-main.mod-pedal .mod-pedal-output > .mod-cv-output:not(.cardinal-expanded) {
+    display: none;
+}
+
 /* initial state */
 /*.cardinal-main.mod-pedal .cardinal-patch-comment,*/
 .cardinal-main.mod-pedal .cardinal-patch-screeenshot {
