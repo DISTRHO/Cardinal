@@ -201,6 +201,7 @@ struct AudioToCVPitch : Module {
     }
 };
 
+#ifndef HEADLESS
 struct SmallPercentageNanoKnob : NanoKnob<2, 0> {
     SmallPercentageNanoKnob() {
         box.size = Vec(32, 32);
@@ -354,6 +355,17 @@ struct AudioToCVPitchWidget : ModuleWidgetWith9HP {
         }));
     }
 };
+#else
+struct AudioToCVPitchWidget : ModuleWidget {
+    AudioToCVPitchWidget(AudioToCVPitch* const module) {
+        setModule(module);
+        addInput(createInput<PJ301MPort>({}, module, AudioToCVPitch::AUDIO_INPUT));
+        addOutput(createOutput<PJ301MPort>({}, module, AudioToCVPitch::CV_PITCH));
+        addOutput(createOutput<PJ301MPort>({}, module, AudioToCVPitch::CV_GATE));
+
+    }
+};
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 

@@ -3,7 +3,7 @@
     background: #333333;
     background: linear-gradient(to bottom, #181919, #333333);
     width: 480px;
-    height: 420px;
+    height: 390px;
     font-size: 20px;
     margin: 0;
     padding: 0;
@@ -11,7 +11,7 @@
 .cardinal-fx.mod-pedal .border {
     border: 2px solid #4c4d4d;
     width: 480px;
-    height: 420px;
+    height: 390px;
     position: absolute;
 }
 
@@ -23,7 +23,7 @@
 /* top and bottom area split */
 .cardinal-fx.mod-pedal .cardinal-fx-top {
     width: 100%;
-    height: 240px;
+    height: 210px;
     position: absolute;
     top: 0px;
     color: white;
@@ -33,14 +33,14 @@
     width: 100%;
     height: 180px;
     position: absolute;
-    top: 240px;
+    top: 210px;
     color: white;
 }
 
 /* top area split */
 .cardinal-fx.mod-pedal .cardinal-fx-top-left {
-    width: 120px;
-    height: 240px;
+    width: 140px;
+    height: 210px;
     position: absolute;
     top: 0px;
     left: 0px;
@@ -51,18 +51,18 @@
 }
 
 .cardinal-fx.mod-pedal .cardinal-fx-top-right {
-    width: 350px;
-    height: 240px;
+    width: 340px;
+    height: 210px;
     position: absolute;
     top: 0px;
-    left: 120px;
+    left: 140px;
 }
 
 .cardinal-fx.mod-pedal .cardinal-patch-comment,
 .cardinal-fx.mod-pedal .cardinal-patch-screeenshot {
-    width: 340px;
-    height: 210px;
-    margin: 20px 20px 10px 0px;
+    width: 330px;
+    height: 190px;
+    margin: 10px 10px 10px 0px;
 }
 
 /* bottom section split */
@@ -174,9 +174,12 @@
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2NgYGD4DwABBAEAwS2OUAAAAABJRU5ErkJggg==);
     background-position: center;
     background-repeat: no-repeat;
-    background-size: contain;
+    background-size: cover;
     width: 100%;
     height: 100%;
+    border: 2px solid #4c4d4d;
+    border-radius: 6px;
+    border-style: ridge;
 }
 
 .cardinal-fx.mod-pedal .cardinal-fx-knob-page-selector > span {

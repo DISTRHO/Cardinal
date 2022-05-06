@@ -1,0 +1,95 @@
+@prefix atom: <http://lv2plug.in/ns/ext/atom#> .
+@prefix lv2: <http://lv2plug.in/ns/lv2core#> .
+@prefix pset: <http://lv2plug.in/ns/ext/presets#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix state: <http://lv2plug.in/ns/ext/state#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<>
+	a pset:Preset ;
+	lv2:appliesTo <https://distrho.kx.studio/plugins/cardinal> ;
+	lv2:port [
+		lv2:symbol "lv2_enabled" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "param_1" ;
+		pset:value 3.0
+	] , [
+		lv2:symbol "param_10" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_11" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_12" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_13" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_14" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_15" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_16" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_17" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_18" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_19" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_2" ;
+		pset:value 5.0
+	] , [
+		lv2:symbol "param_20" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_21" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_22" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_23" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_24" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_3" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_4" ;
+		pset:value 5.0
+	] , [
+		lv2:symbol "param_5" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_6" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_7" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_8" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "param_9" ;
+		pset:value 0.0
+	] ;
+	state:state [
+		<urn:distrho:patch> "KLUv/QBIXR0AZrOOIiAR9Ly6CNQEzyzK+CwIw5H3QvHuEkY2KVmv3eQESAkA+gOGAIAAjQDTgneRB8Qu8lJbrrWmliuWWrVOOmB3F3ms5RZbrLlXSim3Ere7izyswlRGy6IQGWiCd5FHJ2kVtpgzg3eRh6wQXYWjvICRU3kXebAniVdhZzIRJC94F9HodSSl3H+5+1qsux3OjCoSCgkKH4GkHd0OCNKoOn4dTKnWvarX8t527H/rbodAEquwIzMmtLDCkMLIEIu08uca+9XqU3sn9wDH2n3/at9JO/ulGkmP+PtzLTlz77fc2f9y5U99a+u5d6qdveQl39jtVTgynPQqLGsDL3h31wJC8OGuUFLYLPAq3Mg4LRhDNg104FXYYSZq8zzaJfeWcvfum7e2CkeGd3d3EY1INjUGnyJIUmkBIbjAXLHHVLdvzdl7c0jShjGQiIt4mkysAzSaBw10mAhBAqWe60+JvX+7ZqtwZBiBUPNh5u1Vr1+FZZwJTxSdyVAIVQoZaH1onRiUuWAoEzmSgdbHYSJHMjgQYMBGFkjo4VWY1sdBkFFdFiZG6VTKq7BsMChDIx34yGZiYjbIDCmhhXdl1MAlGwjELhLbsqR/qts3tp6/V73gp3fPseav2h9bzZfFSeWvMfZrdVtvpfdqxdTf7dkzX92Sa5fcHVvtUmIt+evn1Gu2mnn7a/evuf/29Bxbyr//13u9OH36ZQHgVRiazZRwh3EYRqD1oXUiyKbGmUDrQ+t85p0cU6tfat1SBJQIgKeoEVFmAEZGIJowRhA0AOACAJAhIgMSYGAIQCBIYgADQQwBQzIMROgoATAAGCAwQgjB4LBBADT1bxCWZ3XXFUabMDuaLONUf0bQ7TgesmQFW2K0AIC4DIQl6tqRPtTyQ0noFFHLQLAATUPeplJl0koHLuVhRjg4NPbs9Wj4AfakXtrVG9Ad+CrbZ0A7Je11icVN+xCwTDBY4Kno85VOIgGk9RzZ1xnpmiObAcD2we4MScUkfADxZIwmSY1vfFxeBnO2iMzNnVOizhd5nU4xNop8kqWVGCB1KmgvNEkW+hzkks3EyByFzDwFDlF2lniRVMGMMof+Y3EQBeSTGEBSh4gEX4611XB1fbturqxt69SVkxPISckW8aolo/yTNVoJCBspCeshPp+jqj7FYS6yDMBKLRy7IHXc+R+MwTYm+KQQqLmmbcdm0+47HTL1RQKZwQ4vBxDovJ+HmZDDJMrAgYowZEBNGMD3FABjnGbw" ;
+		<https://distrho.kx.studio/plugins/cardinal#comment> """Activated by parameters.
+1 - Dry Level
+2 - Wet Level
+3 - Low-Cut
+4 - Decay""" ;
+	] .

@@ -3,7 +3,7 @@
     background: #333333;
     background: linear-gradient(to bottom, #181919, #333333);
     width: 540px;
-    height: 590px;
+    height: 565px;
     font-size: 20px;
     margin: 0;
     padding: 0;
@@ -11,7 +11,7 @@
 .cardinal-main.mod-pedal .border {
     border: 2px solid #4c4d4d;
     width: 540px;
-    height: 590px;
+    height: 565px;
     position: absolute;
 }
 
@@ -23,7 +23,7 @@
 /* top and bottom area split */
 .cardinal-main.mod-pedal .cardinal-main-top {
     width: 100%;
-    height: 240px;
+    height: 230px;
     position: absolute;
     top: 0px;
     color: white;
@@ -31,16 +31,16 @@
 
 .cardinal-main.mod-pedal .cardinal-main-bottom {
     width: 100%;
-    height: 180px;
+    height: 345px;
     position: absolute;
-    top: 240px;
+    top: 220px;
     color: white;
 }
 
 /* top area split */
 .cardinal-main.mod-pedal .cardinal-main-top-left {
-    width: 180px;
-    height: 240px;
+    width: 190px;
+    height: 230px;
     position: absolute;
     top: 0px;
     left: 0px;
@@ -52,30 +52,44 @@
 
 .cardinal-main.mod-pedal .cardinal-main-top-right {
     width: 350px;
-    height: 240px;
+    height: 230px;
     position: absolute;
     top: 0px;
-    left: 180px;
+    left: 190px;
 }
 
 .cardinal-main.mod-pedal .cardinal-patch-comment,
 .cardinal-main.mod-pedal .cardinal-patch-screeenshot {
     width: 340px;
     height: 210px;
-    margin: 20px 20px 10px 0px;
+    margin: 10px 10px 10px 0px;
 }
 
 .cardinal-main.mod-pedal .visibility-buttons {
-    width: 180px;
-    height: 40px;
+    width: 100%;
+    height: 34px;
     font-size: 17px;
     display: flex;
+    align-items: center;
     justify-content: space-evenly;
     justify-content: space-between;
 }
 
 .cardinal-main.mod-pedal .visibility-buttons span {
     cursor: pointer;
+    background-color: #181919;
+    border: 2px solid #4c4d4d;
+    border-radius: 6px;
+    padding: 1px 4px;
+}
+.cardinal-main.mod-pedal .visibility-buttons span:hover {
+    background-color: #333333;
+}
+.cardinal-main.mod-pedal .visibility-buttons span:first-child {
+    width: 52%;
+}
+.cardinal-main.mod-pedal .visibility-buttons span:nth-child(2) {
+    width: 40%;
 }
 
 .cardinal-main.mod-pedal .cardinal-main-knobs {
@@ -169,9 +183,12 @@
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2NgYGD4DwABBAEAwS2OUAAAAABJRU5ErkJggg==);
     background-position: center;
     background-repeat: no-repeat;
-    background-size: contain;
+    background-size: cover;
     width: 100%;
     height: 100%;
+    border: 2px solid #4c4d4d;
+    border-radius: 6px;
+    border-style: ridge;
 }
 
 .cardinal-main.mod-pedal .mod-pedal-input,

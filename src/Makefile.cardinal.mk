@@ -285,6 +285,7 @@ VST3_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resourc
 
 # Install modgui resources if MOD build
 ifeq ($(MOD_BUILD),true)
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/Plateau_Reverb.ttl
 LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui.ttl
 LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf
 LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui
@@ -344,6 +345,10 @@ $(TARGET_DIR)/$(NAME).lv2/resources/%.svg: ../Rack/res/%.svg ../../deps/svg2stub
 	$(SILENT)python3 ../../deps/svg2stub.py $< $@
 
 $(TARGET_DIR)/$(NAME).lv2/mod%: ../MOD/$(NAME).lv2/mod%
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+$(TARGET_DIR)/$(NAME).lv2/%.ttl: ../MOD/$(NAME).lv2/%.ttl
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
