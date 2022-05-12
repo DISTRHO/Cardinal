@@ -448,7 +448,7 @@ class CardinalPlugin : public CardinalBasePlugin
    #endif
 
     std::string fAutosavePath;
-    uint64_t fPreviousFrame;
+    uint64_t fNextExpectedFrame;
 
     struct {
         String comment;
@@ -474,7 +474,7 @@ public:
          #if DISTRHO_PLUGIN_NUM_INPUTS != 0
           fAudioBufferCopy(nullptr),
          #endif
-          fPreviousFrame(0),
+          fNextExpectedFrame(0),
           fWasBypassed(false)
     {
        #ifndef HEADLESS
@@ -1082,7 +1082,7 @@ protected:
             fAudioBufferCopy[i] = new float[bufferSize];
        #endif
 
-        fPreviousFrame = 0;
+        fNextExpectedFrame = 0;
     }
 
     void deactivate() override
@@ -1108,7 +1108,7 @@ protected:
         {
             const TimePosition& timePos(getTimePosition());
 
-            const bool reset = timePos.playing && (timePos.frame == 0 || fPreviousFrame + frames != timePos.frame);
+            const bool reset = timePos.playing && (timePos.frame == 0 || fNextExpectedFrame != timePos.frame);
 
             context->playing = timePos.playing;
             context->bbtValid = timePos.bbt.valid;
@@ -1133,7 +1133,7 @@ protected:
             }
 
             context->reset = reset;
-            fPreviousFrame = timePos.frame;
+            fNextExpectedFrame = timePos.playing ? timePos.frame + frames : 0;
         }
 
         // separate buffers, use them
