@@ -244,7 +244,7 @@ class CardinalUI : public CardinalBaseUI,
     rack::math::Vec lastMousePos;
     WindowParameters windowParameters;
     int rateLimitStep = 0;
-    bool firstIdle = true;
+    int8_t counterForSelfFocus = 0;
 
     struct ScopedContext {
         CardinalPluginContext* const context;
@@ -368,9 +368,9 @@ public:
 
     void uiIdle() override
     {
-        if (firstIdle)
+        if (counterForSelfFocus >= 0 && ++counterForSelfFocus == 5)
         {
-            firstIdle = false;
+            counterForSelfFocus = -1;
             getWindow().focus();
         }
 
