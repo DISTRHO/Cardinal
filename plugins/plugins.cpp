@@ -401,12 +401,13 @@ extern Model* modelPhraseSeq16;
 extern Model* modelPhraseSeq32;
 extern Model* modelPhraseSeqExpander;
 extern Model* modelProbKey;
-// extern Model* modelProbKeyExpander;
 extern Model* modelSemiModularSynth;
+extern Model* modelSygen;
 extern Model* modelTact;
 extern Model* modelTact1;
 extern Model* modelTactG;
 extern Model* modelTwelveKey;
+extern Model* modelVariations;
 extern Model* modelWriteSeq32;
 extern Model* modelWriteSeq64;
 extern Model* modelBlankPanel;
@@ -1709,6 +1710,7 @@ static void initStatic__GrandeModular()
         p->addModel(modelTails);
         p->addModel(modelVarSampleDelays);
         p->addModel(modelVCA3);
+        p->addModel(modelVCA4);
     }
 }
 
@@ -1813,12 +1815,13 @@ static void initStatic__ImpromptuModular()
         p->addModel(modelPhraseSeq32);
         p->addModel(modelPhraseSeqExpander);
         p->addModel(modelProbKey);
-        // p->addModel(modelProbKeyExpander);
         p->addModel(modelSemiModularSynth);
+        p->addModel(modelSygen);
         p->addModel(modelTact);
         p->addModel(modelTact1);
         p->addModel(modelTactG);
         p->addModel(modelTwelveKey);
+        p->addModel(modelVariations);
         p->addModel(modelWriteSeq32);
         p->addModel(modelWriteSeq64);
         p->addModel(modelBlankPanel);
