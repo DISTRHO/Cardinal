@@ -1397,7 +1397,7 @@ $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 		-DUSE_EIGEN \
 		-DSKIP_MINGW_FORMAT \
 		-IChowDSP/lib \
-		-IChowDSP/lib/chowdsp_utils/DSP/WDF \
+		-IChowDSP/lib/chowdsp_utils/modules/chowdsp_dsp/WDF \
 		-Wno-deprecated-copy
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp

@@ -2288,8 +2288,11 @@ static void initStatic__PathSet()
     if (spl.ok())
     {
         p->addModel(modelShiftyMod);
+        p->addModel(modelShiftyExpander);
         p->addModel(modelIceTray);
         p->addModel(modelAstroVibe);
+        p->addModel(modelGlassPane);
+        p->addModel(modelNudge);
     }
 }
 
@@ -2492,6 +2495,7 @@ static void initStatic__Voxglitch()
       p->addModel(modelRepeater);
       p->addModel(modelSamplerX8);
       p->addModel(modelSatanonaut);
+      p->addModel(modelGrooveBox);
       p->addModel(modelWavBank);
       p->addModel(modelWavBankMC);
       p->addModel(modelXY);
