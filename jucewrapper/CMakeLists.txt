@@ -58,6 +58,9 @@ set_property(TARGET sPlugins PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/.
 add_library(sRack STATIC IMPORTED)
 set_property(TARGET sRack PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../src/rack.a")
 
+add_library(libaubio STATIC IMPORTED)
+set_property(TARGET libaubio PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../deps/aubio/libaubio.a")
+
 add_library(libarchive STATIC IMPORTED)
 if (WIN32)
 set_property(TARGET libarchive PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../src/Rack/dep/lib/libarchive_static.a")
@@ -167,6 +170,7 @@ target_link_libraries(CardinalFX
         water
         zita_resampler
         dgl
+        libaubio
         libarchive
         libjansson
         libquickjs
@@ -254,6 +258,7 @@ target_link_libraries(CardinalSynth
         water
         zita_resampler
         dgl
+        libaubio
         libarchive
         libjansson
         libquickjs
