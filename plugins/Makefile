@@ -878,7 +878,7 @@ PLUGIN_FILES += $(filter-out WhatTheRack/src/plugin.cpp,$(wildcard WhatTheRack/s
 
 # modules/types which are present in other plugins
 VOXGLITCH_CUSTOM = $(DRWAV) AudioFile Looper Readout
-VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain Sequencer SequencerDisplay VoltageSequencer
+VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain SamplePlayer Sequencer SequencerDisplay VoltageSequencer
 
 # --------------------------------------------------------------
 # ZetaCarinaeModules

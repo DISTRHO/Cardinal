@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 20
+  CACHE_VERSION: 21
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
