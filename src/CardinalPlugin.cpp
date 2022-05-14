@@ -1075,11 +1075,12 @@ protected:
 
     void activate() override
     {
+        context->bufferSize = getBufferSize();
+
        #if DISTRHO_PLUGIN_NUM_INPUTS != 0
-        const uint32_t bufferSize = getBufferSize();
         fAudioBufferCopy = new float*[DISTRHO_PLUGIN_NUM_INPUTS];
         for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
-            fAudioBufferCopy[i] = new float[bufferSize];
+            fAudioBufferCopy[i] = new float[context->bufferSize];
        #endif
 
         fNextExpectedFrame = 0;
@@ -1181,12 +1182,6 @@ protected:
         context->engine->stepBlock(frames);
 
         fWasBypassed = bypassed;
-    }
-
-    void bufferSizeChanged(const uint32_t newBufferSize) override
-    {
-        rack::contextSet(context);
-        context->bufferSize = newBufferSize;
     }
 
     void sampleRateChanged(const double newSampleRate) override
