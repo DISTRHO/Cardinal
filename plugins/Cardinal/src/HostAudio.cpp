@@ -158,7 +158,17 @@ struct HostAudio2 : HostAudio<2> {
     void processTerminalOutput(const ProcessArgs&) override
     {
         if (!in1connected && !in2connected)
+        {
+#ifndef HEADLESS
+            if (resetMeters)
+            {
+                internalDataFrame = 0;
+                gainMeterL = gainMeterR = 0.0f;
+                resetMeters = false;
+            }
+#endif
             return;
+        }
 
         const uint32_t bufferSize = pcontext->bufferSize;
 
