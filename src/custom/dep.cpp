@@ -451,56 +451,75 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
     // Special case for PathSet colors
     if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/PathSet/", 9) == 0)
     {
-        switch (paint.color)
+        // only invert main colors for Nudge.svg
+        if (std::strcmp(svgFileToInvert, "/PathSet/res/Nudge.svg") == 0)
         {
-        // main blue tone
-        case 0xffdf7a1a:
-            if (shape->opacity == 0.5f && std::strcmp(svgFileToInvert, "/PathSet/res/AstroVibe.svg") == 0)
+            switch (paint.color)
             {
-                shape->opacity = 0.2f;
+            case 0xffe6e6e6:
+                paint.color = 0xff191919;
                 return true;
-            }
-            if (shape->opacity == 0.25f)
-                shape->opacity = 0.75f;
-            return false;
-        // bottom logo stuff, set to full white
-        case 0xff000000:
-            if (shape->stroke.type != NSVG_PAINT_NONE)
-            {
+            case 0xff000000:
                 paint.color = 0xffffffff;
                 return true;
+            default:
+                return false;
             }
-            break;
-        // pink step 2 (pink with 50% opacity on bg)
-        case 0xffef73ea:
-            paint.color = 0xff812d7d;
-            return true;
-        // pink step 3 (pink with 33.3% opacity on bg)
-        case 0xfff49ff0:
-            paint.color = 0xff4d234c;
-            return true;
-        // pink and orange
-        case 0xffe941e2:
-        case 0xff698efb:
-            return false;
-        // blue darker 1 (blue with 50% opacity on bg)
-        case 0xffde944f:
-        case 0xffe3b080:
-        case 0xffe4cbb3:
-        case 0xfff5c99f:
-        case 0xfff6d1b0:
-            paint.color = 0xff7c4919;
-            return true;
-        // blue darker 2 (blue with 33.3% opacity on bg)
-        case 0xffe5d9cd:
-        case 0xfff8dcc2:
-        case 0xffe1a265:
-            paint.color = 0xff5b3a1a;
-            return true;
-        // blue darker 3 (blue with 25% opacity on bg)
-        case 0xffe5cbb3:
-            paint.color = 0xff4b321a;
-            return true;
+        }
+        // everything else
+        else
+        {
+            switch (paint.color)
+            {
+            // main blue tone
+            case 0xffdf7a1a:
+                if (shape->opacity == 0.5f && std::strcmp(svgFileToInvert, "/PathSet/res/AstroVibe.svg") == 0)
+                {
+                    shape->opacity = 0.2f;
+                    return true;
+                }
+                if (shape->opacity == 0.25f)
+                    shape->opacity = 0.75f;
+                return false;
+            // bottom logo stuff, set to full white
+            case 0xff000000:
+                if (shape->stroke.type != NSVG_PAINT_NONE)
+                {
+                    paint.color = 0xffffffff;
+                    return true;
+                }
+                break;
+            // pink step 2 (pink with 50% opacity on bg)
+            case 0xffef73ea:
+                paint.color = 0xff812d7d;
+                return true;
+            // pink step 3 (pink with 33.3% opacity on bg)
+            case 0xfff49ff0:
+                paint.color = 0xff4d234c;
+                return true;
+            // pink and orange
+            case 0xffe941e2:
+            case 0xff698efb:
+                return false;
+            // blue darker 1 (blue with 50% opacity on bg)
+            case 0xffde944f:
+            case 0xffe3b080:
+            case 0xffe4cbb3:
+            case 0xfff5c99f:
+            case 0xfff6d1b0:
+                paint.color = 0xff7c4919;
+                return true;
+            // blue darker 2 (blue with 33.3% opacity on bg)
+            case 0xffe5d9cd:
+            case 0xfff8dcc2:
+            case 0xffe1a265:
+                paint.color = 0xff5b3a1a;
+                return true;
+            // blue darker 3 (blue with 25% opacity on bg)
+            case 0xffe5cbb3:
+                paint.color = 0xff4b321a;
+                return true;
+            }
         }
     }
 
