@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 21
+  CACHE_VERSION: 22
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -444,6 +444,8 @@ jobs:
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=true -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS intel (AU using juce)
+        env:
+          MACOSX_DEPLOYMENT_TARGET: '10.8'
         run: |
           pushd deps/PawPaw; source local.env macos; popd
           git clone --depth=1 -b master https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
@@ -531,6 +533,8 @@ jobs:
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=true -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS universal (AU using juce)
+        env:
+          MACOSX_DEPLOYMENT_TARGET: '10.12'
         run: |
           pushd deps/PawPaw; source local.env macos-universal; popd
           git clone --depth=1 -b master https://github.com/juce-framework/JUCE.git jucewrapper/JUCE

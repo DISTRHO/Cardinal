@@ -17,6 +17,10 @@ BUILD_C_FLAGS += -I.
 BUILD_C_FLAGS += -Isrc
 BUILD_C_FLAGS += $(shell pkg-config --cflags fftw3f)
 
+ifeq ($(CIBUILD),true)
+BUILD_C_FLAGS += -DSKIP_FFTW_MUTEX
+endif
+
 OBJS = \
 	src/cvec.c.o \
 	src/fvec.c.o \
