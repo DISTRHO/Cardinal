@@ -289,6 +289,7 @@ static const struct {
     { "/PathSet/res/GlassPane.svg", {}, -1 },
     { "/PathSet/res/IceTray.svg", {}, -1 },
     { "/PathSet/res/Nudge.svg", {}, -1 },
+    { "/PathSet/res/ShiftyExpander.svg", {}, -1 },
     { "/PathSet/res/ShiftyMod.svg", {}, -1 },
     // BSD-3-Clause
     { "/voxglitch/res/autobreak_front_panel.svg", {}, -1 },
@@ -500,6 +501,9 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
             // pink and orange
             case 0xffe941e2:
             case 0xff698efb:
+            // pink and orange (translucent)
+            case 0x4de941e2:
+            case 0x62698efb:
                 return false;
             // blue darker 1 (blue with 50% opacity on bg)
             case 0xffde944f:
