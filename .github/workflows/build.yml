@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 23
+  CACHE_VERSION: 24
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -451,7 +451,7 @@ jobs:
           git clone --depth=1 -b master https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
           sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
           mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_BUILD_TYPE=Release .. && make -j $(sysctl -n hw.logicalcpu); popd
+          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS intel (packaging)
         run: |
@@ -539,7 +539,7 @@ jobs:
           pushd deps/PawPaw; source local.env macos-universal; popd
           git clone --depth=1 -b master https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
           mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_BUILD_TYPE=Release .. && make -j $(sysctl -n hw.logicalcpu); popd
+          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS universal (packaging)
         run: |

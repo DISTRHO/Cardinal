@@ -86,6 +86,7 @@ set_property(TARGET libzstd PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/..
 # dependencies
 
 find_package(PkgConfig REQUIRED)
+pkg_check_modules(FFTW3F REQUIRED fftw3f)
 pkg_check_modules(LIBLO REQUIRED liblo)
 pkg_check_modules(SNDFILE REQUIRED sndfile)
 
@@ -181,6 +182,7 @@ target_link_libraries(CardinalFX
         ${GL_LIBRARIES}
         ${DBUS_LIBRARIES}
         -L${LIBLO_LIBRARY_DIRS}
+        ${FFTW3F_LIBRARIES}
         ${LIBLO_LIBRARIES}
         ${SNDFILE_LIBRARIES}
         ${X11_LIBRARIES}
@@ -269,6 +271,7 @@ target_link_libraries(CardinalSynth
         ${GL_LIBRARIES}
         ${DBUS_LIBRARIES}
         -L${LIBLO_LIBRARY_DIRS}
+        ${FFTW3F_LIBRARIES}
         ${LIBLO_LIBRARIES}
         ${SNDFILE_LIBRARIES}
         ${X11_LIBRARIES}

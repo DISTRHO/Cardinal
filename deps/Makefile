@@ -99,12 +99,18 @@ CMAKE += -DCMAKE_INSTALL_PREFIX='$(DEP_PATH)'
 CMAKE += -DBUILD_SHARED_LIBS=OFF
 
 # make sure macOS target matches ours
+ifeq ($(MACOS),true)
 ifneq (,$(findstring -arch$(SPACE),$(CXXFLAGS)))
 CMAKE += -DCMAKE_OSX_ARCHITECTURES='$(subst $(SPACE),;,$(subst -arch=,,$(filter -arch=%,$(subst -arch$(SPACE),-arch=,$(CXXFLAGS)))))'
+else ifeq ($(CIBUILD),true)
+$(error CI build requires -march flag on macOS)
 endif
 ifneq (,$(findstring -mmacosx-version-min=,$(CXXFLAGS)))
 export MACOSX_DEPLOYMENT_TARGET = $(subst -mmacosx-version-min=,,$(filter -mmacosx-version-min=%,$(CXXFLAGS)))
 CMAKE += -DCMAKE_OSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET)
+else ifeq ($(CIBUILD),true)
+$(error CI build requires -mmacosx-version-min flag on macOS)
+endif
 endif
 
 # make sure debug/release matches
@@ -151,6 +157,7 @@ DEP_MAKE += CONFIGURE="$(CONFIGURE)"
 DEP_MAKE += DEP_FLAGS="$(BASE_FLAGS)"
 DEP_MAKE += DEP_MAC_SDK_FLAGS=
 DEP_MAKE += MACHINE=$(MACHINE)$(MACHINE_SUFFIX)
+DEP_MAKE += VERBOSE=1
 
 ifeq ($(MACOS),true)
 DEP_MAKE += SHA256SUM="shasum5.28 -a 256"

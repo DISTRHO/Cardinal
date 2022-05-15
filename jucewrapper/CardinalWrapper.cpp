@@ -17,6 +17,11 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include <AvailabilityMacros.h>
+#if MAC_OS_X_VERSION_MAX_ALLOWED > 101200
+ #error unwanted macOS version, too new
+#endif
+
 #define createPlugin createStaticPlugin
 #include "src/DistrhoPluginInternal.hpp"
 #include "src/DistrhoUIInternal.hpp"
