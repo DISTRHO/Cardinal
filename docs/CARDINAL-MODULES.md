@@ -20,6 +20,25 @@ Even though this player plugin can loop files, it is not an audio looper.
 Audio can loop back to the beginning if enabled, but it does not resample or pitch-shift to fit the host BPM.  
 The audio files are played back as-is, with resampling only done when needed to match the host sample rate.
 
+### Audio To CV Pitch
+
+![screenshot](Module_AudioToCVPitch.png)
+
+The Audio To CV Pitch module is a tool that turns your audio signal into CV pitch and CV gate signals.  
+This allows audio from instruments (such as guitars) to play and control synth sounds and effects.
+
+It detects the pitch in your incoming audio signal and outputs a 1V/Oct CV pitch signal on the "Pitch Out" CV port.  
+The "Gate" CV port sends out 10V while a pitch is detected, and resets to 0V when the pitch can no longer be detected.
+
+There is an Octave right-click option that allows you to shift the detected pitch up or down by a maximum of 4 octaves.  
+When set to 0, it will output the same pitch as is detected on the input.
+
+Then the "Hold Output Pitch" right-click option sets whether the plugin resets its outputs to 0, or holds the last detected pitch.
+
+The Sensitivity parameter can be increased to detect quieter signals, or decreased to reduce artifacts.  
+The Confidence Threshold can be increased to make sure the correct pitch is being output, or decrease it to get a faster response time.  
+And finally, the Tolerance parameter influences how quickly you can change pitch, turn it down for a more accurate pitch output, or turn it up to make it easier to jump from one pitch to the next.
+
 ### Carla
 
 ![screenshot](Module_Carla.png)

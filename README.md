@@ -86,10 +86,6 @@ Plugin type is set as regular "effect".
 Because people will ask for it. It is, well... Rack.  
 But a couple of modules background's have their colors flipped, because damn we want proper dark mode!
 
-### Init / Default patch
-
-![screenshot](docs/Screenshot_Init-Patch.png "Screenshot")
-
 ### Module browser
 
 ![screenshot](docs/Screenshot_Module-Browser.png "Screenshot")
@@ -101,6 +97,10 @@ But a couple of modules background's have their colors flipped, because damn we 
 ### Carla and Ildaeil plugin hosts
 
 ![screenshot](docs/Screenshot_Carla+Ildaeil.png "Screenshot")
+
+### Custom Fundamental modules design
+
+![screenshot](docs/Screenshot_Fundamental.png "Screenshot")
 
 
 ## Included modules
@@ -169,7 +169,7 @@ At the moment the following 3rd-party modules are provided:
 - ZetaCarinae
 - ZZC
 
-Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.
+Additionally Cardinal provides its own modules for DAW/Host automation, time position, audio to CV pitch conversion and internal plugin hosting.
 
 ### Adding modules
 
