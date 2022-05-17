@@ -1148,7 +1148,13 @@ protected:
         {
            #if DISTRHO_PLUGIN_NUM_INPUTS != 0
             for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
-                std::memcpy(fAudioBufferCopy[i], inputs[i], sizeof(float)*frames);
+            {
+               #if CARDINAL_VARIANT_MAIN
+                // can be null on main variant
+                if (inputs[i] != nullptr)
+               #endif
+                    std::memcpy(fAudioBufferCopy[i], inputs[i], sizeof(float)*frames);
+            }
             context->dataIns = fAudioBufferCopy;
            #else
             context->dataIns = nullptr;
@@ -1157,7 +1163,13 @@ protected:
         }
 
         for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
-            std::memset(outputs[i], 0, sizeof(float)*frames);
+        {
+           #if CARDINAL_VARIANT_MAIN
+            // can be null on main variant
+            if (outputs[i] != nullptr)
+           #endif
+                std::memset(outputs[i], 0, sizeof(float)*frames);
+        }
 
         if (bypassed)
         {

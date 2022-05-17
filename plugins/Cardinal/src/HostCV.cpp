@@ -87,6 +87,9 @@ struct HostCV : TerminalModule {
         }
         else if (const float* const* const dataIns = pcontext->dataIns)
         {
+            if (dataIns[CARDINAL_AUDIO_IO_OFFSET] == nullptr)
+                return;
+
             float outputOffset;
             outputOffset = params[BIPOLAR_OUTPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
 
@@ -115,6 +118,9 @@ struct HostCV : TerminalModule {
             return;
 
         float** const dataOuts = pcontext->dataOuts;
+
+        if (dataOuts[CARDINAL_AUDIO_IO_OFFSET] == nullptr)
+            return;
 
         float inputOffset;
         inputOffset = params[BIPOLAR_INPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
