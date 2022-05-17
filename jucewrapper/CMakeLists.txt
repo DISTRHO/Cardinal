@@ -135,7 +135,7 @@ target_sources(Cardinal
 target_include_directories(Cardinal
     PRIVATE
         ../dpf/distrho
-        ../src/CardinalFX)
+        ../src/Cardinal)
 
 target_compile_definitions(Cardinal
     PUBLIC
