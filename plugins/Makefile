@@ -874,7 +874,7 @@ PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*
 # --------------------------------------------------------------
 # WhatTheRack
 
-PLUGIN_FILES += $(filter-out WhatTheRack/src/plugin.cpp,$(wildcard WhatTheRack/src/*.cpp))
+PLUGIN_FILES += $(filter-out WhatTheRack/src/WhatTheRack.cpp,$(wildcard WhatTheRack/src/*.cpp))
 
 # modules/types which are present in other plugins
 VOXGLITCH_CUSTOM = $(DRWAV) AudioFile Looper Readout
