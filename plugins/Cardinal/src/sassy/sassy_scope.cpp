@@ -610,15 +610,7 @@ void do_show_scope_window(ScopeData* gScope, const float uiScale)
     ImGui::PushStyleColor(ImGuiCol_SliderGrab, gScope->colors[0]); ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, gScope->colors[0]);
     if (ImGui::VSliderInt("###0a", ImVec2(19 * uiScale, 150 * uiScale), &gScope->mCh[0].mScaleSlider, -4, 4, ""))
     {
-        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-        {
-            gScope->mCh[0].mScaleSlider = 0;
-            gScope->mCh[0].mScale = scalesteps[4];
-        }
-        else
-        {
-            gScope->mCh[0].mScale = scalesteps[gScope->mCh[0].mScaleSlider + 4];
-        }
+        gScope->mCh[0].mScale = scalesteps[gScope->mCh[0].mScaleSlider + 4];
     }
     if (ImGui::IsItemHovered())
     {
@@ -664,28 +656,43 @@ void do_show_scope_window(ScopeData* gScope, const float uiScale)
     }
     ImGui::PopStyleColor(2);
 
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, gScope->colors[0]); ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, gScope->colors[0]); ImGui::VSliderFloat("###0b", ImVec2(19 * uiScale, 150 * uiScale), &gScope->mCh[0].mOffset, -2, 2, ""); ImGui::PopStyleColor(2);   ImGui::SameLine();
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, gScope->colors[0]);
+    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, gScope->colors[0]);
+    ImGui::VSliderFloat("###0b", ImVec2(19 * uiScale, 150 * uiScale), &gScope->mCh[0].mOffset, -2, 2, "");
+    ImGui::PopStyleColor(2);
+    ImGui::SameLine();
     if (ImGui::IsItemHovered())
     {
         ImGui::BeginTooltip();
         ImGui::Text("%3.3f", gScope->mCh[0].mOffset);
         ImGui::EndTooltip();
     }
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, gScope->colors[1]); ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, gScope->colors[1]); ImGui::VSliderFloat("###1b", ImVec2(19 * uiScale, 150 * uiScale), &gScope->mCh[1].mOffset, -2, 2, ""); ImGui::PopStyleColor(2);   ImGui::SameLine();
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, gScope->colors[1]);
+    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, gScope->colors[1]);
+    ImGui::VSliderFloat("###1b", ImVec2(19 * uiScale, 150 * uiScale), &gScope->mCh[1].mOffset, -2, 2, "");
+    ImGui::PopStyleColor(2);
+    ImGui::SameLine();
     if (ImGui::IsItemHovered())
     {
         ImGui::BeginTooltip();
         ImGui::Text("%3.3f", gScope->mCh[1].mOffset);
         ImGui::EndTooltip();
     }
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, gScope->colors[2]); ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, gScope->colors[2]); ImGui::VSliderFloat("###2b", ImVec2(19 * uiScale, 150 * uiScale), &gScope->mCh[2].mOffset, -2, 2, ""); ImGui::PopStyleColor(2);   ImGui::SameLine();
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, gScope->colors[2]);
+    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, gScope->colors[2]);
+    ImGui::VSliderFloat("###2b", ImVec2(19 * uiScale, 150 * uiScale), &gScope->mCh[2].mOffset, -2, 2, "");
+    ImGui::PopStyleColor(2);
+    ImGui::SameLine();
     if (ImGui::IsItemHovered())
     {
         ImGui::BeginTooltip();
         ImGui::Text("%3.3f", gScope->mCh[2].mOffset);
         ImGui::EndTooltip();
     }
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, gScope->colors[3]); ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, gScope->colors[3]); ImGui::VSliderFloat("###3b", ImVec2(19 * uiScale, 150 * uiScale), &gScope->mCh[3].mOffset, -2, 2, ""); ImGui::PopStyleColor(2);
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, gScope->colors[3]);
+    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, gScope->colors[3]);
+    ImGui::VSliderFloat("###3b", ImVec2(19 * uiScale, 150 * uiScale), &gScope->mCh[3].mOffset, -2, 2, "");
+    ImGui::PopStyleColor(2);
     if (ImGui::IsItemHovered())
     {
         ImGui::BeginTooltip();

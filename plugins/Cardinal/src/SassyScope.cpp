@@ -141,6 +141,17 @@ static ScopeData* getFakeScopeInstance()
 
 struct SassyScopeWidget : ImGuiWidget {
     SassyScopeModule* module = nullptr;
+    int lastClickedSliderBox = -1;
+    Rect sliderBoxes[8];
+
+    SassyScopeWidget()
+    {
+        for (int i=0; i<8; ++i)
+        {
+            sliderBoxes[i].pos = Vec(8 + (i % 4) * 27, 32 + (i / 4) * 153);
+            sliderBoxes[i].size = Vec(19, 150);
+        }
+    }
 
     void drawImGui() override
     {
@@ -172,9 +183,53 @@ struct SassyScopeWidget : ImGuiWidget {
             // center scope
             if (e.pos.x >= 110 && e.pos.x <= 452 && e.pos.y >= 0 && e.pos.y <= 350)
                 return;
+
+            // consume for double-click if event belongs to a slider
+            lastClickedSliderBox = -1;
+            for (int i=0; i<8; ++i)
+            {
+                if (sliderBoxes[i].contains(e.pos))
+                {
+                    lastClickedSliderBox = i;
+                    e.consume(this);
+                    break;
+                }
+            }
         }
 
         ImGuiWidget::onButton(e);
+    }
+
+    void onDoubleClick(const DoubleClickEvent& e) override
+    {
+        // handle double-click for slider param reset
+        if (lastClickedSliderBox != -1)
+        {
+            const int i = lastClickedSliderBox;
+            lastClickedSliderBox = -1;
+
+            // fake a mouse release
+            ButtonEvent e2 = {};
+            e2.button = GLFW_MOUSE_BUTTON_LEFT;
+            e2.action = GLFW_RELEASE;
+            ImGuiWidget::onButton(e2);
+
+            // do the reset
+            if (i < 4)
+            {
+                module->scope.mCh[i].mScaleSlider = 0;
+                module->scope.mCh[i].mScale = 1.0f / 5.0f;
+            }
+            else
+            {
+                module->scope.mCh[i-4].mOffset = 0;
+            }
+
+            e.consume(this);
+            return;
+        }
+
+        ImGuiWidget::onDoubleClick(e);
     }
 };
 
