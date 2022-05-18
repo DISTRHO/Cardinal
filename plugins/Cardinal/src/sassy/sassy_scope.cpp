@@ -111,7 +111,7 @@ static const char* scaletexts[9] = {
 };
 
 static constexpr const int grid_size = 340;
-static constexpr const int grid_half_size = grid_size / 2 + 10;
+static constexpr const int grid_half_size = grid_size / 2;
 static constexpr const int grid_quarter_size = static_cast<int>(grid_half_size / 2);
 static constexpr const int grid_1_8_size = grid_quarter_size / 2;
 static constexpr const int grid_3_8_size = grid_quarter_size + grid_quarter_size / 2;
@@ -132,15 +132,15 @@ static void scope_grid(const float uiScale)
     ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x, p.y + (grid_size / 2 + grid_3_8_size) * uiScale), ImVec2(p.x + (grid_size) * uiScale, p.y + (grid_size / 2 + grid_3_8_size) * uiScale), 0x3f000000);
 
     // zero
-    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2) * uiScale, p.y * uiScale), ImVec2(p.x + (grid_size / 2) * uiScale, p.y + (grid_size) * uiScale), 0xff000000, 3.0f);
+    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2) * uiScale, p.y), ImVec2(p.x + (grid_size / 2) * uiScale, p.y + (grid_size) * uiScale), 0xff000000, 3.0f);
     // 1.0
-    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2 - grid_quarter_size) * uiScale, p.y * uiScale), ImVec2(p.x + (grid_size / 2 - grid_quarter_size) * uiScale, p.y + (grid_size) * uiScale), 0xff000000);
-    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2 + grid_quarter_size) * uiScale, p.y * uiScale), ImVec2(p.x + (grid_size / 2 + grid_quarter_size) * uiScale, p.y + (grid_size) * uiScale), 0xff000000);
+    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2 - grid_quarter_size) * uiScale, p.y), ImVec2(p.x + (grid_size / 2 - grid_quarter_size) * uiScale, p.y + (grid_size) * uiScale), 0xff000000);
+    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2 + grid_quarter_size) * uiScale, p.y), ImVec2(p.x + (grid_size / 2 + grid_quarter_size) * uiScale, p.y + (grid_size) * uiScale), 0xff000000);
     // 0.5
-    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2 - grid_1_8_size) * uiScale, p.y * uiScale), ImVec2(p.x + (grid_size / 2 - grid_1_8_size) * uiScale, p.y + (grid_size) * uiScale), 0x3f000000);
-    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2 + grid_1_8_size) * uiScale, p.y * uiScale), ImVec2(p.x + (grid_size / 2 + grid_1_8_size) * uiScale, p.y + (grid_size) * uiScale), 0x3f000000);
-    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2 - grid_3_8_size) * uiScale, p.y * uiScale), ImVec2(p.x + (grid_size / 2 - grid_3_8_size) * uiScale, p.y + (grid_size) * uiScale), 0x3f000000);
-    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2 + grid_3_8_size) * uiScale, p.y * uiScale), ImVec2(p.x + (grid_size / 2 + grid_3_8_size) * uiScale, p.y + (grid_size) * uiScale), 0x3f000000);
+    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2 - grid_1_8_size) * uiScale, p.y), ImVec2(p.x + (grid_size / 2 - grid_1_8_size) * uiScale, p.y + (grid_size) * uiScale), 0x3f000000);
+    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2 + grid_1_8_size) * uiScale, p.y), ImVec2(p.x + (grid_size / 2 + grid_1_8_size) * uiScale, p.y + (grid_size) * uiScale), 0x3f000000);
+    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2 - grid_3_8_size) * uiScale, p.y), ImVec2(p.x + (grid_size / 2 - grid_3_8_size) * uiScale, p.y + (grid_size) * uiScale), 0x3f000000);
+    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + (grid_size / 2 + grid_3_8_size) * uiScale, p.y), ImVec2(p.x + (grid_size / 2 + grid_3_8_size) * uiScale, p.y + (grid_size) * uiScale), 0x3f000000);
 }
 
 
@@ -368,7 +368,7 @@ static void scope_time(ScopeData* gScope, const float uiScale, int index)
 static void vertline(const float uiScale, const float x, const float w)
 {
     ImVec2 p = ImGui::GetItemRectMin();
-    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + x * uiScale, p.y * uiScale), ImVec2(p.x + x * uiScale, p.y + (grid_size) * uiScale), 0xff000000, w);
+    ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x + x * uiScale, p.y), ImVec2(p.x + x * uiScale, p.y + (grid_size) * uiScale), 0xff000000, w);
 }
 
 static void scope_freq(ScopeData* gScope, const float uiScale, int index)
@@ -426,7 +426,7 @@ static void scope_freq(ScopeData* gScope, const float uiScale, int index)
     float zoom = 1.0f / (1 << gScope->mFFTZoom);
 
     for (int i = 0; i < 10; i++)
-    {     
+    {
         vertline(uiScale, sqrt(100 / freqbin * i / (pot / 4)) / zoom * sizef, 1);
         vertline(uiScale, sqrt(1000 / freqbin * i / (pot / 4)) / zoom * sizef, 1);
         vertline(uiScale, sqrt(10000 / freqbin * i / (pot / 4)) / zoom * sizef, 1);
