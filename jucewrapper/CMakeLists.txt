@@ -193,6 +193,7 @@ target_link_libraries(Cardinal
         ${XEXT_LIBRARIES}
         ${XRANDR_LIBRARIES}
         ${EXTRA_LIBS}
+        -lmagic
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
