@@ -94,6 +94,130 @@ struct SassyScopeModule : Module {
     {
         scope.realloc(e.sampleRate);
     }
+
+    json_t* dataToJson() override
+    {
+        json_t* const rootJ = json_object();
+        DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr, nullptr);
+
+        json_object_set_new(rootJ, "mTimeScale", json_real(scope.mTimeScale));
+        json_object_set_new(rootJ, "mTimeScaleSlider", json_integer(scope.mTimeScaleSlider));
+        json_object_set_new(rootJ, "mSyncMode", json_integer(scope.mSyncMode));
+        json_object_set_new(rootJ, "mSyncChannel", json_integer(scope.mSyncChannel));
+        json_object_set_new(rootJ, "mMode", json_integer(scope.mMode));
+        json_object_set_new(rootJ, "mDisplay", json_integer(scope.mDisplay));
+        json_object_set_new(rootJ, "mFFTZoom", json_integer(scope.mFFTZoom));
+        json_object_set_new(rootJ, "mPot", json_integer(scope.mPot));
+        json_object_set_new(rootJ, "fft.average", json_integer(scope.fft.average));
+
+        json_object_set_new(rootJ, "mCh0.mEnabled", json_boolean(scope.mCh[0].mEnabled));
+        json_object_set_new(rootJ, "mCh0.mScale", json_real(scope.mCh[0].mScale));
+        json_object_set_new(rootJ, "mCh0.mScaleSlider", json_integer(scope.mCh[0].mScaleSlider));
+        json_object_set_new(rootJ, "mCh0.mOffset", json_integer(scope.mCh[0].mOffset));
+
+        json_object_set_new(rootJ, "mCh1.mEnabled", json_boolean(scope.mCh[1].mEnabled));
+        json_object_set_new(rootJ, "mCh1.mScale", json_real(scope.mCh[1].mScale));
+        json_object_set_new(rootJ, "mCh1.mScaleSlider", json_integer(scope.mCh[1].mScaleSlider));
+        json_object_set_new(rootJ, "mCh1.mOffset", json_integer(scope.mCh[1].mOffset));
+
+        json_object_set_new(rootJ, "mCh2.mEnabled", json_boolean(scope.mCh[2].mEnabled));
+        json_object_set_new(rootJ, "mCh2.mScale", json_real(scope.mCh[2].mScale));
+        json_object_set_new(rootJ, "mCh2.mScaleSlider", json_integer(scope.mCh[2].mScaleSlider));
+        json_object_set_new(rootJ, "mCh2.mOffset", json_integer(scope.mCh[2].mOffset));
+
+        json_object_set_new(rootJ, "mCh3.mEnabled", json_boolean(scope.mCh[3].mEnabled));
+        json_object_set_new(rootJ, "mCh3.mScale", json_real(scope.mCh[3].mScale));
+        json_object_set_new(rootJ, "mCh3.mScaleSlider", json_integer(scope.mCh[3].mScaleSlider));
+        json_object_set_new(rootJ, "mCh3.mOffset", json_integer(scope.mCh[3].mOffset));
+
+        return rootJ;
+    }
+
+    void dataFromJson(json_t* const rootJ) override
+    {
+        if (json_t* const mTimeScaleJ = json_object_get(rootJ, "mTimeScale"))
+            scope.mTimeScale = json_real_value(mTimeScaleJ);
+
+        if (json_t* const mTimeScaleSliderJ = json_object_get(rootJ, "mTimeScaleSlider"))
+            scope.mTimeScaleSlider = json_integer_value(mTimeScaleSliderJ);
+
+        if (json_t* const mSyncModeJ = json_object_get(rootJ, "mSyncMode"))
+            scope.mSyncMode = json_integer_value(mSyncModeJ);
+
+        if (json_t* const mSyncChannelJ = json_object_get(rootJ, "mSyncChannel"))
+            scope.mSyncChannel = json_integer_value(mSyncChannelJ);
+
+        if (json_t* const mModeJ = json_object_get(rootJ, "mMode"))
+            scope.mMode = json_integer_value(mModeJ);
+
+        if (json_t* const mDisplayJ = json_object_get(rootJ, "mDisplay"))
+            scope.mDisplay = json_integer_value(mDisplayJ);
+
+        if (json_t* const mFFTZoomJ = json_object_get(rootJ, "mFFTZoom"))
+            scope.mFFTZoom = json_integer_value(mFFTZoomJ);
+
+        if (json_t* const mPotJ = json_object_get(rootJ, "mPot"))
+            scope.mPot = json_integer_value(mPotJ);
+
+        if (json_t* const fftAverageJ = json_object_get(rootJ, "fft.average"))
+            scope.fft.average = json_integer_value(fftAverageJ);
+
+        {
+            if (json_t* const mCh0mEnabledJ = json_object_get(rootJ, "mCh0.mEnabled"))
+                scope.mCh[0].mEnabled = json_boolean_value(mCh0mEnabledJ);
+
+            if (json_t* const mCh0mScaleJ = json_object_get(rootJ, "mCh0.mScale"))
+                scope.mCh[0].mScale = json_real_value(mCh0mScaleJ);
+
+            if (json_t* const mCh0mScaleSliderJ = json_object_get(rootJ, "mCh0.mScaleSlider"))
+                scope.mCh[0].mScaleSlider = json_integer_value(mCh0mScaleSliderJ);
+
+            if (json_t* const mCh0mOffsetJ = json_object_get(rootJ, "mCh0.mOffset"))
+                scope.mCh[0].mOffset = json_integer_value(mCh0mOffsetJ);
+        }
+
+        {
+            if (json_t* const mCh1mEnabledJ = json_object_get(rootJ, "mCh1.mEnabled"))
+                scope.mCh[1].mEnabled = json_boolean_value(mCh1mEnabledJ);
+
+            if (json_t* const mCh1mScaleJ = json_object_get(rootJ, "mCh1.mScale"))
+                scope.mCh[1].mScale = json_real_value(mCh1mScaleJ);
+
+            if (json_t* const mCh1mScaleSliderJ = json_object_get(rootJ, "mCh1.mScaleSlider"))
+                scope.mCh[1].mScaleSlider = json_integer_value(mCh1mScaleSliderJ);
+
+            if (json_t* const mCh1mOffsetJ = json_object_get(rootJ, "mCh1.mOffset"))
+                scope.mCh[1].mOffset = json_integer_value(mCh1mOffsetJ);
+        }
+
+        {
+            if (json_t* const mCh2mEnabledJ = json_object_get(rootJ, "mCh2.mEnabled"))
+                scope.mCh[2].mEnabled = json_boolean_value(mCh2mEnabledJ);
+
+            if (json_t* const mCh2mScaleJ = json_object_get(rootJ, "mCh2.mScale"))
+                scope.mCh[2].mScale = json_real_value(mCh2mScaleJ);
+
+            if (json_t* const mCh2mScaleSliderJ = json_object_get(rootJ, "mCh2.mScaleSlider"))
+                scope.mCh[2].mScaleSlider = json_integer_value(mCh2mScaleSliderJ);
+
+            if (json_t* const mCh2mOffsetJ = json_object_get(rootJ, "mCh2.mOffset"))
+                scope.mCh[2].mOffset = json_integer_value(mCh2mOffsetJ);
+        }
+
+        {
+            if (json_t* const mCh3mEnabledJ = json_object_get(rootJ, "mCh3.mEnabled"))
+                scope.mCh[3].mEnabled = json_boolean_value(mCh3mEnabledJ);
+
+            if (json_t* const mCh3mScaleJ = json_object_get(rootJ, "mCh3.mScale"))
+                scope.mCh[3].mScale = json_real_value(mCh3mScaleJ);
+
+            if (json_t* const mCh3mScaleSliderJ = json_object_get(rootJ, "mCh3.mScaleSlider"))
+                scope.mCh[3].mScaleSlider = json_integer_value(mCh3mScaleSliderJ);
+
+            if (json_t* const mCh3mOffsetJ = json_object_get(rootJ, "mCh3.mOffset"))
+                scope.mCh[3].mOffset = json_integer_value(mCh3mOffsetJ);
+        }
+    }
 };
 
 // used for module browser
