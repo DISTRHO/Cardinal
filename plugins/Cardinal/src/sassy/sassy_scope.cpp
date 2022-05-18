@@ -499,17 +499,17 @@ static void scope_freq(ScopeData* gScope, const float uiScale, int index)
         ImVec2 mp = ImGui::GetMousePos();
         mp.x -= p.x;
         mp.y -= p.y;
-        if (mp.x > 0 && mp.x < grid_size * uiScale &&
-            mp.y > 0 && mp.y < grid_size * uiScale)
+        if (mp.x > 0 && mp.x < size * uiScale &&
+            mp.y > 0 && mp.y < size * uiScale)
         {
             ImGui::GetWindowDrawList()->AddLine(
                 ImVec2(p.x + mp.x, p.y),
                 ImVec2(p.x + mp.x, p.y + grid_size * uiScale),
                 0xff00ff00, 1 * uiScale);
             ImGui::BeginTooltip();
-            int note = (int)(12 * log(32 * POW_2_3_4TH * (freqbins[(int)mp.x] / 440)) / log(2));            
+            int note = (int)(12 * log(32 * POW_2_3_4TH * (freqbins[(int)(mp.x / uiScale)] / (sizef-1))) / log(2));
             if (note < 0 || note > 127) note = -1;
-            ImGui::Text("%3.3fHz%s%s", freqbins[(int)mp.x], note==-1?"":"\n", note==-1?"":gNotestr[note]);
+            ImGui::Text("%3.3fHz%s%s", freqbins[(int)(mp.x / uiScale)], note==-1?"":"\n", note==-1?"":gNotestr[note]);
             ImGui::EndTooltip();
         }
     }
