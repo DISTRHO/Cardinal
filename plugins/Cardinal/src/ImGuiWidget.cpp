@@ -270,16 +270,12 @@ void ImGuiWidget::onDragHover(const DragHoverEvent& e)
     }
 }
 
-void ImGuiWidget::onDragLeave(const DragLeaveEvent& e)
+void ImGuiWidget::onDragEnd(const DragEndEvent& e)
 {
     ImGui::SetCurrentContext(imData->context);
 
-    // FIXME this is not the correct event..
     ImGuiIO& io(ImGui::GetIO());
     io.MouseDown[0] = io.MouseDown[1] = io.MouseDown[2] = false;
-
-    if (io.WantCaptureMouse)
-        e.consume(this);
 }
 
 void ImGuiWidget::onHoverScroll(const HoverScrollEvent& e)
