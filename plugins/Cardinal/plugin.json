@@ -183,6 +183,15 @@
       ]
     },
     {
+      "slug": "SassyScope",
+      "name": "Sassy Scope",
+      "description": "Scope from Sassy Audio Spreadsheet",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#sassy-scope",
+      "tags": [
+        "Visual"
+      ]
+    },
+    {
       "slug": "TextEditor",
       "name": "Text Editor",
       "description": "An embed text editor inside Cardinal",

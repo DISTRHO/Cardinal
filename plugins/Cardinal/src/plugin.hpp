@@ -46,6 +46,7 @@ extern Model* modelHostParameters;
 extern Model* modelHostTime;
 extern Model* modelIldaeil;
 extern Model* modelMPV;
+extern Model* modelSassyScope;
 extern Model* modelTextEditor;
 
 extern std::vector<Model*> hostTerminalModels;

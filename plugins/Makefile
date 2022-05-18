@@ -218,6 +218,8 @@ endif
 ifneq ($(HEADLESS),true)
 PLUGIN_FILES += Cardinal/src/ImGuiWidget.cpp
 PLUGIN_FILES += Cardinal/src/ImGuiTextEditor.cpp
+PLUGIN_FILES += Cardinal/src/SassyScope.cpp
+# PLUGIN_FILES += Cardinal/src/sassy/sassy_scope.cpp
 PLUGIN_FILES += $(wildcard Cardinal/src/DearImGui/*.cpp)
 PLUGIN_FILES += $(wildcard Cardinal/src/DearImGuiColorTextEditor/*.cpp)
 endif

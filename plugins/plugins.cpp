@@ -878,6 +878,11 @@ static void initStatic__Cardinal()
         spl.removeModule("Carla");
         spl.removeModule("Ildaeil");
        #endif
+       #ifndef HEADLESS
+        p->addModel(modelSassyScope);
+       #else
+        spl.removeModule("SassyScope");
+       #endif
        #if defined(HAVE_X11) && !defined(HEADLESS) && !defined(STATIC_BUILD)
         p->addModel(modelMPV);
        #else
