@@ -821,13 +821,23 @@ struct StaticPluginLoader {
         json_t* const version = json_string((APP_VERSION_MAJOR + ".0").c_str());
         json_object_set(rootJ, "version", version);
         json_decref(version);
+
+        // Load manifest
+        p->fromJson(rootJ);
+
+        // Reject plugin if slug already exists
+        if (Plugin* const existingPlugin = getPlugin(p->slug))
+            throw Exception("Plugin %s is already loaded, not attempting to load it again", p->slug.c_str());
     }
 
     ~StaticPluginLoader()
     {
         if (rootJ != nullptr)
         {
-            plugin->fromJson(rootJ);
+            // Load modules manifest
+            json_t* const modulesJ = json_object_get(rootJ, "modules");
+            plugin->modulesFromJson(modulesJ);
+
             json_decref(rootJ);
             plugins.push_back(plugin);
         }
