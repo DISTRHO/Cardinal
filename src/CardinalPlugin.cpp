@@ -248,6 +248,9 @@ struct Initializer
         INFO("Destroying plugins");
         plugin::destroyStaticPlugins();
 
+        INFO("Destroying settings");
+        settings::destroy();
+
         INFO("Destroying logger");
         logger::destroy();
     }
