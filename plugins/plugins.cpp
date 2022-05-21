@@ -80,11 +80,13 @@ extern Model* modelBlank;
 // AS
 #define modelADSR modelASADSR
 #define modelVCA modelASVCA
+#define modelWaveShaper modelASWaveShaper
 #define LedLight ASLedLight
 #define YellowRedLight ASYellowRedLight
 #include "AS/src/AS.hpp"
 #undef modelADSR
 #undef modelVCA
+#undef modelWaveShaper
 #undef LedLight
 #undef YellowRedLight
 
@@ -1125,6 +1127,7 @@ static void initStatic__AS()
     {
 #define modelADSR modelASADSR
 #define modelVCA modelASVCA
+#define modelWaveShaper modelASWaveShaper
         //OSCILLATORS
         p->addModel(modelSineOsc);
         p->addModel(modelSawOsc);
@@ -1175,6 +1178,7 @@ static void initStatic__AS()
         p->addModel(modelBlankPanelSpecial);
 #undef modelADSR
 #undef modelVCA
+#undef modelWaveShaper
     }
 }
 

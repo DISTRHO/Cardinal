@@ -323,7 +323,7 @@ PLUGIN_FILES += $(filter-out AS/src/AS.cpp,$(wildcard AS/src/*.cpp))
 PLUGIN_FILES += AS/freeverb/revmodel.cpp
 
 # modules/types which are present in other plugins
-AS_CUSTOM = ADSR BpmDisplayWidget LabelDisplayWidget LedLight LowFrequencyOscillator SigDisplayWidget VCA YellowRedLight allpass comb revmodel
+AS_CUSTOM = ADSR BpmDisplayWidget LabelDisplayWidget LedLight LowFrequencyOscillator SigDisplayWidget VCA WaveShaper YellowRedLight allpass comb revmodel
 AS_CUSTOM_PER_FILE = NumberDisplayWidget
 
 # --------------------------------------------------------------
