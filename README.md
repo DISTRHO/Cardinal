@@ -131,6 +131,7 @@ At the moment the following 3rd-party modules are provided:
 - ExpertSleepers Encoders
 - Extratone
 - Fehler Fabrik
+- forsitan modulare
 - Fundamental
 - Glue the Giant
 - GoodSheperd

@@ -203,3 +203,6 @@
 [submodule "plugins/AS"]
 	path = plugins/AS
 	url = https://github.com/AScustomWorks/AS.git
+[submodule "plugins/forsitan-modulare"]
+	path = plugins/forsitan-modulare
+	url = https://github.com/gosub/forsitan-modulare.git

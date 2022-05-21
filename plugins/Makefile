@@ -537,6 +537,11 @@ PLUGIN_FILES += $(filter-out FehlerFabrik/src/plugin.cpp,$(wildcard FehlerFabrik
 FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter
 
 # --------------------------------------------------------------
+# forsitan modulare
+
+PLUGIN_FILES += $(filter-out forsitan-modulare/src/forsitan.cpp,$(wildcard forsitan-modulare/src/*.cpp))
+
+# --------------------------------------------------------------
 # GlueTheGiant
 
 PLUGIN_FILES += $(filter-out GlueTheGiant/src/plugin.cpp,$(wildcard GlueTheGiant/src/*.cpp))
@@ -1464,6 +1469,13 @@ $(BUILD_DIR)/Fundamental/%.c.o: Fundamental/%.c
 	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@ \
 		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
 		-DpluginInstance=pluginInstance__Fundamental
+
+$(BUILD_DIR)/forsitan-modulare/%.cpp.o: forsitan-modulare/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(GLUETHEGIANT_CUSTOM),$(call custom_module_names,$(m),forsitan)) \
+		-DpluginInstance=pluginInstance__forsitan
 
 $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

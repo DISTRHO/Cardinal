@@ -320,6 +320,9 @@ void setupSamples();
 // FehlerFabrik
 #include "FehlerFabrik/src/plugin.hpp"
 
+// forsitan modulare
+#include "forsitan-modulare/src/forsitan.hpp"
+
 // GlueTheGiant
 #include "GlueTheGiant/src/plugin.hpp"
 bool audition_mixer = false;
@@ -732,6 +735,7 @@ Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
 Plugin* pluginInstance__Extratone;
 Plugin* pluginInstance__FehlerFabrik;
+Plugin* pluginInstance__forsitan;
 Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__GoodSheperd;
 Plugin* pluginInstance__GrandeModular;
@@ -1722,6 +1726,22 @@ static void initStatic__FehlerFabrik()
     }
 }
 
+static void initStatic__forsitan()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__forsitan = p;
+
+    const StaticPluginLoader spl(p, "forsitan-modulare");
+    if (spl.ok())
+    {
+        p->addModel(alea);
+        p->addModel(interea);
+        p->addModel(cumuli);
+        p->addModel(deinde);
+        p->addModel(pavo);
+    }
+}
+
 static void initStatic__GlueTheGiant()
 {
     Plugin* const p = new Plugin;
@@ -2667,6 +2687,7 @@ void initStaticPlugins()
     initStatic__ExpertSleepersEncoders();
     initStatic__Extratone();
     initStatic__FehlerFabrik();
+    initStatic__forsitan();
     initStatic__GlueTheGiant();
     initStatic__GoodSheperd();
     initStatic__GrandeModular();

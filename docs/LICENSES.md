@@ -37,6 +37,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | ExpertSleepers Encoders | MIT                      | |
 | Extratone               | GPL-3.0-or-later         | |
 | Fehler Fabrik           | GPL-3.0-or-later         | |
+| forsitan modulare       | GPL-3.0-or-later         | |
 | Fundamental             | GPL-3.0-or-later         | |
 | Glue the Giant          | GPL-3.0-or-later         | |
 | GoodSheperd             | GPL-3.0-or-later         | |
@@ -144,6 +145,7 @@ Below is a list of artwork licenses from plugins
 | ExpertSleepers-Encoders/*               | MIT              | [Same license as source code](https://github.com/expertsleepersltd/vcvrack-encoders/issues/3) |
 | Extratone/*                             | GPL-3.0-or-later | [Same license as source code](https://github.com/EaterOfSheep/Extratone/issues/7) |
 | FehlerFabrik/*                          | GPL-3.0-or-later | No artwork specific license provided, see [FehlerFabrik#17](https://github.com/RCameron93/FehlerFabrik/issues/17) |
+| forsitan-modulare/*                     | GPL-3.0-or-later | No artwork specific license provided |
 | Fundamental/*                           | GPL-3.0-or-later | Same license as source code |
 | GlueTheGiant/*                          | GPL-3.0-or-later | Same license as source code |
 | GlueTheGiant/fonts/DSEG7-*              | OFL-1.1-RFN      | |
