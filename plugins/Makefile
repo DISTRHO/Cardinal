@@ -317,6 +317,16 @@ PLUGIN_FILES += AriaModules/src/Undular.cpp
 ARIA_CUSTOM = Blank
 
 # --------------------------------------------------------------
+# AS
+
+PLUGIN_FILES += $(filter-out AS/src/AS.cpp,$(wildcard AS/src/*.cpp))
+PLUGIN_FILES += AS/freeverb/revmodel.cpp
+
+# modules/types which are present in other plugins
+AS_CUSTOM = ADSR LabelDisplayWidget LedLight LowFrequencyOscillator VCA YellowRedLight allpass comb revmodel
+AS_CUSTOM_PER_FILE = NumberDisplayWidget
+
+# --------------------------------------------------------------
 # AudibleInstruments
 
 PLUGIN_FILES += $(filter-out AudibleInstruments/src/plugin.cpp,$(wildcard AudibleInstruments/src/*.cpp))
@@ -1291,6 +1301,15 @@ $(BUILD_DIR)/AriaModules/%.cpp.o: AriaModules/%.cpp
 		$(foreach m,$(ARIA_CUSTOM),$(call custom_module_names,$(m),Aria)) \
 		-DpluginInstance=pluginInstance__Aria \
 		-Wno-cast-function-type
+
+$(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(AS_CUSTOM),$(call custom_module_names,$(m),AS)) \
+		$(foreach m,$(AS_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),AS_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__AS \
+		-Wno-unused-private-field
 
 $(BUILD_DIR)/AudibleInstruments/%.o: AudibleInstruments/%
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

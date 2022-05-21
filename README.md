@@ -115,6 +115,7 @@ At the moment the following 3rd-party modules are provided:
 - Animated Circuits
 - Arable Instruments
 - Aria Salvatrice
+- AS
 - Audible Instruments
 - Autinn
 - Axioma

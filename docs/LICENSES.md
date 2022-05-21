@@ -21,6 +21,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Animated Circuits       | GPL-3.0-or-later         | |
 | Arable Instruments      | GPL-3.0-or-later         | |
 | Aria Salvatrice         | GPL-3.0-or-later         | |
+| AS                      | MIT                      | |
 | Audible Instruments     | GPL-3.0-or-later         | |
 | Autinn                  | GPL-3.0-or-later         | |
 | Axioma                  | GPL-3.0-or-later         | |
@@ -109,6 +110,9 @@ Below is a list of artwork licenses from plugins
 | AriaModules/lcd/Fixed_v01/*             | Custom           | See [LICENSE.txt](../plugins/AriaModules/res/lcd/Fixed_v01/LICENSE.txt) |
 | AriaModules/lcd/piano/*                 | WTFPL            | |
 | AriaModules/signature/*                 | Custom           | Removal required if modifying other files without author's permission |
+| AS/*                                    | CC-BY-NC-ND-4.0  | The AS Logo/Monogram is Copyright (c) 2017 Alfredo Santamaria and cannot be used in derivative works; Cardinal has [explicit permission](https://github.com/AScustomWorks/AS/issues/60#issuecomment-1133488586) for its use. |
+| AS/saxmono.ttf                          | Custom           | You may download this font, circulate it und use it freely. You may not alter, rename, change copyrights or modify this font in any way. |
+| AS/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
 | AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, [used and distributed with permission](LICENSE-PERMISSIONS.md#audible-instruments-émilie-gillet--mutable-instruments) |
 | Autinn/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | Axioma/*                                | GPL-3.0-or-later | No artwork specific license provided |
@@ -207,7 +211,7 @@ Below is a list of artwork licenses from plugins
 | WhatTheRack/BoomButton/*                | CC-BY-3.0        | |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | [Same license as source code](https://github.com/mhampton/ZetaCarinaeModules/issues/8) |
 | ZZC/*                                   | CC-BY-NC-SA-4.0  | |
-| ZZC/panels/*                            | CC-BY-NC-SA-4.0  | NOTE: The ZZC Logo is Copyright (c) 2019 Sergey Ukolov and cannot be used in derivative works; Cardinal's use does not officially constitute derivative work. |
+| ZZC/panels/*                            | CC-BY-NC-SA-4.0  | The ZZC Logo is Copyright (c) 2019 Sergey Ukolov and cannot be used in derivative works; Cardinal's use does not officially constitute derivative work. |
 | ZZC/fonts/DSEG/*                        | OFL-1.1-RFN      | |
 | ZZC/fonts/Nunito/*                      | OFL-1.1-RFN      | |
 

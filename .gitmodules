@@ -200,3 +200,6 @@
 [submodule "plugins/WhatTheRack"]
 	path = plugins/WhatTheRack
 	url = https://github.com/korfuri/WhatTheRack.git
+[submodule "plugins/AS"]
+	path = plugins/AS
+	url = https://github.com/AScustomWorks/AS.git
