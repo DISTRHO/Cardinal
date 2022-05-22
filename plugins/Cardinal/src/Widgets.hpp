@@ -377,8 +377,9 @@ struct OpenGlWidgetWithBrowserPreview : OpenGlWidget {
         fb = nvgluCreateFramebuffer(args.vg, box.size.x * oversample, box.size.y * oversample, 0);
         DISTRHO_SAFE_ASSERT_RETURN(fb != nullptr,);
 
-        // draw our special framebuffer
         nvgluBindFramebuffer(fb);
+
+        // draw our special framebuffer
         drawFramebufferForBrowserPreview();
 
         // reset to regular framebuffer
@@ -388,8 +389,8 @@ struct OpenGlWidgetWithBrowserPreview : OpenGlWidget {
         nvgBeginPath(args.vg);
         nvgRect(args.vg, 0.0f, 0.0f, box.size.x, box.size.y);
         NVGpaint paint = nvgImagePattern(args.vg,
-                                          0.0f, 0.0f, box.size.x, box.size.y,
-                                          0.0f, fb->image, 1.0f);
+                                         0.0f, 0.0f, box.size.x, box.size.y,
+                                         0.0f, fb->image, 1.0f);
         nvgFillPaint(args.vg, paint);
         nvgFill(args.vg);
     }
