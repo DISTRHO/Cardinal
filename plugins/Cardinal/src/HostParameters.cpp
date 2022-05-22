@@ -37,6 +37,8 @@ struct HostParameters : TerminalModule {
     CardinalPluginContext* const pcontext;
     rack::dsp::SlewLimiter parameters[kModuleParameters];
     bool parametersConnected[kModuleParameters] = {};
+    bool bypassed = false;
+    uint32_t lastProcessCounter = 0;
 
     HostParameters()
         : pcontext(static_cast<CardinalPluginContext*>(APP))
@@ -45,31 +47,36 @@ struct HostParameters : TerminalModule {
             throw rack::Exception("Plugin context is null.");
 
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-
-        const float fsampleRate = static_cast<float>(pcontext->sampleRate);
-        SampleRateChangeEvent e = {
-            fsampleRate,
-            1.0f / fsampleRate
-        };
-        onSampleRateChange(e);
     }
 
     void processTerminalInput(const ProcessArgs& args) override
     {
-        if (isBypassed())
+        const uint32_t processCounter = pcontext->processCounter;
+
+        // only checked on input
+        if (lastProcessCounter != processCounter)
+        {
+            bypassed = isBypassed();
+            lastProcessCounter = processCounter;
+
+            for (uint32_t i=0; i<kModuleParameters; ++i)
+            {
+                const bool connected = outputs[i].isConnected();
+
+                if (parametersConnected[i] != connected)
+                {
+                    parametersConnected[i] = connected;
+                    parameters[i].reset();
+                }
+            }
+        }
+
+        if (bypassed)
             return;
 
         for (uint32_t i=0; i<kModuleParameters; ++i)
         {
-            const bool connected = outputs[i].isConnected();
-
-            if (parametersConnected[i] != connected)
-            {
-                parametersConnected[i] = connected;
-                parameters[i].reset();
-            }
-
-            if (connected)
+            if (parametersConnected[i])
                 outputs[i].setVoltage(parameters[i].process(args.sampleTime, pcontext->parameters[i]));
         }
     }

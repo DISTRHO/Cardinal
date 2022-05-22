@@ -34,6 +34,9 @@ struct CardinalBlankModule : Module {
     CardinalBlankModule() {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
     }
+
+    void process(const ProcessArgs&) override
+    {}
 };
 
 struct CardinalBlankImage : Widget {

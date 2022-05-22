@@ -79,6 +79,9 @@ struct TextEditorModule : Module {
         return rootJ;
     }
 
+    void process(const ProcessArgs&) override
+    {}
+
     void dataFromJson(json_t* const rootJ) override
     {
         file.clear();

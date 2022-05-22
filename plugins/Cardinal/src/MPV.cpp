@@ -49,6 +49,9 @@ struct CardinalEmbedModule : Module {
         configOutput(0, "Audio Left");
         configOutput(1, "Audio Right");
     }
+
+    void process(const ProcessArgs&) override
+    {}
 };
 
 // --------------------------------------------------------------------------------------------------------------------
