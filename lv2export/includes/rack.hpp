@@ -37,6 +37,7 @@
 #include <string>
 #include <vector>
 
+enum NVGalign {};
 struct NVGcolor { float a; };
 struct NVGpaint {};
 
@@ -56,9 +57,11 @@ inline void nvgImageSize(void*, int, void*, void*) {}
 inline NVGpaint nvgImagePattern(void*, float, float, float, float, float, int handle, float) { return {}; }
 
 struct json_t {};
+json_t* json_boolean(bool) { return NULL; }
 json_t* json_integer(int) { return NULL; }
 json_t* json_object() { return NULL; }
 json_t* json_object_get(json_t*, const char*) { return NULL; }
+bool json_boolean_value(json_t*) { return false; }
 int json_integer_value(json_t*) { return 0; }
 void json_object_set_new(json_t*, const char*, json_t*) {}
 
@@ -108,6 +111,10 @@ inline int clamp(int x, int a, int b) {
 
 inline float clamp(float x, float a = 0.f, float b = 1.f) {
     return std::fmax(std::fmin(x, b), a);
+}
+
+inline float rescale(float x, float xMin, float xMax, float yMin, float yMax) {
+    return yMin + (x - xMin) / (xMax - xMin) * (yMax - yMin);
 }
 
 struct Vec {
@@ -547,12 +554,12 @@ struct Module {
         float sampleRate;
         float sampleTime;
     };
-    virtual void onSampleRateChange(const SampleRateChangeEvent& e) {
+    virtual void onSampleRateChange(const SampleRateChangeEvent&) {
         onSampleRateChange();
     }
 
     struct ResetEvent {};
-    virtual void onReset(const ResetEvent& e) {} // TODO
+    virtual void onReset(const ResetEvent&) {} // TODO
 
     virtual void onAdd() {}
     virtual void onRemove() {}
@@ -595,11 +602,119 @@ struct Widget {
 
     using BaseEvent = widget::BaseEvent;
 
+    struct PositionBaseEvent {
+        math::Vec pos;
+    };
+
+    struct HoverEvent : BaseEvent, PositionBaseEvent {
+        math::Vec mouseDelta;
+    };
+    virtual void onHover(const HoverEvent&) {
+    }
+
+    struct ButtonEvent : BaseEvent, PositionBaseEvent {
+        int button;
+        int action;
+        int mods;
+    };
+    virtual void onButton(const ButtonEvent&) {
+    }
+
+    struct DoubleClickEvent : BaseEvent {};
+    virtual void onDoubleClick(const DoubleClickEvent&) {}
+
+    struct KeyBaseEvent {
+        int key;
+        int scancode;
+        std::string keyName;
+        int action;
+        int mods;
+    };
+
+    struct HoverKeyEvent : BaseEvent, PositionBaseEvent, KeyBaseEvent {};
+    virtual void onHoverKey(const HoverKeyEvent&) {
+    }
+
+    struct TextBaseEvent {
+        int codepoint;
+    };
+    struct HoverTextEvent : BaseEvent, PositionBaseEvent, TextBaseEvent {};
+    virtual void onHoverText(const HoverTextEvent&) {
+    }
+
+    struct HoverScrollEvent : BaseEvent, PositionBaseEvent {
+        math::Vec scrollDelta;
+    };
+    virtual void onHoverScroll(const HoverScrollEvent&) {
+    }
+
+    struct EnterEvent : BaseEvent {};
+    virtual void onEnter(const EnterEvent&) {}
+
+    struct LeaveEvent : BaseEvent {};
+    virtual void onLeave(const LeaveEvent&) {}
+
+    struct SelectEvent : BaseEvent {};
+    virtual void onSelect(const SelectEvent&) {}
+
+    struct DeselectEvent : BaseEvent {};
+    virtual void onDeselect(const DeselectEvent&) {}
+
+    struct SelectKeyEvent : BaseEvent, KeyBaseEvent {};
+    virtual void onSelectKey(const SelectKeyEvent&) {}
+
+    struct SelectTextEvent : BaseEvent, TextBaseEvent {};
+    virtual void onSelectText(const SelectTextEvent&) {}
+
+    struct DragBaseEvent : BaseEvent {
+        int button;
+    };
+
+    struct DragStartEvent : DragBaseEvent {};
+    virtual void onDragStart(const DragStartEvent&) {}
+
+    struct DragEndEvent : DragBaseEvent {};
+    virtual void onDragEnd(const DragEndEvent&) {}
+
+    struct DragMoveEvent : DragBaseEvent {
+        math::Vec mouseDelta;
+    };
+    virtual void onDragMove(const DragMoveEvent&) {}
+
+    struct DragHoverEvent : DragBaseEvent, PositionBaseEvent {
+        Widget* origin = NULL;
+        math::Vec mouseDelta;
+    };
+    virtual void onDragHover(const DragHoverEvent&) {
+    }
+
+    struct DragEnterEvent : DragBaseEvent {
+        Widget* origin = NULL;
+    };
+    virtual void onDragEnter(const DragEnterEvent&) {}
+
+    struct DragLeaveEvent : DragBaseEvent {
+        Widget* origin = NULL;
+    };
+    virtual void onDragLeave(const DragLeaveEvent&) {}
+
+    struct DragDropEvent : DragBaseEvent {
+        Widget* origin = NULL;
+    };
+    virtual void onDragDrop(const DragDropEvent&) {}
+
+    struct PathDropEvent : BaseEvent, PositionBaseEvent {
+        PathDropEvent(const std::vector<std::string>& paths) : paths(paths) {}
+        const std::vector<std::string>& paths;
+    };
+    virtual void onPathDrop(const PathDropEvent&) {
+    }
+
     struct ActionEvent : BaseEvent {};
-    virtual void onAction(const ActionEvent& e) {}
+    virtual void onAction(const ActionEvent&) {}
 
     struct ChangeEvent : BaseEvent {};
-    virtual void onChange(const ChangeEvent& e) {}
+    virtual void onChange(const ChangeEvent&) {}
 
     bool hasChild(Widget* child) { return false; }
     void addChild(Widget* child) {}
@@ -923,31 +1038,31 @@ struct PulseGenerator {
 } // namespace dsp
 
 namespace event {
-// using Base = widget::BaseEvent;
-// using PositionBase = widget::Widget::PositionBaseEvent;
-// using KeyBase = widget::Widget::KeyBaseEvent;
-// using TextBase = widget::Widget::TextBaseEvent;
-// using Hover = widget::Widget::HoverEvent;
-// using Button = widget::Widget::ButtonEvent;
-// using DoubleClick = widget::Widget::DoubleClickEvent;
-// using HoverKey = widget::Widget::HoverKeyEvent;
-// using HoverText = widget::Widget::HoverTextEvent;
-// using HoverScroll = widget::Widget::HoverScrollEvent;
-// using Enter = widget::Widget::EnterEvent;
-// using Leave = widget::Widget::LeaveEvent;
-// using Select = widget::Widget::SelectEvent;
-// using Deselect = widget::Widget::DeselectEvent;
-// using SelectKey = widget::Widget::SelectKeyEvent;
-// using SelectText = widget::Widget::SelectTextEvent;
-// using DragBase = widget::Widget::DragBaseEvent;
-// using DragStart = widget::Widget::DragStartEvent;
-// using DragEnd = widget::Widget::DragEndEvent;
-// using DragMove = widget::Widget::DragMoveEvent;
-// using DragHover = widget::Widget::DragHoverEvent;
-// using DragEnter = widget::Widget::DragEnterEvent;
-// using DragLeave = widget::Widget::DragLeaveEvent;
-// using DragDrop = widget::Widget::DragDropEvent;
-// using PathDrop = widget::Widget::PathDropEvent;
+using Base = widget::BaseEvent;
+using PositionBase = widget::Widget::PositionBaseEvent;
+using KeyBase = widget::Widget::KeyBaseEvent;
+using TextBase = widget::Widget::TextBaseEvent;
+using Hover = widget::Widget::HoverEvent;
+using Button = widget::Widget::ButtonEvent;
+using DoubleClick = widget::Widget::DoubleClickEvent;
+using HoverKey = widget::Widget::HoverKeyEvent;
+using HoverText = widget::Widget::HoverTextEvent;
+using HoverScroll = widget::Widget::HoverScrollEvent;
+using Enter = widget::Widget::EnterEvent;
+using Leave = widget::Widget::LeaveEvent;
+using Select = widget::Widget::SelectEvent;
+using Deselect = widget::Widget::DeselectEvent;
+using SelectKey = widget::Widget::SelectKeyEvent;
+using SelectText = widget::Widget::SelectTextEvent;
+using DragBase = widget::Widget::DragBaseEvent;
+using DragStart = widget::Widget::DragStartEvent;
+using DragEnd = widget::Widget::DragEndEvent;
+using DragMove = widget::Widget::DragMoveEvent;
+using DragHover = widget::Widget::DragHoverEvent;
+using DragEnter = widget::Widget::DragEnterEvent;
+using DragLeave = widget::Widget::DragLeaveEvent;
+using DragDrop = widget::Widget::DragDropEvent;
+using PathDrop = widget::Widget::PathDropEvent;
 using Action = widget::Widget::ActionEvent;
 using Change = widget::Widget::ChangeEvent;
 // using Dirty = widget::Widget::DirtyEvent;
@@ -972,6 +1087,14 @@ struct Plugin {
 } // namespace plugin
 
 namespace ui {
+
+struct Button : widget::OpaqueWidget {
+    std::string text;
+    Quantity* quantity = NULL;
+};
+
+struct ChoiceButton : Button {
+};
 
 struct Menu : widget::OpaqueWidget {
 //     Menu* parentMenu = NULL;
