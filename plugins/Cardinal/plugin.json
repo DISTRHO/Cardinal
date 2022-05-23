@@ -91,6 +91,15 @@
       ]
     },
     {
+      "slug": "HostParametersMap",
+      "name": "Host Parameters Map",
+      "description": "Allows host-controlled plugin parameters to control other module parameters",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#host-parameters-map",
+      "tags": [
+        "External"
+      ]
+    },
+    {
       "slug": "HostTime",
       "name": "Host Time",
       "description": "Exposes host-provided time/transport information in a module",

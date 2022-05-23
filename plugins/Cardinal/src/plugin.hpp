@@ -43,6 +43,7 @@ extern Model* modelHostMIDICC;
 extern Model* modelHostMIDIGate;
 extern Model* modelHostMIDIMap;
 extern Model* modelHostParameters;
+extern Model* modelHostParametersMap;
 extern Model* modelHostTime;
 extern Model* modelIldaeil;
 extern Model* modelMPV;

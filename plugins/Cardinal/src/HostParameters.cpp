@@ -53,7 +53,6 @@ struct HostParameters : TerminalModule {
     {
         const uint32_t processCounter = pcontext->processCounter;
 
-        // only checked on input
         if (lastProcessCounter != processCounter)
         {
             bypassed = isBypassed();

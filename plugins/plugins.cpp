@@ -895,6 +895,7 @@ static void initStatic__Cardinal()
         p->addModel(modelHostMIDIGate);
         p->addModel(modelHostMIDIMap);
         p->addModel(modelHostParameters);
+        p->addModel(modelHostParametersMap);
         p->addModel(modelHostTime);
         p->addModel(modelTextEditor);
        #ifndef STATIC_BUILD
@@ -931,6 +932,7 @@ static void initStatic__Cardinal()
             modelHostMIDIGate,
             modelHostMIDIMap,
             modelHostParameters,
+            modelHostParametersMap,
             modelHostTime,
         };
     }
