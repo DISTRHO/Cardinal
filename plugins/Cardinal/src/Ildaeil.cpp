@@ -121,7 +121,7 @@ static const char* getPathForJSFX()
        #if defined(CARLA_OS_MAC)
         path = homeDir() + "/Library/Application Support/REAPER/Effects";
        #elif defined(CARLA_OS_WIN)
-        path = getSpecialPath(kSpecialPathAppData) + "\\REAPER\\Effects"
+        path = getSpecialPath(kSpecialPathAppData) + "\\REAPER\\Effects";
        #else
         if (const char* const configHome = std::getenv("XDG_CONFIG_HOME"))
             path = configHome;
