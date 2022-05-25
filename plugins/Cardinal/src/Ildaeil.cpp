@@ -52,6 +52,19 @@ json_t *jsonp_stringn_nocheck_own(const char* value, size_t len);
 }
 #endif
 
+// defined elsewhere
+namespace rack {
+#ifdef ARCH_WIN
+enum SpecialPath {
+    kSpecialPathUserProfile,
+    kSpecialPathCommonProgramFiles,
+    kSpecialPathAppData,
+};
+std::string getSpecialPath(const SpecialPath type)
+#endif
+std::string homeDir();
+}
+
 #define BUFFER_SIZE 128
 
 // generates a warning if this is defined as anything else
@@ -96,6 +109,28 @@ static void projectLoadedFromDSP(void* ui);
 // --------------------------------------------------------------------------------------------------------------------
 
 static Mutex sPluginInfoLoadMutex;
+
+static const char* getPathForJSFX()
+{
+    static std::string path;
+
+    if (path.empty())
+    {
+       #if defined(CARLA_OS_MAC)
+        path = homeDir() + "/Library/Application Support/REAPER/Effects";
+       #elif defined(CARLA_OS_WIN)
+        path = getSpecialPath() + "\\REAPER\\Effects"
+       #else
+        if (const char* const configHome = std::getenv("XDG_CONFIG_HOME"))
+            path = configHome;
+        else
+            path = homeDir() + "/.config";
+        path += "/REAPER/Effects";
+       #endif
+    }
+
+    return path.c_str();
+}
 
 /*
 #ifndef HEADLESS
@@ -248,6 +283,8 @@ struct IldaeilModule : Module {
 
         if (const char* const path = std::getenv("LV2_PATH"))
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PLUGIN_PATH, PLUGIN_LV2, path);
+
+        carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PLUGIN_PATH, PLUGIN_JSFX, getPathForJSFX());
 
 #ifdef CARLA_OS_MAC
         carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PREFER_UI_BRIDGES, 0, nullptr);
@@ -1068,7 +1105,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         {
         case PLUGIN_INTERNAL:
         case PLUGIN_AU:
-        // case PLUGIN_JSFX:
+        case PLUGIN_JSFX:
         case PLUGIN_SFZ:
             label = info.label;
             break;
@@ -1095,6 +1132,9 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         {
         case PLUGIN_LV2:
             path = std::getenv("LV2_PATH");
+            break;
+        case PLUGIN_JSFX:
+            path = getPathForJSFX();
             break;
         default:
             path = nullptr;
@@ -1386,6 +1426,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         static const char* pluginTypes[] = {
             getPluginTypeAsString(PLUGIN_INTERNAL),
             getPluginTypeAsString(PLUGIN_LV2),
+            getPluginTypeAsString(PLUGIN_JSFX),
         };
 
         setupMainWindowPos();
@@ -1431,6 +1472,9 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             int current;
             switch (fPluginType)
             {
+            case PLUGIN_JSFX:
+                current = 2;
+                break;
             case PLUGIN_LV2:
                 current = 1;
                 break;
@@ -1449,6 +1493,9 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                     break;
                 case 1:
                     fNextPluginType = PLUGIN_LV2;
+                    break;
+                case 2:
+                    fNextPluginType = PLUGIN_JSFX;
                     break;
                 }
             }
@@ -1485,7 +1532,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                     case PLUGIN_INTERNAL:
                     case PLUGIN_AU:
                     case PLUGIN_SFZ:
-                    // case PLUGIN_JSFX:
+                    case PLUGIN_JSFX:
                         ImGui::TableSetupColumn("Name");
                         ImGui::TableSetupColumn("Label");
                         ImGui::TableHeadersRow();
@@ -1512,7 +1559,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
                         {
                         case PLUGIN_INTERNAL:
                         case PLUGIN_AU:
-                        // case PLUGIN_JSFX:
+                        case PLUGIN_JSFX:
                         case PLUGIN_SFZ:
                             ImGui::TableNextRow();
                             ImGui::TableSetColumnIndex(0);

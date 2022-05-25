@@ -47,6 +47,7 @@ bool isStandalone();
 enum SpecialPath {
     kSpecialPathUserProfile,
     kSpecialPathCommonProgramFiles,
+    kSpecialPathAppData,
 };
 std::string getSpecialPath(SpecialPath type);
 #endif

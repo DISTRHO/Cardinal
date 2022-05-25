@@ -55,6 +55,7 @@
 const std::string CARDINAL_VERSION = "22.05";
 
 namespace rack {
+
 namespace settings {
 int rateLimit = 0;
 }
@@ -76,6 +77,9 @@ std::string getSpecialPath(const SpecialPath type)
     case kSpecialPathCommonProgramFiles:
         csidl = CSIDL_PROGRAM_FILES_COMMON;
         break;
+    case kSpecialPathAppData:
+        csidl = CSIDL_COMMON_APPDATA;
+        break;
     default:
         return {};
     }
@@ -88,7 +92,21 @@ std::string getSpecialPath(const SpecialPath type)
     return {};
 }
 #endif
+
+std::string homeDir()
+{
+# ifdef ARCH_WIN
+    return getSpecialPath(kSpecialPathUserProfile);
+# else
+    if (const char* const home = getenv("HOME"))
+        return home;
+    if (struct passwd* const pwd = getpwuid(getuid()))
+        return pwd->pw_dir;
+# endif
+    return {};
 }
+
+} // namespace rack
 
 namespace patchUtils
 {
@@ -102,19 +120,6 @@ static void promptClear(const char* const message, const std::function<void()> a
         return action();
 
     asyncDialog::create(message, action);
-}
-
-static std::string homeDir()
-{
-# ifdef ARCH_WIN
-    return getSpecialPath(kSpecialPathUserProfile);
-# else
-    if (const char* const home = getenv("HOME"))
-        return home;
-    if (struct passwd* const pwd = getpwuid(getuid()))
-        return pwd->pw_dir;
-# endif
-    return {};
 }
 #endif
 
