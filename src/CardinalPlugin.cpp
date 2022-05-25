@@ -635,6 +635,11 @@ protected:
 
     void initAudioPort(const bool input, uint32_t index, AudioPort& port) override
     {
+       #if CARDINAL_VARIANT_FX || CARDINAL_VARIANT_SYNTH
+        if (index < 2)
+            port.groupId = kPortGroupStereo;
+       #endif
+
         if (index >= 8)
         {
             port.hints = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange;
