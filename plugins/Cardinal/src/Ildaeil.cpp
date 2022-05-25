@@ -45,6 +45,8 @@
 #include "water/streams/MemoryOutputStream.h"
 #include "water/xml/XmlDocument.h"
 
+#include <string>
+
 #ifndef CARDINAL_SYSDEPS
 // private method that takes ownership, we can use it to avoid superfulous allocations
 extern "C" {
