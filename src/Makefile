@@ -95,7 +95,11 @@ endif
 
 BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing -faligned-new
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+
+ifneq ($(MACOS),true)
+BUILD_CXX_FLAGS += -faligned-new
+endif
 
 # use our custom function to invert some colors
 BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
