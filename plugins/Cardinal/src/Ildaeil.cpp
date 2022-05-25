@@ -62,7 +62,7 @@ enum SpecialPath {
     kSpecialPathCommonProgramFiles,
     kSpecialPathAppData,
 };
-std::string getSpecialPath(const SpecialPath type)
+std::string getSpecialPath(const SpecialPath type);
 #endif
 std::string homeDir();
 }
