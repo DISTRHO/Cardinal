@@ -54,9 +54,6 @@ ifneq ($(DEBUG),true)
 CARLA_EXTRA_ARGS += EXTERNAL_PLUGINS=true
 endif
 
-CARLA_EXTRA_ARGS += USING_JUCE=false
-CARLA_EXTRA_ARGS += USING_JUCE_GUI_EXTRA=false
-
 # --------------------------------------------------------------
 # DGL config
 

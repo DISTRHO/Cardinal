@@ -28,6 +28,9 @@ set_property(TARGET native_plugins PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_
 add_library(audio_decoder STATIC IMPORTED)
 set_property(TARGET audio_decoder PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/audio_decoder.a")
 
+add_library(carla_dgl STATIC IMPORTED)
+set_property(TARGET carla_dgl PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/dgl.a")
+
 add_library(jackbridge STATIC IMPORTED)
 set_property(TARGET jackbridge PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/jackbridge.min.a")
 
@@ -170,6 +173,7 @@ target_link_libraries(Cardinal
         carla_plugin
         native_plugins
         audio_decoder
+        carla_dgl
         jackbridge
         lilv
         rtmempool
@@ -260,6 +264,7 @@ target_link_libraries(CardinalFX
         carla_plugin
         native_plugins
         audio_decoder
+        carla_dgl
         jackbridge
         lilv
         rtmempool
@@ -350,6 +355,7 @@ target_link_libraries(CardinalSynth
         carla_plugin
         native_plugins
         audio_decoder
+        carla_dgl
         jackbridge
         lilv
         rtmempool
