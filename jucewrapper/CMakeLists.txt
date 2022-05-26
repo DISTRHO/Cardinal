@@ -43,6 +43,9 @@ set_property(TARGET sfzero PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../
 add_library(water STATIC IMPORTED)
 set_property(TARGET water PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/water.a")
 
+add_library(ysfx STATIC IMPORTED)
+set_property(TARGET ysfx PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/ysfx.a")
+
 add_library(zita_resampler STATIC IMPORTED)
 set_property(TARGET zita_resampler PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/zita-resampler.a")
 
@@ -172,6 +175,7 @@ target_link_libraries(Cardinal
         rtmempool
         sfzero
         water
+        ysfx
         zita_resampler
         dgl
         libaubio
@@ -261,6 +265,7 @@ target_link_libraries(CardinalFX
         rtmempool
         sfzero
         water
+        ysfx
         zita_resampler
         dgl
         libaubio
@@ -350,6 +355,7 @@ target_link_libraries(CardinalSynth
         rtmempool
         sfzero
         water
+        ysfx
         zita_resampler
         dgl
         libaubio
