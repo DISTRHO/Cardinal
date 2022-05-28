@@ -30,7 +30,6 @@
 
 #ifndef HEADLESS
 # include "DistrhoUI.hpp"
-# include "extra/FileBrowserDialog.hpp"
 #endif
 
 START_NAMESPACE_DISTRHO

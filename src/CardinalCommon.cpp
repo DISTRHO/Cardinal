@@ -139,7 +139,7 @@ void loadDialog()
         CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(pcontext->ui);
         DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
 
-        FileBrowserOptions opts;
+        DISTRHO_NAMESPACE::FileBrowserOptions opts;
         opts.startDir = dir.c_str();
         opts.saving = ui->saving = false;
         opts.title = "Open patch";
@@ -236,7 +236,7 @@ static void saveAsDialog(const bool uncompressed)
     CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(pcontext->ui);
     DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
 
-    FileBrowserOptions opts;
+    DISTRHO_NAMESPACE::FileBrowserOptions opts;
     opts.startDir = dir.c_str();
     opts.saving = ui->saving = true;
     opts.title = "Save patch";
@@ -276,7 +276,7 @@ void async_dialog_filebrowser(const bool saving,
     // only 1 dialog possible at a time
     DISTRHO_SAFE_ASSERT_RETURN(ui->filebrowserhandle == nullptr,);
 
-    FileBrowserOptions opts;
+    DISTRHO_NAMESPACE::FileBrowserOptions opts;
     opts.saving = saving;
     opts.startDir = startDir;
     opts.title = title;
