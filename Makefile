@@ -199,7 +199,9 @@ carla:
 ifneq ($(STATIC_BUILD),true)
 	$(MAKE) static-plugin -C carla $(CARLA_EXTRA_ARGS) \
 		CAN_GENERATE_LV2_TTL=false \
-		STATIC_PLUGIN_TARGET=true
+		CUSTOM_DPF_PATH=$(CURDIR)/dpf \
+		STATIC_PLUGIN_TARGET=true \
+		USING_CUSTOM_DPF=true
 endif
 
 deps:

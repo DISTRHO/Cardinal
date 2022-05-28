@@ -47,17 +47,8 @@ GLFWAPI const char* glfwGetClipboardString(GLFWwindow*)
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr, nullptr);
     DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr, nullptr);
 
-    const char* mimeType = nullptr;
-    size_t dataSize = 0;
-
-    if (const void* const clipboard = context->ui->getClipboard(mimeType, dataSize))
-    {
-        if (mimeType == nullptr || std::strcmp(mimeType, "text/plain") != 0)
-            return nullptr;
-        return static_cast<const char*>(clipboard);
-    }
-
-    return nullptr;
+    size_t dataSize;
+    return static_cast<const char*>(context->ui->getClipboard(dataSize));
 }
 
 GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char* const text)
@@ -268,7 +259,6 @@ class CardinalUI : public CardinalBaseUI,
         {
             if (context->window != nullptr)
                 WindowParametersSave(context->window);
-            rack::contextSet(nullptr);
         }
     };
 
@@ -619,13 +609,8 @@ protected:
         switch (ev.button)
         {
         case 1: button = GLFW_MOUSE_BUTTON_LEFT;   break;
-       #ifdef DISTRHO_OS_MAC
         case 2: button = GLFW_MOUSE_BUTTON_RIGHT;  break;
         case 3: button = GLFW_MOUSE_BUTTON_MIDDLE; break;
-       #else
-        case 2: button = GLFW_MOUSE_BUTTON_MIDDLE; break;
-        case 3: button = GLFW_MOUSE_BUTTON_RIGHT;  break;
-       #endif
         default:
             button = ev.button;
             break;
@@ -776,6 +761,17 @@ protected:
         std::snprintf(sizeString, sizeof(sizeString), "%d:%d",
                       (int)(ev.size.getWidth() / scaleFactor), (int)(ev.size.getHeight() / scaleFactor));
         setState("windowSize", sizeString);
+    }
+
+    uint32_t uiClipboardDataOffer() override
+    {
+        const std::vector<ClipboardDataOffer> offers(getClipboardDataOfferTypes());
+
+        for (const ClipboardDataOffer offer : offers)
+            if (std::strcmp(offer.type, "text/plain") == 0)
+                return offer.id;
+
+        return 0;
     }
 
     void uiFocus(const bool focus, const CrossingMode mode) override
