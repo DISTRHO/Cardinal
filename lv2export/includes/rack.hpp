@@ -409,13 +409,13 @@ struct Engine {
 
 struct Light {
     float value = 0.f;
-    void setBrightness(float brightness) {
+    inline void setBrightness(float brightness) {
         value = brightness;
     }
-    float getBrightness() {
+    inline float getBrightness() {
         return value;
     }
-    void setBrightnessSmooth(float brightness, float deltaTime, float lambda = 30.f) {
+    inline void setBrightnessSmooth(float brightness, float deltaTime, float lambda = 30.f) {
         if (brightness < value) {
             // Fade out light
             value += (brightness - value) * lambda * deltaTime;
@@ -425,10 +425,10 @@ struct Light {
             value = brightness;
         }
     }
-    void setSmoothBrightness(float brightness, float deltaTime) {
+    inline void setSmoothBrightness(float brightness, float deltaTime) {
         setBrightnessSmooth(brightness, deltaTime);
     }
-    void setBrightnessSmooth(float brightness, int frames = 1) {
+    inline void setBrightnessSmooth(float brightness, int frames = 1) {
         setBrightnessSmooth(brightness, frames / 44100.f);
     }
 };
@@ -445,8 +445,8 @@ struct LightInfo {
 
 struct Param {
     float value = 0.f;
-    float getValue() { return value; }
-    void setValue(float value) { this->value = value; }
+    inline float getValue() { return value; }
+    inline void setValue(float value) { this->value = value; }
 };
 
 struct Port {
@@ -463,39 +463,39 @@ struct Port {
         INPUT,
         OUTPUT,
     };
-    void setVoltage(float voltage, int channel = 0) { voltages[channel] = voltage; }
-    float getVoltage(int channel = 0) { return voltages[channel]; }
-    float getPolyVoltage(int channel) { return isMonophonic() ? getVoltage(0) : getVoltage(channel); }
-    float getNormalVoltage(float normalVoltage, int channel = 0) {
+    inline void setVoltage(float voltage, int channel = 0) { voltages[channel] = voltage; }
+    inline float getVoltage(int channel = 0) { return voltages[channel]; }
+    inline float getPolyVoltage(int channel) { return isMonophonic() ? getVoltage(0) : getVoltage(channel); }
+    inline float getNormalVoltage(float normalVoltage, int channel = 0) {
         return isConnected() ? getVoltage(channel) : normalVoltage;
     }
-    float getNormalPolyVoltage(float normalVoltage, int channel) {
+    inline float getNormalPolyVoltage(float normalVoltage, int channel) {
         return isConnected() ? getPolyVoltage(channel) : normalVoltage;
     }
-    float* getVoltages(int firstChannel = 0) { return &voltages[firstChannel]; }
-    void readVoltages(float* v) {
+    inline float* getVoltages(int firstChannel = 0) { return &voltages[firstChannel]; }
+    inline void readVoltages(float* v) {
         for (int c = 0; c < channels; c++) {
             v[c] = voltages[c];
         }
     }
-    void writeVoltages(const float* v) {
+    inline void writeVoltages(const float* v) {
         for (int c = 0; c < channels; c++) {
             voltages[c] = v[c];
         }
     }
-    void clearVoltages() {
+    inline void clearVoltages() {
         for (int c = 0; c < channels; c++) {
             voltages[c] = 0.f;
         }
     }
-    float getVoltageSum() {
+    inline float getVoltageSum() {
         float sum = 0.f;
         for (int c = 0; c < channels; c++) {
             sum += voltages[c];
         }
         return sum;
     }
-    float getVoltageRMS() {
+    inline float getVoltageRMS() {
         if (channels == 0) {
             return 0.f;
         }
@@ -534,7 +534,7 @@ struct Port {
 //     void setVoltageSimd(T voltage, int firstChannel) {
 //         voltage.store(&voltages[firstChannel]);
 //     }
-    void setChannels(int channels) {
+    inline void setChannels(int channels) {
         if (this->channels == 0) {
             return;
         }
@@ -546,11 +546,11 @@ struct Port {
         }
         this->channels = channels;
     }
-    int getChannels() { return channels; }
-    bool isConnected() { return channels > 0; }
-    bool isMonophonic() { return channels == 1; }
-    bool isPolyphonic() { return channels > 1; }
-    float normalize(float normalVoltage) { return getNormalVoltage(normalVoltage); }
+    inline int getChannels() { return channels; }
+    inline bool isConnected() { return channels > 0; }
+    inline bool isMonophonic() { return channels == 1; }
+    inline bool isPolyphonic() { return channels > 1; }
+    inline float normalize(float normalVoltage) { return getNormalVoltage(normalVoltage); }
 };
 
 struct Output : Port {};
@@ -601,9 +601,9 @@ struct ParamQuantity : Quantity {
 //     float getSmoothValue();
 //     void setValue(float value) override;
 //     float getValue() override;
-    float getMinValue() override { return minValue; }
-    float getMaxValue() override { return maxValue; }
-    float getDefaultValue() override { return defaultValue; }
+    inline float getMinValue() override { return minValue; }
+    inline float getMaxValue() override { return maxValue; }
+    inline float getDefaultValue() override { return defaultValue; }
 //     float getDisplayValue() override;
 //     void setDisplayValue(float displayValue) override;
 //     std::string getDisplayValueString() override;
@@ -669,6 +669,9 @@ struct Module {
             configOutput(i);
         }
         lightInfos.resize(numLights);
+        for (int i = 0; i < numLights; i++) {
+            configLight(i);
+        }
     } 
     template <class TParamQuantity = ParamQuantity>
     TParamQuantity* configParam(int paramId, float minValue, float maxValue, float defaultValue, std::string name = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {

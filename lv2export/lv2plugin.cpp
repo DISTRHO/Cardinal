@@ -105,13 +105,13 @@ struct PluginLv2 {
         // FIXME for CV ports we need to detect if something is connected
         for (int i=numInputs; --i >=0;)
         {
-            if (!kCvInputs[i])
-                module->inputs[i].channels = 1;
+            // if (!kCvInputs[i])
+            module->inputs[i].channels = 1;
         }
         for (int i=numOutputs; --i >=0;)
         {
-            if (!kCvOutputs[i])
-                module->outputs[i].channels = 1;
+            // if (!kCvOutputs[i])
+            module->outputs[i].channels = 1;
         }
 
         d_stdout("Loaded " SLUG " :: %i inputs, %i outputs, %i params and %i lights",
@@ -128,12 +128,6 @@ struct PluginLv2 {
     void lv2_connect_port(const uint32_t port, void* const dataLocation)
     {
         ports[port] = dataLocation;
-    }
-
-    void lv2_activate()
-    {
-        contextSet(&context);
-        module->onReset();
     }
 
     void lv2_run(const uint32_t sampleCount)
@@ -171,6 +165,9 @@ struct PluginLv2 {
             ++args.frame;
         }
 
+        for (int i=numLights; --i >=0;)
+            *static_cast<float*>(ports[numInputs+numOutputs+numParams+i]) = module->lights[i].getBrightness();
+
         frameCount += sampleCount;
     }
 };
@@ -187,11 +184,6 @@ static LV2_Handle lv2_instantiate(const LV2_Descriptor*, double sampleRate, cons
 static void lv2_connect_port(LV2_Handle instance, uint32_t port, void* dataLocation)
 {
     instancePtr->lv2_connect_port(port, dataLocation);
-}
-
-static void lv2_activate(LV2_Handle instance)
-{
-    instancePtr->lv2_activate();
 }
 
 static void lv2_run(LV2_Handle instance, uint32_t sampleCount)
@@ -219,7 +211,7 @@ static const LV2_Descriptor sLv2Descriptor = {
     "urn:cardinal:" SLUG,
     lv2_instantiate,
     lv2_connect_port,
-    lv2_activate,
+    NULL, // activate
     lv2_run,
     NULL, // deactivate
     lv2_cleanup,

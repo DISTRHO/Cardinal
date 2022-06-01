@@ -92,7 +92,7 @@ void lv2_generate_ttl()
 
     for (int i=0; i<module->getNumParams(); ++i)
     {
-        ParamQuantity* q = module->getParamQuantity(i);
+        ParamQuantity* const q = module->getParamQuantity(i);
         d_stdout("    lv2:port [");
         d_stdout("        a lv2:InputPort, lv2:ControlPort ;");
         d_stdout("        lv2:index %d ;", index++);
@@ -101,6 +101,29 @@ void lv2_generate_ttl()
         d_stdout("        lv2:default %f ;", q->defaultValue);
         d_stdout("        lv2:minimum %f ;", q->minValue);
         d_stdout("        lv2:maximum %f ;", q->maxValue);
+        d_stdout("    ] ;");
+        d_stdout("");
+        // q->getDescription().c_str()
+        // q->unit.c_str()
+    }
+
+    for (int i=0; i<module->getNumLights(); ++i)
+    {
+        LightInfo* const li = module->getLightInfo(i);
+        d_stdout("    lv2:port [");
+        d_stdout("        a lv2:OutputPort, lv2:ControlPort ;");
+        d_stdout("        lv2:index %d ;", index++);
+        d_stdout("        lv2:symbol \"lv2_light_%d\" ;", i + 1);
+        if (!li->name.empty())
+        {
+            d_stdout("        lv2:name \"%s\" ;", li->name.c_str());
+            if (!li->description.empty())
+                d_stdout("        lv2:comment \"%s\" ;", li->description.c_str());
+        }
+        else
+        {
+            d_stdout("        lv2:name \"Light %d\" ;", i + 1);
+        }
         d_stdout("    ] ;");
         d_stdout("");
         // q->getDescription().c_str()
