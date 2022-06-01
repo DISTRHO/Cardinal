@@ -35,6 +35,9 @@ static constexpr const bool kCvOutputs[] = PLUGIN_CV_OUTPUTS;
 
 #include "DistrhoUtils.hpp"
 
+#include <time.h>
+#include <sys/time.h>
+
 namespace rack {
 
 static thread_local Context* threadContext = nullptr;
@@ -51,6 +54,15 @@ void contextSet(Context* context) {
     threadContext = context;
 }
 
+namespace random {
+
+Xoroshiro128Plus& local() {
+    static Xoroshiro128Plus rng;
+    return rng;
+}
+
+} // namespace random
+
 }
 
 struct PluginLv2 {
@@ -62,6 +74,21 @@ struct PluginLv2 {
 
     PluginLv2(double sr)
     {
+        rack::random::Xoroshiro128Plus& rng(rack::random::local());
+
+        if (! rng.isSeeded())
+        {
+            struct timeval tv;
+            gettimeofday(&tv, NULL);
+            uint64_t usec = uint64_t(tv.tv_sec) * 1000 * 1000 + tv.tv_usec;
+
+            static uint64_t globalCounter = 1;
+            rng.seed(usec, globalCounter++);
+
+            for (int i = 0; i < 4; i++)
+                rng();
+        }
+
         context._engine.sampleRate = sr;
         contextSet(&context);
         module = PLUGIN_MODEL->createModule();

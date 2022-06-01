@@ -34,16 +34,12 @@ ifeq ($(DEBUG),true)
 BASE_FLAGS += -UDEBUG
 endif
 
-# BASE_FLAGS += -DHEADLESS
-# BASE_FLAGS += -DPRIVATE=
-# 
-# BASE_FLAGS += -fno-finite-math-only
-# # BASE_FLAGS += -I../dpf/dgl
-# BASE_FLAGS += -I../dpf/dgl/src/nanovg
-# BASE_FLAGS += -I../dpf/distrho
-# BASE_FLAGS += -I../include
+BASE_FLAGS += -DHEADLESS
+BASE_FLAGS += -fno-finite-math-only
+BASE_FLAGS += -pthread
+
+# might be needed later
 # BASE_FLAGS += -I../include/neon-compat
-# BASE_FLAGS += -I../src/Rack/include
 # ifeq ($(SYSDEPS),true)
 # BASE_FLAGS += -DCARDINAL_SYSDEPS
 # BASE_FLAGS += $(shell pkg-config --cflags jansson libarchive samplerate speexdsp)
@@ -58,14 +54,13 @@ endif
 # # BASE_FLAGS += -IRack/dep/osdialog
 # BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 # BASE_FLAGS += -I../src/Rack/dep/pffft
-# BASE_FLAGS += -pthread
-# 
-# ifeq ($(WINDOWS),true)
-# BASE_FLAGS += -D_USE_MATH_DEFINES
-# BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
-# BASE_FLAGS += -I../include/mingw-compat
-# BASE_FLAGS += -I../include/mingw-std-threads
-# endif
+
+ifeq ($(WINDOWS),true)
+BASE_FLAGS += -D_USE_MATH_DEFINES
+BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
+BASE_FLAGS += -I../include/mingw-compat
+BASE_FLAGS += -I../include/mingw-std-threads
+endif
 
 # --------------------------------------------------------------
 # lots of warnings from VCV side
@@ -121,10 +116,15 @@ clean:
 
 # --------------------------------------------------------------
 
-# $(BUILD_DIR)/valleyaudio-plateau.cpp.o: plugins/valleyaudio-plateau.cpp
-# 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-# 	@echo "Compiling $<"
-# 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DSLUG='"$*"' -c -o $@
+$(BUILD_DIR)/aubileinstruments-%.cpp.o: plugins/aubileinstruments-%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -DSLUG='"aubileinstruments-$*"' \
+		-DTEST \
+		-I../plugins/AudibleInstruments/eurorack \
+		-Wno-class-memaccess \
+		-Wno-unused-local-typedefs \
+		-c -o $@
 
 $(BUILD_DIR)/%.cpp.o: plugins/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
