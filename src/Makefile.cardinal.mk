@@ -19,11 +19,8 @@ endif
 
 ifneq ($(STATIC_BUILD),true)
 
-ifneq ($(DEBUG),true)
-EXTERNAL_PLUGINS = true
-endif
-
 CWD = ../../carla/source
+STATIC_PLUGIN_TARGET = true
 include $(CWD)/Makefile.deps.mk
 
 CARLA_BUILD_DIR = ../../carla/build

@@ -104,6 +104,9 @@ endif
 ifneq ($(HAVE_X11),true)
 $(error X11 dependency not installed/available)
 endif
+ifneq ($(HAVE_XCURSOR),true)
+$(warning Xcursor dependency not installed/available)
+endif
 ifneq ($(HAVE_XEXT),true)
 $(warning Xext dependency not installed/available)
 endif
@@ -115,6 +118,7 @@ else
 
 CARLA_EXTRA_ARGS += HAVE_OPENGL=false
 CARLA_EXTRA_ARGS += HAVE_X11=false
+CARLA_EXTRA_ARGS += HAVE_XCURSOR=false
 CARLA_EXTRA_ARGS += HAVE_XEXT=false
 CARLA_EXTRA_ARGS += HAVE_XRANDR=false
 
