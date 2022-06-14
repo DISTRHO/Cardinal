@@ -761,17 +761,6 @@ protected:
         setState("windowSize", sizeString);
     }
 
-    uint32_t uiClipboardDataOffer() override
-    {
-        const std::vector<ClipboardDataOffer> offers(getClipboardDataOfferTypes());
-
-        for (const ClipboardDataOffer offer : offers)
-            if (std::strcmp(offer.type, "text/plain") == 0)
-                return offer.id;
-
-        return 0;
-    }
-
     void uiFocus(const bool focus, const CrossingMode mode) override
     {
         if (focus)
