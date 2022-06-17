@@ -3,7 +3,7 @@
     <title>Cardinal</title>
     <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true" />
     <license file="@builddir@/../LICENSE" mime-type="text/plain" />
-    <options customize="always" hostArchitectures="x86_64" require-scripts="false" rootVolumeOnly="true" />
+    <options customize="always" hostArchitectures="@buildarchs@" require-scripts="false" rootVolumeOnly="true" />
     <pkg-ref id="studio.kx.distrho.cardinal" />
     <welcome file="@builddir@/../utils/macOS/welcome.txt" mime-type="text/plain" />
     <choice id="studio.kx.distrho.cardinal-res" title="Resources" description="Install resources" visible="false">
