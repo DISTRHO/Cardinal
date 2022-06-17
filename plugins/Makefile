@@ -908,9 +908,9 @@ PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCa
 # --------------------------------------------------------------
 # ZZC
 
-PLUGIN_FILES += $(filter-out ZZC/src/ZZC.cpp,$(wildcard ZZC/src/*.cpp))
-PLUGIN_FILES += ZZC/src/dsp/Wavetable.cpp
-PLUGIN_FILES += ZZC/src/filetypes/WavSupport.cpp
+PLUGIN_FILES += $(filter-out ZZC/src/ZZC.cpp ZZC/src/WavetablePlayer.cpp,$(wildcard ZZC/src/*.cpp))
+# PLUGIN_FILES += ZZC/src/dsp/Wavetable.cpp
+# PLUGIN_FILES += ZZC/src/filetypes/WavSupport.cpp
 
 # modules/types which are present in other plugins
 ZZC_CUSTOM = Clock LowFrequencyOscillator
@@ -938,6 +938,7 @@ BASE_FLAGS += -I../dpf/distrho
 
 BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/neon-compat
+BASE_FLAGS += -I../include/osdialog-stub
 
 ifeq ($(HAVE_X11),true)
 BASE_FLAGS += -DHAVE_X11
@@ -959,7 +960,6 @@ BASE_FLAGS += -I../src/Rack/dep/filesystem/include
 # # BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
 BASE_FLAGS += -I../src/Rack/dep/glfw/include
 BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
-BASE_FLAGS += -I../src/Rack/dep/osdialog
 BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
 
