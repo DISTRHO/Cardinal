@@ -115,6 +115,7 @@ endif (APPLE)
 
 # Main variant
 
+#[[
 juce_add_plugin(Cardinal
     AU_MAIN_TYPE kAudioUnitType_MusicEffect
     COMPANY_COPYRIGHT "GPL-3.0-or-later"
@@ -202,6 +203,7 @@ target_link_libraries(Cardinal
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
+#]]
 
 # FX variant
 
