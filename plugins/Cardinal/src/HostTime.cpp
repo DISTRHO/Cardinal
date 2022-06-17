@@ -92,7 +92,6 @@ struct HostTime : TerminalModule {
         {
             if (d_isZero(tick))
             {
-                pulseReset.trigger();
                 pulseClock.trigger();
                 pulseBeat.trigger();
                 if (timeInfo.beat == 1)
