@@ -1,0 +1,1 @@
+../Cardinal/DistrhoPluginInfo.h
