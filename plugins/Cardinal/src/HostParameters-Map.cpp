@@ -33,6 +33,13 @@
 
 static constexpr const uint8_t MAX_MAPPED_PARAMS = 64;
 
+struct HostParameterMapping {
+    uint8_t hostParamId = UINT8_MAX;
+    bool inverted = false;
+    bool smooth = true;
+    ParamHandle paramHandle;
+};
+
 struct HostParametersMap : TerminalModule {
     enum ParamIds {
         NUM_PARAMS
@@ -47,14 +54,7 @@ struct HostParametersMap : TerminalModule {
         NUM_LIGHTS
     };
 
-    struct Mapping {
-        uint8_t hostParamId = UINT8_MAX;
-        bool inverted = false;
-        bool smooth = false;
-        ParamHandle paramHandle;
-    };
-
-    Mapping mappings[MAX_MAPPED_PARAMS];
+    HostParameterMapping mappings[MAX_MAPPED_PARAMS];
     dsp::ExponentialFilter valueFilters[MAX_MAPPED_PARAMS];
     bool filterInitialized[MAX_MAPPED_PARAMS] = {};
     bool valueReached[MAX_MAPPED_PARAMS] = {};
@@ -297,20 +297,20 @@ struct HostParametersMap : TerminalModule {
         updateMapLen();
     }
 
-    void learnParam(const uint8_t hostParamId, const bool inverted, const bool smooth,
-                    const int64_t moduleId, const int paramId)
+    void learnParam(const uint8_t id, const int64_t moduleId, const int paramId)
     {
-        const uint8_t id = learningId;
-        learningId = UINT8_MAX;
+        DISTRHO_SAFE_ASSERT_UINT2_RETURN(id == learningId, id, learningId,);
         DISTRHO_SAFE_ASSERT_RETURN(id < MAX_MAPPED_PARAMS,);
 
+        // reset for next time
+        learningId = UINT8_MAX;
+
+        // reset smoothing filters
         filterInitialized[id] = false;
         valueFilters[id].reset();
         valueReached[id] = true;
-        mappings[id].inverted = inverted;
-        mappings[id].smooth = smooth;
-        mappings[id].hostParamId = hostParamId;
 
+        // report mapping change to engine if needed
         if (mappings[id].paramHandle.moduleId != moduleId || mappings[id].paramHandle.paramId != paramId)
             pcontext->engine->updateParamHandle(&mappings[id].paramHandle, moduleId, paramId, true);
 
@@ -338,17 +338,66 @@ struct HostParametersMap : TerminalModule {
 // --------------------------------------------------------------------------------------------------------------------
 
 #ifndef HEADLESS
+struct ParameterIndexQuantity : Quantity {
+    HostParameterMapping& mapping;
+    float v;
+
+    ParameterIndexQuantity(HostParameterMapping& m)
+      : mapping(m),
+        v(mapping.hostParamId) {}
+
+    float getMinValue() override {
+        return 0;
+    }
+    float getMaxValue() override {
+        return kModuleParameters - 1;
+    }
+    float getDefaultValue() override {
+        return 0;
+    }
+    float getValue() override {
+        return v;
+    }
+    void setValue(float value) override {
+        v = math::clamp(value, getMinValue(), getMaxValue());
+        mapping.hostParamId = math::clamp(static_cast<int>(v + 0.5f), 0, kModuleParameters - 1);
+    }
+    float getDisplayValue() override {
+        return mapping.hostParamId + 1;
+    }
+    void setDisplayValue(float displayValue) override {
+        setValue(displayValue - 1);
+	}
+    std::string getLabel() override {
+        return "Host Parameter";
+    }
+};
+
+struct ParameterIndexSlider : ui::Slider {
+	ParameterIndexSlider(HostParameterMapping& m) {
+		quantity = new ParameterIndexQuantity(m);
+	}
+	~ParameterIndexSlider() {
+		delete quantity;
+	}
+};
+
+static HostParameterMapping& getDummyHostParameterMapping()
+{
+    static HostParameterMapping mapping;
+    return mapping;
+}
+
 struct HostParametersMapChoice : CardinalLedDisplayChoice {
     HostParametersMap* const module;
     const uint8_t id;
-    uint8_t hostParamId = UINT8_MAX;
-    bool inverted = false;
-    bool smooth = true;
+    HostParameterMapping& mapping;
 
     HostParametersMapChoice(HostParametersMap* const m, const uint8_t i)
       : CardinalLedDisplayChoice(),
         module(m),
-        id(i)
+        id(i),
+        mapping(m != nullptr ? m->mappings[i] : getDummyHostParameterMapping())
     {
         alignTextCenter = false;
 
@@ -388,11 +437,11 @@ struct HostParametersMapChoice : CardinalLedDisplayChoice {
             if (ParamWidget* const touchedParam = APP->scene->rack->touchedParam)
             {
                 APP->scene->rack->touchedParam = nullptr;
-                DISTRHO_SAFE_ASSERT_RETURN(hostParamId < kModuleParameters,);
+                DISTRHO_SAFE_ASSERT_RETURN(mapping.hostParamId < kModuleParameters,);
 
                 const int64_t moduleId = touchedParam->module->id;
                 const int paramId = touchedParam->paramId;
-                module->learnParam(hostParamId, inverted, smooth, moduleId, paramId);
+                module->learnParam(id, moduleId, paramId);
             }
         }
         else
@@ -444,25 +493,7 @@ struct HostParametersMapChoice : CardinalLedDisplayChoice {
         case GLFW_MOUSE_BUTTON_LEFT:
             APP->scene->rack->touchedParam = nullptr;
             e.consume(this);
-            // reset before dialog
-            module->learningId = hostParamId = UINT8_MAX;
-            inverted = smooth = false;
-            HostParametersMapChoice* const self = this;
-            // open dialog
-            async_dialog_text_input("Plugin-exposed parameter index to map to", "1", [self](char* newText){
-                if (self == nullptr || newText == nullptr)
-                    return;
-                // FIXME use a proper dialog
-                const int hostParamIdTry = std::atoi(newText);
-                if (hostParamIdTry > 0 && hostParamIdTry < (int)kModuleParameters)
-                {
-                    self->module->learningId = self->id;
-                    self->hostParamId = static_cast<uint8_t>(hostParamIdTry - 1);
-                    self->inverted = false;
-                    self->smooth = false;
-                }
-                std::free(newText);
-            });
+            createMappingMenu();
             break;
         }
     }
@@ -472,7 +503,7 @@ struct HostParametersMapChoice : CardinalLedDisplayChoice {
         DISTRHO_SAFE_ASSERT_RETURN(module != nullptr, "error");
         DISTRHO_SAFE_ASSERT_RETURN(id < module->numMappedParmeters, "error");
 
-        ParamHandle paramHandle(module->mappings[id].paramHandle);
+        const ParamHandle& paramHandle(module->mappings[id].paramHandle);
 
         Module* const paramModule = paramHandle.module;
         DISTRHO_CUSTOM_SAFE_ASSERT_ONCE_RETURN("paramModule is null", paramModule != nullptr, "error");
@@ -488,6 +519,26 @@ struct HostParametersMapChoice : CardinalLedDisplayChoice {
         s += paramModule->model->name;
         s += ")";
         return s;
+    }
+
+    void createMappingMenu()
+    {
+        ui::Menu* const menu = createMenu();
+        menu->cornerFlags = BND_CORNER_TOP;
+        menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+
+        if (mapping.hostParamId == UINT8_MAX)
+        {
+            mapping.hostParamId = 0;
+            module->learningId = id;
+        }
+
+        ParameterIndexSlider* const paramIndexSlider = new ParameterIndexSlider(mapping);
+        paramIndexSlider->box.size.x = RACK_GRID_WIDTH * 11;
+        menu->addChild(paramIndexSlider);
+
+        menu->addChild(createBoolPtrMenuItem("Inverted", "", &mapping.inverted));
+        menu->addChild(createBoolPtrMenuItem("Smooth", "", &mapping.smooth));
     }
 };
 
