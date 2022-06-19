@@ -48,6 +48,8 @@ endif # STATIC_BUILD
 # --------------------------------------------------------------
 # Import base definitions
 
+NVG_DISABLE_SKIPPING_WHITESPACE = true
+NVG_FONT_TEXTURE_FLAGS = NVG_IMAGE_NEAREST
 USE_NANOVG_FBO = true
 include ../../dpf/Makefile.base.mk
 
@@ -80,6 +82,7 @@ FILES_DSP += RemoteNanoVG.cpp
 FILES_DSP += RemoteWindow.cpp
 else
 FILES_UI  = CardinalUI.cpp
+FILES_UI += glfw.cpp
 FILES_UI += Window.cpp
 endif
 
@@ -120,9 +123,6 @@ endif
 # --------------------------------------------------------------
 # Do some magic
 
-NVG_DISABLE_SKIPPING_WHITESPACE = true
-NVG_FONT_TEXTURE_FLAGS = NVG_IMAGE_NEAREST
-USE_NANOVG_FBO = true
 USE_VST2_BUNDLE = true
 include ../../dpf/Makefile.plugins.mk
 
