@@ -20,6 +20,10 @@
 
 #include <GLFW/glfw3.h>
 
+typedef struct GLFWcursor {
+    DGL_NAMESPACE::MouseCursor cursorId;
+} GLFWcursor;
+
 GLFWAPI int glfwGetKeyScancode(int) { return 0; }
 
 GLFWAPI const char* glfwGetClipboardString(GLFWwindow*)
@@ -43,13 +47,53 @@ GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char* const text)
     context->ui->setClipboard(nullptr, text, std::strlen(text)+1);
 }
 
+GLFWAPI GLFWcursor* glfwCreateStandardCursor(const int shape)
+{
+    static GLFWcursor cursors[] = {
+        { kMouseCursorArrow        }, // GLFW_ARROW_CURSOR
+        { kMouseCursorCaret        }, // GLFW_IBEAM_CURSOR
+        { kMouseCursorCrosshair    }, // GLFW_CROSSHAIR_CURSOR
+        { kMouseCursorHand         }, // GLFW_POINTING_HAND_CURSOR
+        { kMouseCursorNotAllowed   }, // GLFW_NOT_ALLOWED_CURSOR
+        { kMouseCursorLeftRight    }, // GLFW_RESIZE_EW_CURSOR
+        { kMouseCursorUpDown       }, // GLFW_RESIZE_NS_CURSOR
+        { kMouseCursorDiagonal     }, // GLFW_RESIZE_NWSE_CURSOR
+        { kMouseCursorAntiDiagonal }, // GLFW_RESIZE_NESW_CURSOR
+        // NOTE GLFW_RESIZE_ALL_CURSOR is unsupported in pugl
+    };
+
+    switch (shape)
+    {
+    case GLFW_ARROW_CURSOR:
+        return &cursors[kMouseCursorArrow];
+    case GLFW_IBEAM_CURSOR:
+        return &cursors[kMouseCursorCaret];
+    case GLFW_CROSSHAIR_CURSOR:
+        return &cursors[kMouseCursorCrosshair];
+    case GLFW_POINTING_HAND_CURSOR:
+        return &cursors[kMouseCursorHand];
+    case GLFW_NOT_ALLOWED_CURSOR:
+        return &cursors[kMouseCursorNotAllowed];
+    case GLFW_RESIZE_EW_CURSOR:
+        return &cursors[kMouseCursorLeftRight];
+    case GLFW_RESIZE_NS_CURSOR:
+        return &cursors[kMouseCursorUpDown];
+    case GLFW_RESIZE_NWSE_CURSOR:
+        return &cursors[kMouseCursorDiagonal];
+    case GLFW_RESIZE_NESW_CURSOR:
+        return &cursors[kMouseCursorAntiDiagonal];
+    default:
+        return nullptr;
+    }
+}
+
 GLFWAPI void glfwSetCursor(GLFWwindow*, GLFWcursor* const cursor)
 {
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr,);
     DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr,);
 
-    context->ui->setCursor(cursor != nullptr ? kMouseCursorDiagonal : kMouseCursorArrow);
+    context->ui->setCursor(cursor != nullptr ? cursor->cursorId : kMouseCursorArrow);
 }
 
 GLFWAPI double glfwGetTime(void)

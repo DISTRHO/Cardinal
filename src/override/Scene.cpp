@@ -108,11 +108,11 @@ struct ResizeHandle : widget::OpaqueWidget {
 	}
 
 	void onEnter(const EnterEvent& e) override {
-		glfwSetCursor(nullptr, (GLFWcursor*)0x1);
+		glfwSetCursor(APP->window->win, glfwCreateStandardCursor(GLFW_RESIZE_NWSE_CURSOR));
 	}
 
 	void onLeave(const LeaveEvent& e) override {
-		glfwSetCursor(nullptr, nullptr);
+		glfwSetCursor(APP->window->win, nullptr);
 	}
 
 	void onDragStart(const DragStartEvent&) override {
