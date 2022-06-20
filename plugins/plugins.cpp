@@ -2611,6 +2611,7 @@ static void initStatic__Voxglitch()
       p->addModel(modelSamplerX8);
       p->addModel(modelSatanonaut);
       p->addModel(modelGrooveBox);
+      p->addModel(modelGrooveBoxExpander);
       p->addModel(modelWavBank);
       p->addModel(modelWavBankMC);
       p->addModel(modelXY);
