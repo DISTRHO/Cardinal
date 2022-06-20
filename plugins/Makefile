@@ -537,7 +537,7 @@ PLUGIN_FILES += $(filter-out Extratone/src/plugin.cpp,$(wildcard Extratone/src/*
 PLUGIN_FILES += $(filter-out FehlerFabrik/src/plugin.cpp,$(wildcard FehlerFabrik/src/*.cpp))
 
 # modules/types which are present in other plugins
-FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter
+FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter SimpleDelay
 
 # --------------------------------------------------------------
 # forsitan modulare
@@ -891,14 +891,14 @@ VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 
 PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
 
+# modules/types which are present in other plugins
+VOXGLITCH_CUSTOM = $(DRWAV) ADSR AudioFile Looper Readout
+VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain SamplePlayer Sequencer SequencerDisplay VoltageSequencer
+
 # --------------------------------------------------------------
 # WhatTheRack
 
 PLUGIN_FILES += $(filter-out WhatTheRack/src/WhatTheRack.cpp,$(wildcard WhatTheRack/src/*.cpp))
-
-# modules/types which are present in other plugins
-VOXGLITCH_CUSTOM = $(DRWAV) AudioFile Looper Readout
-VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain SamplePlayer Sequencer SequencerDisplay VoltageSequencer
 
 # --------------------------------------------------------------
 # ZetaCarinaeModules
