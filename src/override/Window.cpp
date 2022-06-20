@@ -355,6 +355,11 @@ void Window::setSize(math::Vec size) {
 		ui->setSize(internal->size.x, internal->size.y);
 }
 
+void WindowSetInternalSize(rack::window::Window* const window, math::Vec size) {
+	size = size.max(WINDOW_SIZE_MIN);
+	window->internal->size = size;
+}
+
 
 void Window::run() {
 	internal->frame = 0;

@@ -46,6 +46,7 @@ namespace app {
 namespace window {
     void WindowSetPluginUI(Window* window, DISTRHO_NAMESPACE::UI* ui);
     void WindowSetMods(Window* window, int mods);
+    void WindowSetInternalSize(rack::window::Window* window, math::Vec size);
 }
 }
 
@@ -610,7 +611,7 @@ protected:
         UI::onResize(ev);
 
         if (context->window != nullptr)
-            context->window->setSize(rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
+            WindowSetInternalSize(context->window, rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
 
         const double scaleFactor = getScaleFactor();
         char sizeString[64];
