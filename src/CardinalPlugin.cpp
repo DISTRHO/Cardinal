@@ -81,6 +81,13 @@ namespace window {
 
 START_NAMESPACE_DISTRHO
 
+template<typename T>
+static inline
+bool d_isDiffHigherThanLimit(const T& v1, const T& v2, const T& limit)
+{
+    return v1 != v2 ? (v1 > v2 ? v1 - v2 : v2 - v1) > limit : false;
+}
+
 // -----------------------------------------------------------------------------------------------------------
 
 struct Initializer
@@ -1117,7 +1124,7 @@ protected:
         {
             const TimePosition& timePos(getTimePosition());
 
-            const bool reset = timePos.playing && (timePos.frame == 0 || fNextExpectedFrame != timePos.frame);
+            const bool reset = timePos.playing && (timePos.frame == 0 || d_isDiffHigherThanLimit(fNextExpectedFrame, timePos.frame, (uint64_t)2));
 
             context->playing = timePos.playing;
             context->bbtValid = timePos.bbt.valid;
