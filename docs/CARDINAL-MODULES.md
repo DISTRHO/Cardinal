@@ -163,6 +163,15 @@ If you find other content we can use, under clear license terms, maybe it could 
 
 Sometimes we just need to have fun. :)
 
+### Sassy Scope
+
+![screenshot](Module_SassyScope.png)
+
+The virtual oscilloscope from the [Sassy Spreadsheet](https://github.com/jarikomppa/sassy) project.  
+Features time and frequency analysis, input-based trigger sync and allows to pause the analysis for careful inspection.
+
+Line colors follow the color of the cable connected to its respective input.
+
 ### Expanders MIDI
 
 ![screenshot](Module_ExpandersMIDI.png)
