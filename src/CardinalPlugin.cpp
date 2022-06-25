@@ -621,7 +621,7 @@ protected:
 
     uint32_t getVersion() const override
     {
-        return d_version(0, 22, 5);
+        return d_version(0, 22, 6);
     }
 
     int64_t getUniqueId() const override
