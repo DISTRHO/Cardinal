@@ -132,7 +132,30 @@ It has pretty much the same options and functionality as the Rack MIDI-Map.
 For automating CV sources from the host side, this module directly converts the 24 Cardinal host-exposed parameters into CV signals inside Cardinal.
 
 The parameters have an internal slew limiter in order to smooth out the changes over time.  
-The fall time of the smoothing filter is based on the current host block size and sample rate.
+The fall time of the smoothing filter is based on the current host block size and sample rate.  
+You can disable this smoothing filter using right-click menu options.
+
+Clicking on an input jack from this module will send a "touch"/"edit" event to the plugin host / DAW,  
+required for allowing to create parameter automation lines in some hosts.
+
+### Host Parameters Map
+
+![screenshot](Module_HostParametersMap.png)
+
+For automating modules loaded inside Cardinal from within host side, using the 24 Cardinal host-exposed parameters.
+
+This is similar to Host MIDI CC Map, but instead of having MIDI CC from the host as source of events, it uses host-exposed parameters.
+
+Simply click on the last item on the list of mappings (which will say "click here to map" or "unmapped" depending if you have already any mappings or not),
+and then move a Cardinal-side module knob or controllable widget.
+
+Anytime you click to either do a new mapping or edit an existing one, a few options appear for setting host parameter, smooth on/off and invert on/off.  
+It is not possible to reassign an existing mapping to a different knob.  
+Right-clicking an item on the mapping list will remove it.
+
+Changing module knobs from Cardinal side will not send a parameter change event to the host.  
+This module works more in a "one to many" control scheme, where 1 single host parameter can control many cardinal modules, but never the other way around.  
+If you need to send a "parameter change" signal from Cardinal, use the "Host Parameters" module.
 
 ### Host Time
 
