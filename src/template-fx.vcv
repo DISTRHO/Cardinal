@@ -1,6 +1,5 @@
 {
-  "version": "2.1",
-  "path": "/Shared/Personal/FOSS/GIT/DISTRHO/DISTRHO_Cardinal/src/template-fx.vcv",
+  "version": "2.1.1",
   "unsaved": true,
   "zoom": 1.0,
   "modules": [
@@ -10,7 +9,7 @@
       "model": "TextEditor",
       "version": "2.0",
       "params": [],
-      "leftModuleId": 4,
+      "leftModuleId": 1299757500751091,
       "data": {
         "filepath": "",
         "lang": "None",
@@ -18,7 +17,7 @@
         "width": 19
       },
       "pos": [
-        34,
+        45,
         0
       ]
     },
@@ -85,9 +84,36 @@
       "version": "2.0",
       "params": [],
       "leftModuleId": 3,
-      "rightModuleId": 8712245256622475,
+      "rightModuleId": 1299757500751091,
+      "data": {
+        "smooth": true
+      },
       "pos": [
         25,
+        0
+      ]
+    },
+    {
+      "id": 1299757500751091,
+      "plugin": "Cardinal",
+      "model": "HostParametersMap",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 4,
+      "rightModuleId": 8712245256622475,
+      "data": {
+        "maps": [
+          {
+            "hostParamId": 255,
+            "inverted": false,
+            "smooth": true,
+            "moduleId": -1,
+            "paramId": 0
+          }
+        ]
+      },
+      "pos": [
+        34,
         0
       ]
     }
