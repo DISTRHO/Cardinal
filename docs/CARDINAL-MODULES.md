@@ -47,8 +47,9 @@ And finally, the Tolerance parameter influences how quickly you can change pitch
 This is a Cardinal/Rack module of Carla with 2 audio and 8 CV IO.  
 Double-click on the panel to show the Carla's own window.
 
-Note it is required for Carla to be installed on your system in order to show its GUI.  
-This is currently not supported under Windows.
+Note that it is required for Carla to be installed on your system in order to show its GUI.  
+Cardinal Windows installers ship with their own Carla version, for convenience.  
+On Linux and macOS you will need Carla to be installed in their typical locations.
 
 MIDI input and output are possible with the use of expander modules.
 
@@ -63,7 +64,7 @@ You can change this with right-click menu options, in case you want no offset to
 [Ildaeil](https://github.com/DISTRHO/Ildaeil) is a mini-plugin host based on [Carla](https://kx.studio/Applications:Carla).  
 This is a Cardinal/Rack module of Ildaeil with 2 audio IO.
 
-Currently Ildaeil supports (Carla) internal and LV2 plugins.  
+Currently Ildaeil supports (Carla) internal, LV2 and JSFX plugins.  
 More plugin support will be added in future releases.
 
 There is no way to automate hosted plugin parameters yet.
