@@ -122,15 +122,35 @@ struct ImGuiWidget::PrivateData {
         {
 #ifndef DGL_NO_SHARED_RESOURCES
             using namespace dpf_resources;
-            static const ImWchar ranges[] = { 0x20, 0xFF, 0 }; /* FIXME unicode range not working.. */
             ImFontConfig fc;
             fc.FontDataOwnedByAtlas = false;
             fc.OversampleH = 1;
             fc.OversampleV = 1;
             fc.PixelSnapH = true;
-            io.Fonts->AddFontFromMemoryTTF((void*)dejavusans_ttf,
-                                           dejavusans_ttf_size,
-                                           13.0f * scaleFactor, &fc, ranges);
+            io.Fonts->AddFontFromMemoryTTF((void*)dejavusans_ttf, dejavusans_ttf_size, 13.0f * scaleFactor, &fc);
+
+            // extra fonts we can try loading for unicode support
+            static const char* extraFontPathsToTry[] = {
+               #if defined(ARCH_WIN)
+                // TODO
+                // "Meiryo.ttc",
+               #elif defined(ARCH_MAC)
+                // TODO
+               #elif defined(ARCH_LIN)
+                "/usr/share/fonts/opentype/noto/NotoSerifCJK-Regular.ttc",
+               #endif
+            };
+
+            fc.FontDataOwnedByAtlas = true;
+            fc.MergeMode = true;
+
+            for (size_t i=0; i<ARRAY_SIZE(extraFontPathsToTry); ++i)
+            {
+                if (rack::system::exists(extraFontPathsToTry[i]))
+                    io.Fonts->AddFontFromFileTTF(extraFontPathsToTry[i], 13.0f * scaleFactor, &fc,
+                                                 io.Fonts->GetGlyphRangesJapanese());
+            }
+
             io.Fonts->Build();
 #endif
         }
