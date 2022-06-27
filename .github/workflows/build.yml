@@ -745,7 +745,7 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env win32; popd
           make features
-          make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
+          xvfb-run make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
       - name: Build win64 cross-compiled (carla)
         run: |
           pushd deps/PawPaw; source local.env win32; popd
@@ -837,7 +837,7 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env win64; popd
           make features
-          make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
+          xvfb-run make CIBUILD=true NOOPT=true WITH_LTO=true -j $(nproc)
       - name: Build win64 cross-compiled (carla)
         run: |
           pushd deps/PawPaw; source local.env win64; popd
