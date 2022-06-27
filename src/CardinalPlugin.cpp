@@ -52,6 +52,7 @@
 static const constexpr uint kCardinalStateBaseCount = 3; // patch, screenshot, comment
 
 #ifndef HEADLESS
+# include "extra/ScopedValueSetter.hpp"
 # include "WindowParameters.hpp"
 static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount + 2; // moduleInfos, windowSize
 #else
@@ -68,6 +69,9 @@ static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount;
 #endif
 
 namespace rack {
+namespace engine {
+    void Engine_setAboutToClose(Engine*);
+}
 namespace plugin {
     void initStaticPlugins();
     void destroyStaticPlugins();
@@ -572,6 +576,12 @@ public:
         {
             const ScopedContext sc(this);
             context->patch->clear();
+
+            // do a little dance to prevent context scene deletion from saving to temp dir
+#ifndef HEADLESS
+            const ScopedValueSetter<bool> svs(rack::settings::headless, true);
+#endif
+            Engine_setAboutToClose(context->engine);
             delete context;
         }
 
