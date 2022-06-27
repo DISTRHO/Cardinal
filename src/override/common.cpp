@@ -38,6 +38,8 @@
 #include <windows.h>
 
 FILE* fopen_u8(const char* filename, const char* mode) {
+	if (std::strncmp(filename, "\\\\?\\", 4) == 0 && std::getenv("CARDINAL_UNDER_WINE") != nullptr)
+		filename = "Z:\\dev\\null";
 	return _wfopen(rack::string::UTF8toUTF16(filename).c_str(), rack::string::UTF8toUTF16(mode).c_str());
 }
 
