@@ -77,8 +77,11 @@ std::string getSpecialPath(const SpecialPath type)
     case kSpecialPathCommonProgramFiles:
         csidl = CSIDL_PROGRAM_FILES_COMMON;
         break;
+    case kSpecialPathProgramFiles:
+        csidl = CSIDL_PROGRAM_FILES;
+        break;
     case kSpecialPathAppData:
-        csidl = CSIDL_COMMON_APPDATA;
+        csidl = CSIDL_APPDATA;
         break;
     default:
         return {};

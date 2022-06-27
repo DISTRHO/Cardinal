@@ -60,6 +60,7 @@ namespace rack {
 enum SpecialPath {
     kSpecialPathUserProfile,
     kSpecialPathCommonProgramFiles,
+    kSpecialPathProgramFiles,
     kSpecialPathAppData,
 };
 std::string getSpecialPath(const SpecialPath type);
@@ -122,6 +123,8 @@ static const char* getPathForJSFX()
         path = homeDir() + "/Library/Application Support/REAPER/Effects";
        #elif defined(CARLA_OS_WIN)
         path = getSpecialPath(kSpecialPathAppData) + "\\REAPER\\Effects";
+        if (! system::exists(path))
+            path = getSpecialPath(kSpecialPathProgramFiles) + "\\REAPER\\InstallData\\Effects";
        #else
         if (const char* const configHome = std::getenv("XDG_CONFIG_HOME"))
             path = configHome;
