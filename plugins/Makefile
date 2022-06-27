@@ -1041,7 +1041,7 @@ clean:
 # --------------------------------------------------------------
 
 ifeq ($(NOPLUGINS),true)
-PLUGIN_LIST = Cardinal
+PLUGIN_LIST = Cardinal Fundamental
 else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 endif
