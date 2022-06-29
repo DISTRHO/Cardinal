@@ -728,6 +728,11 @@ PLUGIN_FILES += $(filter-out MSM/src/MSM.cpp,$(wildcard MSM/src/*.cpp))
 MSM_CUSTOM = ADSR BlankPanel Delay LFO LowFrequencyOscillator Mult Noise OP VCA VCO sawTable triTable
 
 # --------------------------------------------------------------
+# myth-modules
+
+PLUGIN_FILES += $(filter-out myth-modules/src/plugin.cpp,$(wildcard myth-modules/src/*.cpp))
+
+# --------------------------------------------------------------
 # Nonlinear Circuits
 
 PLUGIN_FILES += $(filter-out nonlinearcircuits/src/NLC.cpp,$(wildcard nonlinearcircuits/src/*.cpp))
@@ -1708,6 +1713,13 @@ $(BUILD_DIR)/MSM/%.cpp.o: MSM/%.cpp
 		$(foreach m,$(MSM_CUSTOM),$(call custom_module_names,$(m),MSM)) \
 		-DpluginInstance=pluginInstance__MSM \
 		-DDARKTHEME
+
+$(BUILD_DIR)/myth-modules/%.cpp.o: myth-modules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MYTH_MODULES_CUSTOM),$(call custom_module_names,$(m),myth_modules)) \
+		-DpluginInstance=pluginInstance__myth_modules
 
 $(BUILD_DIR)/nonlinearcircuits/%.cpp.o: nonlinearcircuits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

@@ -631,6 +631,9 @@ extern Model* modelBlankPanel;
 #undef modelVCA
 #undef modelVCO
 
+// myth-modules
+#include "myth-modules/src/plugin.hpp"
+
 // Nonlinear Circuits
 #include "nonlinearcircuits/src/NLC.hpp"
 
@@ -759,6 +762,7 @@ Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__MSM;
+Plugin* pluginInstance__myth_modules;
 Plugin* pluginInstance__nonlinearcircuits;
 Plugin* pluginInstance__Orbits;
 Plugin* pluginInstance__ParableInstruments;
@@ -2343,6 +2347,19 @@ static void initStatic__MSM()
     }
 }
 
+static void initStatic__myth_modules()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__myth_modules = p;
+
+    const StaticPluginLoader spl(p, "myth-modules");
+    if (spl.ok())
+    {
+        p->addModel(modelMavka);
+        p->addModel(modelMolphar);
+    }
+}
+
 static void initStatic__nonlinearcircuits()
 {
     Plugin* const p = new Plugin;
@@ -2726,6 +2743,7 @@ void initStaticPlugins()
     initStatic__Mog();
     initStatic__mscHack();
     initStatic__MSM();
+    initStatic__myth_modules();
     initStatic__nonlinearcircuits();
     initStatic__Orbits();
     initStatic__ParableInstruments();

@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -268,6 +268,9 @@ static const struct {
     { "/kocmoc/res/SKF.svg", {}, -1 },
     { "/kocmoc/res/SVF.svg", {}, -1 },
     { "/kocmoc/res/TRG.svg", {}, -1 },
+    // GPL-3.0-or-later
+    { "/myth-modules/res/Mavka.svg", {}, -1 },
+    { "/myth-modules/res/Molphar.svg", {}, -1 },
     // CC0-1.0
     { "/nonlinearcircuits/res/BOOLs2.svg", {}, -1 },
     { "/nonlinearcircuits/res/DoubleNeuronRef.svg", {}, -1 },
@@ -549,6 +552,7 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
     {
     // scopes or other special things (do nothing)
     case 0x40ffffff:
+    case 0xff0000aa:
     case 0xff004200:
     case 0xff2b281e:
     case 0xff2d2827:

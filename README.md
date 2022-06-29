@@ -154,6 +154,7 @@ At the moment the following 3rd-party modules are provided:
 - Mog
 - mscHack
 - MSM
+- Myth
 - Nonlinear Circuits
 - Orbits
 - Parable Instruments
