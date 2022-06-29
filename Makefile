@@ -328,7 +328,6 @@ TAR_ARGS = \
 	--exclude=build \
 	--exclude=jucewrapper \
 	--exclude=lv2export \
-	--exclude=patches \
 	--exclude=carla/data \
 	--exclude=carla/source/frontend \
 	--exclude=carla/source/interposer \
