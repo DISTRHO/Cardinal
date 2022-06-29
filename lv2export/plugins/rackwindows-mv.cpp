@@ -17,9 +17,12 @@
 
 #include "rackwindows/src/mv.cpp"
 
+#define PLUGIN_BRAND "Rackwindows"
+#define PLUGIN_LABEL "MV"
 #define PLUGIN_MODEL modelMv
 #define PLUGIN_CV_INPUTS {1,1,1,1,0,0}
 #define PLUGIN_CV_OUTPUTS {0,0}
+#define PLUGIN_LV2_CATEGORY "lv2:ReverbPlugin"
 
 #include "lv2plugin.cpp"
 #include "export.cpp"

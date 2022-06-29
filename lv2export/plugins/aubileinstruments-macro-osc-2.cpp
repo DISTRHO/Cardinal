@@ -52,9 +52,12 @@
 
 #include "AudibleInstruments/eurorack/plaits/resources.cc"
 
+#define PLUGIN_BRAND "AudibleInstruments"
+#define PLUGIN_LABEL "Macro Osc 2"
 #define PLUGIN_MODEL modelPlaits
 #define PLUGIN_CV_INPUTS {1,1,1,1,1,1,1,1}
 #define PLUGIN_CV_OUTPUTS {0,0}
+#define PLUGIN_LV2_CATEGORY "lv2:GeneratorPlugin"
 
 #include "lv2plugin.cpp"
 #include "export.cpp"

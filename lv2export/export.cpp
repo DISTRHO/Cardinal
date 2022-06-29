@@ -15,6 +15,14 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
+#ifndef PLUGIN_BRAND
+# error PLUGIN_BRAND undefined
+#endif
+
+#ifndef PLUGIN_LABEL
+# error PLUGIN_LABEL undefined
+#endif
+
 #ifndef PLUGIN_MODEL
 # error PLUGIN_MODEL undefined
 #endif
@@ -43,11 +51,14 @@ void lv2_generate_ttl()
     d_stdout("@prefix doap:  <http://usefulinc.com/ns/doap#> .");
     d_stdout("@prefix foaf:  <http://xmlns.com/foaf/0.1/> .");
     d_stdout("@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .");
+    d_stdout("@prefix mod:   <http://moddevices.com/ns/mod#> .");
     d_stdout("");
 
     d_stdout("<urn:cardinal:" SLUG ">");
-    d_stdout("    a lv2:Plugin, doap:Project ;");
+    d_stdout("    a \"" PLUGIN_LV2_CATEGORY "\", doap:Project ;");
     d_stdout("    doap:name \"" SLUG "\" ;");
+    d_stdout("    mod:brand \"" PLUGIN_BRAND "\" ;");
+    d_stdout("    mod:label \"" PLUGIN_LABEL "\" ;");
     d_stdout("");
 
     int index = 0;
@@ -57,8 +68,18 @@ void lv2_generate_ttl()
         d_stdout("    lv2:port [");
         if (kCvInputs[i])
         {
-            d_stdout("        a lv2:InputPort, lv2:CVPort ;");
+            d_stdout("        a lv2:InputPort, lv2:CVPort, mod:CVPort ;");
             d_stdout("        lv2:symbol \"lv2_cv_in_%d\" ;", ++numCV);
+            if (kCvOutputs[i] == Bi)
+            {
+                d_stdout("        lv2:minimum -5.0 ;");
+                d_stdout("        lv2:maximum 5.0 ;");
+            }
+            else
+            {
+                d_stdout("        lv2:minimum 0.0 ;");
+                d_stdout("        lv2:maximum 10.0 ;");
+            }
         }
         else
         {
@@ -76,8 +97,18 @@ void lv2_generate_ttl()
         d_stdout("    lv2:port [");
         if (kCvOutputs[i])
         {
-            d_stdout("        a lv2:OutputPort, lv2:CVPort ;");
+            d_stdout("        a lv2:OutputPort, lv2:CVPort, mod:CVPort ;");
             d_stdout("        lv2:symbol \"lv2_cv_out_%d\" ;", ++numCV);
+            if (kCvOutputs[i] == Bi)
+            {
+                d_stdout("        lv2:minimum -5.0 ;");
+                d_stdout("        lv2:maximum 5.0 ;");
+            }
+            else
+            {
+                d_stdout("        lv2:minimum 0.0 ;");
+                d_stdout("        lv2:maximum 10.0 ;");
+            }
         }
         else
         {

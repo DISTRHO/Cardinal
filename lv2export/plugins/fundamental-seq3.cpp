@@ -17,9 +17,21 @@
 
 #include "Fundamental/src/SEQ3.cpp"
 
+#define PLUGIN_BRAND "VCV Fundamental"
+#define PLUGIN_LABEL "SEQ3"
 #define PLUGIN_MODEL modelSEQ3
-#define PLUGIN_CV_INPUTS {1,1,1,1,1}
-#define PLUGIN_CV_OUTPUTS {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+#define PLUGIN_CV_INPUTS {Bi,Uni,Uni,Uni,Uni}
+#define PLUGIN_CV_OUTPUTS {          \
+    /* trigger */                    \
+    Uni,                             \
+    /* 3 cv outs */                  \
+    Bi,Bi,Bi,                        \
+    /* 8 steps */                    \
+    Uni,Uni,Uni,Uni,Uni,Uni,Uni,Uni, \
+    /* steps, clk, run, reset */     \
+    Uni,Uni,Uni,Uni                  \
+}
+#define PLUGIN_LV2_CATEGORY "mod:CVPlugin"
 
 #include "lv2plugin.cpp"
 #include "export.cpp"

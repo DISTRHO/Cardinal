@@ -32,9 +32,12 @@
 // #include "AudibleInstruments/eurorack/braids/quantizer.cc"
 #include "AudibleInstruments/eurorack/braids/resources.cc"
 
+#define PLUGIN_BRAND "AudibleInstruments"
+#define PLUGIN_LABEL "Macro Osc"
 #define PLUGIN_MODEL modelBraids
 #define PLUGIN_CV_INPUTS {1,1,1,1,1}
 #define PLUGIN_CV_OUTPUTS {0}
+#define PLUGIN_LV2_CATEGORY "lv2:GeneratorPlugin"
 
 #include "lv2plugin.cpp"
 #include "export.cpp"

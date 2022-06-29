@@ -27,8 +27,14 @@
 # error PLUGIN_CV_OUTPUTS undefined
 #endif
 
-static constexpr const bool kCvInputs[] = PLUGIN_CV_INPUTS;
-static constexpr const bool kCvOutputs[] = PLUGIN_CV_OUTPUTS;
+enum PortType {
+    Audio = 0,
+    Bi = 1,
+    Uni = 2,
+};
+
+static constexpr const int kCvInputs[] = PLUGIN_CV_INPUTS;
+static constexpr const int kCvOutputs[] = PLUGIN_CV_OUTPUTS;
 
 #include "src/lv2/buf-size.h"
 #include "src/lv2/options.h"

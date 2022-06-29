@@ -17,9 +17,12 @@
 
 #include "Fundamental/src/Quantizer.cpp"
 
+#define PLUGIN_BRAND "VCV Fundamental"
+#define PLUGIN_LABEL "Quantizer"
 #define PLUGIN_MODEL modelQuantizer
-#define PLUGIN_CV_INPUTS {1}
-#define PLUGIN_CV_OUTPUTS {1}
+#define PLUGIN_CV_INPUTS {Bi}
+#define PLUGIN_CV_OUTPUTS {Bi}
+#define PLUGIN_LV2_CATEGORY "mod:CVPlugin"
 
 #include "lv2plugin.cpp"
 #include "export.cpp"
