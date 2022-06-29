@@ -57,6 +57,10 @@
 #include "../CardinalCommon.hpp"
 
 namespace rack {
+namespace asset {
+std::string patchesPath();
+}
+
 namespace app {
 namespace menuBar {
 
@@ -85,9 +89,21 @@ struct MenuButton : ui::Button {
 
 struct FileButton : MenuButton {
 	const bool isStandalone;
+	std::vector<std::string> demoPatches;
 
 	FileButton(const bool standalone)
-		: MenuButton(),  isStandalone(standalone) {}
+		: MenuButton(),  isStandalone(standalone)
+	{
+		const std::string patchesDir = asset::patchesPath();
+
+		if (system::isDirectory(patchesDir))
+		{
+			demoPatches = system::getEntries(patchesDir);
+			std::sort(demoPatches.begin(), demoPatches.end(), [](const std::string& a, const std::string& b){
+				return string::lowercase(a) < string::lowercase(b);
+			});
+		}
+	}
 
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
@@ -111,11 +127,13 @@ struct FileButton : MenuButton {
 			patchUtils::saveAsDialog();
 		}));
 
-		menu->addChild(createMenuItem("Export uncompressed json...", "", []() {
-			patchUtils::saveAsDialogUncompressed();
-		}));
+		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
+			patchUtils::revertDialog();
+		}, APP->patch->path.empty()));
 
 #ifdef HAVE_LIBLO
+		menu->addChild(new ui::MenuSeparator);
+
 		if (patchUtils::isRemoteConnected()) {
 			menu->addChild(createMenuItem("Deploy to MOD", "F7", []() {
 				patchUtils::deployToRemote();
@@ -133,16 +151,36 @@ struct FileButton : MenuButton {
 		}
 #endif
 
-		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
-			patchUtils::revertDialog();
-		}, APP->patch->path.empty()));
-
 		menu->addChild(new ui::MenuSeparator);
 
 		// Load selection
 		menu->addChild(createMenuItem("Import selection", "", [=]() {
 			patchUtils::loadSelectionDialog();
 		}, false, true));
+
+		menu->addChild(createMenuItem("Export uncompressed json...", "", []() {
+			patchUtils::saveAsDialogUncompressed();
+		}));
+
+		if (!demoPatches.empty())
+		{
+			menu->addChild(new ui::MenuSeparator);
+
+			menu->addChild(createSubmenuItem("Open Demo / Example project", "", [=](ui::Menu* const menu) {
+				for (std::string path : demoPatches) {
+					std::string label = system::getStem(path);
+
+					for (size_t i=0, len=label.size(); i<len; ++i) {
+						if (label[i] == '_')
+							label[i] = ' ';
+					}
+
+					menu->addChild(createMenuItem(label, "", [path]() {
+						patchUtils::loadPathDialog(path);
+					}));
+				}
+			}));
+		}
 
 		if (isStandalone) {
 			menu->addChild(new ui::MenuSeparator);

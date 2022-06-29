@@ -279,7 +279,8 @@ else
 all: lv2 vst2 vst3 static
 endif
 
-CORE_RESOURCES  = $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
+CORE_RESOURCES  = patches
+CORE_RESOURCES += $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
 CORE_RESOURCES += $(subst ../,,$(wildcard ../template*.vcv))
 
 LV2_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
@@ -324,6 +325,10 @@ $(BUILD_DIR)/distrho.rc.o: ../../utils/distrho.rc ../../utils/distrho.ico
 endif
 
 # --------------------------------------------------------------
+
+$(TARGET_DIR)/%/patches: ../../patches
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
 
 $(TARGET_DIR)/%/template.vcv: ../template.vcv
 	-@mkdir -p "$(shell dirname $@)"

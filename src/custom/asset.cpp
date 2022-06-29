@@ -78,6 +78,15 @@ std::string plugin(plugin::Plugin* plugin, std::string filename) {
     return system::join(plugin->path, filename);
 }
 
+// path to demo patch files
+std::string patchesPath() {
+    // no bundlePath set, assume local source build
+    if (bundlePath.empty())
+        return system::join(systemDir, "..", "..", "patches");
+    // bundlePath is present, use resources from bundle
+    return system::join(systemDir, "patches");
+}
+
 // path to plugin manifest
 std::string pluginManifest(const std::string& dirname) {
     // no bundlePath set, assume local source build
