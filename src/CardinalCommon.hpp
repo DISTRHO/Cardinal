@@ -58,7 +58,7 @@ std::string getSpecialPath(SpecialPath type);
 namespace patchUtils {
 
 void loadDialog();
-void loadPathDialog(const std::string& path);
+void loadPathDialog(const std::string& path, bool asTemplate = false);
 void loadSelectionDialog();
 void loadTemplateDialog();
 void revertDialog();

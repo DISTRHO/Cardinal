@@ -151,11 +151,17 @@ void loadDialog()
 #endif
 }
 
-void loadPathDialog(const std::string& path)
+void loadPathDialog(const std::string& path, const bool asTemplate)
 {
 #ifndef HEADLESS
-    promptClear("The current patch is unsaved. Clear it and open the new patch?", [path]() {
+    promptClear("The current patch is unsaved. Clear it and open the new patch?", [path, asTemplate]() {
         APP->patch->loadAction(path);
+
+        if (asTemplate)
+        {
+            APP->patch->path = "";
+            APP->history->setSaved();
+        }
     });
 #endif
 }

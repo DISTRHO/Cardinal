@@ -176,7 +176,7 @@ struct FileButton : MenuButton {
 					}
 
 					menu->addChild(createMenuItem(label, "", [path]() {
-						patchUtils::loadPathDialog(path);
+						patchUtils::loadPathDialog(path, true);
 					}));
 				}
 			}));
