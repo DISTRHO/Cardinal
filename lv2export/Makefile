@@ -14,7 +14,7 @@ SYSDEPS ?= false
 # --------------------------------------------------------------
 # Import base definitions
 
-USE_NANOVG_FBO = true
+DISTRHO_NAMESPACE = CardinalLV2
 include ../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------

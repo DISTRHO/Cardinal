@@ -7,6 +7,8 @@
 # --------------------------------------------------------------
 # Import base definitions
 
+DISTRHO_NAMESPACE = CardinalDISTRHO
+DGL_NAMESPACE = CardinalDGL
 USE_NANOVG_FBO = true
 include ../dpf/Makefile.base.mk
 

@@ -143,6 +143,8 @@ target_include_directories(Cardinal
 
 target_compile_definitions(Cardinal
     PUBLIC
+        DISTRHO_NAMESPACE=CardinalDISTRHO
+        DGL_NAMESPACE=CardinalDGL
         JucePlugin_PreferredChannelConfigurations=8,8
         JUCE_CHECK_MEMORY_LEAKS=0
         JUCE_DISABLE_NATIVE_FILECHOOSERS=1
@@ -234,6 +236,8 @@ target_include_directories(CardinalFX
 
 target_compile_definitions(CardinalFX
     PUBLIC
+        DISTRHO_NAMESPACE=CardinalDISTRHO
+        DGL_NAMESPACE=CardinalDGL
         JucePlugin_PreferredChannelConfigurations=2,2
         JUCE_CHECK_MEMORY_LEAKS=0
         JUCE_DISABLE_NATIVE_FILECHOOSERS=1
@@ -324,6 +328,8 @@ target_include_directories(CardinalSynth
 
 target_compile_definitions(CardinalSynth
     PUBLIC
+        DISTRHO_NAMESPACE=CardinalDISTRHO
+        DGL_NAMESPACE=CardinalDGL
         JucePlugin_PreferredChannelConfigurations=0,2
         JUCE_CHECK_MEMORY_LEAKS=0
         JUCE_DISABLE_NATIVE_FILECHOOSERS=1

@@ -12,7 +12,6 @@ VERSION = 22.06
 # --------------------------------------------------------------
 # Import base definitions
 
-USE_NANOVG_FBO = true
 include dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -43,7 +42,9 @@ endif
 # --------------------------------------------------------------
 # Carla config
 
-CARLA_EXTRA_ARGS = CARLA_BACKEND_NAMESPACE=Cardinal \
+CARLA_EXTRA_ARGS = \
+	CARLA_BACKEND_NAMESPACE=Cardinal \
+	DGL_NAMESPACE=CardinalDGL \
 	HAVE_FFMPEG=false \
 	HAVE_FLUIDSYNTH=false \
 	HAVE_PROJECTM=false \
@@ -58,6 +59,8 @@ endif
 # DGL config
 
 DGL_EXTRA_ARGS = \
+	DISTRHO_NAMESPACE=CardinalDISTRHO \
+	DGL_NAMESPACE=CardinalDGL \
 	NVG_DISABLE_SKIPPING_WHITESPACE=true \
 	NVG_FONT_TEXTURE_FLAGS=NVG_IMAGE_NEAREST \
 	USE_NANOVG_FBO=true \

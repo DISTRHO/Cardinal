@@ -48,6 +48,8 @@ endif # STATIC_BUILD
 # --------------------------------------------------------------
 # Import base definitions
 
+DISTRHO_NAMESPACE = CardinalDISTRHO
+DGL_NAMESPACE = CardinalDGL
 NVG_DISABLE_SKIPPING_WHITESPACE = true
 NVG_FONT_TEXTURE_FLAGS = NVG_IMAGE_NEAREST
 USE_NANOVG_FBO = true
