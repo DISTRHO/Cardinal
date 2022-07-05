@@ -194,7 +194,6 @@ PLUGIN_FILES = plugins.cpp
 PLUGIN_FILES += Cardinal/src/Blank.cpp
 PLUGIN_FILES += Cardinal/src/ExpanderInputMIDI.cpp
 PLUGIN_FILES += Cardinal/src/ExpanderOutputMIDI.cpp
-PLUGIN_FILES += Cardinal/src/glBars.cpp
 PLUGIN_FILES += Cardinal/src/HostAudio.cpp
 PLUGIN_FILES += Cardinal/src/HostCV.cpp
 PLUGIN_FILES += Cardinal/src/HostMIDI.cpp
@@ -205,6 +204,12 @@ PLUGIN_FILES += Cardinal/src/HostParameters.cpp
 PLUGIN_FILES += Cardinal/src/HostParameters-Map.cpp
 PLUGIN_FILES += Cardinal/src/HostTime.cpp
 PLUGIN_FILES += Cardinal/src/TextEditor.cpp
+
+ifeq ($(USE_GLES2),true)
+ifeq ($(USE_GLES3),true)
+PLUGIN_FILES += Cardinal/src/glBars.cpp
+endif
+endif
 
 ifneq ($(STATIC_BUILD),true)
 PLUGIN_FILES += Cardinal/src/AudioFile.cpp
@@ -226,7 +231,7 @@ PLUGIN_FILES += Cardinal/src/DearImGui.cpp
 PLUGIN_FILES += Cardinal/src/DearImGuiColorTextEditor.cpp
 endif
 
-ifeq ($(shell pkg-config --exists fftw3f && echo true),true)
+ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
 PLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
 BASE_FLAGS += -DHAVE_FFTW3F
 endif
@@ -953,7 +958,7 @@ endif
 
 ifeq ($(SYSDEPS),true)
 BASE_FLAGS += -DCARDINAL_SYSDEPS
-BASE_FLAGS += $(shell pkg-config --cflags jansson libarchive samplerate speexdsp)
+BASE_FLAGS += $(shell $(PKG_CONFIG) --cflags jansson libarchive samplerate speexdsp)
 BASE_FLAGS += -I../deps/sysroot/include
 else
 BASE_FLAGS += -DZSTDLIB_VISIBILITY=

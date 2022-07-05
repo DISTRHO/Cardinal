@@ -130,7 +130,7 @@ endif
 # --------------------------------------------------------------
 # Check for optional system-wide dependencies
 
-ifeq ($(shell pkg-config --exists fftw3f && echo true),true)
+ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
 HAVE_FFTW3F = true
 else
 $(warning fftw3f dependency not installed/available)
