@@ -47,7 +47,10 @@
 #include "DistrhoPluginUtils.hpp"
 #include "PluginContext.hpp"
 #include "extra/Base64.hpp"
-#include "extra/SharedResourcePointer.hpp"
+
+#ifndef DISTRHO_OS_WASM
+# include "extra/SharedResourcePointer.hpp"
+#endif
 
 static const constexpr uint kCardinalStateBaseCount = 3; // patch, screenshot, comment
 
@@ -173,7 +176,9 @@ struct Initializer
                 else
                #endif
                 {
-                   #if defined(ARCH_MAC)
+                   #if defined(DISTRHO_OS_WASM)
+                    asset::systemDir = "/resources";
+                   #elif defined(ARCH_MAC)
                     asset::systemDir = "/Library/Application Support/Cardinal";
                    #elif defined(ARCH_WIN)
                     const std::string commonprogfiles = getSpecialPath(kSpecialPathCommonProgramFiles);
@@ -452,7 +457,11 @@ struct ScopedContext {
 
 class CardinalPlugin : public CardinalBasePlugin
 {
+   #ifdef DISTRHO_OS_WASM
+    ScopedPointer<Initializer> fInitializer;
+   #else
     SharedResourcePointer<Initializer> fInitializer;
+   #endif
 
    #if DISTRHO_PLUGIN_NUM_INPUTS != 0
     /* If host audio ins == outs we can get issues for inplace processing.
@@ -484,7 +493,11 @@ class CardinalPlugin : public CardinalBasePlugin
 public:
     CardinalPlugin()
         : CardinalBasePlugin(kModuleParameters + kWindowParameterCount + 1, 0, kCardinalStateCount),
+         #ifdef DISTRHO_OS_WASM
+          fInitializer(new Initializer(this)),
+         #else
           fInitializer(this),
+         #endif
          #if DISTRHO_PLUGIN_NUM_INPUTS != 0
           fAudioBufferCopy(nullptr),
          #endif

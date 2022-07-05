@@ -17,6 +17,8 @@
 
 #pragma once
 
+#ifdef __HAIKU__
+// these are missing from HaikuOS
 #define pthread_setname_np(...)
 
 static int pthread_getcpuclockid(pthread_t, clockid_t* const clock_id)
@@ -24,6 +26,7 @@ static int pthread_getcpuclockid(pthread_t, clockid_t* const clock_id)
     *clock_id = CLOCK_REALTIME;
     return 0;
 }
+#endif
 
 static int backtrace(void**, int)
 {

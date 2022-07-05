@@ -204,7 +204,9 @@ BASE_FLAGS += -Wno-unused-variable
 # --------------------------------------------------------------
 # extra linker flags
 
-ifeq ($(HAIKU),true)
+ifeq ($(WASM),true)
+LINK_FLAGS += --preload-file=./resources -sALLOW_MEMORY_GROWTH
+else ifeq ($(HAIKU),true)
 LINK_FLAGS += -lpthread
 else
 LINK_FLAGS += -pthread

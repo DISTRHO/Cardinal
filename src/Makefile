@@ -35,7 +35,9 @@ BASE_FLAGS += -DARCH_LIN
 endif
 
 ifeq ($(HAIKU),true)
-BASE_FLAGS += -I../include/haiku-compat
+BASE_FLAGS += -I../include/linux-compat
+else ifeq ($(WASM),true)
+BASE_FLAGS += -I../include/linux-compat
 endif
 
 BASE_FLAGS += -DPRIVATE=
