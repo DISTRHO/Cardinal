@@ -157,7 +157,9 @@ struct Window::Internal {
 
 	int frame = 0;
 	int frameSwapInterval = 1;
+#ifndef DGL_USE_GLES
 	int generateScreenshotStep = kScreenshotStepNone;
+#endif
 	double monitorRefreshRate = 60.0;
 	double frameTime = 0.0;
 	double lastFrameDuration = 0.0;
@@ -366,6 +368,7 @@ void Window::run() {
 }
 
 
+#ifndef DGL_USE_GLES
 static void Window__flipBitmap(uint8_t* pixels, const int width, const int height, const int depth) {
 	for (int y = 0; y < height / 2; y++) {
 		const int flipY = height - y - 1;
@@ -415,6 +418,7 @@ static void Window__writeImagePNG(void* context, void* data, int size) {
 	ui->setState("screenshot", String::asBase64(data, size).buffer());
 }
 #endif
+#endif
 
 
 void Window::step() {
@@ -453,6 +457,7 @@ void Window::step() {
 		APP->event->handleDirty();
 	}
 
+#ifndef DGL_USE_GLES
 	// Hide menu and background if generating screenshot
 	if (internal->generateScreenshotStep == kScreenshotStepStarted) {
 #ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
@@ -462,6 +467,7 @@ void Window::step() {
 		internal->generateScreenshotStep = kScreenshotStepSecondPass;
 #endif
 	}
+#endif
 
 	// Get framebuffer/window ratio
 	int winWidth = internal->ui->getWidth();
@@ -501,6 +507,7 @@ void Window::step() {
 
 	++internal->frame;
 
+#ifndef DGL_USE_GLES
 	if (internal->generateScreenshotStep != kScreenshotStepNone) {
 		++internal->generateScreenshotStep;
 
@@ -541,6 +548,7 @@ void Window::step() {
 
 		delete[] pixels;
 	}
+#endif
 }
 
 
@@ -586,7 +594,7 @@ void Window::setFullScreen(bool) {
 
 
 bool Window::isFullScreen() {
-#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
+#if defined(CARDINAL_TRANSPARENT_SCREENSHOTS) && !defined(DGL_USE_GLES)
 	return internal->generateScreenshotStep != kScreenshotStepNone;
 #else
 	return false;
@@ -668,7 +676,9 @@ int& Window::fbCount() {
 
 
 void generateScreenshot() {
+#ifndef DGL_USE_GLES
 	APP->window->internal->generateScreenshotStep = kScreenshotStepStarted;
+#endif
 }
 
 

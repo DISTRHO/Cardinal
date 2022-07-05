@@ -456,6 +456,9 @@ void ImGuiWidget::drawFramebufferCommon(const Vec& fbSize, const float scaleFact
         }
     }
 
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+    // TODO?
+#else
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -464,6 +467,7 @@ void ImGuiWidget::drawFramebufferCommon(const Vec& fbSize, const float scaleFact
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
+#endif
 
     io.DisplaySize = ImVec2(box.size.x * scaleFactor, box.size.y * scaleFactor);
     io.DisplayFramebufferScale = ImVec2(fbSize.x / (box.size.x * scaleFactor), fbSize.y / (box.size.y * scaleFactor));
