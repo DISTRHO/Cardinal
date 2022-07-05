@@ -149,6 +149,7 @@ CONFIGURE += ac_cv_host=$(TARGET_MACHINE)
 
 DEP_MAKE  = $(MAKE)
 DEP_MAKE += ARCH_NAME=$(ARCH_NAME)
+DEP_MAKE += AR=$(AR)
 DEP_MAKE += CC=$(CC)
 DEP_MAKE += CXX=$(CXX)
 DEP_MAKE += CFLAGS="$(BUILD_C_FLAGS)"
@@ -207,10 +208,14 @@ $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched:
 	sed -i -e "s/#pragma GCC visibility push/#error we dont want this/" $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/configure
 	touch $@
 
+# custom zstd build for only building static libs
+$(DEP_PATH)/lib/libzstd.a: $(DEP_PATH)/zstd-1.4.5/.stamp-patched
+	cd $(DEP_PATH)/zstd-1.4.5/build/cmake && $(CMAKE) -DZSTD_BUILD_STATIC=ON -DZSTD_BUILD_PROGRAMS=OFF -DZSTD_BUILD_SHARED=OFF -DZSTD_MULTITHREAD_SUPPORT=OFF .
+	$(DEP_MAKE) -C $(DEP_PATH)/zstd-1.4.5/build/cmake
+	$(DEP_MAKE) -C $(DEP_PATH)/zstd-1.4.5/build/cmake install
+
 # zstd cmake is borked, see https://github.com/facebook/zstd/issues/1401
 # zstd also fails to build on old systems, patch that too
-$(DEP_PATH)/lib/libzstd.a: $(DEP_PATH)/zstd-1.4.5/.stamp-patched
-
 $(DEP_PATH)/zstd-1.4.5/.stamp-patched:
 	$(DEP_MAKE) -C $(DEP_PATH) zstd-1.4.5
 	sed -i -e "56,66d" $(DEP_PATH)/zstd-1.4.5/build/cmake/CMakeModules/AddZstdCompilationFlags.cmake
