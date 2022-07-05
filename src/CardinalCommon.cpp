@@ -52,6 +52,10 @@
 # include <unistd.h>
 #endif
 
+#ifdef DISTRHO_OS_WASM
+# include <emscripten/emscripten.h>
+#endif
+
 const std::string CARDINAL_VERSION = "22.06";
 
 namespace rack {
@@ -265,6 +269,17 @@ void saveAsDialogUncompressed()
 {
 #ifndef HEADLESS
     saveAsDialog(true);
+#endif
+}
+
+void openBrowser(const std::string& url)
+{
+#ifdef DISTRHO_OS_WASM
+    EM_ASM({
+        window.open(UTF8ToString($0), '_blank');
+    }, url.c_str());
+#else
+    patchUtils::openBrowser(url);
 #endif
 }
 

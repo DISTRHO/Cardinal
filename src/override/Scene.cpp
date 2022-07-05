@@ -342,7 +342,7 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == 0) {
-			system::openBrowser("https://vcvrack.com/manual/");
+			patchUtils::openBrowser("https://vcvrack.com/manual/");
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F3 && (e.mods & RACK_MOD_MASK) == 0) {

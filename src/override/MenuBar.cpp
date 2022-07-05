@@ -572,11 +572,11 @@ struct HelpButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 		menu->addChild(createMenuItem("Rack User manual", "F1", [=]() {
-			system::openBrowser("https://vcvrack.com/manual");
+			patchUtils::openBrowser("https://vcvrack.com/manual");
 		}));
 
 		menu->addChild(createMenuItem("Cardinal Project page", "", [=]() {
-			system::openBrowser("https://github.com/DISTRHO/Cardinal/");
+			patchUtils::openBrowser("https://github.com/DISTRHO/Cardinal/");
 		}));
 
 		menu->addChild(new ui::MenuSeparator);

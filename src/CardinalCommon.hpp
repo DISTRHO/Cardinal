@@ -66,6 +66,7 @@ void saveDialog(const std::string& path);
 void saveAsDialog();
 void saveAsDialogUncompressed();
 void appendSelectionContextMenu(rack::ui::Menu* menu);
+void openBrowser(const std::string& url);
 
 bool connectToRemote();
 bool isRemoteConnected();
