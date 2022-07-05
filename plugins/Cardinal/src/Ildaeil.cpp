@@ -32,8 +32,9 @@
 # include "ImGuiWidget.hpp"
 # include "ModuleWidgets.hpp"
 # include "extra/FileBrowserDialog.hpp"
+# include "extra/Mutex.hpp"
+# include "extra/Runner.hpp"
 # include "extra/ScopedPointer.hpp"
-# include "extra/Thread.hpp"
 # include "../../src/extra/SharedResourcePointer.hpp"
 #else
 # include "extra/Mutex.hpp"
@@ -589,7 +590,7 @@ static intptr_t host_dispatcher(const NativeHostHandle handle, const NativeHostD
 // --------------------------------------------------------------------------------------------------------------------
 
 #ifndef HEADLESS
-struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
+struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
     static constexpr const uint kButtonHeight = 20;
 
     struct PluginInfoCache {
@@ -670,6 +671,19 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         kIdleNothing
     } fIdleState = kIdleInit;
 
+    struct RunnerData {
+        bool needsReinit = true;
+        uint pluginCount = 0;
+        uint pluginIndex = 0;
+
+        void init()
+        {
+            needsReinit = true;
+            pluginCount = 0;
+            pluginIndex = 0;
+        }
+    } fRunnerData;
+
     PluginType fPluginType = PLUGIN_LV2;
     PluginType fNextPluginType = fPluginType;
     uint fPluginCount = 0;
@@ -741,8 +755,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
             module->fUI = nullptr;
         }
 
-        if (isThreadRunning())
-            stopThread(-1);
+        stopRunner();
 
         fPluginGenericUI = nullptr;
 
@@ -1046,13 +1059,13 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         {
         case kIdleInit:
             fIdleState = kIdleNothing;
-            startThread();
+            initAndStartRunner();
             break;
 
         case kIdleInitPluginAlreadyLoaded:
             fIdleState = kIdleNothing;
             createOrUpdatePluginGenericUI(handle);
-            startThread();
+            initAndStartRunner();
             break;
 
         case kIdlePluginLoadedFromDSP:
@@ -1087,10 +1100,9 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         case kIdleChangePluginType:
             fIdleState = kIdleNothing;
             fPluginSelected = -1;
-            if (isThreadRunning())
-                stopThread(-1);
+            stopRunner();
             fPluginType = fNextPluginType;
-            startThread();
+            initAndStartRunner();
             break;
 
         case kIdleNothing:
@@ -1130,93 +1142,117 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Thread {
         loadPlugin(handle, label);
     }
 
-    void run() override
+    bool initAndStartRunner()
     {
-        const char* path;
-        switch (fPluginType)
+        if (isRunnerActive())
+            stopRunner();
+
+        fRunnerData.needsReinit = true;
+        return startRunner();
+    }
+
+    bool run() override
+    {
+        if (fRunnerData.needsReinit)
         {
-        case PLUGIN_LV2:
-            path = std::getenv("LV2_PATH");
-            break;
-        case PLUGIN_JSFX:
-            path = getPathForJSFX();
-            break;
-        default:
-            path = nullptr;
-            break;
-        }
+            fRunnerData.needsReinit = false;
 
-        if (path != nullptr)
-            carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_PLUGIN_PATH, fPluginType, path);
+            const char* path;
+            switch (fPluginType)
+            {
+            case PLUGIN_LV2:
+                path = std::getenv("LV2_PATH");
+                break;
+            case PLUGIN_JSFX:
+                path = getPathForJSFX();
+                break;
+            default:
+                path = nullptr;
+                break;
+            }
 
-        fPluginCount = 0;
-        delete[] fPlugins;
+            if (path != nullptr)
+                carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_PLUGIN_PATH, fPluginType, path);
 
-        uint count;
+            fPluginCount = 0;
+            delete[] fPlugins;
 
-        {
-            const MutexLocker cml(sPluginInfoLoadMutex);
-
-            d_stdout("Will scan plugins now...");
-            count = carla_get_cached_plugin_count(fPluginType, path);
-            d_stdout("Scanning found %u plugins", count);
-        }
-
-        if (fDrawingState == kDrawingLoading)
-        {
-            fDrawingState = kDrawingPluginList;
-            fPluginSearchFirstShow = true;
-        }
-
-        if (count != 0)
-        {
-            fPlugins = new PluginInfoCache[count];
-
-            for (uint i=0, j; i < count && ! shouldThreadExit(); ++i)
             {
                 const MutexLocker cml(sPluginInfoLoadMutex);
 
-                const CarlaCachedPluginInfo* const info = carla_get_cached_plugin_info(fPluginType, i);
-                DISTRHO_SAFE_ASSERT_CONTINUE(info != nullptr);
+                d_stdout("Will scan plugins now...");
+                fRunnerData.pluginCount = carla_get_cached_plugin_count(fPluginType, path);
+                d_stdout("Scanning found %u plugins", fRunnerData.pluginCount);
+            }
 
-                if (! info->valid)
-                    continue;
-                if (info->audioIns != 0 && info->audioIns != 2)
-                    continue;
-                if (info->midiIns != 0 && info->midiIns != 1)
-                    continue;
-                if (info->midiOuts != 0 && info->midiOuts != 1)
-                    continue;
+            if (fDrawingState == kDrawingLoading)
+            {
+                fDrawingState = kDrawingPluginList;
+                fPluginSearchFirstShow = true;
+            }
 
-                if (fPluginType == PLUGIN_INTERNAL)
-                {
-                    if (std::strcmp(info->label, "audiogain_s") == 0)
-                        continue;
-                    if (std::strcmp(info->label, "cv2audio") == 0)
-                        continue;
-                    if (std::strcmp(info->label, "lfo") == 0)
-                        continue;
-                    if (std::strcmp(info->label, "midi2cv") == 0)
-                        continue;
-                    if (std::strcmp(info->label, "midithrough") == 0)
-                        continue;
-                    if (std::strcmp(info->label, "3bandsplitter") == 0)
-                        continue;
-                }
-
-                j = fPluginCount;
-                fPlugins[j].name = strdup(info->name);
-                fPlugins[j].label = strdup(info->label);
-                ++fPluginCount;
+            if (fRunnerData.pluginCount != 0)
+            {
+                fPlugins = new PluginInfoCache[fRunnerData.pluginCount];
+                fPluginScanningFinished = false;
+                return true;
+            }
+            else
+            {
+                fPlugins = nullptr;
+                fPluginScanningFinished = true;
+                return false;
             }
         }
-        else
-        {
-            fPlugins = nullptr;
-        }
 
-        if (! shouldThreadExit())
-            fPluginScanningFinished = true;
+        const uint index = fRunnerData.pluginIndex++;
+        DISTRHO_SAFE_ASSERT_UINT2_RETURN(index < fRunnerData.pluginCount,
+                                         index, fRunnerData.pluginCount, false);
+
+        do {
+            const MutexLocker cml(sPluginInfoLoadMutex);
+
+            const CarlaCachedPluginInfo* const info = carla_get_cached_plugin_info(fPluginType, index);
+            DISTRHO_SAFE_ASSERT_CONTINUE(info != nullptr);
+
+            if (! info->valid)
+                break;
+            if (info->audioIns != 0 && info->audioIns != 2)
+                break;
+            if (info->midiIns != 0 && info->midiIns != 1)
+                break;
+            if (info->midiOuts != 0 && info->midiOuts != 1)
+                break;
+
+            if (fPluginType == PLUGIN_INTERNAL)
+            {
+                if (std::strcmp(info->label, "audiogain_s") == 0)
+                    break;
+                if (std::strcmp(info->label, "cv2audio") == 0)
+                    break;
+                if (std::strcmp(info->label, "lfo") == 0)
+                    break;
+                if (std::strcmp(info->label, "midi2cv") == 0)
+                    break;
+                if (std::strcmp(info->label, "midithrough") == 0)
+                    break;
+                if (std::strcmp(info->label, "3bandsplitter") == 0)
+                    break;
+            }
+
+            const uint pindex = fPluginCount;
+            fPlugins[pindex].name = strdup(info->name);
+            fPlugins[pindex].label = strdup(info->label);
+            ++fPluginCount;
+        } while (false);
+
+        // run again
+        if (fRunnerData.pluginIndex != fRunnerData.pluginCount)
+            return true;
+
+        // stop here
+        fPluginScanningFinished = true;
+        return false;
     }
 
     void drawImGui() override

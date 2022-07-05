@@ -17,7 +17,7 @@
 
 #include "plugincontext.hpp"
 #include "ModuleWidgets.hpp"
-#include "extra/Thread.hpp"
+#include "extra/Runner.hpp"
 
 #include "CarlaNativePlugin.h"
 
@@ -58,7 +58,7 @@ static void host_ui_closed(NativeHostHandle) {}
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct CarlaInternalPluginModule : Module, Thread {
+struct CarlaInternalPluginModule : Module, Runner {
     enum ParamIds {
         NUM_PARAMS
     };
@@ -168,7 +168,7 @@ struct CarlaInternalPluginModule : Module, Thread {
         // host-sync disabled by default
         fCarlaPluginDescriptor->set_parameter_value(fCarlaPluginHandle, kParameterHostSync, 0.0f);
 
-        startThread();
+        startRunner(500);
     }
 
     ~CarlaInternalPluginModule() override
@@ -176,18 +176,15 @@ struct CarlaInternalPluginModule : Module, Thread {
         if (fCarlaPluginHandle == nullptr)
             return;
 
-        stopThread(-1);
+        stopRunner();
         fCarlaPluginDescriptor->deactivate(fCarlaPluginHandle);
         fCarlaPluginDescriptor->cleanup(fCarlaPluginHandle);
     }
 
-    void run() override
+    bool run() override
     {
-        while (!shouldThreadExit())
-        {
-            d_msleep(500);
-            fCarlaPluginDescriptor->dispatcher(fCarlaPluginHandle, NATIVE_PLUGIN_OPCODE_IDLE, 0, 0, nullptr, 0.0f);
-        }
+        fCarlaPluginDescriptor->dispatcher(fCarlaPluginHandle, NATIVE_PLUGIN_OPCODE_IDLE, 0, 0, nullptr, 0.0f);
+        return true;
     }
 
     const NativeTimeInfo* hostGetTimeInfo() const noexcept
