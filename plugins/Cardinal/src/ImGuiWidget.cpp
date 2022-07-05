@@ -22,7 +22,11 @@
 # include "../../../dpf/dgl/src/Resources.hpp"
 #endif
 
-#include "DearImGui/imgui_impl_opengl2.h"
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+# include "DearImGui/imgui_impl_opengl3.h"
+#else
+# include "DearImGui/imgui_impl_opengl2.h"
+#endif
 
 static const char* GetClipboardTextFn(void*)
 {
@@ -91,7 +95,11 @@ struct ImGuiWidget::PrivateData {
         if (created)
         {
             ImGui::SetCurrentContext(context);
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+            ImGui_ImplOpenGL3_Shutdown();
+#else
             ImGui_ImplOpenGL2_Shutdown();
+#endif
         }
 
         ImGui::DestroyContext(context);
@@ -161,7 +169,11 @@ struct ImGuiWidget::PrivateData {
         if (created)
         {
             ImGui::SetCurrentContext(context);
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+            ImGui_ImplOpenGL3_Shutdown();
+#else
             ImGui_ImplOpenGL2_Shutdown();
+#endif
             created = false;
         }
 
@@ -177,7 +189,11 @@ struct ImGuiWidget::PrivateData {
 
         if (doInit)
         {
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+            ImGui_ImplOpenGL3_Init();
+#else
             ImGui_ImplOpenGL2_Init();
+#endif
             created = true;
         }
     }
@@ -232,7 +248,11 @@ void ImGuiWidget::onContextCreate(const ContextCreateEvent& e)
     DISTRHO_SAFE_ASSERT_RETURN(!imData->created,);
 
     ImGui::SetCurrentContext(imData->context);
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+    ImGui_ImplOpenGL3_Init();
+#else
     ImGui_ImplOpenGL2_Init();
+#endif
     imData->created = true;
 }
 
@@ -241,7 +261,11 @@ void ImGuiWidget::onContextDestroy(const ContextDestroyEvent& e)
     if (imData->created)
     {
         ImGui::SetCurrentContext(imData->context);
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+        ImGui_ImplOpenGL3_Shutdown();
+#else
         ImGui_ImplOpenGL2_Shutdown();
+#endif
         imData->created = false;
     }
 
@@ -446,7 +470,11 @@ void ImGuiWidget::drawFramebufferCommon(const Vec& fbSize, const float scaleFact
 
     if (!imData->created)
     {
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+        ImGui_ImplOpenGL3_Init();
+#else
         ImGui_ImplOpenGL2_Init();
+#endif
         imData->created = true;
     }
 
@@ -454,13 +482,22 @@ void ImGuiWidget::drawFramebufferCommon(const Vec& fbSize, const float scaleFact
     io.DeltaTime = time - imData->lastFrameTime;
     imData->lastFrameTime = time;
 
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+    ImGui_ImplOpenGL3_NewFrame();
+#else
     ImGui_ImplOpenGL2_NewFrame();
+#endif
+
     ImGui::NewFrame();
-
     drawImGui();
-
     ImGui::Render();
 
     if (ImDrawData* const data = ImGui::GetDrawData())
+    {
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+        ImGui_ImplOpenGL3_RenderDrawData(data);
+#else
         ImGui_ImplOpenGL2_RenderDrawData(data);
+#endif
+    }
 }
