@@ -1004,6 +1004,12 @@ ifeq ($(NOPLUGINS),true)
 BASE_FLAGS += -DNOPLUGINS
 endif
 
+ifeq ($(USE_GLES2),true)
+BASE_FLAGS += -DNANOVG_GLES2_FORCED
+else ifeq ($(USE_GLES3),true)
+BASE_FLAGS += -DNANOVG_GLES3_FORCED
+endif
+
 ifeq ($(shell $(PKG_CONFIG) --exists sndfile && echo true),true)
 BASE_FLAGS += -DHAVE_SNDFILE
 endif

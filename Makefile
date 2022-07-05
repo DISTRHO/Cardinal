@@ -97,8 +97,7 @@ endif
 # --------------------------------------------------------------
 # Check for X11+OpenGL dependencies (unless headless build)
 
-ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
-ifneq ($(WASM),true)
+ifneq ($(HAIKU_OR_MACOS_OR_WASM_OR_WINDOWS),true)
 ifneq ($(HEADLESS),true)
 
 ifneq ($(HAVE_OPENGL),true)
@@ -125,7 +124,6 @@ CARLA_EXTRA_ARGS += HAVE_XCURSOR=false
 CARLA_EXTRA_ARGS += HAVE_XEXT=false
 CARLA_EXTRA_ARGS += HAVE_XRANDR=false
 
-endif
 endif
 endif
 
