@@ -205,7 +205,8 @@ BASE_FLAGS += -Wno-unused-variable
 # extra linker flags
 
 ifeq ($(WASM),true)
-LINK_FLAGS += --preload-file=./resources -sALLOW_MEMORY_GROWTH
+LINK_FLAGS += --preload-file=./resources -sALLOW_MEMORY_GROWTH -sINITIAL_MEMORY=32Mb -sLZ4=1 --shell-file=../emscripten/shell.html
+# -sDISABLE_EXCEPTION_CATCHING=1
 else ifeq ($(HAIKU),true)
 LINK_FLAGS += -lpthread
 else
