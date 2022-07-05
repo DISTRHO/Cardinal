@@ -209,6 +209,3 @@
 [submodule "plugins/myth-modules"]
 	path = plugins/myth-modules
 	url = https://github.com/Ahineya/vcv-myth-plugin.git
-[submodule "plugins/Mojo"]
-	path = plugins/Mojo
-	url = https://github.com/tomdasilva/Mojo
