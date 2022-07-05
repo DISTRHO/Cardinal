@@ -222,8 +222,8 @@ ifneq ($(HEADLESS),true)
 PLUGIN_FILES += Cardinal/src/ImGuiWidget.cpp
 PLUGIN_FILES += Cardinal/src/ImGuiTextEditor.cpp
 PLUGIN_FILES += Cardinal/src/SassyScope.cpp
-PLUGIN_FILES += Cardinal/src/DearImGui.cpp
-PLUGIN_FILES += Cardinal/src/DearImGuiColorTextEditor.cpp
+PLUGIN_FILES += $(wildcard Cardinal/src/DearImGui/*.cpp)
+PLUGIN_FILES += $(wildcard Cardinal/src/DearImGuiColorTextEditor/*.cpp)
 endif
 
 ifeq ($(shell pkg-config --exists fftw3f && echo true),true)
@@ -712,6 +712,11 @@ MOCKBAMODULAR_CUSTOM = Blank Comparator
 
 PLUGIN_FILES += Mog/src/Network.cpp
 PLUGIN_FILES += Mog/src/Nexus.cpp
+
+# --------------------------------------------------------------
+# Mojo
+
+PLUGIN_FILES += $(filter-out Mojo/src/plugin.cpp,$(wildcard Mojo/src/*.cpp))
 
 # --------------------------------------------------------------
 # mscHack
@@ -1700,6 +1705,14 @@ $(BUILD_DIR)/Mog/%.cpp.o: Mog/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MOG_CUSTOM),$(call custom_module_names,$(m),Mog)) \
 		-DpluginInstance=pluginInstance__Mog
+
+$(BUILD_DIR)/Mojo/src/%.cpp.o: Mojo/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),Mojo)) \
+		-DpluginInstance=pluginInstance__Mojo \
+		-Wno-misleading-indentation
 
 $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
