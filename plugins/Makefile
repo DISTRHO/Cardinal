@@ -1710,7 +1710,7 @@ $(BUILD_DIR)/Mojo/src/%.cpp.o: Mojo/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),Mojo)) \
+		$(foreach m,$(MOJO_CUSTOM),$(call custom_module_names,$(m),Mojo)) \
 		-DpluginInstance=pluginInstance__Mojo \
 		-Wno-misleading-indentation
 
