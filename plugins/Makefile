@@ -490,9 +490,12 @@ BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 # --------------------------------------------------------------
 # ChowDSP
 
+# FIXME
+ifneq ($(WASM),true)
 PLUGIN_FILES += $(wildcard ChowDSP/src/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/src/*/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
+endif
 
 # --------------------------------------------------------------
 # CatroModulo
@@ -825,6 +828,8 @@ UNLESS_MODULES_CUSTOM = Selection
 # --------------------------------------------------------------
 # ValleyAudio
 
+# FIXME
+ifneq ($(WASM),true)
 PLUGIN_FILES += $(filter-out ValleyAudio/src/Valley.cpp,$(wildcard ValleyAudio/src/*.cpp))
 PLUGIN_FILES += $(wildcard ValleyAudio/src/*/*.cpp)
 PLUGIN_FILES += $(wildcard ValleyAudio/src/*/*/*.cpp)
@@ -897,6 +902,7 @@ PLUGIN_BINARIES += ValleyAudio/src/XFADE.bin
 # modules/types which are present in other plugins
 VALLEYAUDIO_CUSTOM = $(DRWAV) DigitalDisplay
 VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
+endif
 
 # --------------------------------------------------------------
 # Voxglitch
