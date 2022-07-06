@@ -19,7 +19,6 @@
 
 #ifndef HEADLESS
 # include "ImGuiTextEditor.hpp"
-# include "extra/FileBrowserDialog.hpp"
 #endif
 
 #include <fstream>
