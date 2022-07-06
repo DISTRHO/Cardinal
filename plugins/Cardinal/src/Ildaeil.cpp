@@ -122,6 +122,8 @@ static const char* getPathForJSFX()
     {
        #if defined(CARLA_OS_MAC)
         path = homeDir() + "/Library/Application Support/REAPER/Effects";
+       #elif defined(CARLA_OS_WASM)
+        path = "/jsfx";
        #elif defined(CARLA_OS_WIN)
         path = getSpecialPath(kSpecialPathAppData) + "\\REAPER\\Effects";
         if (! system::exists(path))
@@ -254,6 +256,9 @@ struct IldaeilModule : Module {
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/Applications/Carla.app/Contents/MacOS");
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/Applications/Carla.app/Contents/MacOS/resources");
         }
+#elif defined(CARLA_OS_WASM)
+        if (true)
+        {}
 #elif defined(CARLA_OS_WIN)
         const std::string winBinaryDir = system::join(asset::systemDir, "Carla");
 
