@@ -662,7 +662,7 @@ struct AudioFileWidget : ModuleWidgetWithSideScrews<23> {
             void onAction(const event::Action&) override
             {
                 CarlaInternalPluginModule* const module = this->module;
-                async_dialog_filebrowser(false, nullptr, text.c_str(), [module](char* path)
+                async_dialog_filebrowser(false, nullptr, nullptr, text.c_str(), [module](char* path)
                 {
                     if (path == nullptr)
                         return;

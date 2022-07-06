@@ -65,7 +65,7 @@ static void CardinalModuleWidget__loadDialog(ModuleWidget* const w)
 
     WeakPtr<ModuleWidget> weakThis = w;
 
-    async_dialog_filebrowser(false, presetDir.c_str(), "Load preset", [=](char* pathC) {
+    async_dialog_filebrowser(false, nullptr, presetDir.c_str(), "Load preset", [=](char* pathC) {
         // Delete directories if empty
         DEFER({
             try {
@@ -100,7 +100,7 @@ void CardinalModuleWidget__saveDialog(ModuleWidget* const w)
 
     WeakPtr<ModuleWidget> weakThis = w;
 
-    async_dialog_filebrowser(true, presetDir.c_str(), "Save preset", [=](char* pathC) {
+    async_dialog_filebrowser(true, "preset.vcvm", presetDir.c_str(), "Save preset", [=](char* pathC) {
         // Delete directories if empty
         DEFER({
             try {
@@ -281,7 +281,13 @@ static void CardinalModuleWidget__saveSelectionDialog(RackWidget* const w)
     std::string selectionDir = asset::user("selections");
     system::createDirectories(selectionDir);
 
-    async_dialog_filebrowser(true, selectionDir.c_str(), "Save selection as", [w](char* pathC) {
+    async_dialog_filebrowser(true, "selection.vcvs", selectionDir.c_str(),
+                            #ifdef DISTRHO_OS_WASM
+                             "Save selection",
+                            #else
+                             "Save selection as...",
+                            #endif
+                             [w](char* pathC) {
         if (!pathC) {
             // No path selected
             return;

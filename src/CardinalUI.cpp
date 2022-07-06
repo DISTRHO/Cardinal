@@ -182,6 +182,17 @@ public:
             }
         }
 
+       #ifdef DISTRHO_OS_WASM
+        asyncDialog::create("Welcome!\n"
+                            "This is a special web-assembly version of Cardinal, "
+                            "allowing you to enjoy eurorack-style modules directly in your browser.\n"
+                            "\n"
+                            "This is still very much a work in progress, "
+                            "minor issues and occasional crashes are expected.\n"
+                            "\n"
+                            "Proceed with caution and have fun!");
+       #endif
+
         context->window->step();
 
         rack::contextSet(nullptr);

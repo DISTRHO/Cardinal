@@ -10,6 +10,7 @@
 DISTRHO_NAMESPACE = CardinalDISTRHO
 DGL_NAMESPACE = CardinalDGL
 USE_NANOVG_FBO = true
+WASM_EXCEPTIONS = true
 include ../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -25,8 +26,8 @@ endif
 # List of drwav functions, used in several modules
 
 DRWAV  = drwav
-DRWAV += drwav__on_seek
 DRWAV += drwav__on_read
+DRWAV += drwav__on_seek
 DRWAV += drwav__read_and_close_f32
 DRWAV += drwav__read_and_close_s16
 DRWAV += drwav__read_and_close_s32
@@ -34,6 +35,13 @@ DRWAV += drwav_alaw_to_f32
 DRWAV += drwav_alaw_to_s16
 DRWAV += drwav_alaw_to_s16
 DRWAV += drwav_alaw_to_s32
+DRWAV += drwav_bytes_to_f32
+DRWAV += drwav_bytes_to_s16
+DRWAV += drwav_bytes_to_s32
+DRWAV += drwav_bytes_to_s64
+DRWAV += drwav_bytes_to_u16
+DRWAV += drwav_bytes_to_u32
+DRWAV += drwav_bytes_to_u64
 DRWAV += drwav_close
 DRWAV += drwav_close
 DRWAV += drwav_container
@@ -46,29 +54,47 @@ DRWAV += drwav_f64_to_f32
 DRWAV += drwav_f64_to_s16
 DRWAV += drwav_f64_to_s16
 DRWAV += drwav_f64_to_s32
+DRWAV += drwav_fmt_get_format
 DRWAV += drwav_fopen
+DRWAV += drwav_fourcc_equal
 DRWAV += drwav_free
+DRWAV += drwav_get_cursor_in_pcm_frames
+DRWAV += drwav_get_length_in_pcm_frames
+DRWAV += drwav_guid_equal
 DRWAV += drwav_init
 DRWAV += drwav_init_ex
 DRWAV += drwav_init_file
 DRWAV += drwav_init_file_ex
+DRWAV += drwav_init_file_ex_w
+DRWAV += drwav_init_file_w
+DRWAV += drwav_init_file_with_metadata
+DRWAV += drwav_init_file_with_metadata_w
 DRWAV += drwav_init_file_write
 DRWAV += drwav_init_file_write
 DRWAV += drwav_init_file_write__internal
 DRWAV += drwav_init_file_write__internal
 DRWAV += drwav_init_file_write_sequential
 DRWAV += drwav_init_file_write_sequential
+DRWAV += drwav_init_file_write_sequential_pcm_frames
+DRWAV += drwav_init_file_write_sequential_pcm_frames_w
+DRWAV += drwav_init_file_write_sequential_w
+DRWAV += drwav_init_file_write_w
 DRWAV += drwav_init_memory
 DRWAV += drwav_init_memory_ex
+DRWAV += drwav_init_memory_with_metadata
 DRWAV += drwav_init_memory_write
 DRWAV += drwav_init_memory_write
 DRWAV += drwav_init_memory_write__internal
 DRWAV += drwav_init_memory_write__internal
 DRWAV += drwav_init_memory_write_sequential
+DRWAV += drwav_init_memory_write_sequential_pcm_frames
+DRWAV += drwav_init_with_metadata
 DRWAV += drwav_init_write
 DRWAV += drwav_init_write
 DRWAV += drwav_init_write__internal
 DRWAV += drwav_init_write_sequential
+DRWAV += drwav_init_write_sequential_pcm_frames
+DRWAV += drwav_init_write_with_metadata
 DRWAV += drwav_mulaw_to_f32
 DRWAV += drwav_mulaw_to_s16
 DRWAV += drwav_mulaw_to_s16
@@ -90,8 +116,11 @@ DRWAV += drwav_open_ex
 DRWAV += drwav_open_file
 DRWAV += drwav_open_file_and_read_f32
 DRWAV += drwav_open_file_and_read_pcm_frames_f32
+DRWAV += drwav_open_file_and_read_pcm_frames_f32_w
 DRWAV += drwav_open_file_and_read_pcm_frames_s16
+DRWAV += drwav_open_file_and_read_pcm_frames_s16_w
 DRWAV += drwav_open_file_and_read_pcm_frames_s32
+DRWAV += drwav_open_file_and_read_pcm_frames_s32_w
 DRWAV += drwav_open_file_and_read_s16
 DRWAV += drwav_open_file_and_read_s32
 DRWAV += drwav_open_file_ex
@@ -133,9 +162,17 @@ DRWAV += drwav_read_f32__mulaw
 DRWAV += drwav_read_f32__pcm
 DRWAV += drwav_read_f32__pcm
 DRWAV += drwav_read_pcm_frames
+DRWAV += drwav_read_pcm_frames_be
 DRWAV += drwav_read_pcm_frames_f32
+DRWAV += drwav_read_pcm_frames_f32be
+DRWAV += drwav_read_pcm_frames_f32le
+DRWAV += drwav_read_pcm_frames_le
 DRWAV += drwav_read_pcm_frames_s16
+DRWAV += drwav_read_pcm_frames_s16be
+DRWAV += drwav_read_pcm_frames_s16le
 DRWAV += drwav_read_pcm_frames_s32
+DRWAV += drwav_read_pcm_frames_s32be
+DRWAV += drwav_read_pcm_frames_s32le
 DRWAV += drwav_read_raw
 DRWAV += drwav_read_s16
 DRWAV += drwav_read_s16__alaw
@@ -173,14 +210,20 @@ DRWAV += drwav_seek_to_sample
 DRWAV += drwav_seek_to_sample
 DRWAV += drwav_smpl
 DRWAV += drwav_smpl_loop
+DRWAV += drwav_take_ownership_of_metadata
+DRWAV += drwav_target_write_size_bytes
 DRWAV += drwav_u8_to_f32
 DRWAV += drwav_u8_to_s16
 DRWAV += drwav_u8_to_s16
 DRWAV += drwav_u8_to_s32
 DRWAV += drwav_uninit
+DRWAV += drwav_version
+DRWAV += drwav_version_string
 DRWAV += drwav_write
 DRWAV += drwav_write
 DRWAV += drwav_write_pcm_frames
+DRWAV += drwav_write_pcm_frames_be
+DRWAV += drwav_write_pcm_frames_le
 DRWAV += drwav_write_raw
 
 # --------------------------------------------------------------
@@ -1496,19 +1539,19 @@ $(BUILD_DIR)/FehlerFabrik/%.cpp.o: FehlerFabrik/%.cpp
 		$(foreach m,$(FEHLERFABRIK_CUSTOM),$(call custom_module_names,$(m),FehlerFabrik)) \
 		-DpluginInstance=pluginInstance__FehlerFabrik
 
-$(BUILD_DIR)/Fundamental/%.c.o: Fundamental/%.c
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@ \
-		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
-		-DpluginInstance=pluginInstance__Fundamental
-
 $(BUILD_DIR)/forsitan-modulare/%.cpp.o: forsitan-modulare/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(GLUETHEGIANT_CUSTOM),$(call custom_module_names,$(m),forsitan)) \
 		-DpluginInstance=pluginInstance__forsitan
+
+$(BUILD_DIR)/Fundamental/%.c.o: Fundamental/%.c
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@ \
+		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
+		-DpluginInstance=pluginInstance__Fundamental
 
 $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

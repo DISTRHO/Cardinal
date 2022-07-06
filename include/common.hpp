@@ -68,7 +68,7 @@
 
 // opens a file browser, startDir and title can be null
 // action is always triggered on close (path can be null), must be freed if not null
-void async_dialog_filebrowser(bool saving, const char* startDir, const char* title,
+void async_dialog_filebrowser(bool saving, const char* defaultName, const char* startDir, const char* title,
                               std::function<void(char* path)> action);
 
 // opens a message dialog with only an "ok" button

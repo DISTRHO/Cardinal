@@ -147,8 +147,8 @@ void loadDialog()
         DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
 
         DISTRHO_NAMESPACE::FileBrowserOptions opts;
-        opts.startDir = dir.c_str();
         opts.saving = ui->saving = false;
+        opts.startDir = dir.c_str();
         opts.title = "Open patch";
         ui->openFileBrowser(opts);
     });
@@ -177,7 +177,7 @@ void loadSelectionDialog()
     std::string selectionDir = asset::user("selections");
     system::createDirectories(selectionDir);
 
-    async_dialog_filebrowser(false, selectionDir.c_str(), "Import selection", [w](char* pathC) {
+    async_dialog_filebrowser(false, nullptr, selectionDir.c_str(), "Import selection", [w](char* pathC) {
         if (!pathC) {
             // No path selected
             return;
@@ -250,8 +250,9 @@ static void saveAsDialog(const bool uncompressed)
     DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
 
     DISTRHO_NAMESPACE::FileBrowserOptions opts;
-    opts.startDir = dir.c_str();
     opts.saving = ui->saving = true;
+    opts.defaultName = "patch.vcv";
+    opts.startDir = dir.c_str();
     opts.title = "Save patch";
     ui->savingUncompressed = uncompressed;
     ui->openFileBrowser(opts);
@@ -286,6 +287,7 @@ void openBrowser(const std::string& url)
 }
 
 void async_dialog_filebrowser(const bool saving,
+                              const char* const defaultName,
                               const char* const startDir,
                               const char* const title,
                               const std::function<void(char* path)> action)
@@ -302,6 +304,7 @@ void async_dialog_filebrowser(const bool saving,
 
     DISTRHO_NAMESPACE::FileBrowserOptions opts;
     opts.saving = saving;
+    opts.defaultName = defaultName;
     opts.startDir = startDir;
     opts.title = title;
 
