@@ -66,7 +66,7 @@ int rateLimit = 0;
 
 bool isStandalone()
 {
-    return std::strstr(getPluginFormatName(), "JACK") != nullptr;
+    return std::strstr(getPluginFormatName(), "Standalone") != nullptr;
 }
 
 #ifdef ARCH_WIN

@@ -168,7 +168,7 @@ struct CardinalEmbedWidget : ModuleWidget, ExternalWindow {
                 self->terminateAndWaitForExternalProcess();
 
                 WeakPtr<CardinalEmbedWidget> const self = this->self;
-                async_dialog_filebrowser(false, nullptr, text.c_str(), [self](char* path)
+                async_dialog_filebrowser(false, nullptr, nullptr, text.c_str(), [self](char* path)
                 {
                     if (path == nullptr)
                         return;
