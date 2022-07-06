@@ -212,6 +212,3 @@
 [submodule "plugins/Mojo"]
 	path = plugins/Mojo
 	url = https://github.com/TheGuyWhoo/Mojo
-[submodule "plugins/Atelier"]
-	path = plugins/Atelier
-	url = https://github.com/Xenakios/Atelier
