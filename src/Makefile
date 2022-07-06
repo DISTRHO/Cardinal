@@ -44,7 +44,7 @@ BASE_FLAGS += -DPRIVATE=
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
 BASE_FLAGS += -I../include
-BASE_FLAGS += -I../include/neon-compat
+BASE_FLAGS += -I../include/simd-compat
 BASE_FLAGS += -IRack/include
 ifeq ($(SYSDEPS),true)
 BASE_FLAGS += -DCARDINAL_SYSDEPS
@@ -81,13 +81,10 @@ ifeq ($(HAIKU),true)
 BASE_FLAGS += -DCLOCK_MONOTONIC_RAW=CLOCK_MONOTONIC
 endif
 
-ifeq ($(WASM),true)
-BASE_FLAGS += -DNANOVG_GLES2=1
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-# FIXME
-BASE_FLAGS += -DRTLD_DEEPBIND=0
-else ifneq ($(HAIKU),true)
+ifneq ($(WASM),true)
+ifneq ($(HAIKU),true)
 BASE_FLAGS += -pthread
+endif
 endif
 
 ifeq ($(WINDOWS),true)
@@ -116,6 +113,10 @@ BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
 
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
+
+ifeq ($(WASM),true)
+BUILD_CXX_FLAGS += -fexceptions
+endif
 
 # --------------------------------------------------------------
 # Rack files to build

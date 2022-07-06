@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,8 +17,28 @@
 
 #pragma once
 
-#if defined(__i386__) || defined(__x86_64__) || defined(__EMSCRIPTEN__)
+#if defined(__i386__) || defined(__x86_64__)
 # include_next <pmmintrin.h>
+
+#elif defined(__EMSCRIPTEN__)
+# include_next <pmmintrin.h>
+
+// NOTE these have been verified to be unused (included for ValleyAudio builds)
+// static inline
+// __m64 _mm_and_si64(__m64 a, __m64 b) { return a; }
+// 
+// static inline
+// __m64 _mm_andnot_si64(__m64 a, __m64 b) { return a; }
+// 
+// static inline
+// __m64 _mm_or_si64(__m64 a, __m64 b) { return a; }
+
+static inline
+__m64 _mm_set1_pi16(short w)
+{
+    return __extension__ (__m64){ static_cast<float>(w), static_cast<float>(w) };
+}
+
 #else
 # include "../sse2neon/sse2neon.h"
 

@@ -490,12 +490,9 @@ BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 # --------------------------------------------------------------
 # ChowDSP
 
-# FIXME
-ifneq ($(WASM),true)
 PLUGIN_FILES += $(wildcard ChowDSP/src/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/src/*/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
-endif
 
 # --------------------------------------------------------------
 # CatroModulo
@@ -828,8 +825,6 @@ UNLESS_MODULES_CUSTOM = Selection
 # --------------------------------------------------------------
 # ValleyAudio
 
-# FIXME
-ifneq ($(WASM),true)
 PLUGIN_FILES += $(filter-out ValleyAudio/src/Valley.cpp,$(wildcard ValleyAudio/src/*.cpp))
 PLUGIN_FILES += $(wildcard ValleyAudio/src/*/*.cpp)
 PLUGIN_FILES += $(wildcard ValleyAudio/src/*/*/*.cpp)
@@ -902,7 +897,6 @@ PLUGIN_BINARIES += ValleyAudio/src/XFADE.bin
 # modules/types which are present in other plugins
 VALLEYAUDIO_CUSTOM = $(DRWAV) DigitalDisplay
 VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
-endif
 
 # --------------------------------------------------------------
 # Voxglitch
@@ -955,8 +949,8 @@ BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
 
 BASE_FLAGS += -I../include
-BASE_FLAGS += -I../include/neon-compat
 BASE_FLAGS += -I../include/osdialog-stub
+BASE_FLAGS += -I../include/simd-compat
 
 ifeq ($(HAVE_X11),true)
 BASE_FLAGS += -DHAVE_X11
@@ -995,13 +989,15 @@ endif
 ifeq ($(BSD),true)
 BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
 BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
+else ifeq ($(WASM),true)
+BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
+BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
 endif
 
-ifeq ($(WASM),true)
-BASE_FLAGS += -DNANOVG_GLES2=1
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-else ifneq ($(HAIKU),true)
+ifneq ($(WASM),true)
+ifneq ($(HAIKU),true)
 BASE_FLAGS += -pthread
+endif
 endif
 
 ifeq ($(WINDOWS),true)
@@ -1035,6 +1031,10 @@ endif
 
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
+
+ifeq ($(WASM),true)
+BUILD_CXX_FLAGS += -fexceptions
+endif
 
 # --------------------------------------------------------------
 # lots of warnings from VCV side

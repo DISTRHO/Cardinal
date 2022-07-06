@@ -14,6 +14,11 @@
         margin: 0;
       }
 
+      #canvas_file_open,
+      #canvas_file_save {
+        display: none;
+      }
+
       #canvas_wrapper {
         display: none;
         width: 100vw;
@@ -73,6 +78,8 @@
       <progress value="0" max="100" id="progress" hidden=1></progress>
     </div>
     <div id="canvas_wrapper">
+      <input type="file" id="canvas_file_open" ></input>
+      <a href="#" id="canvas_file_save"></a>
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
     </div>
 

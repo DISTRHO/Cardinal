@@ -1622,8 +1622,6 @@ static void initStatic__cf()
     }
 }
 
-// FIXME
-#ifndef DISTRHO_OS_WASM
 static void initStatic__ChowDSP()
 {
     Plugin* const p = new Plugin;
@@ -1650,7 +1648,6 @@ static void initStatic__ChowDSP()
         p->addModel(modelChowChorus);
     }
 }
-#endif
 
 static void initStatic__DrumKit()
 {
@@ -2589,8 +2586,6 @@ static void initStatic__unless_modules()
     }
 }
 
-// FIXME
-#ifndef DISTRHO_OS_WASM
 static void initStatic__ValleyAudio()
 {
     Plugin* const p = new Plugin;
@@ -2609,7 +2604,6 @@ static void initStatic__ValleyAudio()
         p->addModel(modelTerrorform);
     }
 }
-#endif
 
 static void initStatic__Voxglitch()
 {
@@ -2725,10 +2719,7 @@ void initStaticPlugins()
     initStatic__BogaudioModules();
     initStatic__CatroModulo();
     initStatic__cf();
-// FIXME
-#ifndef DISTRHO_OS_WASM
     initStatic__ChowDSP();
-#endif
     initStatic__DrumKit();
     initStatic__ESeries();
     initStatic__ExpertSleepersEncoders();
@@ -2768,10 +2759,7 @@ void initStaticPlugins()
     initStatic__sonusmodular();
     initStatic__stocaudio();
     initStatic__unless_modules();
-// FIXME
-#ifndef DISTRHO_OS_WASM
     initStatic__ValleyAudio();
-#endif
     initStatic__Voxglitch();
     initStatic__WhatTheRack();
     initStatic__ZetaCarinaeModules();

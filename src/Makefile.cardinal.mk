@@ -143,7 +143,7 @@ BASE_FLAGS += -DPRIVATE=
 BASE_FLAGS += -I..
 BASE_FLAGS += -I../../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../../include
-BASE_FLAGS += -I../../include/neon-compat
+BASE_FLAGS += -I../../include/simd-compat
 BASE_FLAGS += -I../Rack/include
 ifeq ($(SYSDEPS),true)
 BASE_FLAGS += -DCARDINAL_SYSDEPS
@@ -164,11 +164,10 @@ ifeq ($(MOD_BUILD),true)
 BASE_FLAGS += -DDISTRHO_PLUGIN_USES_MODGUI=1 -DDISTRHO_PLUGIN_MINIMUM_BUFFER_SIZE=0xffff
 endif
 
-ifeq ($(WASM),true)
-BASE_FLAGS += -DNANOVG_GLES2=1
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-else ifneq ($(HAIKU),true)
+ifneq ($(WASM),true)
+ifneq ($(HAIKU),true)
 BASE_FLAGS += -pthread
+endif
 endif
 
 ifeq ($(WINDOWS),true)
@@ -195,6 +194,10 @@ endif
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
 
+ifeq ($(WASM),true)
+BUILD_CXX_FLAGS += -fexceptions
+endif
+
 # --------------------------------------------------------------
 # FIXME lots of warnings from VCV side
 
@@ -205,8 +208,12 @@ BASE_FLAGS += -Wno-unused-variable
 # extra linker flags
 
 ifeq ($(WASM),true)
-LINK_FLAGS += --preload-file=./resources -sALLOW_MEMORY_GROWTH -sINITIAL_MEMORY=32Mb -sLZ4=1 --shell-file=../emscripten/shell.html
-# -sDISABLE_EXCEPTION_CATCHING=1
+LINK_FLAGS += --preload-file=./resources
+LINK_FLAGS += -sALLOW_MEMORY_GROWTH
+LINK_FLAGS += -sEXPORTED_RUNTIME_METHODS=FS,ccall
+LINK_FLAGS += -sINITIAL_MEMORY=64Mb
+LINK_FLAGS += -sLZ4=1
+LINK_FLAGS += --shell-file=../emscripten/shell.html
 else ifeq ($(HAIKU),true)
 LINK_FLAGS += -lpthread
 else
