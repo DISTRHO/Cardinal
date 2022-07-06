@@ -205,6 +205,7 @@ BASE_FLAGS += -Wno-unused-variable
 # extra linker flags
 
 ifeq ($(WASM),true)
+LINK_FLAGS += --preload-file=./jsfx
 LINK_FLAGS += --preload-file=./resources
 LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sEXPORTED_RUNTIME_METHODS=FS,cwrap

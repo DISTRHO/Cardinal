@@ -689,7 +689,11 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
         }
     } fRunnerData;
 
+   #ifdef CARLA_OS_WASM
+    PluginType fPluginType = PLUGIN_JSFX;
+   #else
     PluginType fPluginType = PLUGIN_LV2;
+   #endif
     PluginType fNextPluginType = fPluginType;
     uint fPluginCount = 0;
     int fPluginSelected = -1;
@@ -1152,7 +1156,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
         if (isRunnerActive())
             stopRunner();
 
-        fRunnerData.needsReinit = true;
+        fRunnerData.init();
         return startRunner();
     }
 
@@ -1175,9 +1179,6 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
                 path = nullptr;
                 break;
             }
-
-            if (path != nullptr)
-                carla_set_engine_option(module->fCarlaHostHandle, ENGINE_OPTION_PLUGIN_PATH, fPluginType, path);
 
             fPluginCount = 0;
             delete[] fPlugins;
@@ -1551,11 +1552,13 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
             if (ImGui::Button("Load Plugin"))
                 fIdleState = kIdleLoadSelectedPlugin;
 
+           #ifndef CARLA_OS_WASM
             if (fPluginType != PLUGIN_INTERNAL && (module == nullptr || module->canUseBridges))
             {
                 ImGui::SameLine();
                 ImGui::Checkbox("Run in bridge mode", &fPluginWillRunInBridgeMode);
             }
+           #endif
 
             ImGui::EndDisabled();
 
