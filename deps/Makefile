@@ -10,6 +10,7 @@
 DISTRHO_NAMESPACE = CardinalDISTRHO
 DGL_NAMESPACE = CardinalDGL
 USE_NANOVG_FBO = true
+WASM_EXCEPTIONS = true
 include ../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -61,10 +62,6 @@ BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
-
-ifeq ($(WASM),true)
-BUILD_CXX_FLAGS += -fexceptions
-endif
 
 # --------------------------------------------------------------
 # override VCV arch.mk stuff so we can build more architectures

@@ -3,10 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="Cardinal" />
+    <meta name="theme-color" content="#111111">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1" user-scalable="no">
     <title>Cardinal Synth</title>
     <style>
       html {
-        background-color: #111;
+        background-color: #111111;
         color: #eee;
       }
       body, canvas {
@@ -14,15 +17,35 @@
         margin: 0;
       }
 
-      #canvas_file_open,
-      #canvas_file_save {
+      #canvas_file_open {
         display: none;
       }
 
       #canvas_wrapper {
         display: none;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        position: absolute;
         width: 100vw;
         height: 100vh;
+      }
+      @media (min-resolution: 2dppx) {
+        #canvas_wrapper {
+          scale: calc(1/2);
+          width: 200vw;
+          height: 200vh;
+          left: -50vw;
+          top: -50vh;
+        }
+      }
+      @media (min-resolution: 3dppx) {
+        #canvas_wrapper {
+          scale: calc(1/3);
+          width: 300vw;
+          height: 300vh;
+          left: -100vw;
+          top: -100vh;
+        }
       }
 
       .emscripten {
@@ -79,7 +102,6 @@
     </div>
     <div id="canvas_wrapper">
       <input type="file" id="canvas_file_open" ></input>
-      <a href="#" id="canvas_file_save"></a>
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
     </div>
 

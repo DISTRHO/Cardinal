@@ -21,7 +21,6 @@
 # include_next <mmintrin.h>
 #elif defined(__EMSCRIPTEN__)
 # include <wasm_simd128.h>
-// # include_next <pmmintrin.h>
 #else
 # include "../sse2neon/sse2neon.h"
 #endif

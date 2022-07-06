@@ -287,7 +287,7 @@ struct SassyScopeWidget : ImGuiWidget {
         do_show_scope_window(module != nullptr ? &module->scope : getFakeScopeInstance(), scaleFactor);
     }
 
-    void onButton(const ButtonEvent& e)
+    void onButton(const ButtonEvent& e) override
     {
         // if mouse press is over draggable areas, do nothing so event can go to Rack
         if (e.action == GLFW_PRESS)

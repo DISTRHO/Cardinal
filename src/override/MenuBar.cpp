@@ -114,6 +114,7 @@ struct FileButton : MenuButton {
 			patchUtils::loadTemplateDialog();
 		}));
 
+#ifndef DISTRHO_OS_WASM
 		menu->addChild(createMenuItem("Open / Import...", RACK_MOD_CTRL_NAME "+O", []() {
 			patchUtils::loadDialog();
 		}));
@@ -126,6 +127,23 @@ struct FileButton : MenuButton {
 		menu->addChild(createMenuItem("Save as / Export...", RACK_MOD_CTRL_NAME "+Shift+S", []() {
 			patchUtils::saveAsDialog();
 		}));
+#else
+		menu->addChild(createMenuItem("Import patch...", RACK_MOD_CTRL_NAME "+O", []() {
+			patchUtils::loadDialog();
+		}));
+
+		menu->addChild(createMenuItem("Import selection...", "", [=]() {
+			patchUtils::loadSelectionDialog();
+		}, false, true));
+
+		menu->addChild(createMenuItem("Save and download compressed", RACK_MOD_CTRL_NAME "+Shift+S", []() {
+			patchUtils::saveAsDialog();
+		}));
+
+		menu->addChild(createMenuItem("Save and download uncompressed", "", []() {
+			patchUtils::saveAsDialogUncompressed();
+		}));
+#endif
 
 		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
 			patchUtils::revertDialog();
@@ -151,16 +169,18 @@ struct FileButton : MenuButton {
 		}
 #endif
 
+#ifndef DISTRHO_OS_WASM
 		menu->addChild(new ui::MenuSeparator);
 
 		// Load selection
-		menu->addChild(createMenuItem("Import selection", "", [=]() {
+		menu->addChild(createMenuItem("Import selection...", "", [=]() {
 			patchUtils::loadSelectionDialog();
 		}, false, true));
 
 		menu->addChild(createMenuItem("Export uncompressed json...", "", []() {
 			patchUtils::saveAsDialogUncompressed();
 		}));
+#endif
 
 		if (!demoPatches.empty())
 		{
@@ -182,13 +202,15 @@ struct FileButton : MenuButton {
 			}));
 		}
 
+#ifndef DISTRHO_OS_WASM
 		if (isStandalone) {
 			menu->addChild(new ui::MenuSeparator);
 
 			menu->addChild(createMenuItem("Quit", RACK_MOD_CTRL_NAME "+Q", []() {
 				APP->window->close();
 			}));
-		};
+		}
+#endif
 	}
 };
 

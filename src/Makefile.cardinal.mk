@@ -53,6 +53,7 @@ DGL_NAMESPACE = CardinalDGL
 NVG_DISABLE_SKIPPING_WHITESPACE = true
 NVG_FONT_TEXTURE_FLAGS = NVG_IMAGE_NEAREST
 USE_NANOVG_FBO = true
+WASM_EXCEPTIONS = true
 include ../../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -194,10 +195,6 @@ endif
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
 
-ifeq ($(WASM),true)
-BUILD_CXX_FLAGS += -fexceptions
-endif
-
 # --------------------------------------------------------------
 # FIXME lots of warnings from VCV side
 
@@ -210,9 +207,9 @@ BASE_FLAGS += -Wno-unused-variable
 ifeq ($(WASM),true)
 LINK_FLAGS += --preload-file=./resources
 LINK_FLAGS += -sALLOW_MEMORY_GROWTH
-LINK_FLAGS += -sEXPORTED_RUNTIME_METHODS=FS,ccall
+LINK_FLAGS += -sEXPORTED_RUNTIME_METHODS=FS,cwrap
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
-LINK_FLAGS += -sLZ4=1
+# LINK_FLAGS += -sLZ4=1
 LINK_FLAGS += --shell-file=../emscripten/shell.html
 else ifeq ($(HAIKU),true)
 LINK_FLAGS += -lpthread
