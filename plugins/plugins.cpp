@@ -908,12 +908,15 @@ static void initStatic__Cardinal()
        #endif
        #ifndef STATIC_BUILD
         p->addModel(modelAudioFile);
-        p->addModel(modelCarla);
         p->addModel(modelIldaeil);
        #else
         spl.removeModule("AudioFile");
-        spl.removeModule("Carla");
         spl.removeModule("Ildaeil");
+       #endif
+       #if !(defined(DISTRHO_OS_WASM) || defined(STATIC_BUILD))
+        p->addModel(modelCarla);
+       #else
+        spl.removeModule("Carla");
        #endif
        #ifndef HEADLESS
         p->addModel(modelSassyScope);
