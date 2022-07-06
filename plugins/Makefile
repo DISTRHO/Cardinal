@@ -205,8 +205,8 @@ PLUGIN_FILES += Cardinal/src/HostParameters-Map.cpp
 PLUGIN_FILES += Cardinal/src/HostTime.cpp
 PLUGIN_FILES += Cardinal/src/TextEditor.cpp
 
-ifeq ($(USE_GLES2),true)
-ifeq ($(USE_GLES3),true)
+ifneq ($(USE_GLES2),true)
+ifneq ($(USE_GLES3),true)
 PLUGIN_FILES += Cardinal/src/glBars.cpp
 endif
 endif
