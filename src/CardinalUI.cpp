@@ -30,6 +30,13 @@
 #include <ui/MenuSeparator.hpp>
 #include <window/Window.hpp>
 
+#ifdef DISTRHO_OS_WASM
+#include <ui/Button.hpp>
+#include <ui/Label.hpp>
+#include <ui/MenuOverlay.hpp>
+#include <ui/SequentialLayout.hpp>
+#endif
+
 #ifdef NDEBUG
 # undef DEBUG
 #endif
@@ -85,6 +92,89 @@ void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, 
         pcontext->ui->editParameter(index, false);
     }
 }
+
+// -----------------------------------------------------------------------------------------------------------
+
+#ifdef DISTRHO_OS_WASM
+struct WasmWelcomeDialog : rack::widget::OpaqueWidget
+{
+    static const constexpr float margin = 10;
+    static const constexpr float buttonWidth = 100;
+
+    WasmWelcomeDialog()
+    {
+        using rack::ui::Button;
+        using rack::ui::Label;
+        using rack::ui::MenuOverlay;
+        using rack::ui::SequentialLayout;
+
+        box.size = rack::math::Vec(550, 280);
+
+        SequentialLayout* const layout = new SequentialLayout;
+        layout->box.pos = rack::math::Vec(0, 0);
+        layout->box.size = box.size;
+        layout->orientation = SequentialLayout::VERTICAL_ORIENTATION;
+        layout->margin = rack::math::Vec(margin, margin);
+        layout->spacing = rack::math::Vec(margin, margin);
+        layout->wrap = false;
+        addChild(layout);
+
+        SequentialLayout* const contentLayout = new SequentialLayout;
+        contentLayout->spacing = rack::math::Vec(margin, margin);
+        layout->addChild(contentLayout);
+
+        SequentialLayout* const buttonLayout = new SequentialLayout;
+        buttonLayout->alignment = SequentialLayout::CENTER_ALIGNMENT;
+        buttonLayout->box.size = box.size;
+        buttonLayout->spacing = rack::math::Vec(margin, margin);
+        layout->addChild(buttonLayout);
+
+        Label* const label = new Label;
+        label->box.size.x = box.size.x - 2*margin;
+        label->box.size.y = box.size.y - 2*margin - 40;
+        label->fontSize = 20;
+        label->text = ""
+            "Welcome!\n"
+            "This is a special web-assembly version of Cardinal, "
+            "allowing you to enjoy eurorack-style modules directly in your browser.\n"
+            "\n"
+            "This is still very much a work in progress, "
+            "minor issues and occasional crashes are expected.\n"
+            "\n"
+            "Proceed with caution and have fun!";
+        contentLayout->addChild(label);
+
+        struct AsyncDismissButton : Button {
+            WasmWelcomeDialog* dialog;
+            void onAction(const ActionEvent& e) override {
+                dialog->getParent()->requestDelete();
+            }
+        };
+        AsyncDismissButton* const dismissButton = new AsyncDismissButton;
+        dismissButton->box.size.x = buttonWidth;
+        dismissButton->text = "Dismiss";
+        dismissButton->dialog = this;
+        buttonLayout->addChild(dismissButton);
+
+        MenuOverlay* const overlay = new MenuOverlay;
+        overlay->bgColor = nvgRGBAf(0, 0, 0, 0.33);
+        overlay->addChild(this);
+        APP->scene->addChild(overlay);
+    }
+
+    void step() override
+    {
+        OpaqueWidget::step();
+        box.pos = parent->box.size.minus(box.size).div(2).round();
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
+        Widget::draw(args);
+    }
+};
+#endif
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -183,14 +273,7 @@ public:
         }
 
        #ifdef DISTRHO_OS_WASM
-        asyncDialog::create("Welcome!\n"
-                            "This is a special web-assembly version of Cardinal, "
-                            "allowing you to enjoy eurorack-style modules directly in your browser.\n"
-                            "\n"
-                            "This is still very much a work in progress, "
-                            "minor issues and occasional crashes are expected.\n"
-                            "\n"
-                            "Proceed with caution and have fun!");
+        new WasmWelcomeDialog();
        #endif
 
         context->window->step();
