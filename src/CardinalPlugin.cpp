@@ -116,7 +116,6 @@ struct Initializer
         settings::autoCheckUpdates = false;
         settings::autosaveInterval = 0;
         settings::devMode = true;
-        settings::discordUpdateActivity = false;
         settings::isPlugin = true;
         settings::skipLoadOnLaunch = true;
         settings::showTipsOnLaunch = false;

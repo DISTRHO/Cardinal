@@ -52,7 +52,7 @@ const std::string APP_NAME = "Cardinal";
 const std::string APP_EDITION = getPluginFormatName();
 const std::string APP_EDITION_NAME = "Audio Plugin";
 const std::string APP_VERSION_MAJOR = "2";
-const std::string APP_VERSION = "2.1.1";
+const std::string APP_VERSION = "2.1.2";
 #if defined ARCH_WIN
 	const std::string APP_OS = "win";
 #elif defined ARCH_MAC
