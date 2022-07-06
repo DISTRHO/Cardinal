@@ -2277,9 +2277,9 @@ static void initStatic__Mojo()
     const StaticPluginLoader spl(p, "Mojo");
     if (spl.ok())
     {
-        p->addModel(modeldogs);
-        p->addModel(modelpigs);
-        p->addModel(modelsheep);
+        p->addModel(modelDogs);
+        p->addModel(modelPigs);
+        p->addModel(modelSheep);
     }
 }
 
