@@ -35,6 +35,7 @@
 #include <ui/Label.hpp>
 #include <ui/MenuOverlay.hpp>
 #include <ui/SequentialLayout.hpp>
+#include "CardinalCommon.hpp"
 #endif
 
 #ifdef NDEBUG
@@ -99,7 +100,7 @@ void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, 
 struct WasmWelcomeDialog : rack::widget::OpaqueWidget
 {
     static const constexpr float margin = 10;
-    static const constexpr float buttonWidth = 100;
+    static const constexpr float buttonWidth = 110;
 
     WasmWelcomeDialog()
     {
@@ -108,7 +109,7 @@ struct WasmWelcomeDialog : rack::widget::OpaqueWidget
         using rack::ui::MenuOverlay;
         using rack::ui::SequentialLayout;
 
-        box.size = rack::math::Vec(550, 280);
+        box.size = rack::math::Vec(550, 310);
 
         SequentialLayout* const layout = new SequentialLayout;
         layout->box.pos = rack::math::Vec(0, 0);
@@ -135,6 +136,7 @@ struct WasmWelcomeDialog : rack::widget::OpaqueWidget
         label->fontSize = 20;
         label->text = ""
             "Welcome!\n"
+            "\n"
             "This is a special web-assembly version of Cardinal, "
             "allowing you to enjoy eurorack-style modules directly in your browser.\n"
             "\n"
@@ -144,13 +146,26 @@ struct WasmWelcomeDialog : rack::widget::OpaqueWidget
             "Proceed with caution and have fun!";
         contentLayout->addChild(label);
 
-        struct AsyncDismissButton : Button {
+        struct JoinDiscussionButton : Button {
+            WasmWelcomeDialog* dialog;
+            void onAction(const ActionEvent& e) override {
+                patchUtils::openBrowser("https://github.com/DISTRHO/Cardinal/issues/287");
+                dialog->getParent()->requestDelete();
+            }
+        };
+        JoinDiscussionButton* const discussionButton = new JoinDiscussionButton;
+        discussionButton->box.size.x = buttonWidth;
+        discussionButton->text = "Join discussion";
+        discussionButton->dialog = this;
+        buttonLayout->addChild(discussionButton);
+
+        struct DismissButton : Button {
             WasmWelcomeDialog* dialog;
             void onAction(const ActionEvent& e) override {
                 dialog->getParent()->requestDelete();
             }
         };
-        AsyncDismissButton* const dismissButton = new AsyncDismissButton;
+        DismissButton* const dismissButton = new DismissButton;
         dismissButton->box.size.x = buttonWidth;
         dismissButton->text = "Dismiss";
         dismissButton->dialog = this;
