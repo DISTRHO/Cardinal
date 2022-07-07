@@ -11,6 +11,7 @@
       html {
         background-color: #111111;
         color: #eee;
+        overflow: hidden;
       }
       body, canvas {
         padding: 0;
@@ -29,22 +30,74 @@
         width: 100vw;
         height: 100vh;
       }
+      @media (min-resolution: 1.05dppx) { /* FIXME unused by FF?? */
+        #canvas_wrapper {
+          scale: calc(1/1.1);
+          left: -4.5vw;
+          top: -4.5vh;
+        }
+      }
+      @media (min-resolution: 1.2dppx) {
+        #canvas_wrapper {
+          scale: calc(1/1.2);
+          left: -8.333vw;
+          top: -8.333vh;
+        }
+      }
+      @media (min-resolution: 1.333dppx) {
+        #canvas_wrapper {
+          scale: calc(1/1.333);
+          left: -12.5vw;
+          top: -12.5vh;
+        }
+      }
+      @media (min-resolution: 1.5dppx) {
+        #canvas_wrapper {
+          scale: calc(1/1.5);
+          left: calc(-100vw / 6);
+          top: calc(-100vh / 6);
+        }
+      }
+      @media (min-resolution: 1.7dppx) {
+        #canvas_wrapper {
+          scale: calc(1/1.7);
+          left: -20.5vw;
+          top: -20.5vh;
+        }
+      }
       @media (min-resolution: 2dppx) {
         #canvas_wrapper {
           scale: calc(1/2);
-          width: 200vw;
-          height: 200vh;
-          left: -50vw;
-          top: -50vh;
+          left: calc(-100vw / 4);
+          top: calc(-100vh / 4);
+        }
+      }
+      @media (min-resolution: 2.4dppx) {
+        #canvas_wrapper {
+          scale: calc(1/2.4);
+          left: -29.1937vw;
+          top: -29.1937vh;
         }
       }
       @media (min-resolution: 3dppx) {
         #canvas_wrapper {
           scale: calc(1/3);
-          width: 300vw;
-          height: 300vh;
-          left: -100vw;
-          top: -100vh;
+          left: -33.333vw;
+          top: -33.333vh;
+        }
+      }
+      @media (min-resolution: 4dppx) {
+        #canvas_wrapper {
+          scale: calc(1/4q);
+          left: -37.5vw;
+          top: -37.5vh;
+        }
+      }
+      @media (min-resolution: 5dppx) {
+        #canvas_wrapper {
+          scale: calc(1/5);
+          left: -40vw;
+          top: -40vh;
         }
       }
 
