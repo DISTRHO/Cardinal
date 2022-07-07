@@ -95,6 +95,7 @@ DRWAV += drwav_init_write__internal
 DRWAV += drwav_init_write_sequential
 DRWAV += drwav_init_write_sequential_pcm_frames
 DRWAV += drwav_init_write_with_metadata
+DRWAV += drwav_metadata
 DRWAV += drwav_mulaw_to_f32
 DRWAV += drwav_mulaw_to_s16
 DRWAV += drwav_mulaw_to_s16
