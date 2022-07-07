@@ -18,6 +18,8 @@
 # define IMGUI_IMPL_OPENGL_ES2
 #elif defined(DGL_USE_GLES3)
 # define IMGUI_IMPL_OPENGL_ES3
+#elif defined(DGL_USE_OPENGL3)
+# define IMGUI_IMPL_OPENGL_LOADER_CUSTOM
 #endif
 
 #define IMGUI_DPF_BACKEND
