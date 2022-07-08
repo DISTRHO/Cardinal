@@ -575,11 +575,6 @@ static void host_ui_custom_data_changed(NativeHostHandle handle, const char* key
     d_stdout("%s %p %s %s", __FUNCTION__, handle, key, value);
 }
 
-static void host_ui_closed(NativeHostHandle handle)
-{
-    d_stdout("%s %p", __FUNCTION__, handle);
-}
-
 static const char* host_ui_save_file(NativeHostHandle, bool, const char*, const char*)
 {
     return nullptr;
@@ -804,6 +799,12 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
         }
 
         setDirty(true);
+    }
+
+    void closeUI() noexcept
+    {
+        if (fIdleState == kIdleGiveIdleToUI)
+            fIdleState = kIdleNothing;
     }
 
     void openFileFromDSP(bool /* isDir */, const char* const title, const char* /* filter */)
@@ -1083,7 +1084,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
             break;
 
         case kIdleGiveIdleToUI:
-            module->fCarlaPluginDescriptor->ui_idle(module->fCarlaPluginHandle);
+            if (module->fCarlaPluginDescriptor->ui_idle != nullptr)
+                module->fCarlaPluginDescriptor->ui_idle(module->fCarlaPluginHandle);
             break;
 
         case kIdleChangePluginType:
@@ -1632,6 +1634,12 @@ static void host_ui_parameter_changed(const NativeHostHandle handle, const uint3
 {
     if (IldaeilWidget* const ui = static_cast<IldaeilWidget*>(static_cast<IldaeilModule*>(handle)->fUI))
         ui->changeParameterFromDSP(index, value);
+}
+
+static void host_ui_closed(const NativeHostHandle handle)
+{
+    if (IldaeilWidget* const ui = static_cast<IldaeilWidget*>(static_cast<IldaeilModule*>(handle)->fUI))
+        ui->closeUI();
 }
 
 static const char* host_ui_open_file(const NativeHostHandle handle,
