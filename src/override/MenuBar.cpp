@@ -489,6 +489,8 @@ struct ViewButton : MenuButton {
 		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
+		menu->addChild(createMenuLabel("Appearance"));
+
 		menu->addChild(createBoolPtrMenuItem("Show tooltips", "", &settings::tooltips));
 
 		ZoomSlider* zoomSlider = new ZoomSlider;
@@ -512,8 +514,16 @@ struct ViewButton : MenuButton {
 		menu->addChild(haloBrightnessSlider);
 
 		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuLabel("Module dragging"));
 
-		// menu->addChild(createBoolPtrMenuItem("Hide cursor while dragging", "", &settings::allowCursorLock));
+		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
+
+		menu->addChild(createBoolPtrMenuItem("Auto-squeeze modules when dragging", "", &settings::squeezeModules));
+
+		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuLabel("Parameters"));
+
+		// menu->addChild(createBoolPtrMenuItem("Lock cursor while dragging", "", &settings::allowCursorLock));
 
 		static const std::vector<std::string> knobModeLabels = {
 			"Linear",
@@ -537,11 +547,10 @@ struct ViewButton : MenuButton {
 		knobScrollSensitivitySlider->box.size.x = 250.0;
 		menu->addChild(knobScrollSensitivitySlider);
 
-		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
+		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuLabel("Window"));
 
 		menu->addChild(createBoolPtrMenuItem("Invert zoom", "", &settings::invertZoom));
-
-		menu->addChild(new ui::MenuSeparator);
 
 		static const std::vector<std::string> rateLimitLabels = {
 			"None",

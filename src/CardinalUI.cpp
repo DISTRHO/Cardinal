@@ -419,6 +419,9 @@ public:
         case kWindowParameterInvertZoom:
             windowParameters.invertZoom = value > 0.5f;
             break;
+        case kWindowParameterSqueezeModulePositions:
+            windowParameters.squeezeModules = value > 0.5f;
+            break;
         default:
             return;
         }
@@ -514,6 +517,9 @@ protected:
             break;
         case kWindowParameterInvertZoom:
             windowParameters.invertZoom = value > 0.5f;
+            break;
+        case kWindowParameterSqueezeModulePositions:
+            windowParameters.squeezeModules = value > 0.5f;
             break;
         default:
             return;

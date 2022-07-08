@@ -517,6 +517,7 @@ public:
         fWindowParameters[kWindowParameterBrowserSort] = 3.0f;
         fWindowParameters[kWindowParameterBrowserZoom] = 50.0f;
         fWindowParameters[kWindowParameterInvertZoom] = 0.0f;
+        fWindowParameters[kWindowParameterSqueezeModulePositions] = 1.0f;
        #endif
 
         // create unique temporary path for this instance
@@ -859,6 +860,14 @@ protected:
             parameter.symbol = "invertZoom";
             parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
             parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 1.0f;
+            break;
+        case kWindowParameterSqueezeModulePositions:
+            parameter.name = "Auto-squeeze module positions";
+            parameter.symbol = "squeezeModules";
+            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+            parameter.ranges.def = 1.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 1.0f;
             break;

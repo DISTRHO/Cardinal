@@ -132,9 +132,9 @@ void CardinalModuleWidget__saveDialog(ModuleWidget* const w)
 static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget, std::string presetDir) {
     bool foundPresets = false;
 
-    // Note: This is not cached, so opening this menu each time might have a bit of latency.
     if (system::isDirectory(presetDir))
     {
+        // Note: This is not cached, so opening this menu each time might have a bit of latency.
         std::vector<std::string> entries = system::getEntries(presetDir);
         std::sort(entries.begin(), entries.end());
         for (std::string path : entries) {
@@ -143,7 +143,7 @@ static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget
             std::regex r("^\\d+_");
             name = std::regex_replace(name, r, "");
 
-            if (system::getExtension(path) == ".vcvm")
+            if (system::getExtension(path) == ".vcvm" && name != "template")
             {
                 if (!foundPresets)
                     menu->addChild(new ui::MenuSeparator);
@@ -324,6 +324,11 @@ void CardinalModuleWidget::onButton(const ButtonEvent& e)
                 if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
                     APP->scene->rack->select(this, false);
                     e.consume(NULL);
+                    return;
+                }
+
+                // If module positions are locked, don't consume left-click
+                if (settings::lockModules) {
                     return;
                 }
 

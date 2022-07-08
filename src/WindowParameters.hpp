@@ -33,6 +33,7 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
+// NOTE make sure to never change the order, parameters indexes are based on this
 enum WindowParameterList {
     kWindowParameterShowTooltips,
     kWindowParameterCableOpacity,
@@ -47,6 +48,7 @@ enum WindowParameterList {
     kWindowParameterBrowserSort,
     kWindowParameterBrowserZoom,
     kWindowParameterInvertZoom,
+    kWindowParameterSqueezeModulePositions,
     kWindowParameterCount,
 };
 
@@ -62,6 +64,7 @@ struct WindowParameters {
     bool tooltips = true;
     bool knobScroll = false;
     bool lockModules = false;
+    bool squeezeModules = true;
     bool invertZoom = false;
     // cardinal specific
     int rateLimit = 0;

@@ -775,6 +775,13 @@ void WindowParametersSave(rack::window::Window* const window)
 			window->internal->callback->WindowParametersChanged(kWindowParameterLockModulePositions,
 			                                                    rack::settings::lockModules);
 	}
+	if (window->internal->params.squeezeModules != rack::settings::squeezeModules)
+	{
+		window->internal->params.squeezeModules = rack::settings::squeezeModules;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterSqueezeModulePositions,
+			                                                    rack::settings::squeezeModules);
+	}
 	if (window->internal->params.invertZoom != rack::settings::invertZoom)
 	{
 		window->internal->params.invertZoom = rack::settings::invertZoom;
@@ -804,6 +811,7 @@ void WindowParametersRestore(rack::window::Window* const window)
 	rack::settings::tooltips = window->internal->params.tooltips;
 	rack::settings::knobScroll = window->internal->params.knobScroll;
 	rack::settings::lockModules = window->internal->params.lockModules;
+	rack::settings::squeezeModules = window->internal->params.squeezeModules;
 	rack::settings::invertZoom = window->internal->params.invertZoom;
 	rack::settings::rateLimit = window->internal->params.rateLimit;
 }
