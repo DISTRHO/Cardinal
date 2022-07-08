@@ -30,6 +30,19 @@
 
 #include_next "common.hpp"
 
+// Workaround for wrong file permissions from zstd extraction
+#ifdef __EMSCRIPTEN__
+#define fopen fopen_wasm
+
+extern "C" {
+FILE* fopen_wasm(const char* filename, const char* mode);
+}
+
+namespace std {
+	using ::fopen_wasm;
+}
+#endif
+
 // Make binary resources work the same no matter the OS
 #undef BINARY
 #undef BINARY_START
