@@ -17,6 +17,9 @@
 
 #pragma once
 
+#ifndef __EMSCRIPTEN__
 #define GHC_OS_DETECTED
 #define GHC_OS_LINUX
+#endif
+
 #include_next <ghc/filesystem.hpp>

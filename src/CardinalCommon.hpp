@@ -25,6 +25,10 @@
 # define REMOTE_HOST_PORT "2228"
 #endif
 
+#ifdef DISTRHO_OS_WASM
+# define CARDINAL_IMPORTED_TEMPLATE_FILENAME "/imported.vcv"
+#endif
+
 extern const std::string CARDINAL_VERSION;
 
 namespace rack {
@@ -51,6 +55,10 @@ enum SpecialPath {
     kSpecialPathAppData,
 };
 std::string getSpecialPath(SpecialPath type);
+#endif
+
+#ifdef DISTRHO_OS_WASM
+extern char* patchStorageSlug;
 #endif
 
 } // namespace rack

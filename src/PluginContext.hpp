@@ -122,10 +122,6 @@ void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, 
 
 // -----------------------------------------------------------------------------------------------------------
 
-struct CardinalAudioDevice;
-struct CardinalMidiInputDevice;
-struct CardinalMidiOutputDevice;
-
 CardinalPluginContext* getRackContextFromPlugin(void* ptr);
 
 class CardinalBasePlugin : public Plugin {
@@ -139,11 +135,17 @@ public:
 };
 
 #ifndef HEADLESS
+struct WasmPatchStorageLoadingDialog;
+
 class CardinalBaseUI : public UI {
 public:
     CardinalPluginContext* const context;
     bool saving;
     bool savingUncompressed;
+
+   #ifdef DISTRHO_OS_WASM
+    WasmPatchStorageLoadingDialog* psDialog;
+   #endif
 
     // for 3rd party modules
     std::function<void(char* path)> filebrowseraction;
@@ -154,6 +156,9 @@ public:
           context(getRackContextFromPlugin(getPluginInstancePointer())),
           saving(false),
           savingUncompressed(false),
+         #ifdef DISTRHO_OS_WASM
+          psDialog(nullptr),
+         #endif
           filebrowseraction(),
           filebrowserhandle(nullptr)
     {

@@ -100,6 +100,10 @@ std::string getSpecialPath(const SpecialPath type)
 }
 #endif
 
+#ifdef DISTRHO_OS_WASM
+char* patchStorageSlug = nullptr;
+#endif
+
 std::string homeDir()
 {
 # ifdef ARCH_WIN

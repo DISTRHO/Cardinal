@@ -31,11 +31,12 @@
 #include <window/Window.hpp>
 
 #ifdef DISTRHO_OS_WASM
-#include <ui/Button.hpp>
-#include <ui/Label.hpp>
-#include <ui/MenuOverlay.hpp>
-#include <ui/SequentialLayout.hpp>
-#include "CardinalCommon.hpp"
+# include <ui/Button.hpp>
+# include <ui/Label.hpp>
+# include <ui/MenuOverlay.hpp>
+# include <ui/SequentialLayout.hpp>
+# include "CardinalCommon.hpp"
+# include <emscripten/emscripten.h>
 #endif
 
 #ifdef NDEBUG
@@ -189,6 +190,104 @@ struct WasmWelcomeDialog : rack::widget::OpaqueWidget
         Widget::draw(args);
     }
 };
+
+struct WasmPatchStorageLoadingDialog : rack::widget::OpaqueWidget
+{
+    static const constexpr float margin = 10;
+
+    rack::ui::MenuOverlay* overlay;
+
+    WasmPatchStorageLoadingDialog()
+    {
+        using rack::ui::Label;
+        using rack::ui::MenuOverlay;
+        using rack::ui::SequentialLayout;
+
+        box.size = rack::math::Vec(300, 50);
+
+        SequentialLayout* const layout = new SequentialLayout;
+        layout->box.pos = rack::math::Vec(0, 0);
+        layout->box.size = box.size;
+        layout->orientation = SequentialLayout::VERTICAL_ORIENTATION;
+        layout->margin = rack::math::Vec(margin, margin);
+        layout->spacing = rack::math::Vec(margin, margin);
+        layout->wrap = false;
+        addChild(layout);
+
+        Label* const label = new Label;
+        label->box.size.x = box.size.x - 2*margin;
+        label->box.size.y = box.size.y - 2*margin - 40;
+        label->fontSize = 16;
+        label->text = "Load patch from PatchStorage...\n";
+        layout->addChild(label);
+
+        overlay = new MenuOverlay;
+        overlay->bgColor = nvgRGBAf(0, 0, 0, 0.33);
+        overlay->addChild(this);
+        APP->scene->addChild(overlay);
+    }
+
+    void step() override
+    {
+        OpaqueWidget::step();
+        box.pos = parent->box.size.minus(box.size).div(2).round();
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
+        Widget::draw(args);
+    }
+};
+
+static void downloadPatchStorageFailed(const char* const filename)
+{
+    d_stdout("downloadPatchStorageFailed %s", filename);
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+    CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(context->ui);
+
+    if (ui->psDialog != nullptr)
+    {
+        ui->psDialog->overlay->requestDelete();
+        asyncDialog::create("Failed to fetch patch from PatchStorage");
+    }
+
+    using namespace rack;
+    context->patch->templatePath = system::join(asset::systemDir, "template-synth.vcv"); // FIXME
+    context->patch->loadTemplate();
+    context->scene->rackScroll->reset();
+}
+
+static void downloadPatchStorageSucceeded(const char* const filename)
+{
+    d_stdout("downloadPatchStorageSucceeded %s | %s", filename, APP->patch->templatePath.c_str());
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+    CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(context->ui);
+
+    ui->psDialog->overlay->requestDelete();
+    ui->psDialog = nullptr;
+
+    if (FILE* f = fopen(filename, "r"))
+    {
+        uint8_t buf[8] = {};
+        fread(buf, 8, 1, f);
+        d_stdout("read patch %x %x %x %x %x %x %x %x",
+                buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7]);
+        fclose(f);
+    }
+
+    try {
+        context->patch->load(CARDINAL_IMPORTED_TEMPLATE_FILENAME);
+    } catch (rack::Exception& e) {
+        const std::string message = rack::string::f("Could not load patch: %s", e.what());
+        asyncDialog::create(message.c_str());
+        return;
+    }
+
+    context->scene->rackScroll->reset();
+    context->patch->path = "";
+    context->history->setSaved();
+}
 #endif
 
 // -----------------------------------------------------------------------------------------------------------
@@ -288,7 +387,21 @@ public:
         }
 
        #ifdef DISTRHO_OS_WASM
-        new WasmWelcomeDialog();
+        if (rack::patchStorageSlug != nullptr)
+        {
+            std::string url("/patchstorage.php?slug=");
+            url += rack::patchStorageSlug;
+            std::free(rack::patchStorageSlug);
+            rack::patchStorageSlug = nullptr;
+
+            psDialog = new WasmPatchStorageLoadingDialog();
+            emscripten_async_wget(url.c_str(), context->patch->templatePath.c_str(),
+                                  downloadPatchStorageSucceeded, downloadPatchStorageFailed);
+        }
+        else
+        {
+            new WasmWelcomeDialog();
+        }
        #endif
 
         context->window->step();
