@@ -1812,6 +1812,7 @@ struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
 };
 #else
 static void host_ui_parameter_changed(NativeHostHandle, uint32_t, float) {}
+static void host_ui_closed(NativeHostHandle) {}
 static const char* host_ui_open_file(NativeHostHandle, bool, const char*, const char*) { return nullptr; }
 static void projectLoadedFromDSP(void*) {}
 struct IldaeilModuleWidget : ModuleWidget {
