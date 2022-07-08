@@ -406,7 +406,13 @@ void appendSelectionContextMenu(ui::Menu* const menu)
     }, false, true));
 
     // Save
-    menu->addChild(createMenuItem("Save selection as", "", [w]() {
+    menu->addChild(createMenuItem(
+       #ifdef DISTRHO_OS_WASM
+        "Save selection",
+       #else
+        "Save selection as...",
+       #endif
+        "", [w]() {
         CardinalModuleWidget__saveSelectionDialog(w);
     }, n == 0));
 
