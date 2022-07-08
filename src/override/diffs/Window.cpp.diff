@@ -1,5 +1,5 @@
---- ../Rack/src/window/Window.cpp	2022-02-09 15:35:19.238863170 +0000
-+++ Window.cpp	2022-05-15 12:05:26.430956655 +0100
+--- ../Rack/src/window/Window.cpp	2022-06-04 19:14:19.951414839 +0100
++++ Window.cpp	2022-07-08 12:18:51.634824005 +0100
 @@ -1,33 +1,83 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -108,7 +108,7 @@
  		throw Exception("Failed to load font %s", filename.c_str());
  	}
  	INFO("Loaded font %s", filename.c_str());
-@@ -79,375 +128,308 @@
+@@ -79,375 +128,317 @@
  }
  
  
@@ -148,7 +148,9 @@
 -	int frameSwapInterval = -1;
 -	double monitorRefreshRate = 0.0;
 +	int frameSwapInterval = 1;
++#ifndef DGL_USE_GLES
 +	int generateScreenshotStep = kScreenshotStepNone;
++#endif
 +	double monitorRefreshRate = 60.0;
  	double frameTime = 0.0;
  	double lastFrameDuration = 0.0;
@@ -200,14 +202,18 @@
 +	return nvgCreateFontMem(vg, NANOVG_DEJAVU_SANS_TTF,
 +	                        (uchar*)dejavusans_ttf, dejavusans_ttf_size, 0);
  }
--
--
++#endif
+ 
+ 
 -static void windowMaximizeCallback(GLFWwindow* win, int maximized) {
 -	settings::windowMaximized = maximized;
 -	// DEBUG("windowMaximizeCallback %d", maximized);
 -}
--
--
++Window::Window() {
++	internal = new Internal;
+ 
++	DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
+ 
 -static void mouseButtonCallback(GLFWwindow* win, int button, int action, int mods) {
 -	contextSet((Context*) glfwGetWindowUserPointer(win));
 -#if defined ARCH_MAC
@@ -221,28 +227,6 @@
 -		button = GLFW_MOUSE_BUTTON_MIDDLE;
 -		mods &= ~(GLFW_MOD_CONTROL | GLFW_MOD_SHIFT);
 -	}
- #endif
- 
--	APP->event->handleButton(APP->window->internal->lastMousePos, button, action, mods);
--}
--
- 
--static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
--	contextSet((Context*) glfwGetWindowUserPointer(win));
--	math::Vec mousePos = math::Vec(xpos, ypos).div(APP->window->pixelRatio / APP->window->windowRatio).round();
--	math::Vec mouseDelta = mousePos.minus(APP->window->internal->lastMousePos);
-+Window::Window() {
-+	internal = new Internal;
- 
--	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
--	if (APP->window->internal->ignoreNextMouseDelta) {
--		APP->window->internal->ignoreNextMouseDelta = false;
--		mouseDelta = math::Vec();
--	}
-+	DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
- 
--	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
--	(void) cursorMode;
 +	// Set up NanoVG
 +	const int nvgFlags = NVG_ANTIALIAS;
 +	vg = nvgCreateGL(nvgFlags);
@@ -251,19 +235,10 @@
 +	fbVg = nvgCreateSharedGLES2(vg, nvgFlags);
 +#else
 +	fbVg = nvgCreateSharedGL2(vg, nvgFlags);
-+#endif
+ #endif
  
--#if defined ARCH_MAC
--	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
--	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
--	if (cursorMode == GLFW_CURSOR_HIDDEN) {
--		// CGSetLocalEventsSuppressionInterval(0.0);
--		glfwSetCursorPos(win, APP->window->internal->lastMousePos.x, APP->window->internal->lastMousePos.y);
--		CGAssociateMouseAndMouseCursorPosition(true);
--		mousePos = APP->window->internal->lastMousePos;
--	}
--	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
--	glfwSetCursor(win, NULL);
+-	APP->event->handleButton(APP->window->internal->lastMousePos, button, action, mods);
+-}
 +	// Load default Blendish font
 +#ifndef DGL_NO_SHARED_RESOURCES
 +	uiFont = std::make_shared<Font>();
@@ -278,14 +253,16 @@
 +	internal->fontCache[uiFont2->ofilename] = uiFont2;
 +#else
 +	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
- #endif
++#endif
  
--	APP->window->internal->lastMousePos = mousePos;
 +	if (uiFont != nullptr)
 +		bndSetFont(uiFont->handle);
 +}
  
--	APP->event->handleHover(mousePos, mouseDelta);
+-static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
+-	contextSet((Context*) glfwGetWindowUserPointer(win));
+-	math::Vec mousePos = math::Vec(xpos, ypos).div(APP->window->pixelRatio / APP->window->windowRatio).round();
+-	math::Vec mouseDelta = mousePos.minus(APP->window->internal->lastMousePos);
 +void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 +{
 +	if (ui != nullptr)
@@ -307,12 +284,11 @@
 +		window->internal->r_fbVg = nvgCreateSharedGL2(window->internal->r_vg, NVG_ANTIALIAS);
 +#endif
  
--	// Keyboard/mouse MIDI driver
--	int width, height;
--	glfwGetWindowSize(win, &width, &height);
--	math::Vec scaledPos(xpos / width, ypos / height);
--	keyboard::mouseMove(scaledPos);
--}
+-	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
+-	if (APP->window->internal->ignoreNextMouseDelta) {
+-		APP->window->internal->ignoreNextMouseDelta = false;
+-		mouseDelta = math::Vec();
+-	}
 +		// swap contexts
 +		window->internal->o_vg = window->vg;
 +		window->internal->o_fbVg = window->fbVg;
@@ -337,22 +313,40 @@
 +			                                      NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 +		}
  
+-	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
+-	(void) cursorMode;
 +		// Init settings
 +		WindowParametersRestore(window);
  
--static void cursorEnterCallback(GLFWwindow* win, int entered) {
--	contextSet((Context*) glfwGetWindowUserPointer(win));
--	if (!entered) {
--		APP->event->handleLeave();
+-#if defined ARCH_MAC
+-	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
+-	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
+-	if (cursorMode == GLFW_CURSOR_HIDDEN) {
+-		// CGSetLocalEventsSuppressionInterval(0.0);
+-		glfwSetCursorPos(win, APP->window->internal->lastMousePos.x, APP->window->internal->lastMousePos.y);
+-		CGAssociateMouseAndMouseCursorPosition(true);
+-		mousePos = APP->window->internal->lastMousePos;
 +		widget::Widget::ContextCreateEvent e;
 +		APP->scene->onContextCreate(e);
  	}
--}
+-	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
+-	glfwSetCursor(win, NULL);
+-#endif
+-
+-	APP->window->internal->lastMousePos = mousePos;
+-
+-	APP->event->handleHover(mousePos, mouseDelta);
 +	else
 +	{
 +		widget::Widget::ContextDestroyEvent e;
 +		APP->scene->onContextDestroy(e);
  
+-	// Keyboard/mouse MIDI driver
+-	int width, height;
+-	glfwGetWindowSize(win, &width, &height);
+-	math::Vec scaledPos(xpos / width, ypos / height);
+-	keyboard::mouseMove(scaledPos);
+-}
 +		// swap contexts
 +		window->uiFont->vg = window->internal->o_vg;
 +		window->vg = window->internal->o_vg;
@@ -376,46 +370,31 @@
 +			image.second->ohandle = -1;
 +		}
  
++#if defined NANOVG_GLES2
++		nvgDeleteGLES2(window->internal->r_fbVg);
++#else
++		nvgDeleteGL2(window->internal->r_fbVg);
++#endif
+ 
+-static void cursorEnterCallback(GLFWwindow* win, int entered) {
+-	contextSet((Context*) glfwGetWindowUserPointer(win));
+-	if (!entered) {
+-		APP->event->handleLeave();
++		window->internal->ui = nullptr;
++		window->internal->callback = nullptr;
+ 	}
+ }
+ 
++void WindowSetMods(Window* const window, const int mods)
++{
++	window->internal->mods = mods;
++}
+ 
 -static void scrollCallback(GLFWwindow* win, double x, double y) {
 -	contextSet((Context*) glfwGetWindowUserPointer(win));
 -	math::Vec scrollDelta = math::Vec(x, y);
 -#if defined ARCH_MAC
 -	scrollDelta = scrollDelta.mult(10.0);
-+#if defined NANOVG_GLES2
-+		nvgDeleteGLES2(window->internal->r_fbVg);
- #else
--	scrollDelta = scrollDelta.mult(50.0);
-+		nvgDeleteGL2(window->internal->r_fbVg);
- #endif
- 
--	APP->event->handleScroll(APP->window->internal->lastMousePos, scrollDelta);
-+		window->internal->ui = nullptr;
-+		window->internal->callback = nullptr;
-+	}
- }
- 
--
--static void charCallback(GLFWwindow* win, unsigned int codepoint) {
--	contextSet((Context*) glfwGetWindowUserPointer(win));
--	if (APP->event->handleText(APP->window->internal->lastMousePos, codepoint))
--		return;
-+void WindowSetMods(Window* const window, const int mods)
-+{
-+	window->internal->mods = mods;
- }
- 
--
--static void keyCallback(GLFWwindow* win, int key, int scancode, int action, int mods) {
--	contextSet((Context*) glfwGetWindowUserPointer(win));
--	if (APP->event->handleKey(APP->window->internal->lastMousePos, key, scancode, action, mods))
--		return;
--
--	// Keyboard/mouse MIDI driver
--	if (action == GLFW_PRESS && (mods & RACK_MOD_MASK) == 0) {
--		keyboard::press(key);
--	}
--	if (action == GLFW_RELEASE) {
--		keyboard::release(key);
 +Window::~Window() {
 +	{
 +		DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
@@ -429,14 +408,47 @@
 +#if defined NANOVG_GLES2
 +		nvgDeleteGLES2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
 +		nvgDeleteGLES2(internal->o_vg != nullptr ? internal->o_vg : vg);
-+#else
+ #else
+-	scrollDelta = scrollDelta.mult(50.0);
 +		nvgDeleteGL2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
 +		nvgDeleteGL2(internal->o_vg != nullptr ? internal->o_vg : vg);
-+#endif
- 	}
--}
--
+ #endif
++	}
  
+-	APP->event->handleScroll(APP->window->internal->lastMousePos, scrollDelta);
++	delete internal;
+ }
+ 
+ 
+-static void charCallback(GLFWwindow* win, unsigned int codepoint) {
+-	contextSet((Context*) glfwGetWindowUserPointer(win));
+-	if (APP->event->handleText(APP->window->internal->lastMousePos, codepoint))
+-		return;
++math::Vec Window::getSize() {
++	return internal->size;
+ }
+ 
+ 
+-static void keyCallback(GLFWwindow* win, int key, int scancode, int action, int mods) {
+-	contextSet((Context*) glfwGetWindowUserPointer(win));
+-	if (APP->event->handleKey(APP->window->internal->lastMousePos, key, scancode, action, mods))
+-		return;
++void Window::setSize(math::Vec size) {
++	size = size.max(WINDOW_SIZE_MIN);
++	internal->size = size;
+ 
+-	// Keyboard/mouse MIDI driver
+-	if (action == GLFW_PRESS && (mods & RACK_MOD_MASK) == 0) {
+-		keyboard::press(key);
+-	}
+-	if (action == GLFW_RELEASE) {
+-		keyboard::release(key);
+-	}
++	if (DISTRHO_NAMESPACE::UI* const ui = internal->ui)
++		ui->setSize(internal->size.x, internal->size.y);
+ }
+ 
+-
 -static void dropCallback(GLFWwindow* win, int count, const char** paths) {
 -	contextSet((Context*) glfwGetWindowUserPointer(win));
 -	std::vector<std::string> pathsVec;
@@ -444,14 +456,16 @@
 -		pathsVec.push_back(paths[i]);
 -	}
 -	APP->event->handleDrop(APP->window->internal->lastMousePos, pathsVec);
-+	delete internal;
++void WindowSetInternalSize(rack::window::Window* const window, math::Vec size) {
++	size = size.max(WINDOW_SIZE_MIN);
++	window->internal->size = size;
  }
  
  
 -static void errorCallback(int error, const char* description) {
 -	WARN("GLFW error %d: %s", error, description);
-+math::Vec Window::getSize() {
-+	return internal->size;
++void Window::run() {
++	internal->frame = 0;
  }
  
  
@@ -542,10 +556,7 @@
 -
 -	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 -	glGetError();
-+void Window::setSize(math::Vec size) {
-+	size = size.max(WINDOW_SIZE_MIN);
-+	internal->size = size;
- 
+-
 -	// Set up NanoVG
 -	int nvgFlags = NVG_ANTIALIAS;
 -#if defined NANOVG_GL2
@@ -560,27 +571,15 @@
 -		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize NanoVG. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 -		throw Exception("Could not initialize NanoVG");
 -	}
-+	if (DISTRHO_NAMESPACE::UI* const ui = internal->ui)
-+		ui->setSize(internal->size.x, internal->size.y);
-+}
- 
+-
 -	// Load default Blendish font
 -	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
 -	bndSetFont(uiFont->handle);
- 
+-
 -	if (APP->scene) {
 -		widget::Widget::ContextCreateEvent e;
 -		APP->scene->onContextCreate(e);
--	}
-+void Window::run() {
-+	internal->frame = 0;
- }
- 
- 
--Window::~Window() {
--	if (APP->scene) {
--		widget::Widget::ContextDestroyEvent e;
--		APP->scene->onContextDestroy(e);
++#ifndef DGL_USE_GLES
 +static void Window__flipBitmap(uint8_t* pixels, const int width, const int height, const int depth) {
 +	for (int y = 0; y < height / 2; y++) {
 +		const int flipY = height - y - 1;
@@ -589,33 +588,13 @@
 +		std::memmove(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
 +		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
  	}
--
--	// Fonts and Images in the cache must be deleted before the NanoVG context is deleted
--	internal->fontCache.clear();
--	internal->imageCache.clear();
--
--	// nvgDeleteClone(fbVg);
--
--#if defined NANOVG_GL2
--	nvgDeleteGL2(vg);
--	nvgDeleteGL2(fbVg);
--#elif defined NANOVG_GL3
--	nvgDeleteGL3(vg);
--#elif defined NANOVG_GLES2
--	nvgDeleteGLES2(vg);
--#endif
--
--	glfwDestroyWindow(win);
--	delete internal;
  }
  
  
--math::Vec Window::getSize() {
--	int width, height;
--	glfwGetWindowSize(win, &width, &height);
--	return math::Vec(width, height);
--}
--
+-Window::~Window() {
+-	if (APP->scene) {
+-		widget::Widget::ContextDestroyEvent e;
+-		APP->scene->onContextDestroy(e);
 +#ifdef STBI_WRITE_NO_STDIO
 +static void Window__downscaleBitmap(uint8_t* pixels, int& width, int& height) {
 +	int targetWidth = width;
@@ -642,15 +621,42 @@
 +			const int xs = static_cast<int>(x * scale);
 +			std::memmove(pixels + (width * y + x) * 3, pixels + (width * ys + xs) * 3, 3);
 +		}
-+	}
+ 	}
  
--void Window::setSize(math::Vec size) {
--	size = size.max(WINDOW_SIZE_MIN);
--	glfwSetWindowSize(win, size.x, size.y);
+-	// Fonts and Images in the cache must be deleted before the NanoVG context is deleted
+-	internal->fontCache.clear();
+-	internal->imageCache.clear();
+-
+-	// nvgDeleteClone(fbVg);
+-
+-#if defined NANOVG_GL2
+-	nvgDeleteGL2(vg);
+-	nvgDeleteGL2(fbVg);
+-#elif defined NANOVG_GL3
+-	nvgDeleteGL3(vg);
+-#elif defined NANOVG_GLES2
+-	nvgDeleteGLES2(vg);
+-#endif
+-
+-	glfwDestroyWindow(win);
+-	delete internal;
 +	width = targetWidth;
 +	height = targetHeight;
  }
  
+-
+-math::Vec Window::getSize() {
+-	int width, height;
+-	glfwGetWindowSize(win, &width, &height);
+-	return math::Vec(width, height);
+-}
+-
+-
+-void Window::setSize(math::Vec size) {
+-	size = size.max(WINDOW_SIZE_MIN);
+-	glfwSetWindowSize(win, size.x, size.y);
+-}
+-
 -
 -void Window::run() {
 -	internal->frame = 0;
@@ -662,6 +668,7 @@
 +	UI* const ui = static_cast<UI*>(context);
 +	ui->setState("screenshot", String::asBase64(data, size).buffer());
  }
++#endif
 +#endif
  
  
@@ -710,7 +717,7 @@
  	if (APP->patch->path != "") {
  		windowTitle += " - ";
  		if (!APP->history->isSaved())
-@@ -455,243 +437,155 @@
+@@ -455,243 +446,159 @@
  		windowTitle += system::getFilename(APP->patch->path);
  	}
  	if (windowTitle != internal->lastWindowTitle) {
@@ -734,6 +741,7 @@
  		APP->event->handleDirty();
  	}
  
++#ifndef DGL_USE_GLES
 +	// Hide menu and background if generating screenshot
 +	if (internal->generateScreenshotStep == kScreenshotStepStarted) {
 +#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
@@ -743,6 +751,7 @@
 +		internal->generateScreenshotStep = kScreenshotStepSecondPass;
 +#endif
 +	}
++#endif
 +
  	// Get framebuffer/window ratio
 -	int fbWidth, fbHeight;
@@ -815,9 +824,10 @@
 -	// );
 -	internal->frame++;
 -}
++#ifndef DGL_USE_GLES
 +	if (internal->generateScreenshotStep != kScreenshotStepNone) {
 +		++internal->generateScreenshotStep;
- 
++
 +		int y = 0;
 +#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
 +		constexpr const int depth = 4;
@@ -826,23 +836,16 @@
 +		constexpr const int depth = 3;
 +#endif
  
--void Window::activateContext() {
--	glfwMakeContextCurrent(win);
--}
 +		// Allocate pixel color buffer
 +		uint8_t* const pixels = new uint8_t[winHeight * winWidth * 4];
  
+-void Window::activateContext() {
+-	glfwMakeContextCurrent(win);
+-}
 +		// glReadPixels defaults to GL_BACK, but the back-buffer is unstable, so use the front buffer (what the user sees)
 +		glReadBuffer(GL_FRONT);
 +		glReadPixels(0, 0, winWidth, winHeight, depth == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, pixels);
  
--static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
--	for (int y = 0; y < height / 2; y++) {
--		int flipY = height - y - 1;
--		uint8_t tmp[width * depth];
--		std::memcpy(tmp, &pixels[y * width * depth], width * depth);
--		std::memcpy(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
--		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
 +		if (internal->generateScreenshotStep == kScreenshotStepSaving)
 +		{
 +			// Write pixels to PNG
@@ -857,7 +860,14 @@
 +#else
 +			stbi_write_png("screenshot.png", winWidth, winHeight, depth, pixelsWithOffset, stride);
 +#endif
-+
+ 
+-static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
+-	for (int y = 0; y < height / 2; y++) {
+-		int flipY = height - y - 1;
+-		uint8_t tmp[width * depth];
+-		std::memcpy(tmp, &pixels[y * width * depth], width * depth);
+-		std::memcpy(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
+-		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
 +			internal->generateScreenshotStep = kScreenshotStepNone;
 +			APP->scene->menuBar->show();
 +			APP->scene->rack->children.front()->show();
@@ -865,6 +875,11 @@
 +
 +		delete[] pixels;
  	}
++#endif
++}
++
++
++void Window::activateContext() {
  }
  
  
@@ -933,7 +948,7 @@
 -			nvgImageSize(vg, fbw->getImageHandle(), &width, &height);
 -			uint8_t* pixels = new uint8_t[height * width * 4];
 -			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-+void Window::activateContext() {
++void Window::screenshot(const std::string&) {
 +}
  
 -			// Write pixels to PNG
@@ -946,10 +961,6 @@
 -			delete fbw;
 -		}
 -	}
-+void Window::screenshot(const std::string&) {
-+}
-+
-+
 +void Window::screenshotModules(const std::string&, float) {
  }
  
@@ -1023,7 +1034,7 @@
  bool Window::isFullScreen() {
 -	GLFWmonitor* monitor = glfwGetWindowMonitor(win);
 -	return monitor != NULL;
-+#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
++#if defined(CARDINAL_TRANSPARENT_SCREENSHOTS) && !defined(DGL_USE_GLES)
 +	return internal->generateScreenshotStep != kScreenshotStepNone;
 +#else
 +	return false;
@@ -1031,7 +1042,7 @@
  }
  
  
-@@ -722,14 +616,15 @@
+@@ -722,14 +629,15 @@
  		return pair->second;
  
  	// Load font
@@ -1050,7 +1061,7 @@
  	}
  	internal->fontCache[filename] = font;
  	return font;
-@@ -742,14 +637,15 @@
+@@ -742,14 +650,15 @@
  		return pair->second;
  
  	// Load image
@@ -1069,21 +1080,22 @@
  	}
  	internal->imageCache[filename] = image;
  	return image;
-@@ -766,28 +662,146 @@
+@@ -766,28 +675,156 @@
  }
  
  
 -void init() {
 -	int err;
-+void generateScreenshot() {
-+	APP->window->internal->generateScreenshotStep = kScreenshotStepStarted;
-+}
- 
+-
 -	// Set up GLFW
 -#if defined ARCH_MAC
 -	glfwInitHint(GLFW_COCOA_CHDIR_RESOURCES, GLFW_TRUE);
 -	glfwInitHint(GLFW_COCOA_MENUBAR, GLFW_FALSE);
--#endif
++void generateScreenshot() {
++#ifndef DGL_USE_GLES
++	APP->window->internal->generateScreenshotStep = kScreenshotStepStarted;
+ #endif
++}
  
 -	glfwSetErrorCallback(errorCallback);
 -	err = glfwInit();
@@ -1091,6 +1103,7 @@
 -		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLFW.");
 -		throw Exception("Could not initialize GLFW");
 -	}
++
 +void init() {
  }
  
@@ -1185,6 +1198,13 @@
 +			window->internal->callback->WindowParametersChanged(kWindowParameterLockModulePositions,
 +			                                                    rack::settings::lockModules);
 +	}
++	if (window->internal->params.squeezeModules != rack::settings::squeezeModules)
++	{
++		window->internal->params.squeezeModules = rack::settings::squeezeModules;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterSqueezeModulePositions,
++			                                                    rack::settings::squeezeModules);
++	}
 +	if (window->internal->params.invertZoom != rack::settings::invertZoom)
 +	{
 +		window->internal->params.invertZoom = rack::settings::invertZoom;
@@ -1214,6 +1234,7 @@
 +	rack::settings::tooltips = window->internal->params.tooltips;
 +	rack::settings::knobScroll = window->internal->params.knobScroll;
 +	rack::settings::lockModules = window->internal->params.lockModules;
++	rack::settings::squeezeModules = window->internal->params.squeezeModules;
 +	rack::settings::invertZoom = window->internal->params.invertZoom;
 +	rack::settings::rateLimit = window->internal->params.rateLimit;
 +}

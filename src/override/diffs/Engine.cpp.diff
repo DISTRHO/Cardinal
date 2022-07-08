@@ -1,5 +1,5 @@
---- ../Rack/src/engine/Engine.cpp	2022-02-05 22:30:09.253393116 +0000
-+++ Engine.cpp	2022-02-10 18:51:20.077011285 +0000
+--- ../Rack/src/engine/Engine.cpp	2022-06-04 19:14:19.947414815 +0100
++++ Engine.cpp	2022-06-27 19:37:11.048290788 +0100
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -224,15 +224,17 @@
  
  	// moduleId
  	std::map<int64_t, Module*> modulesCache;
-@@ -199,6 +80,7 @@
+@@ -198,7 +79,9 @@
+ 	int64_t blockFrame = 0;
  	double blockTime = 0.0;
  	int blockFrames = 0;
++	bool aboutToClose = false;
  
 +#ifndef HEADLESS
  	// Meter
  	int meterCount = 0;
  	double meterTotal = 0.0;
-@@ -206,6 +88,7 @@
+@@ -206,6 +89,7 @@
  	double meterLastTime = -INFINITY;
  	double meterLastAverage = 0.0;
  	double meterLastMax = 0.0;
@@ -240,7 +242,7 @@
  
  	// Parameter smoothing
  	Module* smoothModule = NULL;
-@@ -217,22 +100,6 @@
+@@ -217,22 +101,6 @@
  	Readers lock when using the engine's state.
  	*/
  	SharedMutex mutex;
@@ -263,7 +265,7 @@
  };
  
  
-@@ -260,76 +127,11 @@
+@@ -260,76 +128,11 @@
  }
  
  
@@ -341,7 +343,7 @@
  	// Copy all voltages from output to input
  	for (int c = 0; c < channels; c++) {
  		float v = output->voltages[c];
-@@ -346,6 +148,53 @@
+@@ -346,6 +149,53 @@
  }
  
  
@@ -395,7 +397,7 @@
  /** Steps a single frame
  */
  static void Engine_stepFrame(Engine* that) {
-@@ -372,13 +221,8 @@
+@@ -372,13 +222,8 @@
  		}
  	}
  
@@ -410,7 +412,7 @@
  		if (module->leftExpander.messageFlipRequested) {
  			std::swap(module->leftExpander.producerMessage, module->leftExpander.consumerMessage);
  			module->leftExpander.messageFlipRequested = false;
-@@ -389,13 +233,32 @@
+@@ -389,13 +234,32 @@
  		}
  	}
  
@@ -449,7 +451,7 @@
  }
  
  
-@@ -416,32 +279,45 @@
+@@ -416,32 +280,45 @@
  
  static void Engine_updateConnected(Engine* that) {
  	// Find disconnected ports
@@ -506,7 +508,7 @@
  	}
  }
  
-@@ -460,37 +336,23 @@
+@@ -460,37 +337,23 @@
  
  Engine::Engine() {
  	internal = new Internal;
@@ -552,7 +554,7 @@
  
  	delete internal;
  }
-@@ -519,18 +381,22 @@
+@@ -519,18 +382,22 @@
  		removeModule_NoLock(module);
  		delete module;
  	}
@@ -578,7 +580,7 @@
  	random::init();
  
  	internal->blockFrame = internal->frame;
-@@ -543,18 +409,14 @@
+@@ -543,18 +410,14 @@
  		Engine_updateExpander_NoLock(this, module, true);
  	}
  
@@ -598,7 +600,7 @@
  	// Stop timer
  	double endTime = system::getTime();
  	double meter = (endTime - startTime) / (frames * internal->sampleTime);
-@@ -572,47 +434,20 @@
+@@ -572,47 +435,20 @@
  		internal->meterTotal = 0.0;
  		internal->meterMax = 0.0;
  	}
@@ -648,7 +650,7 @@
  }
  
  
-@@ -635,20 +470,13 @@
+@@ -635,20 +471,13 @@
  	for (Module* module : internal->modules) {
  		module->onSampleRateChange(e);
  	}
@@ -672,7 +674,7 @@
  }
  
  
-@@ -658,7 +486,6 @@
+@@ -658,7 +487,6 @@
  
  
  void Engine::yieldWorkers() {
@@ -680,7 +682,7 @@
  }
  
  
-@@ -698,17 +525,25 @@
+@@ -698,17 +526,25 @@
  
  
  double Engine::getMeterAverage() {
@@ -707,7 +709,7 @@
  }
  
  
-@@ -718,8 +553,12 @@
+@@ -718,8 +554,12 @@
  	for (Module* m : internal->modules) {
  		if (i >= len)
  			break;
@@ -722,7 +724,7 @@
  	}
  	return i;
  }
-@@ -728,27 +567,43 @@
+@@ -728,27 +568,43 @@
  std::vector<int64_t> Engine::getModuleIds() {
  	SharedLock<SharedMutex> lock(internal->mutex);
  	std::vector<int64_t> moduleIds;
@@ -770,7 +772,7 @@
  	internal->modulesCache[module->id] = module;
  	// Dispatch AddEvent
  	Module::AddEvent eAdd;
-@@ -772,11 +627,11 @@
+@@ -772,11 +628,11 @@
  }
  
  
@@ -787,7 +789,7 @@
  	// Dispatch RemoveEvent
  	Module::RemoveEvent eRemove;
  	module->onRemove(eRemove);
-@@ -785,18 +640,14 @@
+@@ -785,18 +641,14 @@
  		if (paramHandle->moduleId == module->id)
  			paramHandle->module = NULL;
  	}
@@ -808,7 +810,7 @@
  	}
  	// Update expanders of other modules
  	for (Module* m : internal->modules) {
-@@ -809,14 +660,31 @@
+@@ -809,14 +661,31 @@
  			m->rightExpander.module = NULL;
  		}
  	}
@@ -843,7 +845,7 @@
  }
  
  
-@@ -824,7 +692,8 @@
+@@ -824,7 +693,8 @@
  	SharedLock<SharedMutex> lock(internal->mutex);
  	// TODO Performance could be improved by searching modulesCache, but more testing would be needed to make sure it's always valid.
  	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
@@ -853,7 +855,7 @@
  }
  
  
-@@ -844,7 +713,7 @@
+@@ -844,7 +714,7 @@
  
  void Engine::resetModule(Module* module) {
  	std::lock_guard<SharedMutex> lock(internal->mutex);
@@ -862,7 +864,7 @@
  
  	Module::ResetEvent eReset;
  	module->onReset(eReset);
-@@ -853,7 +722,7 @@
+@@ -853,7 +723,7 @@
  
  void Engine::randomizeModule(Module* module) {
  	std::lock_guard<SharedMutex> lock(internal->mutex);
@@ -871,7 +873,7 @@
  
  	Module::RandomizeEvent eRandomize;
  	module->onRandomize(eRandomize);
-@@ -861,7 +730,7 @@
+@@ -861,7 +731,7 @@
  
  
  void Engine::bypassModule(Module* module, bool bypassed) {
@@ -880,7 +882,14 @@
  	if (module->isBypassed() == bypassed)
  		return;
  
-@@ -912,6 +781,10 @@
+@@ -907,11 +777,17 @@
+ 
+ 
+ void Engine::prepareSave() {
++	if (internal->aboutToClose)
++		return;
+ 	SharedLock<SharedMutex> lock(internal->mutex);
+ 	for (Module* module : internal->modules) {
  		Module::SaveEvent e;
  		module->onSave(e);
  	}
@@ -891,7 +900,7 @@
  }
  
  
-@@ -946,16 +819,16 @@
+@@ -946,16 +822,16 @@
  
  void Engine::addCable(Cable* cable) {
  	std::lock_guard<SharedMutex> lock(internal->mutex);
@@ -913,7 +922,7 @@
  		// Get connected status of output, to decide whether we need to call a PortChangeEvent.
  		// It's best to not trust `cable->outputModule->outputs[cable->outputId]->isConnected()`
  		if (cable2->outputModule == cable->outputModule && cable2->outputId == cable->outputId)
-@@ -969,6 +842,8 @@
+@@ -969,6 +845,8 @@
  	// Add the cable
  	internal->cables.push_back(cable);
  	internal->cablesCache[cable->id] = cable;
@@ -922,7 +931,7 @@
  	Engine_updateConnected(this);
  	// Dispatch input port event
  	{
-@@ -996,10 +871,12 @@
+@@ -996,10 +874,12 @@
  
  
  void Engine::removeCable_NoLock(Cable* cable) {
@@ -937,7 +946,7 @@
  	// Remove the cable
  	internal->cablesCache.erase(cable->id);
  	internal->cables.erase(it);
-@@ -1085,11 +962,11 @@
+@@ -1085,11 +965,11 @@
  	std::lock_guard<SharedMutex> lock(internal->mutex);
  	// New ParamHandles must be blank.
  	// This means we don't have to refresh the cache.
@@ -951,7 +960,7 @@
  
  	// Add it
  	internal->paramHandles.insert(paramHandle);
-@@ -1106,7 +983,7 @@
+@@ -1106,7 +986,7 @@
  void Engine::removeParamHandle_NoLock(ParamHandle* paramHandle) {
  	// Check that the ParamHandle is already added
  	auto it = internal->paramHandles.find(paramHandle);
@@ -960,7 +969,7 @@
  
  	// Remove it
  	paramHandle->module = NULL;
-@@ -1143,7 +1020,7 @@
+@@ -1143,7 +1023,7 @@
  void Engine::updateParamHandle_NoLock(ParamHandle* paramHandle, int64_t moduleId, int paramId, bool overwrite) {
  	// Check that it exists
  	auto it = internal->paramHandles.find(paramHandle);
@@ -969,7 +978,7 @@
  
  	// Set IDs
  	paramHandle->moduleId = moduleId;
-@@ -1187,6 +1064,10 @@
+@@ -1187,6 +1067,10 @@
  		json_t* moduleJ = module->toJson();
  		json_array_append_new(modulesJ, moduleJ);
  	}
@@ -980,7 +989,7 @@
  	json_object_set_new(rootJ, "modules", modulesJ);
  
  	// cables
-@@ -1197,11 +1078,6 @@
+@@ -1197,11 +1081,6 @@
  	}
  	json_object_set_new(rootJ, "cables", cablesJ);
  
@@ -992,7 +1001,7 @@
  	return rootJ;
  }
  
-@@ -1225,14 +1101,20 @@
+@@ -1225,14 +1104,20 @@
  		}
  		catch (Exception& e) {
  			WARN("Cannot load model: %s", e.what());
@@ -1017,7 +1026,7 @@
  
  		try {
  			// This doesn't need a lock because the Module is not added to the Engine yet.
-@@ -1248,7 +1130,8 @@
+@@ -1248,7 +1133,8 @@
  		}
  		catch (Exception& e) {
  			WARN("Cannot load module: %s", e.what());
@@ -1027,7 +1036,7 @@
  			delete module;
  			continue;
  		}
-@@ -1285,67 +1168,10 @@
+@@ -1285,67 +1171,15 @@
  			continue;
  		}
  	}
@@ -1038,9 +1047,9 @@
 -		Module* masterModule = getModule(json_integer_value(masterModuleIdJ));
 -		setMasterModule(masterModule);
 -	}
--}
--
--
+ }
+ 
+ 
 -void EngineWorker::run() {
 -	// Configure thread
 -	contextSet(engine->internal->context);
@@ -1083,15 +1092,18 @@
 -			});
 -		}
 -	}
++void Engine::startFallbackThread() {
  }
  
  
- void Engine::startFallbackThread() {
+-void Engine::startFallbackThread() {
 -	if (internal->fallbackThread.joinable())
 -		return;
 -
 -	internal->fallbackRunning = true;
 -	internal->fallbackThread = std::thread(Engine_fallbackRun, this);
++void Engine_setAboutToClose(Engine* const engine) {
++	engine->internal->aboutToClose = true;
  }
  
  

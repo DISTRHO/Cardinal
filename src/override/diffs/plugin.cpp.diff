@@ -1,6 +1,6 @@
---- ../Rack/src/plugin.cpp	2022-05-21 22:03:14.887288742 +0100
-+++ plugin.cpp	2022-05-21 22:14:18.180931534 +0100
-@@ -1,336 +1,41 @@
+--- ../Rack/src/plugin.cpp	2022-07-07 00:16:13.701492001 +0100
++++ plugin.cpp	2022-06-04 19:10:13.508951513 +0100
+@@ -1,342 +1,41 @@
 -#include <thread>
 -#include <map>
 -#include <stdexcept>
@@ -287,6 +287,10 @@
 -	// Get user plugins directory
 -	system::createDirectory(pluginsPath);
 -
+-	// Don't load plugins if safe mode is enabled
+-	if (settings::safeMode)
+-		return;
+-
 -	// Extract packages and load plugins
 -	extractPackages(pluginsPath);
 -	loadPlugins(pluginsPath);
@@ -342,11 +346,13 @@
 -
 -
 -void destroy() {
--	for (Plugin* plugin : plugins) {
+-	while (!plugins.empty()) {
+-		Plugin* plugin = plugins.back();
 -		INFO("Destroying plugin %s", plugin->name.c_str());
 -		destroyPlugin(plugin);
+-		plugins.pop_back();
 -	}
--	plugins.clear();
+-	assert(plugins.empty());
 -}
 -
 -
@@ -366,7 +372,7 @@
  
  
  /** Given slug => fallback slug.
-@@ -383,8 +88,19 @@
+@@ -389,8 +88,19 @@
  */
  using PluginModuleSlug = std::tuple<std::string, std::string>;
  static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = {
@@ -387,7 +393,7 @@
  	// {{"", ""}, {"", ""}},
  };
  
-@@ -472,7 +188,6 @@
+@@ -478,7 +188,6 @@
  }
  
  
