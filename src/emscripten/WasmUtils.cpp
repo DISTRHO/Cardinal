@@ -15,22 +15,22 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#pragma once
+#include <emscripten/html5.h>
 
-#define pthread_setname_np(...)
+// -----------------------------------------------------------------------------------------------------------
 
-int pthread_getcpuclockid(pthread_t, clockid_t* const clock_id)
+namespace CardinalDISTRHO {
+
+long d_emscripten_set_interval(void (*cb)(void* userData), double intervalMsecs, void* userData)
 {
-    *clock_id = CLOCK_REALTIME;
-    return 0;
+    return emscripten_set_interval(cb, intervalMsecs, userData);
 }
 
-static int backtrace(void**, int)
+void d_emscripten_clear_interval(long setIntervalId)
 {
-    return 0;
+    emscripten_clear_interval(setIntervalId);
 }
 
-char** backtrace_symbols(void* const*, int)
-{
-    return nullptr;
 }
+
+// -----------------------------------------------------------------------------------------------------------

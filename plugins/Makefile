@@ -515,7 +515,7 @@ PLUGIN_FILES += $(filter-out Bidoo/src/plugin.cpp Bidoo/src/ANTN.cpp,$(wildcard 
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
-PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
+PLUGIN_FILES += $(filter-out Bidoo/src/dep/lodepng/pngdetail.cpp,$(wildcard Bidoo/src/dep/lodepng/*.cpp))
 PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/src/dep/resampler/*.cpp))
 PLUGIN_FILES += BidooDark/plugin.cpp
 
@@ -1024,6 +1024,10 @@ BASE_FLAGS += -I../src/Rack/dep/pffft
 
 ifeq ($(DEBUG),true)
 BASE_FLAGS += -UDEBUG
+ifeq ($(WASM),true)
+# SSE must always be enabled on wasm, even in debug builds
+BASE_FLAGS += -msse -msse2 -msse3 -msimd128
+endif
 endif
 
 ifeq ($(HEADLESS),true)
@@ -1096,6 +1100,23 @@ BASE_FLAGS += -Wno-deprecated-declarations
 
 ifeq ($(MACOS),true)
 BASE_FLAGS += -Wno-unknown-warning-option
+endif
+
+# --------------------------------------------------------------
+# Carla and friends build flags
+
+CARLA_FLAGS = \
+	-DCARLA_BACKEND_NAMESPACE=Cardinal \
+	-DREAL_BUILD \
+	-DSTATIC_PLUGIN_TARGET \
+	-I../deps/aubio/src \
+	-I../carla/source/backend \
+	-I../carla/source/includes \
+	-I../carla/source/modules \
+	-I../carla/source/utils
+
+ifeq ($(WASM),true)
+CARLA_FLAGS += -DDISTRHO_RUNNER_INDIRECT_WASM_CALLS
 endif
 
 # --------------------------------------------------------------
@@ -1314,14 +1335,7 @@ $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 		-Dstbtt_fontinfo=stbtt_fontinfo_cardinal \
 		-Dstbrp_node=stbrp_node_cardinal \
 		-Dstbrp_rect=stbrp_rect_cardinal \
-		-DCARLA_BACKEND_NAMESPACE=Cardinal \
-		-DREAL_BUILD \
-		-DSTATIC_PLUGIN_TARGET \
-		-I../deps/aubio/src \
-		-I../carla/source/backend \
-		-I../carla/source/includes \
-		-I../carla/source/modules \
-		-I../carla/source/utils
+		$(CARLA_FLAGS)
 
 $(BUILD_DIR)/21kHz/%.cpp.o: 21kHz/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

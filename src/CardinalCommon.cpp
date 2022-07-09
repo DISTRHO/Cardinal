@@ -284,7 +284,7 @@ void openBrowser(const std::string& url)
         window.open(UTF8ToString($0), '_blank');
     }, url.c_str());
 #else
-    patchUtils::openBrowser(url);
+    system::openBrowser(url);
 #endif
 }
 

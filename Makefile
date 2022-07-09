@@ -64,7 +64,6 @@ DGL_EXTRA_ARGS = \
 	NVG_DISABLE_SKIPPING_WHITESPACE=true \
 	NVG_FONT_TEXTURE_FLAGS=NVG_IMAGE_NEAREST \
 	USE_NANOVG_FBO=true \
-	WASM_EXCEPTIONS=true \
 	WINDOWS_ICON_ID=401
 
 # --------------------------------------------------------------

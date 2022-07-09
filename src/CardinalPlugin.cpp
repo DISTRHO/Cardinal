@@ -104,16 +104,18 @@ bool d_isDiffHigherThanLimit(const T& v1, const T& v2, const T& limit)
 // -----------------------------------------------------------------------------------------------------------
 
 #ifdef DISTRHO_OS_WASM
-EM_JS(char*, getPatchStorageSlug, (), {
-    var searchParams = new URLSearchParams(window.location.search);
-    var patch = searchParams.get('patchstorage');
-    if (!patch)
-      return null;
-    var length = lengthBytesUTF8(patch) + 1;
-    var str = _malloc(length);
-    stringToUTF8(patch, str, length);
-    return str;
-});
+static char* getPatchStorageSlug() {
+    return static_cast<char*>(EM_ASM_PTR({
+        var searchParams = new URLSearchParams(window.location.search);
+        var patch = searchParams.get('patchstorage');
+        if (!patch)
+        return null;
+        var length = lengthBytesUTF8(patch) + 1;
+        var str = _malloc(length);
+        stringToUTF8(patch, str, length);
+        return str;
+    }));
+};
 #endif
 
 // -----------------------------------------------------------------------------------------------------------

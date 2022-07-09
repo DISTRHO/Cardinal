@@ -64,6 +64,10 @@ BASE_FLAGS += -IRack/dep/pffft
 
 ifeq ($(DEBUG),true)
 BASE_FLAGS += -UDEBUG
+ifeq ($(WASM),true)
+# SSE must always be enabled on wasm, even in debug builds
+BASE_FLAGS += -msse -msse2 -msse3 -msimd128
+endif
 endif
 
 ifeq ($(HAVE_LIBLO),true)
@@ -168,6 +172,10 @@ RACK_FILES += $(wildcard Rack/src/*/*.c)
 RACK_FILES += $(filter-out $(IGNORED_FILES),$(wildcard Rack/src/*.cpp))
 RACK_FILES += $(filter-out $(IGNORED_FILES), $(wildcard Rack/src/*/*.cpp))
 
+ifeq ($(WASM),true)
+RACK_FILES += emscripten/WasmUtils.cpp
+endif
+
 # --------------------------------------------------------------
 # lots of warnings from VCV side
 
@@ -194,6 +202,8 @@ all: $(TARGET)
 ifeq ($(MOD_BUILD),true)
 	$(MAKE) -C Cardinal lv2
 	$(MAKE) -C CardinalFX lv2
+else ifeq ($(WASM),true)
+	$(MAKE) -C CardinalSynth jack
 else
 	$(MAKE) -C Cardinal
 	$(MAKE) -C CardinalFX $(CARDINAL_FX_ARGS)
@@ -243,6 +253,8 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
+
+$(BUILD_DIR)/emscripten/WasmUtils.cpp.o: BUILD_CXX_FLAGS += -fno-exceptions
 
 # --------------------------------------------------------------
 

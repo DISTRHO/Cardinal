@@ -388,20 +388,9 @@ public:
 
        #ifdef DISTRHO_OS_WASM
         if (rack::patchStorageSlug != nullptr)
-        {
-            std::string url("/patchstorage.php?slug=");
-            url += rack::patchStorageSlug;
-            std::free(rack::patchStorageSlug);
-            rack::patchStorageSlug = nullptr;
-
             psDialog = new WasmPatchStorageLoadingDialog();
-            emscripten_async_wget(url.c_str(), context->patch->templatePath.c_str(),
-                                  downloadPatchStorageSucceeded, downloadPatchStorageFailed);
-        }
         else
-        {
             new WasmWelcomeDialog();
-        }
        #endif
 
         context->window->step();
@@ -443,6 +432,19 @@ public:
         {
             counterForSelfFocus = -1;
             getWindow().focus();
+
+           #ifdef DISTRHO_OS_WASM
+            if (rack::patchStorageSlug != nullptr)
+            {
+                std::string url("/patchstorage.php?slug=");
+                url += rack::patchStorageSlug;
+                std::free(rack::patchStorageSlug);
+                rack::patchStorageSlug = nullptr;
+
+                emscripten_async_wget(url.c_str(), context->patch->templatePath.c_str(),
+                                    downloadPatchStorageSucceeded, downloadPatchStorageFailed);
+            }
+           #endif
         }
 
         if (filebrowserhandle != nullptr && fileBrowserIdle(filebrowserhandle))

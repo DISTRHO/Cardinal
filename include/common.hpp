@@ -30,16 +30,19 @@
 
 #include_next "common.hpp"
 
-// Workaround for wrong file permissions from zstd extraction
+// Workaround for wrong file permissions from zstd extraction and system usage
 #ifdef __EMSCRIPTEN__
 #define fopen fopen_wasm
+#define system system_wasm
 
 extern "C" {
 FILE* fopen_wasm(const char* filename, const char* mode);
+inline int system_wasm(const char*) { return 0; }
 }
 
 namespace std {
 	using ::fopen_wasm;
+	using ::system_wasm;
 }
 #endif
 

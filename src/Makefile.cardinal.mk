@@ -20,7 +20,6 @@ endif
 ifneq ($(STATIC_BUILD),true)
 
 CWD = ../../carla/source
-STATIC_PLUGIN_TARGET = true
 include $(CWD)/Makefile.deps.mk
 
 CARLA_BUILD_DIR = ../../carla/build
@@ -35,7 +34,9 @@ CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/carla_engine_
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/carla_plugin.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/native-plugins.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/audio_decoder.a
+ifneq ($(WASM),true)
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/jackbridge.min.a
+endif
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/lilv.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/rtmempool.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/sfzero.a
@@ -113,6 +114,11 @@ RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libzstd.a
 endif
 
 # --------------------------------------------------------------
+
+# FIXME
+ifeq ($(WASM),true)
+STATIC_CARLA_PLUGIN_LIBS = -lsndfile -lopus -lFLAC -lvorbisenc -lvorbis -logg -lm
+endif
 
 EXTRA_DEPENDENCIES = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS)
 EXTRA_LIBS = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS) $(STATIC_CARLA_PLUGIN_LIBS)
@@ -206,6 +212,7 @@ BASE_FLAGS += -Wno-unused-variable
 
 ifeq ($(WASM),true)
 LINK_FLAGS += --preload-file=./jsfx
+LINK_FLAGS += --preload-file=./lv2
 LINK_FLAGS += --preload-file=./resources
 LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
