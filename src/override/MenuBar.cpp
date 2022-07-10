@@ -110,7 +110,12 @@ struct FileButton : MenuButton {
 		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
-		menu->addChild(createMenuItem("New", RACK_MOD_CTRL_NAME "+N", []() {
+#ifndef DISTRHO_OS_WASM
+		const char* const NewShortcut = RACK_MOD_CTRL_NAME "+N";
+#else
+		const char* const NewShortcut = "";
+#endif
+		menu->addChild(createMenuItem("New", NewShortcut, []() {
 			patchUtils::loadTemplateDialog();
 		}));
 
@@ -523,7 +528,9 @@ struct ViewButton : MenuButton {
 		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("Parameters"));
 
-		// menu->addChild(createBoolPtrMenuItem("Lock cursor while dragging", "", &settings::allowCursorLock));
+#ifdef DISTRHO_OS_WASM
+		menu->addChild(createBoolPtrMenuItem("Lock cursor while dragging", "", &settings::allowCursorLock));
+#endif
 
 		static const std::vector<std::string> knobModeLabels = {
 			"Linear",
@@ -549,6 +556,16 @@ struct ViewButton : MenuButton {
 
 		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("Window"));
+
+#ifdef DISTRHO_OS_WASM
+		const bool fullscreen = APP->window->isFullScreen();
+		std::string fullscreenText = "F11";
+		if (fullscreen)
+			fullscreenText += " " CHECKMARK_STRING;
+		menu->addChild(createMenuItem("Fullscreen", fullscreenText, [=]() {
+			APP->window->setFullScreen(!fullscreen);
+		}));
+#endif
 
 		menu->addChild(createBoolPtrMenuItem("Invert zoom", "", &settings::invertZoom));
 

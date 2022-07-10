@@ -136,7 +136,11 @@ struct Initializer
     {
         using namespace rack;
 
+#ifdef DISTRHO_OS_WASM
+        settings::allowCursorLock = true;
+#else
         settings::allowCursorLock = false;
+#endif
         settings::autoCheckUpdates = false;
         settings::autosaveInterval = 0;
         settings::devMode = true;

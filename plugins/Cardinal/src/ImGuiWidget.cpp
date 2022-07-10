@@ -504,7 +504,4 @@ void ImGuiWidget::drawFramebufferCommon(const Vec& fbSize, const float scaleFact
         ImGui_ImplOpenGL2_RenderDrawData(data);
 #endif
     }
-
-    // FIXME
-    io.KeysDown[GLFW_KEY_DELETE] = io.KeysDown[GLFW_KEY_BACKSPACE] = io.KeysDown[GLFW_KEY_ENTER] = false;
 }

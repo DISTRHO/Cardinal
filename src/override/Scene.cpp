@@ -360,6 +360,12 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			window::generateScreenshot();
 			e.consume(this);
 		}
+#ifdef DISTRHO_OS_WASM
+		if (e.key == GLFW_KEY_F11 && (e.mods & RACK_MOD_MASK) == 0) {
+			APP->window->setFullScreen(!APP->window->isFullScreen());
+			e.consume(this);
+		}
+#endif
 
 		// Module selections
 		if (e.keyName == "a" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {

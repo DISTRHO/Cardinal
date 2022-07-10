@@ -62,6 +62,10 @@
 # include "src/Resources.hpp"
 #endif
 
+#ifdef DISTRHO_OS_WASM
+# include <emscripten/html5.h>
+#endif
+
 namespace rack {
 namespace window {
 
@@ -172,7 +176,11 @@ struct Window::Internal {
 
 	Internal()
 		: hiddenApp(false),
-		  hiddenWindow(hiddenApp) { hiddenApp.idle(); }
+		  hiddenWindow(hiddenApp)
+	{
+		hiddenWindow.setIgnoringKeyRepeat(true);
+		hiddenApp.idle();
+	}
 };
 
 
@@ -224,6 +232,10 @@ Window::Window() {
 
 	if (uiFont != nullptr)
 		bndSetFont(uiFont->handle);
+
+#ifdef DISTRHO_OS_WASM
+	emscripten_lock_orientation(EMSCRIPTEN_ORIENTATION_LANDSCAPE_PRIMARY);
+#endif
 }
 
 void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
@@ -536,7 +548,7 @@ void Window::step() {
 #ifdef STBI_WRITE_NO_STDIO
 			Window__downscaleBitmap(pixelsWithOffset, winWidth, winHeight);
 			stbi_write_png_to_func(Window__writeImagePNG, internal->ui,
-                                   winWidth, winHeight, depth, pixelsWithOffset, stride);
+			                       winWidth, winHeight, depth, pixelsWithOffset, stride);
 #else
 			stbi_write_png("screenshot.png", winWidth, winHeight, depth, pixelsWithOffset, stride);
 #endif
@@ -572,14 +584,31 @@ void Window::close() {
 
 
 void Window::cursorLock() {
+#ifdef DISTRHO_OS_WASM
+	if (!settings::allowCursorLock)
+		return;
+
+	emscripten_request_pointerlock(internal->ui->getWindow().getApp().getClassName(), false);
+#endif
 }
 
 
 void Window::cursorUnlock() {
+#ifdef DISTRHO_OS_WASM
+	if (!settings::allowCursorLock)
+		return;
+
+	emscripten_exit_pointerlock();
+#endif
 }
 
 
 bool Window::isCursorLocked() {
+#ifdef DISTRHO_OS_WASM
+	EmscriptenPointerlockChangeEvent status;
+	if (emscripten_get_pointerlock_status(&status) == EMSCRIPTEN_RESULT_SUCCESS)
+		return status.isActive;
+#endif
 	return false;
 }
 
@@ -589,18 +618,28 @@ int Window::getMods() {
 }
 
 
-void Window::setFullScreen(bool) {
+void Window::setFullScreen(const bool fullscreen) {
+#ifdef DISTRHO_OS_WASM
+	if (fullscreen)
+		emscripten_request_fullscreen(internal->ui->getWindow().getApp().getClassName(), false);
+	else
+		emscripten_exit_fullscreen();
+#endif
 }
 
 
 bool Window::isFullScreen() {
-#if defined(CARDINAL_TRANSPARENT_SCREENSHOTS) && !defined(DGL_USE_GLES)
+#ifdef DISTRHO_OS_WASM
+	EmscriptenFullscreenChangeEvent status;
+	if (emscripten_get_fullscreen_status(&status) == EMSCRIPTEN_RESULT_SUCCESS)
+		return status.isFullscreen;
+	return false;
+#elif defined(CARDINAL_TRANSPARENT_SCREENSHOTS) && !defined(DGL_USE_GLES)
 	return internal->generateScreenshotStep != kScreenshotStepNone;
 #else
 	return false;
 #endif
 }
-
 
 double Window::getMonitorRefreshRate() {
 	return internal->monitorRefreshRate;
