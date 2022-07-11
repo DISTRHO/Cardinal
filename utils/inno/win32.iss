@@ -22,7 +22,7 @@ Name: "custom"; Description: "Custom installation"; Flags: iscustom;
 [Components]
 Name: resources; Description: "Resources"; Types: full custom; Flags: fixed;
 Name: carla; Description: "Carla/Ildaeil host tools"; Types: full;
-Name: jack; Description: "JACK Standalone"; Types: full;
+Name: jack; Description: "Standalone (requires JACK)"; Types: full;
 Name: lv2; Description: "LV2 plugin"; Types: full;
 Name: vst2; Description: "VST2 plugin"; Types: full;
 Name: vst3; Description: "VST3 plugin"; Types: full;

@@ -631,6 +631,19 @@ struct EngineButton : MenuButton {
 					requestMIDI();
 			}));
 		}
+
+		if (supportsBufferSizeChanges()) {
+			static const std::vector<uint32_t> bufferSizes = {256, 512, 1024, 2048, 4096, 8192, 16384};
+			const uint32_t currentBufferSize = getBufferSize();
+			menu->addChild(createSubmenuItem("Buffer Size", std::to_string(currentBufferSize), [=](ui::Menu* menu) {
+				for (uint32_t bufferSize : bufferSizes) {
+					menu->addChild(createCheckMenuItem(std::to_string(bufferSize), "",
+						[=]() {return currentBufferSize == bufferSize;},
+						[=]() {requestBufferSizeChange(bufferSize);}
+					));
+				}
+			}));
+		}
 #endif
 	}
 };
