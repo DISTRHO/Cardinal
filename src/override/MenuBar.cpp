@@ -50,11 +50,15 @@
 #include <patch.hpp>
 #include <library.hpp>
 
+#include "../CardinalCommon.hpp"
+
 #ifdef HAVE_LIBLO
 # include <lo/lo.h>
 #endif
 
-#include "../CardinalCommon.hpp"
+#ifdef DISTRHO_OS_WASM
+# include "DistrhoStandaloneUtils.hpp"
+#endif
 
 namespace rack {
 namespace asset {
@@ -604,6 +608,30 @@ struct EngineButton : MenuButton {
 		menu->addChild(createMenuItem("Performance meters", cpuMeterText, [=]() {
 			settings::cpuMeter ^= true;
 		}));
+
+#ifdef DISTRHO_OS_WASM
+		if (supportsAudioInput()) {
+			const bool enabled = isAudioInputEnabled();
+			std::string text = "Enable Audio Input";
+			if (enabled)
+				text += " " CHECKMARK_STRING;
+			menu->addChild(createMenuItem(text, "", [enabled]() {
+				if (!enabled)
+					requestAudioInput();
+			}));
+		}
+
+		if (supportsMIDI()) {
+			const bool enabled = isMIDIEnabled();
+			std::string text = "Enable MIDI";
+			if (enabled)
+				text += " " CHECKMARK_STRING;
+			menu->addChild(createMenuItem(text, "", [enabled]() {
+				if (!enabled)
+					requestMIDI();
+			}));
+		}
+#endif
 	}
 };
 
@@ -682,7 +710,7 @@ struct MenuBar : widget::OpaqueWidget {
 
 	MenuBar(const bool isStandalone)
 		: widget::OpaqueWidget()
-    {
+	{
 		const float margin = 5;
 		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
 

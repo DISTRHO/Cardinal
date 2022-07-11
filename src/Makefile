@@ -203,7 +203,7 @@ ifeq ($(MOD_BUILD),true)
 	$(MAKE) -C Cardinal lv2
 	$(MAKE) -C CardinalFX lv2
 else ifeq ($(WASM),true)
-	$(MAKE) -C CardinalSynth jack
+	$(MAKE) -C CardinalFX jack
 else
 	$(MAKE) -C Cardinal
 	$(MAKE) -C CardinalFX $(CARDINAL_FX_ARGS)
