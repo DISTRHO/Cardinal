@@ -90,13 +90,23 @@ MACHINE_SUFFIX = -linux
 endif
 
 # --------------------------------------------------------------
+# Set up env to pass to cmake and configure
+
+ENV = env
+ENV += AR=$(AR)
+ENV += CC=$(CC)
+ENV += CXX=$(CXX)
+ENV += CFLAGS='$(BUILD_C_FLAGS)'
+ENV += CXXFLAGS='$(BUILD_CXX_FLAGS)'
+ENV += LDFLAGS='$(LINK_FLAGS)'
+
+# --------------------------------------------------------------
 # Fix up cmake
 
 SPACE =
 SPACE +=
 
-CMAKE = cmake
-
+CMAKE  = cmake
 CMAKE += -DCMAKE_INSTALL_LIBDIR=lib
 CMAKE += -DCMAKE_INSTALL_PREFIX='$(DEP_PATH)'
 CMAKE += -DBUILD_SHARED_LIBS=OFF
@@ -156,25 +166,31 @@ DEP_MAKE += CXX=$(CXX)
 DEP_MAKE += CFLAGS="$(BUILD_C_FLAGS)"
 DEP_MAKE += CXXFLAGS="$(BUILD_CXX_FLAGS)"
 DEP_MAKE += LDFLAGS="$(LINK_FLAGS)"
-DEP_MAKE += CMAKE="$(CMAKE)"
-DEP_MAKE += CONFIGURE="$(CONFIGURE)"
 DEP_MAKE += DEP_FLAGS="$(BASE_FLAGS)"
 DEP_MAKE += DEP_MAC_SDK_FLAGS=
 DEP_MAKE += MACHINE=$(MACHINE)$(MACHINE_SUFFIX)
 DEP_MAKE += VERBOSE=1
 
 ifeq ($(MACOS),true)
+ifeq ($(CIBUILD),true)
 DEP_MAKE += SHA256SUM="shasum5.28 -a 256"
+else
+DEP_MAKE += SHA256SUM="shasum5.30 -a 256"
 endif
+endif
+
+DEP_MAKE2  = $(DEP_MAKE)
+DEP_MAKE2 += CMAKE="$(ENV) $(CMAKE)"
+DEP_MAKE2 += CONFIGURE="$(ENV) $(CONFIGURE)"
 
 # --------------------------------------------------------------
 # Rack internal dependencies target
 
 $(DEP_PATH)/lib/%.a:
-	$(DEP_MAKE) -C $(DEP_PATH) lib/$*.a
+	$(DEP_MAKE2) -C $(DEP_PATH) lib/$*.a
 
 $(DEP_PATH)/jansson-2.12:
-	$(DEP_MAKE) -C $(DEP_PATH) jansson-2.12
+	$(DEP_MAKE2) -C $(DEP_PATH) jansson-2.12
 
 # libarchive: skip shared lib and ensure libzstd is enabled
 $(DEP_PATH)/lib/libarchive.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
@@ -182,7 +198,7 @@ $(DEP_PATH)/lib/libarchive.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3
 $(DEP_PATH)/lib/libarchive_static.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
 
 $(DEP_PATH)/libarchive-3.4.3/.stamp-patched:
-	$(DEP_MAKE) -C $(DEP_PATH) libarchive-3.4.3
+	$(DEP_MAKE2) -C $(DEP_PATH) libarchive-3.4.3
 	sed -i -e "618,625d" $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt
 	awk 'NR==616{print "  SET(HAVE_LIBZSTD 1)"}1' $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt > $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt2
 	mv $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt2 $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt
@@ -194,7 +210,7 @@ $(DEP_PATH)/libarchive-3.4.3/.stamp-patched:
 $(DEP_PATH)/lib/libsamplerate.a: $(DEP_PATH)/libsamplerate-0.1.9/.stamp-patched
 
 $(DEP_PATH)/libsamplerate-0.1.9/.stamp-patched:
-	$(DEP_MAKE) -C $(DEP_PATH) libsamplerate-0.1.9
+	$(DEP_MAKE2) -C $(DEP_PATH) libsamplerate-0.1.9
 	sed -i -e "s/src doc examples tests/src/" $(DEP_PATH)/libsamplerate-0.1.9/Makefile.in
 	touch $@
 
@@ -202,7 +218,7 @@ $(DEP_PATH)/libsamplerate-0.1.9/.stamp-patched:
 $(DEP_PATH)/lib/libspeexdsp.a: $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched
 
 $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched:
-	$(DEP_MAKE) -C $(DEP_PATH) speexdsp-SpeexDSP-1.2rc3 \
+	$(DEP_MAKE2) -C $(DEP_PATH) speexdsp-SpeexDSP-1.2rc3 \
 		WGET="wget -c http://downloads.xiph.org/releases/speex/speexdsp-1.2rc3.tar.gz && mv speexdsp-1.2rc3.tar.gz speexdsp-SpeexDSP-1.2rc3.tgz #" \
 		SHA256SUM="true" \
 		UNTAR="mkdir -p speexdsp-SpeexDSP-1.2rc3 && tar -x --strip-components=1 --directory=$(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3 -f"
@@ -212,13 +228,13 @@ $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched:
 # custom zstd build for only building static libs
 $(DEP_PATH)/lib/libzstd.a: $(DEP_PATH)/zstd-1.4.5/.stamp-patched
 	cd $(DEP_PATH)/zstd-1.4.5/build/cmake && $(CMAKE) -DZSTD_BUILD_STATIC=ON -DZSTD_BUILD_PROGRAMS=OFF -DZSTD_BUILD_SHARED=OFF -DZSTD_MULTITHREAD_SUPPORT=OFF .
-	$(DEP_MAKE) -C $(DEP_PATH)/zstd-1.4.5/build/cmake
-	$(DEP_MAKE) -C $(DEP_PATH)/zstd-1.4.5/build/cmake install
+	$(DEP_MAKE2) -C $(DEP_PATH)/zstd-1.4.5/build/cmake
+	$(DEP_MAKE2) -C $(DEP_PATH)/zstd-1.4.5/build/cmake install
 
 # zstd cmake is borked, see https://github.com/facebook/zstd/issues/1401
 # zstd also fails to build on old systems, patch that too
 $(DEP_PATH)/zstd-1.4.5/.stamp-patched:
-	$(DEP_MAKE) -C $(DEP_PATH) zstd-1.4.5
+	$(DEP_MAKE2) -C $(DEP_PATH) zstd-1.4.5
 	sed -i -e "56,66d" $(DEP_PATH)/zstd-1.4.5/build/cmake/CMakeModules/AddZstdCompilationFlags.cmake
 	sed -i -e "146,175d" $(DEP_PATH)/zstd-1.4.5/programs/util.c
 	sed -i -e "142,144d" $(DEP_PATH)/zstd-1.4.5/programs/util.c
