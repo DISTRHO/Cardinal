@@ -16,16 +16,16 @@ OutputDir=.
 UsePreviousAppDir=no
 
 [Types]
-Name: "full"; Description: "Full installation";
+Name: "normal"; Description: "Normal installation (recommended)";
 Name: "custom"; Description: "Custom installation"; Flags: iscustom;
 
 [Components]
-Name: resources; Description: "Resources"; Types: full custom; Flags: fixed;
-Name: carla; Description: "Carla/Ildaeil host tools"; Types: full;
-Name: jack; Description: "Standalone (requires JACK)"; Types: full;
-Name: lv2; Description: "LV2 plugin"; Types: full;
-Name: vst2; Description: "VST2 plugin"; Types: full;
-Name: vst3; Description: "VST3 plugin"; Types: full;
+Name: resources; Description: "Resources"; Types: normal custom; Flags: fixed;
+Name: carla; Description: "Carla/Ildaeil host tools"; Types: normal;
+Name: jack; Description: "Standalone (requires JACK)"; Types: custom;
+Name: lv2; Description: "LV2 plugin"; Types: normal;
+Name: vst2; Description: "VST2 plugin"; Types: normal;
+Name: vst3; Description: "VST3 plugin"; Types: normal;
 
 [Files]
 #include "resources.iss"
