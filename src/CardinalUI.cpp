@@ -298,7 +298,7 @@ class CardinalUI : public CardinalBaseUI,
     rack::math::Vec lastMousePos;
     WindowParameters windowParameters;
     int rateLimitStep = 0;
-    int8_t counterForSelfFocus = 0;
+    int8_t counterForFirstIdlePoint = 0;
 
     struct ScopedContext {
         CardinalPluginContext* const context;
@@ -428,10 +428,9 @@ public:
 
     void uiIdle() override
     {
-        if (counterForSelfFocus >= 0 && ++counterForSelfFocus == 5)
+        if (counterForFirstIdlePoint >= 0 && ++counterForFirstIdlePoint == 5)
         {
-            counterForSelfFocus = -1;
-            getWindow().focus();
+            counterForFirstIdlePoint = -1;
 
            #ifdef DISTRHO_OS_WASM
             if (rack::patchStorageSlug != nullptr)
@@ -690,6 +689,9 @@ protected:
 
     bool onMouse(const MouseEvent& ev) override
     {
+        if (ev.press)
+            getWindow().focus();
+
         const int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
         int mods = glfwMods(ev.mod);
 
@@ -850,14 +852,9 @@ protected:
         setState("windowSize", sizeString);
     }
 
-    void uiFocus(const bool focus, const CrossingMode mode) override
+    void uiFocus(const bool focus, CrossingMode) override
     {
-        if (focus)
-        {
-            if (mode == kCrossingNormal)
-                getWindow().focus();
-        }
-        else
+        if (!focus)
         {
             const ScopedContext sc(this, 0);
             context->event->handleLeave();
