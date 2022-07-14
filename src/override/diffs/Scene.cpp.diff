@@ -1,5 +1,5 @@
---- ../Rack/src/app/Scene.cpp	2022-06-04 19:14:19.947414815 +0100
-+++ Scene.cpp	2022-07-06 09:36:54.421492710 +0100
+--- ../Rack/src/app/Scene.cpp	2022-04-11 20:05:02.007283878 +0100
++++ Scene.cpp	2022-07-12 09:45:31.518663160 +0100
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -269,7 +269,7 @@
  			e.consume(this);
  		}
  		if (e.keyName == "z" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -220,22 +335,29 @@
+@@ -220,24 +335,37 @@
  			APP->scene->rackScroll->setZoom(std::pow(2.f, zoom));
  			e.consume(this);
  		}
@@ -291,10 +291,6 @@
  			settings::cpuMeter ^= true;
  			e.consume(this);
  		}
--		if (e.key == GLFW_KEY_F11 && (e.mods & RACK_MOD_MASK) == 0) {
--			APP->window->setFullScreen(!APP->window->isFullScreen());
--			// The MenuBar will be hidden when the mouse moves over the RackScrollWidget.
--			// menuBar->hide();
 +		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
 +			patchUtils::deployToRemote();
 +			window::generateScreenshot();
@@ -302,10 +298,20 @@
 +		}
 +		if (e.key == GLFW_KEY_F9 && (e.mods & RACK_MOD_MASK) == 0) {
 +			window::generateScreenshot();
++			e.consume(this);
++		}
++#ifdef DISTRHO_OS_WASM
+ 		if (e.key == GLFW_KEY_F11 && (e.mods & RACK_MOD_MASK) == 0) {
+ 			APP->window->setFullScreen(!APP->window->isFullScreen());
+-			// The MenuBar will be hidden when the mouse moves over the RackScrollWidget.
+-			// menuBar->hide();
  			e.consume(this);
  		}
++#endif
  
-@@ -326,13 +448,6 @@
+ 		// Module selections
+ 		if (e.keyName == "a" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+@@ -326,13 +454,6 @@
  
  	// Key commands that can be overridden by children
  	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -319,7 +325,7 @@
  		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
  			rack->pasteClipboardAction();
  			e.consume(this);
-@@ -351,7 +466,7 @@
+@@ -351,7 +472,7 @@
  		std::string extension = system::getExtension(path);
  
  		if (extension == ".vcv") {
@@ -328,7 +334,7 @@
  			e.consume(this);
  			return;
  		}
-@@ -368,3 +483,94 @@
+@@ -368,3 +489,94 @@
  
  } // namespace app
  } // namespace rack

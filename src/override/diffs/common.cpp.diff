@@ -1,6 +1,6 @@
---- ../Rack/src/common.cpp	2022-06-04 19:14:19.947414815 +0100
-+++ common.cpp	2022-07-07 00:16:54.680919544 +0100
-@@ -1,11 +1,45 @@
+--- ../Rack/src/common.cpp	2022-04-11 20:05:02.007283878 +0100
++++ common.cpp	2022-07-12 09:45:31.518663160 +0100
+@@ -1,33 +1,77 @@
 +/*
 + * DISTRHO Cardinal Plugin
 + * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
@@ -37,7 +37,8 @@
 +
 +#include "DistrhoPluginUtils.hpp"
  
- #if defined ARCH_WIN
+-#if defined ARCH_WIN
++#if defined(ARCH_WIN)
  #include <windows.h>
  
  FILE* fopen_u8(const char* filename, const char* mode) {
@@ -46,7 +47,17 @@
  	return _wfopen(rack::string::UTF8toUTF16(filename).c_str(), rack::string::UTF8toUTF16(mode).c_str());
  }
  
-@@ -14,20 +48,21 @@
++#elif defined(DISTRHO_OS_WASM)
++#include <sys/stat.h>
++#undef fopen
++
++FILE* fopen_wasm(const char* filename, const char* mode) {
++	chmod(filename, 0777);
++	return std::fopen(filename, mode);
++}
++
+ #endif
+ 
  
  namespace rack {
  

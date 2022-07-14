@@ -732,12 +732,12 @@ jobs:
         run: |
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
           ./deps/PawPaw/bootstrap-cardinal.sh wasm && ./deps/PawPaw/.cleanup.sh wasm
-      #- name: Build wasm cross-compiled
-        #run: |
-          #source ~/PawPawBuilds/emsdk/emsdk_env.sh
-          #pushd deps/PawPaw; source local.env wasm; popd
-          #make features
-          #make CIBUILD=true NOOPT=true -j $(nproc)
+      - name: Build wasm cross-compiled
+        run: |
+          source ~/PawPawBuilds/emsdk/emsdk_env.sh
+          pushd deps/PawPaw; source local.env wasm; popd
+          make features
+          make CIBUILD=true NOOPT=true USING_GLES2=true -j $(nproc)
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -749,23 +749,23 @@ jobs:
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      #- name: Pack binaries
-        #run: |
-          #cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls *.html *.data *.js *.wasm)
-      #- uses: actions/upload-artifact@v2
-        #with:
-          #name: ${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          #path: |
-            #*.zip
-      #- uses: softprops/action-gh-release@v1
-        #if: startsWith(github.ref, 'refs/tags/')
-        #with:
-          #tag_name: ${{ github.ref_name }}
-          #name: ${{ github.ref_name }}
-          #draft: false
-          #prerelease: false
-          #files: |
-            #*.zip
+      - name: Pack binaries
+        run: |
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls *.html *.data *.js *.wasm)
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          path: |
+            *.zip
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            *.zip
 
   win32:
     runs-on: ubuntu-20.04

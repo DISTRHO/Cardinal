@@ -136,6 +136,7 @@ RACK_FILES += override/plugin.cpp
 RACK_FILES += override/Engine.cpp
 RACK_FILES += override/MenuBar.cpp
 RACK_FILES += override/Model.cpp
+RACK_FILES += override/OpenGlWidget.cpp
 RACK_FILES += override/Scene.cpp
 
 RACK_FILES += Rack/dep/pffft/pffft.c
@@ -164,6 +165,7 @@ IGNORED_FILES += Rack/src/app/TipWindow.cpp
 IGNORED_FILES += Rack/src/dsp/minblep.cpp
 IGNORED_FILES += Rack/src/engine/Engine.cpp
 IGNORED_FILES += Rack/src/plugin/Model.cpp
+IGNORED_FILES += Rack/src/widget/OpenGlWidget.cpp
 IGNORED_FILES += Rack/src/window/Window.cpp
 IGNORED_FILES += $(wildcard Rack/src/core/*.cpp)
 
