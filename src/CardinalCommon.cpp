@@ -56,7 +56,7 @@
 # include <emscripten/emscripten.h>
 #endif
 
-const std::string CARDINAL_VERSION = "22.06";
+const std::string CARDINAL_VERSION = "22.07";
 
 namespace rack {
 
