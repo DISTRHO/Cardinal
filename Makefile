@@ -197,7 +197,7 @@ endif
 # --------------------------------------------------------------
 # Individual targets
 
-cardinal: carla deps dgl plugins
+cardinal: carla deps dgl plugins resources
 	$(MAKE) all -C src $(CARLA_EXTRA_ARGS)
 
 carla:
@@ -227,7 +227,7 @@ endif
 plugins: deps
 	$(MAKE) all -C plugins
 
-resources: cardinal
+resources:
 	$(MAKE) resources -C plugins
 
 ifneq ($(CROSS_COMPILING),true)

@@ -106,7 +106,12 @@ ENV += LDFLAGS='$(LINK_FLAGS)'
 SPACE =
 SPACE +=
 
-CMAKE  = cmake
+ifeq ($(WASM),true)
+CMAKE = emcmake cmake
+else
+CMAKE = cmake
+endif
+
 CMAKE += -DCMAKE_INSTALL_LIBDIR=lib
 CMAKE += -DCMAKE_INSTALL_PREFIX='$(DEP_PATH)'
 CMAKE += -DBUILD_SHARED_LIBS=OFF
@@ -124,6 +129,10 @@ CMAKE += -DCMAKE_OSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET)
 else ifeq ($(CIBUILD),true)
 $(error CI build requires -mmacosx-version-min flag on macOS)
 endif
+endif
+
+ifeq ($(CROSS_COMPILING),true)
+CMAKE += -DCMAKE_CROSSCOMPILING=ON
 endif
 
 # make sure debug/release matches
@@ -171,7 +180,7 @@ DEP_MAKE += DEP_MAC_SDK_FLAGS=
 DEP_MAKE += MACHINE=$(MACHINE)$(MACHINE_SUFFIX)
 DEP_MAKE += VERBOSE=1
 
-ifeq ($(MACOS),true)
+ifeq ($(shell uname -s),Darwin)
 ifeq ($(CIBUILD),true)
 DEP_MAKE += SHA256SUM="shasum5.28 -a 256"
 else

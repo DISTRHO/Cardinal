@@ -129,6 +129,10 @@ EXTRA_LIBS += ../../deps/aubio/libaubio.a
 EXTRA_LIBS += $(shell $(PKG_CONFIG) --libs fftw3f)
 endif
 
+ifeq ($(WASM),true)
+EXTRA_DEPENDENCIES += wasm_resources
+endif
+
 # --------------------------------------------------------------
 # Do some magic
 
@@ -211,8 +215,8 @@ BASE_FLAGS += -Wno-unused-variable
 # extra linker flags
 
 ifeq ($(WASM),true)
-# LINK_FLAGS += --preload-file=./jsfx
-# LINK_FLAGS += --preload-file=./lv2
+LINK_FLAGS += --preload-file=./jsfx
+LINK_FLAGS += --preload-file=./lv2
 LINK_FLAGS += --preload-file=./resources
 LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
@@ -321,11 +325,6 @@ ifeq ($(CARDINAL_VARIANT),main)
 jack: BUILD_CXX_FLAGS += -DDPF_JACK_STANDALONE_SKIP_RTAUDIO_FALLBACK -DDPF_JACK_STANDALONE_SKIP_SDL2_FALLBACK
 endif
 
-# Prepare resources for wasm
-ifeq ($(WASM),main)
-jack: wasm_resources
-endif
-
 # Cardinal main variant is not available as VST2 due to lack of CV ports
 ifneq ($(CARDINAL_VARIANT),main)
 ifeq ($(MACOS),true)
@@ -342,8 +341,13 @@ vst3: $(VST3_RESOURCES)
 # --------------------------------------------------------------
 # Extra rules for wasm resources
 
-wasm_resources: $(LV2_RESOURCES)
-	cp -rL $(TARGET_DIR)/$(NAME).lv2/resources .
+wasm_resources: $(CURDIR)/lv2 $(CURDIR)/resources
+
+$(CURDIR)/lv2: $(LV2_RESOURCES)
+	$(shell wget https://falktx.com/data/wasm-things-2022-08-15.tar.gz && tar xf wasm-things-2022-08-15.tar.gz)
+
+$(CURDIR)/resources: $(LV2_RESOURCES)
+	cp -rL $(TARGET_DIR)/$(NAME).lv2/resources $(CURDIR)/resources
 
 # --------------------------------------------------------------
 # Extra rules for Windows icon
@@ -372,6 +376,10 @@ $(TARGET_DIR)/%/template-fx.vcv: ../template-fx.vcv
 	$(SILENT)ln -sf $(abspath $<) $@
 
 $(TARGET_DIR)/%/template-synth.vcv: ../template-synth.vcv
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+$(TARGET_DIR)/%/template-wasm.vcv: ../template-wasm.vcv
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
