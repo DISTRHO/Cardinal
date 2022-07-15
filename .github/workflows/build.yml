@@ -737,7 +737,7 @@ jobs:
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
           pushd deps/PawPaw; source local.env wasm; popd
           make features
-          make CIBUILD=true NOOPT=true USING_GLES2=true -j $(nproc)
+          make CIBUILD=true NOOPT=true USE_GLES2=true -j $(nproc)
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
