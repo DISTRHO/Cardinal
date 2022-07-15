@@ -663,6 +663,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
         kIdleLoadSelectedPlugin,
         kIdlePluginLoadedFromDSP,
         kIdleResetPlugin,
+        kIdleOpenFileUI,
         kIdleShowCustomUI,
         kIdleHidePluginUI,
         kIdleGiveIdleToUI,
@@ -693,6 +694,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
     int fPluginSelected = -1;
     bool fPluginScanningFinished = false;
     bool fPluginHasCustomUI = false;
+    bool fPluginHasFileOpen = false;
     bool fPluginHasOutputParameters = false;
     bool fPluginRunning = false;
     bool fPluginWillRunInBridgeMode = false;
@@ -762,16 +764,28 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
     {
         const CarlaHostHandle handle = module->fCarlaHostHandle;
 
-        if (carla_get_current_plugin_count(handle) != 0)
+        if (carla_get_current_plugin_count(handle) == 0)
+            return false;
+
+        const uint hints = carla_get_plugin_info(handle, 0)->hints;
+        updatePluginFlags(hints);
+
+        fPluginRunning = true;
+        return true;
+    }
+
+    void updatePluginFlags(const uint hints) noexcept
+    {
+        if (hints & PLUGIN_HAS_CUSTOM_UI_USING_FILE_OPEN)
         {
-            const uint hints = carla_get_plugin_info(handle, 0)->hints;
-
-            fPluginRunning = true;
-            fPluginHasCustomUI = hints & PLUGIN_HAS_CUSTOM_UI;
-            return true;
+            fPluginHasCustomUI = false;
+            fPluginHasFileOpen = true;
         }
-
-        return false;
+        else
+        {
+            fPluginHasCustomUI = hints & PLUGIN_HAS_CUSTOM_UI;
+            fPluginHasFileOpen = false;
+        }
     }
 
     void projectLoadedFromDSP()
@@ -828,7 +842,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
         const CarlaPluginInfo* const info = carla_get_plugin_info(handle, 0);
 
         fDrawingState = kDrawingPluginGenericUI;
-        fPluginHasCustomUI = info->hints & PLUGIN_HAS_CUSTOM_UI;
+        updatePluginFlags(info->hints);
+
         if (fPluginGenericUI == nullptr)
             createPluginGenericUI(handle, info);
         else
@@ -1061,6 +1076,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
         case kIdlePluginLoadedFromDSP:
             fIdleState = kIdleNothing;
             createOrUpdatePluginGenericUI(handle);
+            if (fRunnerData.needsReinit)
+                initAndStartRunner();
             break;
 
         case kIdleLoadSelectedPlugin:
@@ -1071,6 +1088,11 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
         case kIdleResetPlugin:
             fIdleState = kIdleNothing;
             loadPlugin(handle, carla_get_plugin_info(handle, 0)->label);
+            break;
+
+        case kIdleOpenFileUI:
+            fIdleState = kIdleNothing;
+            carla_show_custom_ui(handle, 0, true);
             break;
 
         case kIdleShowCustomUI:
@@ -1338,12 +1360,23 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
             if (ImGui::Button("Reset"))
                 fIdleState = kIdleResetPlugin;
 
-            if (fDrawingState == kDrawingPluginGenericUI && fPluginHasCustomUI)
+            if (fDrawingState == kDrawingPluginGenericUI)
             {
-                ImGui::SameLine();
+                if (fPluginHasCustomUI)
+                {
+                    ImGui::SameLine();
 
-                if (ImGui::Button("Show Custom GUI"))
-                    fIdleState = kIdleShowCustomUI;
+                    if (ImGui::Button("Show Custom GUI"))
+                        fIdleState = kIdleShowCustomUI;
+                }
+
+                if (fPluginHasFileOpen)
+                {
+                    ImGui::SameLine();
+
+                    if (ImGui::Button("Open File..."))
+                        fIdleState = kIdleOpenFileUI;
+                }
             }
         }
 
