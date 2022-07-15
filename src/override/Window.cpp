@@ -240,6 +240,22 @@ Window::Window() {
 
 void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 {
+	// if nanovg context failed, init only bare minimum
+	if (window->vg == nullptr)
+	{
+		if (ui != nullptr)
+		{
+			window->internal->ui = ui;
+			window->internal->size = rack::math::Vec(ui->getWidth(), ui->getHeight());
+		}
+		else
+		{
+			window->internal->ui = nullptr;
+			window->internal->callback = nullptr;
+		}
+		return;
+	}
+
 	if (ui != nullptr)
 	{
 		const GLubyte* vendor = glGetString(GL_VENDOR);
@@ -343,13 +359,16 @@ Window::~Window() {
 		internal->fontCache.clear();
 		internal->imageCache.clear();
 
+		if (vg != nullptr)
+		{
 #if defined NANOVG_GLES2
-		nvgDeleteGLES2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
-		nvgDeleteGLES2(internal->o_vg != nullptr ? internal->o_vg : vg);
+			nvgDeleteGLES2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
+			nvgDeleteGLES2(internal->o_vg != nullptr ? internal->o_vg : vg);
 #else
-		nvgDeleteGL2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
-		nvgDeleteGL2(internal->o_vg != nullptr ? internal->o_vg : vg);
+			nvgDeleteGL2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
+			nvgDeleteGL2(internal->o_vg != nullptr ? internal->o_vg : vg);
 #endif
+		}
 	}
 
 	delete internal;
@@ -435,6 +454,9 @@ static void Window__writeImagePNG(void* context, void* data, int size) {
 
 void Window::step() {
 	DISTRHO_SAFE_ASSERT_RETURN(internal->ui != nullptr,);
+
+	if (vg == nullptr)
+		return;
 
 	double frameTime = system::getTime();
 	double lastFrameTime = internal->frameTime;
