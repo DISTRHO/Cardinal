@@ -594,7 +594,7 @@ struct ViewButton : MenuButton {
 #ifdef DISTRHO_OS_WASM
 		const bool fullscreen = APP->window->isFullScreen();
 		std::string rightText = "F11";
-		if (rightText)
+		if (fullscreen)
 			rightText += " " CHECKMARK_STRING;
 		menu->addChild(createMenuItem("Fullscreen", rightText, [=]() {
 			APP->window->setFullScreen(!fullscreen);
