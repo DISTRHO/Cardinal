@@ -19,6 +19,13 @@
 
 #include <cstdio>
 #include <cstring>
+#include <list>
+
+namespace rack {
+namespace settings {
+extern bool darkMode;
+}
+}
 
 #include "nanovg.h"
 
@@ -43,6 +50,7 @@ NVGcolor nvgRGBblank(unsigned char, unsigned char, unsigned char)
 // Compile those nice implementation-in-header little libraries
 #define NANOSVG_IMPLEMENTATION
 #define NANOSVG_ALL_COLOR_KEYWORDS
+#undef nsvgDelete
 #undef nsvgParseFromFile
 #include <nanosvg.h>
 
@@ -327,6 +335,7 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
         // Special case for DrumKit background gradient
         if (std::strncmp(svgFileToInvert, "/DrumKit/", 9) == 0)
         {
+            std::free(paint.gradient);
             paint.type = NSVG_PAINT_COLOR;
             paint.color = 0xff191919;
             return true;
@@ -593,12 +602,33 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
 
 extern "C" {
 NSVGimage* nsvgParseFromFileCardinal(const char* filename, const char* units, float dpi);
+void nsvgDeleteCardinal(NSVGimage*);
+}
+
+struct ExtendedNSVGimage {
+    NSVGimage* handle;
+    NSVGshape* shapesOrig;
+    NSVGshape* shapesDark;
+};
+static std::list<ExtendedNSVGimage> loadedSVGs;
+
+static void nsvg__duplicatePaint(NSVGpaint& dst, NSVGpaint& src)
+{
+	if (dst.type == NSVG_PAINT_LINEAR_GRADIENT || dst.type == NSVG_PAINT_RADIAL_GRADIENT)
+    {
+		dst.gradient = static_cast<NSVGgradient*>(malloc(sizeof(NSVGgradient)));
+        std::memcpy(dst.gradient, src.gradient, sizeof(NSVGgradient));
+    }
 }
 
 NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* const units, const float dpi)
 {
     if (NSVGimage* const handle = nsvgParseFromFile(filename, units, dpi))
     {
+        bool hasDarkMode = false;
+        NSVGshape* shapesOrig;
+        NSVGshape* shapesDark;
+
         for (size_t i = 0; i < sizeof(svgFilesToInvert)/sizeof(svgFilesToInvert[0]); ++i)
         {
             const char* const svgFileToInvert = svgFilesToInvert[i].filename;
@@ -614,7 +644,30 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             const int shapeNumberToIgnore = svgFilesToInvert[i].shapeNumberToIgnore;
             int shapeCounter = 0;
 
-            for (NSVGshape* shape = handle->shapes; shape != nullptr; shape = shape->next, ++shapeCounter)
+            hasDarkMode = true;
+            shapesOrig = handle->shapes;
+
+            // duplicate all shapes, so we can swap between original and dark mode at will
+            shapesDark = static_cast<NSVGshape*>(malloc(sizeof(NSVGshape)));
+            std::memcpy(shapesDark, shapesOrig, sizeof(NSVGshape));
+            nsvg__duplicatePaint(shapesDark->fill, shapesOrig->fill);
+            nsvg__duplicatePaint(shapesDark->stroke, shapesOrig->stroke);
+
+            for (NSVGshape* shape2 = shapesDark;;)
+            {
+                if (shape2->next == nullptr)
+                    break;
+
+                NSVGshape* const shapedup = static_cast<NSVGshape*>(malloc(sizeof(NSVGshape)));
+                std::memcpy(shapedup, shape2->next, sizeof(NSVGshape));
+                nsvg__duplicatePaint(shapedup->fill, shape2->next->fill);
+                nsvg__duplicatePaint(shapedup->stroke, shape2->next->stroke);
+                shape2->next = shapedup;
+                shape2 = shapedup;
+            }
+
+            // shape paint inversion
+            for (NSVGshape* shape = shapesDark; shape != nullptr; shape = shape->next, ++shapeCounter)
             {
                 if (shapeNumberToIgnore == shapeCounter)
                     continue;
@@ -635,7 +688,7 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
                     invertPaint(shape, shape->stroke, svgFileToInvert);
             }
 
-            return handle;
+            break;
         }
 
         // Special case for AmalgamatedHarmonics background color
@@ -643,8 +696,62 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             if (std::strstr(filename, "/AmalgamatedHarmonics/") != nullptr)
                 handle->shapes->fill.color = 0xff191919;
 
+        if (hasDarkMode)
+        {
+            const ExtendedNSVGimage ext = { handle, shapesOrig, shapesDark };
+            loadedSVGs.push_back(ext);
+
+            if (rack::settings::darkMode)
+                handle->shapes = shapesDark;
+        }
+
         return handle;
     }
 
     return nullptr;
+}
+
+void nsvgDeleteCardinal(NSVGimage* const handle)
+{
+    for (auto it = loadedSVGs.cbegin(), end = loadedSVGs.cend(); it != end; ++it)
+    {
+        const ExtendedNSVGimage& ext(*it);
+
+        if (ext.handle != handle)
+            continue;
+
+        // delete duplicated resources
+        for (NSVGshape *next, *shape = ext.shapesDark;;)
+        {
+            next = shape->next;
+
+            nsvg__deletePaint(&shape->fill);
+            nsvg__deletePaint(&shape->stroke);
+            std::free(shape);
+
+            if (next == nullptr)
+                break;
+
+            shape = next;
+        }
+
+        // revert shapes back to original
+        handle->shapes = ext.shapesOrig;
+
+        loadedSVGs.erase(it);
+        break;
+    }
+
+    nsvgDelete(handle);
+}
+
+void switchDarkMode(bool darkMode)
+{
+    if (rack::settings::darkMode == darkMode)
+        return;
+
+    rack::settings::darkMode = darkMode;
+
+    for (ExtendedNSVGimage& ext : loadedSVGs)
+        ext.handle->shapes = darkMode ? ext.shapesDark : ext.shapesOrig;
 }

@@ -33,10 +33,6 @@ extern const std::string CARDINAL_VERSION;
 
 namespace rack {
 
-namespace settings {
-extern int rateLimit;
-}
-
 namespace ui {
 struct Menu;
 }

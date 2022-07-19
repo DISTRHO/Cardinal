@@ -17,7 +17,9 @@
 
 #pragma once
 
+#include "color.hpp"
 #include "rack.hpp"
+#include "settings.hpp"
 
 #ifdef NDEBUG
 # undef DEBUG
@@ -66,22 +68,26 @@ struct ModuleWidgetWithSideScrews : ModuleWidget {
     void drawBackground(NVGcontext* const vg) {
         nvgBeginPath(vg);
         nvgRect(vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(vg, nvgLinearGradient(vg, 0, 0, 0, box.size.y,
-                                           nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
+        if (rack::settings::darkMode)
+            nvgFillPaint(vg, nvgLinearGradient(vg, 0, 0, 0, box.size.y,
+                                               nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
+        else
+            nvgFillPaint(vg, nvgLinearGradient(vg, 0, 0, 0, box.size.y,
+                                               nvgRGB(0xe7, 0xe6, 0xe6), nvgRGB(0xde, 0xdd, 0xdd)));
         nvgFill(vg);
     }
 
     void drawOutputJacksArea(NVGcontext* const vg, const int numOutputs) {
         nvgBeginPath(vg);
         nvgRoundedRect(vg, startX_Out - 2.5f, startY - 2.0f, padding, padding * numOutputs, 4);
-        nvgFillColor(vg, nvgRGB(0xd0, 0xd0, 0xd0));
+        nvgFillColor(vg, rack::settings::darkMode ? nvgRGB(0xd0, 0xd0, 0xd0) : nvgRGB(0x2f, 0x2f, 0x2f));
         nvgFill(vg);
     }
 
     void drawTextLine(NVGcontext* const vg, const uint posY, const char* const text) {
         const float y = startY + posY * padding;
         nvgBeginPath(vg);
-        nvgFillColor(vg, color::WHITE);
+        nvgFillColor(vg, rack::settings::darkMode ? color::WHITE : color::BLACK);
         nvgText(vg, box.size.x * 0.5f, y + 16, text, nullptr);
     }
 
@@ -96,3 +102,4 @@ typedef ModuleWidgetWithSideScrews<3> ModuleWidgetWith3HP;
 typedef ModuleWidgetWithSideScrews<8> ModuleWidgetWith8HP;
 typedef ModuleWidgetWithSideScrews<9> ModuleWidgetWith9HP;
 typedef ModuleWidgetWithSideScrews<11> ModuleWidgetWith11HP;
+typedef ModuleWidgetWithSideScrews<25> ModuleWidgetWith25HP;

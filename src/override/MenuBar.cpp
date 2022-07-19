@@ -40,6 +40,7 @@
 #include <ui/ProgressBar.hpp>
 #include <ui/Label.hpp>
 #include <engine/Engine.hpp>
+#include <widget/FramebufferWidget.hpp>
 #include <window/Window.hpp>
 #include <asset.hpp>
 #include <context.hpp>
@@ -59,6 +60,8 @@
 #ifdef DISTRHO_OS_WASM
 # include "DistrhoStandaloneUtils.hpp"
 #endif
+
+void switchDarkMode(bool darkMode);
 
 namespace rack {
 namespace asset {
@@ -492,6 +495,20 @@ struct KnobScrollSensitivitySlider : ui::Slider {
 };
 
 
+static void setAllFramebufferWidgetsDirty(widget::Widget* const widget)
+{
+	for (widget::Widget* child : widget->children)
+	{
+		if (widget::FramebufferWidget* const fbw = dynamic_cast<widget::FramebufferWidget*>(child))
+		{
+			fbw->setDirty();
+			break;
+		}
+		setAllFramebufferWidgetsDirty(child);
+	}
+}
+
+
 struct ViewButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
@@ -499,6 +516,14 @@ struct ViewButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 		menu->addChild(createMenuLabel("Appearance"));
+
+		std::string darkModeText;
+		if (settings::darkMode)
+			darkModeText = CHECKMARK_STRING;
+		menu->addChild(createMenuItem("Dark Mode", darkModeText, []() {
+			switchDarkMode(!settings::darkMode);
+			setAllFramebufferWidgetsDirty(APP->scene);
+		}));
 
 		menu->addChild(createBoolPtrMenuItem("Show tooltips", "", &settings::tooltips));
 
@@ -563,10 +588,10 @@ struct ViewButton : MenuButton {
 
 #ifdef DISTRHO_OS_WASM
 		const bool fullscreen = APP->window->isFullScreen();
-		std::string fullscreenText = "F11";
-		if (fullscreen)
-			fullscreenText += " " CHECKMARK_STRING;
-		menu->addChild(createMenuItem("Fullscreen", fullscreenText, [=]() {
+		std::string rightText = "F11";
+		if (rightText)
+			rightText += " " CHECKMARK_STRING;
+		menu->addChild(createMenuItem("Fullscreen", rightText, [=]() {
 			APP->window->setFullScreen(!fullscreen);
 		}));
 #endif
@@ -612,10 +637,10 @@ struct EngineButton : MenuButton {
 #ifdef DISTRHO_OS_WASM
 		if (supportsAudioInput()) {
 			const bool enabled = isAudioInputEnabled();
-			std::string text = "Enable Audio Input";
+			std::string rightText;
 			if (enabled)
-				text += " " CHECKMARK_STRING;
-			menu->addChild(createMenuItem(text, "", [enabled]() {
+				rightText = CHECKMARK_STRING;
+			menu->addChild(createMenuItem("Enable Audio Input", rightText, [enabled]() {
 				if (!enabled)
 					requestAudioInput();
 			}));
@@ -623,10 +648,10 @@ struct EngineButton : MenuButton {
 
 		if (supportsMIDI()) {
 			const bool enabled = isMIDIEnabled();
-			std::string text = "Enable MIDI";
+			std::string rightText;
 			if (enabled)
-				text += " " CHECKMARK_STRING;
-			menu->addChild(createMenuItem(text, "", [enabled]() {
+				rightText = CHECKMARK_STRING;
+			menu->addChild(createMenuItem("Enable MIDI", rightText, [enabled]() {
 				if (!enabled)
 					requestMIDI();
 			}));

@@ -114,6 +114,7 @@ BUILD_CXX_FLAGS += -faligned-new -Wno-abi
 endif
 
 # use our custom function to invert some colors
+BUILD_CXX_FLAGS += -DnsvgDelete=nsvgDeleteCardinal
 BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
 
 # Rack code is not tested for this flag, unset it
