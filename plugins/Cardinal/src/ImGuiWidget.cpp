@@ -16,6 +16,7 @@
  */
 
 #include "ImGuiWidget.hpp"
+#include "DearImGui/imgui.h"
 #include "DistrhoUtils.hpp"
 
 #ifndef DGL_NO_SHARED_RESOURCES
@@ -75,6 +76,7 @@ static void setupIO()
 struct ImGuiWidget::PrivateData {
     ImGuiContext* context = nullptr;
     bool created = false;
+    bool darkMode = true;
     bool fontGenerated = false;
     bool useMonospacedFont = false;
     float originalScaleFactor = 0.0f;
@@ -205,13 +207,13 @@ struct ImGuiWidget::PrivateData {
         style.FrameRounding = 4;
         style.ScaleAllSizes(scaleFactor);
 
-        const ImVec4 color_Cardinal(0.76f, 0.11f, 0.22f, 1.00f);
-        const ImVec4 color_DimCardinal(171.0 / 255.0, 54.0 / 255.0, 73.0 / 255.0, 1.00f);
+        const ImVec4 color_Cardinal(0.76f, 0.11f, 0.22f, 1.f);
+        const ImVec4 color_DimCardinal(171.f / 255.f, 54.f / 255.f, 73.f / 255.f, 1.f);
 
         ImVec4* const colors = style.Colors;
-        colors[ImGuiCol_Text]             = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-        colors[ImGuiCol_TextDisabled]     = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-        colors[ImGuiCol_WindowBg]         = ImVec4(0.101f, 0.101f, 0.101f, 0.94f);
+        colors[ImGuiCol_Text]             = ImVec4(1.f, 1.f, 1.f, 1.f);
+        colors[ImGuiCol_TextDisabled]     = ImVec4(0.5f, 0.5f, 0.5f, 1.f);
+        colors[ImGuiCol_WindowBg]         = ImVec4(0.099f, 0.099f, 0.099f, 1.f);
         colors[ImGuiCol_FrameBg]          = ImVec4(0.20f, 0.21f, 0.22f, 0.54f);
         colors[ImGuiCol_FrameBgHovered]   = ImVec4(0.40f, 0.40f, 0.40f, 0.40f);
         colors[ImGuiCol_FrameBgActive]    = ImVec4(0.18f, 0.18f, 0.18f, 0.67f);
@@ -223,9 +225,21 @@ struct ImGuiWidget::PrivateData {
         colors[ImGuiCol_ButtonHovered]    = color_Cardinal;
         colors[ImGuiCol_ButtonActive]     = color_Cardinal;
         colors[ImGuiCol_TextSelectedBg]   = ImVec4(0.87f, 0.87f, 0.87f, 0.35f);
-        colors[ImGuiCol_Header]           = ImVec4(0.44f, 0.44f, 0.44f, 0.40f);
+        colors[ImGuiCol_Header]           = ImVec4(0.44f, 0.44f, 0.44f, 0.4f);
         colors[ImGuiCol_HeaderHovered]    = color_DimCardinal;
         colors[ImGuiCol_HeaderActive]     = color_Cardinal;
+
+        if (!settings::darkMode)
+        {
+            for (int c = 0; c < ImGuiCol_COUNT; ++c)
+            {
+                if (std::memcmp(&colors[c], &color_Cardinal, sizeof(color_Cardinal)) == 0)
+                    continue;
+                if (std::memcmp(&colors[c], &color_DimCardinal, sizeof(color_DimCardinal)) == 0)
+                    continue;
+                colors[c] = ImVec4(1.f - colors[c].x, 1.f - colors[c].y, 1.f - colors[c].z, colors[c].w);
+            }
+        }
     }
 };
 
@@ -414,6 +428,17 @@ void ImGuiWidget::onSelectText(const SelectTextEvent& e)
 
     if (io.WantCaptureKeyboard)
         e.consume(this);
+}
+
+void ImGuiWidget::step()
+{
+    if (imData->darkMode != settings::darkMode)
+    {
+        imData->darkMode = settings::darkMode;
+        imData->resetEverything(true);
+    }
+
+    OpenGlWidgetWithBrowserPreview::step();
 }
 
 void ImGuiWidget::drawFramebuffer()

@@ -17,9 +17,7 @@
 
 #pragma once
 
-#include "color.hpp"
 #include "rack.hpp"
-#include "settings.hpp"
 
 #ifdef NDEBUG
 # undef DEBUG

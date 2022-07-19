@@ -324,7 +324,7 @@ struct ModuleResizeHandle : OpaqueWidget {
             nvgMoveTo(args.vg, x + 0.5, margin + 0.5);
             nvgLineTo(args.vg, x + 0.5, box.size.y - margin + 0.5);
             nvgStrokeWidth(args.vg, 1.0);
-            nvgStrokeColor(args.vg, nvgRGBAf(0.5, 0.5, 0.5, 0.5));
+            nvgStrokeColor(args.vg, nvgRGBAf(0.5f, 0.5f, 0.5f, 0.5f));
             nvgStroke(args.vg);
         }
     }
@@ -349,8 +349,8 @@ struct TextEditorModuleWidget : ModuleWidget {
 
         textEditorModule = module;
         textEditorWidget = new ImGuiTextEditor();
-        textEditorWidget->box.pos = Vec(RACK_GRID_WIDTH, 0);
-        textEditorWidget->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH, box.size.y);
+        textEditorWidget->box.pos = Vec(RACK_GRID_WIDTH + 1, 1);
+        textEditorWidget->box.size = Vec(box.size.x - 2 * RACK_GRID_WIDTH - 2, box.size.y - 2);
         addChild(textEditorWidget);
 
         if (module != nullptr)
@@ -384,7 +384,8 @@ struct TextEditorModuleWidget : ModuleWidget {
     {
         nvgBeginPath(args.vg);
         nvgRect(args.vg, 0.0, 0.0, box.size.x, box.size.y);
-        nvgFillColor(args.vg, nvgRGB(0x20, 0x20, 0x20));
+        nvgFillColor(args.vg, settings::darkMode ? nvgRGB(0x20, 0x20, 0x20)
+                                                 : nvgRGB(0xe6, 0xe6, 0xe6));
         nvgFill(args.vg);
         ModuleWidget::draw(args);
     }

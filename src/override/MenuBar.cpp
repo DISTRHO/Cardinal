@@ -68,6 +68,10 @@ namespace asset {
 std::string patchesPath();
 }
 
+namespace plugin {
+void updateStaticPluginsDarkMode();
+}
+
 namespace app {
 namespace menuBar {
 
@@ -522,6 +526,7 @@ struct ViewButton : MenuButton {
 			darkModeText = CHECKMARK_STRING;
 		menu->addChild(createMenuItem("Dark Mode", darkModeText, []() {
 			switchDarkMode(!settings::darkMode);
+			plugin::updateStaticPluginsDarkMode();
 			setAllFramebufferWidgetsDirty(APP->scene);
 		}));
 

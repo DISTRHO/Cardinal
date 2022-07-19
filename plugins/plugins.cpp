@@ -2777,5 +2777,26 @@ void destroyStaticPlugins()
     plugins.clear();
 }
 
+void updateStaticPluginsDarkMode()
+{
+#ifndef NOPLUGINS
+    const bool darkMode = settings::darkMode;
+    // bogaudio
+    {
+        Skins& skins(Skins::skins());
+        skins._default = darkMode ? "dark" : "light";
+
+        std::lock_guard<std::mutex> lock(skins._defaultSkinListenersLock);
+        for (auto listener : skins._defaultSkinListeners) {
+            listener->defaultSkinChanged(skins._default);
+        }
+    }
+    // meander
+    {
+        panelTheme = darkMode ? 1 : 0;
+    }
+#endif
+}
+
 }
 }

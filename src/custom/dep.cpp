@@ -617,7 +617,7 @@ static void nsvg__duplicatePaint(NSVGpaint& dst, NSVGpaint& src)
 	if (dst.type == NSVG_PAINT_LINEAR_GRADIENT || dst.type == NSVG_PAINT_RADIAL_GRADIENT)
     {
 		dst.gradient = static_cast<NSVGgradient*>(malloc(sizeof(NSVGgradient)));
-        std::memcpy(dst.gradient, src.gradient, sizeof(NSVGgradient));
+		std::memcpy(dst.gradient, src.gradient, sizeof(NSVGgradient));
     }
 }
 

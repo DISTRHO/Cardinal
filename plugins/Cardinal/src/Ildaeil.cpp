@@ -1750,8 +1750,8 @@ struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
         if (module == nullptr || module->pcontext != nullptr)
         {
             ildaeilWidget = new IldaeilWidget(module);
-            ildaeilWidget->box.pos = Vec(3 * RACK_GRID_WIDTH, 0);
-            ildaeilWidget->box.size = Vec(box.size.x - 6 * RACK_GRID_WIDTH, box.size.y);
+            ildaeilWidget->box.pos = Vec(3 * RACK_GRID_WIDTH + 1, 1);
+            ildaeilWidget->box.size = Vec(box.size.x - 6 * RACK_GRID_WIDTH - 2, box.size.y - 2);
             addChild(ildaeilWidget);
         }
 

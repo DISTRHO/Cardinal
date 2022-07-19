@@ -39,6 +39,7 @@ protected:
     void onButton(const ButtonEvent& e) override;
     void onSelectKey(const SelectKeyEvent& e) override;
     void onSelectText(const SelectTextEvent& e) override;
+    void step() override;
 
     void setAsCurrentContext();
     void setUseMonospaceFont(bool useMonoFont = true);
