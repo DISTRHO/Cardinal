@@ -100,4 +100,5 @@ typedef ModuleWidgetWithSideScrews<3> ModuleWidgetWith3HP;
 typedef ModuleWidgetWithSideScrews<8> ModuleWidgetWith8HP;
 typedef ModuleWidgetWithSideScrews<9> ModuleWidgetWith9HP;
 typedef ModuleWidgetWithSideScrews<11> ModuleWidgetWith11HP;
+typedef ModuleWidgetWithSideScrews<14> ModuleWidgetWith14HP;
 typedef ModuleWidgetWithSideScrews<25> ModuleWidgetWith25HP;
