@@ -30,12 +30,12 @@
 #include "AsyncDialog.hpp"
 #include "PluginContext.hpp"
 #include "DistrhoPluginUtils.hpp"
-#include "settings.hpp"
 
 #include <asset.hpp>
 #include <context.hpp>
 #include <history.hpp>
 #include <patch.hpp>
+#include <settings.hpp>
 #include <string.hpp>
 #include <system.hpp>
 #include <app/Scene.hpp>

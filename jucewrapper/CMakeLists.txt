@@ -165,8 +165,8 @@ target_link_libraries(Cardinal
     PRIVATE
         juce::juce_audio_utils
         ${STATIC_LIBS_START}
-        sCardinal
         sPlugins
+        sCardinal
         sRack
         carla_host_plugin
         carla_engine_plugin
@@ -258,8 +258,8 @@ target_link_libraries(CardinalFX
     PRIVATE
         juce::juce_audio_utils
         ${STATIC_LIBS_START}
-        sCardinalFX
         sPlugins
+        sCardinalFX
         sRack
         carla_host_plugin
         carla_engine_plugin
@@ -350,8 +350,8 @@ target_link_libraries(CardinalSynth
     PRIVATE
         juce::juce_audio_utils
         ${STATIC_LIBS_START}
-        sCardinalSynth
         sPlugins
+        sCardinalSynth
         sRack
         carla_host_plugin
         carla_engine_plugin
