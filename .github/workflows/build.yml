@@ -809,7 +809,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 qttools5-dev qttools5-dev-tools xvfb
+          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine32:i386 wine-stable:i386 qttools5-dev qttools5-dev-tools xvfb
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh win32 && ./deps/PawPaw/.cleanup.sh win32
@@ -901,7 +901,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable qttools5-dev qttools5-dev-tools xvfb
+          sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine32:i386 wine64 wine-stable qttools5-dev qttools5-dev-tools xvfb
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh win64 && ./deps/PawPaw/.cleanup.sh win64
