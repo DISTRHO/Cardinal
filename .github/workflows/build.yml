@@ -803,11 +803,12 @@ jobs:
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
           sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+          sudo apt-get purge -yqq libnginx*
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine32:i386 wine-stable:i386 qttools5-dev qttools5-dev-tools xvfb
+          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 qttools5-dev qttools5-dev-tools xvfb
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh win32 && ./deps/PawPaw/.cleanup.sh win32
@@ -895,11 +896,12 @@ jobs:
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
           sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+          sudo apt-get purge -yqq libnginx*
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine32:i386 wine64 wine-stable qttools5-dev qttools5-dev-tools xvfb
+          sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable qttools5-dev qttools5-dev-tools xvfb
       - name: Build extra dependencies
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh win64 && ./deps/PawPaw/.cleanup.sh win64
@@ -1056,14 +1058,14 @@ jobs:
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
                     /usr/lib/carla/carla-bridge-native vst2 ./${p} "" 1>/dev/null; \
             done
-      - name: Test VST3 plugin
-        run: |
-            for p in $(ls bin/ | grep vst3); do \
-                env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
-                    valgrind \
-                    --error-exitcode=255 \
-                    --leak-check=no \
-                    --track-origins=yes \
-                    --suppressions=./dpf/utils/valgrind-dpf.supp \
-                    /usr/lib/carla/carla-bridge-native vst3 ./bin/${p} "" 1>/dev/null; \
-            done
+      #- name: Test VST3 plugin
+        #run: |
+            #for p in $(ls bin/ | grep vst3); do \
+                #env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
+                    #valgrind \
+                    #--error-exitcode=255 \
+                    #--leak-check=no \
+                    #--track-origins=yes \
+                    #--suppressions=./dpf/utils/valgrind-dpf.supp \
+                    #/usr/lib/carla/carla-bridge-native vst3 ./bin/${p} "" 1>/dev/null; \
+            #done
