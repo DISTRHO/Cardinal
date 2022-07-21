@@ -443,22 +443,22 @@ jobs:
           pushd deps/PawPaw; source local.env macos; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=true -j $(sysctl -n hw.logicalcpu)
-      - name: Build macOS intel (AU using juce)
-        env:
-          MACOSX_DEPLOYMENT_TARGET: '10.8'
-        run: |
-          pushd deps/PawPaw; source local.env macos; popd
-          git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
-          sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
-          mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_OSX_SYSROOT=${PAWPAW_PREFIX} -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
-          mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
-      - name: Build macOS intel (packaging)
-        env:
-          MACOS_ARCHS: 'x86_64'
-        run: |
-          pushd deps/PawPaw; source local.env macos; popd
-          ./utils/create-macos-installer.sh
+      #- name: Build macOS intel (AU using juce)
+        #env:
+          #MACOSX_DEPLOYMENT_TARGET: '10.8'
+        #run: |
+          #pushd deps/PawPaw; source local.env macos; popd
+          #git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
+          #sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
+          #mkdir -p jucewrapper/build
+          #pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_OSX_SYSROOT=${PAWPAW_PREFIX} -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
+          #mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
+      #- name: Build macOS intel (packaging)
+        #env:
+          #MACOS_ARCHS: 'x86_64'
+        #run: |
+          #pushd deps/PawPaw; source local.env macos; popd
+          #./utils/create-macos-installer.sh
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -533,21 +533,21 @@ jobs:
           pushd deps/PawPaw; source local.env macos-universal; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=true -j $(sysctl -n hw.logicalcpu)
-      - name: Build macOS universal (AU using juce)
-        env:
-          MACOSX_DEPLOYMENT_TARGET: '10.12'
-        run: |
-          pushd deps/PawPaw; source local.env macos-universal; popd
-          git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
-          mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_OSX_SYSROOT=${PAWPAW_PREFIX} -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
-          mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
-      - name: Build macOS universal (packaging)
-        env:
-          MACOS_ARCHS: 'arm64,x86_64'
-        run: |
-          pushd deps/PawPaw; source local.env macos-universal; popd
-          ./utils/create-macos-installer.sh
+      #- name: Build macOS universal (AU using juce)
+        #env:
+          #MACOSX_DEPLOYMENT_TARGET: '10.12'
+        #run: |
+          #pushd deps/PawPaw; source local.env macos-universal; popd
+          #git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
+          #mkdir -p jucewrapper/build
+          #pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_OSX_SYSROOT=${PAWPAW_PREFIX} -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
+          #mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
+      #- name: Build macOS universal (packaging)
+        #env:
+          #MACOS_ARCHS: 'arm64,x86_64'
+        #run: |
+          #pushd deps/PawPaw; source local.env macos-universal; popd
+          #./utils/create-macos-installer.sh
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
@@ -802,8 +802,8 @@ jobs:
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-          sudo apt-get purge -yqq libnginx*
+          sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+          sudo apt-get purge -yqq libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture i386
@@ -895,8 +895,8 @@ jobs:
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-          sudo apt-get purge -yqq libnginx*
+          sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+          sudo apt-get purge -yqq libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture i386
