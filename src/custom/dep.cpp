@@ -41,9 +41,9 @@ float FollowerBase::efGainMaxDecibelsDebug = 12.0f;
 
 // Special nvgRGB for blank panels
 extern "C" {
-NVGcolor nvgRGBblank(unsigned char, unsigned char, unsigned char)
+NVGcolor nvgRGBblank(const unsigned char r, const unsigned char g, const unsigned char b)
 {
-    return nvgRGB(0x20, 0x20, 0x20);
+    return rack::settings::darkMode ? nvgRGB(0x20, 0x20, 0x20) : nvgRGB(r, g, b);
 }
 }
 
