@@ -215,6 +215,12 @@ struct FileButton : MenuButton {
 						patchUtils::loadPathDialog(path, true);
 					}));
 				}
+
+				menu->addChild(new ui::MenuSeparator);
+
+				menu->addChild(createMenuItem("Open PatchStorage.com for more patches", "", []() {
+					patchUtils::openBrowser("https://patchstorage.com/platform/cardinal/");
+				}));
 			}));
 		}
 
