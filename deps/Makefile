@@ -111,6 +111,13 @@ CMAKE += -DCMAKE_INSTALL_LIBDIR=lib
 CMAKE += -DCMAKE_INSTALL_PREFIX='$(DEP_PATH)'
 CMAKE += -DBUILD_SHARED_LIBS=OFF
 
+# make sure debug/release matches
+ifeq ($(DEBUG),true)
+CMAKE += -DCMAKE_BUILD_TYPE=Debug
+else
+CMAKE += -DCMAKE_BUILD_TYPE=Release
+endif
+
 # make sure macOS target matches ours
 ifeq ($(MACOS),true)
 ifneq (,$(findstring -arch$(SPACE),$(CXXFLAGS)))
@@ -124,13 +131,7 @@ CMAKE += -DCMAKE_OSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET)
 else ifeq ($(CIBUILD),true)
 $(error CI build requires -mmacosx-version-min flag on macOS)
 endif
-endif
-
-# make sure debug/release matches
-ifeq ($(DEBUG),true)
-CMAKE += -DCMAKE_BUILD_TYPE=Debug
-else
-CMAKE += -DCMAKE_BUILD_TYPE=Release
+CMAKE += -DCMAKE_OSX_SYSROOT=$(shell xcrun --sdk macosx --show-sdk-path)
 endif
 
 # fix cross-compilation for windows
