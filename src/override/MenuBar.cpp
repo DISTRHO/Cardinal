@@ -52,13 +52,10 @@
 #include <library.hpp>
 
 #include "../CardinalCommon.hpp"
+#include "DistrhoStandaloneUtils.hpp"
 
 #ifdef HAVE_LIBLO
 # include <lo/lo.h>
-#endif
-
-#ifdef DISTRHO_OS_WASM
-# include "DistrhoStandaloneUtils.hpp"
 #endif
 
 void switchDarkMode(bool darkMode);
@@ -645,42 +642,42 @@ struct EngineButton : MenuButton {
 			settings::cpuMeter ^= true;
 		}));
 
-#ifdef DISTRHO_OS_WASM
-		if (supportsAudioInput()) {
-			const bool enabled = isAudioInputEnabled();
-			std::string rightText;
-			if (enabled)
-				rightText = CHECKMARK_STRING;
-			menu->addChild(createMenuItem("Enable Audio Input", rightText, [enabled]() {
-				if (!enabled)
-					requestAudioInput();
-			}));
-		}
+		if (isUsingNativeAudio()) {
+			if (supportsAudioInput()) {
+				const bool enabled = isAudioInputEnabled();
+				std::string rightText;
+				if (enabled)
+					rightText = CHECKMARK_STRING;
+				menu->addChild(createMenuItem("Enable Audio Input", rightText, [enabled]() {
+					if (!enabled)
+						requestAudioInput();
+				}));
+			}
 
-		if (supportsMIDI()) {
-			const bool enabled = isMIDIEnabled();
-			std::string rightText;
-			if (enabled)
-				rightText = CHECKMARK_STRING;
-			menu->addChild(createMenuItem("Enable MIDI", rightText, [enabled]() {
-				if (!enabled)
-					requestMIDI();
-			}));
-		}
+			if (supportsMIDI()) {
+				const bool enabled = isMIDIEnabled();
+				std::string rightText;
+				if (enabled)
+					rightText = CHECKMARK_STRING;
+				menu->addChild(createMenuItem("Enable MIDI", rightText, [enabled]() {
+					if (!enabled)
+						requestMIDI();
+				}));
+			}
 
-		if (supportsBufferSizeChanges()) {
-			static const std::vector<uint32_t> bufferSizes = {256, 512, 1024, 2048, 4096, 8192, 16384};
-			const uint32_t currentBufferSize = getBufferSize();
-			menu->addChild(createSubmenuItem("Buffer Size", std::to_string(currentBufferSize), [=](ui::Menu* menu) {
-				for (uint32_t bufferSize : bufferSizes) {
-					menu->addChild(createCheckMenuItem(std::to_string(bufferSize), "",
-						[=]() {return currentBufferSize == bufferSize;},
-						[=]() {requestBufferSizeChange(bufferSize);}
-					));
-				}
-			}));
+			if (supportsBufferSizeChanges()) {
+				static const std::vector<uint32_t> bufferSizes = {256, 512, 1024, 2048, 4096, 8192, 16384};
+				const uint32_t currentBufferSize = getBufferSize();
+				menu->addChild(createSubmenuItem("Buffer Size", std::to_string(currentBufferSize), [=](ui::Menu* menu) {
+					for (uint32_t bufferSize : bufferSizes) {
+						menu->addChild(createCheckMenuItem(std::to_string(bufferSize), "",
+							[=]() {return currentBufferSize == bufferSize;},
+							[=]() {requestBufferSizeChange(bufferSize);}
+						));
+					}
+				}));
+			}
 		}
-#endif
 	}
 };
 
