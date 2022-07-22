@@ -23,7 +23,8 @@
 
 namespace rack {
 namespace settings {
-extern bool darkMode;
+bool darkMode = true;
+int rateLimit = 0;
 }
 }
 

@@ -61,11 +61,6 @@ const std::string CARDINAL_VERSION = "22.07";
 
 namespace rack {
 
-namespace settings {
-bool darkMode = true;
-int rateLimit = 0;
-}
-
 bool isStandalone()
 {
     return std::strstr(getPluginFormatName(), "Standalone") != nullptr;
