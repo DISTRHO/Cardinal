@@ -97,12 +97,15 @@ struct MenuButton : ui::Button {
 
 struct FileButton : MenuButton {
 	const bool isStandalone;
+#if !(defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD))
 	std::vector<std::string> demoPatches;
+#endif
 
 	FileButton(const bool standalone)
 		: MenuButton(),  isStandalone(standalone)
 	{
-		const std::string patchesDir = asset::patchesPath();
+#if !(defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD))
+		const std::string patchesDir = asset::patchesPath() + DISTRHO_OS_SEP_STR "examples";
 
 		if (system::isDirectory(patchesDir))
 		{
@@ -111,6 +114,7 @@ struct FileButton : MenuButton {
 				return string::lowercase(a) < string::lowercase(b);
 			});
 		}
+#endif
 	}
 
 	void onAction(const ActionEvent& e) override {
@@ -195,6 +199,7 @@ struct FileButton : MenuButton {
 		}));
 #endif
 
+#if !(defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD))
 		if (!demoPatches.empty())
 		{
 			menu->addChild(new ui::MenuSeparator);
@@ -220,6 +225,7 @@ struct FileButton : MenuButton {
 				}));
 			}));
 		}
+#endif
 
 #ifndef DISTRHO_OS_WASM
 		if (isStandalone) {

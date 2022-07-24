@@ -253,7 +253,7 @@ static void downloadPatchStorageFailed(const char* const filename)
     }
 
     using namespace rack;
-    context->patch->templatePath = system::join(asset::systemDir, "template-synth.vcv"); // FIXME
+    context->patch->templatePath = system::join(asset::systemDir, "init/wasm.vcv"); // FIXME
     context->patch->loadTemplate();
     context->scene->rackScroll->reset();
 }
@@ -277,7 +277,7 @@ static void downloadPatchStorageSucceeded(const char* const filename)
     }
 
     try {
-        context->patch->load(CARDINAL_IMPORTED_TEMPLATE_FILENAME);
+        context->patch->load(CARDINAL_WASM_IMPORTED_TEMPLATE_FILENAME);
     } catch (rack::Exception& e) {
         const std::string message = rack::string::f("Could not load patch: %s", e.what());
         asyncDialog::create(message.c_str());
@@ -428,7 +428,7 @@ public:
 
     void uiIdle() override
     {
-        if (counterForFirstIdlePoint >= 0 && ++counterForFirstIdlePoint == 5)
+        if (counterForFirstIdlePoint >= 0 && ++counterForFirstIdlePoint == 30)
         {
             counterForFirstIdlePoint = -1;
 

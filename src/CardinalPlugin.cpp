@@ -52,18 +52,14 @@
 # include "extra/SharedResourcePointer.hpp"
 #endif
 
-#if CARDINAL_VARIANT_FX
-# define CARDINAL_FACTORY_TEMPLATE_NAME "template-fx.vcv"
-#elif CARDINAL_VARIANT_SYNTH
-# define CARDINAL_FACTORY_TEMPLATE_NAME "template-synth.vcv"
-#else
-# define CARDINAL_FACTORY_TEMPLATE_NAME "template.vcv"
-#endif
-
 #ifdef DISTRHO_OS_WASM
-# define CARDINAL_TEMPLATE_NAME "template-wasm.vcv"
+# define CARDINAL_TEMPLATE_NAME "init/wasm.vcv"
+#elif CARDINAL_VARIANT_FX
+# define CARDINAL_TEMPLATE_NAME "init/fx.vcv"
+#elif CARDINAL_VARIANT_SYNTH
+# define CARDINAL_TEMPLATE_NAME "init/synth.vcv"
 #else
-# define CARDINAL_TEMPLATE_NAME CARDINAL_FACTORY_TEMPLATE_NAME
+# define CARDINAL_TEMPLATE_NAME "init/main.vcv"
 #endif
 
 static const constexpr uint kCardinalStateBaseCount = 3; // patch, screenshot, comment
@@ -78,16 +74,19 @@ static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount;
 #endif
 
 namespace rack {
+namespace asset {
+std::string patchesPath();
+}
 namespace engine {
-    void Engine_setAboutToClose(Engine*);
+void Engine_setAboutToClose(Engine*);
 }
 namespace plugin {
-    void initStaticPlugins();
-    void destroyStaticPlugins();
+void initStaticPlugins();
+void destroyStaticPlugins();
 }
 #ifndef HEADLESS
 namespace window {
-    void WindowInit(Window* window, DISTRHO_NAMESPACE::Plugin* plugin);
+void WindowInit(Window* window, DISTRHO_NAMESPACE::Plugin* plugin);
 }
 #endif
 }
@@ -183,10 +182,8 @@ struct Initializer
             {
                 if (const char* const resourcePath = getResourcePath(bundlePath))
                 {
-                    asset::bundlePath = system::join(resourcePath, "PluginManifests");
                     asset::systemDir = resourcePath;
-                    templatePath = system::join(asset::systemDir, CARDINAL_TEMPLATE_NAME);
-                    factoryTemplatePath = system::join(asset::systemDir, CARDINAL_FACTORY_TEMPLATE_NAME);
+                    asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
                 }
             }
 
@@ -196,13 +193,8 @@ struct Initializer
                 // Make system dir point to source code location as fallback
                 asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
 
-                if (system::exists(system::join(asset::systemDir, "res")))
-                {
-                    templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR CARDINAL_TEMPLATE_NAME;
-                    factoryTemplatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR CARDINAL_FACTORY_TEMPLATE_NAME;
-                }
                 // If source code dir does not exist use install target prefix as system dir
-                else
+                if (!system::exists(system::join(asset::systemDir, "res")))
                #endif
                 {
                    #if defined(DISTRHO_OS_WASM)
@@ -218,18 +210,19 @@ struct Initializer
                    #endif
 
                     asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
-                    templatePath = system::join(asset::systemDir, CARDINAL_TEMPLATE_NAME);
-                    factoryTemplatePath = system::join(asset::systemDir, CARDINAL_FACTORY_TEMPLATE_NAME);
                 }
             }
 
             asset::userDir = asset::systemDir;
         }
 
+        const std::string patchesPath = asset::patchesPath();
        #ifdef DISTRHO_OS_WASM
-        if ((patchStorageSlug = getPatchStorageSlug()) != nullptr)
-            templatePath = CARDINAL_IMPORTED_TEMPLATE_FILENAME;
+        templatePath = system::join(patchesPath, CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME);
+       #else
+        templatePath = system::join(patchesPath, CARDINAL_TEMPLATE_NAME);
        #endif
+        factoryTemplatePath = system::join(patchesPath, CARDINAL_TEMPLATE_NAME);
 
         // Log environment
         INFO("%s %s v%s", APP_NAME.c_str(), APP_EDITION.c_str(), APP_VERSION.c_str());
@@ -608,11 +601,13 @@ public:
             context->window = new rack::window::Window;
 
        #ifdef DISTRHO_OS_WASM
-        if (rack::patchStorageSlug == nullptr)
+        if ((rack::patchStorageSlug = getPatchStorageSlug()) == nullptr)
        #endif
         {
             context->patch->loadTemplate();
             context->scene->rackScroll->reset();
+            // swap to factory template after first load
+            context->patch->templatePath = context->patch->factoryTemplatePath;
         }
 
        #if defined(HAVE_LIBLO) && defined(HEADLESS)

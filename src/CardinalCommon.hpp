@@ -26,7 +26,12 @@
 #endif
 
 #ifdef DISTRHO_OS_WASM
-# define CARDINAL_IMPORTED_TEMPLATE_FILENAME "/imported.vcv"
+# define CARDINAL_WASM_IMPORTED_TEMPLATE_FILENAME "/imported.vcv"
+# ifdef STATIC_BUILD
+#  define CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME "welcome-wasm.vcv"
+# else
+#  define CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME "welcome-wasm-mini.vcv"
+# endif
 #endif
 
 extern const std::string CARDINAL_VERSION;

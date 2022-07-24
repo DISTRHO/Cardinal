@@ -311,7 +311,6 @@ endif
 
 CORE_RESOURCES  = patches
 CORE_RESOURCES += $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
-CORE_RESOURCES += $(subst ../,,$(wildcard ../template*.vcv))
 
 LV2_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
 VST3_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
@@ -373,22 +372,6 @@ endif
 # --------------------------------------------------------------
 
 $(TARGET_DIR)/%/patches: ../../patches
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
-
-$(TARGET_DIR)/%/template.vcv: ../template.vcv
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
-
-$(TARGET_DIR)/%/template-fx.vcv: ../template-fx.vcv
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
-
-$(TARGET_DIR)/%/template-synth.vcv: ../template-synth.vcv
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
-
-$(TARGET_DIR)/%/template-wasm.vcv: ../template-wasm.vcv
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
