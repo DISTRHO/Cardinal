@@ -1227,7 +1227,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
 
             if (! info->valid)
                 break;
-            if (info->audioIns != 0 && info->audioIns != 2)
+            if (info->audioIns > 2)
                 break;
             if (info->midiIns != 0 && info->midiIns != 1)
                 break;
@@ -1424,7 +1424,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
                 if (param.readonly)
                 {
                     ImGui::BeginDisabled();
-                    ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.printformat, ImGuiSliderFlags_NoInput);
+                    ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.printformat,
+                                       ImGuiSliderFlags_NoInput | (param.log ? ImGuiSliderFlags_Logarithmic : 0x0));
                     ImGui::EndDisabled();
                     continue;
                 }
@@ -1447,7 +1448,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
                 else
                 {
                     const bool ret = param.log
-                                   ? ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.printformat, 2.0f)
+                                   ? ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.printformat, ImGuiSliderFlags_Logarithmic)
                                    : ImGui::SliderFloat(param.name, &ui->values[i], param.min, param.max, param.printformat);
                     if (ret)
                     {
