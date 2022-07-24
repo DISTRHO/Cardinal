@@ -765,6 +765,78 @@ jobs:
           files: |
             *.zip
 
+  wasm-mini:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Set up cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/emsdk
+            */*.a
+            build/CardinalFX
+            build/plugins
+            build/rack
+            dpf/build
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+            src/Rack/dep/zstd-1.4.5
+          key: wasm-mini-v${{ env.CACHE_VERSION }}
+      - name: Set up dependencies
+        run: |
+            [ -e ~/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/emsdk
+            cd ~/emsdk && ./emsdk install latest && ./emsdk activate latest
+      - name: Build wasm-mini cross-compiled
+        env:
+          AR: emar
+          CC: emcc
+          CXX: em++
+          NM: emnm
+          RANLIB: emranlib
+          STRIP: emstrip
+        run: |
+          source ~/emsdk/emsdk_env.sh
+          make features
+          make CIBUILD=true NOPLUGINS=true STATIC_BUILD=true USE_GLES2=true -j $(nproc)
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        id: slug1
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        id: slug2
+        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
+      - name: Set sha8
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+      - name: Pack binaries
+        run: |
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls *.html *.data *.js *.wasm)
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          path: |
+            *.zip
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            *.zip
+
   win32:
     runs-on: ubuntu-20.04
     steps:

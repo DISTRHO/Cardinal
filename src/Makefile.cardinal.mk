@@ -117,7 +117,9 @@ endif
 
 # FIXME
 ifeq ($(WASM),true)
+ifneq ($(STATIC_BUILD),true)
 STATIC_CARLA_PLUGIN_LIBS = -lsndfile -lopus -lFLAC -lvorbisenc -lvorbis -logg -lm
+endif
 endif
 
 EXTRA_DEPENDENCIES = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS)
@@ -215,8 +217,10 @@ BASE_FLAGS += -Wno-unused-variable
 # extra linker flags
 
 ifeq ($(WASM),true)
+ifneq ($(STATIC_BUILD),true)
 LINK_FLAGS += --preload-file=./jsfx
 LINK_FLAGS += --preload-file=./lv2
+endif
 LINK_FLAGS += --preload-file=./resources
 LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
@@ -341,7 +345,12 @@ vst3: $(VST3_RESOURCES)
 # --------------------------------------------------------------
 # Extra rules for wasm resources
 
-wasm_resources: $(CURDIR)/lv2 $(CURDIR)/resources
+WASM_RESOURCES  = $(CURDIR)/resources
+ifneq ($(STATIC_BUILD),true)
+WASM_RESOURCES += $(CURDIR)/lv2
+endif
+
+wasm_resources: $(WASM_RESOURCES)
 
 $(CURDIR)/lv2: $(LV2_RESOURCES)
 	$(shell wget https://falktx.com/data/wasm-things-2022-08-15.tar.gz && tar xf wasm-things-2022-08-15.tar.gz)

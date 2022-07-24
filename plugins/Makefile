@@ -1134,9 +1134,14 @@ clean:
 
 ifeq ($(NOPLUGINS),true)
 PLUGIN_LIST = Cardinal Fundamental
+
+RESOURCE_FILES = \
+		$(wildcard Cardinal/res/*.svg) \
+		$(wildcard Fundamental/res/*.svg) \
+		$(wildcard Fundamental/res/components/*.svg) \
+		Fundamental/presets
 else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
-endif
 
 UNWANTED_FILES  = HetrickCV/res/illustrator - deprecated/MyModule.svg
 UNWANTED_FILES += $(wildcard Meander/res/*)
@@ -1163,7 +1168,6 @@ RESOURCE_FILES += BaconPlugs/res/Keypunch029.json
 RESOURCE_FILES += BaconPlugs/res/midi/chopin
 RESOURCE_FILES += BaconPlugs/res/midi/debussy
 RESOURCE_FILES += BaconPlugs/res/midi/goldberg
-RESOURCE_FILES += Cardinal/res/Miku/Miku.png
 RESOURCE_FILES += cf/playeroscs
 RESOURCE_FILES += DrumKit/res/samples
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
@@ -1178,14 +1182,20 @@ RESOURCE_FILES += $(wildcard unless_modules/art/*.art)
 RESOURCE_FILES += $(wildcard unless_modules/art/svg/*/*.svg)
 RESOURCE_FILES += $(wildcard unless_modules/font/*.ttf)
 # RESOURCE_FILES += $(wildcard unless_modules/manual/*)
+endif
+
+RESOURCE_FILES += Cardinal/res/Miku/Miku.png
 
 # MOD builds only have LV2 FX variant for now
 ifeq ($(MOD_BUILD),true)
+
 LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
+
 else
+
 LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.lv2/resources/PluginManifests/%.json)
@@ -1209,6 +1219,7 @@ VST3_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst3/Contents/Resources/P
 VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.vst3/Contents/Resources/%)
 VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst3/Contents/Resources/%)
 VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst3/Contents/Resources/%)
+
 endif
 
 resources: $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES)
