@@ -364,6 +364,7 @@ static const struct {
     { "/Autinn/res/ZodModule.svg", {}, -1 },
     */
     // ??? used for testing, might get turned off
+    { "/Befaco/res/components/Knurlie.svg", {}, -1 },
     { "/Befaco/res/panels/ABC.svg", {}, -1 },
     { "/Befaco/res/panels/ADSR.svg", {}, -1 },
     { "/Befaco/res/panels/ChoppingKinky.svg", {}, -1 },
@@ -407,7 +408,6 @@ static const struct {
     { "/forsitan-modulare/res/palette.svg", {}, -1 },
     { "/forsitan-modulare/res/pavo.svg", {}, -1 },
     // GPLv3+
-    /* FIXME ends up transparent??
     { "/Fundamental/res/8vert.svg", {}, -1 },
     { "/Fundamental/res/ADSR.svg", {}, -1 },
     { "/Fundamental/res/Delay.svg", {}, -1 },
@@ -434,7 +434,6 @@ static const struct {
     { "/Fundamental/res/VCO.svg", {}, -1 },
     { "/Fundamental/res/WTLFO.svg", {}, -1 },
     { "/Fundamental/res/WTVCO.svg", {}, -1 },
-    */
     // MIT
     { "/HamptonHarmonics/res/Arp.svg", {}, -1 },
     { "/HamptonHarmonics/res/Progress.svg", {}, -1 },
@@ -471,6 +470,15 @@ static const struct {
     { "/sonusmodular/res/yabp.svg", {}, -1 },
     // TODO bacon, chowdsp, ???
 };
+
+static inline
+unsigned int invertColor(const unsigned int color) noexcept
+{
+    return (color & 0xff000000)
+         | (0xff0000 - (color & 0xff0000))
+         | (0xff00 - (color & 0xff00))
+         | (0xff - (color & 0xff));
+}
 
 static inline
 bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
@@ -737,10 +745,7 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
         return true;
     // all others (direct invert)
     default:
-        paint.color = (paint.color & 0xff000000)
-                    | (0xff0000 - (paint.color & 0xff0000))
-                    | (0xff00 - (paint.color & 0xff00))
-                    | (0xff - (paint.color & 0xff));
+        paint.color = invertColor(paint.color);
         return true;
     }
 }
@@ -748,11 +753,23 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
 static inline
 bool invertPaintForLightMode(NSVGshape* const shape, NSVGpaint& paint)
 {
-    paint.color = (paint.color & 0xff000000)
-                | (0xff0000 - (paint.color & 0xff0000))
-                | (0xff00 - (paint.color & 0xff00))
-                | (0xff - (paint.color & 0xff));
-    return true;
+    switch(paint.type)
+    {
+    case NSVG_PAINT_NONE:
+        return true;
+    case NSVG_PAINT_LINEAR_GRADIENT:
+        for (int i=0; i<paint.gradient->nstops; ++i)
+            paint.gradient->stops[i].color = invertColor(paint.gradient->stops[i].color);
+        return true;
+    case NSVG_PAINT_COLOR:
+        paint.color = (paint.color & 0xff000000)
+                    | (0xff0000 - (paint.color & 0xff0000))
+                    | (0xff00 - (paint.color & 0xff00))
+                    | (0xff - (paint.color & 0xff));
+        return true;
+    default:
+        return false;
+    }
 }
 
 extern "C" {
