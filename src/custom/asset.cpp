@@ -50,9 +50,6 @@ std::string user(std::string filename) {
 
 // get system resource, trimming "res/" prefix if we are loaded as a plugin bundle
 std::string system(std::string filename) {
-    // Always use dark screws
-    if (string::endsWith(filename, "/ScrewSilver.svg"))
-        filename = filename.substr(0, filename.size()-10) + "Black.svg";
     return system::join(systemDir, bundlePath.empty() ? filename : trim(filename));
 }
 
