@@ -762,10 +762,7 @@ bool invertPaintForLightMode(NSVGshape* const shape, NSVGpaint& paint)
             paint.gradient->stops[i].color = invertColor(paint.gradient->stops[i].color);
         return true;
     case NSVG_PAINT_COLOR:
-        paint.color = (paint.color & 0xff000000)
-                    | (0xff0000 - (paint.color & 0xff0000))
-                    | (0xff00 - (paint.color & 0xff00))
-                    | (0xff - (paint.color & 0xff));
+        paint.color = invertColor(paint.color);
         return true;
     default:
         return false;
@@ -892,6 +889,31 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             handleMOD = nsvgParseFromFile(silverfilename.c_str(), units, dpi);
             goto postparse;
         }
+
+#if 0
+        // Special case for GlueTheGiant
+        if (std::strstr(filename, "/GlueTheGiant/res/") != nullptr)
+        {
+            printf("special hack for glue\n");
+            if (std::strncmp(filename + (filenamelen - 13), "/BusDepot.svg",     13) == 0 ||
+                std::strncmp(filename + (filenamelen - 13), "/BusRoute.svg",     13) == 0 ||
+                std::strncmp(filename + (filenamelen - 13), "/EnterBus.svg",     13) == 0 ||
+                std::strncmp(filename + (filenamelen - 12), "/ExitBus.svg",      12) == 0 ||
+                std::strncmp(filename + (filenamelen - 11), "/GigBus.svg",       11) == 0 ||
+                std::strncmp(filename + (filenamelen - 17), "/MetroCityBus.svg", 17) == 0 ||
+                std::strncmp(filename + (filenamelen - 12), "/MiniBus.svg",      12) == 0 ||
+                std::strncmp(filename + (filenamelen -  9), "/Road.svg",          9) == 0 ||
+                std::strncmp(filename + (filenamelen - 14), "/SchoolBus.svg",    14) == 0)
+            {
+                const std::string nightfilename = std::string(filename).substr(0, filenamelen-4) + "_Night.svg";
+                hasDarkMode = true;
+                shapesOrig = shapesMOD = nullptr;
+                handleMOD = nsvgParseFromFile(nightfilename.c_str(), units, dpi);
+                printf("special hack for glue: %s -> %s\n", filename, nightfilename.c_str());
+                goto postparse;
+            }
+        }
+#endif
 
         for (size_t i = 0; i < sizeof(svgFilesToInvertForDarkMode)/sizeof(svgFilesToInvertForDarkMode[0]); ++i)
         {
