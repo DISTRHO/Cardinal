@@ -292,6 +292,11 @@ PLUGIN_FILES += Fundamental/src/dr_wav.c
 # modules/types which are present in other plugins
 FUNDAMENTAL_CUSTOM = $(DRWAV)
 
+# --------------------------------------------------------------
+# ZamAudio (always enabled)
+
+PLUGIN_FILES += $(wildcard ZamAudio/src/*.cpp)
+
 ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------
 # 21kHz
@@ -1133,12 +1138,13 @@ clean:
 # --------------------------------------------------------------
 
 ifeq ($(NOPLUGINS),true)
-PLUGIN_LIST = Cardinal Fundamental
+PLUGIN_LIST = Cardinal Fundamental ZamAudio
 
 RESOURCE_FILES = \
 		$(wildcard Cardinal/res/*.svg) \
 		$(wildcard Fundamental/res/*.svg) \
 		$(wildcard Fundamental/res/components/*.svg) \
+		$(wildcard ZamAudio/res/*.svg) \
 		Fundamental/presets
 else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
@@ -1923,6 +1929,13 @@ $(BUILD_DIR)/WhatTheRack/%.cpp.o: WhatTheRack/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(WHATTHERACK_CUSTOM),$(call custom_module_names,$(m),WhatTheRack)) \
 		-DpluginInstance=pluginInstance__WhatTheRack
+
+$(BUILD_DIR)/ZamAudio/%.cpp.o: ZamAudio/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ZAMAUDIO_CUSTOM),$(call custom_module_names,$(m),ZamAudio)) \
+		-DpluginInstance=pluginInstance__ZamAudio
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
