@@ -867,6 +867,7 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
 
         bool hasDarkMode = false;
         bool hasLightMode = false;
+        NSVGimage* handleOrig;
         NSVGimage* handleMOD = nullptr;
         NSVGshape* shapesOrig;
         NSVGshape* shapesMOD;
@@ -991,8 +992,6 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
                 handle->shapes->fill.color = 0xff191919;
 
 postparse:
-        NSVGimage* handleOrig;
-
         if (handleMOD != nullptr)
         {
             handleOrig = static_cast<NSVGimage*>(malloc(sizeof(NSVGimage)));
@@ -1066,7 +1065,7 @@ void nsvgDeleteCardinal(NSVGimage* const handle)
     nsvgDelete(handle);
 }
 
-void switchDarkMode(bool darkMode)
+void switchDarkMode(const bool darkMode)
 {
     if (rack::settings::darkMode == darkMode)
         return;
@@ -1084,8 +1083,8 @@ void switchDarkMode(bool darkMode)
     for (ExtendedNSVGimage& ext : loadedLightSVGs)
     {
         if (ext.shapesMOD != nullptr)
-            ext.handle->shapes = darkMode ? ext.shapesOrig : ext.shapesMOD;
+            ext.handle->shapes = !darkMode ? ext.shapesMOD : ext.shapesOrig;
         else if (ext.handleMOD != nullptr)
-            std::memcpy(ext.handle, darkMode ? ext.handleOrig : ext.handleMOD, sizeof(NSVGimage));
+            std::memcpy(ext.handle, !darkMode ? ext.handleMOD : ext.handleOrig, sizeof(NSVGimage));
     }
 }
