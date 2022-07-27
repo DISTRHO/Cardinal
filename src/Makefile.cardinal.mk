@@ -10,6 +10,8 @@ ifeq ($(NAME),Cardinal)
 CARDINAL_VARIANT = main
 else ifeq ($(NAME),CardinalFX)
 CARDINAL_VARIANT = fx
+else ifeq ($(NAME),CardinalNative)
+CARDINAL_VARIANT = native
 else ifeq ($(NAME),CardinalSynth)
 CARDINAL_VARIANT = synth
 endif
@@ -55,6 +57,15 @@ NVG_DISABLE_SKIPPING_WHITESPACE = true
 NVG_FONT_TEXTURE_FLAGS = NVG_IMAGE_NEAREST
 USE_NANOVG_FBO = true
 WASM_EXCEPTIONS = true
+
+ifeq ($(CARDINAL_VARIANT),main)
+# main variant should not use rtaudio/sdl2 fallback (it has CV ports)
+SKIP_NATIVE_AUDIO_FALLBACK = true
+else
+# fx and synth variants should only use rtaudio/sdl2 fallbacks
+FORCE_NATIVE_AUDIO_FALLBACK = true
+endif
+
 include ../../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -300,11 +311,9 @@ BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 # Enable all possible plugin types and setup resources
 
 ifeq ($(CARDINAL_VARIANT),main)
-ifneq ($(STATIC_BUILD),true)
 all: jack lv2 vst3
-else
-all: lv2 vst3
-endif # STATIC_BUILD
+else ifeq ($(CARDINAL_VARIANT),native)
+all: jack
 else
 all: lv2 vst2 vst3 static
 endif
@@ -321,11 +330,6 @@ LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/Plateau_Reverb.ttl
 LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui.ttl
 LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf
 LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui
-endif
-
-# Cardinal main variant should not use rtaudio/sdl2 fallback (it has CV ports)
-ifeq ($(CARDINAL_VARIANT),main)
-jack: BUILD_CXX_FLAGS += -DDPF_JACK_STANDALONE_SKIP_RTAUDIO_FALLBACK -DDPF_JACK_STANDALONE_SKIP_SDL2_FALLBACK
 endif
 
 # Cardinal main variant is not available as VST2 due to lack of CV ports

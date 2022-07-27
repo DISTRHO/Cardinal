@@ -206,15 +206,19 @@ ifeq ($(MOD_BUILD),true)
 	$(MAKE) -C Cardinal lv2
 	$(MAKE) -C CardinalFX lv2
 else ifeq ($(WASM),true)
-	$(MAKE) -C CardinalFX jack
+	$(MAKE) -C CardinalNative
 else
 	$(MAKE) -C Cardinal
+	$(MAKE) -C CardinalNative
 	$(MAKE) -C CardinalFX $(CARDINAL_FX_ARGS)
 	$(MAKE) -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 endif
 
 jack: $(TARGET)
 	$(MAKE) jack -C Cardinal
+
+native: $(TARGET)
+	$(MAKE) jack -C CardinalNative
 
 lv2: $(TARGET)
 	$(MAKE) lv2 -C Cardinal

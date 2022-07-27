@@ -26,14 +26,14 @@
 #define CARDINAL_NUM_AUDIO_OUTPUTS 2
 
 #define DISTRHO_PLUGIN_BRAND "DISTRHO"
-#define DISTRHO_PLUGIN_URI   "https://distrho.kx.studio/plugins/cardinal#fx"
+#define DISTRHO_PLUGIN_URI   "https://distrho.kx.studio/plugins/cardinal"
 
-#if defined(__MOD_DEVICES__)
-# define DISTRHO_PLUGIN_NAME  "Cardinal Mini"
-# define DISTRHO_PLUGIN_LABEL "CardinalMini"
+#if defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD)
+# define DISTRHO_PLUGIN_NAME  "Mini Cardinal"
+# define DISTRHO_PLUGIN_LABEL "MiniCardinal"
 #else
-# define DISTRHO_PLUGIN_NAME  "Cardinal FX"
-# define DISTRHO_PLUGIN_LABEL "CardinalFX"
+# define DISTRHO_PLUGIN_NAME  "Cardinal"
+# define DISTRHO_PLUGIN_LABEL "Cardinal"
 #endif
 
 #ifdef HEADLESS
