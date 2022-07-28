@@ -403,7 +403,7 @@ jobs:
           make SYSDEPS=true -j $(nproc)
 
   macos-intel:
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
         with:
@@ -489,7 +489,7 @@ jobs:
             ${{ github.event.repository.name }}-*.pkg
 
   macos-universal:
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
         with:
