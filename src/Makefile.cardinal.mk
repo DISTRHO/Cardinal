@@ -233,6 +233,7 @@ LINK_FLAGS += --preload-file=./jsfx
 LINK_FLAGS += --preload-file=./lv2
 endif
 LINK_FLAGS += --preload-file=./resources
+LINK_FLAGS += --use-preload-plugins
 LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
 LINK_FLAGS += -sLZ4=1
