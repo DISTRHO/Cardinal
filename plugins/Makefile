@@ -1192,13 +1192,19 @@ endif
 
 RESOURCE_FILES += Cardinal/res/Miku/Miku.png
 
-# MOD builds only have LV2 FX variant for now
+# MOD builds only have LV2 main and FX variant
 ifeq ($(MOD_BUILD),true)
 
 LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
+
+# MOD builds only have LV2 FX variant for now
+else ifeq ($(WASM),true)
+
+LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalNative.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalNative.lv2/resources/%)
 
 else
 
@@ -1238,6 +1244,10 @@ resources: $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES)
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
+../bin/CardinalNative.lv2/resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
 ../bin/CardinalSynth.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
@@ -1253,6 +1263,10 @@ endif
 	$(SILENT)ln -sf $(abspath $<) $@
 
 ../bin/CardinalFX.lv2/resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalNative.lv2/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 

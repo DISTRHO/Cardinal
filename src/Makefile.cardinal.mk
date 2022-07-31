@@ -378,7 +378,11 @@ endif
 
 $(TARGET_DIR)/%/patches: ../../patches
 	-@mkdir -p "$(shell dirname $@)"
+ifeq ($(WASM),true)
+	cp -rL $< $@
+else
 	$(SILENT)ln -sf $(abspath $<) $@
+endif
 
 $(TARGET_DIR)/$(NAME).lv2/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"

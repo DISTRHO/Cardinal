@@ -1,12 +1,6 @@
 {
   "version": "2.1.1",
-  "path": "/home/falktx/Source/DISTRHO/Cardinal/src/Rack/../../patches/VT_-_Jupiter_Ascent.vcv",
-  "unsaved": true,
   "zoom": 1.0,
-  "gridOffset": [
-    -1.0,
-    -0.03684210404753685
-  ],
   "modules": [
     {
       "id": 674529428127255,
