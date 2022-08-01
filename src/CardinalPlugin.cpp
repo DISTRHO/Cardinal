@@ -76,6 +76,7 @@ static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount;
 namespace rack {
 namespace asset {
 std::string patchesPath();
+void destroy();
 }
 namespace engine {
 void Engine_setAboutToClose(Engine*);
@@ -289,6 +290,9 @@ struct Initializer
 
         INFO("Destroying plugins");
         plugin::destroyStaticPlugins();
+
+        INFO("Destroying colourized assets");
+        asset::destroy();
 
         INFO("Destroying settings");
         settings::destroy();

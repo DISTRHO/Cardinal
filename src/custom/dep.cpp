@@ -775,7 +775,7 @@ void nsvgDeleteCardinal(NSVGimage*);
 }
 
 struct ExtendedNSVGimage {
-    NSVGimage* handle;
+    NSVGimage* const handle;
     NSVGimage* handleOrig;
     NSVGimage* handleMOD;
     NSVGshape* shapesOrig;
@@ -1087,4 +1087,27 @@ void switchDarkMode(const bool darkMode)
         else if (ext.handleMOD != nullptr)
             std::memcpy(ext.handle, !darkMode ? ext.handleMOD : ext.handleOrig, sizeof(NSVGimage));
     }
+}
+
+namespace rack {
+namespace asset {
+
+void destroy() {
+    for (auto it = loadedDarkSVGs.begin(), end = loadedDarkSVGs.end(); it != end; ++it)
+    {
+        ExtendedNSVGimage& ext(*it);
+        deleteExtendedNSVGimage(ext);
+    }
+
+    for (auto it = loadedLightSVGs.begin(), end = loadedLightSVGs.end(); it != end; ++it)
+    {
+        ExtendedNSVGimage& ext(*it);
+        deleteExtendedNSVGimage(ext);
+    }
+
+    loadedDarkSVGs.clear();
+    loadedLightSVGs.clear();
+}
+
+}
 }
