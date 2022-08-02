@@ -661,13 +661,11 @@ struct EngineButton : MenuButton {
 			}
 
 			if (supportsMIDI()) {
-				const bool enabled = isMIDIEnabled();
 				std::string rightText;
-				if (enabled)
+				if (isMIDIEnabled())
 					rightText = CHECKMARK_STRING;
-				menu->addChild(createMenuItem("Enable MIDI", rightText, [enabled]() {
-					if (!enabled)
-						requestMIDI();
+				menu->addChild(createMenuItem("Enable/Reconnect MIDI", rightText, []() {
+					requestMIDI();
 				}));
 			}
 

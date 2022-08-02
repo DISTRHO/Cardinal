@@ -36,6 +36,7 @@ static constexpr const uint32_t kModuleParameters = 24;
 enum CardinalVariant {
     kCardinalVariantMain,
     kCardinalVariantFX,
+    kCardinalVariantNative,
     kCardinalVariantSynth,
 };
 

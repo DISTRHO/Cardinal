@@ -12,7 +12,7 @@
       "data": {
         "filepath": "",
         "lang": "None",
-        "etext": "Welcome to Cardinal!\n\nThis is the Web/Wasm variant\nIt has 2 audio outputs, enabled by default.\nUse Engine menu to enable input and/or MIDI.\n\nA basic VCO + ADSR + VCA is the default patch\n\n",
+        "etext": "Welcome to Cardinal!\n\nThis is the Native Audio/MIDI variant.\nIt has 2 audio outputs, enabled by default.\nUse Engine menu to enable input and/or MIDI.\n\nA basic VCO + ADSR + VCA is the default patch\n\n",
         "width": 23
       },
       "pos": [

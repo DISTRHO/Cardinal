@@ -5,6 +5,7 @@
 *.exe
 *.dll
 *.dylib
+*.pkg
 *.so
 *.zip
 
@@ -12,8 +13,13 @@
 .kdev_include_paths
 .kdev4/
 
-bin/
-build/
-documentation.pdf
-utils/inno/resources.iss
-utils/inno/version.iss
+.cache
+compile_commands.json
+
+/bin/
+/build/
+/documentation.pdf
+/jucewrapper/build/
+/jucewrapper/JUCE/
+/utils/inno/resources.iss
+/utils/inno/version.iss

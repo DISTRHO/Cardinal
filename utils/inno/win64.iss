@@ -17,13 +17,14 @@ OutputDir=.
 UsePreviousAppDir=no
 
 [Types]
-Name: "normal"; Description: "Normal installation (recommended)";
+Name: "full"; Description: "Full installation";
 Name: "custom"; Description: "Custom installation"; Flags: iscustom;
 
 [Components]
 Name: resources; Description: "Resources"; Types: normal custom; Flags: fixed;
 Name: carla; Description: "Carla/Ildaeil host tools"; Types: normal;
-Name: jack; Description: "Standalone (requires JACK)"; Types: custom;
+Name: jack; Description: "Standalone (JACK)"; Types: custom;
+Name: native; Description: "Standalone (Native)"; Types: custom;
 Name: lv2; Description: "LV2 plugin"; Types: normal;
 Name: vst2; Description: "VST2 plugin"; Types: normal;
 Name: vst3; Description: "VST3 plugin"; Types: normal;
@@ -47,6 +48,8 @@ Source: "..\..\carla\build\Carla\resources\lib\*.*"; DestDir: "{commoncf64}\Card
 Source: "..\..\carla\build\Carla\resources\lib\PyQt5\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources\lib\PyQt5"; Components: carla; Flags: ignoreversion;
 ; jack
 Source: "..\..\bin\Cardinal.exe"; DestDir: "{app}"; Components: jack; Flags: ignoreversion;
+; native
+Source: "..\..\bin\CardinalNative.exe"; DestDir: "{app}"; Components: native; Flags: ignoreversion;
 ; lv2
 Source: "..\..\bin\Cardinal.lv2\*.*"; DestDir: "{commoncf64}\LV2\Cardinal.lv2"; Components: lv2; Flags: ignoreversion;
 Source: "..\..\bin\CardinalFX.lv2\*.*"; DestDir: "{commoncf64}\LV2\CardinalFX.lv2"; Components: lv2; Flags: ignoreversion;
@@ -59,4 +62,5 @@ Source: "..\..\bin\CardinalFX.vst3\Contents\x86_64-win\CardinalFX.vst3"; DestDir
 Source: "..\..\bin\CardinalSynth.vst3\Contents\x86_64-win\CardinalSynth.vst3"; DestDir: "{commoncf64}\VST3\CardinalSynth.vst3\Contents\x86_64-win"; Components: vst3; Flags: ignoreversion;
 
 [Icons]
-Name: "{commonprograms}\Cardinal"; Filename: "{app}\Cardinal.exe"; IconFilename: "{app}\distrho.ico"; WorkingDir: "{app}"; Comment: "Virtual modular synthesizer plugin"; Components: jack;
+Name: "{commonprograms}\Cardinal (JACK)"; Filename: "{app}\Cardinal.exe"; IconFilename: "{app}\distrho.ico"; WorkingDir: "{app}"; Comment: "Virtual modular synthesizer plugin (JACK variant)"; Components: jack;
+Name: "{commonprograms}\Cardinal (Native)"; Filename: "{app}\CardinalNative.exe"; IconFilename: "{app}\distrho.ico"; WorkingDir: "{app}"; Comment: "Virtual modular synthesizer plugin (Native variant)"; Components: native;

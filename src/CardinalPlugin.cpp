@@ -52,10 +52,10 @@
 # include "extra/SharedResourcePointer.hpp"
 #endif
 
-#ifdef DISTRHO_OS_WASM
-# define CARDINAL_TEMPLATE_NAME "init/wasm.vcv"
-#elif CARDINAL_VARIANT_FX
+#if CARDINAL_VARIANT_FX
 # define CARDINAL_TEMPLATE_NAME "init/fx.vcv"
+#elif CARDINAL_VARIANT_NATIVE
+# define CARDINAL_TEMPLATE_NAME "init/native.vcv"
 #elif CARDINAL_VARIANT_SYNTH
 # define CARDINAL_TEMPLATE_NAME "init/synth.vcv"
 #else
@@ -188,11 +188,12 @@ struct Initializer
                 }
             }
 
-            if (asset::systemDir.empty() || ! system::exists(asset::systemDir))
+            if (asset::systemDir.empty() || ! system::exists(asset::systemDir) || ! system::exists(asset::bundlePath))
             {
                #ifdef CARDINAL_PLUGIN_SOURCE_DIR
                 // Make system dir point to source code location as fallback
                 asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
+                asset::bundlePath.clear();
 
                 // If source code dir does not exist use install target prefix as system dir
                 if (!system::exists(system::join(asset::systemDir, "res")))
@@ -683,12 +684,12 @@ protected:
 
     uint32_t getVersion() const override
     {
-        return d_version(0, 22, 7);
+        return d_version(0, 22, 8);
     }
 
     int64_t getUniqueId() const override
     {
-       #if CARDINAL_VARIANT_MAIN
+       #if CARDINAL_VARIANT_MAIN || CARDINAL_VARIANT_NATIVE
         return d_cconst('d', 'C', 'd', 'n');
        #elif CARDINAL_VARIANT_FX
         return d_cconst('d', 'C', 'n', 'F');
@@ -704,7 +705,7 @@ protected:
 
     void initAudioPort(const bool input, uint32_t index, AudioPort& port) override
     {
-       #if CARDINAL_VARIANT_FX || CARDINAL_VARIANT_SYNTH
+       #if CARDINAL_VARIANT_FX || CARDINAL_VARIANT_NATIVE || CARDINAL_VARIANT_SYNTH
         if (index < 2)
             port.groupId = kPortGroupStereo;
        #endif

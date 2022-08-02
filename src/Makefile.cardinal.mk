@@ -347,6 +347,21 @@ vst2: $(VST2_RESOURCES)
 vst3: $(VST3_RESOURCES)
 
 # --------------------------------------------------------------
+# Extra rules for macOS app bundle
+
+$(TARGET_DIR)/Cardinal.app/Contents/Info.plist: ../../utils/macOS/Info_JACK.plist $(TARGET_DIR)/Cardinal.app/Contents/Resources/distrho.icns
+	-@mkdir -p $(shell dirname $@)
+	cp $< $@
+
+$(TARGET_DIR)/CardinalNative.app/Contents/Info.plist: ../../utils/macOS/Info_Native.plist $(TARGET_DIR)/CardinalNative.app/Contents/Resources/distrho.icns
+	-@mkdir -p $(shell dirname $@)
+	cp $< $@
+
+$(TARGET_DIR)/%.app/Contents/Resources/distrho.icns: ../../utils/distrho.icns
+	-@mkdir -p $(shell dirname $@)
+	cp $< $@
+
+# --------------------------------------------------------------
 # Extra rules for wasm resources
 
 WASM_RESOURCES  = $(CURDIR)/resources

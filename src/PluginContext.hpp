@@ -41,6 +41,7 @@ static constexpr const uint kModuleParameters = 24;
 enum CardinalVariant {
     kCardinalVariantMain,
     kCardinalVariantFX,
+    kCardinalVariantNative,
     kCardinalVariantSynth,
 };
 
@@ -74,6 +75,8 @@ struct CardinalPluginContext : rack::Context {
           variant(kCardinalVariantMain),
          #elif CARDINAL_VARIANT_FX
           variant(kCardinalVariantFX),
+         #elif CARDINAL_VARIANT_NATIVE
+          variant(kCardinalVariantNative),
          #elif CARDINAL_VARIANT_SYNTH
           variant(kCardinalVariantSynth),
          #else
