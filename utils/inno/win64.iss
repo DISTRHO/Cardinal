@@ -17,7 +17,7 @@ OutputDir=.
 UsePreviousAppDir=no
 
 [Types]
-Name: "full"; Description: "Full installation";
+Name: "normal"; Description: "Full installation";
 Name: "custom"; Description: "Custom installation"; Flags: iscustom;
 
 [Components]
