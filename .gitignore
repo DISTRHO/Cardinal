@@ -21,5 +21,6 @@ compile_commands.json
 /documentation.pdf
 /jucewrapper/build/
 /jucewrapper/JUCE/
+/src/CardinalNative/resources/
 /utils/inno/resources.iss
 /utils/inno/version.iss
