@@ -144,6 +144,15 @@ CMAKE += -DCMAKE_CXX_COMPILER_AR=$(CMAKE_AR)
 CMAKE += -DCMAKE_RANLIB=$(CMAKE_RANLIB)
 CMAKE += -DCMAKE_C_COMPILER_RANLIB=$(CMAKE_RANLIB)
 CMAKE += -DCMAKE_CXX_COMPILER_RANLIB=$(CMAKE_RANLIB)
+ifeq ($(shell uname -s),Darwin)
+CMAKE += -DCMAKE_CROSSCOMPILING=ON
+CMAKE += -DCMAKE_SYSTEM_NAME=Generic
+endif
+endif
+
+# fix cmake forcing SDK for us
+ifeq ($(MACOS),true)
+CMAKE += -DCMAKE_OSX_SYSROOT="macosx"
 endif
 
 # fix cross-compilation for windows
