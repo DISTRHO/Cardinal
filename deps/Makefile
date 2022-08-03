@@ -134,6 +134,18 @@ endif
 CMAKE += -DCMAKE_OSX_SYSROOT=$(shell xcrun --sdk macosx --show-sdk-path)
 endif
 
+# fix emar and emranlib usage
+ifeq ($(WASM),true)
+CMAKE_AR     = $(shell which $(AR))
+CMAKE_RANLIB = $(shell which $(RANLIB))
+CMAKE += -DCMAKE_AR=$(CMAKE_AR)
+CMAKE += -DCMAKE_C_COMPILER_AR=$(CMAKE_AR)
+CMAKE += -DCMAKE_CXX_COMPILER_AR=$(CMAKE_AR)
+CMAKE += -DCMAKE_RANLIB=$(CMAKE_RANLIB)
+CMAKE += -DCMAKE_C_COMPILER_RANLIB=$(CMAKE_RANLIB)
+CMAKE += -DCMAKE_CXX_COMPILER_RANLIB=$(CMAKE_RANLIB)
+endif
+
 # fix cross-compilation for windows
 ifeq ($(WINDOWS),true)
 CMAKE += -G 'Unix Makefiles'
