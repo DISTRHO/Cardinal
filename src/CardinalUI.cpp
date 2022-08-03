@@ -136,15 +136,15 @@ struct WasmWelcomeDialog : rack::widget::OpaqueWidget
         label->box.size.y = box.size.y - 2*margin - 40;
         label->fontSize = 20;
         label->text = ""
-            "Welcome!\n"
+            "Welcome to Cardinal on the Web!\n"
             "\n"
-            "This is a special web-assembly version of Cardinal, "
-            "allowing you to enjoy eurorack-style modules directly in your browser.\n"
+            "If using mobile/touch devices, please note:\n"
+            " - Single quick press does simple mouse click\n"
+            " - Press & move does click & drag action\n"
+            " - Press & hold does right-click (and opens module browser)\n"
             "\n"
-            "This is still very much a work in progress, "
-            "minor issues and occasional crashes are expected.\n"
-            "\n"
-            "Proceed with caution and have fun!";
+            "Still a bit experimental, so proceed with caution.\n"
+            "Have fun!";
         contentLayout->addChild(label);
 
         struct JoinDiscussionButton : Button {
