@@ -142,8 +142,40 @@ EXTRA_LIBS += ../../deps/aubio/libaubio.a
 EXTRA_LIBS += $(shell $(PKG_CONFIG) --libs fftw3f)
 endif
 
+# --------------------------------------------------------------
+# Setup resources
+
+CORE_RESOURCES  = patches
+CORE_RESOURCES += $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
+
+LV2_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
+VST3_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
+
+# Install modgui resources if MOD build
+ifeq ($(MOD_BUILD),true)
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/Plateau_Reverb.ttl
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui.ttl
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui
+endif
+
+# Cardinal main variant is not available as VST2 due to lack of CV ports
+ifneq ($(CARDINAL_VARIANT),main)
+ifeq ($(MACOS),true)
+VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%)
+else
+VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.vst/resources/%)
+endif
+endif
+
 ifeq ($(WASM),true)
-EXTRA_DEPENDENCIES += wasm_resources
+WASM_RESOURCES  = $(LV2_RESOURCES)
+
+ifneq ($(STATIC_BUILD),true)
+WASM_RESOURCES += $(CURDIR)/lv2
+endif
+
+EXTRA_DEPENDENCIES += $(WASM_RESOURCES)
 endif
 
 # --------------------------------------------------------------
@@ -229,11 +261,11 @@ BASE_FLAGS += -Wno-unused-variable
 
 ifeq ($(WASM),true)
 ifneq ($(STATIC_BUILD),true)
+LINK_FLAGS += --use-preload-plugins
 LINK_FLAGS += --preload-file=./jsfx
 LINK_FLAGS += --preload-file=./lv2
-LINK_FLAGS += --use-preload-plugins
 endif
-LINK_FLAGS += --preload-file=./resources
+LINK_FLAGS += --preload-file=../../bin/CardinalNative.lv2/resources@/resources
 LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
 LINK_FLAGS += -sLZ4=1
@@ -319,29 +351,6 @@ else
 all: lv2 vst2 vst3 static
 endif
 
-CORE_RESOURCES  = patches
-CORE_RESOURCES += $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
-
-LV2_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
-VST3_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
-
-# Install modgui resources if MOD build
-ifeq ($(MOD_BUILD),true)
-LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/Plateau_Reverb.ttl
-LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui.ttl
-LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf
-LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui
-endif
-
-# Cardinal main variant is not available as VST2 due to lack of CV ports
-ifneq ($(CARDINAL_VARIANT),main)
-ifeq ($(MACOS),true)
-VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%)
-else
-VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.vst/resources/%)
-endif
-endif
-
 lv2: $(LV2_RESOURCES)
 vst2: $(VST2_RESOURCES)
 vst3: $(VST3_RESOURCES)
@@ -364,18 +373,10 @@ $(TARGET_DIR)/%.app/Contents/Resources/distrho.icns: ../../utils/distrho.icns
 # --------------------------------------------------------------
 # Extra rules for wasm resources
 
-WASM_RESOURCES  = $(CURDIR)/resources
-ifneq ($(STATIC_BUILD),true)
-WASM_RESOURCES += $(CURDIR)/lv2
-endif
-
-wasm_resources: $(WASM_RESOURCES)
-
+ifeq ($(WASM),true)
 $(CURDIR)/lv2: $(LV2_RESOURCES)
-	$(shell wget https://falktx.com/data/wasm-things-2022-08-15.tar.gz && tar xf wasm-things-2022-08-15.tar.gz)
-
-$(CURDIR)/resources: $(LV2_RESOURCES)
-	cp -rL $(TARGET_DIR)/$(NAME).lv2/resources $(CURDIR)/resources
+	$(shell wget -O - https://falktx.com/data/wasm-things-2022-08-15.tar.gz | tar xz wasm-things-2022-08-15.tar.gz)
+endif
 
 # --------------------------------------------------------------
 # Extra rules for Windows icon
