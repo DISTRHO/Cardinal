@@ -270,6 +270,7 @@ LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
 LINK_FLAGS += -sLZ4=1
 LINK_FLAGS += --shell-file=../emscripten/shell.html
+LINK_FLAGS += -O3
 else ifeq ($(HAIKU),true)
 LINK_FLAGS += -lpthread
 else
@@ -375,7 +376,7 @@ $(TARGET_DIR)/%.app/Contents/Resources/distrho.icns: ../../utils/distrho.icns
 
 ifeq ($(WASM),true)
 $(CURDIR)/lv2: $(LV2_RESOURCES)
-	$(shell wget -O - https://falktx.com/data/wasm-things-2022-08-15.tar.gz | tar xz wasm-things-2022-08-15.tar.gz)
+	wget -O - https://falktx.com/data/wasm-things-2022-08-15.tar.gz | tar xz -C $(CURDIR)
 endif
 
 # --------------------------------------------------------------
