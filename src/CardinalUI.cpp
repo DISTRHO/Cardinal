@@ -441,7 +441,7 @@ public:
                 rack::patchStorageSlug = nullptr;
 
                 emscripten_async_wget(url.c_str(), context->patch->templatePath.c_str(),
-                                    downloadPatchStorageSucceeded, downloadPatchStorageFailed);
+                                      downloadPatchStorageSucceeded, downloadPatchStorageFailed);
             }
            #endif
         }
