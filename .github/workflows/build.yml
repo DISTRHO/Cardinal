@@ -733,6 +733,10 @@ jobs:
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: wasm-v${{ env.CACHE_VERSION }}
+      - name: Enable extra swap
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 13
       - name: Set up dependencies
         run: |
             [ -e ~/PawPawBuilds/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/PawPawBuilds/emsdk
