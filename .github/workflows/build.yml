@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 28
+  CACHE_VERSION: 29
   CARDINAL_UNDER_WINE: 1
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
