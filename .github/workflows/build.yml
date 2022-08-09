@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 30
+  CACHE_VERSION: 31
   CARDINAL_UNDER_WINE: 1
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
@@ -24,17 +24,6 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            */*.a
-            bin/*.*/*.so
-            bin/*.vst3/Contents/*/*.so
-            bin/Cardinal
-            build/Cardinal
-            build/CardinalFX
-            build/CardinalSynth
-            build/plugins
-            build/rack
-            carla/build
-            dpf/build
             src/Rack/dep/bin
             src/Rack/dep/include
             src/Rack/dep/lib
@@ -59,15 +48,21 @@ jobs:
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           sudo apt-get update -qq
           sudo apt-get install -yqq g++-aarch64-linux-gnu libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libglib2.0-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-linux-arm64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build extra dependencies
         env:
           PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64 && ./deps/PawPaw/.cleanup.sh linux-aarch64
       - name: Build linux arm64 cross-compiled
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-aarch64; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
@@ -113,17 +108,6 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            */*.a
-            bin/*.*/*.so
-            bin/*.vst3/Contents/*/*.so
-            bin/Cardinal
-            build/Cardinal
-            build/CardinalFX
-            build/CardinalSynth
-            build/plugins
-            build/rack
-            carla/build
-            dpf/build
             src/Rack/dep/bin
             src/Rack/dep/include
             src/Rack/dep/lib
@@ -148,15 +132,21 @@ jobs:
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           sudo apt-get update -qq
           sudo apt-get install -yqq g++-arm-linux-gnueabihf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libglib2.0-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-linux-armhf-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build extra dependencies
         env:
           PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh linux-armhf && ./deps/PawPaw/.cleanup.sh linux-armhf
       - name: Build linux armhf cross-compiled
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-armhf; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
@@ -202,17 +192,6 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            */*.a
-            bin/*.*/*.so
-            bin/*.vst3/Contents/*/*.so
-            bin/Cardinal
-            build/Cardinal
-            build/CardinalFX
-            build/CardinalSynth
-            build/plugins
-            build/rack
-            carla/build
-            dpf/build
             src/Rack/dep/bin
             src/Rack/dep/include
             src/Rack/dep/lib
@@ -233,15 +212,21 @@ jobs:
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
           sudo apt-get install -yqq g++-multilib libdbus-1-dev:i386 libgl1-mesa-dev:i386 libglib2.0-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-linux-i686-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build extra dependencies
         env:
           PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh linux-i686 && ./deps/PawPaw/.cleanup.sh linux-i686
       - name: Build linux i686
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-i686; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
@@ -287,17 +272,6 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            */*.a
-            bin/*.*/*.so
-            bin/*.vst3/Contents/*/*.so
-            bin/Cardinal
-            build/Cardinal
-            build/CardinalFX
-            build/CardinalSynth
-            build/plugins
-            build/rack
-            carla/build
-            dpf/build
             src/Rack/dep/bin
             src/Rack/dep/include
             src/Rack/dep/lib
@@ -312,13 +286,19 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev libglib2.0-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-linux-x86_64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build extra dependencies
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh linux && ./deps/PawPaw/.cleanup.sh linux
       - name: Build linux x86_64
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
@@ -423,17 +403,6 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            */*.a
-            bin/*.*/*.dylib
-            bin/*.*/Contents/MacOS/*
-            bin/Cardinal
-            build/Cardinal
-            build/CardinalFX
-            build/CardinalSynth
-            build/plugins
-            build/rack
-            carla/build
-            dpf/build
             src/Rack/dep/bin
             src/Rack/dep/include
             src/Rack/dep/lib
@@ -444,13 +413,19 @@ jobs:
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: macos-intel-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-macos-intel-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build extra dependencies
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh macos && ./deps/PawPaw/.cleanup.sh macos
       - name: Build macOS intel (base)
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           pushd deps/PawPaw; source local.env macos; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(sysctl -n hw.logicalcpu)
@@ -463,7 +438,7 @@ jobs:
           git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
           sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
           mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_OSX_SYSROOT=$(xcrun --sdk macosx --show-sdk-path) -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
+          pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_OSX_SYSROOT=$(xcrun --sdk macosx --show-sdk-path) -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS intel (packaging)
         env:
@@ -512,17 +487,6 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            */*.a
-            bin/*.*/*.dylib
-            bin/*.*/Contents/MacOS/*
-            bin/Cardinal
-            build/Cardinal
-            build/CardinalFX
-            build/CardinalSynth
-            build/plugins
-            build/rack
-            carla/build
-            dpf/build
             src/Rack/dep/bin
             src/Rack/dep/include
             src/Rack/dep/lib
@@ -533,13 +497,19 @@ jobs:
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: macos-universal-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-macos-universal-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build extra dependencies
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh macos-universal && ./deps/PawPaw/.cleanup.sh macos-universal
       - name: Build macOS universal (base)
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           pushd deps/PawPaw; source local.env macos-universal; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(sysctl -n hw.logicalcpu)
@@ -551,7 +521,7 @@ jobs:
           pushd deps/PawPaw; source local.env macos-universal; popd
           git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
           mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_OSX_SYSROOT=$(xcrun --sdk macosx --show-sdk-path) -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
+          pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_OSX_SYSROOT=$(xcrun --sdk macosx --show-sdk-path) -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS universal (packaging)
         env:
@@ -717,12 +687,6 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            */*.a
-            build/CardinalFX
-            build/plugins
-            build/rack
-            carla/build
-            dpf/build
             src/Rack/dep/bin
             src/Rack/dep/include
             src/Rack/dep/lib
@@ -860,17 +824,6 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            */*.a
-            bin/*.*/*.dll
-            bin/*.vst3/Contents/*/*.vst3
-            bin/Cardinal.exe
-            build/Cardinal
-            build/CardinalFX
-            build/CardinalSynth
-            build/plugins
-            build/rack
-            carla/build
-            dpf/build
             src/Rack/dep/bin
             src/Rack/dep/include
             src/Rack/dep/lib
@@ -892,19 +845,26 @@ jobs:
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
           sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 qttools5-dev qttools5-dev-tools xvfb
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-win32-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build extra dependencies
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh win32 && ./deps/PawPaw/.cleanup.sh win32
       - name: Build win32 cross-compiled (base)
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win32; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
       - name: Build win64 cross-compiled (carla)
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win32; popd
           make -C carla CARLA_BACKEND_NAMESPACE=Cardinal EXTERNAL_PLUGINS=true HAVE_FLUIDSYNTH=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false HAVE_PYQT=true HAVE_QT5=true HAVE_QT5PKG=true STATIC_PLUGIN_TARGET=true USING_CUSTOM_DPF=true CUSTOM_DPF_PATH=$(pwd)/dpf -j $(nproc)
           make -C carla EMBED_TARGET=true TESTING=true dist
@@ -956,17 +916,6 @@ jobs:
         with:
           path: |
             ~/PawPawBuilds
-            */*.a
-            bin/*.*/*.dll
-            bin/*.vst3/Contents/*/*.vst3
-            bin/Cardinal.exe
-            build/Cardinal
-            build/CardinalFX
-            build/CardinalSynth
-            build/plugins
-            build/rack
-            carla/build
-            dpf/build
             src/Rack/dep/bin
             src/Rack/dep/include
             src/Rack/dep/lib
@@ -988,19 +937,26 @@ jobs:
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
           sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable qttools5-dev qttools5-dev-tools xvfb
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-win64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build extra dependencies
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh win64 && ./deps/PawPaw/.cleanup.sh win64
       - name: Build win64 cross-compiled (base)
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win64; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
       - name: Build win64 cross-compiled (carla)
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win64; popd
           make -C carla CARLA_BACKEND_NAMESPACE=Cardinal EXTERNAL_PLUGINS=true HAVE_FLUIDSYNTH=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false HAVE_PYQT=true HAVE_QT5=true HAVE_QT5PKG=true STATIC_PLUGIN_TARGET=true USING_CUSTOM_DPF=true CUSTOM_DPF_PATH=$(pwd)/dpf all win32r -j $(nproc)
           make -C carla EMBED_TARGET=true TESTING=true dist
