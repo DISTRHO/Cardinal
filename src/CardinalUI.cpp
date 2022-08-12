@@ -203,12 +203,12 @@ struct WasmPatchStorageLoadingDialog : rack::widget::OpaqueWidget
         using rack::ui::MenuOverlay;
         using rack::ui::SequentialLayout;
 
-        box.size = rack::math::Vec(300, 50);
+        box.size = rack::math::Vec(300, 40);
 
         SequentialLayout* const layout = new SequentialLayout;
         layout->box.pos = rack::math::Vec(0, 0);
         layout->box.size = box.size;
-        layout->orientation = SequentialLayout::VERTICAL_ORIENTATION;
+        layout->alignment = SequentialLayout::CENTER_ALIGNMENT;
         layout->margin = rack::math::Vec(margin, margin);
         layout->spacing = rack::math::Vec(margin, margin);
         layout->wrap = false;
@@ -216,9 +216,9 @@ struct WasmPatchStorageLoadingDialog : rack::widget::OpaqueWidget
 
         Label* const label = new Label;
         label->box.size.x = box.size.x - 2*margin;
-        label->box.size.y = box.size.y - 2*margin - 40;
+        label->box.size.y = box.size.y - 2*margin;
         label->fontSize = 16;
-        label->text = "Load patch from PatchStorage...\n";
+        label->text = "Loading patch from PatchStorage...\n";
         layout->addChild(label);
 
         overlay = new MenuOverlay;
@@ -249,6 +249,7 @@ static void downloadPatchStorageFailed(const char* const filename)
     if (ui->psDialog != nullptr)
     {
         ui->psDialog->overlay->requestDelete();
+        ui->psDialog = nullptr;
         asyncDialog::create("Failed to fetch patch from PatchStorage");
     }
 
@@ -277,7 +278,7 @@ static void downloadPatchStorageSucceeded(const char* const filename)
     }
 
     try {
-        context->patch->load(CARDINAL_WASM_IMPORTED_TEMPLATE_FILENAME);
+        context->patch->load(filename);
     } catch (rack::Exception& e) {
         const std::string message = rack::string::f("Could not load patch: %s", e.what());
         asyncDialog::create(message.c_str());
