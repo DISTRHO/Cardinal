@@ -99,6 +99,7 @@ std::string getSpecialPath(const SpecialPath type)
 
 #ifdef DISTRHO_OS_WASM
 char* patchFromURL = nullptr;
+char* patchRemoteURL = nullptr;
 char* patchStorageSlug = nullptr;
 #endif
 

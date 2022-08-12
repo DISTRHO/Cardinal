@@ -59,6 +59,7 @@ std::string getSpecialPath(SpecialPath type);
 
 #ifdef DISTRHO_OS_WASM
 extern char* patchFromURL;
+extern char* patchRemoteURL;
 extern char* patchStorageSlug;
 #endif
 

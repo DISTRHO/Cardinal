@@ -117,6 +117,19 @@ static char* getPatchFileEncodedInURL() {
     }));
 };
 
+static char* getPatchRemoteURL() {
+    return static_cast<char*>(EM_ASM_PTR({
+        var searchParams = new URLSearchParams(window.location.search);
+        var patch = searchParams.get('patchurl');
+        if (!patch)
+        return null;
+        var length = lengthBytesUTF8(patch) + 1;
+        var str = _malloc(length);
+        stringToUTF8(patch, str, length);
+        return str;
+    }));
+};
+
 static char* getPatchStorageSlug() {
     return static_cast<char*>(EM_ASM_PTR({
         var searchParams = new URLSearchParams(window.location.search);
@@ -620,6 +633,7 @@ public:
 
        #ifdef DISTRHO_OS_WASM
         if ((rack::patchStorageSlug = getPatchStorageSlug()) == nullptr &&
+            (rack::patchRemoteURL = getPatchRemoteURL()) == nullptr &&
             (rack::patchFromURL = getPatchFileEncodedInURL()) == nullptr)
        #endif
         {

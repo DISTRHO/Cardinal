@@ -142,7 +142,7 @@ public:
 };
 
 #ifndef HEADLESS
-struct WasmPatchStorageLoadingDialog;
+struct WasmRemotePatchLoadingDialog;
 
 class CardinalBaseUI : public UI {
 public:
@@ -151,7 +151,7 @@ public:
     bool savingUncompressed;
 
    #ifdef DISTRHO_OS_WASM
-    WasmPatchStorageLoadingDialog* psDialog;
+    WasmRemotePatchLoadingDialog* psDialog;
    #endif
 
     // for 3rd party modules
