@@ -135,6 +135,10 @@ public:
         : Plugin(parameterCount, programCount, stateCount),
           context(new CardinalPluginContext(this)) {}
     ~CardinalBasePlugin() override {}
+
+#ifndef HEADLESS
+    friend class CardinalUI;
+#endif
 };
 
 #ifndef HEADLESS

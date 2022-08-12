@@ -389,9 +389,18 @@ public:
 
        #ifdef DISTRHO_OS_WASM
         if (rack::patchStorageSlug != nullptr)
+        {
             psDialog = new WasmPatchStorageLoadingDialog();
+        }
+        else if (rack::patchFromURL != nullptr)
+        {
+            static_cast<CardinalBasePlugin*>(context->plugin)->setState("patch", rack::patchFromURL);
+            rack::contextSet(context);
+        }
         else
+        {
             new WasmWelcomeDialog();
+        }
        #endif
 
         context->window->step();
