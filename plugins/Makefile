@@ -309,6 +309,14 @@ PLUGIN_FILES += $(filter-out 21kHz/src/21kHz.cpp,$(wildcard 21kHz/src/*.cpp))
 PLUGIN_FILES += $(filter-out 8Mode/src/8mode.cpp,$(wildcard 8Mode/src/*.cpp))
 
 # --------------------------------------------------------------
+# alefsbits
+
+PLUGIN_FILES += $(filter-out alefsbits/src/plugin.cpp,$(wildcard alefsbits/src/*.cpp))
+
+# modules/types which are present in other plugins
+ALEFSBITS_CUSTOM = Steps Logic
+
+# --------------------------------------------------------------
 # AlgoritmArte
 
 PLUGIN_FILES += $(filter-out Algoritmarte/src/plugin.cpp,$(wildcard Algoritmarte/src/*.cpp))
@@ -1076,7 +1084,7 @@ endif
 
 BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing 
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 
 ifneq ($(MACOS),true)
 BUILD_CXX_FLAGS += -faligned-new -Wno-abi
@@ -1386,6 +1394,13 @@ $(BUILD_DIR)/AaronStatic/%.cpp.o: AaronStatic/%.cpp
 		$(foreach m,$(AARONSTATIC_CUSTOM),$(call custom_module_names,$(m),AaronStatic)) \
 		-DpluginInstance=pluginInstance__AaronStatic \
 		-Dinit=init__AaronStatic
+
+$(BUILD_DIR)/alefsbits/%.cpp.o: alefsbits/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ALEFSBITS_CUSTOM),$(call custom_module_names,$(m),alefsbits)) \
+		-DpluginInstance=pluginInstance__alefsbits
 
 $(BUILD_DIR)/Algoritmarte/%.cpp.o: Algoritmarte/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
