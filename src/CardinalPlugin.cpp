@@ -104,6 +104,32 @@ bool d_isDiffHigherThanLimit(const T& v1, const T& v2, const T& limit)
 // -----------------------------------------------------------------------------------------------------------
 
 #ifdef DISTRHO_OS_WASM
+static char* getPatchFileEncodedInURL() {
+    return static_cast<char*>(EM_ASM_PTR({
+        var searchParams = new URLSearchParams(window.location.search);
+        var patch = searchParams.get('patch');
+        if (!patch)
+        return null;
+        var length = lengthBytesUTF8(patch) + 1;
+        var str = _malloc(length);
+        stringToUTF8(patch, str, length);
+        return str;
+    }));
+};
+
+static char* getPatchRemoteURL() {
+    return static_cast<char*>(EM_ASM_PTR({
+        var searchParams = new URLSearchParams(window.location.search);
+        var patch = searchParams.get('patchurl');
+        if (!patch)
+        return null;
+        var length = lengthBytesUTF8(patch) + 1;
+        var str = _malloc(length);
+        stringToUTF8(patch, str, length);
+        return str;
+    }));
+};
+
 static char* getPatchStorageSlug() {
     return static_cast<char*>(EM_ASM_PTR({
         var searchParams = new URLSearchParams(window.location.search);
@@ -606,7 +632,9 @@ public:
             context->window = new rack::window::Window;
 
        #ifdef DISTRHO_OS_WASM
-        if ((rack::patchStorageSlug = getPatchStorageSlug()) == nullptr)
+        if ((rack::patchStorageSlug = getPatchStorageSlug()) == nullptr &&
+            (rack::patchRemoteURL = getPatchRemoteURL()) == nullptr &&
+            (rack::patchFromURL = getPatchFileEncodedInURL()) == nullptr)
        #endif
         {
             context->patch->loadTemplate();
@@ -1143,11 +1171,29 @@ protected:
 
         const std::vector<uint8_t> data(d_getChunkFromBase64String(value));
 
+        DISTRHO_SAFE_ASSERT_RETURN(data.size() >= 4,);
+
         const ScopedContext sc(this);
 
         rack::system::removeRecursively(fAutosavePath);
         rack::system::createDirectories(fAutosavePath);
-        rack::system::unarchiveToDirectory(data, fAutosavePath);
+
+        static constexpr const char zstdMagic[] = "\x28\xb5\x2f\xfd";
+
+        if (std::memcmp(data.data(), zstdMagic, sizeof(zstdMagic)) != 0)
+        {
+            FILE* const f = std::fopen(rack::system::join(fAutosavePath, "patch.json").c_str(), "w");
+            DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
+
+            std::fwrite(data.data(), data.size(), 1, f);
+            std::fclose(f);
+        }
+        else
+        {
+            try {
+                rack::system::unarchiveToDirectory(data, fAutosavePath);
+            } DISTRHO_SAFE_EXCEPTION_RETURN("setState unarchiveToDirectory",);
+        }
 
         try {
             context->patch->loadAutosave();

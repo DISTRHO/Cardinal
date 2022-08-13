@@ -135,10 +135,14 @@ public:
         : Plugin(parameterCount, programCount, stateCount),
           context(new CardinalPluginContext(this)) {}
     ~CardinalBasePlugin() override {}
+
+#ifndef HEADLESS
+    friend class CardinalUI;
+#endif
 };
 
 #ifndef HEADLESS
-struct WasmPatchStorageLoadingDialog;
+struct WasmRemotePatchLoadingDialog;
 
 class CardinalBaseUI : public UI {
 public:
@@ -147,7 +151,7 @@ public:
     bool savingUncompressed;
 
    #ifdef DISTRHO_OS_WASM
-    WasmPatchStorageLoadingDialog* psDialog;
+    WasmRemotePatchLoadingDialog* psDialog;
    #endif
 
     // for 3rd party modules

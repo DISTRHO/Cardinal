@@ -66,15 +66,12 @@ BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
 # --------------------------------------------------------------
 # override VCV arch.mk stuff so we can build more architectures
 
-ifeq ($(CPU_AARCH64),true)
-ARCH_NAME = aarch64
-MACHINE = x86_64-the-rack
+ifeq ($(CPU_ARM32),true)
+ARCH_NAME = arm
+MACHINE = i686-the-rack
 else ifeq ($(CPU_ARM64),true)
 ARCH_NAME = arm64
 MACHINE = x86_64-the-rack
-else ifeq ($(CPU_ARM),true)
-ARCH_NAME = arm
-MACHINE = i686-the-rack
 else ifeq ($(WASM),true)
 MACHINE = i686-wasm
 else

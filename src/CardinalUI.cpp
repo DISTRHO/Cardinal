@@ -191,24 +191,24 @@ struct WasmWelcomeDialog : rack::widget::OpaqueWidget
     }
 };
 
-struct WasmPatchStorageLoadingDialog : rack::widget::OpaqueWidget
+struct WasmRemotePatchLoadingDialog : rack::widget::OpaqueWidget
 {
     static const constexpr float margin = 10;
 
     rack::ui::MenuOverlay* overlay;
 
-    WasmPatchStorageLoadingDialog()
+    WasmRemotePatchLoadingDialog(const bool isFromPatchStorage)
     {
         using rack::ui::Label;
         using rack::ui::MenuOverlay;
         using rack::ui::SequentialLayout;
 
-        box.size = rack::math::Vec(300, 50);
+        box.size = rack::math::Vec(300, 40);
 
         SequentialLayout* const layout = new SequentialLayout;
         layout->box.pos = rack::math::Vec(0, 0);
         layout->box.size = box.size;
-        layout->orientation = SequentialLayout::VERTICAL_ORIENTATION;
+        layout->alignment = SequentialLayout::CENTER_ALIGNMENT;
         layout->margin = rack::math::Vec(margin, margin);
         layout->spacing = rack::math::Vec(margin, margin);
         layout->wrap = false;
@@ -216,9 +216,11 @@ struct WasmPatchStorageLoadingDialog : rack::widget::OpaqueWidget
 
         Label* const label = new Label;
         label->box.size.x = box.size.x - 2*margin;
-        label->box.size.y = box.size.y - 2*margin - 40;
+        label->box.size.y = box.size.y - 2*margin;
         label->fontSize = 16;
-        label->text = "Load patch from PatchStorage...\n";
+        label->text = isFromPatchStorage
+                    ? "Loading patch from PatchStorage...\n"
+                    : "Loading remote patch...\n";
         layout->addChild(label);
 
         overlay = new MenuOverlay;
@@ -240,16 +242,17 @@ struct WasmPatchStorageLoadingDialog : rack::widget::OpaqueWidget
     }
 };
 
-static void downloadPatchStorageFailed(const char* const filename)
+static void downloadRemotePatchFailed(const char* const filename)
 {
-    d_stdout("downloadPatchStorageFailed %s", filename);
+    d_stdout("downloadRemotePatchFailed %s", filename);
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(context->ui);
 
     if (ui->psDialog != nullptr)
     {
         ui->psDialog->overlay->requestDelete();
-        asyncDialog::create("Failed to fetch patch from PatchStorage");
+        ui->psDialog = nullptr;
+        asyncDialog::create("Failed to fetch remote patch");
     }
 
     using namespace rack;
@@ -258,9 +261,9 @@ static void downloadPatchStorageFailed(const char* const filename)
     context->scene->rackScroll->reset();
 }
 
-static void downloadPatchStorageSucceeded(const char* const filename)
+static void downloadRemotePatchSucceeded(const char* const filename)
 {
-    d_stdout("downloadPatchStorageSucceeded %s | %s", filename, APP->patch->templatePath.c_str());
+    d_stdout("downloadRemotePatchSucceeded %s | %s", filename, APP->patch->templatePath.c_str());
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(context->ui);
 
@@ -277,7 +280,7 @@ static void downloadPatchStorageSucceeded(const char* const filename)
     }
 
     try {
-        context->patch->load(CARDINAL_WASM_IMPORTED_TEMPLATE_FILENAME);
+        context->patch->load(filename);
     } catch (rack::Exception& e) {
         const std::string message = rack::string::f("Could not load patch: %s", e.what());
         asyncDialog::create(message.c_str());
@@ -388,9 +391,22 @@ public:
 
        #ifdef DISTRHO_OS_WASM
         if (rack::patchStorageSlug != nullptr)
-            psDialog = new WasmPatchStorageLoadingDialog();
+        {
+            psDialog = new WasmRemotePatchLoadingDialog(true);
+        }
+        else if (rack::patchRemoteURL != nullptr)
+        {
+            psDialog = new WasmRemotePatchLoadingDialog(false);
+        }
+        else if (rack::patchFromURL != nullptr)
+        {
+            static_cast<CardinalBasePlugin*>(context->plugin)->setState("patch", rack::patchFromURL);
+            rack::contextSet(context);
+        }
         else
+        {
             new WasmWelcomeDialog();
+        }
        #endif
 
         context->window->step();
@@ -441,7 +457,17 @@ public:
                 rack::patchStorageSlug = nullptr;
 
                 emscripten_async_wget(url.c_str(), context->patch->templatePath.c_str(),
-                                      downloadPatchStorageSucceeded, downloadPatchStorageFailed);
+                                      downloadRemotePatchSucceeded, downloadRemotePatchFailed);
+            }
+            else if (rack::patchRemoteURL != nullptr)
+            {
+                std::string url("/patchurl.php?url=");
+                url += rack::patchRemoteURL;
+                std::free(rack::patchRemoteURL);
+                rack::patchRemoteURL = nullptr;
+
+                emscripten_async_wget(url.c_str(), context->patch->templatePath.c_str(),
+                                      downloadRemotePatchSucceeded, downloadRemotePatchFailed);
             }
            #endif
         }

@@ -1042,10 +1042,7 @@ BASE_FLAGS += -ffat-lto-objects
 endif
 endif
 
-ifeq ($(BSD),true)
-BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
-BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
-else ifeq ($(WASM),true)
+ifeq ($(BSD)$(WASM),true)
 BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
 BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
 endif
