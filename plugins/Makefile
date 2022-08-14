@@ -630,6 +630,11 @@ PLUGIN_FILES += $(filter-out GoodSheperd/src/plugin.cpp,$(wildcard GoodSheperd/s
 PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModular/src/*.cpp))
 
 # --------------------------------------------------------------
+# H4N4 Modules
+
+PLUGIN_FILES += $(filter-out h4n4-modules/src/plugin.cpp,$(wildcard h4n4-modules/src/*.cpp))
+
+# --------------------------------------------------------------
 # Hampton Harmonics
 
 PLUGIN_FILES += $(filter-out HamptonHarmonics/src/plugin.cpp,$(wildcard HamptonHarmonics/src/*.cpp))
@@ -1631,7 +1636,7 @@ $(BUILD_DIR)/forsitan-modulare/%.cpp.o: forsitan-modulare/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(GLUETHEGIANT_CUSTOM),$(call custom_module_names,$(m),forsitan)) \
+		$(foreach m,$(FORSITAN_CUSTOM),$(call custom_module_names,$(m),forsitan)) \
 		-DpluginInstance=pluginInstance__forsitan
 
 $(BUILD_DIR)/Fundamental/%.c.o: Fundamental/%.c
@@ -1680,6 +1685,13 @@ $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 		-Wno-missing-braces \
 		-Wno-narrowing \
 		-Wno-self-assign
+
+$(BUILD_DIR)/h4n4-modules/%.cpp.o: h4n4-modules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(H4N4_CUSTOM),$(call custom_module_names,$(m),H4N4)) \
+		-DpluginInstance=pluginInstance__H4N4
 
 $(BUILD_DIR)/HamptonHarmonics/%.cpp.o: HamptonHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

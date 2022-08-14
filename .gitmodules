@@ -212,3 +212,6 @@
 [submodule "plugins/alefsbits"]
 	path = plugins/alefsbits
 	url = https://github.com/alefnull/alefsbits.git
+[submodule "plugins/h4n4-modules"]
+	path = plugins/h4n4-modules
+	url = https://github.com/hannakoppelaar/h4n4-modules.git

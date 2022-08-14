@@ -349,6 +349,9 @@ void saveGtgPluginDefault(const char*, int) {}
 // GrandeModular
 #include "GrandeModular/src/plugin.hpp"
 
+// H4N4 Modules
+#include "h4n4-modules/src/plugin.hpp"
+
 // Hampton Harmonics
 #define modelArp modelHamptonHarmonicsArp
 #define modelProgress modelHamptonHarmonicsProgress
@@ -756,6 +759,7 @@ Plugin* pluginInstance__forsitan;
 Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__GoodSheperd;
 Plugin* pluginInstance__GrandeModular;
+Plugin* pluginInstance__H4N4;
 Plugin* pluginInstance__HamptonHarmonics;
 Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
@@ -1893,6 +1897,18 @@ static void initStatic__GrandeModular()
     }
 }
 
+static void initStatic__H4N4()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__H4N4 = p;
+
+    const StaticPluginLoader spl(p, "h4n4-modules");
+    if (spl.ok())
+    {
+        p->addModel(modelXenQnt);
+    }
+}
+
 static void initStatic__HamptonHarmonics()
 {
     Plugin* const p = new Plugin;
@@ -2786,6 +2802,7 @@ void initStaticPlugins()
     initStatic__GlueTheGiant();
     initStatic__GoodSheperd();
     initStatic__GrandeModular();
+    initStatic__H4N4();
     initStatic__HamptonHarmonics();
     initStatic__HetrickCV();
     initStatic__ImpromptuModular();
