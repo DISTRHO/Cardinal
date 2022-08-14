@@ -209,3 +209,6 @@
 [submodule "plugins/myth-modules"]
 	path = plugins/myth-modules
 	url = https://github.com/Ahineya/vcv-myth-plugin.git
+[submodule "plugins/h4n4-modules"]
+	path = plugins/h4n4-modules
+	url = https://github.com/hannakoppelaar/h4n4-modules.git
