@@ -145,8 +145,7 @@ Below is a list of artwork licenses from plugins
 | dBiz/Light/*                            | CC-BY-NC-ND-4.0  | |
 | dBiz/component/*                        | CC-BY-NC-ND-4.0  | |
 | dBiz/DejaVuSansMono.ttf                 | Bitstream-Vera   | |
-| dBiz/DOTMATRI.TTF                       | Unknown          | needs research |
-| dBiz/Rounded_elegance.ttf               | Unknown          | needs research |
+| dBiz/ShareTechMono-Regular.ttf          | OFL-1.1          | |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
 | E-Series/*                              | Custom           | Copyright © Synthesis Technology, [used and distributed with permission](LICENSE-PERMISSIONS.md#eseries-paul-schreiber--synthtech) |

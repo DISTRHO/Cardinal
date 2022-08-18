@@ -314,7 +314,15 @@ extern Model* modelTestVCF;
 void setupSamples();
 
 // dBiz
+#define darkPanelID darkPanelIDdBiz
+#define DarkDefaultItem DarkDefaultItemdBiz
+#define lightPanelID lightPanelIDdBiz
+#define OrangeLight OrangeLightdBiz
 #include "dBiz/src/plugin.hpp"
+#undef darkPanelID
+#undef DarkDefaultItem
+#undef lightPanelID
+#undef OrangeLight
 
 // ESeries
 #include "ESeries/src/plugin.hpp"
@@ -1680,6 +1688,10 @@ static void initStatic__dBiz()
     const StaticPluginLoader spl(p, "dBiz");
     if (spl.ok())
     {
+#define darkPanelID darkPanelIDdBiz
+#define DarkDefaultItem DarkDefaultItemdBiz
+#define lightPanelID lightPanelIDdBiz
+#define OrangeLight OrangeLightdBiz
         p->addModel(modelNavControl);
         p->addModel(modelBench);
         p->addModel(modelContorno);
@@ -1713,6 +1725,10 @@ static void initStatic__dBiz()
         p->addModel(modelDualFilter);
         p->addModel(modelOrder);
         p->addModel(modelDualMatrix);
+#undef darkPanelID
+#undef DarkDefaultItem
+#undef lightPanelID
+#undef OrangeLight
     }
 }
 
