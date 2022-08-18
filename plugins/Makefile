@@ -568,7 +568,7 @@ CF_CUSTOM = $(DRWAV)
 PLUGIN_FILES += $(filter-out dBiz/src/plugin.cpp,$(wildcard dBiz/src/*.cpp))
 
 # modules/types which are present in other plugins
-DBIZ_CUSTOM = darkPanelID DarkDefaultItem lightPanelID OrangeLight Chord
+DBIZ_CUSTOM = darkPanelID DarkDefaultItem lightPanelID OrangeLight Chord VCA4 Divider
 
 # --------------------------------------------------------------
 # DrumKit

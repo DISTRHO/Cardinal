@@ -319,12 +319,16 @@ void setupSamples();
 #define lightPanelID dBizlightPanelID
 #define OrangeLight dBizOrangeLight
 #define modelChord modeldBizChord
+#define modelVCA4 modeldBizVCA4
+#define modelDivider modeldBizDivider
 #include "dBiz/src/plugin.hpp"
 #undef darkPanelID
 #undef DarkDefaultItem
 #undef lightPanelID
 #undef OrangeLight
 #undef modelChord
+#undef modelVCA4
+#undef modelDivider
 
 // ESeries
 #include "ESeries/src/plugin.hpp"
@@ -1691,12 +1695,13 @@ static void initStatic__dBiz()
     const StaticPluginLoader spl(p, "dBiz");
     if (spl.ok())
     {
-
 #define darkPanelID dBizdarkPanelID
 #define DarkDefaultItem dBizDarkDefaultItem
 #define lightPanelID dBizlightPanelID
 #define OrangeLight dBizOrangeLight
 #define modelChord modeldBizChord
+#define modelVCA4 modeldBizVCA4
+#define modelDivider modeldBizDivider
         p->addModel(modelNavControl);
         p->addModel(modelBench);
         p->addModel(modelContorno);
@@ -1735,6 +1740,8 @@ static void initStatic__dBiz()
 #undef lightPanelID
 #undef OrangeLight
 #undef modelChord
+#undef modelVCA4
+#undef modelDivider
     }
 }
 
