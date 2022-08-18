@@ -565,7 +565,10 @@ CF_CUSTOM = $(DRWAV)
 # --------------------------------------------------------------
 # dBiz
 
-PLUGIN_FILES += $(wildcard dBiz/src/*.cpp)
+PLUGIN_FILES += $(filter-out dBiz/src/plugin.cpp,$(wildcard dBiz/src/*.cpp))
+
+# modules/types which are present in other plugins
+DBIZ_CUSTOM = darkPanelID DarkDefaultItem lightPanelID OrangeLight Chord
 
 # --------------------------------------------------------------
 # DrumKit
@@ -1081,7 +1084,7 @@ endif
 
 BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing 
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 
 ifneq ($(MACOS),true)
 BUILD_CXX_FLAGS += -faligned-new -Wno-abi

@@ -314,15 +314,17 @@ extern Model* modelTestVCF;
 void setupSamples();
 
 // dBiz
-#define darkPanelID darkPanelIDdBiz
-#define DarkDefaultItem DarkDefaultItemdBiz
-#define lightPanelID lightPanelIDdBiz
-#define OrangeLight OrangeLightdBiz
+#define darkPanelID dBizdarkPanelID
+#define DarkDefaultItem dBizDarkDefaultItem
+#define lightPanelID dBizlightPanelID
+#define OrangeLight dBizOrangeLight
+#define modelChord modeldBizChord
 #include "dBiz/src/plugin.hpp"
 #undef darkPanelID
 #undef DarkDefaultItem
 #undef lightPanelID
 #undef OrangeLight
+#undef modelChord
 
 // ESeries
 #include "ESeries/src/plugin.hpp"
@@ -720,6 +722,7 @@ std::vector<Model*> hostTerminalModels;
 
 // stuff that reads config files, we dont want that
 int loadConsoleType() { return 0; }
+bool loadDarkAsDefault() { return 1; }
 int loadDirectOutMode() { return 0; }
 void saveConsoleType(int) {}
 void saveDarkAsDefault(bool) {}
@@ -1688,10 +1691,12 @@ static void initStatic__dBiz()
     const StaticPluginLoader spl(p, "dBiz");
     if (spl.ok())
     {
-#define darkPanelID darkPanelIDdBiz
-#define DarkDefaultItem DarkDefaultItemdBiz
-#define lightPanelID lightPanelIDdBiz
-#define OrangeLight OrangeLightdBiz
+
+#define darkPanelID dBizdarkPanelID
+#define DarkDefaultItem dBizDarkDefaultItem
+#define lightPanelID dBizlightPanelID
+#define OrangeLight dBizOrangeLight
+#define modelChord modeldBizChord
         p->addModel(modelNavControl);
         p->addModel(modelBench);
         p->addModel(modelContorno);
@@ -1729,6 +1734,7 @@ static void initStatic__dBiz()
 #undef DarkDefaultItem
 #undef lightPanelID
 #undef OrangeLight
+#undef modelChord
     }
 }
 
