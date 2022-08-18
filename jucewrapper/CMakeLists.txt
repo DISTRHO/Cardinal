@@ -14,40 +14,40 @@ add_library(dgl STATIC IMPORTED)
 set_property(TARGET dgl PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../dpf/build/libdgl-opengl.a")
 
 add_library(carla_host_plugin STATIC IMPORTED)
-set_property(TARGET carla_host_plugin PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/plugin/Release/carla-host-plugin.cpp.o")
+set_property(TARGET carla_host_plugin PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/plugin/${CMAKE_BUILD_TYPE}/carla-host-plugin.cpp.o")
 
 add_library(carla_engine_plugin STATIC IMPORTED)
-set_property(TARGET carla_engine_plugin PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/carla_engine_plugin.a")
+set_property(TARGET carla_engine_plugin PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/carla_engine_plugin.a")
 
 add_library(carla_plugin STATIC IMPORTED)
-set_property(TARGET carla_plugin PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/carla_plugin.a")
+set_property(TARGET carla_plugin PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/carla_plugin.a")
 
 add_library(native_plugins STATIC IMPORTED)
-set_property(TARGET native_plugins PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/native-plugins.a")
+set_property(TARGET native_plugins PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/native-plugins.a")
 
 add_library(audio_decoder STATIC IMPORTED)
-set_property(TARGET audio_decoder PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/audio_decoder.a")
+set_property(TARGET audio_decoder PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/audio_decoder.a")
 
 add_library(jackbridge STATIC IMPORTED)
-set_property(TARGET jackbridge PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/jackbridge.min.a")
+set_property(TARGET jackbridge PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/jackbridge.min.a")
 
 add_library(lilv STATIC IMPORTED)
-set_property(TARGET lilv PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/lilv.a")
+set_property(TARGET lilv PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/lilv.a")
 
 add_library(rtmempool STATIC IMPORTED)
-set_property(TARGET rtmempool PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/rtmempool.a")
+set_property(TARGET rtmempool PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/rtmempool.a")
 
 add_library(sfzero STATIC IMPORTED)
-set_property(TARGET sfzero PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/sfzero.a")
+set_property(TARGET sfzero PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/sfzero.a")
 
 add_library(water STATIC IMPORTED)
-set_property(TARGET water PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/water.a")
+set_property(TARGET water PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/water.a")
 
 add_library(ysfx STATIC IMPORTED)
-set_property(TARGET ysfx PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/ysfx.a")
+set_property(TARGET ysfx PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/ysfx.a")
 
 add_library(zita_resampler STATIC IMPORTED)
-set_property(TARGET zita_resampler PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/zita-resampler.a")
+set_property(TARGET zita_resampler PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/zita-resampler.a")
 
 add_library(sCardinal STATIC IMPORTED)
 set_property(TARGET sCardinal PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../bin/Cardinal.a")
