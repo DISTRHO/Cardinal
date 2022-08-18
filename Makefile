@@ -5,14 +5,14 @@
 #
 
 # also set in:
+# jucewrapper/CMakeList.txt `project`
 # src/CardinalCommon.cpp `CARDINAL_VERSION`
 # src/CardinalPlugin.cpp `getVersion`
-VERSION = 22.04
+VERSION = 22.08
 
 # --------------------------------------------------------------
 # Import base definitions
 
-USE_NANOVG_FBO = true
 include dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -43,7 +43,9 @@ endif
 # --------------------------------------------------------------
 # Carla config
 
-CARLA_EXTRA_ARGS = CARLA_BACKEND_NAMESPACE=Cardinal \
+CARLA_EXTRA_ARGS = \
+	CARLA_BACKEND_NAMESPACE=Cardinal \
+	DGL_NAMESPACE=CardinalDGL \
 	HAVE_FFMPEG=false \
 	HAVE_FLUIDSYNTH=false \
 	HAVE_PROJECTM=false \
@@ -54,20 +56,19 @@ ifneq ($(DEBUG),true)
 CARLA_EXTRA_ARGS += EXTERNAL_PLUGINS=true
 endif
 
-CARLA_EXTRA_ARGS += USING_JUCE=false
-CARLA_EXTRA_ARGS += USING_JUCE_GUI_EXTRA=false
-
 # --------------------------------------------------------------
 # DGL config
 
 DGL_EXTRA_ARGS = \
+	DISTRHO_NAMESPACE=CardinalDISTRHO \
+	DGL_NAMESPACE=CardinalDGL \
 	NVG_DISABLE_SKIPPING_WHITESPACE=true \
 	NVG_FONT_TEXTURE_FLAGS=NVG_IMAGE_NEAREST \
 	USE_NANOVG_FBO=true \
 	WINDOWS_ICON_ID=401
 
 # --------------------------------------------------------------
-# Check for system-wide dependencies
+# Check for required system-wide dependencies
 
 ifeq ($(SYSDEPS),true)
 
@@ -97,8 +98,7 @@ endif
 # --------------------------------------------------------------
 # Check for X11+OpenGL dependencies (unless headless build)
 
-ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
-ifneq ($(WASM),true)
+ifneq ($(HAIKU_OR_MACOS_OR_WASM_OR_WINDOWS),true)
 ifneq ($(HEADLESS),true)
 
 ifneq ($(HAVE_OPENGL),true)
@@ -106,6 +106,9 @@ $(error OpenGL dependency not installed/available)
 endif
 ifneq ($(HAVE_X11),true)
 $(error X11 dependency not installed/available)
+endif
+ifneq ($(HAVE_XCURSOR),true)
+$(warning Xcursor dependency not installed/available)
 endif
 ifneq ($(HAVE_XEXT),true)
 $(warning Xext dependency not installed/available)
@@ -118,11 +121,20 @@ else
 
 CARLA_EXTRA_ARGS += HAVE_OPENGL=false
 CARLA_EXTRA_ARGS += HAVE_X11=false
+CARLA_EXTRA_ARGS += HAVE_XCURSOR=false
 CARLA_EXTRA_ARGS += HAVE_XEXT=false
 CARLA_EXTRA_ARGS += HAVE_XRANDR=false
 
 endif
 endif
+
+# --------------------------------------------------------------
+# Check for optional system-wide dependencies
+
+ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
+HAVE_FFTW3F = true
+else
+$(warning fftw3f dependency not installed/available)
 endif
 
 # --------------------------------------------------------------
@@ -186,14 +198,16 @@ endif
 # --------------------------------------------------------------
 # Individual targets
 
-cardinal: carla deps dgl plugins
+cardinal: carla deps dgl plugins resources
 	$(MAKE) all -C src $(CARLA_EXTRA_ARGS)
 
 carla:
 ifneq ($(STATIC_BUILD),true)
 	$(MAKE) static-plugin -C carla $(CARLA_EXTRA_ARGS) \
 		CAN_GENERATE_LV2_TTL=false \
-		STATIC_PLUGIN_TARGET=true
+		CUSTOM_DPF_PATH=$(CURDIR)/dpf \
+		STATIC_PLUGIN_TARGET=true \
+		USING_CUSTOM_DPF=true
 endif
 
 deps:
@@ -201,6 +215,9 @@ ifeq ($(SYSDEPS),true)
 	$(MAKE) quickjs -C deps
 else
 	$(MAKE) all -C deps
+endif
+ifeq ($(HAVE_FFTW3F),true)
+	$(MAKE) all -C deps/aubio
 endif
 
 dgl:
@@ -211,7 +228,7 @@ endif
 plugins: deps
 	$(MAKE) all -C plugins
 
-resources: cardinal
+resources:
 	$(MAKE) resources -C plugins
 
 ifneq ($(CROSS_COMPILING),true)
@@ -250,6 +267,7 @@ deps/unzipfx/unzipfx2cat.exe:
 clean:
 	$(MAKE) distclean -C carla $(CARLA_EXTRA_ARGS) CAN_GENERATE_LV2_TTL=false STATIC_PLUGIN_TARGET=true
 	$(MAKE) clean -C deps
+	$(MAKE) clean -C deps/aubio
 	$(MAKE) clean -C dpf/dgl
 	$(MAKE) clean -C dpf/utils/lv2-ttl-generator
 	$(MAKE) clean -C plugins
@@ -312,7 +330,6 @@ TAR_ARGS = \
 	--exclude=build \
 	--exclude=jucewrapper \
 	--exclude=lv2export \
-	--exclude=patches \
 	--exclude=carla/data \
 	--exclude=carla/source/frontend \
 	--exclude=carla/source/interposer \

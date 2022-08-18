@@ -26,6 +26,7 @@
  */
 
 #include "plugincontext.hpp"
+#include "ModuleWidgets.hpp"
 #include "Widgets.hpp"
 
 #include <algorithm>
@@ -34,7 +35,7 @@
 
 USE_NAMESPACE_DISTRHO;
 
-static const int MAX_MIDI_CONTROL = 120; /* 0x77 + 1 */
+static constexpr const int MAX_MIDI_CONTROL = 120; /* 0x77 + 1 */
 
 struct HostMIDIMap : TerminalModule {
     enum ParamIds {
@@ -58,6 +59,7 @@ struct HostMIDIMap : TerminalModule {
     uint32_t lastProcessCounter;
     int nextLearningId;
     uint8_t channel;
+    bool bypassed = false;
 
     // from Rack
     bool smooth;
@@ -93,11 +95,10 @@ struct HostMIDIMap : TerminalModule {
         for (int id = 0; id < MAX_MIDI_CONTROL; ++id)
         {
             paramHandles[id].color = nvgRGBf(0.76f, 0.11f, 0.22f);
+            paramHandles[id].text.reserve(25);
+            valueFilters[id].setTau(1 / 30.f);
             pcontext->engine->addParamHandle(&paramHandles[id]);
         }
-
-        for (int i = 0; i < MAX_MIDI_CONTROL; i++)
-            valueFilters[i].setTau(1 / 30.f);
 
         divider.setDivision(32);
         onReset();
@@ -139,13 +140,14 @@ struct HostMIDIMap : TerminalModule {
 
         if (processCounterChanged)
         {
+            bypassed = isBypassed();
             lastProcessCounter = processCounter;
             midiEvents = pcontext->midiEvents;
             midiEventsLeft = pcontext->midiEventCount;
             midiEventFrame = 0;
         }
 
-        if (isBypassed() || !divider.process())
+        if (bypassed || !divider.process())
         {
             ++midiEventFrame;
             return;
@@ -260,21 +262,6 @@ struct HostMIDIMap : TerminalModule {
     void processTerminalOutput(const ProcessArgs&) override
     {}
 
-    void clearMap(int id)
-    {
-        nextLearningId = -1;
-        learningId = -1;
-        learnedCc = false;
-        learnedParam = false;
-
-        ccs[id] = -1;
-        values[id] = -1;
-        pcontext->engine->updateParamHandle(&paramHandles[id], -1, 0, true);
-        valueFilters[id].reset();
-        refreshParamHandleText(id);
-        updateMapLen();
-    }
-
     // ----------------------------------------------------------------------------------------------------------------
     // stuff for resetting state
 
@@ -306,7 +293,21 @@ struct HostMIDIMap : TerminalModule {
     // ----------------------------------------------------------------------------------------------------------------
     // stuff called from panel side, must lock engine
 
-    // called from onSelect
+    void clearMap(int id)
+    {
+        nextLearningId = -1;
+        learningId = -1;
+        learnedCc = false;
+        learnedParam = false;
+
+        ccs[id] = -1;
+        values[id] = -1;
+        pcontext->engine->updateParamHandle(&paramHandles[id], -1, 0, true);
+        valueFilters[id].reset();
+        refreshParamHandleText(id);
+        updateMapLen();
+    }
+
     void enableLearn(const int id)
     {
         if (learningId == id)
@@ -319,16 +320,6 @@ struct HostMIDIMap : TerminalModule {
         learnedParam = false;
     }
 
-    // called from onDeselect
-    void disableLearn(const int id)
-    {
-        nextLearningId = -1;
-
-        if (learningId == id)
-            learningId = -1;
-    }
-
-    // called from onDeselect
     void learnParam(const int id, const int64_t moduleId, const int paramId)
     {
         pcontext->engine->updateParamHandle(&paramHandles[id], moduleId, paramId, true);
@@ -336,6 +327,16 @@ struct HostMIDIMap : TerminalModule {
         maybeCommitLearn();
         updateMapLen();
     }
+
+    /*
+    void disableLearn(const int id)
+    {
+        nextLearningId = -1;
+
+        if (learningId == id)
+            learningId = -1;
+    }
+    */
 
     // ----------------------------------------------------------------------------------------------------------------
     // common utils
@@ -366,15 +367,19 @@ struct HostMIDIMap : TerminalModule {
         nextLearningId = learningId = -1;
     }
 
-    // FIXME this allocates string during RT!!
+    // this is called during RT!!
     void refreshParamHandleText(const int id)
     {
-        std::string text;
         if (ccs[id] >= 0)
-            text = string::f("CC%02d", ccs[id]);
+        {
+            char textBuf[25];
+            std::sprintf(textBuf, "CC%02d", ccs[id]);
+            paramHandles[id].text.assign(textBuf);
+        }
         else
-            text = "MIDI-Map";
-        paramHandles[id].text = text;
+        {
+            paramHandles[id].text.clear();
+        }
     }
 
     void updateMapLen()
@@ -467,7 +472,6 @@ struct HostMIDIMap : TerminalModule {
 struct CardinalMIDIMapChoice : CardinalLedDisplayChoice {
     HostMIDIMap* const module;
     const int id;
-    int disableLearnFrames = -1;
     ParamWidget* lastTouchedParam = nullptr;
 
     CardinalMIDIMapChoice(HostMIDIMap* const m, const int i)
@@ -572,10 +576,10 @@ struct CardinalMIDIMapChoice : CardinalLedDisplayChoice {
         switch (e.button)
         {
         case GLFW_MOUSE_BUTTON_RIGHT:
+            APP->scene->rack->touchedParam = lastTouchedParam = nullptr;
             module->clearMap(id);
             e.consume(this);
             break;
-            // fall-through
         case GLFW_MOUSE_BUTTON_LEFT:
             APP->scene->rack->touchedParam = lastTouchedParam = nullptr;
             module->enableLearn(id);
@@ -602,10 +606,10 @@ struct CardinalMIDIMapChoice : CardinalLedDisplayChoice {
         ParamHandle* const paramHandle = &module->paramHandles[id];
 
         Module* const paramModule = paramHandle->module;
-        DISTRHO_SAFE_ASSERT_RETURN(paramModule != nullptr, "error");
+        DISTRHO_CUSTOM_SAFE_ASSERT_ONCE_RETURN("paramModule is null", paramModule != nullptr, "error");
 
         const int paramId = paramHandle->paramId;
-        DISTRHO_SAFE_ASSERT_RETURN(paramId < (int) paramModule->params.size(), "error");
+        DISTRHO_CUSTOM_SAFE_ASSERT_ONCE_RETURN("paramId is out of bounds", paramId < (int) paramModule->params.size(), "error");
 
         ParamQuantity* const paramQuantity = paramModule->paramQuantities[paramId];
         std::string s = paramQuantity->name;
@@ -679,7 +683,7 @@ struct HostMIDIMapDisplay : Widget {
     }
 };
 
-struct HostMIDIMapWidget : ModuleWidget {
+struct HostMIDIMapWidget : ModuleWidgetWith11HP {
     HostMIDIMap* const module;
 
     HostMIDIMapWidget(HostMIDIMap* const m)
@@ -687,11 +691,7 @@ struct HostMIDIMapWidget : ModuleWidget {
     {
         setModule(m);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostMIDIMap.svg")));
-
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        createAndAddScrews();
 
         HostMIDIMapDisplay* const display = createWidget<HostMIDIMapDisplay>(Vec(1.0f, 71.0f));
         display->box.size = Vec(box.size.x - 2.0f, box.size.y - 89.0f);
@@ -701,13 +701,8 @@ struct HostMIDIMapWidget : ModuleWidget {
 
     void draw(const DrawArgs& args) override
     {
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
-                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
-        nvgFill(args.vg);
-
-        ModuleWidget::draw(args);
+        drawBackground(args.vg);
+        ModuleWidgetWith11HP::draw(args);
     }
 
     void appendContextMenu(Menu* const menu) override

@@ -7,7 +7,10 @@
 # --------------------------------------------------------------
 # Import base definitions
 
+DISTRHO_NAMESPACE = CardinalDISTRHO
+DGL_NAMESPACE = CardinalDGL
 USE_NANOVG_FBO = true
+WASM_EXCEPTIONS = true
 include ../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -23,8 +26,8 @@ endif
 # List of drwav functions, used in several modules
 
 DRWAV  = drwav
-DRWAV += drwav__on_seek
 DRWAV += drwav__on_read
+DRWAV += drwav__on_seek
 DRWAV += drwav__read_and_close_f32
 DRWAV += drwav__read_and_close_s16
 DRWAV += drwav__read_and_close_s32
@@ -32,6 +35,13 @@ DRWAV += drwav_alaw_to_f32
 DRWAV += drwav_alaw_to_s16
 DRWAV += drwav_alaw_to_s16
 DRWAV += drwav_alaw_to_s32
+DRWAV += drwav_bytes_to_f32
+DRWAV += drwav_bytes_to_s16
+DRWAV += drwav_bytes_to_s32
+DRWAV += drwav_bytes_to_s64
+DRWAV += drwav_bytes_to_u16
+DRWAV += drwav_bytes_to_u32
+DRWAV += drwav_bytes_to_u64
 DRWAV += drwav_close
 DRWAV += drwav_close
 DRWAV += drwav_container
@@ -44,29 +54,49 @@ DRWAV += drwav_f64_to_f32
 DRWAV += drwav_f64_to_s16
 DRWAV += drwav_f64_to_s16
 DRWAV += drwav_f64_to_s32
+DRWAV += drwav_fmt_get_format
 DRWAV += drwav_fopen
+DRWAV += drwav_fourcc_equal
 DRWAV += drwav_free
+DRWAV += drwav_get_cursor_in_pcm_frames
+DRWAV += drwav_get_length_in_pcm_frames
+DRWAV += drwav_guid_equal
 DRWAV += drwav_init
 DRWAV += drwav_init_ex
 DRWAV += drwav_init_file
 DRWAV += drwav_init_file_ex
+DRWAV += drwav_init_file_ex_w
+DRWAV += drwav_init_file_w
+DRWAV += drwav_init_file_with_metadata
+DRWAV += drwav_init_file_with_metadata_w
 DRWAV += drwav_init_file_write
 DRWAV += drwav_init_file_write
 DRWAV += drwav_init_file_write__internal
 DRWAV += drwav_init_file_write__internal
 DRWAV += drwav_init_file_write_sequential
 DRWAV += drwav_init_file_write_sequential
+DRWAV += drwav_init_file_write_sequential_pcm_frames
+DRWAV += drwav_init_file_write_sequential_pcm_frames_w
+DRWAV += drwav_init_file_write_sequential_w
+DRWAV += drwav_init_file_write_w
 DRWAV += drwav_init_memory
 DRWAV += drwav_init_memory_ex
+DRWAV += drwav_init_memory_with_metadata
 DRWAV += drwav_init_memory_write
 DRWAV += drwav_init_memory_write
 DRWAV += drwav_init_memory_write__internal
 DRWAV += drwav_init_memory_write__internal
 DRWAV += drwav_init_memory_write_sequential
+DRWAV += drwav_init_memory_write_sequential_pcm_frames
+DRWAV += drwav_init_with_metadata
 DRWAV += drwav_init_write
 DRWAV += drwav_init_write
 DRWAV += drwav_init_write__internal
 DRWAV += drwav_init_write_sequential
+DRWAV += drwav_init_write_sequential_pcm_frames
+DRWAV += drwav_init_write_with_metadata
+DRWAV += drwav_metadata
+DRWAV += drwav__metadata_parser
 DRWAV += drwav_mulaw_to_f32
 DRWAV += drwav_mulaw_to_s16
 DRWAV += drwav_mulaw_to_s16
@@ -88,8 +118,11 @@ DRWAV += drwav_open_ex
 DRWAV += drwav_open_file
 DRWAV += drwav_open_file_and_read_f32
 DRWAV += drwav_open_file_and_read_pcm_frames_f32
+DRWAV += drwav_open_file_and_read_pcm_frames_f32_w
 DRWAV += drwav_open_file_and_read_pcm_frames_s16
+DRWAV += drwav_open_file_and_read_pcm_frames_s16_w
 DRWAV += drwav_open_file_and_read_pcm_frames_s32
+DRWAV += drwav_open_file_and_read_pcm_frames_s32_w
 DRWAV += drwav_open_file_and_read_s16
 DRWAV += drwav_open_file_and_read_s32
 DRWAV += drwav_open_file_ex
@@ -131,9 +164,17 @@ DRWAV += drwav_read_f32__mulaw
 DRWAV += drwav_read_f32__pcm
 DRWAV += drwav_read_f32__pcm
 DRWAV += drwav_read_pcm_frames
+DRWAV += drwav_read_pcm_frames_be
 DRWAV += drwav_read_pcm_frames_f32
+DRWAV += drwav_read_pcm_frames_f32be
+DRWAV += drwav_read_pcm_frames_f32le
+DRWAV += drwav_read_pcm_frames_le
 DRWAV += drwav_read_pcm_frames_s16
+DRWAV += drwav_read_pcm_frames_s16be
+DRWAV += drwav_read_pcm_frames_s16le
 DRWAV += drwav_read_pcm_frames_s32
+DRWAV += drwav_read_pcm_frames_s32be
+DRWAV += drwav_read_pcm_frames_s32le
 DRWAV += drwav_read_raw
 DRWAV += drwav_read_s16
 DRWAV += drwav_read_s16__alaw
@@ -171,14 +212,20 @@ DRWAV += drwav_seek_to_sample
 DRWAV += drwav_seek_to_sample
 DRWAV += drwav_smpl
 DRWAV += drwav_smpl_loop
+DRWAV += drwav_take_ownership_of_metadata
+DRWAV += drwav_target_write_size_bytes
 DRWAV += drwav_u8_to_f32
 DRWAV += drwav_u8_to_s16
 DRWAV += drwav_u8_to_s16
 DRWAV += drwav_u8_to_s32
 DRWAV += drwav_uninit
+DRWAV += drwav_version
+DRWAV += drwav_version_string
 DRWAV += drwav_write
 DRWAV += drwav_write
 DRWAV += drwav_write_pcm_frames
+DRWAV += drwav_write_pcm_frames_be
+DRWAV += drwav_write_pcm_frames_le
 DRWAV += drwav_write_raw
 
 # --------------------------------------------------------------
@@ -192,7 +239,6 @@ PLUGIN_FILES = plugins.cpp
 PLUGIN_FILES += Cardinal/src/Blank.cpp
 PLUGIN_FILES += Cardinal/src/ExpanderInputMIDI.cpp
 PLUGIN_FILES += Cardinal/src/ExpanderOutputMIDI.cpp
-PLUGIN_FILES += Cardinal/src/glBars.cpp
 PLUGIN_FILES += Cardinal/src/HostAudio.cpp
 PLUGIN_FILES += Cardinal/src/HostCV.cpp
 PLUGIN_FILES += Cardinal/src/HostMIDI.cpp
@@ -200,12 +246,21 @@ PLUGIN_FILES += Cardinal/src/HostMIDI-CC.cpp
 PLUGIN_FILES += Cardinal/src/HostMIDI-Gate.cpp
 PLUGIN_FILES += Cardinal/src/HostMIDI-Map.cpp
 PLUGIN_FILES += Cardinal/src/HostParameters.cpp
+PLUGIN_FILES += Cardinal/src/HostParameters-Map.cpp
 PLUGIN_FILES += Cardinal/src/HostTime.cpp
 PLUGIN_FILES += Cardinal/src/TextEditor.cpp
 
+ifneq ($(USE_GLES2),true)
+ifneq ($(USE_GLES3),true)
+PLUGIN_FILES += Cardinal/src/glBars.cpp
+endif
+endif
+
 ifneq ($(STATIC_BUILD),true)
 PLUGIN_FILES += Cardinal/src/AudioFile.cpp
+ifneq ($(WASM),true)
 PLUGIN_FILES += Cardinal/src/Carla.cpp
+endif
 PLUGIN_FILES += Cardinal/src/Ildaeil.cpp
 ifneq ($(HEADLESS),true)
 ifeq ($(HAVE_X11),true)
@@ -218,8 +273,14 @@ endif
 ifneq ($(HEADLESS),true)
 PLUGIN_FILES += Cardinal/src/ImGuiWidget.cpp
 PLUGIN_FILES += Cardinal/src/ImGuiTextEditor.cpp
-PLUGIN_FILES += $(wildcard Cardinal/src/DearImGui/*.cpp)
-PLUGIN_FILES += $(wildcard Cardinal/src/DearImGuiColorTextEditor/*.cpp)
+PLUGIN_FILES += Cardinal/src/SassyScope.cpp
+PLUGIN_FILES += Cardinal/src/DearImGui.cpp
+PLUGIN_FILES += Cardinal/src/DearImGuiColorTextEditor.cpp
+endif
+
+ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
+PLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
+BASE_FLAGS += -DHAVE_FFTW3F
 endif
 
 # --------------------------------------------------------------
@@ -230,6 +291,11 @@ PLUGIN_FILES += Fundamental/src/dr_wav.c
 
 # modules/types which are present in other plugins
 FUNDAMENTAL_CUSTOM = $(DRWAV)
+
+# --------------------------------------------------------------
+# ZamAudio (always enabled)
+
+PLUGIN_FILES += $(wildcard ZamAudio/src/*.cpp)
 
 ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------
@@ -308,6 +374,16 @@ PLUGIN_FILES += AriaModules/src/Undular.cpp
 
 # modules/types which are present in other plugins
 ARIA_CUSTOM = Blank
+
+# --------------------------------------------------------------
+# AS
+
+PLUGIN_FILES += $(filter-out AS/src/AS.cpp,$(wildcard AS/src/*.cpp))
+PLUGIN_FILES += AS/freeverb/revmodel.cpp
+
+# modules/types which are present in other plugins
+AS_CUSTOM = ADSR BpmDisplayWidget LabelDisplayWidget LedLight LowFrequencyOscillator SigDisplayWidget VCA WaveShaper YellowRedLight allpass comb revmodel
+AS_CUSTOM_PER_FILE = NumberDisplayWidget
 
 # --------------------------------------------------------------
 # AudibleInstruments
@@ -444,7 +520,7 @@ PLUGIN_FILES += $(filter-out Bidoo/src/plugin.cpp Bidoo/src/ANTN.cpp,$(wildcard 
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/filters/*.cpp)
 PLUGIN_FILES += $(wildcard Bidoo/src/dep/freeverb/*.cpp)
-PLUGIN_FILES += $(wildcard Bidoo/src/dep/lodepng/*.cpp)
+PLUGIN_FILES += $(filter-out Bidoo/src/dep/lodepng/pngdetail.cpp,$(wildcard Bidoo/src/dep/lodepng/*.cpp))
 PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/src/dep/resampler/*.cpp))
 PLUGIN_FILES += BidooDark/plugin.cpp
 
@@ -482,6 +558,9 @@ CATROMODULO_CUSTOM = LowFrequencyOscillator NumDisplayWidget
 # cf
 
 PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
+
+# modules/types which are present in other plugins
+CF_CUSTOM = $(DRWAV)
 
 # --------------------------------------------------------------
 # dBiz
@@ -522,7 +601,12 @@ PLUGIN_FILES += $(filter-out Extratone/src/plugin.cpp,$(wildcard Extratone/src/*
 PLUGIN_FILES += $(filter-out FehlerFabrik/src/plugin.cpp,$(wildcard FehlerFabrik/src/*.cpp))
 
 # modules/types which are present in other plugins
-FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter
+FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter SimpleDelay
+
+# --------------------------------------------------------------
+# forsitan modulare
+
+PLUGIN_FILES += $(filter-out forsitan-modulare/src/forsitan.cpp,$(wildcard forsitan-modulare/src/*.cpp))
 
 # --------------------------------------------------------------
 # GlueTheGiant
@@ -651,6 +735,11 @@ PLUGIN_FILES += $(filter-out LyraeModules/src/plugin.cpp,$(wildcard LyraeModules
 LYRAE_CUSTOM = Delta
 
 # --------------------------------------------------------------
+# Meander
+
+PLUGIN_FILES += $(filter-out Meander/src/plugin.cpp,$(wildcard Meander/src/*.cpp))
+
+# --------------------------------------------------------------
 # MindMeld
 
 PLUGIN_FILES += $(wildcard MindMeldModular/src/*.cpp)
@@ -703,6 +792,11 @@ PLUGIN_FILES += $(filter-out MSM/src/MSM.cpp,$(wildcard MSM/src/*.cpp))
 MSM_CUSTOM = ADSR BlankPanel Delay LFO LowFrequencyOscillator Mult Noise OP VCA VCO sawTable triTable
 
 # --------------------------------------------------------------
+# myth-modules
+
+PLUGIN_FILES += $(filter-out myth-modules/src/plugin.cpp,$(wildcard myth-modules/src/*.cpp))
+
+# --------------------------------------------------------------
 # Nonlinear Circuits
 
 PLUGIN_FILES += $(filter-out nonlinearcircuits/src/NLC.cpp,$(wildcard nonlinearcircuits/src/*.cpp))
@@ -740,6 +834,9 @@ PLUGIN_FILES += $(filter-out PathSet/src/plugin.cpp,$(wildcard PathSet/src/*.cpp
 
 PLUGIN_FILES += $(filter-out PinkTrombone/src/plugin.cpp,$(wildcard PinkTrombone/src/*.cpp))
 PLUGIN_FILES += $(wildcard PinkTrombone/src/PinkTrombone/*.cpp)
+
+# modules/types which are present in other plugins
+PINKTROMBONE_CUSTOM = WhiteNoise
 
 # --------------------------------------------------------------
 # Prism
@@ -864,8 +961,13 @@ VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
 
 # modules/types which are present in other plugins
-VOXGLITCH_CUSTOM = $(DRWAV) AudioFile Looper Readout
-VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain Sequencer SequencerDisplay VoltageSequencer
+VOXGLITCH_CUSTOM = $(DRWAV) ADSR AudioFile Looper Readout
+VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain SamplePlayer Sequencer SequencerDisplay VoltageSequencer
+
+# --------------------------------------------------------------
+# WhatTheRack
+
+PLUGIN_FILES += $(filter-out WhatTheRack/src/WhatTheRack.cpp,$(wildcard WhatTheRack/src/*.cpp))
 
 # --------------------------------------------------------------
 # ZetaCarinaeModules
@@ -875,9 +977,9 @@ PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCa
 # --------------------------------------------------------------
 # ZZC
 
-PLUGIN_FILES += $(filter-out ZZC/src/ZZC.cpp,$(wildcard ZZC/src/*.cpp))
-PLUGIN_FILES += ZZC/src/dsp/Wavetable.cpp
-PLUGIN_FILES += ZZC/src/filetypes/WavSupport.cpp
+PLUGIN_FILES += $(filter-out ZZC/src/ZZC.cpp ZZC/src/WavetablePlayer.cpp,$(wildcard ZZC/src/*.cpp))
+# PLUGIN_FILES += ZZC/src/dsp/Wavetable.cpp
+# PLUGIN_FILES += ZZC/src/filetypes/WavSupport.cpp
 
 # modules/types which are present in other plugins
 ZZC_CUSTOM = Clock LowFrequencyOscillator
@@ -904,7 +1006,8 @@ BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
 
 BASE_FLAGS += -I../include
-BASE_FLAGS += -I../include/neon-compat
+BASE_FLAGS += -I../include/osdialog-stub
+BASE_FLAGS += -I../include/simd-compat
 
 ifeq ($(HAVE_X11),true)
 BASE_FLAGS += -DHAVE_X11
@@ -912,7 +1015,7 @@ endif
 
 ifeq ($(SYSDEPS),true)
 BASE_FLAGS += -DCARDINAL_SYSDEPS
-BASE_FLAGS += $(shell pkg-config --cflags jansson libarchive samplerate speexdsp)
+BASE_FLAGS += $(shell $(PKG_CONFIG) --cflags jansson libarchive samplerate speexdsp)
 BASE_FLAGS += -I../deps/sysroot/include
 else
 BASE_FLAGS += -DZSTDLIB_VISIBILITY=
@@ -926,12 +1029,15 @@ BASE_FLAGS += -I../src/Rack/dep/filesystem/include
 # # BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
 BASE_FLAGS += -I../src/Rack/dep/glfw/include
 BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
-BASE_FLAGS += -I../src/Rack/dep/osdialog
 BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
 
 ifeq ($(DEBUG),true)
 BASE_FLAGS += -UDEBUG
+ifeq ($(WASM),true)
+# SSE must always be enabled on wasm, even in debug builds
+BASE_FLAGS += -msse -msse2 -msse3 -msimd128
+endif
 endif
 
 ifeq ($(HEADLESS),true)
@@ -941,16 +1047,15 @@ BASE_FLAGS += -ffat-lto-objects
 endif
 endif
 
-ifeq ($(BSD),true)
+ifeq ($(BSD)$(WASM),true)
 BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
 BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
 endif
 
-ifeq ($(WASM),true)
-BASE_FLAGS += -DNANOVG_GLES2=1
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-else ifneq ($(HAIKU),true)
+ifneq ($(WASM),true)
+ifneq ($(HAIKU),true)
 BASE_FLAGS += -pthread
+endif
 endif
 
 ifeq ($(WINDOWS),true)
@@ -964,16 +1069,30 @@ ifeq ($(NOPLUGINS),true)
 BASE_FLAGS += -DNOPLUGINS
 endif
 
+ifeq ($(USE_GLES2),true)
+BASE_FLAGS += -DNANOVG_GLES2_FORCED
+else ifeq ($(USE_GLES3),true)
+BASE_FLAGS += -DNANOVG_GLES3_FORCED
+endif
+
 ifeq ($(shell $(PKG_CONFIG) --exists sndfile && echo true),true)
 BASE_FLAGS += -DHAVE_SNDFILE
 endif
 
 BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing -faligned-new
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing 
+
+ifneq ($(MACOS),true)
+BUILD_CXX_FLAGS += -faligned-new -Wno-abi
+endif
 
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
+
+ifeq ($(WASM),true)
+BUILD_CXX_FLAGS += -fexceptions
+endif
 
 # --------------------------------------------------------------
 # lots of warnings from VCV side
@@ -991,6 +1110,23 @@ BASE_FLAGS += -Wno-unknown-warning-option
 endif
 
 # --------------------------------------------------------------
+# Carla and friends build flags
+
+CARLA_FLAGS = \
+	-DCARLA_BACKEND_NAMESPACE=Cardinal \
+	-DREAL_BUILD \
+	-DSTATIC_PLUGIN_TARGET \
+	-I../deps/aubio/src \
+	-I../carla/source/backend \
+	-I../carla/source/includes \
+	-I../carla/source/modules \
+	-I../carla/source/utils
+
+ifeq ($(WASM),true)
+CARLA_FLAGS += -DDISTRHO_RUNNER_INDIRECT_WASM_CALLS
+endif
+
+# --------------------------------------------------------------
 # Build targets
 
 TARGET = plugins.a
@@ -1004,12 +1140,19 @@ clean:
 # --------------------------------------------------------------
 
 ifeq ($(NOPLUGINS),true)
-PLUGIN_LIST = Cardinal
+PLUGIN_LIST = Cardinal Fundamental ZamAudio
+
+RESOURCE_FILES = \
+		$(wildcard Cardinal/res/*.svg) \
+		$(wildcard Fundamental/res/*.svg) \
+		$(wildcard Fundamental/res/components/*.svg) \
+		$(wildcard ZamAudio/res/*.svg) \
+		Fundamental/presets
 else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
-endif
 
 UNWANTED_FILES  = HetrickCV/res/illustrator - deprecated/MyModule.svg
+UNWANTED_FILES += $(wildcard Meander/res/*)
 UNWANTED_FILES += $(wildcard Mog/res/*)
 UNWANTED_FILES += $(wildcard Mog/res/*/*)
 UNWANTED_FILES += $(wildcard nonlinearcircuits/res/*)
@@ -1033,13 +1176,13 @@ RESOURCE_FILES += BaconPlugs/res/Keypunch029.json
 RESOURCE_FILES += BaconPlugs/res/midi/chopin
 RESOURCE_FILES += BaconPlugs/res/midi/debussy
 RESOURCE_FILES += BaconPlugs/res/midi/goldberg
-RESOURCE_FILES += Cardinal/res/Miku/Miku.png
 RESOURCE_FILES += cf/playeroscs
 RESOURCE_FILES += DrumKit/res/samples
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
+RESOURCE_FILES += Meander/res
 RESOURCE_FILES += Mog/res
 RESOURCE_FILES += nonlinearcircuits/res
 RESOURCE_FILES += ParableInstruments/res/Neil.png
@@ -1047,12 +1190,26 @@ RESOURCE_FILES += $(wildcard unless_modules/art/*.art)
 RESOURCE_FILES += $(wildcard unless_modules/art/svg/*/*.svg)
 RESOURCE_FILES += $(wildcard unless_modules/font/*.ttf)
 # RESOURCE_FILES += $(wildcard unless_modules/manual/*)
+endif
+
+RESOURCE_FILES += Cardinal/res/Miku/Miku.png
+
+# MOD builds only have LV2 main and FX variant
+ifeq ($(MOD_BUILD),true)
+
+LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
+LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
 
 # MOD builds only have LV2 FX variant for now
-ifeq ($(MOD_BUILD),true)
-LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
-LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
+else ifeq ($(WASM),true)
+
+LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalNative.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalNative.lv2/resources/%)
+
 else
+
 LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.lv2/resources/PluginManifests/%.json)
@@ -1076,6 +1233,7 @@ VST3_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst3/Contents/Resources/P
 VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.vst3/Contents/Resources/%)
 VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst3/Contents/Resources/%)
 VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst3/Contents/Resources/%)
+
 endif
 
 resources: $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES)
@@ -1085,6 +1243,10 @@ resources: $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES)
 	$(SILENT)ln -sf $(abspath $<) $@
 
 ../bin/CardinalFX.lv2/resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalNative.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
@@ -1103,6 +1265,10 @@ endif
 	$(SILENT)ln -sf $(abspath $<) $@
 
 ../bin/CardinalFX.lv2/resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalNative.lv2/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
@@ -1202,13 +1368,7 @@ $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 		-Dstbtt_fontinfo=stbtt_fontinfo_cardinal \
 		-Dstbrp_node=stbrp_node_cardinal \
 		-Dstbrp_rect=stbrp_rect_cardinal \
-		-DCARLA_BACKEND_NAMESPACE=Cardinal \
-		-DREAL_BUILD \
-		-DSTATIC_PLUGIN_TARGET \
-		-I../carla/source/backend \
-		-I../carla/source/includes \
-		-I../carla/source/modules \
-		-I../carla/source/utils
+		$(CARLA_FLAGS)
 
 $(BUILD_DIR)/21kHz/%.cpp.o: 21kHz/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1271,6 +1431,15 @@ $(BUILD_DIR)/AriaModules/%.cpp.o: AriaModules/%.cpp
 		$(foreach m,$(ARIA_CUSTOM),$(call custom_module_names,$(m),Aria)) \
 		-DpluginInstance=pluginInstance__Aria \
 		-Wno-cast-function-type
+
+$(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(AS_CUSTOM),$(call custom_module_names,$(m),AS)) \
+		$(foreach m,$(AS_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),AS_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__AS \
+		-Wno-unused-private-field
 
 $(BUILD_DIR)/AudibleInstruments/%.o: AudibleInstruments/%
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1379,7 +1548,7 @@ $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 		-DUSE_EIGEN \
 		-DSKIP_MINGW_FORMAT \
 		-IChowDSP/lib \
-		-IChowDSP/lib/chowdsp_utils/DSP/WDF \
+		-IChowDSP/lib/chowdsp_utils/modules/chowdsp_dsp/WDF \
 		-Wno-deprecated-copy
 
 
@@ -1426,6 +1595,13 @@ $(BUILD_DIR)/FehlerFabrik/%.cpp.o: FehlerFabrik/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(FEHLERFABRIK_CUSTOM),$(call custom_module_names,$(m),FehlerFabrik)) \
 		-DpluginInstance=pluginInstance__FehlerFabrik
+
+$(BUILD_DIR)/forsitan-modulare/%.cpp.o: forsitan-modulare/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(GLUETHEGIANT_CUSTOM),$(call custom_module_names,$(m),forsitan)) \
+		-DpluginInstance=pluginInstance__forsitan
 
 $(BUILD_DIR)/Fundamental/%.c.o: Fundamental/%.c
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1593,6 +1769,15 @@ $(BUILD_DIR)/LyraeModules/%.cpp.o: LyraeModules/%.cpp
 		$(foreach m,$(LYRAE_CUSTOM),$(call custom_module_names,$(m),Lyrae)) \
 		-DpluginInstance=pluginInstance__Lyrae
 
+$(BUILD_DIR)/Meander/src/Meander.cpp.o: Meander/src/Meander.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MEANDER_CUSTOM),$(call custom_module_names,$(m),Meander)) \
+		-DpluginInstance=pluginInstance__Meander \
+		-Wno-format-security \
+		-Wno-format-zero-length
+
 $(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -1649,6 +1834,13 @@ $(BUILD_DIR)/MSM/%.cpp.o: MSM/%.cpp
 		$(foreach m,$(MSM_CUSTOM),$(call custom_module_names,$(m),MSM)) \
 		-DpluginInstance=pluginInstance__MSM \
 		-DDARKTHEME
+
+$(BUILD_DIR)/myth-modules/%.cpp.o: myth-modules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MYTH_MODULES_CUSTOM),$(call custom_module_names,$(m),myth_modules)) \
+		-DpluginInstance=pluginInstance__myth_modules
 
 $(BUILD_DIR)/nonlinearcircuits/%.cpp.o: nonlinearcircuits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1754,6 +1946,20 @@ $(BUILD_DIR)/voxglitch/%.cpp.o: voxglitch/%.cpp
 		$(foreach m,$(VOXGLITCH_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),Voxglitch_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__Voxglitch \
 		-DSKIP_MINGW_FORMAT
+
+$(BUILD_DIR)/WhatTheRack/%.cpp.o: WhatTheRack/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(WHATTHERACK_CUSTOM),$(call custom_module_names,$(m),WhatTheRack)) \
+		-DpluginInstance=pluginInstance__WhatTheRack
+
+$(BUILD_DIR)/ZamAudio/%.cpp.o: ZamAudio/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ZAMAUDIO_CUSTOM),$(call custom_module_names,$(m),ZamAudio)) \
+		-DpluginInstance=pluginInstance__ZamAudio
 
 $(BUILD_DIR)/ZetaCarinaeModules/%.cpp.o: ZetaCarinaeModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

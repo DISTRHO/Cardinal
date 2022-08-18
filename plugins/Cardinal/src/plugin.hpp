@@ -29,6 +29,7 @@ using namespace rack;
 extern Plugin* pluginInstance;
 
 extern Model* modelAudioFile;
+extern Model* modelAudioToCVPitch;
 extern Model* modelCarla;
 extern Model* modelCardinalBlank;
 extern Model* modelExpanderInputMIDI;
@@ -42,9 +43,11 @@ extern Model* modelHostMIDICC;
 extern Model* modelHostMIDIGate;
 extern Model* modelHostMIDIMap;
 extern Model* modelHostParameters;
+extern Model* modelHostParametersMap;
 extern Model* modelHostTime;
 extern Model* modelIldaeil;
 extern Model* modelMPV;
+extern Model* modelSassyScope;
 extern Model* modelTextEditor;
 
 extern std::vector<Model*> hostTerminalModels;
@@ -58,7 +61,7 @@ float d_findMaxNormalizedFloat(const float floats[], const std::size_t count)
     DISTRHO_SAFE_ASSERT_RETURN(floats != nullptr, 0.0f);
     DISTRHO_SAFE_ASSERT_RETURN(count > 0, 0.0f);
 
-    static const float kEmptyFloats[8192] = {};
+    static constexpr const float kEmptyFloats[8192] = {};
 
     if (count <= 8192 && std::memcmp(floats, kEmptyFloats, count) == 0)
         return 0.0f;

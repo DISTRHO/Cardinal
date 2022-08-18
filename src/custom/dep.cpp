@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -19,6 +19,15 @@
 
 #include <cstdio>
 #include <cstring>
+#include <list>
+#include <string>
+
+namespace rack {
+namespace settings {
+bool darkMode = true;
+int rateLimit = 0;
+}
+}
 
 #include "nanovg.h"
 
@@ -34,15 +43,16 @@ float FollowerBase::efGainMaxDecibelsDebug = 12.0f;
 
 // Special nvgRGB for blank panels
 extern "C" {
-NVGcolor nvgRGBblank(unsigned char, unsigned char, unsigned char)
+NVGcolor nvgRGBblank(const unsigned char r, const unsigned char g, const unsigned char b)
 {
-    return nvgRGB(0x20, 0x20, 0x20);
+    return rack::settings::darkMode ? nvgRGB(0x20, 0x20, 0x20) : nvgRGB(r, g, b);
 }
 }
 
 // Compile those nice implementation-in-header little libraries
 #define NANOSVG_IMPLEMENTATION
 #define NANOSVG_ALL_COLOR_KEYWORDS
+#undef nsvgDelete
 #undef nsvgParseFromFile
 #include <nanosvg.h>
 
@@ -51,7 +61,7 @@ static const struct {
     const char* const filename;
     const char* shapeIdsToIgnore[5];
     const int shapeNumberToIgnore;
-} svgFilesToInvert[] = {
+} svgFilesToInvertForDarkMode[] = {
     // MIT
     { "/21kHz/res/Panels/D_Inf.svg", {}, -1 },
     { "/21kHz/res/Panels/PalmLoop.svg", {}, -1 },
@@ -268,25 +278,31 @@ static const struct {
     { "/kocmoc/res/SKF.svg", {}, -1 },
     { "/kocmoc/res/SVF.svg", {}, -1 },
     { "/kocmoc/res/TRG.svg", {}, -1 },
+    // GPL-3.0-or-later
+    { "/myth-modules/res/Mavka.svg", {}, -1 },
+    { "/myth-modules/res/Molphar.svg", {}, -1 },
     // CC0-1.0
+    { "/nonlinearcircuits/res/BOOLs2.svg", {}, -1 },
+    { "/nonlinearcircuits/res/DoubleNeuronRef.svg", {}, -1 },
+    { "/nonlinearcircuits/res/LetsSplosh.svg", {}, -1 },
     { "/nonlinearcircuits/res/NLC - 4seq.svg", {}, -1 },
     { "/nonlinearcircuits/res/NLC - 8 BIT CIPHER.svg", {}, -1 },
-    { "/nonlinearcircuits/res/BOOLs2.svg", {}, -1 },
     { "/nonlinearcircuits/res/NLC - DIVIDE & CONQUER.svg", {}, -1 },
     { "/nonlinearcircuits/res/NLC - DIVINE CMOS.svg", {}, -1 },
-    { "/nonlinearcircuits/res/DoubleNeuronRef.svg", {}, -1 },
     { "/nonlinearcircuits/res/NLC - GENiE.svg", {}, -1 },
-    { "/nonlinearcircuits/res/LetsSplosh.svg", {}, -1 },
     { "/nonlinearcircuits/res/NLC - NEURON.svg", {}, -1 },
     { "/nonlinearcircuits/res/NLC - NUMBERWANG.svg", {}, -1 },
     { "/nonlinearcircuits/res/NLC - SEGUE.svg", {}, -1 },
-    { "/nonlinearcircuits/res/squid-axon-papernoise-panel2.svg", {}, -1 },
     { "/nonlinearcircuits/res/NLC - STATUES.svg", {}, -1 },
+    { "/nonlinearcircuits/res/squid-axon-papernoise-panel2.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
     { "/ParableInstruments/res/Neil.svg", {}, -1 },
     // GPL-3.0-or-later
     { "/PathSet/res/AstroVibe.svg", {}, -1 },
+    { "/PathSet/res/GlassPane.svg", {}, -1 },
     { "/PathSet/res/IceTray.svg", {}, -1 },
+    { "/PathSet/res/Nudge.svg", {}, -1 },
+    { "/PathSet/res/ShiftyExpander.svg", {}, -1 },
     { "/PathSet/res/ShiftyMod.svg", {}, -1 },
     // BSD-3-Clause
     { "/voxglitch/res/autobreak_front_panel.svg", {}, -1 },
@@ -308,15 +324,171 @@ static const struct {
     { "/voxglitch/res/wav_bank_front_panel.svg", {}, -1 },
     { "/voxglitch/res/wav_bank_mc_front_panel_v2.svg", {}, -1 },
     { "/voxglitch/res/xy_front_panel.svg", {}, -1 },
+    // WTFPL
+    { "/WhatTheRack/res/WhatTheJack.svg", {}, -1 },
+    { "/WhatTheRack/res/WhatTheMod.svg", {}, -1 },
+    { "/WhatTheRack/res/WhatTheRack.svg", {}, -1 },
 };
 
-static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
+static const struct {
+    const char* const filename;
+    const char* shapeIdsToIgnore[5];
+    const int shapeNumberToIgnore;
+} svgFilesToInvertForLightMode[] = {
+    // GPLv3+
+    /* FIXME does not work very well
+    { "/Autinn/res/AmpModule.svg", {}, -1 },
+    { "/Autinn/res/BassModule.svg", {}, -1 },
+    { "/Autinn/res/CVConverterModule.svg", {}, -1 },
+    { "/Autinn/res/ComponentLibrary", {}, -1 },
+    { "/Autinn/res/DeadbandModule.svg", {}, -1 },
+    { "/Autinn/res/DigiModule.svg", {}, -1 },
+    { "/Autinn/res/DiseeModule.svg", {}, -1 },
+    { "/Autinn/res/FilModule.svg", {}, -1 },
+    { "/Autinn/res/FlopperModule.svg", {}, -1 },
+    { "/Autinn/res/ImpModule.svg", {}, -1 },
+    { "/Autinn/res/JetteModule.svg", {}, -1 },
+    { "/Autinn/res/MelodyModule.svg", {}, -1 },
+    { "/Autinn/res/MeraModule.svg", {}, -1 },
+    { "/Autinn/res/Mixer6Module.svg", {}, -1 },
+    { "/Autinn/res/NapModule.svg", {}, -1 },
+    { "/Autinn/res/NonModule.svg", {}, -1 },
+    { "/Autinn/res/OxcartModule.svg", {}, -1 },
+    { "/Autinn/res/RebelModule.svg", {}, -1 },
+    { "/Autinn/res/RetriModule.svg", {}, -1 },
+    { "/Autinn/res/SawModule.svg", {}, -1 },
+    { "/Autinn/res/SjipModule.svg", {}, -1 },
+    { "/Autinn/res/SquareModule.svg", {}, -1 },
+    { "/Autinn/res/VibratoModule.svg", {}, -1 },
+    { "/Autinn/res/VxyModule.svg", {}, -1 },
+    { "/Autinn/res/ZodModule.svg", {}, -1 },
+    */
+    // ??? used for testing, might get turned off
+    { "/Befaco/res/components/Knurlie.svg", {}, -1 },
+    { "/Befaco/res/panels/ABC.svg", {}, -1 },
+    { "/Befaco/res/panels/ADSR.svg", {}, -1 },
+    { "/Befaco/res/panels/ChoppingKinky.svg", {}, -1 },
+    { "/Befaco/res/panels/DualAtenuverter.svg", {}, -1 },
+    { "/Befaco/res/panels/EvenVCO.svg", {}, -1 },
+    { "/Befaco/res/panels/HexmixVCA.svg", {}, -1 },
+    { "/Befaco/res/panels/Kickall.svg", {}, -1 },
+    { "/Befaco/res/panels/Mex.svg", {}, -1 },
+    { "/Befaco/res/panels/Mixer.svg", {}, -1 },
+    { "/Befaco/res/panels/Morphader.svg", {}, -1 },
+    { "/Befaco/res/panels/Muxlicer.svg", {}, -1 },
+    { "/Befaco/res/panels/NoisePlethora.svg", {}, -1 },
+    { "/Befaco/res/panels/Percall.svg", {}, -1 },
+    { "/Befaco/res/panels/Rampage.svg", {}, -1 },
+    { "/Befaco/res/panels/STMix.svg", {}, -1 },
+    { "/Befaco/res/panels/SamplingModulator.svg", {}, -1 },
+    { "/Befaco/res/panels/SlewLimiter.svg", {}, -1 },
+    { "/Befaco/res/panels/SpringReverb.svg", {}, -1 },
+    { "/Befaco/res/panels/StereoStrip.svg", {}, -1 },
+    // GPLv3+
+    { "/Cardinal/res/AudioFile.svg", {}, -1 },
+    { "/Cardinal/res/AudioToCVPitch.svg", {}, -1 },
+    { "/Cardinal/res/Carla.svg", {}, -1 },
+    { "/Cardinal/res/ExpanderMIDI.svg", {}, -1 },
+    { "/Cardinal/res/glBars.svg", {}, -1 },
+    { "/Cardinal/res/HostAudio.svg", {}, -1 },
+    { "/Cardinal/res/HostCV.svg", {}, -1 },
+    { "/Cardinal/res/HostMIDI.svg", {}, -1 },
+    { "/Cardinal/res/HostMIDICC.svg", {}, -1 },
+    { "/Cardinal/res/HostMIDIGate.svg", {}, -1 },
+    { "/Cardinal/res/HostMIDIMap.svg", {}, -1 },
+    { "/Cardinal/res/HostParameters.svg", {}, -1 },
+    { "/Cardinal/res/HostParamsMap.svg", {}, -1 },
+    { "/Cardinal/res/HostTime.svg", {}, -1 },
+    { "/Cardinal/res/Ildaeil.svg", {}, -1 },
+    // GPLv3+
+    { "/forsitan-modulare/res/alea.svg", {}, -1 },
+    { "/forsitan-modulare/res/cumuli.svg", {}, -1 },
+    { "/forsitan-modulare/res/deinde.svg", {}, -1 },
+    { "/forsitan-modulare/res/interea.svg", {}, -1 },
+    { "/forsitan-modulare/res/palette.svg", {}, -1 },
+    { "/forsitan-modulare/res/pavo.svg", {}, -1 },
+    // GPLv3+
+    { "/Fundamental/res/8vert.svg", {}, -1 },
+    { "/Fundamental/res/ADSR.svg", {}, -1 },
+    { "/Fundamental/res/Delay.svg", {}, -1 },
+    { "/Fundamental/res/LFO.svg", {}, -1 },
+    { "/Fundamental/res/Merge.svg", {}, -1 },
+    { "/Fundamental/res/MidSide.svg", {}, -1 },
+    { "/Fundamental/res/Mixer.svg", {}, -1 },
+    { "/Fundamental/res/Mutes.svg", {}, -1 },
+    { "/Fundamental/res/Noise.svg", {}, -1 },
+    { "/Fundamental/res/Octave.svg", {}, -1 },
+    { "/Fundamental/res/Pulses.svg", {}, -1 },
+    { "/Fundamental/res/Quantizer.svg", {}, -1 },
+    { "/Fundamental/res/Random.svg", {}, -1 },
+    { "/Fundamental/res/SEQ3.svg", {}, -1 },
+    { "/Fundamental/res/Scope.svg", {}, -1 },
+    { "/Fundamental/res/SequentialSwitch1.svg", {}, -1 },
+    { "/Fundamental/res/SequentialSwitch2.svg", {}, -1 },
+    { "/Fundamental/res/Split.svg", {}, -1 },
+    { "/Fundamental/res/Sum.svg", {}, -1 },
+    { "/Fundamental/res/VCA-1.svg", {}, -1 },
+    { "/Fundamental/res/VCA.svg", {}, -1 },
+    { "/Fundamental/res/VCF.svg", {}, -1 },
+    { "/Fundamental/res/VCMixer.svg", {}, -1 },
+    { "/Fundamental/res/VCO.svg", {}, -1 },
+    { "/Fundamental/res/WTLFO.svg", {}, -1 },
+    { "/Fundamental/res/WTVCO.svg", {}, -1 },
+    // MIT
+    { "/HamptonHarmonics/res/Arp.svg", {}, -1 },
+    { "/HamptonHarmonics/res/Progress.svg", {}, -1 },
+    // GPLv3+
+    { "/LomasModules/res/AdvancedSampler.svg", {}, -1 },
+    { "/LomasModules/res/GateSequencer.svg", {}, -1 },
+    // GPLv3+
+    { "/sonusmodular/res/addiction.svg", {}, -1 },
+    { "/sonusmodular/res/bitter.svg", {}, -1 },
+    { "/sonusmodular/res/bymidside.svg", {}, -1 },
+    { "/sonusmodular/res/campione.svg", {}, -1 },
+    { "/sonusmodular/res/chainsaw.svg", {}, -1 },
+    { "/sonusmodular/res/ctrl.svg", {}, -1 },
+    { "/sonusmodular/res/deathcrush.svg", {}, -1 },
+    { "/sonusmodular/res/fraction.svg", {}, -1 },
+    { "/sonusmodular/res/harmony.svg", {}, -1 },
+    { "/sonusmodular/res/ladrone.svg", {}, -1 },
+    { "/sonusmodular/res/luppolo.svg", {}, -1 },
+    { "/sonusmodular/res/luppolo3.svg", {}, -1 },
+    { "/sonusmodular/res/micromacro.svg", {}, -1 },
+    { "/sonusmodular/res/mrcheb.svg", {}, -1 },
+    { "/sonusmodular/res/multimulti.svg", {}, -1 },
+    { "/sonusmodular/res/neurosc.svg", {}, -1 },
+    { "/sonusmodular/res/oktagon.svg", {}, -1 },
+    { "/sonusmodular/res/osculum.svg", {}, -1 },
+    { "/sonusmodular/res/paramath.svg", {}, -1 },
+    { "/sonusmodular/res/piconoise.svg", {}, -1 },
+    { "/sonusmodular/res/pith.svg", {}, -1 },
+    { "/sonusmodular/res/pusher.svg", {}, -1 },
+    { "/sonusmodular/res/ringo.svg", {}, -1 },
+    { "/sonusmodular/res/scramblase.svg", {}, -1 },
+    { "/sonusmodular/res/tropicana.svg", {}, -1 },
+    { "/sonusmodular/res/twoff.svg", {}, -1 },
+    { "/sonusmodular/res/yabp.svg", {}, -1 },
+    // TODO bacon, chowdsp, ???
+};
+
+static inline
+unsigned int invertColor(const unsigned int color) noexcept
+{
+    return (color & 0xff000000)
+         | (0xff0000 - (color & 0xff0000))
+         | (0xff00 - (color & 0xff00))
+         | (0xff - (color & 0xff));
+}
+
+static inline
+bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
 {
     if (paint.type == NSVG_PAINT_LINEAR_GRADIENT && svgFileToInvert != nullptr)
     {
         // Special case for DrumKit background gradient
         if (std::strncmp(svgFileToInvert, "/DrumKit/", 9) == 0)
         {
+            std::free(paint.gradient);
             paint.type = NSVG_PAINT_COLOR;
             paint.color = 0xff191919;
             return true;
@@ -445,56 +617,78 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
     // Special case for PathSet colors
     if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/PathSet/", 9) == 0)
     {
-        switch (paint.color)
+        // only invert main colors for Nudge.svg
+        if (std::strcmp(svgFileToInvert, "/PathSet/res/Nudge.svg") == 0)
         {
-        // main blue tone
-        case 0xffdf7a1a:
-            if (shape->opacity == 0.5f && std::strcmp(svgFileToInvert, "/PathSet/res/AstroVibe.svg") == 0)
+            switch (paint.color)
             {
-                shape->opacity = 0.2f;
+            case 0xffe6e6e6:
+                paint.color = 0xff191919;
                 return true;
-            }
-            if (shape->opacity == 0.25f)
-                shape->opacity = 0.75f;
-            return false;
-        // bottom logo stuff, set to full white
-        case 0xff000000:
-            if (shape->stroke.type != NSVG_PAINT_NONE)
-            {
+            case 0xff000000:
                 paint.color = 0xffffffff;
                 return true;
+            default:
+                return false;
             }
-            break;
-        // pink step 2 (pink with 50% opacity on bg)
-        case 0xffef73ea:
-            paint.color = 0xff812d7d;
-            return true;
-        // pink step 3 (pink with 33.3% opacity on bg)
-        case 0xfff49ff0:
-            paint.color = 0xff4d234c;
-            return true;
-        // pink and orange
-        case 0xffe941e2:
-        case 0xff698efb:
-            return false;
-        // blue darker 1 (blue with 50% opacity on bg)
-        case 0xffde944f:
-        case 0xffe3b080:
-        case 0xffe4cbb3:
-        case 0xfff5c99f:
-        case 0xfff6d1b0:
-            paint.color = 0xff7c4919;
-            return true;
-        // blue darker 2 (blue with 33.3% opacity on bg)
-        case 0xffe5d9cd:
-        case 0xfff8dcc2:
-        case 0xffe1a265:
-            paint.color = 0xff5b3a1a;
-            return true;
-        // blue darker 3 (blue with 25% opacity on bg)
-        case 0xffe5cbb3:
-            paint.color = 0xff4b321a;
-            return true;
+        }
+        // everything else
+        else
+        {
+            switch (paint.color)
+            {
+            // main blue tone
+            case 0xffdf7a1a:
+                if (shape->opacity == 0.5f && std::strcmp(svgFileToInvert, "/PathSet/res/AstroVibe.svg") == 0)
+                {
+                    shape->opacity = 0.2f;
+                    return true;
+                }
+                if (shape->opacity == 0.25f)
+                    shape->opacity = 0.75f;
+                return false;
+            // bottom logo stuff, set to full white
+            case 0xff000000:
+                if (shape->stroke.type != NSVG_PAINT_NONE)
+                {
+                    paint.color = 0xffffffff;
+                    return true;
+                }
+                break;
+            // pink step 2 (pink with 50% opacity on bg)
+            case 0xffef73ea:
+                paint.color = 0xff812d7d;
+                return true;
+            // pink step 3 (pink with 33.3% opacity on bg)
+            case 0xfff49ff0:
+                paint.color = 0xff4d234c;
+                return true;
+            // pink and orange
+            case 0xffe941e2:
+            case 0xff698efb:
+            // pink and orange (translucent)
+            case 0x4de941e2:
+            case 0x62698efb:
+                return false;
+            // blue darker 1 (blue with 50% opacity on bg)
+            case 0xffde944f:
+            case 0xffe3b080:
+            case 0xffe4cbb3:
+            case 0xfff5c99f:
+            case 0xfff6d1b0:
+                paint.color = 0xff7c4919;
+                return true;
+            // blue darker 2 (blue with 33.3% opacity on bg)
+            case 0xffe5d9cd:
+            case 0xfff8dcc2:
+            case 0xffe1a265:
+                paint.color = 0xff5b3a1a;
+                return true;
+            // blue darker 3 (blue with 25% opacity on bg)
+            case 0xffe5cbb3:
+                paint.color = 0xff4b321a;
+                return true;
+            }
         }
     }
 
@@ -520,6 +714,7 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
     {
     // scopes or other special things (do nothing)
     case 0x40ffffff:
+    case 0xff0000aa:
     case 0xff004200:
     case 0xff2b281e:
     case 0xff2d2827:
@@ -550,26 +745,180 @@ static inline bool invertPaint(NSVGshape* const shape, NSVGpaint& paint, const c
         return true;
     // all others (direct invert)
     default:
-        paint.color = (paint.color & 0xff000000)
-                    | (0xff0000 - (paint.color & 0xff0000))
-                    | (0xff00 - (paint.color & 0xff00))
-                    | (0xff - (paint.color & 0xff));
+        paint.color = invertColor(paint.color);
         return true;
+    }
+}
+
+static inline
+bool invertPaintForLightMode(NSVGshape* const shape, NSVGpaint& paint)
+{
+    switch(paint.type)
+    {
+    case NSVG_PAINT_NONE:
+        return true;
+    case NSVG_PAINT_LINEAR_GRADIENT:
+        for (int i=0; i<paint.gradient->nstops; ++i)
+            paint.gradient->stops[i].color = invertColor(paint.gradient->stops[i].color);
+        return true;
+    case NSVG_PAINT_COLOR:
+        paint.color = invertColor(paint.color);
+        return true;
+    default:
+        return false;
     }
 }
 
 extern "C" {
 NSVGimage* nsvgParseFromFileCardinal(const char* filename, const char* units, float dpi);
+void nsvgDeleteCardinal(NSVGimage*);
+}
+
+struct ExtendedNSVGimage {
+    NSVGimage* const handle;
+    NSVGimage* handleOrig;
+    NSVGimage* handleMOD;
+    NSVGshape* shapesOrig;
+    NSVGshape* shapesMOD;
+};
+
+static std::list<ExtendedNSVGimage> loadedDarkSVGs;
+static std::list<ExtendedNSVGimage> loadedLightSVGs;
+
+static inline
+void nsvg__duplicatePaint(NSVGpaint& dst, NSVGpaint& src)
+{
+	if (dst.type == NSVG_PAINT_LINEAR_GRADIENT || dst.type == NSVG_PAINT_RADIAL_GRADIENT)
+    {
+        const size_t size = sizeof(NSVGgradient) + sizeof(NSVGgradientStop)*(src.gradient->nstops-1);
+		dst.gradient = static_cast<NSVGgradient*>(malloc(size));
+		std::memcpy(dst.gradient, src.gradient, size);
+    }
+}
+
+static inline
+NSVGshape* nsvg__duplicateShapes(NSVGshape* const orig)
+{
+    NSVGshape* const dup = static_cast<NSVGshape*>(malloc(sizeof(NSVGshape)));
+    std::memcpy(dup, orig, sizeof(NSVGshape));
+    nsvg__duplicatePaint(dup->fill, orig->fill);
+    nsvg__duplicatePaint(dup->stroke, orig->stroke);
+
+    for (NSVGshape* shape2 = dup;;)
+    {
+        if (shape2->next == nullptr)
+            break;
+
+        NSVGshape* const shapedup = static_cast<NSVGshape*>(malloc(sizeof(NSVGshape)));
+        std::memcpy(shapedup, shape2->next, sizeof(NSVGshape));
+        nsvg__duplicatePaint(shapedup->fill, shape2->next->fill);
+        nsvg__duplicatePaint(shapedup->stroke, shape2->next->stroke);
+        shape2->next = shapedup;
+        shape2 = shapedup;
+    }
+
+    return dup;
+}
+
+static inline
+void deleteExtendedNSVGimage(ExtendedNSVGimage& ext)
+{
+    if (ext.shapesMOD != nullptr)
+    {
+        // delete duplicated resources
+        for (NSVGshape *next, *shape = ext.shapesMOD;;)
+        {
+            next = shape->next;
+
+            nsvg__deletePaint(&shape->fill);
+            nsvg__deletePaint(&shape->stroke);
+            std::free(shape);
+
+            if (next == nullptr)
+                break;
+
+            shape = next;
+        }
+
+        // revert shapes back to original
+        ext.handle->shapes = ext.shapesOrig;
+        ext.shapesMOD = nullptr;
+    }
+
+    if (ext.handleMOD != nullptr)
+    {
+        nsvgDelete(ext.handleMOD);
+        ext.handleMOD = nullptr;
+    }
+
+    if (ext.handleOrig != nullptr)
+    {
+        std::memcpy(ext.handle, ext.handleOrig, sizeof(NSVGimage));
+        std::free(ext.handleOrig);
+        ext.handleOrig = nullptr;
+    }
 }
 
 NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* const units, const float dpi)
 {
     if (NSVGimage* const handle = nsvgParseFromFile(filename, units, dpi))
     {
-        for (size_t i = 0; i < sizeof(svgFilesToInvert)/sizeof(svgFilesToInvert[0]); ++i)
+        const size_t filenamelen = std::strlen(filename);
+
+        bool hasDarkMode = false;
+        bool hasLightMode = false;
+        NSVGimage* handleOrig;
+        NSVGimage* handleMOD = nullptr;
+        NSVGshape* shapesOrig;
+        NSVGshape* shapesMOD;
+
+        // Special case for light/dark screws
+        if (std::strncmp(filename + (filenamelen-16), "/ScrewSilver.svg", 16) == 0)
         {
-            const char* const svgFileToInvert = svgFilesToInvert[i].filename;
-            const size_t filenamelen = std::strlen(filename);
+            const std::string blackfilename = std::string(filename).substr(0, filenamelen-10) + "Black.svg";
+            hasDarkMode = true;
+            shapesOrig = shapesMOD = nullptr;
+            handleMOD = nsvgParseFromFile(blackfilename.c_str(), units, dpi);
+            goto postparse;
+        }
+
+        if (std::strncmp(filename + (filenamelen-15), "/ScrewBlack.svg", 15) == 0)
+        {
+            const std::string silverfilename = std::string(filename).substr(0, filenamelen-9) + "Silver.svg";
+            hasLightMode = true;
+            shapesOrig = shapesMOD = nullptr;
+            handleMOD = nsvgParseFromFile(silverfilename.c_str(), units, dpi);
+            goto postparse;
+        }
+
+#if 0
+        // Special case for GlueTheGiant
+        if (std::strstr(filename, "/GlueTheGiant/res/") != nullptr)
+        {
+            printf("special hack for glue\n");
+            if (std::strncmp(filename + (filenamelen - 13), "/BusDepot.svg",     13) == 0 ||
+                std::strncmp(filename + (filenamelen - 13), "/BusRoute.svg",     13) == 0 ||
+                std::strncmp(filename + (filenamelen - 13), "/EnterBus.svg",     13) == 0 ||
+                std::strncmp(filename + (filenamelen - 12), "/ExitBus.svg",      12) == 0 ||
+                std::strncmp(filename + (filenamelen - 11), "/GigBus.svg",       11) == 0 ||
+                std::strncmp(filename + (filenamelen - 17), "/MetroCityBus.svg", 17) == 0 ||
+                std::strncmp(filename + (filenamelen - 12), "/MiniBus.svg",      12) == 0 ||
+                std::strncmp(filename + (filenamelen -  9), "/Road.svg",          9) == 0 ||
+                std::strncmp(filename + (filenamelen - 14), "/SchoolBus.svg",    14) == 0)
+            {
+                const std::string nightfilename = std::string(filename).substr(0, filenamelen-4) + "_Night.svg";
+                hasDarkMode = true;
+                shapesOrig = shapesMOD = nullptr;
+                handleMOD = nsvgParseFromFile(nightfilename.c_str(), units, dpi);
+                printf("special hack for glue: %s -> %s\n", filename, nightfilename.c_str());
+                goto postparse;
+            }
+        }
+#endif
+
+        for (size_t i = 0; i < sizeof(svgFilesToInvertForDarkMode)/sizeof(svgFilesToInvertForDarkMode[0]); ++i)
+        {
+            const char* const svgFileToInvert = svgFilesToInvertForDarkMode[i].filename;
             const size_t filterlen = std::strlen(svgFileToInvert);
 
             if (filenamelen < filterlen)
@@ -577,11 +926,17 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             if (std::strncmp(filename + (filenamelen-filterlen), svgFileToInvert, filterlen) != 0)
                 continue;
 
-            const char* const* const shapeIdsToIgnore = svgFilesToInvert[i].shapeIdsToIgnore;
-            const int shapeNumberToIgnore = svgFilesToInvert[i].shapeNumberToIgnore;
+            const char* const* const shapeIdsToIgnore = svgFilesToInvertForDarkMode[i].shapeIdsToIgnore;
+            const int shapeNumberToIgnore = svgFilesToInvertForDarkMode[i].shapeNumberToIgnore;
             int shapeCounter = 0;
 
-            for (NSVGshape* shape = handle->shapes; shape != nullptr; shape = shape->next, ++shapeCounter)
+            hasDarkMode = true;
+            handleMOD = nullptr;
+            shapesOrig = handle->shapes;
+            shapesMOD = nsvg__duplicateShapes(shapesOrig);
+
+            // shape paint inversion
+            for (NSVGshape* shape = shapesMOD; shape != nullptr; shape = shape->next, ++shapeCounter)
             {
                 if (shapeNumberToIgnore == shapeCounter)
                     continue;
@@ -598,11 +953,37 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
                 if (ignore)
                     continue;
 
-                if (invertPaint(shape, shape->fill, svgFileToInvert))
-                    invertPaint(shape, shape->stroke, svgFileToInvert);
+                if (invertPaintForDarkMode(shape, shape->fill, svgFileToInvert))
+                    invertPaintForDarkMode(shape, shape->stroke, svgFileToInvert);
             }
 
-            return handle;
+            goto postparse;
+        }
+
+        for (size_t i = 0; i < sizeof(svgFilesToInvertForLightMode)/sizeof(svgFilesToInvertForLightMode[0]); ++i)
+        {
+            const char* const svgFileToInvert = svgFilesToInvertForLightMode[i].filename;
+            const size_t filenamelen = std::strlen(filename);
+            const size_t filterlen = std::strlen(svgFileToInvert);
+
+            if (filenamelen < filterlen)
+                continue;
+            if (std::strncmp(filename + (filenamelen-filterlen), svgFileToInvert, filterlen) != 0)
+                continue;
+
+            hasLightMode = true;
+            handleMOD = nullptr;
+            shapesOrig = handle->shapes;
+            shapesMOD = nsvg__duplicateShapes(shapesOrig);
+
+            // shape paint inversion
+            for (NSVGshape* shape = shapesMOD; shape != nullptr; shape = shape->next)
+            {
+                if (invertPaintForLightMode(shape, shape->fill))
+                    invertPaintForLightMode(shape, shape->stroke);
+            }
+
+            goto postparse;
         }
 
         // Special case for AmalgamatedHarmonics background color
@@ -610,8 +991,123 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             if (std::strstr(filename, "/AmalgamatedHarmonics/") != nullptr)
                 handle->shapes->fill.color = 0xff191919;
 
+postparse:
+        if (handleMOD != nullptr)
+        {
+            handleOrig = static_cast<NSVGimage*>(malloc(sizeof(NSVGimage)));
+            std::memcpy(handleOrig, handle, sizeof(NSVGimage));
+        }
+        else
+        {
+            handleOrig = nullptr;
+        }
+
+        if (hasDarkMode)
+        {
+            const ExtendedNSVGimage ext = { handle, handleOrig, handleMOD, shapesOrig, shapesMOD };
+            loadedDarkSVGs.push_back(ext);
+
+            if (rack::settings::darkMode)
+            {
+                if (shapesMOD != nullptr)
+                    handle->shapes = shapesMOD;
+                else if (handleMOD != nullptr)
+                    std::memcpy(handle, handleMOD, sizeof(NSVGimage));
+            }
+        }
+
+        if (hasLightMode)
+        {
+            const ExtendedNSVGimage ext = { handle, handleOrig, handleMOD, shapesOrig, shapesMOD };
+            loadedLightSVGs.push_back(ext);
+
+            if (!rack::settings::darkMode)
+            {
+                if (shapesMOD != nullptr)
+                    handle->shapes = shapesMOD;
+                else if (handleMOD != nullptr)
+                    std::memcpy(handle, handleMOD, sizeof(NSVGimage));
+            }
+        }
+
         return handle;
     }
 
     return nullptr;
+}
+
+void nsvgDeleteCardinal(NSVGimage* const handle)
+{
+    for (auto it = loadedDarkSVGs.begin(), end = loadedDarkSVGs.end(); it != end; ++it)
+    {
+        ExtendedNSVGimage& ext(*it);
+
+        if (ext.handle != handle)
+            continue;
+
+        deleteExtendedNSVGimage(ext);
+        loadedDarkSVGs.erase(it);
+        break;
+    }
+
+    for (auto it = loadedLightSVGs.begin(), end = loadedLightSVGs.end(); it != end; ++it)
+    {
+        ExtendedNSVGimage& ext(*it);
+
+        if (ext.handle != handle)
+            continue;
+
+        deleteExtendedNSVGimage(ext);
+        loadedLightSVGs.erase(it);
+        break;
+    }
+
+    nsvgDelete(handle);
+}
+
+void switchDarkMode(const bool darkMode)
+{
+    if (rack::settings::darkMode == darkMode)
+        return;
+
+    rack::settings::darkMode = darkMode;
+
+    for (ExtendedNSVGimage& ext : loadedDarkSVGs)
+    {
+        if (ext.shapesMOD != nullptr)
+            ext.handle->shapes = darkMode ? ext.shapesMOD : ext.shapesOrig;
+        else if (ext.handleMOD != nullptr)
+            std::memcpy(ext.handle, darkMode ? ext.handleMOD : ext.handleOrig, sizeof(NSVGimage));
+    }
+
+    for (ExtendedNSVGimage& ext : loadedLightSVGs)
+    {
+        if (ext.shapesMOD != nullptr)
+            ext.handle->shapes = !darkMode ? ext.shapesMOD : ext.shapesOrig;
+        else if (ext.handleMOD != nullptr)
+            std::memcpy(ext.handle, !darkMode ? ext.handleMOD : ext.handleOrig, sizeof(NSVGimage));
+    }
+}
+
+namespace rack {
+namespace asset {
+
+void destroy() {
+    for (auto it = loadedDarkSVGs.begin(), end = loadedDarkSVGs.end(); it != end; ++it)
+    {
+        ExtendedNSVGimage& ext(*it);
+        deleteExtendedNSVGimage(ext);
+    }
+
+    for (auto it = loadedLightSVGs.begin(), end = loadedLightSVGs.end(); it != end; ++it)
+    {
+        ExtendedNSVGimage& ext(*it);
+        deleteExtendedNSVGimage(ext);
+    }
+
+    loadedDarkSVGs.clear();
+    loadedLightSVGs.clear();
+}
+
+}
 }

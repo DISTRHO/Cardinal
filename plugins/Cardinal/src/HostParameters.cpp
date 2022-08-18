@@ -37,6 +37,9 @@ struct HostParameters : TerminalModule {
     CardinalPluginContext* const pcontext;
     rack::dsp::SlewLimiter parameters[kModuleParameters];
     bool parametersConnected[kModuleParameters] = {};
+    bool bypassed = false;
+    bool smooth = true;
+    uint32_t lastProcessCounter = 0;
 
     HostParameters()
         : pcontext(static_cast<CardinalPluginContext*>(APP))
@@ -45,32 +48,37 @@ struct HostParameters : TerminalModule {
             throw rack::Exception("Plugin context is null.");
 
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-
-        const float fsampleRate = static_cast<float>(pcontext->sampleRate);
-        SampleRateChangeEvent e = {
-            fsampleRate,
-            1.0f / fsampleRate
-        };
-        onSampleRateChange(e);
     }
 
     void processTerminalInput(const ProcessArgs& args) override
     {
-        if (isBypassed())
+        const uint32_t processCounter = pcontext->processCounter;
+
+        if (lastProcessCounter != processCounter)
+        {
+            bypassed = isBypassed();
+            lastProcessCounter = processCounter;
+
+            for (uint32_t i=0; i<kModuleParameters; ++i)
+            {
+                const bool connected = outputs[i].isConnected();
+
+                if (parametersConnected[i] != connected)
+                {
+                    parametersConnected[i] = connected;
+                    parameters[i].reset();
+                }
+            }
+        }
+
+        if (bypassed)
             return;
 
         for (uint32_t i=0; i<kModuleParameters; ++i)
         {
-            const bool connected = outputs[i].isConnected();
-
-            if (parametersConnected[i] != connected)
-            {
-                parametersConnected[i] = connected;
-                parameters[i].reset();
-            }
-
-            if (connected)
-                outputs[i].setVoltage(parameters[i].process(args.sampleTime, pcontext->parameters[i]));
+            if (parametersConnected[i])
+                outputs[i].setVoltage(smooth ? parameters[i].process(args.sampleTime, pcontext->parameters[i])
+                                             : pcontext->parameters[i]);
         }
     }
 
@@ -86,6 +94,25 @@ struct HostParameters : TerminalModule {
             parameters[i].reset();
             parameters[i].setRiseFall(fall, fall);
         }
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // save and load json stuff
+
+    json_t* dataToJson() override
+    {
+        json_t* const rootJ = json_object();
+        DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr, nullptr);
+
+        json_object_set_new(rootJ, "smooth", json_boolean(smooth));
+
+        return rootJ;
+    }
+
+    void dataFromJson(json_t* const rootJ) override
+    {
+        if (json_t* const smoothJ = json_object_get(rootJ, "smooth"))
+            smooth = json_boolean_value(smoothJ);
     }
 };
 
@@ -111,9 +138,12 @@ struct HostParametersWidget : ModuleWidgetWith9HP {
     static constexpr const float paddingH = 30.0f;
     static constexpr const float paddingV = 49.0f;
 
-    HostParametersWidget(HostParameters* const module)
+    HostParameters* const module;
+
+    HostParametersWidget(HostParameters* const m)
+        : module(m)
     {
-        setModule(module);
+        setModule(m);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostParameters.svg")));
         createAndAddScrews();
 
@@ -121,7 +151,7 @@ struct HostParametersWidget : ModuleWidgetWith9HP {
         {
             const float x = startX + int(i / 6) * paddingH;
             const float y = startY + int(i % 6) * paddingV;
-            addOutput(createOutput<CardinalParameterPJ301MPort>(Vec(x, y), module, i));
+            addOutput(createOutput<CardinalParameterPJ301MPort>(Vec(x, y), m, i));
         }
     }
 
@@ -153,6 +183,12 @@ struct HostParametersWidget : ModuleWidgetWith9HP {
         }
 
         ModuleWidgetWith9HP::draw(args);
+    }
+
+    void appendContextMenu(Menu* const menu) override
+    {
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createBoolPtrMenuItem("Smooth", "", &module->smooth));
     }
 };
 #else

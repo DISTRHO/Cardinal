@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="Cardinal" />
+    <meta name="theme-color" content="#111111">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=0" user-scalable="no">
+    <title>Cardinal</title>
+    <style>
+      html {
+        background-color: #111111;
+        color: #eee;
+        overflow: hidden;
+      }
+      body, canvas {
+        padding: 0;
+        margin: 0;
+      }
+
+      #canvas_file_open {
+        display: none;
+      }
+
+      #canvas_wrapper {
+        --device-pixel-ratio: 1;
+        display: none;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        position: fixed;
+        transform-origin: 0 0 0;
+        transform: scale(calc(1 / var(--device-pixel-ratio)));
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #error {
+        background: rgba(0,0,0,0.75);
+        display: none;
+        position: fixed;
+        padding: 0.5em;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 2;
+      }
+
+      .emscripten {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding-right: 0;
+        text-align: center;
+      }
+
+      .spinner {
+        height: 50px;
+        width: 50px;
+        margin: 0px auto;
+        margin-top: 100px;
+        -webkit-animation: rotation .8s linear infinite;
+        -moz-animation: rotation .8s linear infinite;
+        -o-animation: rotation .8s linear infinite;
+        animation: rotation 0.8s linear infinite;
+        border-left: 10px solid rgb(0,150,240);
+        border-right: 10px solid rgb(0,150,240);
+        border-bottom: 10px solid rgb(0,150,240);
+        border-top: 10px solid rgb(100,0,200);
+        border-radius: 100%;
+        background-color: rgb(200,100,250);
+      }
+      @-webkit-keyframes rotation {
+        from {-webkit-transform: rotate(0deg);}
+        to {-webkit-transform: rotate(360deg);}
+      }
+      @-moz-keyframes rotation {
+        from {-moz-transform: rotate(0deg);}
+        to {-moz-transform: rotate(360deg);}
+      }
+      @-o-keyframes rotation {
+        from {-o-transform: rotate(0deg);}
+        to {-o-transform: rotate(360deg);}
+      }
+      @keyframes rotation {
+        from {transform: rotate(0deg);}
+        to {transform: rotate(360deg);}
+      }
+
+    </style>
+  </head>
+  <body>
+    <figure style="overflow:visible;" id="spinner">
+      <div class="spinner"></div>
+      <center style="margin-top:0.5em"><strong>Cardinal</strong></center>
+    </figure>
+    <div class="emscripten" id="error"></div>
+    <div class="emscripten" id="status">Downloading...</div>
+    <div class="emscripten">
+      <progress value="0" max="100" id="progress" hidden=1></progress>
+    </div>
+    <div id="canvas_wrapper">
+      <input type="file" id="canvas_file_open" ></input>
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+    </div>
+
+    <script type='text/javascript'>
+      'use strict';
+
+      var wasmErrors = [];
+      var errorElement = document.getElementById('error');
+      var statusElement = document.getElementById('status');
+      var progressElement = document.getElementById('progress');
+      var spinnerElement = document.getElementById('spinner');
+
+      if (typeof(WebAssembly) === "undefined") {
+        wasmErrors.push('WebAssembly unsupported');
+      } else {
+        if (!WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,2,1,0,5,3,1,0,1,10,14,1,12,0,65,0,65,0,65,0,252,10,0,0,11]))) {
+          wasmErrors.push('Bulk Memory Operations unsupported');
+        }
+        if (!WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,2,1,0,10,8,1,6,0,6,64,25,11,11]))) {
+          wasmErrors.push('Exception handling unsupported');
+        }
+        if (!WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,2,8,1,1,97,1,98,3,127,1,6,6,1,127,1,65,0,11,7,5,1,1,97,3,1]))) {
+          wasmErrors.push('Importable/Exportable mutable globals unsupported');
+        }
+        if (!WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,5,1,96,0,1,123,3,2,1,0,10,10,1,8,0,65,0,253,15,253,98,11]))) {
+          wasmErrors.push('Fixed-Width SIMD unsupported');
+        }
+      }
+
+      if (wasmErrors.length !== 0) {
+        errorElement.innerHTML = 'Cannot start Cardinal:<br>' + wasmErrors.join('<br>') + '<br><br>Perhaps try a different browser?';
+        errorElement.style.display = 'block';
+        statusElement.style.display = 'none';
+        progressElement.style.display = 'none';
+        spinnerElement.style.display = 'none';
+      } else {
+        var canvasWrapper = document.getElementById('canvas_wrapper');
+
+        var Module = {
+          preRun: [],
+          postRun: function() {
+            statusElement.style.display = 'none';
+            progressElement.style.display = 'none';
+            spinnerElement.style.display = 'none';
+            canvasWrapper.style.display = 'block';
+            window.dispatchEvent(new Event('resize'));
+          },
+          canvas: (function() {
+            var canvas = document.getElementById('canvas');
+
+            // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+            // application robust, you may want to override this behavior before shipping!
+            // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+            canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+
+            return canvas;
+          })(),
+          setStatus: function(text) {
+            if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+            if (text === Module.setStatus.last.text) return;
+            var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+            var now = Date.now();
+            if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+            Module.setStatus.last.time = now;
+            Module.setStatus.last.text = text;
+            if (m) {
+              text = m[1];
+              progressElement.value = parseInt(m[2])*100;
+              progressElement.max = parseInt(m[4])*100;
+              progressElement.hidden = false;
+              spinnerElement.hidden = false;
+            } else {
+              progressElement.value = null;
+              progressElement.max = null;
+              progressElement.hidden = true;
+              if (!text) spinnerElement.hidden = true;
+            }
+            statusElement.innerHTML = text;
+          },
+          totalDependencies: 0,
+          monitorRunDependencies: function(left) {
+            this.totalDependencies = Math.max(this.totalDependencies, left);
+            Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+          }
+        };
+        Module.setStatus('Downloading...');
+        window.onerror = function(err) {
+          errorElement.innerHTML = 'Exception thrown:<br>' + err
+          errorElement.style.display = 'block';
+          spinnerElement.style.display = 'none';
+          Module.setStatus = function(text) {
+            if (text) console.error('[post-exception status] ' + text);
+          };
+        };
+      }
+    </script>
+    {{{ SCRIPT }}}
+  </body>
+</html>

@@ -9,13 +9,12 @@ else
   exit
 fi
 
-rm -rf res
-rm -rf au
-rm -rf lv2
-rm -rf vst2
-rm -rf vst3
+rm -rf res jack native au lv2 vst2 vst3
+mkdir jack native au lv2 vst2 vst3
 
-mkdir au lv2 vst2 vst3
+mv Cardinal.app jack/CardinalJACK.app
+mv CardinalNative.app native/CardinalNative.app
+
 mv *.component au/
 mv *.lv2 lv2/
 mv *.vst vst2/
@@ -30,6 +29,18 @@ pkgbuild \
   --install-location "/Library/Application Support/Cardinal/" \
   --root "${PWD}/res/" \
   ../dpf-cardinal-resources.pkg
+
+pkgbuild \
+  --identifier "studio.kx.distrho.plugins.cardinal.jack" \
+  --install-location "/Applications/" \
+  --root "${PWD}/jack/" \
+  ../dpf-cardinal-jack.pkg
+
+pkgbuild \
+  --identifier "studio.kx.distrho.plugins.cardinal.native" \
+  --install-location "/Applications/" \
+  --root "${PWD}/native/" \
+  ../dpf-cardinal-native.pkg
 
 pkgbuild \
   --identifier "studio.kx.distrho.plugins.cardinal.components" \
@@ -57,7 +68,9 @@ pkgbuild \
 
 cd ..
 
-sed -e "s|@builddir@|${PWD}/build|" utils/macOS/package.xml.in > build/package.xml
+sed -e "s|@builddir@|${PWD}/build|" \
+    -e "s|@buildarchs@|${MACOS_ARCHS}|" \
+    utils/macOS/package.xml.in > build/package.xml
 
 productbuild \
   --distribution build/package.xml \

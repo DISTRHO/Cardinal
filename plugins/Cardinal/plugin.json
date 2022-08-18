@@ -91,6 +91,15 @@
       ]
     },
     {
+      "slug": "HostParametersMap",
+      "name": "Host Parameters Map",
+      "description": "Allows host-controlled plugin parameters to control other module parameters",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#host-parameters-map",
+      "tags": [
+        "External"
+      ]
+    },
+    {
       "slug": "HostTime",
       "name": "Host Time",
       "description": "Exposes host-provided time/transport information in a module",
@@ -114,7 +123,7 @@
       "description": "Cardinal's own blank panel, featuring Hatsune Miku",
       "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#blank",
       "tags": [
-        "Visual"
+        "Blank"
       ]
     },
     {
@@ -147,6 +156,15 @@
       ]
     },
     {
+      "slug": "AudioToCVPitch",
+      "name": "Audio To CV Pitch",
+      "description": "Converts a monophonic audio signal to CV pitch",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#audio-to-cv-pitch",
+      "tags": [
+        "Utility"
+      ]
+    },
+    {
       "slug": "Carla",
       "name": "Carla Plugin Host",
       "description": "A modular plugin host within Cardinal",
@@ -169,6 +187,15 @@
       "name": "MPV",
       "description": "An embed video player inside Cardinal",
       "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#mpv",
+      "tags": [
+        "Visual"
+      ]
+    },
+    {
+      "slug": "SassyScope",
+      "name": "Sassy Scope",
+      "description": "Scope from Sassy Audio Spreadsheet",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#sassy-scope",
       "tags": [
         "Visual"
       ]

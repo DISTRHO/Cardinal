@@ -19,7 +19,7 @@ iscc="${innodir}/drive_c/InnoSetup/ISCC.exe"
 # download it
 if [ ! -f "${dlfile}" ]; then
     # FIXME proper dl version
-    curl -L https://jrsoftware.org/download.php/is.exe?site=2 -o "${dlfile}"
+    curl -L https://jrsoftware.org/download.php/is.exe -o "${dlfile}"
 fi
 
 # initialize wine

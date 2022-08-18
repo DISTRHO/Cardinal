@@ -54,6 +54,7 @@ typedef struct GLFWwindow GLFWwindow;
 
 GLFWAPI const char* glfwGetClipboardString(GLFWwindow*) { return nullptr; }
 GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char*) {}
+GLFWAPI GLFWcursor* glfwCreateStandardCursor(int) { return nullptr; }
 GLFWAPI void glfwSetCursor(GLFWwindow*, GLFWcursor*) {}
 GLFWAPI const char* glfwGetKeyName(int, int) { return nullptr; }
 GLFWAPI int glfwGetKeyScancode(int) { return 0; }

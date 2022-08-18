@@ -62,6 +62,10 @@
 # include "src/Resources.hpp"
 #endif
 
+#ifdef DISTRHO_OS_WASM
+# include <emscripten/html5.h>
+#endif
+
 namespace rack {
 namespace window {
 
@@ -157,7 +161,9 @@ struct Window::Internal {
 
 	int frame = 0;
 	int frameSwapInterval = 1;
+#ifndef DGL_USE_GLES
 	int generateScreenshotStep = kScreenshotStepNone;
+#endif
 	double monitorRefreshRate = 60.0;
 	double frameTime = 0.0;
 	double lastFrameDuration = 0.0;
@@ -170,7 +176,11 @@ struct Window::Internal {
 
 	Internal()
 		: hiddenApp(false),
-		  hiddenWindow(hiddenApp) { hiddenApp.idle(); }
+		  hiddenWindow(hiddenApp)
+	{
+		hiddenWindow.setIgnoringKeyRepeat(true);
+		hiddenApp.idle();
+	}
 };
 
 
@@ -222,10 +232,30 @@ Window::Window() {
 
 	if (uiFont != nullptr)
 		bndSetFont(uiFont->handle);
+
+#ifdef DISTRHO_OS_WASM
+	emscripten_lock_orientation(EMSCRIPTEN_ORIENTATION_LANDSCAPE_PRIMARY);
+#endif
 }
 
 void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 {
+	// if nanovg context failed, init only bare minimum
+	if (window->vg == nullptr)
+	{
+		if (ui != nullptr)
+		{
+			window->internal->ui = ui;
+			window->internal->size = rack::math::Vec(ui->getWidth(), ui->getHeight());
+		}
+		else
+		{
+			window->internal->ui = nullptr;
+			window->internal->callback = nullptr;
+		}
+		return;
+	}
+
 	if (ui != nullptr)
 	{
 		const GLubyte* vendor = glGetString(GL_VENDOR);
@@ -329,13 +359,16 @@ Window::~Window() {
 		internal->fontCache.clear();
 		internal->imageCache.clear();
 
+		if (vg != nullptr)
+		{
 #if defined NANOVG_GLES2
-		nvgDeleteGLES2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
-		nvgDeleteGLES2(internal->o_vg != nullptr ? internal->o_vg : vg);
+			nvgDeleteGLES2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
+			nvgDeleteGLES2(internal->o_vg != nullptr ? internal->o_vg : vg);
 #else
-		nvgDeleteGL2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
-		nvgDeleteGL2(internal->o_vg != nullptr ? internal->o_vg : vg);
+			nvgDeleteGL2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
+			nvgDeleteGL2(internal->o_vg != nullptr ? internal->o_vg : vg);
 #endif
+		}
 	}
 
 	delete internal;
@@ -355,12 +388,18 @@ void Window::setSize(math::Vec size) {
 		ui->setSize(internal->size.x, internal->size.y);
 }
 
+void WindowSetInternalSize(rack::window::Window* const window, math::Vec size) {
+	size = size.max(WINDOW_SIZE_MIN);
+	window->internal->size = size;
+}
+
 
 void Window::run() {
 	internal->frame = 0;
 }
 
 
+#ifndef DGL_USE_GLES
 static void Window__flipBitmap(uint8_t* pixels, const int width, const int height, const int depth) {
 	for (int y = 0; y < height / 2; y++) {
 		const int flipY = height - y - 1;
@@ -410,10 +449,14 @@ static void Window__writeImagePNG(void* context, void* data, int size) {
 	ui->setState("screenshot", String::asBase64(data, size).buffer());
 }
 #endif
+#endif
 
 
 void Window::step() {
 	DISTRHO_SAFE_ASSERT_RETURN(internal->ui != nullptr,);
+
+	if (vg == nullptr)
+		return;
 
 	double frameTime = system::getTime();
 	double lastFrameTime = internal->frameTime;
@@ -448,6 +491,7 @@ void Window::step() {
 		APP->event->handleDirty();
 	}
 
+#ifndef DGL_USE_GLES
 	// Hide menu and background if generating screenshot
 	if (internal->generateScreenshotStep == kScreenshotStepStarted) {
 #ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
@@ -457,6 +501,7 @@ void Window::step() {
 		internal->generateScreenshotStep = kScreenshotStepSecondPass;
 #endif
 	}
+#endif
 
 	// Get framebuffer/window ratio
 	int winWidth = internal->ui->getWidth();
@@ -496,6 +541,7 @@ void Window::step() {
 
 	++internal->frame;
 
+#ifndef DGL_USE_GLES
 	if (internal->generateScreenshotStep != kScreenshotStepNone) {
 		++internal->generateScreenshotStep;
 
@@ -524,7 +570,7 @@ void Window::step() {
 #ifdef STBI_WRITE_NO_STDIO
 			Window__downscaleBitmap(pixelsWithOffset, winWidth, winHeight);
 			stbi_write_png_to_func(Window__writeImagePNG, internal->ui,
-                                   winWidth, winHeight, depth, pixelsWithOffset, stride);
+			                       winWidth, winHeight, depth, pixelsWithOffset, stride);
 #else
 			stbi_write_png("screenshot.png", winWidth, winHeight, depth, pixelsWithOffset, stride);
 #endif
@@ -536,6 +582,7 @@ void Window::step() {
 
 		delete[] pixels;
 	}
+#endif
 }
 
 
@@ -559,14 +606,31 @@ void Window::close() {
 
 
 void Window::cursorLock() {
+#ifdef DISTRHO_OS_WASM
+	if (!settings::allowCursorLock)
+		return;
+
+	emscripten_request_pointerlock(internal->ui->getWindow().getApp().getClassName(), false);
+#endif
 }
 
 
 void Window::cursorUnlock() {
+#ifdef DISTRHO_OS_WASM
+	if (!settings::allowCursorLock)
+		return;
+
+	emscripten_exit_pointerlock();
+#endif
 }
 
 
 bool Window::isCursorLocked() {
+#ifdef DISTRHO_OS_WASM
+	EmscriptenPointerlockChangeEvent status;
+	if (emscripten_get_pointerlock_status(&status) == EMSCRIPTEN_RESULT_SUCCESS)
+		return status.isActive;
+#endif
 	return false;
 }
 
@@ -576,18 +640,28 @@ int Window::getMods() {
 }
 
 
-void Window::setFullScreen(bool) {
+void Window::setFullScreen(const bool fullscreen) {
+#ifdef DISTRHO_OS_WASM
+	if (fullscreen)
+		emscripten_request_fullscreen(internal->ui->getWindow().getApp().getClassName(), false);
+	else
+		emscripten_exit_fullscreen();
+#endif
 }
 
 
 bool Window::isFullScreen() {
-#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
+#ifdef DISTRHO_OS_WASM
+	EmscriptenFullscreenChangeEvent status;
+	if (emscripten_get_fullscreen_status(&status) == EMSCRIPTEN_RESULT_SUCCESS)
+		return status.isFullscreen;
+	return false;
+#elif defined(CARDINAL_TRANSPARENT_SCREENSHOTS) && !defined(DGL_USE_GLES)
 	return internal->generateScreenshotStep != kScreenshotStepNone;
 #else
 	return false;
 #endif
 }
-
 
 double Window::getMonitorRefreshRate() {
 	return internal->monitorRefreshRate;
@@ -663,7 +737,9 @@ int& Window::fbCount() {
 
 
 void generateScreenshot() {
+#ifndef DGL_USE_GLES
 	APP->window->internal->generateScreenshotStep = kScreenshotStepStarted;
+#endif
 }
 
 
@@ -760,6 +836,13 @@ void WindowParametersSave(rack::window::Window* const window)
 			window->internal->callback->WindowParametersChanged(kWindowParameterLockModulePositions,
 			                                                    rack::settings::lockModules);
 	}
+	if (window->internal->params.squeezeModules != rack::settings::squeezeModules)
+	{
+		window->internal->params.squeezeModules = rack::settings::squeezeModules;
+		if (window->internal->callback != nullptr)
+			window->internal->callback->WindowParametersChanged(kWindowParameterSqueezeModulePositions,
+			                                                    rack::settings::squeezeModules);
+	}
 	if (window->internal->params.invertZoom != rack::settings::invertZoom)
 	{
 		window->internal->params.invertZoom = rack::settings::invertZoom;
@@ -789,6 +872,7 @@ void WindowParametersRestore(rack::window::Window* const window)
 	rack::settings::tooltips = window->internal->params.tooltips;
 	rack::settings::knobScroll = window->internal->params.knobScroll;
 	rack::settings::lockModules = window->internal->params.lockModules;
+	rack::settings::squeezeModules = window->internal->params.squeezeModules;
 	rack::settings::invertZoom = window->internal->params.invertZoom;
 	rack::settings::rateLimit = window->internal->params.rateLimit;
 }

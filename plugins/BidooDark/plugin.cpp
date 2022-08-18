@@ -25,6 +25,12 @@ void BidooModule::dataFromJson(json_t*) {
 void BidooWidget::appendContextMenu(Menu*) {
 }
 
+void BidooWidget::writeThemeAndContrastAsDefault() {
+}
+
+void BidooWidget::readThemeAndContrastFromDefault() {
+}
+
 void BidooWidget::prepareThemes(const std::string& filename) {
 	setPanel(APP->window->loadSvg(filename));
 }

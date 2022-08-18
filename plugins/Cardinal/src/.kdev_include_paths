@@ -1,3 +1,4 @@
+../../../deps/aubio/src
 ../../../include
 ../../../carla/source/backend
 ../../../carla/source/includes

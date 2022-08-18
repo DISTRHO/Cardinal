@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(Cardinal VERSION 22.03)
+project(Cardinal VERSION 22.08)
 
 add_subdirectory(JUCE)
 
@@ -43,8 +43,14 @@ set_property(TARGET sfzero PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../
 add_library(water STATIC IMPORTED)
 set_property(TARGET water PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/water.a")
 
+add_library(ysfx STATIC IMPORTED)
+set_property(TARGET ysfx PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/ysfx.a")
+
 add_library(zita_resampler STATIC IMPORTED)
 set_property(TARGET zita_resampler PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/Release/zita-resampler.a")
+
+add_library(sCardinal STATIC IMPORTED)
+set_property(TARGET sCardinal PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../bin/Cardinal.a")
 
 add_library(sCardinalFX STATIC IMPORTED)
 set_property(TARGET sCardinalFX PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../bin/CardinalFX.a")
@@ -57,6 +63,9 @@ set_property(TARGET sPlugins PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/.
 
 add_library(sRack STATIC IMPORTED)
 set_property(TARGET sRack PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../src/rack.a")
+
+add_library(libaubio STATIC IMPORTED)
+set_property(TARGET libaubio PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../deps/aubio/libaubio.a")
 
 add_library(libarchive STATIC IMPORTED)
 if (WIN32)
@@ -83,6 +92,7 @@ set_property(TARGET libzstd PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/..
 # dependencies
 
 find_package(PkgConfig REQUIRED)
+pkg_check_modules(FFTW3F REQUIRED fftw3f)
 pkg_check_modules(LIBLO REQUIRED liblo)
 pkg_check_modules(SNDFILE REQUIRED sndfile)
 
@@ -103,6 +113,100 @@ set(STATIC_LIBS_END "-Wl,--no-whole-archive")
 set(PLUGIN_FORMATS Standalone VST3)
 endif (APPLE)
 
+# Main variant
+
+#[[
+juce_add_plugin(Cardinal
+    AU_MAIN_TYPE kAudioUnitType_MusicEffect
+    COMPANY_COPYRIGHT "GPL-3.0-or-later"
+    COMPANY_NAME "DISTRHO"
+    COMPANY_WEBSITE "https://github.com/DISTRHO/Cardinal"
+    DESCRIPTION "Virtual modular synthesizer plugin"
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    FORMATS ${PLUGIN_FORMATS}
+    IS_MIDI_EFFECT FALSE
+    IS_SYNTH FALSE
+    NEEDS_MIDI_INPUT TRUE
+    NEEDS_MIDI_OUTPUT TRUE
+    PLUGIN_CODE DcnM
+    PLUGIN_MANUFACTURER_CODE Dstr
+    PRODUCT_NAME "Cardinal")
+
+target_sources(Cardinal
+    PRIVATE
+        CardinalWrapper.cpp)
+
+target_include_directories(Cardinal
+    PRIVATE
+        ../dpf/distrho
+        ../src/Cardinal)
+
+target_compile_definitions(Cardinal
+    PUBLIC
+        DISTRHO_NAMESPACE=CardinalDISTRHO
+        DGL_NAMESPACE=CardinalDGL
+        JucePlugin_PreferredChannelConfigurations=8,8
+        JUCE_CHECK_MEMORY_LEAKS=0
+        JUCE_DISABLE_NATIVE_FILECHOOSERS=1
+        JUCE_DISPLAY_SPLASH_SCREEN=0
+        JUCE_MODAL_LOOPS_PERMITTED=0
+        JUCE_USE_CURL=0
+        JUCE_USE_FLAC=0
+        JUCE_USE_OGGVORBIS=0
+        JUCE_USE_XINERAMA=0
+        JUCE_VST3_CAN_REPLACE_VST2=0
+        JUCE_ALSA=1
+        JUCE_DIRECTSOUND=0
+        JUCE_JACK=1
+        JUCE_WASAPI=0
+        JUCE_WEB_BROWSER=0)
+
+target_link_libraries(Cardinal
+    PRIVATE
+        juce::juce_audio_utils
+        ${STATIC_LIBS_START}
+        sPlugins
+        sCardinal
+        sRack
+        carla_host_plugin
+        carla_engine_plugin
+        carla_plugin
+        native_plugins
+        audio_decoder
+        jackbridge
+        lilv
+        rtmempool
+        sfzero
+        water
+        ysfx
+        zita_resampler
+        dgl
+        libaubio
+        libarchive
+        libjansson
+        libquickjs
+        libsamplerate
+        libspeexdsp
+        libzstd
+        ${STATIC_LIBS_END}
+        ${GL_LIBRARIES}
+        ${DBUS_LIBRARIES}
+        -L${LIBLO_LIBRARY_DIRS}
+        ${FFTW3F_LIBRARIES}
+        ${LIBLO_LIBRARIES}
+        ${SNDFILE_LIBRARIES}
+        ${X11_LIBRARIES}
+        ${XCURSOR_LIBRARIES}
+        ${XEXT_LIBRARIES}
+        ${XRANDR_LIBRARIES}
+        ${EXTRA_LIBS}
+        -lmagic
+    PUBLIC
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_lto_flags
+        juce::juce_recommended_warning_flags)
+#]]
+
 # FX variant
 
 juce_add_plugin(CardinalFX
@@ -111,7 +215,7 @@ juce_add_plugin(CardinalFX
     COMPANY_NAME "DISTRHO"
     COMPANY_WEBSITE "https://github.com/DISTRHO/Cardinal"
     DESCRIPTION "Virtual modular synthesizer plugin"
-    EDITOR_WANTS_KEYBOARD_FOCUS TRUE
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     FORMATS ${PLUGIN_FORMATS}
     IS_MIDI_EFFECT FALSE
     IS_SYNTH FALSE
@@ -132,6 +236,8 @@ target_include_directories(CardinalFX
 
 target_compile_definitions(CardinalFX
     PUBLIC
+        DISTRHO_NAMESPACE=CardinalDISTRHO
+        DGL_NAMESPACE=CardinalDGL
         JucePlugin_PreferredChannelConfigurations=2,2
         JUCE_CHECK_MEMORY_LEAKS=0
         JUCE_DISABLE_NATIVE_FILECHOOSERS=1
@@ -152,8 +258,8 @@ target_link_libraries(CardinalFX
     PRIVATE
         juce::juce_audio_utils
         ${STATIC_LIBS_START}
-        sCardinalFX
         sPlugins
+        sCardinalFX
         sRack
         carla_host_plugin
         carla_engine_plugin
@@ -165,8 +271,10 @@ target_link_libraries(CardinalFX
         rtmempool
         sfzero
         water
+        ysfx
         zita_resampler
         dgl
+        libaubio
         libarchive
         libjansson
         libquickjs
@@ -177,6 +285,7 @@ target_link_libraries(CardinalFX
         ${GL_LIBRARIES}
         ${DBUS_LIBRARIES}
         -L${LIBLO_LIBRARY_DIRS}
+        ${FFTW3F_LIBRARIES}
         ${LIBLO_LIBRARIES}
         ${SNDFILE_LIBRARIES}
         ${X11_LIBRARIES}
@@ -198,7 +307,7 @@ juce_add_plugin(CardinalSynth
     COMPANY_NAME "DISTRHO"
     COMPANY_WEBSITE "https://github.com/DISTRHO/Cardinal"
     DESCRIPTION "Virtual modular synthesizer plugin"
-    EDITOR_WANTS_KEYBOARD_FOCUS TRUE
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     FORMATS ${PLUGIN_FORMATS}
     IS_MIDI_EFFECT FALSE
     IS_SYNTH TRUE
@@ -219,6 +328,8 @@ target_include_directories(CardinalSynth
 
 target_compile_definitions(CardinalSynth
     PUBLIC
+        DISTRHO_NAMESPACE=CardinalDISTRHO
+        DGL_NAMESPACE=CardinalDGL
         JucePlugin_PreferredChannelConfigurations=0,2
         JUCE_CHECK_MEMORY_LEAKS=0
         JUCE_DISABLE_NATIVE_FILECHOOSERS=1
@@ -239,8 +350,8 @@ target_link_libraries(CardinalSynth
     PRIVATE
         juce::juce_audio_utils
         ${STATIC_LIBS_START}
-        sCardinalSynth
         sPlugins
+        sCardinalSynth
         sRack
         carla_host_plugin
         carla_engine_plugin
@@ -252,8 +363,10 @@ target_link_libraries(CardinalSynth
         rtmempool
         sfzero
         water
+        ysfx
         zita_resampler
         dgl
+        libaubio
         libarchive
         libjansson
         libquickjs
@@ -264,6 +377,7 @@ target_link_libraries(CardinalSynth
         ${GL_LIBRARIES}
         ${DBUS_LIBRARIES}
         -L${LIBLO_LIBRARY_DIRS}
+        ${FFTW3F_LIBRARIES}
         ${LIBLO_LIBRARIES}
         ${SNDFILE_LIBRARIES}
         ${X11_LIBRARIES}

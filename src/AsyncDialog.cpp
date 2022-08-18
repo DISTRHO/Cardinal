@@ -44,7 +44,7 @@ struct AsyncDialog : OpaqueWidget
 	Label* label;
 
 	AsyncDialog(const char* const message)
-    {
+	{
 		setup(message);
 
 		struct AsyncDismissButton : Button {
@@ -61,7 +61,7 @@ struct AsyncDialog : OpaqueWidget
 	}
 
 	AsyncDialog(const char* const message, const std::function<void()> action)
-    {
+	{
 		setup(message);
 
 		struct AsyncCancelButton : Button {
@@ -131,7 +131,7 @@ struct AsyncDialog : OpaqueWidget
 	}
 
 	void draw(const DrawArgs& args) override
-    {
+	{
 		bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
 		Widget::draw(args);
 	}
@@ -261,13 +261,13 @@ struct AsyncTextInput : OpaqueWidget
 	}
 
 	void step() override
-    {
+	{
 		OpaqueWidget::step();
 		box.pos = parent->box.size.minus(box.size).div(2).round();
 	}
 
 	void draw(const DrawArgs& args) override
-    {
+	{
 		bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
 		Widget::draw(args);
 	}

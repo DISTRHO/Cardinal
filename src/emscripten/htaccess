@@ -1,0 +1,13 @@
+RewriteEngine on
+RewriteCond %{HTTP:Accept-Encoding} gzip
+RewriteCond %{REQUEST_URI} .*\.(data|js|wasm)
+#RewriteCond %{REQUEST_FILENAME}.gz -s
+RewriteRule ^(.+) $1.gz
+RewriteRule "\.data\.gz$" "-" [T=application/octet-stream,E=no-brotli,E=no-gzip]
+RewriteRule "\.js\.gz$" "-" [T=application/javascript,E=no-brotli,E=no-gzip]
+RewriteRule "\.wasm\.gz$" "-" [T=application/wasm,E=no-brotli,E=no-gzip]
+
+<FilesMatch ".+\.gz$">
+        Header set Content-Encoding gzip
+        Header append Vary Accept-Encoding
+</FilesMatch>

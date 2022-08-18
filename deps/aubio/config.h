@@ -1,0 +1,20 @@
+#ifndef AUBIO_CONFIG_H
+#define AUBIO_CONFIG_H
+
+#define HAVE_STDLIB_H 1
+#define HAVE_STDIO_H 1
+#define HAVE_MATH_H 1
+#define HAVE_STRING_H 1
+#define HAVE_LIMITS_H 1
+#define HAVE_STDARG_H 1
+#define HAVE_GETOPT_H 1
+#define HAVE_UNISTD_H 1
+
+#define HAVE_C99_VARARGS_MACROS 1
+#define HAVE_MEMCPY_HACKS 1
+
+#define HAVE_FFTW3
+#define HAVE_FFTW3F
+#define HAVE_COMPLEX_H
+
+#endif /* AUBIO_CONFIG_H */

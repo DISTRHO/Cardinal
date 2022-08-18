@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,98 +15,88 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#ifndef PLUGIN_INSTANCE
-# error PLUGIN_INSTANCE undefined
-#endif
-
 #ifndef PLUGIN_MODEL
 # error PLUGIN_MODEL undefined
 #endif
 
-#ifndef PLUGIN_URI
-# error PLUGIN_URI undefined
+#ifndef PLUGIN_CV_INPUTS
+# error PLUGIN_CV_INPUTS undefined
 #endif
 
-#define PRIVATE
-#include <common.hpp>
-#include <engine/Engine.hpp>
+#ifndef PLUGIN_CV_OUTPUTS
+# error PLUGIN_CV_OUTPUTS undefined
+#endif
 
-#undef PRIVATE
-#include <rack.hpp>
+enum PortType {
+    Audio = 0,
+    Bi = 1,
+    Uni = 2,
+};
+
+static constexpr const int kCvInputs[] = PLUGIN_CV_INPUTS;
+static constexpr const int kCvOutputs[] = PLUGIN_CV_OUTPUTS;
 
 #include "src/lv2/buf-size.h"
 #include "src/lv2/options.h"
 
 #include "DistrhoUtils.hpp"
 
-using namespace rack;
-
-extern Model* PLUGIN_MODEL;
-extern Plugin* PLUGIN_INSTANCE;
+#include <time.h>
+#include <sys/time.h>
 
 namespace rack {
-namespace engine {
 
-struct Engine::Internal {
-    float sampleRate;
-};
+static thread_local Context* threadContext = nullptr;
 
-Engine::Engine()
-{
-    internal = new Internal;
+Context* contextGet() {
+    DISTRHO_SAFE_ASSERT(threadContext != nullptr);
+    return threadContext;
 }
 
-Engine::~Engine()
-{
-    delete internal;
+#ifdef ARCH_MAC
+__attribute__((optnone))
+#endif
+void contextSet(Context* context) {
+    threadContext = context;
 }
 
-float Engine::getSampleRate()
-{
-    return internal->sampleRate;
+namespace random {
+
+Xoroshiro128Plus& local() {
+    static Xoroshiro128Plus rng;
+    return rng;
 }
 
-}
+} // namespace random
 
-namespace plugin {
-
-void Plugin::addModel(Model* model)
-{
-	// Check that the model is not added to a plugin already
-    DISTRHO_SAFE_ASSERT_RETURN(model != nullptr,);
-	DISTRHO_SAFE_ASSERT_RETURN(model->plugin == nullptr,);
-	model->plugin = this;
-	models.push_back(model);
 }
-Model* modelFromJson(json_t* moduleJ) {
-    return nullptr;
-}
-std::vector<Plugin*> plugins;
-
-} // namespace plugin
-} // namespace rack
 
 struct PluginLv2 {
-    Context* context;
-    Plugin* plugin;
+    Context context;
     engine::Module* module;
-    float sampleRate;
     int frameCount = 0;
     int numInputs, numOutputs, numParams, numLights;
     void** ports;
 
     PluginLv2(double sr)
     {
-        // FIXME shared instance for these 2
-        context = new Context;
-        context->engine = new Engine;
-        context->engine->internal->sampleRate = sr;
-        contextSet(context);
-        plugin = new Plugin;
-        PLUGIN_INSTANCE = plugin;
+        rack::random::Xoroshiro128Plus& rng(rack::random::local());
 
-        sampleRate = sr;
-        plugin->addModel(PLUGIN_MODEL);
+        if (! rng.isSeeded())
+        {
+            struct timeval tv;
+            gettimeofday(&tv, NULL);
+            uint64_t usec = uint64_t(tv.tv_sec) * 1000 * 1000 + tv.tv_usec;
+
+            static uint64_t globalCounter = 1;
+            rng.seed(usec, globalCounter++);
+
+            for (int i = 0; i < 4; i++)
+                rng();
+        }
+
+        context._engine.sampleRate = sr;
+        contextSet(&context);
         module = PLUGIN_MODEL->createModule();
 
         numInputs = module->getNumInputs();
@@ -115,26 +105,30 @@ struct PluginLv2 {
         numLights = module->getNumLights();
         ports = new void*[numInputs+numOutputs+numParams+numLights];
 
+        Module::SampleRateChangeEvent e = { context._engine.sampleRate, 1.0f / context._engine.sampleRate };
+        module->onSampleRateChange(e);
+
         // FIXME for CV ports we need to detect if something is connected
         for (int i=numInputs; --i >=0;)
+        {
+            // if (!kCvInputs[i])
             module->inputs[i].channels = 1;
+        }
         for (int i=numOutputs; --i >=0;)
+        {
+            // if (!kCvOutputs[i])
             module->outputs[i].channels = 1;
+        }
 
-        d_stdout("Loaded %s :: %i inputs, %i outputs, %i params and %i lights",
-                 PLUGIN_URI, numInputs, numOutputs, numParams, numLights);
+        d_stdout("Loaded " SLUG " :: %i inputs, %i outputs, %i params and %i lights",
+                 numInputs, numOutputs, numParams, numLights);
     }
 
     PluginLv2()
     {
-        contextSet(context);
-
+        contextSet(&context);
         delete[] ports;
         delete module;
-
-        // FIXME shared instance for this
-        delete plugin;
-        delete context;
     }
 
     void lv2_connect_port(const uint32_t port, void* const dataLocation)
@@ -142,40 +136,43 @@ struct PluginLv2 {
         ports[port] = dataLocation;
     }
 
-    void lv2_activate()
-    {
-        contextSet(context);
-        module->onReset();
-    }
-
     void lv2_run(const uint32_t sampleCount)
     {
         if (sampleCount == 0)
             return;
 
-        contextSet(context);
+        contextSet(&context);
 
-        Module::ProcessArgs args = {
-            sampleRate,
-            1.0f / sampleRate,
-            frameCount
-        };
+        Module::ProcessArgs args = { context._engine.sampleRate, 1.0f / context._engine.sampleRate, frameCount };
 
         for (int i=numParams; --i >=0;)
-            module->params[i].setValue(*static_cast<float*>(ports[numInputs+numOutputs+i]) * 0.1f); // FIXME?
+            module->params[i].setValue(*static_cast<const float*>(ports[numInputs+numOutputs+i]));
 
         for (uint32_t s=0; s<sampleCount; ++s)
         {
             for (int i=numInputs; --i >=0;)
-                module->inputs[i].setVoltage(static_cast<const float*>(ports[i])[s] * 5.0f);
+            {
+                if (kCvInputs[i])
+                    module->inputs[i].setVoltage(static_cast<const float*>(ports[i])[s]);
+                else
+                    module->inputs[i].setVoltage(static_cast<const float*>(ports[i])[s] * 10.0f);
+            }
 
             module->doProcess(args);
 
             for (int i=numOutputs; --i >=0;)
-                static_cast<float*>(ports[numInputs+i])[s] = module->outputs[i].getVoltage() * 0.2f;
+            {
+                if (kCvOutputs[i])
+                    static_cast<float*>(ports[numInputs+i])[s] = module->outputs[i].getVoltage();
+                else
+                    static_cast<float*>(ports[numInputs+i])[s] = module->outputs[i].getVoltage() * 0.1f;
+            }
 
             ++args.frame;
         }
+
+        for (int i=numLights; --i >=0;)
+            *static_cast<float*>(ports[numInputs+numOutputs+numParams+i]) = module->lights[i].getBrightness();
 
         frameCount += sampleCount;
     }
@@ -195,18 +192,9 @@ static void lv2_connect_port(LV2_Handle instance, uint32_t port, void* dataLocat
     instancePtr->lv2_connect_port(port, dataLocation);
 }
 
-static void lv2_activate(LV2_Handle instance)
-{
-    instancePtr->lv2_activate();
-}
-
 static void lv2_run(LV2_Handle instance, uint32_t sampleCount)
 {
     instancePtr->lv2_run(sampleCount);
-}
-
-static void lv2_deactivate(LV2_Handle instance)
-{
 }
 
 static void lv2_cleanup(LV2_Handle instance)
@@ -226,12 +214,12 @@ static const void* lv2_extension_data(const char* uri)
 // -----------------------------------------------------------------------
 
 static const LV2_Descriptor sLv2Descriptor = {
-    PLUGIN_URI,
+    "urn:cardinal:" SLUG,
     lv2_instantiate,
     lv2_connect_port,
-    lv2_activate,
+    NULL, // activate
     lv2_run,
-    lv2_deactivate,
+    NULL, // deactivate
     lv2_cleanup,
     lv2_extension_data
 };

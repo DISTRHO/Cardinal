@@ -65,7 +65,7 @@ static void CardinalModuleWidget__loadDialog(ModuleWidget* const w)
 
     WeakPtr<ModuleWidget> weakThis = w;
 
-    async_dialog_filebrowser(false, presetDir.c_str(), "Load preset", [=](char* pathC) {
+    async_dialog_filebrowser(false, nullptr, presetDir.c_str(), "Load preset", [=](char* pathC) {
         // Delete directories if empty
         DEFER({
             try {
@@ -100,7 +100,7 @@ void CardinalModuleWidget__saveDialog(ModuleWidget* const w)
 
     WeakPtr<ModuleWidget> weakThis = w;
 
-    async_dialog_filebrowser(true, presetDir.c_str(), "Save preset", [=](char* pathC) {
+    async_dialog_filebrowser(true, "preset.vcvm", presetDir.c_str(), "Save preset", [=](char* pathC) {
         // Delete directories if empty
         DEFER({
             try {
@@ -132,9 +132,9 @@ void CardinalModuleWidget__saveDialog(ModuleWidget* const w)
 static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget, std::string presetDir) {
     bool foundPresets = false;
 
-    // Note: This is not cached, so opening this menu each time might have a bit of latency.
     if (system::isDirectory(presetDir))
     {
+        // Note: This is not cached, so opening this menu each time might have a bit of latency.
         std::vector<std::string> entries = system::getEntries(presetDir);
         std::sort(entries.begin(), entries.end());
         for (std::string path : entries) {
@@ -143,7 +143,7 @@ static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget
             std::regex r("^\\d+_");
             name = std::regex_replace(name, r, "");
 
-            if (system::getExtension(path) == ".vcvm")
+            if (system::getExtension(path) == ".vcvm" && name != "template")
             {
                 if (!foundPresets)
                     menu->addChild(new ui::MenuSeparator);
@@ -281,7 +281,13 @@ static void CardinalModuleWidget__saveSelectionDialog(RackWidget* const w)
     std::string selectionDir = asset::user("selections");
     system::createDirectories(selectionDir);
 
-    async_dialog_filebrowser(true, selectionDir.c_str(), "Save selection as", [w](char* pathC) {
+    async_dialog_filebrowser(true, "selection.vcvs", selectionDir.c_str(),
+                            #ifdef DISTRHO_OS_WASM
+                             "Save selection",
+                            #else
+                             "Save selection as...",
+                            #endif
+                             [w](char* pathC) {
         if (!pathC) {
             // No path selected
             return;
@@ -318,6 +324,11 @@ void CardinalModuleWidget::onButton(const ButtonEvent& e)
                 if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
                     APP->scene->rack->select(this, false);
                     e.consume(NULL);
+                    return;
+                }
+
+                // If module positions are locked, don't consume left-click
+                if (settings::lockModules) {
                     return;
                 }
 
@@ -400,7 +411,13 @@ void appendSelectionContextMenu(ui::Menu* const menu)
     }, false, true));
 
     // Save
-    menu->addChild(createMenuItem("Save selection as", "", [w]() {
+    menu->addChild(createMenuItem(
+       #ifdef DISTRHO_OS_WASM
+        "Save selection",
+       #else
+        "Save selection as...",
+       #endif
+        "", [w]() {
         CardinalModuleWidget__saveSelectionDialog(w);
     }, n == 0));
 

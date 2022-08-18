@@ -79,6 +79,7 @@ struct Engine::Internal {
 	int64_t blockFrame = 0;
 	double blockTime = 0.0;
 	int blockFrames = 0;
+	bool aboutToClose = false;
 
 #ifndef HEADLESS
 	// Meter
@@ -776,6 +777,8 @@ void Engine::prepareSaveModule(Module* module) {
 
 
 void Engine::prepareSave() {
+	if (internal->aboutToClose)
+		return;
 	SharedLock<SharedMutex> lock(internal->mutex);
 	for (Module* module : internal->modules) {
 		Module::SaveEvent e;
@@ -1172,6 +1175,11 @@ void Engine::fromJson(json_t* rootJ) {
 
 
 void Engine::startFallbackThread() {
+}
+
+
+void Engine_setAboutToClose(Engine* const engine) {
+	engine->internal->aboutToClose = true;
 }
 
 

@@ -17,6 +17,11 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include <AvailabilityMacros.h>
+#if MAC_OS_X_VERSION_MAX_ALLOWED > 101200
+ #error unwanted macOS version, too new
+#endif
+
 #define createPlugin createStaticPlugin
 #include "src/DistrhoPluginInternal.hpp"
 #include "src/DistrhoUIInternal.hpp"
@@ -396,14 +401,16 @@ protected:
 
         plugin.setTimePosition(timePosition);
 
-        DISTRHO_SAFE_ASSERT_RETURN(buffer.getNumChannels() == 2,);
+        DISTRHO_SAFE_ASSERT_RETURN(buffer.getNumChannels() >= 2,);
 
-        const float* audioBufferIn[2];
-        float* audioBufferOut[2];
-        audioBufferIn[0] = buffer.getReadPointer(0);
-        audioBufferIn[1] = buffer.getReadPointer(1);
-        audioBufferOut[0] = buffer.getWritePointer(0);
-        audioBufferOut[1] = buffer.getWritePointer(1);
+        const float* audioBufferIn[18] = {};
+        float* audioBufferOut[18] = {};
+
+        for (int i=buffer.getNumChannels(); --i >= 0;)
+        {
+            audioBufferIn[i] = buffer.getReadPointer(i);
+            audioBufferOut[i] = buffer.getWritePointer(i);
+        }
 
         plugin.run(audioBufferIn, audioBufferOut, static_cast<uint32_t>(numSamples), midiEvents, midiEventCount);
     }

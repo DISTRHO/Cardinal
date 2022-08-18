@@ -1,0 +1,26 @@
+{
+    "slug": "ZamAudio",
+    "name": "ZamAudio",
+    "version": "1.0.0",
+    "license": "GPL-2.0-or-later",
+    "brand": "ZamAudio",
+    "author": "Damien Zammit and falkTX",
+    "authorEmail": "falktx@falktx.com",
+    "authorUrl": "http://www.zamaudio.com/",
+    "pluginUrl": "https://github.com/DISTRHO/Cardinal",
+    "manualUrl": "",
+    "sourceUrl": "https://github.com/DISTRHO/Cardinal",
+    "changelogUrl": "",
+    "modules": [
+        {
+            "slug": "ZamComp",
+            "name": "Compressor",
+            "description": "A powerful mono compressor strip. Adds real beef to a kick or snare drum with the right settings.",
+            "manualUrl": "",
+            "tags": [
+                "Effect",
+                "Compressor"
+            ]
+        }
+    ]
+}

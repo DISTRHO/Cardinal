@@ -48,6 +48,7 @@ Additionally, Cardinal contains the following built-in modules not present in th
  * mscHack (never updated to v2)
  * rackwindows
  * Audio File
+ * Audio to CV Pitch converter
  * Carla Plugin Host
  * Ildaeil Host
  * glBars (OpenGL bars visualization, as seen in XMMS and XBMC/Kodi)

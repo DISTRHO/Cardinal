@@ -2,13 +2,13 @@ Cardinal is a free and open-source virtual modular synthesizer plugin.
 It is based on the popular VCV Rack but with a focus on being a fully self-contained plugin version.
 
 Cardinal provides 3 plugin variants - "main", Synth and FX.
-They are all equivalent in performance and behaviour, with only the IO and metadata that changes.
-
+They are all equivalent in performance and behaviour.
 FX and Synth variants both have 2 audio outputs, while "main" has 8.
 All variants have MIDI input and output support.
 
-This package provides the AU, LV2, VST2 and VST3 audio plugins for macOS.
+This package provides the AU, LV2, VST2 and VST3 audio plugins, plus standalones for both JACK and native audio/MIDI.
 
 Notes:
- - Due to AU and VST2 not supporting CV ports, the main variant is not available for these formats.
- - The VST3 version is in progress, already part of the build but still experimental.
+ - Due to AU and VST2 not supporting CV ports, the main variant is not available for these formats
+ - The VST3 version is in progress, Synth and FX variants work well, main variant is known to have issues
+ - The standalones are intentionally very barebones in terms of system integration, prefer to use the plugin versions if you can
