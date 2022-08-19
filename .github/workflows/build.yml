@@ -1050,15 +1050,18 @@ jobs:
           # build-deps
           sudo apt-get install -yqq liblo-dev
           # runtime testing
-          sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint valgrind
+          sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint valgrind xvfb
       - name: Build Cardinal
         env:
           CFLAGS: -g
-          CXXFLAGS: -g -DDPF_ABORT_ON_ERROR
+          CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
           make HEADLESS=true features
           make HEADLESS=true NOOPT=true NOPLUGINS=true SKIP_STRIPPING=true -j $(nproc)
+      - name: Run Cardinal self-tests
+        run: |
+          xvfb-run ./bin/Cardinal selftest
       - name: Validate LV2 ttl syntax
         run: |
           lv2_validate \
