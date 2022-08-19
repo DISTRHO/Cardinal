@@ -368,6 +368,12 @@ protected:
             else
                 timePosition.frame = 0;
 
+            // use 4/4 as fallback time signature if not provided by the host
+            if (posInfo.timeSigNumerator == 0)
+                posInfo.timeSigNumerator = 4;
+            if (posInfo.timeSigDenominator == 0)
+                posInfo.timeSigDenominator = 4;
+
             timePosition.bbt.beatsPerMinute = posInfo.bpm;
 
             const double ppqPos    = std::abs(posInfo.ppqPosition);

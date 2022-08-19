@@ -30,6 +30,10 @@
 #include <ui/MenuSeparator.hpp>
 #include <window/Window.hpp>
 
+#ifdef DPF_RUNTIME_TESTING
+# include <plugin.hpp>
+#endif
+
 #ifdef DISTRHO_OS_WASM
 # include <ui/Button.hpp>
 # include <ui/Label.hpp>
@@ -301,7 +305,12 @@ class CardinalUI : public CardinalBaseUI,
     rack::math::Vec lastMousePos;
     WindowParameters windowParameters;
     int rateLimitStep = 0;
+   #ifdef DISTRHO_OS_WASM
     int8_t counterForFirstIdlePoint = 0;
+   #endif
+   #ifdef DPF_RUNTIME_TESTING
+    bool inSelfTest = false;
+   #endif
 
     struct ScopedContext {
         CardinalPluginContext* const context;
@@ -444,11 +453,67 @@ public:
 
     void uiIdle() override
     {
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest)
+        {
+            context->window->step();
+            return;
+        }
+
+        if (context->plugin->isSelfTestInstance())
+        {
+            inSelfTest = true;
+
+            Application& app(getApp());
+
+            const ScopedContext sc(this);
+
+            context->patch->clear();
+            context->window->step();
+            app.idle();
+
+            const rack::math::Vec mousePos(getWidth()/2,getHeight()/2);
+            context->event->handleButton(mousePos, GLFW_MOUSE_BUTTON_LEFT, GLFW_RELEASE, 0x0);
+            context->event->handleHover(mousePos, rack::math::Vec(0,0));
+            context->window->step();
+            app.idle();
+
+            for (rack::plugin::Plugin* p : rack::plugin::plugins)
+            {
+                for (rack::plugin::Model* m : p->models)
+                {
+                    rack::engine::Module* const module = m->createModule();
+                    DISTRHO_SAFE_ASSERT_CONTINUE(module != nullptr);
+
+                    rack::CardinalPluginModelHelper* const helper = dynamic_cast<rack::CardinalPluginModelHelper*>(m);
+                    DISTRHO_SAFE_ASSERT_CONTINUE(helper != nullptr);
+
+                    rack::app::ModuleWidget* const moduleWidget = helper->createModuleWidget(module);
+                    DISTRHO_SAFE_ASSERT_CONTINUE(moduleWidget != nullptr);
+
+                    context->engine->addModule(module);
+                    context->scene->rack->addModuleAtMouse(moduleWidget);
+
+                    for (int i=5; --i>=0;)
+                        app.idle();
+
+                    context->scene->rack->removeModule(moduleWidget);
+                    context->engine->removeModule(module);
+                    context->window->step();
+                    delete module;
+                    app.idle();
+                }
+            }
+
+            inSelfTest = false;
+        }
+       #endif
+
+       #ifdef DISTRHO_OS_WASM
         if (counterForFirstIdlePoint >= 0 && ++counterForFirstIdlePoint == 30)
         {
             counterForFirstIdlePoint = -1;
 
-           #ifdef DISTRHO_OS_WASM
             if (rack::patchStorageSlug != nullptr)
             {
                 std::string url("/patchstorage.php?slug=");
@@ -469,8 +534,8 @@ public:
                 emscripten_async_wget(url.c_str(), context->patch->templatePath.c_str(),
                                       downloadRemotePatchSucceeded, downloadRemotePatchFailed);
             }
-           #endif
         }
+       #endif
 
         if (filebrowserhandle != nullptr && fileBrowserIdle(filebrowserhandle))
         {
@@ -715,6 +780,10 @@ protected:
 
     bool onMouse(const MouseEvent& ev) override
     {
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest) return false;
+       #endif
+
         if (ev.press)
             getWindow().focus();
 
@@ -752,6 +821,10 @@ protected:
 
     bool onMotion(const MotionEvent& ev) override
     {
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest) return false;
+       #endif
+
         const rack::math::Vec mousePos = rack::math::Vec(ev.pos.getX(), ev.pos.getY()).div(getScaleFactor()).round();
         const rack::math::Vec mouseDelta = mousePos.minus(lastMousePos);
 
@@ -763,6 +836,10 @@ protected:
 
     bool onScroll(const ScrollEvent& ev) override
     {
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest) return false;
+       #endif
+
         rack::math::Vec scrollDelta = rack::math::Vec(ev.delta.getX(), ev.delta.getY());
 #ifndef DISTRHO_OS_MAC
         scrollDelta = scrollDelta.mult(50.0);
@@ -775,6 +852,10 @@ protected:
 
     bool onCharacterInput(const CharacterInputEvent& ev) override
     {
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest) return false;
+       #endif
+
         if (ev.character < ' ' || ev.character >= kKeyDelete)
             return false;
 
@@ -785,6 +866,10 @@ protected:
 
     bool onKeyboard(const KeyboardEvent& ev) override
     {
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest) return false;
+       #endif
+
         const int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
         const int mods = glfwMods(ev.mod);
 
@@ -880,6 +965,10 @@ protected:
 
     void uiFocus(const bool focus, CrossingMode) override
     {
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest) return;
+       #endif
+
         if (!focus)
         {
             const ScopedContext sc(this, 0);
