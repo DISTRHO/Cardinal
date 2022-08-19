@@ -68,7 +68,7 @@ struct CardinalPluginModel : CardinalPluginModelHelper
             tm = dynamic_cast<TModule*>(m);
         }
         app::ModuleWidget* const tmw = new TModuleWidget(tm);
-        DISTRHO_SAFE_ASSERT_RETURN(tmw->module == m, nullptr);
+        DISTRHO_CUSTOM_SAFE_ASSERT_RETURN(m != nullptr ? m->model->name.c_str() : "null", tmw->module == m, nullptr);
         tmw->setModel(this);
         return tmw;
     }

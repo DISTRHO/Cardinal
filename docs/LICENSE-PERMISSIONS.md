@@ -55,6 +55,28 @@ Below follows a direct copy and paste of each individual request.
 > All the best,
 > Manu
 
+### Light Panels
+
+*On Monday, July 25, 2022, 4:31 PM CET, Alexander Chalikiopoulos wrote:*
+
+> I have another panel-question for you. Filipe has been working on a (silly) feature for Cardinal that brings "real light mode" to all the panels. This is something we have been doing for "dark mode" already. This was not applicable to Befaco panels of course, since they are already dark. However now it will be possible to also flip a switch and turn all panels to "light".
+>
+> What we are wondering is if you are OK with us changing the panels in this way. We do not modify the source files, but this is done in real time in the rendering itself. If you have any remarks or suggestions we'll be happy to take those into consideration as well of course.
+>
+> A picture says more than just some words -> https://i.imgur.com/fKBhHCn.png
+>
+> cheers,
+> Alexander
+
+*On Monday, August 15, 2022, 11:21 AM CET, Manu Retamuro wrote:*
+
+> I do not see too much trouble on this mod, for the light version!
+>
+> Thanks a bunch for this!!
+>
+> All the best,
+> Manu
+
 ## ESeries (Paul Schreiber @ SynthTech)
 
 *On Wednesday, January 19, 2022, 04:53:44 AM CST, Filipe Coelho wrote:*
