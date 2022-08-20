@@ -80,7 +80,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst) ../Cardinal
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)  ../CardinalJACK ../CardinalNative
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -164,7 +164,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst) ../Cardinal
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)  ../CardinalJACK ../CardinalNative
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -244,7 +244,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst) ../Cardinal
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst) ../CardinalJACK ../CardinalNative
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -316,7 +316,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst) ../Cardinal
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)  ../CardinalJACK ../CardinalNative
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
