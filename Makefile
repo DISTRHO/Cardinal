@@ -244,16 +244,24 @@ endif
 # --------------------------------------------------------------
 # Packaging standalone for CI
 
-unzipfx: deps/unzipfx/unzipfx2cat$(APP_EXT) Cardinal.zip
-	cat deps/unzipfx/unzipfx2cat$(APP_EXT) Cardinal.zip > Cardinal
-	chmod +x Cardinal
+unzipfx: deps/unzipfx/unzipfx2cat$(APP_EXT) CardinalJACK.zip CardinalNative.zip
+	cat deps/unzipfx/unzipfx2cat$(APP_EXT) CardinalJACK.zip > CardinalJACK
+	cat deps/unzipfx/unzipfx2cat$(APP_EXT) CardinalNative.zip > CardinalNative
+	chmod +x CardinalJACK CardinalNative
 
-Cardinal.zip: bin/Cardinal bin/CardinalFX.lv2/resources
-	mkdir -p build/unzipfx
-	ln -sf ../../bin/Cardinal build/unzipfx/Cardinal
-	ln -s ../../bin/CardinalFX.lv2/resources build/unzipfx/resources
-	cd build/unzipfx && \
-		zip -r -9 ../../Cardinal.zip Cardinal resources
+CardinalJACK.zip: bin/Cardinal bin/CardinalFX.lv2/resources
+	mkdir -p build/unzipfx-jack
+	ln -sf ../../bin/Cardinal build/unzipfx-jack/Cardinal
+	ln -s ../../bin/CardinalFX.lv2/resources build/unzipfx-jack/resources
+	cd build/unzipfx-jack && \
+		zip -r -9 ../../$@ Cardinal resources
+
+CardinalNative.zip: bin/CardinalNative bin/CardinalFX.lv2/resources
+	mkdir -p build/unzipfx-native
+	ln -sf ../../bin/CardinalNative build/unzipfx-native/Cardinal
+	ln -s ../../bin/CardinalFX.lv2/resources build/unzipfx-native/resources
+	cd build/unzipfx-native && \
+		zip -r -9 ../../$@ Cardinal resources
 
 deps/unzipfx/unzipfx2cat:
 	make -C deps/unzipfx -f Makefile.linux
