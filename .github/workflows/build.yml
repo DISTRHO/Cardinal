@@ -1051,14 +1051,19 @@ jobs:
           sudo apt-get install -yqq liblo-dev
           # runtime testing
           sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint valgrind xvfb
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-pluginval-v${{ env.CACHE_VERSION }}
       - name: Build Cardinal
         env:
           CFLAGS: -g
           CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
-          make HEADLESS=true features
-          make HEADLESS=true NOOPT=true NOPLUGINS=true SKIP_STRIPPING=true -j $(nproc)
+          export PATH="/usr/lib/ccache:${PATH}"
+          make features
+          make NOOPT=true SKIP_STRIPPING=true -j $(nproc)
       - name: Run Cardinal self-tests
         run: |
           xvfb-run ./bin/Cardinal selftest
