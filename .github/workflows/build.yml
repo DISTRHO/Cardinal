@@ -1089,13 +1089,13 @@ jobs:
           cp -r bin/CardinalFX.lv2 bin/CardinalSynth.lv2 \
               /usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,instance-access,midi,mod,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 \
               ${LV2_PATH}
-          xvfb-run lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
+          #xvfb-run lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
       - name: Test LV2 plugin
         run: |
             export LV2_PATH=/tmp/lv2-path
             for p in $(lv2ls); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
-                    valgrind \
+                    xvfb-run valgrind \
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
@@ -1106,7 +1106,7 @@ jobs:
         run: |
             for p in $(ls bin/*.vst/*.so); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
-                    valgrind \
+                    xvfb-run valgrind \
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
@@ -1117,7 +1117,7 @@ jobs:
         run: |
             for p in $(ls bin/ | grep vst3); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
-                    valgrind \
+                    xvfb-run valgrind \
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
