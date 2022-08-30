@@ -70,6 +70,9 @@ float d_findMaxNormalizedFloat(const float floats[], const std::size_t count)
 
     for (std::size_t i=1; i<count; ++i)
     {
+        if (!std::isfinite(floats[i]))
+            __builtin_unreachable();
+
         tmp = std::abs(*floats++);
 
         if (tmp > maxf2)

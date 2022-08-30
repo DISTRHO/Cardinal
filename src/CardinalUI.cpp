@@ -469,38 +469,44 @@ public:
             const ScopedContext sc(this);
 
             context->patch->clear();
-            context->window->step();
             app.idle();
 
             const rack::math::Vec mousePos(getWidth()/2,getHeight()/2);
             context->event->handleButton(mousePos, GLFW_MOUSE_BUTTON_LEFT, GLFW_RELEASE, 0x0);
             context->event->handleHover(mousePos, rack::math::Vec(0,0));
-            context->window->step();
             app.idle();
 
             for (rack::plugin::Plugin* p : rack::plugin::plugins)
             {
                 for (rack::plugin::Model* m : p->models)
                 {
+                    d_stdout(">>>>>>>>>>>>>>>>> LOADING module %s : %s", p->slug.c_str(), m->slug.c_str());
                     rack::engine::Module* const module = m->createModule();
                     DISTRHO_SAFE_ASSERT_CONTINUE(module != nullptr);
 
                     rack::CardinalPluginModelHelper* const helper = dynamic_cast<rack::CardinalPluginModelHelper*>(m);
                     DISTRHO_SAFE_ASSERT_CONTINUE(helper != nullptr);
 
+                    d_stdout(">>>>>>>>>>>>>>>>> LOADING moduleWidget %s : %s", p->slug.c_str(), m->slug.c_str());
                     rack::app::ModuleWidget* const moduleWidget = helper->createModuleWidget(module);
                     DISTRHO_SAFE_ASSERT_CONTINUE(moduleWidget != nullptr);
 
+                    d_stdout(">>>>>>>>>>>>>>>>> ADDING TO ENGINE %s : %s", p->slug.c_str(), m->slug.c_str());
                     context->engine->addModule(module);
+
+                    d_stdout(">>>>>>>>>>>>>>>>> ADDING TO RACK VIEW %s : %s", p->slug.c_str(), m->slug.c_str());
                     context->scene->rack->addModuleAtMouse(moduleWidget);
 
                     for (int i=5; --i>=0;)
                         app.idle();
 
+                    d_stdout(">>>>>>>>>>>>>>>>> REMOVING FROM RACK VIEW %s : %s", p->slug.c_str(), m->slug.c_str());
                     context->scene->rack->removeModule(moduleWidget);
-                    context->engine->removeModule(module);
-                    context->window->step();
-                    delete module;
+                    app.idle();
+
+                    d_stdout(">>>>>>>>>>>>>>>>> DELETING module + moduleWidget %s : %s", p->slug.c_str(), m->slug.c_str());
+                    delete moduleWidget;
+
                     app.idle();
                 }
             }
