@@ -29,7 +29,7 @@ __m64 _mm_set1_pi16(short w)
     return __extension__ (__m64){ static_cast<float>(w), static_cast<float>(w) };
 }
 
-#else
+#elif defined(__ARM_NEON)
 # include "../sse2neon/sse2neon.h"
 
 static inline
@@ -43,5 +43,11 @@ __m64 _mm_set1_pi16(short w)
 {
     return vreinterpret_s64_s16(vdup_n_s16(w));
 }
+
+#else
+# define SIMDE_ENABLE_NATIVE_ALIASES
+# include <simde/x86/sse.h>
+# include <simde/x86/sse2.h>
+# include <simde/x86/sse3.h>
 
 #endif
