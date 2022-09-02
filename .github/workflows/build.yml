@@ -558,122 +558,122 @@ jobs:
           files: |
             ${{ github.event.repository.name }}-*.pkg
 
-  modduo:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        uses: actions/cache@v2
-        id: mpb-cache
-        with:
-          path: |
-            ~/mod-workdir
-          key: modduo-static-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
-          sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
-      - name: Bootstrap toolchain
-        if: steps.mpb-cache.outputs.cache-hit != 'true'
-        run: |
-          git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
-          sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
-          $(pwd)/deps/mod-plugin-builder/bootstrap.sh modduo-static minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduo-static
-      - name: Build for modduo
-        run: |
-          make modduo HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} MODDUO=true -j $(nproc)
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
+  #modduo:
+    #runs-on: ubuntu-20.04
+    #steps:
+      #- uses: actions/checkout@v2
+        #with:
+          #submodules: recursive
+      #- name: Set up cache
+        #uses: actions/cache@v2
+        #id: mpb-cache
+        #with:
+          #path: |
+            #~/mod-workdir
+          #key: modduo-static-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+      #- name: Set up dependencies
+        #run: |
+          #sudo apt-get update -qq
+          #sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
+          #sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
+      #- name: Bootstrap toolchain
+        #if: steps.mpb-cache.outputs.cache-hit != 'true'
+        #run: |
+          #git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
+          #sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
+          #$(pwd)/deps/mod-plugin-builder/bootstrap.sh modduo-static minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduo-static
+      #- name: Build for modduo
+        #run: |
+          #make modduo HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} MODDUO=true -j $(nproc)
+      #- name: Set sha8
+        #id: slug
+        #run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      #- name: Pack binaries
+        #run: |
+          #tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
+      #- uses: actions/upload-artifact@v2
+        #with:
+          #name: ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          #path: |
+            #*.tar.gz
 
-  modduox:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        uses: actions/cache@v2
-        id: mpb-cache
-        with:
-          path: |
-            ~/mod-workdir
-          key: modduox-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
-          sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
-      - name: Bootstrap toolchain
-        if: steps.mpb-cache.outputs.cache-hit != 'true'
-        run: |
-          git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
-          sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
-          $(pwd)/deps/mod-plugin-builder/bootstrap.sh modduox-static minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduox-static
-      - name: Build for modduox
-        run: |
-          make modduox HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
+  #modduox:
+    #runs-on: ubuntu-20.04
+    #steps:
+      #- uses: actions/checkout@v2
+        #with:
+          #submodules: recursive
+      #- name: Set up cache
+        #uses: actions/cache@v2
+        #id: mpb-cache
+        #with:
+          #path: |
+            #~/mod-workdir
+          #key: modduox-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+      #- name: Set up dependencies
+        #run: |
+          #sudo apt-get update -qq
+          #sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
+          #sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
+      #- name: Bootstrap toolchain
+        #if: steps.mpb-cache.outputs.cache-hit != 'true'
+        #run: |
+          #git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
+          #sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
+          #$(pwd)/deps/mod-plugin-builder/bootstrap.sh modduox-static minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduox-static
+      #- name: Build for modduox
+        #run: |
+          #make modduox HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+      #- name: Set sha8
+        #id: slug
+        #run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      #- name: Pack binaries
+        #run: |
+          #tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
+      #- uses: actions/upload-artifact@v2
+        #with:
+          #name: ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          #path: |
+            #*.tar.gz
 
-  moddwarf:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        uses: actions/cache@v2
-        id: mpb-cache
-        with:
-          path: |
-            ~/mod-workdir
-          key: moddwarf-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
-          sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
-      - name: Bootstrap toolchain
-        if: steps.mpb-cache.outputs.cache-hit != 'true'
-        run: |
-          git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
-          sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
-          $(pwd)/deps/mod-plugin-builder/bootstrap.sh moddwarf minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh moddwarf
-      - name: Build for moddwarf
-        run: |
-          make moddwarf HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
+  #moddwarf:
+    #runs-on: ubuntu-20.04
+    #steps:
+      #- uses: actions/checkout@v2
+        #with:
+          #submodules: recursive
+      #- name: Set up cache
+        #uses: actions/cache@v2
+        #id: mpb-cache
+        #with:
+          #path: |
+            #~/mod-workdir
+          #key: moddwarf-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+      #- name: Set up dependencies
+        #run: |
+          #sudo apt-get update -qq
+          #sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
+          #sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
+      #- name: Bootstrap toolchain
+        #if: steps.mpb-cache.outputs.cache-hit != 'true'
+        #run: |
+          #git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
+          #sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
+          #$(pwd)/deps/mod-plugin-builder/bootstrap.sh moddwarf minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh moddwarf
+      #- name: Build for moddwarf
+        #run: |
+          #make moddwarf HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+      #- name: Set sha8
+        #id: slug
+        #run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      #- name: Pack binaries
+        #run: |
+          #tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
+      #- uses: actions/upload-artifact@v2
+        #with:
+          #name: ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          #path: |
+            #*.tar.gz
 
   wasm:
     runs-on: ubuntu-20.04
