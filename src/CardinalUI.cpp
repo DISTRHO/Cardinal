@@ -339,7 +339,7 @@ class CardinalUI : public CardinalBaseUI,
 
 public:
     CardinalUI()
-        : CardinalBaseUI(1228, 666)
+        : CardinalBaseUI(DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT)
     {
         Window& window(getWindow());
 
@@ -351,7 +351,7 @@ public:
         setGeometryConstraints(648 * scaleFactor, 538 * scaleFactor);
 
         if (scaleFactor != 1.0)
-            setSize(1228 * scaleFactor, 666 * scaleFactor);
+            setSize(DISTRHO_UI_DEFAULT_WIDTH * scaleFactor, DISTRHO_UI_DEFAULT_HEIGHT * scaleFactor);
 
         rack::contextSet(context);
 
