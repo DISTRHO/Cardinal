@@ -1085,6 +1085,9 @@ endif
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
 
+# Ignore bad behaviour from Rack API
+BUILD_CXX_FLAGS += -Wno-format-security
+
 ifeq ($(WASM),true)
 BUILD_CXX_FLAGS += -fexceptions
 endif
