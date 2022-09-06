@@ -163,8 +163,10 @@ endif
 ifneq ($(CARDINAL_VARIANT),main)
 ifeq ($(MACOS),true)
 VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%)
+CLAP_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).clap/Contents/Resources/%)
 else
 VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.vst/resources/%)
+CLAP_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.clap/resources/%)
 endif
 endif
 
@@ -182,6 +184,7 @@ endif
 # Do some magic
 
 USE_VST2_BUNDLE = true
+USE_CLAP_BUNDLE = true
 include ../../dpf/Makefile.plugins.mk
 
 # --------------------------------------------------------------
@@ -358,10 +361,16 @@ else
 TARGETS = lv2 vst2 vst3 static
 endif
 
+# TESTING
+ifeq ($(CARDINAL_VARIANT),fx)
+TARGETS += clap
+endif
+
 all: $(TARGETS)
 lv2: $(LV2_RESOURCES)
 vst2: $(VST2_RESOURCES)
 vst3: $(VST3_RESOURCES)
+clap: $(CLAP_RESOURCES)
 
 # --------------------------------------------------------------
 # Extra rules for macOS app bundle
@@ -433,11 +442,19 @@ $(TARGET_DIR)/Cardinal.vst/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
+$(TARGET_DIR)/Cardinal.clap/resources/%: ../Rack/res/%
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
 $(TARGET_DIR)/$(NAME).vst/Contents/Resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
 $(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%: ../Rack/res/%
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+$(TARGET_DIR)/$(NAME).clap/Contents/Resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
