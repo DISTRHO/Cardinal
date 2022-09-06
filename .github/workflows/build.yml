@@ -1081,14 +1081,14 @@ jobs:
           make NOOPT=true SKIP_STRIPPING=true -j $(nproc)
       - name: Run Cardinal self-tests
         run: |
-          #xvfb-run valgrind \
-                #--gen-suppressions=all \
-                #--exit-on-first-error=yes \
-                #--error-exitcode=255 \
-                #--leak-check=no \
-                #--track-origins=yes \
-                #--suppressions=./dpf/utils/valgrind-dpf.supp
-          xvfb-run ./bin/Cardinal selftest
+          # --exit-on-first-error=yes
+          xvfb-run valgrind \
+                --gen-suppressions=all \
+                --error-exitcode=255 \
+                --leak-check=no \
+                --track-origins=yes \
+                --suppressions=./dpf/utils/valgrind-dpf.supp \
+                ./bin/Cardinal selftest
       - name: Validate LV2 ttl syntax
         run: |
           lv2_validate \
