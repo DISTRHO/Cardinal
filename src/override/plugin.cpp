@@ -35,6 +35,9 @@ namespace rack {
 namespace plugin {
 
 
+void settingsMergeJson(json_t*) {}
+
+
 /** Given slug => fallback slug.
 Correctly handles bidirectional fallbacks.
 To request fallback slugs to be added to this list, open a GitHub issue.
@@ -43,6 +46,7 @@ static const std::map<std::string, std::string> pluginSlugFallbacks = {
 	{"VultModulesFree", "VultModules"},
 	{"VultModules", "VultModulesFree"},
 	{"AudibleInstrumentsPreview", "AudibleInstruments"},
+	{"SequelSequencers", "DanielDavies"},
 	// {"", ""},
 };
 

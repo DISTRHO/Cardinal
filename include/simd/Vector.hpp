@@ -30,6 +30,13 @@
 #include <cstring>
 #include <pmmintrin.h>
 
+/** NOTE alignas is required in some systems in order to allow SSE usage. */
+#ifndef ARCH_MAC
+#define SIMD_ALIGN alignas(32)
+#else
+#define SIMD_ALIGN
+#endif
+
 
 namespace rack {
 
@@ -62,8 +69,7 @@ struct Vector<float, 4> {
 	using type = float;
 	constexpr static int size = 4;
 
-	/** NOTE alignas is required in order to allow SSE usage. */
-	union alignas(32) {
+	union SIMD_ALIGN {
 		__m128 v;
 		/** Accessing this array of scalars is slow and defeats the purpose of vectorizing.
 		*/
@@ -137,8 +143,7 @@ struct Vector<int32_t, 4> {
 	using type = int32_t;
 	constexpr static int size = 4;
 
-	/** NOTE alignas is required in order to allow SSE usage. */
-	union alignas(32) {
+	union SIMD_ALIGN {
 		__m128i v;
 		int32_t s[4];
 	};

@@ -193,6 +193,22 @@
 [submodule "plugins/PinkTrombone"]
 	path = plugins/PinkTrombone
 	url = https://github.com/VegaDeftwing/PinkTromboneVCV.git
+[submodule "plugins/Meander"]
+	path = plugins/Meander
+	url = https://github.com/knchaffin/Meander.git
+	branch = master-V2
+[submodule "plugins/WhatTheRack"]
+	path = plugins/WhatTheRack
+	url = https://github.com/korfuri/WhatTheRack.git
+[submodule "plugins/AS"]
+	path = plugins/AS
+	url = https://github.com/AScustomWorks/AS.git
+[submodule "plugins/forsitan-modulare"]
+	path = plugins/forsitan-modulare
+	url = https://github.com/gosub/forsitan-modulare.git
+[submodule "plugins/myth-modules"]
+	path = plugins/myth-modules
+	url = https://github.com/Ahineya/vcv-myth-plugin.git
 [submodule "plugins/StarlingVia"]
 	path = plugins/StarlingVia
 	url = https://github.com/starlingcode/Via-for-Rack.git

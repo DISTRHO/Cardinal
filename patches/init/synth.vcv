@@ -1,0 +1,283 @@
+{
+  "version": "2.1.1",
+  "zoom": 1.0,
+  "modules": [
+    {
+      "id": 8712245256622475,
+      "plugin": "Cardinal",
+      "model": "TextEditor",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 1202678850202654,
+      "data": {
+        "filepath": "",
+        "lang": "None",
+        "etext": "Welcome to Cardinal!\n\nThis is the Synth variant\nIt has 2 audio outputs, plus MIDI\n\nA basic VCO + ADSR + VCA is\nthe default patch\n\n",
+        "width": 19
+      },
+      "pos": [
+        58,
+        0
+      ]
+    },
+    {
+      "id": 5726895899473528,
+      "plugin": "Fundamental",
+      "model": "ADSR",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.5,
+          "id": 0
+        },
+        {
+          "value": 0.5,
+          "id": 1
+        },
+        {
+          "value": 0.5,
+          "id": 2
+        },
+        {
+          "value": 0.5,
+          "id": 3
+        },
+        {
+          "value": 0.0,
+          "id": 4
+        },
+        {
+          "value": 0.0,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        },
+        {
+          "value": 0.0,
+          "id": 7
+        },
+        {
+          "value": 0.0,
+          "id": 8
+        }
+      ],
+      "leftModuleId": 8601159184541723,
+      "rightModuleId": 4828178296911509,
+      "pos": [
+        18,
+        0
+      ]
+    },
+    {
+      "id": 4828178296911509,
+      "plugin": "Fundamental",
+      "model": "VCA-1",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        },
+        {
+          "value": 1.0,
+          "id": 1
+        }
+      ],
+      "leftModuleId": 5726895899473528,
+      "rightModuleId": 1,
+      "pos": [
+        27,
+        0
+      ]
+    },
+    {
+      "id": 8601159184541723,
+      "plugin": "Fundamental",
+      "model": "VCO",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        },
+        {
+          "value": 1.0,
+          "id": 1
+        },
+        {
+          "value": 0.0,
+          "id": 2
+        },
+        {
+          "value": 0.0,
+          "id": 3
+        },
+        {
+          "value": 0.0,
+          "id": 4
+        },
+        {
+          "value": 0.5,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        },
+        {
+          "value": 0.0,
+          "id": 7
+        }
+      ],
+      "leftModuleId": 2,
+      "rightModuleId": 5726895899473528,
+      "pos": [
+        9,
+        0
+      ]
+    },
+    {
+      "id": 1,
+      "plugin": "Cardinal",
+      "model": "HostAudio2",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.79432821273803711,
+          "id": 0
+        }
+      ],
+      "leftModuleId": 4828178296911509,
+      "rightModuleId": 4,
+      "data": {
+        "dcFilter": true
+      },
+      "pos": [
+        30,
+        0
+      ]
+    },
+    {
+      "id": 2,
+      "plugin": "Cardinal",
+      "model": "HostMIDI",
+      "version": "2.0",
+      "params": [],
+      "rightModuleId": 8601159184541723,
+      "data": {
+        "pwRange": 0.0,
+        "smooth": false,
+        "channels": 1,
+        "polyMode": 0,
+        "lastPitch": 8192,
+        "lastMod": 0,
+        "inputChannel": 0,
+        "outputChannel": 0
+      },
+      "pos": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": 4,
+      "plugin": "Cardinal",
+      "model": "HostParameters",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 1,
+      "rightModuleId": 1202678850202654,
+      "data": {
+        "smooth": true
+      },
+      "pos": [
+        38,
+        0
+      ]
+    },
+    {
+      "id": 1202678850202654,
+      "plugin": "Cardinal",
+      "model": "HostParametersMap",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 4,
+      "rightModuleId": 8712245256622475,
+      "data": {
+        "maps": [
+          {
+            "hostParamId": 255,
+            "inverted": false,
+            "smooth": true,
+            "moduleId": -1,
+            "paramId": 0
+          }
+        ]
+      },
+      "pos": [
+        47,
+        0
+      ]
+    }
+  ],
+  "cables": [
+    {
+      "id": 5155876120487880,
+      "outputModuleId": 2,
+      "outputId": 1,
+      "inputModuleId": 5726895899473528,
+      "inputId": 4,
+      "color": "#ff9352"
+    },
+    {
+      "id": 781753834216137,
+      "outputModuleId": 2,
+      "outputId": 6,
+      "inputModuleId": 5726895899473528,
+      "inputId": 5,
+      "color": "#ffd452"
+    },
+    {
+      "id": 3464471860196875,
+      "outputModuleId": 5726895899473528,
+      "outputId": 0,
+      "inputModuleId": 4828178296911509,
+      "inputId": 0,
+      "color": "#e8ff52"
+    },
+    {
+      "id": 739552540616113,
+      "outputModuleId": 4828178296911509,
+      "outputId": 0,
+      "inputModuleId": 1,
+      "inputId": 0,
+      "color": "#52beff"
+    },
+    {
+      "id": 6701970185765111,
+      "outputModuleId": 2,
+      "outputId": 0,
+      "inputModuleId": 8601159184541723,
+      "inputId": 0,
+      "color": "#ff5252"
+    },
+    {
+      "id": 6959800657121782,
+      "outputModuleId": 2,
+      "outputId": 2,
+      "inputModuleId": 8601159184541723,
+      "inputId": 1,
+      "color": "#52ff7d"
+    },
+    {
+      "id": 1598271319373837,
+      "outputModuleId": 8601159184541723,
+      "outputId": 0,
+      "inputModuleId": 4828178296911509,
+      "inputId": 1,
+      "color": "#a8ff52"
+    }
+  ]
+}

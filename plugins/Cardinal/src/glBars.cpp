@@ -17,6 +17,7 @@
 
 #ifndef HEADLESS
 # include "glBars.hpp"
+# include "ModuleWidgets.hpp"
 # include "Widgets.hpp"
 #else
 # include "plugin.hpp"
@@ -129,16 +130,13 @@ struct glBarsRendererWidget : OpenGlWidgetWithBrowserPreview {
     }
 };
 
-struct glBarsWidget : ModuleWidget {
+struct glBarsWidget : ModuleWidgetWith25HP {
     glBarsWidget(glBarsModule* const module)
     {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/glBars.svg")));
 
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        createAndAddScrews();
 
         addInput(createInput<PJ301MPort>(Vec(135.0f, 20.0f), module, glBarsModule::IN1_INPUT));
 
@@ -151,13 +149,8 @@ struct glBarsWidget : ModuleWidget {
 
     void draw(const DrawArgs& args) override
     {
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
-                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
-        nvgFill(args.vg);
-
-        ModuleWidget::draw(args);
+        drawBackground(args.vg);
+        ModuleWidgetWith25HP::draw(args);
     }
 };
 #else

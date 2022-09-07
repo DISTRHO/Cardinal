@@ -7,7 +7,10 @@
 # --------------------------------------------------------------
 # Import base definitions
 
+DISTRHO_NAMESPACE = CardinalDISTRHO
+DGL_NAMESPACE = CardinalDGL
 USE_NANOVG_FBO = true
+WASM_EXCEPTIONS = true
 include ../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -29,7 +32,7 @@ endif
 # custom build flags
 
 BASE_FLAGS += -I../include
-BASE_FLAGS += -I../include/neon-compat
+BASE_FLAGS += -I../include/simd-compat
 
 ifeq ($(HEADLESS),true)
 ifeq ($(WITH_LTO),true)
@@ -41,10 +44,10 @@ ifneq ($(SYSDEPS),true)
 BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 endif
 
-ifeq ($(WASM),true)
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-else ifneq ($(HAIKU),true)
+ifneq ($(HAIKU),true)
+ifneq ($(WASM),true)
 BASE_FLAGS += -pthread
+endif
 endif
 
 ifeq ($(WINDOWS),true)
@@ -63,15 +66,12 @@ BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
 # --------------------------------------------------------------
 # override VCV arch.mk stuff so we can build more architectures
 
-ifeq ($(CPU_AARCH64),true)
-ARCH_NAME = aarch64
-MACHINE = x86_64-the-rack
+ifeq ($(CPU_ARM32),true)
+ARCH_NAME = arm
+MACHINE = i686-the-rack
 else ifeq ($(CPU_ARM64),true)
 ARCH_NAME = arm64
 MACHINE = x86_64-the-rack
-else ifeq ($(CPU_ARM),true)
-ARCH_NAME = arm
-MACHINE = i686-the-rack
 else ifeq ($(WASM),true)
 MACHINE = i686-wasm
 else
@@ -87,30 +87,64 @@ MACHINE_SUFFIX = -linux
 endif
 
 # --------------------------------------------------------------
+# Set up env to pass to cmake and configure
+
+ENV = env
+ENV += AR=$(AR)
+ENV += CC=$(CC)
+ENV += CXX=$(CXX)
+ENV += CFLAGS='$(BUILD_C_FLAGS)'
+ENV += CXXFLAGS='$(BUILD_CXX_FLAGS)'
+ENV += LDFLAGS='$(LINK_FLAGS)'
+
+# --------------------------------------------------------------
 # Fix up cmake
 
 SPACE =
 SPACE +=
 
-CMAKE = cmake
-
+CMAKE  = cmake
 CMAKE += -DCMAKE_INSTALL_LIBDIR=lib
 CMAKE += -DCMAKE_INSTALL_PREFIX='$(DEP_PATH)'
 CMAKE += -DBUILD_SHARED_LIBS=OFF
-
-# make sure macOS target matches ours
-ifneq (,$(findstring -arch$(SPACE),$(CXXFLAGS)))
-CMAKE += -DCMAKE_OSX_ARCHITECTURES='$(subst $(SPACE),;,$(subst -arch=,,$(filter -arch=%,$(subst -arch$(SPACE),-arch=,$(CXXFLAGS)))))'
-endif
-ifneq (,$(findstring -mmacosx-version-min=,$(CXXFLAGS)))
-CMAKE += -DCMAKE_OSX_DEPLOYMENT_TARGET=$(subst -mmacosx-version-min=,,$(filter -mmacosx-version-min=%,$(CXXFLAGS)))
-endif
 
 # make sure debug/release matches
 ifeq ($(DEBUG),true)
 CMAKE += -DCMAKE_BUILD_TYPE=Debug
 else
 CMAKE += -DCMAKE_BUILD_TYPE=Release
+endif
+
+# make sure macOS target matches ours
+ifeq ($(MACOS),true)
+ifneq (,$(findstring -arch$(SPACE),$(CXXFLAGS)))
+CMAKE += -DCMAKE_OSX_ARCHITECTURES='$(subst $(SPACE),;,$(subst -arch=,,$(filter -arch=%,$(subst -arch$(SPACE),-arch=,$(CXXFLAGS)))))'
+else ifeq ($(CIBUILD),true)
+$(error CI build requires -arch flag on macOS)
+endif
+ifneq (,$(findstring -mmacosx-version-min=,$(CXXFLAGS)))
+export MACOSX_DEPLOYMENT_TARGET = $(subst -mmacosx-version-min=,,$(filter -mmacosx-version-min=%,$(CXXFLAGS)))
+CMAKE += -DCMAKE_OSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET)
+else ifeq ($(CIBUILD),true)
+$(error CI build requires -mmacosx-version-min flag on macOS)
+endif
+CMAKE += -DCMAKE_OSX_SYSROOT="macosx"
+endif
+
+# fix emar and emranlib usage
+ifeq ($(WASM),true)
+CMAKE_AR     = $(shell which $(AR))
+CMAKE_RANLIB = $(shell which $(RANLIB))
+CMAKE += -DCMAKE_AR=$(CMAKE_AR)
+CMAKE += -DCMAKE_C_COMPILER_AR=$(CMAKE_AR)
+CMAKE += -DCMAKE_CXX_COMPILER_AR=$(CMAKE_AR)
+CMAKE += -DCMAKE_RANLIB=$(CMAKE_RANLIB)
+CMAKE += -DCMAKE_C_COMPILER_RANLIB=$(CMAKE_RANLIB)
+CMAKE += -DCMAKE_CXX_COMPILER_RANLIB=$(CMAKE_RANLIB)
+ifeq ($(shell uname -s),Darwin)
+CMAKE += -DCMAKE_CROSSCOMPILING=ON
+CMAKE += -DCMAKE_SYSTEM_NAME=Generic
+endif
 endif
 
 # fix cross-compilation for windows
@@ -140,29 +174,37 @@ CONFIGURE += ac_cv_host=$(TARGET_MACHINE)
 
 DEP_MAKE  = $(MAKE)
 DEP_MAKE += ARCH_NAME=$(ARCH_NAME)
+DEP_MAKE += AR=$(AR)
 DEP_MAKE += CC=$(CC)
 DEP_MAKE += CXX=$(CXX)
 DEP_MAKE += CFLAGS="$(BUILD_C_FLAGS)"
 DEP_MAKE += CXXFLAGS="$(BUILD_CXX_FLAGS)"
 DEP_MAKE += LDFLAGS="$(LINK_FLAGS)"
-DEP_MAKE += CMAKE="$(CMAKE)"
-DEP_MAKE += CONFIGURE="$(CONFIGURE)"
 DEP_MAKE += DEP_FLAGS="$(BASE_FLAGS)"
 DEP_MAKE += DEP_MAC_SDK_FLAGS=
 DEP_MAKE += MACHINE=$(MACHINE)$(MACHINE_SUFFIX)
+DEP_MAKE += VERBOSE=1
 
-ifeq ($(MACOS),true)
-DEP_MAKE += SHA256SUM="shasum5.28 -a 256"
+ifeq ($(shell uname -s),Darwin)
+ifeq ($(CIBUILD),true)
+DEP_MAKE += SHA256SUM="shasum5.30 -a 256"
+else
+DEP_MAKE += SHA256SUM="shasum5.30 -a 256"
 endif
+endif
+
+DEP_MAKE2  = $(DEP_MAKE)
+DEP_MAKE2 += CMAKE="$(ENV) $(CMAKE)"
+DEP_MAKE2 += CONFIGURE="$(ENV) $(CONFIGURE)"
 
 # --------------------------------------------------------------
 # Rack internal dependencies target
 
 $(DEP_PATH)/lib/%.a:
-	$(DEP_MAKE) -C $(DEP_PATH) lib/$*.a
+	$(DEP_MAKE2) -C $(DEP_PATH) lib/$*.a
 
 $(DEP_PATH)/jansson-2.12:
-	$(DEP_MAKE) -C $(DEP_PATH) jansson-2.12
+	$(DEP_MAKE2) -C $(DEP_PATH) jansson-2.12
 
 # libarchive: skip shared lib and ensure libzstd is enabled
 $(DEP_PATH)/lib/libarchive.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
@@ -170,7 +212,7 @@ $(DEP_PATH)/lib/libarchive.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3
 $(DEP_PATH)/lib/libarchive_static.a: $(DEP_PATH)/lib/libzstd.a $(DEP_PATH)/libarchive-3.4.3/.stamp-patched
 
 $(DEP_PATH)/libarchive-3.4.3/.stamp-patched:
-	$(DEP_MAKE) -C $(DEP_PATH) libarchive-3.4.3
+	$(DEP_MAKE2) -C $(DEP_PATH) libarchive-3.4.3
 	sed -i -e "618,625d" $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt
 	awk 'NR==616{print "  SET(HAVE_LIBZSTD 1)"}1' $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt > $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt2
 	mv $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt2 $(DEP_PATH)/libarchive-3.4.3/CMakeLists.txt
@@ -182,7 +224,7 @@ $(DEP_PATH)/libarchive-3.4.3/.stamp-patched:
 $(DEP_PATH)/lib/libsamplerate.a: $(DEP_PATH)/libsamplerate-0.1.9/.stamp-patched
 
 $(DEP_PATH)/libsamplerate-0.1.9/.stamp-patched:
-	$(DEP_MAKE) -C $(DEP_PATH) libsamplerate-0.1.9
+	$(DEP_MAKE2) -C $(DEP_PATH) libsamplerate-0.1.9
 	sed -i -e "s/src doc examples tests/src/" $(DEP_PATH)/libsamplerate-0.1.9/Makefile.in
 	touch $@
 
@@ -190,19 +232,23 @@ $(DEP_PATH)/libsamplerate-0.1.9/.stamp-patched:
 $(DEP_PATH)/lib/libspeexdsp.a: $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched
 
 $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched:
-	$(DEP_MAKE) -C $(DEP_PATH) speexdsp-SpeexDSP-1.2rc3 \
+	$(DEP_MAKE2) -C $(DEP_PATH) speexdsp-SpeexDSP-1.2rc3 \
 		WGET="wget -c http://downloads.xiph.org/releases/speex/speexdsp-1.2rc3.tar.gz && mv speexdsp-1.2rc3.tar.gz speexdsp-SpeexDSP-1.2rc3.tgz #" \
 		SHA256SUM="true" \
 		UNTAR="mkdir -p speexdsp-SpeexDSP-1.2rc3 && tar -x --strip-components=1 --directory=$(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3 -f"
 	sed -i -e "s/#pragma GCC visibility push/#error we dont want this/" $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/configure
 	touch $@
 
+# custom zstd build for only building static libs
+$(DEP_PATH)/lib/libzstd.a: $(DEP_PATH)/zstd-1.4.5/.stamp-patched
+	cd $(DEP_PATH)/zstd-1.4.5/build/cmake && $(CMAKE) -DZSTD_BUILD_STATIC=ON -DZSTD_BUILD_PROGRAMS=OFF -DZSTD_BUILD_SHARED=OFF -DZSTD_MULTITHREAD_SUPPORT=OFF .
+	$(DEP_MAKE2) -C $(DEP_PATH)/zstd-1.4.5/build/cmake
+	$(DEP_MAKE2) -C $(DEP_PATH)/zstd-1.4.5/build/cmake install
+
 # zstd cmake is borked, see https://github.com/facebook/zstd/issues/1401
 # zstd also fails to build on old systems, patch that too
-$(DEP_PATH)/lib/libzstd.a: $(DEP_PATH)/zstd-1.4.5/.stamp-patched
-
 $(DEP_PATH)/zstd-1.4.5/.stamp-patched:
-	$(DEP_MAKE) -C $(DEP_PATH) zstd-1.4.5
+	$(DEP_MAKE2) -C $(DEP_PATH) zstd-1.4.5
 	sed -i -e "56,66d" $(DEP_PATH)/zstd-1.4.5/build/cmake/CMakeModules/AddZstdCompilationFlags.cmake
 	sed -i -e "146,175d" $(DEP_PATH)/zstd-1.4.5/programs/util.c
 	sed -i -e "142,144d" $(DEP_PATH)/zstd-1.4.5/programs/util.c

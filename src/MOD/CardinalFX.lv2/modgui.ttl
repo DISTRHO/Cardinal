@@ -1,6 +1,8 @@
 @prefix lv2:    <http://lv2plug.in/ns/lv2core#> .
 @prefix mod:    <http://moddevices.com/ns/mod#> .
 @prefix modgui: <http://moddevices.com/ns/modgui#> .
+@prefix pset:   <http://lv2plug.in/ns/ext/presets#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix state:  <http://lv2plug.in/ns/ext/state#> .
 
 <https://distrho.kx.studio/plugins/cardinal#fx>
@@ -19,3 +21,9 @@
         <https://distrho.kx.studio/plugins/cardinal#fx#comment> """Welcome to Cardinal.
 If this is your first time, make sure to check out the documentation link on the plugin info, have fun!""" ;
     ] .
+
+<Plateau_Reverb.ttl>
+    a pset:Preset ;
+    lv2:appliesTo <https://distrho.kx.studio/plugins/cardinal#fx> ;
+    rdfs:label "Plateau Reverb" ;
+    rdfs:seeAlso <Plateau_Reverb.ttl> .

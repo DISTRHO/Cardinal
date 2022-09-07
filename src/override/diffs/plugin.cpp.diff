@@ -1,6 +1,6 @@
---- ../Rack/src/plugin.cpp	2022-02-05 22:30:09.265393248 +0000
-+++ plugin.cpp	2022-01-30 00:24:49.375329910 +0000
-@@ -1,308 +1,40 @@
+--- ../Rack/src/plugin.cpp	2022-07-12 09:46:20.716165650 +0100
++++ plugin.cpp	2022-05-27 23:15:35.681273727 +0100
+@@ -1,342 +1,41 @@
 -#include <thread>
 -#include <map>
 -#include <stdexcept>
@@ -72,6 +72,18 @@
 -// private API
 -////////////////////
 -
+-
+-static void* getSymbol(void* handle, const char* name) {
+-	if (!handle)
+-		return NULL;
+-
+-#if defined ARCH_WIN
+-	return (void*) GetProcAddress((HMODULE) handle, name);
+-#else
+-	return dlsym(handle, name);
+-#endif
+-}
+-
 -/** Returns library handle */
 -static void* loadLibrary(std::string libraryPath) {
 -#if defined ARCH_WIN
@@ -131,12 +143,7 @@
 -	plugin->handle = loadLibrary(libraryPath);
 -
 -	// Get plugin's init() function
--	InitCallback initCallback;
--#if defined ARCH_WIN
--	initCallback = (InitCallback) GetProcAddress((HMODULE) plugin->handle, "init");
--#else
--	initCallback = (InitCallback) dlsym(plugin->handle, "init");
--#endif
+-	InitCallback initCallback = (InitCallback) getSymbol(plugin->handle, "init");
 -	if (!initCallback)
 -		throw Exception("Failed to read init() symbol in %s", libraryPath.c_str());
 -
@@ -183,6 +190,14 @@
 -			throw Exception("JSON parsing error at %s %d:%d %s", manifestFilename.c_str(), error.line, error.column, error.text);
 -		DEFER({json_decref(rootJ);});
 -
+-		// Load manifest
+-		plugin->fromJson(rootJ);
+-
+-		// Reject plugin if slug already exists
+-		Plugin* existingPlugin = getPlugin(plugin->slug);
+-		if (existingPlugin)
+-			throw Exception("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str());
+-
 -		// Call init callback
 -		InitCallback initCallback;
 -		if (path == "") {
@@ -193,13 +208,18 @@
 -		}
 -		initCallback(plugin);
 -
--		// Load manifest
--		plugin->fromJson(rootJ);
+-		// Load modules manifest
+-		json_t* modulesJ = json_object_get(rootJ, "modules");
+-		plugin->modulesFromJson(modulesJ);
 -
--		// Reject plugin if slug already exists
--		Plugin* existingPlugin = getPlugin(plugin->slug);
--		if (existingPlugin)
--			throw Exception("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str());
+-		// Call settingsFromJson() if exists
+-		// Returns NULL for Core.
+-		auto settingsFromJson = (decltype(&::settingsFromJson)) getSymbol(plugin->handle, "settingsFromJson");
+-		if (settingsFromJson) {
+-			json_t* settingsJ = json_object_get(settings::pluginSettingsJ, plugin->slug.c_str());
+-			if (settingsJ)
+-				settingsFromJson(settingsJ);
+-		}
 -	}
 -	catch (Exception& e) {
 -		WARN("Could not load plugin %s: %s", path.c_str(), e.what());
@@ -267,6 +287,10 @@
 -	// Get user plugins directory
 -	system::createDirectory(pluginsPath);
 -
+-	// Don't load plugins if safe mode is enabled
+-	if (settings::safeMode)
+-		return;
+-
 -	// Extract packages and load plugins
 -	extractPackages(pluginsPath);
 -	loadPlugins(pluginsPath);
@@ -296,11 +320,7 @@
 -	typedef void (*DestroyCallback)();
 -	DestroyCallback destroyCallback = NULL;
 -	if (handle) {
--#if defined ARCH_WIN
--		destroyCallback = (DestroyCallback) GetProcAddress((HMODULE) handle, "destroy");
--#else
--		destroyCallback = (DestroyCallback) dlsym(handle, "destroy");
--#endif
+-		destroyCallback = (DestroyCallback) getSymbol(handle, "destroy");
 -	}
 -	if (destroyCallback) {
 -		try {
@@ -326,18 +346,33 @@
 -
 -
 -void destroy() {
--	for (Plugin* plugin : plugins) {
+-	while (!plugins.empty()) {
+-		Plugin* plugin = plugins.back();
 -		INFO("Destroying plugin %s", plugin->name.c_str());
 -		destroyPlugin(plugin);
+-		plugins.pop_back();
 -	}
--	plugins.clear();
+-	assert(plugins.empty());
 -}
 -
 -
+-void settingsMergeJson(json_t* rootJ) {
+-	for (Plugin* plugin : plugins) {
+-		auto settingsToJson = (decltype(&::settingsToJson)) getSymbol(plugin->handle, "settingsToJson");
+-		if (settingsToJson) {
+-			json_t* settingsJ = settingsToJson();
+-			json_object_set_new(rootJ, plugin->slug.c_str(), settingsJ);
+-		}
+-		else {
+-			json_object_del(rootJ, plugin->slug.c_str());
+-		}
+-	}
+-}
++void settingsMergeJson(json_t*) {}
+ 
+ 
  /** Given slug => fallback slug.
- Correctly handles bidirectional fallbacks.
- To request fallback slugs to be added to this list, open a GitHub issue.
-@@ -352,8 +84,19 @@
+@@ -389,8 +88,19 @@
  */
  using PluginModuleSlug = std::tuple<std::string, std::string>;
  static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = {
@@ -358,7 +393,7 @@
  	// {{"", ""}, {"", ""}},
  };
  
-@@ -441,7 +184,6 @@
+@@ -478,7 +188,6 @@
  }
  
  

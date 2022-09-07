@@ -38,6 +38,8 @@
 #include <ui/MenuSeparator.hpp>
 #include <helpers.hpp>
 
+#include "../CardinalCommon.hpp"
+
 
 namespace rack {
 namespace plugin {
@@ -120,7 +122,7 @@ std::string Model::getManualUrl() {
 void Model::appendContextMenu(ui::Menu* menu, bool inBrowser) {
 	// plugin
 	menu->addChild(createMenuItem("Plugin: " + plugin->name, "", [=]() {
-		system::openBrowser(plugin->pluginUrl);
+		patchUtils::openBrowser(plugin->pluginUrl);
 	}, plugin->pluginUrl == ""));
 
 	// version
@@ -129,7 +131,7 @@ void Model::appendContextMenu(ui::Menu* menu, bool inBrowser) {
 	// author
 	if (plugin->author != "") {
 		menu->addChild(createMenuItem("Author: " + plugin->author, "", [=]() {
-			system::openBrowser(plugin->authorUrl);
+			patchUtils::openBrowser(plugin->authorUrl);
 		}, plugin->authorUrl.empty()));
 	}
 
@@ -137,7 +139,7 @@ void Model::appendContextMenu(ui::Menu* menu, bool inBrowser) {
 	std::string license = plugin->license;
 	if (string::startsWith(license, "https://") || string::startsWith(license, "http://")) {
 		menu->addChild(createMenuItem("License: Open in browser", "", [=]() {
-			system::openBrowser(license);
+			patchUtils::openBrowser(license);
 		}));
 	}
 	else if (license != "") {
@@ -158,28 +160,28 @@ void Model::appendContextMenu(ui::Menu* menu, bool inBrowser) {
 	std::string manualUrl = getManualUrl();
 	if (manualUrl != "") {
 		menu->addChild(createMenuItem("User manual", RACK_MOD_CTRL_NAME "+F1", [=]() {
-			system::openBrowser(manualUrl);
+			patchUtils::openBrowser(manualUrl);
 		}));
 	}
 
 	// donate
 	if (plugin->donateUrl != "") {
 		menu->addChild(createMenuItem("Donate", "", [=]() {
-			system::openBrowser(plugin->donateUrl);
+			patchUtils::openBrowser(plugin->donateUrl);
 		}));
 	}
 
 	// source code
 	if (plugin->sourceUrl != "") {
 		menu->addChild(createMenuItem("Source code", "", [=]() {
-			system::openBrowser(plugin->sourceUrl);
+			patchUtils::openBrowser(plugin->sourceUrl);
 		}));
 	}
 
 	// changelog
 	if (plugin->changelogUrl != "") {
 		menu->addChild(createMenuItem("Changelog", "", [=]() {
-			system::openBrowser(plugin->changelogUrl);
+			patchUtils::openBrowser(plugin->changelogUrl);
 		}));
 	}
 

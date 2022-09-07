@@ -1,5 +1,5 @@
---- ../Rack/src/app/Scene.cpp	2022-02-26 23:08:06.701192797 +0000
-+++ Scene.cpp	2022-04-02 03:13:14.856813800 +0100
+--- ../Rack/src/app/Scene.cpp	2022-04-11 20:05:02.007283878 +0100
++++ Scene.cpp	2022-07-12 09:45:31.518663160 +0100
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -112,11 +112,11 @@
 +	}
 +
 +	void onEnter(const EnterEvent& e) override {
-+		glfwSetCursor(nullptr, (GLFWcursor*)0x1);
++		glfwSetCursor(APP->window->win, glfwCreateStandardCursor(GLFW_RESIZE_NWSE_CURSOR));
 +	}
 +
 +	void onLeave(const LeaveEvent& e) override {
-+		glfwSetCursor(nullptr, nullptr);
++		glfwSetCursor(APP->window->win, nullptr);
  	}
  
 -	void onDragStart(const DragStartEvent& e) override {
@@ -242,7 +242,7 @@
  			e.consume(this);
  		}
  		if (e.keyName == "q" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -180,19 +292,20 @@
+@@ -180,19 +292,22 @@
  			e.consume(this);
  		}
  		if (e.keyName == "o" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -255,19 +255,21 @@
 +			patchUtils::revertDialog();
  			e.consume(this);
  		}
++#ifndef DISTRHO_OS_WASM
  		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 -			APP->patch->saveDialog();
 +			// NOTE: will do nothing if path is empty, intentionally
 +			patchUtils::saveDialog(APP->patch->path);
  			e.consume(this);
  		}
++#endif
  		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
 -			APP->patch->saveAsDialog();
 +			patchUtils::saveAsDialog();
  			e.consume(this);
  		}
  		if (e.keyName == "z" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -220,10 +333,14 @@
+@@ -220,24 +335,37 @@
  			APP->scene->rackScroll->setZoom(std::pow(2.f, zoom));
  			e.consume(this);
  		}
@@ -281,16 +283,14 @@
 +			e.consume(this);
 +		}
  		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == 0) {
- 			system::openBrowser("https://vcvrack.com/manual/");
+-			system::openBrowser("https://vcvrack.com/manual/");
++			patchUtils::openBrowser("https://vcvrack.com/manual/");
  			e.consume(this);
-@@ -232,10 +349,13 @@
+ 		}
+ 		if (e.key == GLFW_KEY_F3 && (e.mods & RACK_MOD_MASK) == 0) {
  			settings::cpuMeter ^= true;
  			e.consume(this);
  		}
--		if (e.key == GLFW_KEY_F11 && (e.mods & RACK_MOD_MASK) == 0) {
--			APP->window->setFullScreen(!APP->window->isFullScreen());
--			// The MenuBar will be hidden when the mouse moves over the RackScrollWidget.
--			// menuBar->hide();
 +		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
 +			patchUtils::deployToRemote();
 +			window::generateScreenshot();
@@ -298,10 +298,20 @@
 +		}
 +		if (e.key == GLFW_KEY_F9 && (e.mods & RACK_MOD_MASK) == 0) {
 +			window::generateScreenshot();
++			e.consume(this);
++		}
++#ifdef DISTRHO_OS_WASM
+ 		if (e.key == GLFW_KEY_F11 && (e.mods & RACK_MOD_MASK) == 0) {
+ 			APP->window->setFullScreen(!APP->window->isFullScreen());
+-			// The MenuBar will be hidden when the mouse moves over the RackScrollWidget.
+-			// menuBar->hide();
  			e.consume(this);
  		}
++#endif
  
-@@ -326,13 +446,6 @@
+ 		// Module selections
+ 		if (e.keyName == "a" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+@@ -326,13 +454,6 @@
  
  	// Key commands that can be overridden by children
  	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -315,7 +325,7 @@
  		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
  			rack->pasteClipboardAction();
  			e.consume(this);
-@@ -351,7 +464,7 @@
+@@ -351,7 +472,7 @@
  		std::string extension = system::getExtension(path);
  
  		if (extension == ".vcv") {
@@ -324,7 +334,7 @@
  			e.consume(this);
  			return;
  		}
-@@ -368,3 +481,94 @@
+@@ -368,3 +489,94 @@
  
  } // namespace app
  } // namespace rack

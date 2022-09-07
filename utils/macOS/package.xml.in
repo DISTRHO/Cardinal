@@ -3,11 +3,17 @@
     <title>Cardinal</title>
     <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true" />
     <license file="@builddir@/../LICENSE" mime-type="text/plain" />
-    <options customize="always" hostArchitectures="x86_64" require-scripts="false" rootVolumeOnly="true" />
+    <options customize="always" hostArchitectures="@buildarchs@" require-scripts="false" rootVolumeOnly="true" />
     <pkg-ref id="studio.kx.distrho.cardinal" />
     <welcome file="@builddir@/../utils/macOS/welcome.txt" mime-type="text/plain" />
     <choice id="studio.kx.distrho.cardinal-res" title="Resources" description="Install resources" visible="false">
         <pkg-ref id="studio.kx.distrho.cardinal-resources" version="0">dpf-cardinal-resources.pkg</pkg-ref>
+    </choice>
+    <choice id="studio.kx.distrho.cardinal-jack" title="Standalone (JACK)" description="Install Standalone for usage with JACK. See https://jackaudio.org/ for details." visible="true">
+        <pkg-ref id="studio.kx.distrho.cardinal-jack" version="0">dpf-cardinal-jack.pkg</pkg-ref>
+    </choice>
+    <choice id="studio.kx.distrho.cardinal-native" title="Standalone (Native)" description="Install Standalone that uses native Audio and MIDI" visible="true">
+        <pkg-ref id="studio.kx.distrho.cardinal-native" version="0">dpf-cardinal-native.pkg</pkg-ref>
     </choice>
     <choice id="studio.kx.distrho.cardinal-au" title="AU" description="Install AU plugins" visible="true">
         <pkg-ref id="studio.kx.distrho.cardinal-components" version="0">dpf-cardinal-components.pkg</pkg-ref>
@@ -23,6 +29,8 @@
     </choice>
     <choices-outline>
         <line choice="studio.kx.distrho.cardinal-res"/>
+        <line choice="studio.kx.distrho.cardinal-jack"/>
+        <line choice="studio.kx.distrho.cardinal-native"/>
         <line choice="studio.kx.distrho.cardinal-au"/>
         <line choice="studio.kx.distrho.cardinal-lv2"/>
         <line choice="studio.kx.distrho.cardinal-vst2"/>

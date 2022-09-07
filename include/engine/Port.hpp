@@ -32,6 +32,13 @@
 
 #include <list>
 
+/** NOTE alignas is required in some systems in order to allow SSE usage. */
+#ifndef ARCH_MAC
+#define SIMD_ALIGN alignas(32)
+#else
+#define SIMD_ALIGN
+#endif
+
 
 namespace rack {
 namespace engine {
@@ -48,7 +55,7 @@ struct Port {
 	/** Voltage of the port. */
 	/** NOTE alignas is required in order to allow SSE usage.
 	Consecutive data (like in a vector) would otherwise pack Ports in a way that breaks SSE. */
-	union alignas(32) {
+	union SIMD_ALIGN {
 		/** Unstable API. Use getVoltage() and setVoltage() instead. */
 		float voltages[PORT_MAX_CHANNELS] = {};
 		/** DEPRECATED. Unstable API. Use getVoltage() and setVoltage() instead. */

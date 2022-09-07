@@ -26,6 +26,7 @@ USE_NAMESPACE_DISTRHO;
 
 struct HostCV : TerminalModule {
     CardinalPluginContext* const pcontext;
+    bool bypassed = false;
     int dataFrame = 0;
     uint32_t lastProcessCounter = 0;
 
@@ -70,6 +71,7 @@ struct HostCV : TerminalModule {
         // only checked on input
         if (lastProcessCounter != processCounter)
         {
+            bypassed = isBypassed();
             dataFrame = 0;
             lastProcessCounter = processCounter;
         }
@@ -78,13 +80,16 @@ struct HostCV : TerminalModule {
         const uint32_t k = dataFrame;
         DISTRHO_SAFE_ASSERT_RETURN(k < bufferSize,);
 
-        if (isBypassed())
+        if (bypassed)
         {
             for (int i=0; i<10; ++i)
                 outputs[i].setVoltage(0.0f);
         }
         else if (const float* const* const dataIns = pcontext->dataIns)
         {
+            if (dataIns[CARDINAL_AUDIO_IO_OFFSET] == nullptr)
+                return;
+
             float outputOffset;
             outputOffset = params[BIPOLAR_OUTPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
 
@@ -100,7 +105,7 @@ struct HostCV : TerminalModule {
 
     void processTerminalOutput(const ProcessArgs&) override
     {
-        if (pcontext->variant != kCardinalVariantMain)
+        if (pcontext->variant != kCardinalVariantMain || pcontext->bypassed)
             return;
 
         const uint32_t bufferSize = pcontext->bufferSize;
@@ -109,10 +114,13 @@ struct HostCV : TerminalModule {
         const uint32_t k = dataFrame++;
         DISTRHO_SAFE_ASSERT_RETURN(k < bufferSize,);
 
-        if (isBypassed())
+        if (bypassed)
             return;
 
         float** const dataOuts = pcontext->dataOuts;
+
+        if (dataOuts[CARDINAL_AUDIO_IO_OFFSET] == nullptr)
+            return;
 
         float inputOffset;
         inputOffset = params[BIPOLAR_INPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;

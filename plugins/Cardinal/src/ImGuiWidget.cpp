@@ -16,13 +16,18 @@
  */
 
 #include "ImGuiWidget.hpp"
+#include "DearImGui/imgui.h"
 #include "DistrhoUtils.hpp"
 
 #ifndef DGL_NO_SHARED_RESOURCES
 # include "../../../dpf/dgl/src/Resources.hpp"
 #endif
 
-#include "DearImGui/imgui_impl_opengl2.h"
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+# include "DearImGui/imgui_impl_opengl3.h"
+#else
+# include "DearImGui/imgui_impl_opengl2.h"
+#endif
 
 static const char* GetClipboardTextFn(void*)
 {
@@ -71,6 +76,7 @@ static void setupIO()
 struct ImGuiWidget::PrivateData {
     ImGuiContext* context = nullptr;
     bool created = false;
+    bool darkMode = true;
     bool fontGenerated = false;
     bool useMonospacedFont = false;
     float originalScaleFactor = 0.0f;
@@ -91,7 +97,11 @@ struct ImGuiWidget::PrivateData {
         if (created)
         {
             ImGui::SetCurrentContext(context);
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+            ImGui_ImplOpenGL3_Shutdown();
+#else
             ImGui_ImplOpenGL2_Shutdown();
+#endif
         }
 
         ImGui::DestroyContext(context);
@@ -122,15 +132,35 @@ struct ImGuiWidget::PrivateData {
         {
 #ifndef DGL_NO_SHARED_RESOURCES
             using namespace dpf_resources;
-            static const ImWchar ranges[] = { 0x20, 0xFF, 0 }; /* FIXME unicode range not working.. */
             ImFontConfig fc;
             fc.FontDataOwnedByAtlas = false;
             fc.OversampleH = 1;
             fc.OversampleV = 1;
             fc.PixelSnapH = true;
-            io.Fonts->AddFontFromMemoryTTF((void*)dejavusans_ttf,
-                                           dejavusans_ttf_size,
-                                           13.0f * scaleFactor, &fc, ranges);
+            io.Fonts->AddFontFromMemoryTTF((void*)dejavusans_ttf, dejavusans_ttf_size, 13.0f * scaleFactor, &fc);
+
+            // extra fonts we can try loading for unicode support
+            static const char* extraFontPathsToTry[] = {
+               #if defined(ARCH_WIN)
+                // TODO
+                // "Meiryo.ttc",
+               #elif defined(ARCH_MAC)
+                // TODO
+               #elif defined(ARCH_LIN)
+                "/usr/share/fonts/opentype/noto/NotoSerifCJK-Regular.ttc",
+               #endif
+            };
+
+            fc.FontDataOwnedByAtlas = true;
+            fc.MergeMode = true;
+
+            for (size_t i=0; i<ARRAY_SIZE(extraFontPathsToTry); ++i)
+            {
+                if (rack::system::exists(extraFontPathsToTry[i]))
+                    io.Fonts->AddFontFromFileTTF(extraFontPathsToTry[i], 13.0f * scaleFactor, &fc,
+                                                 io.Fonts->GetGlyphRangesJapanese());
+            }
+
             io.Fonts->Build();
 #endif
         }
@@ -141,7 +171,11 @@ struct ImGuiWidget::PrivateData {
         if (created)
         {
             ImGui::SetCurrentContext(context);
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+            ImGui_ImplOpenGL3_Shutdown();
+#else
             ImGui_ImplOpenGL2_Shutdown();
+#endif
             created = false;
         }
 
@@ -157,7 +191,11 @@ struct ImGuiWidget::PrivateData {
 
         if (doInit)
         {
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+            ImGui_ImplOpenGL3_Init();
+#else
             ImGui_ImplOpenGL2_Init();
+#endif
             created = true;
         }
     }
@@ -169,13 +207,13 @@ struct ImGuiWidget::PrivateData {
         style.FrameRounding = 4;
         style.ScaleAllSizes(scaleFactor);
 
-        const ImVec4 color_Cardinal(0.76f, 0.11f, 0.22f, 1.00f);
-        const ImVec4 color_DimCardinal(171.0 / 255.0, 54.0 / 255.0, 73.0 / 255.0, 1.00f);
+        const ImVec4 color_Cardinal(0.76f, 0.11f, 0.22f, 1.f);
+        const ImVec4 color_DimCardinal(171.f / 255.f, 54.f / 255.f, 73.f / 255.f, 1.f);
 
         ImVec4* const colors = style.Colors;
-        colors[ImGuiCol_Text]             = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-        colors[ImGuiCol_TextDisabled]     = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-        colors[ImGuiCol_WindowBg]         = ImVec4(0.101f, 0.101f, 0.101f, 0.94f);
+        colors[ImGuiCol_Text]             = ImVec4(1.f, 1.f, 1.f, 1.f);
+        colors[ImGuiCol_TextDisabled]     = ImVec4(0.5f, 0.5f, 0.5f, 1.f);
+        colors[ImGuiCol_WindowBg]         = ImVec4(0.099f, 0.099f, 0.099f, 1.f);
         colors[ImGuiCol_FrameBg]          = ImVec4(0.20f, 0.21f, 0.22f, 0.54f);
         colors[ImGuiCol_FrameBgHovered]   = ImVec4(0.40f, 0.40f, 0.40f, 0.40f);
         colors[ImGuiCol_FrameBgActive]    = ImVec4(0.18f, 0.18f, 0.18f, 0.67f);
@@ -187,9 +225,21 @@ struct ImGuiWidget::PrivateData {
         colors[ImGuiCol_ButtonHovered]    = color_Cardinal;
         colors[ImGuiCol_ButtonActive]     = color_Cardinal;
         colors[ImGuiCol_TextSelectedBg]   = ImVec4(0.87f, 0.87f, 0.87f, 0.35f);
-        colors[ImGuiCol_Header]           = ImVec4(0.44f, 0.44f, 0.44f, 0.40f);
+        colors[ImGuiCol_Header]           = ImVec4(0.44f, 0.44f, 0.44f, 0.4f);
         colors[ImGuiCol_HeaderHovered]    = color_DimCardinal;
         colors[ImGuiCol_HeaderActive]     = color_Cardinal;
+
+        if (!settings::darkMode)
+        {
+            for (int c = 0; c < ImGuiCol_COUNT; ++c)
+            {
+                if (std::memcmp(&colors[c], &color_Cardinal, sizeof(color_Cardinal)) == 0)
+                    continue;
+                if (std::memcmp(&colors[c], &color_DimCardinal, sizeof(color_DimCardinal)) == 0)
+                    continue;
+                colors[c] = ImVec4(1.f - colors[c].x, 1.f - colors[c].y, 1.f - colors[c].z, colors[c].w);
+            }
+        }
     }
 };
 
@@ -212,7 +262,11 @@ void ImGuiWidget::onContextCreate(const ContextCreateEvent& e)
     DISTRHO_SAFE_ASSERT_RETURN(!imData->created,);
 
     ImGui::SetCurrentContext(imData->context);
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+    ImGui_ImplOpenGL3_Init();
+#else
     ImGui_ImplOpenGL2_Init();
+#endif
     imData->created = true;
 }
 
@@ -221,7 +275,11 @@ void ImGuiWidget::onContextDestroy(const ContextDestroyEvent& e)
     if (imData->created)
     {
         ImGui::SetCurrentContext(imData->context);
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+        ImGui_ImplOpenGL3_Shutdown();
+#else
         ImGui_ImplOpenGL2_Shutdown();
+#endif
         imData->created = false;
     }
 
@@ -270,16 +328,12 @@ void ImGuiWidget::onDragHover(const DragHoverEvent& e)
     }
 }
 
-void ImGuiWidget::onDragLeave(const DragLeaveEvent& e)
+void ImGuiWidget::onDragEnd(const DragEndEvent& e)
 {
     ImGui::SetCurrentContext(imData->context);
 
-    // FIXME this is not the correct event..
     ImGuiIO& io(ImGui::GetIO());
     io.MouseDown[0] = io.MouseDown[1] = io.MouseDown[2] = false;
-
-    if (io.WantCaptureMouse)
-        e.consume(this);
 }
 
 void ImGuiWidget::onHoverScroll(const HoverScrollEvent& e)
@@ -376,6 +430,17 @@ void ImGuiWidget::onSelectText(const SelectTextEvent& e)
         e.consume(this);
 }
 
+void ImGuiWidget::step()
+{
+    if (imData->darkMode != settings::darkMode)
+    {
+        imData->darkMode = settings::darkMode;
+        imData->resetEverything(true);
+    }
+
+    OpenGlWidgetWithBrowserPreview::step();
+}
+
 void ImGuiWidget::drawFramebuffer()
 {
     const float scaleFactor = APP->window->pixelRatio * std::max(1.0f, APP->scene->rack->getAbsoluteZoom());
@@ -416,6 +481,9 @@ void ImGuiWidget::drawFramebufferCommon(const Vec& fbSize, const float scaleFact
         }
     }
 
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+    // TODO?
+#else
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -424,13 +492,18 @@ void ImGuiWidget::drawFramebufferCommon(const Vec& fbSize, const float scaleFact
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
+#endif
 
     io.DisplaySize = ImVec2(box.size.x * scaleFactor, box.size.y * scaleFactor);
     io.DisplayFramebufferScale = ImVec2(fbSize.x / (box.size.x * scaleFactor), fbSize.y / (box.size.y * scaleFactor));
 
     if (!imData->created)
     {
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+        ImGui_ImplOpenGL3_Init();
+#else
         ImGui_ImplOpenGL2_Init();
+#endif
         imData->created = true;
     }
 
@@ -438,13 +511,22 @@ void ImGuiWidget::drawFramebufferCommon(const Vec& fbSize, const float scaleFact
     io.DeltaTime = time - imData->lastFrameTime;
     imData->lastFrameTime = time;
 
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+    ImGui_ImplOpenGL3_NewFrame();
+#else
     ImGui_ImplOpenGL2_NewFrame();
+#endif
+
     ImGui::NewFrame();
-
     drawImGui();
-
     ImGui::Render();
 
     if (ImDrawData* const data = ImGui::GetDrawData())
+    {
+#if defined(DGL_USE_GLES2) || defined(DGL_USE_GLES3) || defined(DGL_USE_OPENGL3)
+        ImGui_ImplOpenGL3_RenderDrawData(data);
+#else
         ImGui_ImplOpenGL2_RenderDrawData(data);
+#endif
+    }
 }

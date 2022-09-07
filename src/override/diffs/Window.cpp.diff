@@ -1,6 +1,6 @@
---- ../Rack/src/window/Window.cpp	2022-02-09 15:35:19.238863170 +0000
-+++ Window.cpp	2022-04-27 16:53:59.743671091 +0100
-@@ -1,33 +1,83 @@
+--- ../Rack/src/window/Window.cpp	2022-04-11 20:05:02.023283713 +0100
++++ Window.cpp	2022-07-12 09:45:31.518663160 +0100
+@@ -1,33 +1,87 @@
 +/*
 + * DISTRHO Cardinal Plugin
 + * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
@@ -76,6 +76,10 @@
 +#ifndef DGL_NO_SHARED_RESOURCES
 +# include "src/Resources.hpp"
 +#endif
++
++#ifdef DISTRHO_OS_WASM
++# include <emscripten/html5.h>
++#endif
  
  namespace rack {
  namespace window {
@@ -97,7 +101,7 @@
  
  
  Font::~Font() {
-@@ -42,9 +92,8 @@
+@@ -42,9 +96,8 @@
  	// Transfer ownership of font data to font object
  	uint8_t* data = system::readFile(filename, &size);
  	// Don't use nvgCreateFont because it doesn't properly handle UTF-8 filenames on Windows.
@@ -108,7 +112,7 @@
  		throw Exception("Failed to load font %s", filename.c_str());
  	}
  	INFO("Loaded font %s", filename.c_str());
-@@ -79,375 +128,308 @@
+@@ -79,375 +132,325 @@
  }
  
  
@@ -148,7 +152,9 @@
 -	int frameSwapInterval = -1;
 -	double monitorRefreshRate = 0.0;
 +	int frameSwapInterval = 1;
++#ifndef DGL_USE_GLES
 +	int generateScreenshotStep = kScreenshotStepNone;
++#endif
 +	double monitorRefreshRate = 60.0;
  	double frameTime = 0.0;
  	double lastFrameDuration = 0.0;
@@ -165,7 +171,11 @@
 +
 +	Internal()
 +		: hiddenApp(false),
-+		  hiddenWindow(hiddenApp) { hiddenApp.idle(); }
++		  hiddenWindow(hiddenApp)
++	{
++		hiddenWindow.setIgnoringKeyRepeat(true);
++		hiddenApp.idle();
++	}
  };
  
  
@@ -200,14 +210,18 @@
 +	return nvgCreateFontMem(vg, NANOVG_DEJAVU_SANS_TTF,
 +	                        (uchar*)dejavusans_ttf, dejavusans_ttf_size, 0);
  }
--
--
++#endif
+ 
+ 
 -static void windowMaximizeCallback(GLFWwindow* win, int maximized) {
 -	settings::windowMaximized = maximized;
 -	// DEBUG("windowMaximizeCallback %d", maximized);
 -}
--
--
++Window::Window() {
++	internal = new Internal;
+ 
++	DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
+ 
 -static void mouseButtonCallback(GLFWwindow* win, int button, int action, int mods) {
 -	contextSet((Context*) glfwGetWindowUserPointer(win));
 -#if defined ARCH_MAC
@@ -221,28 +235,6 @@
 -		button = GLFW_MOUSE_BUTTON_MIDDLE;
 -		mods &= ~(GLFW_MOD_CONTROL | GLFW_MOD_SHIFT);
 -	}
- #endif
- 
--	APP->event->handleButton(APP->window->internal->lastMousePos, button, action, mods);
--}
--
- 
--static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
--	contextSet((Context*) glfwGetWindowUserPointer(win));
--	math::Vec mousePos = math::Vec(xpos, ypos).div(APP->window->pixelRatio / APP->window->windowRatio).round();
--	math::Vec mouseDelta = mousePos.minus(APP->window->internal->lastMousePos);
-+Window::Window() {
-+	internal = new Internal;
- 
--	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
--	if (APP->window->internal->ignoreNextMouseDelta) {
--		APP->window->internal->ignoreNextMouseDelta = false;
--		mouseDelta = math::Vec();
--	}
-+	DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
- 
--	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
--	(void) cursorMode;
 +	// Set up NanoVG
 +	const int nvgFlags = NVG_ANTIALIAS;
 +	vg = nvgCreateGL(nvgFlags);
@@ -251,19 +243,22 @@
 +	fbVg = nvgCreateSharedGLES2(vg, nvgFlags);
 +#else
 +	fbVg = nvgCreateSharedGL2(vg, nvgFlags);
-+#endif
+ #endif
  
--#if defined ARCH_MAC
--	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
--	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
--	if (cursorMode == GLFW_CURSOR_HIDDEN) {
--		// CGSetLocalEventsSuppressionInterval(0.0);
--		glfwSetCursorPos(win, APP->window->internal->lastMousePos.x, APP->window->internal->lastMousePos.y);
--		CGAssociateMouseAndMouseCursorPosition(true);
--		mousePos = APP->window->internal->lastMousePos;
+-	APP->event->handleButton(APP->window->internal->lastMousePos, button, action, mods);
+-}
+-
+-
+-static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
+-	contextSet((Context*) glfwGetWindowUserPointer(win));
+-	math::Vec mousePos = math::Vec(xpos, ypos).div(APP->window->pixelRatio / APP->window->windowRatio).round();
+-	math::Vec mouseDelta = mousePos.minus(APP->window->internal->lastMousePos);
+-
+-	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
+-	if (APP->window->internal->ignoreNextMouseDelta) {
+-		APP->window->internal->ignoreNextMouseDelta = false;
+-		mouseDelta = math::Vec();
 -	}
--	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
--	glfwSetCursor(win, NULL);
 +	// Load default Blendish font
 +#ifndef DGL_NO_SHARED_RESOURCES
 +	uiFont = std::make_shared<Font>();
@@ -278,13 +273,31 @@
 +	internal->fontCache[uiFont2->ofilename] = uiFont2;
 +#else
 +	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
- #endif
++#endif
  
--	APP->window->internal->lastMousePos = mousePos;
+-	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
+-	(void) cursorMode;
 +	if (uiFont != nullptr)
 +		bndSetFont(uiFont->handle);
+ 
+-#if defined ARCH_MAC
+-	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
+-	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
+-	if (cursorMode == GLFW_CURSOR_HIDDEN) {
+-		// CGSetLocalEventsSuppressionInterval(0.0);
+-		glfwSetCursorPos(win, APP->window->internal->lastMousePos.x, APP->window->internal->lastMousePos.y);
+-		CGAssociateMouseAndMouseCursorPosition(true);
+-		mousePos = APP->window->internal->lastMousePos;
+-	}
+-	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
+-	glfwSetCursor(win, NULL);
++#ifdef DISTRHO_OS_WASM
++	emscripten_lock_orientation(EMSCRIPTEN_ORIENTATION_LANDSCAPE_PRIMARY);
+ #endif
 +}
  
+-	APP->window->internal->lastMousePos = mousePos;
+-
 -	APP->event->handleHover(mousePos, mouseDelta);
 +void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 +{
@@ -458,7 +471,10 @@
 -Window::Window() {
 -	internal = new Internal;
 -	int err;
--
++void Window::setSize(math::Vec size) {
++	size = size.max(WINDOW_SIZE_MIN);
++	internal->size = size;
+ 
 -	// Set window hints
 -#if defined NANOVG_GL2
 -	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
@@ -539,12 +555,16 @@
 -	const GLubyte* version = glGetString(GL_VERSION);
 -	INFO("Renderer: %s %s", vendor, renderer);
 -	INFO("OpenGL: %s", version);
--
++	if (DISTRHO_NAMESPACE::UI* const ui = internal->ui)
++		ui->setSize(internal->size.x, internal->size.y);
++}
+ 
 -	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 -	glGetError();
-+void Window::setSize(math::Vec size) {
++void WindowSetInternalSize(rack::window::Window* const window, math::Vec size) {
 +	size = size.max(WINDOW_SIZE_MIN);
-+	internal->size = size;
++	window->internal->size = size;
++}
  
 -	// Set up NanoVG
 -	int nvgFlags = NVG_ANTIALIAS;
@@ -560,14 +580,11 @@
 -		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize NanoVG. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 -		throw Exception("Could not initialize NanoVG");
 -	}
-+	if (DISTRHO_NAMESPACE::UI* const ui = internal->ui)
-+		ui->setSize(internal->size.x, internal->size.y);
-+}
  
 -	// Load default Blendish font
 -	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
 -	bndSetFont(uiFont->handle);
- 
+-
 -	if (APP->scene) {
 -		widget::Widget::ContextCreateEvent e;
 -		APP->scene->onContextCreate(e);
@@ -581,6 +598,7 @@
 -	if (APP->scene) {
 -		widget::Widget::ContextDestroyEvent e;
 -		APP->scene->onContextDestroy(e);
++#ifndef DGL_USE_GLES
 +static void Window__flipBitmap(uint8_t* pixels, const int width, const int height, const int depth) {
 +	for (int y = 0; y < height / 2; y++) {
 +		const int flipY = height - y - 1;
@@ -663,6 +681,7 @@
 +	ui->setState("screenshot", String::asBase64(data, size).buffer());
  }
 +#endif
++#endif
  
  
  void Window::step() {
@@ -710,7 +729,7 @@
  	if (APP->patch->path != "") {
  		windowTitle += " - ";
  		if (!APP->history->isSaved())
-@@ -455,243 +437,155 @@
+@@ -455,246 +458,189 @@
  		windowTitle += system::getFilename(APP->patch->path);
  	}
  	if (windowTitle != internal->lastWindowTitle) {
@@ -734,6 +753,7 @@
  		APP->event->handleDirty();
  	}
  
++#ifndef DGL_USE_GLES
 +	// Hide menu and background if generating screenshot
 +	if (internal->generateScreenshotStep == kScreenshotStepStarted) {
 +#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
@@ -743,6 +763,7 @@
 +		internal->generateScreenshotStep = kScreenshotStepSecondPass;
 +#endif
 +	}
++#endif
 +
  	// Get framebuffer/window ratio
 -	int fbWidth, fbHeight;
@@ -815,9 +836,10 @@
 -	// );
 -	internal->frame++;
 -}
++#ifndef DGL_USE_GLES
 +	if (internal->generateScreenshotStep != kScreenshotStepNone) {
 +		++internal->generateScreenshotStep;
- 
++
 +		int y = 0;
 +#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
 +		constexpr const int depth = 4;
@@ -826,23 +848,16 @@
 +		constexpr const int depth = 3;
 +#endif
  
--void Window::activateContext() {
--	glfwMakeContextCurrent(win);
--}
 +		// Allocate pixel color buffer
 +		uint8_t* const pixels = new uint8_t[winHeight * winWidth * 4];
  
+-void Window::activateContext() {
+-	glfwMakeContextCurrent(win);
+-}
 +		// glReadPixels defaults to GL_BACK, but the back-buffer is unstable, so use the front buffer (what the user sees)
 +		glReadBuffer(GL_FRONT);
 +		glReadPixels(0, 0, winWidth, winHeight, depth == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, pixels);
  
--static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
--	for (int y = 0; y < height / 2; y++) {
--		int flipY = height - y - 1;
--		uint8_t tmp[width * depth];
--		std::memcpy(tmp, &pixels[y * width * depth], width * depth);
--		std::memcpy(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
--		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
 +		if (internal->generateScreenshotStep == kScreenshotStepSaving)
 +		{
 +			// Write pixels to PNG
@@ -853,11 +868,18 @@
 +#ifdef STBI_WRITE_NO_STDIO
 +			Window__downscaleBitmap(pixelsWithOffset, winWidth, winHeight);
 +			stbi_write_png_to_func(Window__writeImagePNG, internal->ui,
-+                                   winWidth, winHeight, depth, pixelsWithOffset, stride);
++			                       winWidth, winHeight, depth, pixelsWithOffset, stride);
 +#else
 +			stbi_write_png("screenshot.png", winWidth, winHeight, depth, pixelsWithOffset, stride);
 +#endif
-+
+ 
+-static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
+-	for (int y = 0; y < height / 2; y++) {
+-		int flipY = height - y - 1;
+-		uint8_t tmp[width * depth];
+-		std::memcpy(tmp, &pixels[y * width * depth], width * depth);
+-		std::memcpy(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
+-		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
 +			internal->generateScreenshotStep = kScreenshotStepNone;
 +			APP->scene->menuBar->show();
 +			APP->scene->rack->children.front()->show();
@@ -865,6 +887,7 @@
 +
 +		delete[] pixels;
  	}
++#endif
  }
  
  
@@ -963,29 +986,39 @@
  
  
  void Window::cursorLock() {
--	if (!settings::allowCursorLock)
--		return;
--
++#ifdef DISTRHO_OS_WASM
+ 	if (!settings::allowCursorLock)
+ 		return;
+ 
 -#if defined ARCH_MAC
 -	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 -#else
 -	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
--#endif
++	emscripten_request_pointerlock(internal->ui->getWindow().getApp().getClassName(), false);
+ #endif
 -	internal->ignoreNextMouseDelta = true;
  }
  
  
  void Window::cursorUnlock() {
--	if (!settings::allowCursorLock)
--		return;
--
++#ifdef DISTRHO_OS_WASM
+ 	if (!settings::allowCursorLock)
+ 		return;
+ 
 -	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 -	internal->ignoreNextMouseDelta = true;
++	emscripten_exit_pointerlock();
++#endif
  }
  
  
  bool Window::isCursorLocked() {
 -	return glfwGetInputMode(win, GLFW_CURSOR) != GLFW_CURSOR_NORMAL;
++#ifdef DISTRHO_OS_WASM
++	EmscriptenPointerlockChangeEvent status;
++	if (emscripten_get_pointerlock_status(&status) == EMSCRIPTEN_RESULT_SUCCESS)
++		return status.isActive;
++#endif
 +	return false;
  }
  
@@ -1016,22 +1049,36 @@
 -		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 -		glfwSetWindowMonitor(win, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 -	}
-+void Window::setFullScreen(bool) {
++void Window::setFullScreen(const bool fullscreen) {
++#ifdef DISTRHO_OS_WASM
++	if (fullscreen)
++		emscripten_request_fullscreen(internal->ui->getWindow().getApp().getClassName(), false);
++	else
++		emscripten_exit_fullscreen();
++#endif
  }
  
  
  bool Window::isFullScreen() {
 -	GLFWmonitor* monitor = glfwGetWindowMonitor(win);
 -	return monitor != NULL;
-+#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
++#ifdef DISTRHO_OS_WASM
++	EmscriptenFullscreenChangeEvent status;
++	if (emscripten_get_fullscreen_status(&status) == EMSCRIPTEN_RESULT_SUCCESS)
++		return status.isFullscreen;
++	return false;
++#elif defined(CARDINAL_TRANSPARENT_SCREENSHOTS) && !defined(DGL_USE_GLES)
 +	return internal->generateScreenshotStep != kScreenshotStepNone;
 +#else
 +	return false;
 +#endif
  }
  
- 
-@@ -722,14 +616,15 @@
+-
+ double Window::getMonitorRefreshRate() {
+ 	return internal->monitorRefreshRate;
+ }
+@@ -722,14 +668,15 @@
  		return pair->second;
  
  	// Load font
@@ -1050,7 +1097,7 @@
  	}
  	internal->fontCache[filename] = font;
  	return font;
-@@ -742,14 +637,15 @@
+@@ -742,14 +689,15 @@
  		return pair->second;
  
  	// Load image
@@ -1069,21 +1116,22 @@
  	}
  	internal->imageCache[filename] = image;
  	return image;
-@@ -766,28 +662,146 @@
+@@ -766,28 +714,156 @@
  }
  
  
 -void init() {
 -	int err;
-+void generateScreenshot() {
-+	APP->window->internal->generateScreenshotStep = kScreenshotStepStarted;
-+}
- 
+-
 -	// Set up GLFW
 -#if defined ARCH_MAC
 -	glfwInitHint(GLFW_COCOA_CHDIR_RESOURCES, GLFW_TRUE);
 -	glfwInitHint(GLFW_COCOA_MENUBAR, GLFW_FALSE);
--#endif
++void generateScreenshot() {
++#ifndef DGL_USE_GLES
++	APP->window->internal->generateScreenshotStep = kScreenshotStepStarted;
+ #endif
++}
  
 -	glfwSetErrorCallback(errorCallback);
 -	err = glfwInit();
@@ -1091,6 +1139,7 @@
 -		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLFW.");
 -		throw Exception("Could not initialize GLFW");
 -	}
++
 +void init() {
  }
  
@@ -1185,6 +1234,13 @@
 +			window->internal->callback->WindowParametersChanged(kWindowParameterLockModulePositions,
 +			                                                    rack::settings::lockModules);
 +	}
++	if (window->internal->params.squeezeModules != rack::settings::squeezeModules)
++	{
++		window->internal->params.squeezeModules = rack::settings::squeezeModules;
++		if (window->internal->callback != nullptr)
++			window->internal->callback->WindowParametersChanged(kWindowParameterSqueezeModulePositions,
++			                                                    rack::settings::squeezeModules);
++	}
 +	if (window->internal->params.invertZoom != rack::settings::invertZoom)
 +	{
 +		window->internal->params.invertZoom = rack::settings::invertZoom;
@@ -1214,6 +1270,7 @@
 +	rack::settings::tooltips = window->internal->params.tooltips;
 +	rack::settings::knobScroll = window->internal->params.knobScroll;
 +	rack::settings::lockModules = window->internal->params.lockModules;
++	rack::settings::squeezeModules = window->internal->params.squeezeModules;
 +	rack::settings::invertZoom = window->internal->params.invertZoom;
 +	rack::settings::rateLimit = window->internal->params.rateLimit;
 +}

@@ -30,6 +30,22 @@
 
 #include_next "common.hpp"
 
+// Workaround for wrong file permissions from zstd extraction and system usage
+#ifdef __EMSCRIPTEN__
+#define fopen fopen_wasm
+#define system system_wasm
+
+extern "C" {
+FILE* fopen_wasm(const char* filename, const char* mode);
+inline int system_wasm(const char*) { return 0; }
+}
+
+namespace std {
+	using ::fopen_wasm;
+	using ::system_wasm;
+}
+#endif
+
 // Make binary resources work the same no matter the OS
 #undef BINARY
 #undef BINARY_START
@@ -68,7 +84,7 @@
 
 // opens a file browser, startDir and title can be null
 // action is always triggered on close (path can be null), must be freed if not null
-void async_dialog_filebrowser(bool saving, const char* startDir, const char* title,
+void async_dialog_filebrowser(bool saving, const char* defaultName, const char* startDir, const char* title,
                               std::function<void(char* path)> action);
 
 // opens a message dialog with only an "ok" button

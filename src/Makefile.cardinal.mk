@@ -10,6 +10,8 @@ ifeq ($(NAME),Cardinal)
 CARDINAL_VARIANT = main
 else ifeq ($(NAME),CardinalFX)
 CARDINAL_VARIANT = fx
+else ifeq ($(NAME),CardinalNative)
+CARDINAL_VARIANT = native
 else ifeq ($(NAME),CardinalSynth)
 CARDINAL_VARIANT = synth
 endif
@@ -18,10 +20,6 @@ endif
 # Carla stuff
 
 ifneq ($(STATIC_BUILD),true)
-
-ifneq ($(DEBUG),true)
-EXTERNAL_PLUGINS = true
-endif
 
 CWD = ../../carla/source
 include $(CWD)/Makefile.deps.mk
@@ -38,11 +36,14 @@ CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/carla_engine_
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/carla_plugin.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/native-plugins.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/audio_decoder.a
+ifneq ($(WASM),true)
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/jackbridge.min.a
+endif
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/lilv.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/rtmempool.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/sfzero.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/water.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/ysfx.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/zita-resampler.a
 
 endif # STATIC_BUILD
@@ -50,7 +51,21 @@ endif # STATIC_BUILD
 # --------------------------------------------------------------
 # Import base definitions
 
+DISTRHO_NAMESPACE = CardinalDISTRHO
+DGL_NAMESPACE = CardinalDGL
+NVG_DISABLE_SKIPPING_WHITESPACE = true
+NVG_FONT_TEXTURE_FLAGS = NVG_IMAGE_NEAREST
 USE_NANOVG_FBO = true
+WASM_EXCEPTIONS = true
+
+ifeq ($(CARDINAL_VARIANT),main)
+# main variant should not use rtaudio/sdl2 fallback (it has CV ports)
+SKIP_NATIVE_AUDIO_FALLBACK = true
+else
+# fx and synth variants should only use rtaudio/sdl2 fallbacks
+FORCE_NATIVE_AUDIO_FALLBACK = true
+endif
+
 include ../../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -82,6 +97,7 @@ FILES_DSP += RemoteNanoVG.cpp
 FILES_DSP += RemoteWindow.cpp
 else
 FILES_UI  = CardinalUI.cpp
+FILES_UI += glfw.cpp
 FILES_UI += Window.cpp
 endif
 
@@ -110,16 +126,65 @@ endif
 
 # --------------------------------------------------------------
 
+# FIXME
+ifeq ($(WASM),true)
+ifneq ($(STATIC_BUILD),true)
+STATIC_CARLA_PLUGIN_LIBS = -lsndfile -lopus -lFLAC -lvorbisenc -lvorbis -logg -lm
+endif
+endif
+
 EXTRA_DEPENDENCIES = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS)
 EXTRA_LIBS = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS) $(STATIC_CARLA_PLUGIN_LIBS)
+
+ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
+EXTRA_DEPENDENCIES += ../../deps/aubio/libaubio.a
+EXTRA_LIBS += ../../deps/aubio/libaubio.a
+EXTRA_LIBS += $(shell $(PKG_CONFIG) --libs fftw3f)
+endif
+
+# --------------------------------------------------------------
+# Setup resources
+
+CORE_RESOURCES  = patches
+CORE_RESOURCES += $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
+
+LV2_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
+VST3_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
+
+# Install modgui resources if MOD build
+ifeq ($(MOD_BUILD),true)
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/Plateau_Reverb.ttl
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui.ttl
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui
+endif
+
+# Cardinal main variant is not available as VST2 due to lack of CV ports
+ifneq ($(CARDINAL_VARIANT),main)
+ifeq ($(MACOS),true)
+VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%)
+CLAP_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).clap/Contents/Resources/%)
+else
+VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.vst/resources/%)
+CLAP_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.clap/resources/%)
+endif
+endif
+
+ifeq ($(WASM),true)
+WASM_RESOURCES  = $(LV2_RESOURCES)
+
+ifneq ($(STATIC_BUILD),true)
+WASM_RESOURCES += $(CURDIR)/lv2
+endif
+
+EXTRA_DEPENDENCIES += $(WASM_RESOURCES)
+endif
 
 # --------------------------------------------------------------
 # Do some magic
 
-NVG_DISABLE_SKIPPING_WHITESPACE = true
-NVG_FONT_TEXTURE_FLAGS = NVG_IMAGE_NEAREST
-USE_NANOVG_FBO = true
 USE_VST2_BUNDLE = true
+USE_CLAP_BUNDLE = true
 include ../../dpf/Makefile.plugins.mk
 
 # --------------------------------------------------------------
@@ -137,11 +202,11 @@ BASE_FLAGS += -DPRIVATE=
 BASE_FLAGS += -I..
 BASE_FLAGS += -I../../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../../include
-BASE_FLAGS += -I../../include/neon-compat
+BASE_FLAGS += -I../../include/simd-compat
 BASE_FLAGS += -I../Rack/include
 ifeq ($(SYSDEPS),true)
 BASE_FLAGS += -DCARDINAL_SYSDEPS
-BASE_FLAGS += $(shell pkg-config --cflags jansson libarchive samplerate speexdsp)
+BASE_FLAGS += $(shell $(PKG_CONFIG) --cflags jansson libarchive samplerate speexdsp)
 else
 BASE_FLAGS += -DZSTDLIB_VISIBILITY=
 BASE_FLAGS += -I../Rack/dep/include
@@ -158,11 +223,10 @@ ifeq ($(MOD_BUILD),true)
 BASE_FLAGS += -DDISTRHO_PLUGIN_USES_MODGUI=1 -DDISTRHO_PLUGIN_MINIMUM_BUFFER_SIZE=0xffff
 endif
 
-ifeq ($(WASM),true)
-BASE_FLAGS += -DNANOVG_GLES2=1
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-else ifneq ($(HAIKU),true)
+ifneq ($(WASM),true)
+ifneq ($(HAIKU),true)
 BASE_FLAGS += -pthread
+endif
 endif
 
 ifeq ($(WINDOWS),true)
@@ -172,12 +236,25 @@ BASE_FLAGS += -I../../include/mingw-compat
 BASE_FLAGS += -I../../include/mingw-std-threads
 endif
 
+ifeq ($(USE_GLES2),true)
+BASE_FLAGS += -DNANOVG_GLES2_FORCED
+else ifeq ($(USE_GLES3),true)
+BASE_FLAGS += -DNANOVG_GLES3_FORCED
+endif
+
 BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing -faligned-new
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+
+ifneq ($(MACOS),true)
+BUILD_CXX_FLAGS += -faligned-new -Wno-abi
+endif
 
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
+
+# Ignore bad behaviour from Rack API
+BUILD_CXX_FLAGS += -Wno-format-security
 
 # --------------------------------------------------------------
 # FIXME lots of warnings from VCV side
@@ -188,7 +265,19 @@ BASE_FLAGS += -Wno-unused-variable
 # --------------------------------------------------------------
 # extra linker flags
 
-ifeq ($(HAIKU),true)
+ifeq ($(WASM),true)
+ifneq ($(STATIC_BUILD),true)
+LINK_FLAGS += --use-preload-plugins
+LINK_FLAGS += --preload-file=./jsfx
+LINK_FLAGS += --preload-file=./lv2
+endif
+LINK_FLAGS += --preload-file=../../bin/CardinalNative.lv2/resources@/resources
+LINK_FLAGS += -sALLOW_MEMORY_GROWTH
+LINK_FLAGS += -sINITIAL_MEMORY=64Mb
+LINK_FLAGS += -sLZ4=1
+LINK_FLAGS += --shell-file=../emscripten/shell.html
+LINK_FLAGS += -O3
+else ifeq ($(HAIKU),true)
 LINK_FLAGS += -lpthread
 else
 LINK_FLAGS += -pthread
@@ -216,7 +305,7 @@ EXTRA_LIBS += -lws2_32 -lwinmm
 endif
 
 ifeq ($(SYSDEPS),true)
-EXTRA_LIBS += $(shell pkg-config --libs jansson libarchive samplerate speexdsp)
+EXTRA_LIBS += $(shell $(PKG_CONFIG) --libs jansson libarchive samplerate speexdsp)
 endif
 
 ifeq ($(WITH_LTO),true)
@@ -262,45 +351,49 @@ BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 # Enable all possible plugin types and setup resources
 
 ifeq ($(CARDINAL_VARIANT),main)
-ifneq ($(STATIC_BUILD),true)
-all: jack lv2 vst3
+TARGETS = lv2 vst3
+ifeq ($(HAVE_JACK),true)
+TARGETS += jack
+endif
+else ifeq ($(CARDINAL_VARIANT),native)
+TARGETS = jack
 else
-all: lv2 vst3
-endif # STATIC_BUILD
-else
-all: lv2 vst2 vst3 static
+TARGETS = lv2 vst2 vst3 static
 endif
 
-CORE_RESOURCES  = $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
-CORE_RESOURCES += $(subst ../,,$(wildcard ../template*.vcv))
-
-LV2_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
-VST3_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
-
-# Install modgui resources if MOD build
-ifeq ($(MOD_BUILD),true)
-LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui.ttl
-LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf
-LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui
+# TESTING
+ifeq ($(CARDINAL_VARIANT),fx)
+TARGETS += clap
 endif
 
-# Cardinal main variant should not use rtaudio fallback (it has CV ports)
-ifeq ($(CARDINAL_VARIANT),main)
-jack: BUILD_CXX_FLAGS += -DDPF_JACK_STANDALONE_SKIP_RTAUDIO_FALLBACK
-endif
-
-# Cardinal main variant is not available as VST2 due to lack of CV ports
-ifneq ($(CARDINAL_VARIANT),main)
-ifeq ($(MACOS),true)
-VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst/Contents/Resources/%)
-else
-VST2_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.vst/resources/%)
-endif
-endif
-
+all: $(TARGETS)
 lv2: $(LV2_RESOURCES)
 vst2: $(VST2_RESOURCES)
 vst3: $(VST3_RESOURCES)
+clap: $(CLAP_RESOURCES)
+
+# --------------------------------------------------------------
+# Extra rules for macOS app bundle
+
+$(TARGET_DIR)/Cardinal.app/Contents/Info.plist: ../../utils/macOS/Info_JACK.plist $(TARGET_DIR)/Cardinal.app/Contents/Resources/distrho.icns
+	-@mkdir -p $(shell dirname $@)
+	cp $< $@
+
+$(TARGET_DIR)/CardinalNative.app/Contents/Info.plist: ../../utils/macOS/Info_Native.plist $(TARGET_DIR)/CardinalNative.app/Contents/Resources/distrho.icns
+	-@mkdir -p $(shell dirname $@)
+	cp $< $@
+
+$(TARGET_DIR)/%.app/Contents/Resources/distrho.icns: ../../utils/distrho.icns
+	-@mkdir -p $(shell dirname $@)
+	cp $< $@
+
+# --------------------------------------------------------------
+# Extra rules for wasm resources
+
+ifeq ($(WASM),true)
+$(CURDIR)/lv2: $(LV2_RESOURCES)
+	wget -O - https://falktx.com/data/wasm-things-2022-08-15.tar.gz | tar xz -C $(CURDIR)
+endif
 
 # --------------------------------------------------------------
 # Extra rules for Windows icon
@@ -316,17 +409,13 @@ endif
 
 # --------------------------------------------------------------
 
-$(TARGET_DIR)/%/template.vcv: ../template.vcv
+$(TARGET_DIR)/%/patches: ../../patches
 	-@mkdir -p "$(shell dirname $@)"
+ifeq ($(WASM),true)
+	cp -rL $< $@
+else
 	$(SILENT)ln -sf $(abspath $<) $@
-
-$(TARGET_DIR)/%/template-fx.vcv: ../template-fx.vcv
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
-
-$(TARGET_DIR)/%/template-synth.vcv: ../template-synth.vcv
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
+endif
 
 $(TARGET_DIR)/$(NAME).lv2/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
@@ -341,6 +430,10 @@ $(TARGET_DIR)/$(NAME).lv2/mod%: ../MOD/$(NAME).lv2/mod%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
+$(TARGET_DIR)/$(NAME).lv2/%.ttl: ../MOD/$(NAME).lv2/%.ttl
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
 $(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf: ../../docs/MODDEVICES.md $(TARGET_DIR)/$(NAME).lv2/modgui
 	(cd ../../docs/ && pandoc MODDEVICES.md -f markdown+implicit_figures -o $(abspath $@))
 endif
@@ -349,11 +442,19 @@ $(TARGET_DIR)/Cardinal.vst/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
+$(TARGET_DIR)/Cardinal.clap/resources/%: ../Rack/res/%
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
 $(TARGET_DIR)/$(NAME).vst/Contents/Resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
 $(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%: ../Rack/res/%
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+$(TARGET_DIR)/$(NAME).clap/Contents/Resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 

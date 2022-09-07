@@ -21,6 +21,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Animated Circuits       | GPL-3.0-or-later         | |
 | Arable Instruments      | GPL-3.0-or-later         | |
 | Aria Salvatrice         | GPL-3.0-or-later         | |
+| AS                      | MIT                      | |
 | Audible Instruments     | GPL-3.0-or-later         | |
 | Autinn                  | GPL-3.0-or-later         | |
 | Axioma                  | GPL-3.0-or-later         | |
@@ -36,6 +37,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | ExpertSleepers Encoders | MIT                      | |
 | Extratone               | GPL-3.0-or-later         | |
 | Fehler Fabrik           | GPL-3.0-or-later         | |
+| forsitan modulare       | GPL-3.0-or-later         | |
 | Fundamental             | GPL-3.0-or-later         | |
 | Glue the Giant          | GPL-3.0-or-later         | |
 | GoodSheperd             | GPL-3.0-or-later         | |
@@ -51,12 +53,14 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Little Utils            | EUPL-1.2                 | |
 | Lomas Modules           | GPL-3.0-or-later         | |
 | Lyrae Modules           | GPL-3.0-or-later         | |
+| Meander                 | GPL-3.0-or-later         | |
 | MindMeld                | GPL-3.0-or-later         | |
 | ML Modules              | BSD-3-Clause             | |
 | Mockba Modular          | MIT                      | |
 | Mog                     | CC0-1.0                  | |
 | mscHack                 | BSD-3-Clause             | |
 | MSM                     | MIT                      | Repo's [LICENSE-dist.md](https://github.com/netboy3/MSM-vcvrack-plugin/issues/10) includes wrong information |
+| Myth                    | GPL-3.0-or-later         | |
 | Nonlinear Circuits      | CC0-1.0                  | |
 | Orbits                  | GPL-3.0-or-later         | |
 | Parable Instruments     | GPL-3.0-or-later         | |
@@ -71,6 +75,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | unless_modules          | GPL-3.0-or-later         | |
 | Valley                  | GPL-3.0-or-later         | |
 | Voxglitch               | GPL-3.0-or-later         | |
+| WhatTheRack             | WTFPL                    | |
 | ZetaCarinae             | GPL-3.0-or-later         | |
 | ZZC                     | GPL-3.0-or-later         | |
 
@@ -108,6 +113,9 @@ Below is a list of artwork licenses from plugins
 | AriaModules/lcd/Fixed_v01/*             | Custom           | See [LICENSE.txt](../plugins/AriaModules/res/lcd/Fixed_v01/LICENSE.txt) |
 | AriaModules/lcd/piano/*                 | WTFPL            | |
 | AriaModules/signature/*                 | Custom           | Removal required if modifying other files without author's permission |
+| AS/*                                    | CC-BY-NC-ND-4.0  | The AS Logo/Monogram is Copyright (c) 2017 Alfredo Santamaria and cannot be used in derivative works; Cardinal has [explicit permission](https://github.com/AScustomWorks/AS/issues/60#issuecomment-1133488586) for its use. |
+| AS/saxmono.ttf                          | Custom           | You may download this font, circulate it und use it freely. You may not alter, rename, change copyrights or modify this font in any way. |
+| AS/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
 | AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, [used and distributed with permission](LICENSE-PERMISSIONS.md#audible-instruments-émilie-gillet--mutable-instruments) |
 | Autinn/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | Axioma/*                                | GPL-3.0-or-later | No artwork specific license provided |
@@ -139,6 +147,7 @@ Below is a list of artwork licenses from plugins
 | ExpertSleepers-Encoders/*               | MIT              | [Same license as source code](https://github.com/expertsleepersltd/vcvrack-encoders/issues/3) |
 | Extratone/*                             | GPL-3.0-or-later | [Same license as source code](https://github.com/EaterOfSheep/Extratone/issues/7) |
 | FehlerFabrik/*                          | GPL-3.0-or-later | No artwork specific license provided, see [FehlerFabrik#17](https://github.com/RCameron93/FehlerFabrik/issues/17) |
+| forsitan-modulare/*                     | GPL-3.0-or-later | No artwork specific license provided |
 | Fundamental/*                           | GPL-3.0-or-later | Same license as source code |
 | GlueTheGiant/*                          | GPL-3.0-or-later | Same license as source code |
 | GlueTheGiant/fonts/DSEG7-*              | OFL-1.1-RFN      | |
@@ -162,6 +171,10 @@ Below is a list of artwork licenses from plugins
 | LomasModules/*                          | GPL-3.0-or-later | [Same license as source code](https://github.com/LomasModules/LomasModules/issues/26) |
 | LomasModules/Fonts/FiraMono-Bold.ttf    | OFL-1.1-RFN      | |
 | LyraeModules/*                          | CC-BY-NC-SA-4.0  | |
+| Meander/*                               | GPL-3.0-or-later | No artwork specific license provided |
+| Meander/Bravura.otf                     | OFL-1.1-RFN      | |
+| Meander/DejaVuSansMono.ttf              | Bitstream-Vera   | |
+| Meander/Ubuntu Condensed 400.ttf        | UFL-1.0          | Ubuntu Font License, based on OFL-1.1 |
 | MindMeld/*                              | CC-BY-NC-ND-4.0  | |
 | MindMeld/fonts/RobotoCondensed-*.ttf    | Apache-2.0       | |
 | ML_modules/*                            | BSD-3-Clause     | No artwork specific license provided |
@@ -176,6 +189,7 @@ Below is a list of artwork licenses from plugins
 | MSM/Fonts/DejaVuSansMono.ttf            | Bitstream-Vera   | |
 | MSM/Fonts/Segment7Standard.ttf          | OFL-1.1-RFN      | |
 | MSM/Fonts/Sudo.ttf                      | OFL-1.1-no-RFN   | |
+| Myth/*                                  | GPL-3.0-or-later | No artwork specific license provided |
 | nonlinearcircuits/*                     | CC0-1.0          | No artwork specific license provided |
 | nonlinearcircuits/Audiowide-Regular.ttf | OFL-1.1-RFN      | |
 | Orbits/*                                | CC-BY-NC-ND-4.0  | |
@@ -199,9 +213,11 @@ Below is a list of artwork licenses from plugins
 | ValleyAudio/ShareTechMono-*.ttf         | OFL-1.1-RFN      | |
 | voxglitch/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | voxglitch/ShareTechMono-Regular.ttf     | OFL-1.1-RFN      | |
+| WhatTheRack/*                           | WTFPL            | |
+| WhatTheRack/BoomButton/*                | CC-BY-3.0        | |
 | ZetaCarinaeModules/*                    | GPL-3.0-or-later | [Same license as source code](https://github.com/mhampton/ZetaCarinaeModules/issues/8) |
 | ZZC/*                                   | CC-BY-NC-SA-4.0  | |
-| ZZC/panels/*                            | CC-BY-NC-SA-4.0  | NOTE: The ZZC Logo is Copyright (c) 2019 Sergey Ukolov and cannot be used in derivative works; Cardinal's use does not officially constitute derivative work. |
+| ZZC/panels/*                            | CC-BY-NC-SA-4.0  | The ZZC Logo is Copyright (c) 2019 Sergey Ukolov and cannot be used in derivative works; Cardinal's use does not officially constitute derivative work. |
 | ZZC/fonts/DSEG/*                        | OFL-1.1-RFN      | |
 | ZZC/fonts/Nunito/*                      | OFL-1.1-RFN      | |
 

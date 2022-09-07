@@ -1,4 +1,4 @@
-<!-- # DISTRHO Cardinal -->
+# DISTRHO Cardinal
 
 *Cardinal, the Rack!*
 
@@ -19,16 +19,12 @@ All "Core" modules from Rack have been replaced by Cardinal equivalents, simplif
 Cardinal does not load external modules and does not connect to the official Rack library/store.  
 All VCV branding has been removed (to the best of our knowledge) in order to avoid any trademark issues.
 
-The VST3 version is in progress, already part of the build but still experimental.
-
 
 ## Current status
 
-With the exception of a few bugs, Cardinal can be considered stable.  
-Though currently the following should be noted:
+Cardinal should be considered stable, if you spot any bugs please report them.  
+Currently the following should be noted:
 
-- Keyboard input does not always work in some hosts [#24](https://github.com/DISTRHO/Cardinal/issues/24)
-- VST3 support incomplete/experimental [#41](https://github.com/DISTRHO/Cardinal/issues/41)
 - Windows 32bit builds do not work well [#80](https://github.com/DISTRHO/Cardinal/issues/80)
 
 ### Stable release
@@ -86,10 +82,6 @@ Plugin type is set as regular "effect".
 Because people will ask for it. It is, well... Rack.  
 But a couple of modules background's have their colors flipped, because damn we want proper dark mode!
 
-### Init / Default patch
-
-![screenshot](docs/Screenshot_Init-Patch.png "Screenshot")
-
 ### Module browser
 
 ![screenshot](docs/Screenshot_Module-Browser.png "Screenshot")
@@ -101,6 +93,10 @@ But a couple of modules background's have their colors flipped, because damn we 
 ### Carla and Ildaeil plugin hosts
 
 ![screenshot](docs/Screenshot_Carla+Ildaeil.png "Screenshot")
+
+### Custom Fundamental modules design
+
+![screenshot](docs/Screenshot_Fundamental.png "Screenshot")
 
 
 ## Included modules
@@ -115,6 +111,7 @@ At the moment the following 3rd-party modules are provided:
 - Animated Circuits
 - Arable Instruments
 - Aria Salvatrice
+- AS
 - Audible Instruments
 - Autinn
 - Axioma
@@ -130,6 +127,7 @@ At the moment the following 3rd-party modules are provided:
 - ExpertSleepers Encoders
 - Extratone
 - Fehler Fabrik
+- forsitan modulare
 - Fundamental
 - Glue the Giant
 - GoodSheperd
@@ -145,12 +143,14 @@ At the moment the following 3rd-party modules are provided:
 - Little Utils
 - Lomas Modules
 - Lyrae Modules
+- Meander
 - MindMeld
 - ML Modules
 - Mockba Modular
 - Mog
 - mscHack
 - MSM
+- Myth
 - Nonlinear Circuits
 - Orbits
 - Parable Instruments
@@ -165,10 +165,11 @@ At the moment the following 3rd-party modules are provided:
 - unless_modules
 - Valley
 - Voxglitch
+- WhatTheRack
 - ZetaCarinae
 - ZZC
 
-Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.
+Additionally Cardinal provides its own modules for DAW/Host automation, time position, audio to CV pitch conversion and internal plugin hosting.
 
 ### Adding modules
 

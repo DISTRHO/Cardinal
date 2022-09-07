@@ -34,24 +34,38 @@
 # undef DEBUG
 #endif
 
-#ifdef HAVE_LIBLO
-# ifdef HEADLESS
-#  include <lo/lo.h>
-#  include "extra/Thread.hpp"
-# endif
-# include "CardinalCommon.hpp"
+#if defined(HAVE_LIBLO) && defined(HEADLESS)
+# include <lo/lo.h>
+# include "extra/Thread.hpp"
 #endif
 
 #include <list>
 
+#include "CardinalCommon.hpp"
 #include "DistrhoPluginUtils.hpp"
 #include "PluginContext.hpp"
 #include "extra/Base64.hpp"
-#include "extra/SharedResourcePointer.hpp"
+
+#ifdef DISTRHO_OS_WASM
+# include <emscripten/emscripten.h>
+#else
+# include "extra/SharedResourcePointer.hpp"
+#endif
+
+#if CARDINAL_VARIANT_FX
+# define CARDINAL_TEMPLATE_NAME "init/fx.vcv"
+#elif CARDINAL_VARIANT_NATIVE
+# define CARDINAL_TEMPLATE_NAME "init/native.vcv"
+#elif CARDINAL_VARIANT_SYNTH
+# define CARDINAL_TEMPLATE_NAME "init/synth.vcv"
+#else
+# define CARDINAL_TEMPLATE_NAME "init/main.vcv"
+#endif
 
 static const constexpr uint kCardinalStateBaseCount = 3; // patch, screenshot, comment
 
 #ifndef HEADLESS
+# include "extra/ScopedValueSetter.hpp"
 # include "WindowParameters.hpp"
 static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount + 2; // moduleInfos, windowSize
 #else
@@ -59,27 +73,76 @@ static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount + 2; /
 static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount;
 #endif
 
-#if CARDINAL_VARIANT_FX
-# define CARDINAL_TEMPLATE_NAME "template-fx.vcv"
-#elif CARDINAL_VARIANT_SYNTH
-# define CARDINAL_TEMPLATE_NAME "template-synth.vcv"
-#else
-# define CARDINAL_TEMPLATE_NAME "template.vcv"
-#endif
-
 namespace rack {
+namespace asset {
+std::string patchesPath();
+void destroy();
+}
+namespace engine {
+void Engine_setAboutToClose(Engine*);
+}
 namespace plugin {
-    void initStaticPlugins();
-    void destroyStaticPlugins();
+void initStaticPlugins();
+void destroyStaticPlugins();
 }
 #ifndef HEADLESS
 namespace window {
-    void WindowInit(Window* window, DISTRHO_NAMESPACE::Plugin* plugin);
+void WindowInit(Window* window, DISTRHO_NAMESPACE::Plugin* plugin);
 }
 #endif
 }
 
 START_NAMESPACE_DISTRHO
+
+template<typename T>
+static inline
+bool d_isDiffHigherThanLimit(const T& v1, const T& v2, const T& limit)
+{
+    return v1 != v2 ? (v1 > v2 ? v1 - v2 : v2 - v1) > limit : false;
+}
+
+// -----------------------------------------------------------------------------------------------------------
+
+#ifdef DISTRHO_OS_WASM
+static char* getPatchFileEncodedInURL() {
+    return static_cast<char*>(EM_ASM_PTR({
+        var searchParams = new URLSearchParams(window.location.search);
+        var patch = searchParams.get('patch');
+        if (!patch)
+        return null;
+        var length = lengthBytesUTF8(patch) + 1;
+        var str = _malloc(length);
+        stringToUTF8(patch, str, length);
+        return str;
+    }));
+};
+
+static char* getPatchRemoteURL() {
+    return static_cast<char*>(EM_ASM_PTR({
+        var searchParams = new URLSearchParams(window.location.search);
+        var patch = searchParams.get('patchurl');
+        if (!patch)
+        return null;
+        var length = lengthBytesUTF8(patch) + 1;
+        var str = _malloc(length);
+        stringToUTF8(patch, str, length);
+        return str;
+    }));
+};
+
+static char* getPatchStorageSlug() {
+    return static_cast<char*>(EM_ASM_PTR({
+        var searchParams = new URLSearchParams(window.location.search);
+        var patch = searchParams.get('patchstorage');
+        if (!patch)
+        return null;
+        var length = lengthBytesUTF8(patch) + 1;
+        var str = _malloc(length);
+        stringToUTF8(patch, str, length);
+        return str;
+    }));
+};
+#endif
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -93,16 +156,20 @@ struct Initializer
     CardinalBasePlugin* oscPlugin = nullptr;
 #endif
     std::string templatePath;
+    std::string factoryTemplatePath;
 
     Initializer(const CardinalBasePlugin* const plugin)
     {
         using namespace rack;
 
+#ifdef DISTRHO_OS_WASM
+        settings::allowCursorLock = true;
+#else
         settings::allowCursorLock = false;
+#endif
         settings::autoCheckUpdates = false;
         settings::autosaveInterval = 0;
         settings::devMode = true;
-        settings::discordUpdateActivity = false;
         settings::isPlugin = true;
         settings::skipLoadOnLaunch = true;
         settings::showTipsOnLaunch = false;
@@ -142,27 +209,25 @@ struct Initializer
             {
                 if (const char* const resourcePath = getResourcePath(bundlePath))
                 {
-                    asset::bundlePath = system::join(resourcePath, "PluginManifests");
                     asset::systemDir = resourcePath;
-                    templatePath = system::join(asset::systemDir, CARDINAL_TEMPLATE_NAME);
+                    asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
                 }
             }
 
-            if (asset::systemDir.empty() || ! system::exists(asset::systemDir))
+            if (asset::systemDir.empty() || ! system::exists(asset::systemDir) || ! system::exists(asset::bundlePath))
             {
                #ifdef CARDINAL_PLUGIN_SOURCE_DIR
                 // Make system dir point to source code location as fallback
                 asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
+                asset::bundlePath.clear();
 
-                if (system::exists(system::join(asset::systemDir, "res")))
-                {
-                    templatePath = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR CARDINAL_TEMPLATE_NAME;
-                }
                 // If source code dir does not exist use install target prefix as system dir
-                else
+                if (!system::exists(system::join(asset::systemDir, "res")))
                #endif
                 {
-                   #if defined(ARCH_MAC)
+                   #if defined(DISTRHO_OS_WASM)
+                    asset::systemDir = "/resources";
+                   #elif defined(ARCH_MAC)
                     asset::systemDir = "/Library/Application Support/Cardinal";
                    #elif defined(ARCH_WIN)
                     const std::string commonprogfiles = getSpecialPath(kSpecialPathCommonProgramFiles);
@@ -172,16 +237,20 @@ struct Initializer
                     asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/cardinal";
                    #endif
 
-                    if (! asset::systemDir.empty())
-                    {
-                        asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
-                        templatePath = system::join(asset::systemDir, CARDINAL_TEMPLATE_NAME);
-                    }
+                    asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
                 }
             }
 
             asset::userDir = asset::systemDir;
         }
+
+        const std::string patchesPath = asset::patchesPath();
+       #ifdef DISTRHO_OS_WASM
+        templatePath = system::join(patchesPath, CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME);
+       #else
+        templatePath = system::join(patchesPath, CARDINAL_TEMPLATE_NAME);
+       #endif
+        factoryTemplatePath = system::join(patchesPath, CARDINAL_TEMPLATE_NAME);
 
         // Log environment
         INFO("%s %s v%s", APP_NAME.c_str(), APP_EDITION.c_str(), APP_VERSION.c_str());
@@ -191,6 +260,7 @@ struct Initializer
         INFO("System directory: %s", asset::systemDir.c_str());
         INFO("User directory: %s", asset::userDir.c_str());
         INFO("Template patch: %s", templatePath.c_str());
+        INFO("System template patch: %s", factoryTemplatePath.c_str());
 
         // Report to user if something is wrong with the installation
         if (asset::systemDir.empty())
@@ -247,6 +317,12 @@ struct Initializer
 
         INFO("Destroying plugins");
         plugin::destroyStaticPlugins();
+
+        INFO("Destroying colourized assets");
+        asset::destroy();
+
+        INFO("Destroying settings");
+        settings::destroy();
 
         INFO("Destroying logger");
         logger::destroy();
@@ -438,7 +514,11 @@ struct ScopedContext {
 
 class CardinalPlugin : public CardinalBasePlugin
 {
+   #ifdef DISTRHO_OS_WASM
+    ScopedPointer<Initializer> fInitializer;
+   #else
     SharedResourcePointer<Initializer> fInitializer;
+   #endif
 
    #if DISTRHO_PLUGIN_NUM_INPUTS != 0
     /* If host audio ins == outs we can get issues for inplace processing.
@@ -448,7 +528,7 @@ class CardinalPlugin : public CardinalBasePlugin
    #endif
 
     std::string fAutosavePath;
-    uint64_t fPreviousFrame;
+    uint64_t fNextExpectedFrame;
 
     struct {
         String comment;
@@ -470,11 +550,15 @@ class CardinalPlugin : public CardinalBasePlugin
 public:
     CardinalPlugin()
         : CardinalBasePlugin(kModuleParameters + kWindowParameterCount + 1, 0, kCardinalStateCount),
+         #ifdef DISTRHO_OS_WASM
+          fInitializer(new Initializer(this)),
+         #else
           fInitializer(this),
+         #endif
          #if DISTRHO_PLUGIN_NUM_INPUTS != 0
           fAudioBufferCopy(nullptr),
          #endif
-          fPreviousFrame(0),
+          fNextExpectedFrame(0),
           fWasBypassed(false)
     {
        #ifndef HEADLESS
@@ -491,6 +575,7 @@ public:
         fWindowParameters[kWindowParameterBrowserSort] = 3.0f;
         fWindowParameters[kWindowParameterBrowserZoom] = 50.0f;
         fWindowParameters[kWindowParameterInvertZoom] = 0.0f;
+        fWindowParameters[kWindowParameterSqueezeModulePositions] = 1.0f;
        #endif
 
         // create unique temporary path for this instance
@@ -537,6 +622,7 @@ public:
         context->patch = new rack::patch::Manager;
         context->patch->autosavePath = fAutosavePath;
         context->patch->templatePath = fInitializer->templatePath;
+        context->patch->factoryTemplatePath = fInitializer->factoryTemplatePath;
 
         context->event = new rack::widget::EventState;
         context->scene = new rack::app::Scene;
@@ -545,23 +631,38 @@ public:
         if (! isDummyInstance())
             context->window = new rack::window::Window;
 
-        context->patch->loadTemplate();
-        context->scene->rackScroll->reset();
+       #ifdef DISTRHO_OS_WASM
+        if ((rack::patchStorageSlug = getPatchStorageSlug()) == nullptr &&
+            (rack::patchRemoteURL = getPatchRemoteURL()) == nullptr &&
+            (rack::patchFromURL = getPatchFileEncodedInURL()) == nullptr)
+       #endif
+        {
+            context->patch->loadTemplate();
+            context->scene->rackScroll->reset();
+            // swap to factory template after first load
+            context->patch->templatePath = context->patch->factoryTemplatePath;
+        }
 
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
+       #if defined(HAVE_LIBLO) && defined(HEADLESS)
         fInitializer->oscPlugin = this;
-#endif
+       #endif
     }
 
     ~CardinalPlugin() override
     {
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
+       #if defined(HAVE_LIBLO) && defined(HEADLESS)
         fInitializer->oscPlugin = nullptr;
-#endif
+       #endif
 
         {
             const ScopedContext sc(this);
             context->patch->clear();
+
+            // do a little dance to prevent context scene deletion from saving to temp dir
+           #ifndef HEADLESS
+            const ScopedValueSetter<bool> svs(rack::settings::headless, true);
+           #endif
+            Engine_setAboutToClose(context->engine);
             delete context;
         }
 
@@ -611,12 +712,12 @@ protected:
 
     uint32_t getVersion() const override
     {
-        return d_version(0, 22, 4);
+        return d_version(0, 22, 9);
     }
 
     int64_t getUniqueId() const override
     {
-       #if CARDINAL_VARIANT_MAIN
+       #if CARDINAL_VARIANT_MAIN || CARDINAL_VARIANT_NATIVE
         return d_cconst('d', 'C', 'd', 'n');
        #elif CARDINAL_VARIANT_FX
         return d_cconst('d', 'C', 'n', 'F');
@@ -632,14 +733,48 @@ protected:
 
     void initAudioPort(const bool input, uint32_t index, AudioPort& port) override
     {
-        if (index >= 8)
+       #if CARDINAL_VARIANT_MAIN
+        if (index < 8)
+        {
+            port.groupId = index / 2;
+        }
+        else
         {
             port.hints = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange;
             index -= 8;
         }
+       #elif CARDINAL_VARIANT_FX || CARDINAL_VARIANT_NATIVE || CARDINAL_VARIANT_SYNTH
+        if (index < 2)
+            port.groupId = kPortGroupStereo;
+       #endif
 
         CardinalBasePlugin::initAudioPort(input, index, port);
     }
+
+   #if CARDINAL_VARIANT_MAIN
+    void initPortGroup(const uint32_t index, PortGroup& portGroup) override
+    {
+        switch (index)
+        {
+        case 0:
+            portGroup.name = "Audio 1+2";
+            portGroup.symbol = "audio_1_and_2";
+            break;
+        case 1:
+            portGroup.name = "Audio 3+4";
+            portGroup.symbol = "audio_3_and_4";
+            break;
+        case 2:
+            portGroup.name = "Audio 5+6";
+            portGroup.symbol = "audio_5_and_6";
+            break;
+        case 3:
+            portGroup.name = "Audio 7+8";
+            portGroup.symbol = "audio_7_and_8";
+            break;
+        }
+    }
+   #endif
 
     void initParameter(const uint32_t index, Parameter& parameter) override
     {
@@ -822,6 +957,14 @@ protected:
             parameter.symbol = "invertZoom";
             parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
             parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 1.0f;
+            break;
+        case kWindowParameterSqueezeModulePositions:
+            parameter.name = "Auto-squeeze module positions";
+            parameter.symbol = "squeezeModules";
+            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+            parameter.ranges.def = 1.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 1.0f;
             break;
@@ -1057,11 +1200,29 @@ protected:
 
         const std::vector<uint8_t> data(d_getChunkFromBase64String(value));
 
+        DISTRHO_SAFE_ASSERT_RETURN(data.size() >= 4,);
+
         const ScopedContext sc(this);
 
         rack::system::removeRecursively(fAutosavePath);
         rack::system::createDirectories(fAutosavePath);
-        rack::system::unarchiveToDirectory(data, fAutosavePath);
+
+        static constexpr const char zstdMagic[] = "\x28\xb5\x2f\xfd";
+
+        if (std::memcmp(data.data(), zstdMagic, sizeof(zstdMagic)) != 0)
+        {
+            FILE* const f = std::fopen(rack::system::join(fAutosavePath, "patch.json").c_str(), "w");
+            DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
+
+            std::fwrite(data.data(), data.size(), 1, f);
+            std::fclose(f);
+        }
+        else
+        {
+            try {
+                rack::system::unarchiveToDirectory(data, fAutosavePath);
+            } DISTRHO_SAFE_EXCEPTION_RETURN("setState unarchiveToDirectory",);
+        }
 
         try {
             context->patch->loadAutosave();
@@ -1075,14 +1236,15 @@ protected:
 
     void activate() override
     {
+        context->bufferSize = getBufferSize();
+
        #if DISTRHO_PLUGIN_NUM_INPUTS != 0
-        const uint32_t bufferSize = getBufferSize();
         fAudioBufferCopy = new float*[DISTRHO_PLUGIN_NUM_INPUTS];
         for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
-            fAudioBufferCopy[i] = new float[bufferSize];
+            fAudioBufferCopy[i] = new float[context->bufferSize];
        #endif
 
-        fPreviousFrame = 0;
+        fNextExpectedFrame = 0;
     }
 
     void deactivate() override
@@ -1108,7 +1270,7 @@ protected:
         {
             const TimePosition& timePos(getTimePosition());
 
-            const bool reset = timePos.playing && (timePos.frame == 0 || fPreviousFrame + frames != timePos.frame);
+            const bool reset = timePos.playing && (timePos.frame == 0 || d_isDiffHigherThanLimit(fNextExpectedFrame, timePos.frame, (uint64_t)2));
 
             context->playing = timePos.playing;
             context->bbtValid = timePos.bbt.valid;
@@ -1133,7 +1295,7 @@ protected:
             }
 
             context->reset = reset;
-            fPreviousFrame = timePos.frame;
+            fNextExpectedFrame = timePos.playing ? timePos.frame + frames : 0;
         }
 
         // separate buffers, use them
@@ -1147,7 +1309,13 @@ protected:
         {
            #if DISTRHO_PLUGIN_NUM_INPUTS != 0
             for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
-                std::memcpy(fAudioBufferCopy[i], inputs[i], sizeof(float)*frames);
+            {
+               #if CARDINAL_VARIANT_MAIN
+                // can be null on main variant
+                if (inputs[i] != nullptr)
+               #endif
+                    std::memcpy(fAudioBufferCopy[i], inputs[i], sizeof(float)*frames);
+            }
             context->dataIns = fAudioBufferCopy;
            #else
             context->dataIns = nullptr;
@@ -1156,7 +1324,13 @@ protected:
         }
 
         for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
-            std::memset(outputs[i], 0, sizeof(float)*frames);
+        {
+           #if CARDINAL_VARIANT_MAIN
+            // can be null on main variant
+            if (outputs[i] != nullptr)
+           #endif
+                std::memset(outputs[i], 0, sizeof(float)*frames);
+        }
 
         if (bypassed)
         {
@@ -1181,12 +1355,6 @@ protected:
         context->engine->stepBlock(frames);
 
         fWasBypassed = bypassed;
-    }
-
-    void bufferSizeChanged(const uint32_t newBufferSize) override
-    {
-        rack::contextSet(context);
-        context->bufferSize = newBufferSize;
     }
 
     void sampleRateChanged(const double newSampleRate) override

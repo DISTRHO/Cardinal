@@ -26,6 +26,7 @@
  */
 
 #include "plugincontext.hpp"
+#include "ModuleWidgets.hpp"
 #include "Widgets.hpp"
 
 #include <algorithm>
@@ -707,7 +708,7 @@ struct CCGridDisplay : Widget {
 	}
 };
 
-struct HostMIDICCWidget : ModuleWidget {
+struct HostMIDICCWidget : ModuleWidgetWith14HP {
     static constexpr const float startX_In = 14.0f;
     static constexpr const float startX_Out = 115.0f;
     static constexpr const float startY = 190.0f;
@@ -721,10 +722,7 @@ struct HostMIDICCWidget : ModuleWidget {
         setModule(m);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostMIDICC.svg")));
 
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        createAndAddScrews();
 
         for (int i=0; i<18; ++i)
         {
@@ -748,18 +746,14 @@ struct HostMIDICCWidget : ModuleWidget {
 
     void draw(const DrawArgs& args) override
     {
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
-                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
-        nvgFill(args.vg);
+        drawBackground(args.vg);
 
         nvgBeginPath(args.vg);
         nvgRoundedRect(args.vg, startX_Out - 2.5f, startY - 2.0f, padding * 3, padding * 6, 4);
         nvgFillColor(args.vg, nvgRGB(0xd0, 0xd0, 0xd0));
         nvgFill(args.vg);
 
-        ModuleWidget::draw(args);
+        ModuleWidgetWith14HP::draw(args);
     }
 
     void appendContextMenu(Menu* const menu) override

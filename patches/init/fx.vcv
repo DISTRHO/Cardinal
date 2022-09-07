@@ -1,0 +1,186 @@
+{
+  "version": "2.1.1",
+  "zoom": 1.0,
+  "modules": [
+    {
+      "id": 8712245256622475,
+      "plugin": "Cardinal",
+      "model": "TextEditor",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 1299757500751091,
+      "data": {
+        "filepath": "",
+        "lang": "None",
+        "etext": "Welcome to Cardinal!\n\nThis is the FX variant\nIt has 2 audio ports, plus MIDI\n\nAudio and MIDI is pass-through in\nthe default patch\n\n",
+        "width": 19
+      },
+      "pos": [
+        45,
+        0
+      ]
+    },
+    {
+      "id": 1,
+      "plugin": "Cardinal",
+      "model": "HostAudio2",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        }
+      ],
+      "rightModuleId": 2,
+      "data": {
+        "dcFilter": true
+      },
+      "pos": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": 2,
+      "plugin": "Cardinal",
+      "model": "HostMIDI",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 1,
+      "rightModuleId": 3,
+      "data": {
+        "pwRange": 0.0,
+        "smooth": false,
+        "channels": 1,
+        "polyMode": 0,
+        "lastPitch": 8192,
+        "lastMod": 0,
+        "inputChannel": 0,
+        "outputChannel": 0
+      },
+      "pos": [
+        8,
+        0
+      ]
+    },
+    {
+      "id": 3,
+      "plugin": "Cardinal",
+      "model": "HostTime",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 2,
+      "rightModuleId": 4,
+      "pos": [
+        17,
+        0
+      ]
+    },
+    {
+      "id": 4,
+      "plugin": "Cardinal",
+      "model": "HostParameters",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 3,
+      "rightModuleId": 1299757500751091,
+      "data": {
+        "smooth": true
+      },
+      "pos": [
+        25,
+        0
+      ]
+    },
+    {
+      "id": 1299757500751091,
+      "plugin": "Cardinal",
+      "model": "HostParametersMap",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 4,
+      "rightModuleId": 8712245256622475,
+      "data": {
+        "maps": [
+          {
+            "hostParamId": 255,
+            "inverted": false,
+            "smooth": true,
+            "moduleId": -1,
+            "paramId": 0
+          }
+        ]
+      },
+      "pos": [
+        34,
+        0
+      ]
+    }
+  ],
+  "cables": [
+    {
+      "id": 4678253779474352,
+      "outputModuleId": 2,
+      "outputId": 0,
+      "inputModuleId": 2,
+      "inputId": 0,
+      "color": "#ff5252"
+    },
+    {
+      "id": 7683580154025470,
+      "outputModuleId": 2,
+      "outputId": 1,
+      "inputModuleId": 2,
+      "inputId": 1,
+      "color": "#ff9352"
+    },
+    {
+      "id": 8430980435213069,
+      "outputModuleId": 2,
+      "outputId": 2,
+      "inputModuleId": 2,
+      "inputId": 2,
+      "color": "#ffd452"
+    },
+    {
+      "id": 4583111412242866,
+      "outputModuleId": 2,
+      "outputId": 3,
+      "inputModuleId": 2,
+      "inputId": 3,
+      "color": "#e8ff52"
+    },
+    {
+      "id": 4427623524544856,
+      "outputModuleId": 2,
+      "outputId": 4,
+      "inputModuleId": 2,
+      "inputId": 4,
+      "color": "#a8ff52"
+    },
+    {
+      "id": 6950452937672903,
+      "outputModuleId": 2,
+      "outputId": 5,
+      "inputModuleId": 2,
+      "inputId": 5,
+      "color": "#67ff52"
+    },
+    {
+      "id": 3491422883476882,
+      "outputModuleId": 1,
+      "outputId": 0,
+      "inputModuleId": 1,
+      "inputId": 0,
+      "color": "#52beff"
+    },
+    {
+      "id": 4569757452962581,
+      "outputModuleId": 1,
+      "outputId": 1,
+      "inputModuleId": 1,
+      "inputId": 1,
+      "color": "#527dff"
+    }
+  ]
+}
