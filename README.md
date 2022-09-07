@@ -19,16 +19,12 @@ All "Core" modules from Rack have been replaced by Cardinal equivalents, simplif
 Cardinal does not load external modules and does not connect to the official Rack library/store.  
 All VCV branding has been removed (to the best of our knowledge) in order to avoid any trademark issues.
 
-**The VST3 version is in progress, already part of the build but still experimental.**  
-Prefer to use other formats if you can.
-
 
 ## Current status
 
 Cardinal should be considered stable, if you spot any bugs please report them.  
 Currently the following should be noted:
 
-- VST3 support incomplete/experimental [#41](https://github.com/DISTRHO/Cardinal/issues/41)
 - Windows 32bit builds do not work well [#80](https://github.com/DISTRHO/Cardinal/issues/80)
 
 ### Stable release

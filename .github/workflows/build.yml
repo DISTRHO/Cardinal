@@ -1041,16 +1041,31 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+      - name: Set up cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+            src/Rack/dep/zstd-1.4.5
+          key: pluginval-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           # custom repos
-          wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_10.0.3_all.deb
-          sudo dpkg -i kxstudio-repos_10.0.3_all.deb
+          wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_11.1.0_all.deb
+          sudo dpkg -i kxstudio-repos_11.1.0_all.deb
           sudo apt-get update -qq
           # build-deps
           sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
           # runtime testing
-          sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint valgrind xvfb
+          sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -1066,7 +1081,14 @@ jobs:
           make NOOPT=true SKIP_STRIPPING=true -j $(nproc)
       - name: Run Cardinal self-tests
         run: |
-          xvfb-run ./bin/Cardinal selftest
+          # --exit-on-first-error=yes
+          xvfb-run valgrind \
+                --gen-suppressions=all \
+                --error-exitcode=255 \
+                --leak-check=no \
+                --track-origins=yes \
+                --suppressions=./dpf/utils/valgrind-dpf.supp \
+                ./bin/Cardinal selftest
       - name: Validate LV2 ttl syntax
         run: |
           lv2_validate \
@@ -1082,13 +1104,13 @@ jobs:
           cp -r bin/CardinalFX.lv2 bin/CardinalSynth.lv2 \
               /usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,instance-access,midi,mod,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 \
               ${LV2_PATH}
-          lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
+          xvfb-run lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
       - name: Test LV2 plugin
         run: |
             export LV2_PATH=/tmp/lv2-path
             for p in $(lv2ls); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
-                    valgrind \
+                    xvfb-run valgrind \
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
@@ -1099,7 +1121,7 @@ jobs:
         run: |
             for p in $(ls bin/*.vst/*.so); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
-                    valgrind \
+                    xvfb-run valgrind \
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
@@ -1110,7 +1132,7 @@ jobs:
         run: |
             for p in $(ls bin/ | grep vst3); do \
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
-                    valgrind \
+                    xvfb-run valgrind \
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
