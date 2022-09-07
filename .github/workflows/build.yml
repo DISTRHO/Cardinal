@@ -347,7 +347,10 @@ jobs:
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
           make features
-          make DEBUG=true -j $(nproc)
+          # multiple jobs for building carla, deps and plugins
+          make DEBUG=true carla deps dgl plugins resources -j $(nproc)
+          # single job for final build stage, otherwise we might killed due to OOM
+          make DEBUG=true -j 1
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
@@ -718,7 +721,10 @@ jobs:
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
           pushd deps/PawPaw; source local.env wasm; popd
           make features
-          make CIBUILD=true NOOPT=true USE_GLES2=true -j $(nproc)
+          # multiple jobs for building carla, deps and plugins
+          make CIBUILD=true NOOPT=true USE_GLES2=true carla deps dgl plugins resources -j $(nproc)
+          # single job for final build stage, otherwise we might killed due to OOM
+          make CIBUILD=true NOOPT=true USE_GLES2=true -j 1
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         id: slug1
