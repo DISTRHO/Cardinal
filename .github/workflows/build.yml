@@ -1085,7 +1085,7 @@ jobs:
           xvfb-run valgrind \
                 --gen-suppressions=all \
                 --error-exitcode=255 \
-                --leak-check=yes \
+                --leak-check=no \
                 --track-origins=yes \
                 --suppressions=./dpf/utils/valgrind-dpf.supp \
                 ./bin/Cardinal selftest
@@ -1112,7 +1112,7 @@ jobs:
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
                     xvfb-run valgrind \
                     --error-exitcode=255 \
-                    --leak-check=yes \
+                    --leak-check=no \
                     --track-origins=yes \
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
                     /usr/lib/carla/carla-bridge-native lv2 "" ${p}; \
@@ -1123,7 +1123,7 @@ jobs:
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
                     xvfb-run valgrind \
                     --error-exitcode=255 \
-                    --leak-check=yes \
+                    --leak-check=no \
                     --track-origins=yes \
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
                     /usr/lib/carla/carla-bridge-native vst2 ./${p} ""; \
@@ -1134,7 +1134,7 @@ jobs:
                 env CARLA_BRIDGE_DUMMY=1 CARLA_BRIDGE_TESTING=native \
                     xvfb-run valgrind \
                     --error-exitcode=255 \
-                    --leak-check=yes \
+                    --leak-check=no \
                     --track-origins=yes \
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
                     /usr/lib/carla/carla-bridge-native vst3 ./bin/${p} ""; \
