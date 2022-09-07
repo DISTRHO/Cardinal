@@ -24,7 +24,8 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 | Plugin in AU format            | No                        | Yes                             | |
 | Plugin in LV2 format           | No                        | Yes                             | |
 | Plugin in VST2 format          | Yes                       | Yes                             | |
-| Plugin in VST3 format          | No                        | WIP                             | |
+| Plugin in VST3 format          | No                        | Yes                             | |
+| Plugin in CLAP format          | No                        | WIP                             | |
 | Plugin inside itself           | No, will crash            | Yes                             | Technical limitations prevent Rack Pro from loading inside itself |
 | Multi-threaded engine          | Yes                       | No, uses host audio thread      | Intentional in Cardinal, for removing jitter |
 | Supports ARM systems           | No                        | Yes                             | This means Apple M1 too, yes |

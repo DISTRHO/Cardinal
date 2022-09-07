@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(Cardinal VERSION 22.08)
+project(Cardinal VERSION 22.09)
 
 add_subdirectory(JUCE)
 
