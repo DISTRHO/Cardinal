@@ -27,6 +27,9 @@
     <choice id="studio.kx.distrho.cardinal-vst3" title="VST3" description="Install VST3 plugins" visible="true">
         <pkg-ref id="studio.kx.distrho.cardinal-vst3bundles" version="0">dpf-cardinal-vst3bundles.pkg</pkg-ref>
     </choice>
+    <choice id="studio.kx.distrho.cardinal-clap" title="CLAP" description="Install CLAP plugins" visible="true">
+        <pkg-ref id="studio.kx.distrho.cardinal-clapbundles" version="0">dpf-cardinal-clapbundles.pkg</pkg-ref>
+    </choice>
     <choices-outline>
         <line choice="studio.kx.distrho.cardinal-res"/>
         <line choice="studio.kx.distrho.cardinal-jack"/>
@@ -35,5 +38,6 @@
         <line choice="studio.kx.distrho.cardinal-lv2"/>
         <line choice="studio.kx.distrho.cardinal-vst2"/>
         <line choice="studio.kx.distrho.cardinal-vst3"/>
+        <line choice="studio.kx.distrho.cardinal-clap"/>
     </choices-outline>
 </installer-gui-script>

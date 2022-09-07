@@ -28,6 +28,7 @@ Name: native; Description: "Standalone (Native)"; Types: custom;
 Name: lv2; Description: "LV2 plugin"; Types: normal;
 Name: vst2; Description: "VST2 plugin"; Types: normal;
 Name: vst3; Description: "VST3 plugin"; Types: normal;
+Name: clap; Description: "CLAP plugin"; Types: normal;
 
 [Files]
 #include "resources.iss"
@@ -60,6 +61,8 @@ Source: "..\..\bin\Cardinal.vst\*.*"; DestDir: "{commoncf64}\VST2\Cardinal.vst";
 Source: "..\..\bin\Cardinal.vst3\Contents\x86_64-win\Cardinal.vst3"; DestDir: "{commoncf64}\VST3\Cardinal.vst3\Contents\x86_64-win"; Components: vst3; Flags: ignoreversion;
 Source: "..\..\bin\CardinalFX.vst3\Contents\x86_64-win\CardinalFX.vst3"; DestDir: "{commoncf64}\VST3\CardinalFX.vst3\Contents\x86_64-win"; Components: vst3; Flags: ignoreversion;
 Source: "..\..\bin\CardinalSynth.vst3\Contents\x86_64-win\CardinalSynth.vst3"; DestDir: "{commoncf64}\VST3\CardinalSynth.vst3\Contents\x86_64-win"; Components: vst3; Flags: ignoreversion;
+; clap
+Source: "..\..\bin\Cardinal.clap\*.*"; DestDir: "{commoncf64}\CLAP\Cardinal.clap"; Components: clap; Flags: ignoreversion;
 
 [Icons]
 Name: "{commonprograms}\Cardinal (JACK)"; Filename: "{app}\Cardinal.exe"; IconFilename: "{app}\distrho.ico"; WorkingDir: "{app}"; Comment: "Virtual modular synthesizer plugin (JACK variant)"; Components: jack;
