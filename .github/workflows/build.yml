@@ -413,16 +413,18 @@ jobs:
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: macos-intel-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-macos-intel-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build extra dependencies
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh macos && ./deps/PawPaw/.cleanup.sh macos
+      - name: Set up ccache
+        if: steps.cache.outputs.cache-hit == 'true'
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-macos-intel-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build macOS intel (base)
+        if: steps.cache.outputs.cache-hit == 'true'
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
@@ -430,6 +432,7 @@ jobs:
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS intel (AU using juce)
+        if: steps.cache.outputs.cache-hit == 'true'
         env:
           MACOSX_DEPLOYMENT_TARGET: '10.8'
         run: |
@@ -441,6 +444,7 @@ jobs:
           pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_OSX_SYSROOT="macosx" -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS intel (packaging)
+        if: steps.cache.outputs.cache-hit == 'true'
         env:
           MACOS_ARCHS: 'x86_64'
         run: |
@@ -497,16 +501,18 @@ jobs:
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: macos-universal-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-macos-universal-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build extra dependencies
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh macos-universal && ./deps/PawPaw/.cleanup.sh macos-universal
+      - name: Set up ccache
+        if: steps.cache.outputs.cache-hit == 'true'
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-macos-universal-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build macOS universal (base)
+        if: steps.cache.outputs.cache-hit == 'true'
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
@@ -514,6 +520,7 @@ jobs:
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS universal (AU using juce)
+        if: steps.cache.outputs.cache-hit == 'true'
         env:
           MACOSX_DEPLOYMENT_TARGET: '10.12'
         run: |
@@ -524,6 +531,7 @@ jobs:
           pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_OSX_SYSROOT="macosx" -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS universal (packaging)
+        if: steps.cache.outputs.cache-hit == 'true'
         env:
           MACOS_ARCHS: 'arm64,x86_64'
         run: |
