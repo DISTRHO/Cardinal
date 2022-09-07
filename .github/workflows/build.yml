@@ -385,7 +385,7 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libjansson-dev libsamplerate0-dev libsndfile1-dev libspeexdsp-dev
+          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libfftw3-dev libjansson-dev libsamplerate0-dev libsndfile1-dev libspeexdsp-dev
       - name: Build linux x86_64 (sysdeps)
         run: |
           make features
