@@ -120,6 +120,9 @@ BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
 
+# Ignore bad behaviour from Rack API
+BUILD_CXX_FLAGS += -Wno-format-security
+
 # --------------------------------------------------------------
 # Rack files to build
 
@@ -197,8 +200,8 @@ endif
 TARGET = rack.a
 
 ifneq ($(MACOS),true)
-CARDINAL_FX_ARGS = VST2_FILENAME=Cardinal.vst/CardinalFX$(LIB_EXT)
-CARDINAL_SYNTH_ARGS = VST2_FILENAME=Cardinal.vst/CardinalSynth$(LIB_EXT)
+CARDINAL_FX_ARGS = VST2_FILENAME=Cardinal.vst/CardinalFX$(LIB_EXT) CLAP_FILENAME=Cardinal.clap/CardinalFX.clap
+CARDINAL_SYNTH_ARGS = VST2_FILENAME=Cardinal.vst/CardinalSynth$(LIB_EXT) CLAP_FILENAME=Cardinal.clap/CardinalSynth.clap
 endif
 
 all: $(TARGET)
@@ -233,6 +236,9 @@ vst3: $(TARGET)
 	$(MAKE) vst3 -C Cardinal
 	$(MAKE) vst3 -C CardinalFX $(CARDINAL_FX_ARGS)
 	$(MAKE) vst3 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
+
+clap: $(TARGET)
+	$(MAKE) clap -C CardinalFX $(CARDINAL_FX_ARGS)
 
 clean:
 	rm -f $(TARGET)

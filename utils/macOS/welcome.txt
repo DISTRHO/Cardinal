@@ -10,5 +10,4 @@ This package provides the AU, LV2, VST2 and VST3 audio plugins, plus standalones
 
 Notes:
  - Due to AU and VST2 not supporting CV ports, the main variant is not available for these formats
- - The VST3 version is in progress, Synth and FX variants work well, main variant is known to have issues
  - The standalones are intentionally very barebones in terms of system integration, prefer to use the plugin versions if you can
