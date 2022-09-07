@@ -2450,6 +2450,7 @@ static void initStatic__PathSet()
         p->addModel(modelAstroVibe);
         p->addModel(modelGlassPane);
         p->addModel(modelNudge);
+        p->addModel(modelOneShot);
     }
 }
 
