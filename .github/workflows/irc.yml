@@ -10,7 +10,7 @@ jobs:
       - name: Format message
         id: message
         run: |
-          message="${{ github.actor }} pushed $(echo '${{ github.event.commits[0].message }}' | head -n 1) ${{ github.event.commits[0].url }}"
+          message="${{ github.actor }} pushed $(echo '${{ github.event.commits[0].message }}' | head -n 1 | tr -d "'") ${{ github.event.commits[0].url }}"
           echo ::set-output name=message::"${message}"
       - name: IRC notification
         uses: Gottox/irc-message-action@v2

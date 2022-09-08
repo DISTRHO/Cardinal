@@ -309,6 +309,14 @@ PLUGIN_FILES += $(filter-out 21kHz/src/21kHz.cpp,$(wildcard 21kHz/src/*.cpp))
 PLUGIN_FILES += $(filter-out 8Mode/src/8mode.cpp,$(wildcard 8Mode/src/*.cpp))
 
 # --------------------------------------------------------------
+# alefsbits
+
+PLUGIN_FILES += $(filter-out alefsbits/src/plugin.cpp,$(wildcard alefsbits/src/*.cpp))
+
+# modules/types which are present in other plugins
+ALEFSBITS_CUSTOM = Steps Logic
+
+# --------------------------------------------------------------
 # AlgoritmArte
 
 PLUGIN_FILES += $(filter-out Algoritmarte/src/plugin.cpp,$(wildcard Algoritmarte/src/*.cpp))
@@ -628,6 +636,11 @@ PLUGIN_FILES += $(filter-out GoodSheperd/src/plugin.cpp,$(wildcard GoodSheperd/s
 # GrandeModular
 
 PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModular/src/*.cpp))
+
+# --------------------------------------------------------------
+# H4N4 Modules
+
+PLUGIN_FILES += $(filter-out h4n4-modules/src/plugin.cpp,$(wildcard h4n4-modules/src/*.cpp))
 
 # --------------------------------------------------------------
 # Hampton Harmonics
@@ -1424,6 +1437,13 @@ $(BUILD_DIR)/AaronStatic/%.cpp.o: AaronStatic/%.cpp
 		-DpluginInstance=pluginInstance__AaronStatic \
 		-Dinit=init__AaronStatic
 
+$(BUILD_DIR)/alefsbits/%.cpp.o: alefsbits/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ALEFSBITS_CUSTOM),$(call custom_module_names,$(m),alefsbits)) \
+		-DpluginInstance=pluginInstance__alefsbits
+
 $(BUILD_DIR)/Algoritmarte/%.cpp.o: Algoritmarte/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -1632,7 +1652,7 @@ $(BUILD_DIR)/forsitan-modulare/%.cpp.o: forsitan-modulare/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(GLUETHEGIANT_CUSTOM),$(call custom_module_names,$(m),forsitan)) \
+		$(foreach m,$(FORSITAN_CUSTOM),$(call custom_module_names,$(m),forsitan)) \
 		-DpluginInstance=pluginInstance__forsitan
 
 $(BUILD_DIR)/Fundamental/%.c.o: Fundamental/%.c
@@ -1681,6 +1701,13 @@ $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 		-Wno-missing-braces \
 		-Wno-narrowing \
 		-Wno-self-assign
+
+$(BUILD_DIR)/h4n4-modules/%.cpp.o: h4n4-modules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(H4N4_CUSTOM),$(call custom_module_names,$(m),H4N4)) \
+		-DpluginInstance=pluginInstance__H4N4
 
 $(BUILD_DIR)/HamptonHarmonics/%.cpp.o: HamptonHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

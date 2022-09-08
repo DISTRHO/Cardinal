@@ -39,6 +39,13 @@
 // Aaron Static
 #include "AaronStatic/src/plugin.hpp"
 
+// Alef's Bits
+#define modelSteps modelalefsbitsSteps
+#define modelLogic modelalefsbitsLogic
+#include "alefsbits/src/plugin.hpp"
+#undef modelSteps
+#undef modelLogic
+
 // Algoritmarte
 #include "Algoritmarte/src/plugin.hpp"
 
@@ -358,6 +365,9 @@ void saveGtgPluginDefault(const char*, int) {}
 
 // GrandeModular
 #include "GrandeModular/src/plugin.hpp"
+
+// H4N4 Modules
+#include "h4n4-modules/src/plugin.hpp"
 
 // Hampton Harmonics
 #define modelArp modelHamptonHarmonicsArp
@@ -741,6 +751,7 @@ Plugin* pluginInstance__ZamAudio;
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
 extern Plugin* pluginInstance__AaronStatic;
+Plugin* pluginInstance__alefsbits;
 Plugin* pluginInstance__Algoritmarte;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__ArableInstruments;
@@ -767,6 +778,7 @@ Plugin* pluginInstance__forsitan;
 Plugin* pluginInstance__GlueTheGiant;
 Plugin* pluginInstance__GoodSheperd;
 Plugin* pluginInstance__GrandeModular;
+Plugin* pluginInstance__H4N4;
 Plugin* pluginInstance__HamptonHarmonics;
 Plugin* pluginInstance__HetrickCV;
 extern Plugin* pluginInstance__ImpromptuModular;
@@ -1060,6 +1072,33 @@ static void initStatic__AaronStatic()
         p->addModel(modelScaleCV);
         p->addModel(modelRandomNoteCV);
         p->addModel(modelDiatonicCV);
+    }
+}
+
+static void initStatic__alefsbits()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__alefsbits = p;
+
+    const StaticPluginLoader spl(p, "alefsbits");
+    if (spl.ok())
+    {
+#define modelSteps modelalefsbitsSteps
+#define modelLogic modelalefsbitsLogic
+        p->addModel(modelSimplexandhold);
+        p->addModel(modelBlank6hp);
+        p->addModel(modelPolyrand);
+        p->addModel(modelNoize);
+        p->addModel(modelSteps);
+        p->addModel(modelFibb);
+        p->addModel(modelOctsclr);
+        p->addModel(modelShift);
+        p->addModel(modelMlt);
+        p->addModel(modelMath);
+        p->addModel(modelLogic);
+        p->addModel(modelProbablynot);
+#undef modelSteps
+#undef modelLogic
     }
 }
 
@@ -1935,6 +1974,18 @@ static void initStatic__GrandeModular()
     }
 }
 
+static void initStatic__H4N4()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__H4N4 = p;
+
+    const StaticPluginLoader spl(p, "h4n4-modules");
+    if (spl.ok())
+    {
+        p->addModel(modelXenQnt);
+    }
+}
+
 static void initStatic__HamptonHarmonics()
 {
     Plugin* const p = new Plugin;
@@ -2802,6 +2853,7 @@ void initStaticPlugins()
     initStatic__21kHz();
     initStatic__8Mode();
     initStatic__AaronStatic();
+    initStatic__alefsbits();
     initStatic__Algoritmarte();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
@@ -2828,6 +2880,7 @@ void initStaticPlugins()
     initStatic__GlueTheGiant();
     initStatic__GoodSheperd();
     initStatic__GrandeModular();
+    initStatic__H4N4();
     initStatic__HamptonHarmonics();
     initStatic__HetrickCV();
     initStatic__ImpromptuModular();
