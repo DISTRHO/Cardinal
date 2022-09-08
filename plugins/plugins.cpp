@@ -2527,6 +2527,7 @@ static void initStatic__PathSet()
         p->addModel(modelAstroVibe);
         p->addModel(modelGlassPane);
         p->addModel(modelNudge);
+        p->addModel(modelOneShot);
     }
 }
 
@@ -2719,18 +2720,16 @@ static void initStatic__Voxglitch()
       p->addModel(modelDigitalSequencerXP);
       p->addModel(modelGlitchSequencer);
       p->addModel(modelGhosts);
-      p->addModel(modelGoblins);
-      p->addModel(modelGrainEngine);
       p->addModel(modelGrainEngineMK2);
       p->addModel(modelGrainEngineMK2Expander);
       p->addModel(modelGrainFx);
+      p->addModel(modelGrooveBox);
+      p->addModel(modelGrooveBoxExpander);
       p->addModel(modelHazumi);
       p->addModel(modelLooper);
       p->addModel(modelRepeater);
       p->addModel(modelSamplerX8);
       p->addModel(modelSatanonaut);
-      p->addModel(modelGrooveBox);
-      p->addModel(modelGrooveBoxExpander);
       p->addModel(modelWavBank);
       p->addModel(modelWavBankMC);
       p->addModel(modelXY);

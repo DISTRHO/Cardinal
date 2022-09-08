@@ -95,6 +95,14 @@ struct AudioToCVPitch : Module {
         configParam(PARAM_TOLERANCE, 0.f, 99.f,  kDefaultTolerance, "Tolerance", " %");
     }
 
+    ~AudioToCVPitch() override
+    {
+        if (pitchDetector != nullptr)
+            del_aubio_pitch(pitchDetector);
+        del_fvec(detectedPitch);
+        del_fvec(inputBuffer);
+    }
+
     void process(const ProcessArgs& args) override
     {
         float cvPitch = lastUsedOutputPitch;

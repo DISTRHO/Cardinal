@@ -21,6 +21,8 @@ endif
 
 ifneq ($(STATIC_BUILD),true)
 
+STATIC_PLUGIN_TARGET = true
+
 CWD = ../../carla/source
 include $(CWD)/Makefile.deps.mk
 

@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 31
+  CACHE_VERSION: 32
   CARDINAL_UNDER_WINE: 1
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
@@ -47,7 +47,7 @@ jobs:
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-aarch64-linux-gnu libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libglib2.0-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
+          sudo apt-get install -yqq g++-aarch64-linux-gnu libasound2-dev:arm64 libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libglib2.0-dev:arm64 libpulse-dev:arm64 libsdl2-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -80,7 +80,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)  ../CardinalJACK ../CardinalNative
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap)  ../CardinalJACK ../CardinalNative
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -131,7 +131,7 @@ jobs:
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-arm-linux-gnueabihf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libglib2.0-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static
+          sudo apt-get install -yqq g++-arm-linux-gnueabihf libasound2-dev:armhf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libglib2.0-dev:armhf libpulse-dev:armhf libsdl2-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -164,7 +164,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)  ../CardinalJACK ../CardinalNative
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap)  ../CardinalJACK ../CardinalNative
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -211,7 +211,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-multilib libdbus-1-dev:i386 libgl1-mesa-dev:i386 libglib2.0-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
+          sudo apt-get install -yqq g++-multilib libasound2-dev:i386 libdbus-1-dev:i386 libgl1-mesa-dev:i386 libglib2.0-dev:i386 libpulse-dev:i386 libsdl2-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -244,7 +244,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst) ../CardinalJACK ../CardinalNative
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -285,7 +285,7 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev libglib2.0-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+          sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev libpulse-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -316,7 +316,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)  ../CardinalJACK ../CardinalNative
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap)  ../CardinalJACK ../CardinalNative
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -341,19 +341,22 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+          sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev liblo-dev libpulse-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
       - name: Build linux x86_64 (debug)
         env:
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
           make features
-          make DEBUG=true -j $(nproc)
+          # multiple jobs for building carla, deps and plugins
+          make DEBUG=true carla deps dgl plugins resources -j $(nproc)
+          # single job for final build stage, otherwise we might killed due to OOM
+          make DEBUG=true -j 1
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap)
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -385,7 +388,7 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libjansson-dev libsamplerate0-dev libsndfile1-dev libspeexdsp-dev
+          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libfftw3-dev libjansson-dev libsamplerate0-dev libsndfile1-dev libspeexdsp-dev
       - name: Build linux x86_64 (sysdeps)
         run: |
           make features
@@ -413,16 +416,18 @@ jobs:
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: macos-intel-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-macos-intel-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build extra dependencies
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh macos && ./deps/PawPaw/.cleanup.sh macos
+      - name: Set up ccache
+        if: steps.cache.outputs.cache-hit == 'true'
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-macos-intel-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build macOS intel (base)
+        if: steps.cache.outputs.cache-hit == 'true'
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
@@ -430,6 +435,7 @@ jobs:
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS intel (AU using juce)
+        if: steps.cache.outputs.cache-hit == 'true'
         env:
           MACOSX_DEPLOYMENT_TARGET: '10.8'
         run: |
@@ -441,6 +447,7 @@ jobs:
           pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_OSX_SYSROOT="macosx" -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS intel (packaging)
+        if: steps.cache.outputs.cache-hit == 'true'
         env:
           MACOS_ARCHS: 'x86_64'
         run: |
@@ -497,16 +504,18 @@ jobs:
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: macos-universal-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-macos-universal-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build extra dependencies
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh macos-universal && ./deps/PawPaw/.cleanup.sh macos-universal
+      - name: Set up ccache
+        if: steps.cache.outputs.cache-hit == 'true'
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-macos-universal-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
       - name: Build macOS universal (base)
+        if: steps.cache.outputs.cache-hit == 'true'
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
@@ -514,6 +523,7 @@ jobs:
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS universal (AU using juce)
+        if: steps.cache.outputs.cache-hit == 'true'
         env:
           MACOSX_DEPLOYMENT_TARGET: '10.12'
         run: |
@@ -524,6 +534,7 @@ jobs:
           pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_OSX_SYSROOT="macosx" -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS universal (packaging)
+        if: steps.cache.outputs.cache-hit == 'true'
         env:
           MACOS_ARCHS: 'arm64,x86_64'
         run: |
@@ -675,70 +686,70 @@ jobs:
           path: |
             *.tar.gz
 
-  wasm:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: wasm-v${{ env.CACHE_VERSION }}
-      - name: Set up dependencies
-        run: |
-            [ -e ~/PawPawBuilds/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/PawPawBuilds/emsdk
-            cd ~/PawPawBuilds/emsdk && ./emsdk install latest && ./emsdk activate latest
-      - name: Build extra dependencies
-        run: |
-          source ~/PawPawBuilds/emsdk/emsdk_env.sh
-          ./deps/PawPaw/bootstrap-cardinal.sh wasm && ./deps/PawPaw/.cleanup.sh wasm
-      - name: Build wasm cross-compiled
-        run: |
-          source ~/PawPawBuilds/emsdk/emsdk_env.sh
-          pushd deps/PawPaw; source local.env wasm; popd
-          make features
-          make CIBUILD=true NOOPT=true USE_GLES2=true -j $(nproc)
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - name: Pack binaries
-        run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls *.html *.data *.js *.wasm)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.zip
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.zip
+  #wasm:
+    #runs-on: ubuntu-20.04
+    #steps:
+      #- uses: actions/checkout@v2
+        #with:
+          #submodules: recursive
+      #- name: Set up cache
+        #id: cache
+        #uses: actions/cache@v2
+        #with:
+          #path: |
+            #~/PawPawBuilds
+            #src/Rack/dep/bin
+            #src/Rack/dep/include
+            #src/Rack/dep/lib
+            #src/Rack/dep/share
+            #src/Rack/dep/jansson-2.12
+            #src/Rack/dep/libarchive-3.4.3
+            #src/Rack/dep/libsamplerate-0.1.9
+            #src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+            #src/Rack/dep/zstd-1.4.5
+          #key: wasm-v${{ env.CACHE_VERSION }}
+      #- name: Set up dependencies
+        #run: |
+            #[ -e ~/PawPawBuilds/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/PawPawBuilds/emsdk
+            #cd ~/PawPawBuilds/emsdk && ./emsdk install latest && ./emsdk activate latest
+      #- name: Build extra dependencies
+        #run: |
+          #source ~/PawPawBuilds/emsdk/emsdk_env.sh
+          #./deps/PawPaw/bootstrap-cardinal.sh wasm && ./deps/PawPaw/.cleanup.sh wasm
+      #- name: Build wasm cross-compiled
+        #run: |
+          #source ~/PawPawBuilds/emsdk/emsdk_env.sh
+          #pushd deps/PawPaw; source local.env wasm; popd
+          #make features
+          #make CIBUILD=true NOOPT=true USE_GLES2=true -j $(nproc)
+      #- name: Set sha8 (non-release)
+        #if: startsWith(github.ref, 'refs/tags/') != true
+        #id: slug1
+        #run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      #- name: Set sha8 (release)
+        #if: startsWith(github.ref, 'refs/tags/')
+        #id: slug2
+        #run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
+      #- name: Set sha8
+        #id: slug
+        #run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+      #- name: Pack binaries
+        #run: |
+          #cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls *.html *.data *.js *.wasm)
+      #- uses: actions/upload-artifact@v2
+        #with:
+          #name: ${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          #path: |
+            #*.zip
+      #- uses: softprops/action-gh-release@v1
+        #if: startsWith(github.ref, 'refs/tags/')
+        #with:
+          #tag_name: ${{ github.ref_name }}
+          #name: ${{ github.ref_name }}
+          #draft: false
+          #prerelease: false
+          #files: |
+            #*.zip
 
   wasm-mini:
     runs-on: ubuntu-20.04
@@ -881,7 +892,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst)
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -973,7 +984,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst)
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -1115,7 +1126,7 @@ jobs:
                     --leak-check=no \
                     --track-origins=yes \
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
-                    /usr/lib/carla/carla-bridge-native lv2 "" ${p} 1>/dev/null; \
+                    /usr/lib/carla/carla-bridge-native lv2 "" ${p}; \
             done
       - name: Test VST2 plugin
         run: |
@@ -1126,7 +1137,7 @@ jobs:
                     --leak-check=no \
                     --track-origins=yes \
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
-                    /usr/lib/carla/carla-bridge-native vst2 ./${p} "" 1>/dev/null; \
+                    /usr/lib/carla/carla-bridge-native vst2 ./${p} ""; \
             done
       - name: Test VST3 plugin
         run: |
@@ -1137,5 +1148,5 @@ jobs:
                     --leak-check=no \
                     --track-origins=yes \
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
-                    /usr/lib/carla/carla-bridge-native vst3 ./bin/${p} "" 1>/dev/null; \
+                    /usr/lib/carla/carla-bridge-native vst3 ./bin/${p} ""; \
             done

@@ -525,7 +525,7 @@ PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/s
 PLUGIN_FILES += BidooDark/plugin.cpp
 
 # modules/types which are present in other plugins
-BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter $(DRWAV)
+BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter PitchShifter $(DRWAV)
 BIDOO_CUSTOM_PER_FILE = channel channel filterType
 
 # --------------------------------------------------------------
@@ -545,6 +545,9 @@ BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 PLUGIN_FILES += $(wildcard ChowDSP/src/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/src/*/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
+
+# modules/types which are present in other plugins
+CHOWDSP_CUSTOM = sign
 
 # --------------------------------------------------------------
 # CatroModulo
@@ -832,6 +835,9 @@ PARABLE_CUSTOM = Clouds CustomPanel CloudsWidget FreezeLight clouds stmlib
 
 PLUGIN_FILES += $(filter-out PathSet/src/plugin.cpp,$(wildcard PathSet/src/*.cpp))
 
+# modules/types which are present in other plugins
+PATHSET_CUSTOM = PitchShifter
+
 # --------------------------------------------------------------
 # PinkTrombone
 
@@ -880,7 +886,7 @@ PLUGIN_FILES += $(filter-out stocaudio/src/plugin.cpp,$(wildcard stocaudio/src/*
 PLUGIN_FILES += $(filter-out unless_modules/src/unless.cpp,$(wildcard unless_modules/src/*.cpp))
 
 # modules/types which are present in other plugins
-UNLESS_MODULES_CUSTOM = Selection
+UNLESS_MODULES_CUSTOM = Selection sign
 
 # --------------------------------------------------------------
 # ValleyAudio
@@ -964,7 +970,7 @@ VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
 
 # modules/types which are present in other plugins
-VOXGLITCH_CUSTOM = $(DRWAV) ADSR AudioFile Looper Readout
+VOXGLITCH_CUSTOM = ADSR AudioFile Looper Readout
 VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain SamplePlayer Sequencer SequencerDisplay VoltageSequencer
 
 # --------------------------------------------------------------
