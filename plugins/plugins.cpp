@@ -564,6 +564,9 @@ std::string loadBack(int) { return "res/Empty_gray.svg"; }
 // Mog
 #include "Mog/src/plugin.hpp"
 
+// Mojo
+#include "Mojo/src/plugin.hpp"
+
 // mscHack
 /* NOTE too much noise in original include, do this a different way
 // #include "mscHack/src/mscHack.hpp"
@@ -764,6 +767,7 @@ extern Plugin* pluginInstance__MindMeld;
 Plugin* pluginInstance__ML;
 Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
+Plugin* pluginInstance__Mojo;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__MSM;
 Plugin* pluginInstance__myth_modules;
@@ -2290,6 +2294,20 @@ static void initStatic__Mog()
     }
 }
 
+static void initStatic__Mojo()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Mojo = p;
+
+    const StaticPluginLoader spl(p, "Mojo");
+    if (spl.ok())
+    {
+        p->addModel(modelDogs);
+        p->addModel(modelPigs);
+        p->addModel(modelSheep);
+    }
+}
+
 static void initStatic__mscHack()
 {
     Plugin* const p = new Plugin;
@@ -2766,6 +2784,7 @@ void initStaticPlugins()
     initStatic__ML();
     initStatic__MockbaModular();
     initStatic__Mog();
+    initStatic__Mojo();
     initStatic__mscHack();
     initStatic__MSM();
     initStatic__myth_modules();
