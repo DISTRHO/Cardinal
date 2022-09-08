@@ -316,26 +316,28 @@ extern Model* modelTestVCF;
 #include "ChowDSP/src/plugin.cpp"
 #undef init
 
+// dBiz
+#define DarkDefaultItem dBizDarkDefaultItem
+#define OrangeLight dBizOrangeLight
+#define darkPanelID dBizdarkPanelID
+#define lightPanelID dBizlightPanelID
+#define modelChord modeldBizChord
+#define modelDivider modeldBizDivider
+#define modelFourSeq modeldBizFourSeq
+#define modelVCA4 modeldBizVCA4
+#include "dBiz/src/plugin.hpp"
+#undef DarkDefaultItem
+#undef OrangeLight
+#undef darkPanelID
+#undef lightPanelID
+#undef modelChord
+#undef modelDivider
+#undef modelFourSeq
+#undef modelVCA4
+
 // DrumKit
 #include "DrumKit/src/DrumKit.hpp"
 void setupSamples();
-
-// dBiz
-#define darkPanelID dBizdarkPanelID
-#define DarkDefaultItem dBizDarkDefaultItem
-#define lightPanelID dBizlightPanelID
-#define OrangeLight dBizOrangeLight
-#define modelChord modeldBizChord
-#define modelVCA4 modeldBizVCA4
-#define modelDivider modeldBizDivider
-#include "dBiz/src/plugin.hpp"
-#undef darkPanelID
-#undef DarkDefaultItem
-#undef lightPanelID
-#undef OrangeLight
-#undef modelChord
-#undef modelVCA4
-#undef modelDivider
 
 // ESeries
 #include "ESeries/src/plugin.hpp"
@@ -1737,8 +1739,9 @@ static void initStatic__dBiz()
     if (spl.ok())
     {
 #define modelChord modeldBizChord
-#define modelVCA4 modeldBizVCA4
 #define modelDivider modeldBizDivider
+#define modelFourSeq modeldBizFourSeq
+#define modelVCA4 modeldBizVCA4
         p->addModel(modelNavControl);
         p->addModel(modelBench);
         p->addModel(modelContorno);
@@ -1773,8 +1776,9 @@ static void initStatic__dBiz()
         p->addModel(modelOrder);
         p->addModel(modelDualMatrix);
 #undef modelChord
-#undef modelVCA4
 #undef modelDivider
+#undef modelFourSeq
+#undef modelVCA4
     }
 }
 

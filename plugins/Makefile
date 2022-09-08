@@ -394,14 +394,6 @@ AS_CUSTOM = ADSR BpmDisplayWidget LabelDisplayWidget LedLight LowFrequencyOscill
 AS_CUSTOM_PER_FILE = NumberDisplayWidget
 
 # --------------------------------------------------------------
-# dBiz
-
-PLUGIN_FILES += $(filter-out dBiz/src/plugin.cpp,$(wildcard dBiz/src/*.cpp))
-
-# modules/types which are present in other plugins
-DBIZ_CUSTOM = Chord DarkDefaultItem Divider OrangeLight VCA4 darkPanelID lightPanelID
-
-# --------------------------------------------------------------
 # AudibleInstruments
 
 PLUGIN_FILES += $(filter-out AudibleInstruments/src/plugin.cpp,$(wildcard AudibleInstruments/src/*.cpp))
@@ -580,6 +572,15 @@ PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 
 # modules/types which are present in other plugins
 CF_CUSTOM = $(DRWAV)
+
+# --------------------------------------------------------------
+# dBiz
+
+PLUGIN_FILES += $(filter-out dBiz/src/plugin.cpp,$(wildcard dBiz/src/*.cpp))
+
+# modules/types which are present in other plugins
+DBIZ_CUSTOM  = Chord DarkDefaultItem Divider FourSeq FourSeqWidget OrangeLight VCA4 Wavefolder darkPanelID lightPanelID
+DBIZ_CUSTOM_PER_FILE = MultiFilter Oscillator calcOutput sineOsc subBank
 
 # --------------------------------------------------------------
 # DrumKit
@@ -1512,7 +1513,6 @@ $(BUILD_DIR)/Autinn/%.cpp.o: Autinn/%.cpp
 		-DpluginInstance=pluginInstance__Autinn \
 		-Dinit=init__Autinn
 
-
 $(BUILD_DIR)/Axioma/%.cpp.o: Axioma/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -1609,6 +1609,7 @@ $(BUILD_DIR)/dBiz/src/%.cpp.o: dBiz/src/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(DBIZ_CUSTOM),$(call custom_module_names,$(m),dBiz)) \
+		$(foreach m,$(DBIZ_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),dBiz_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__dBiz
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
