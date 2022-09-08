@@ -33,6 +33,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Catro/Modulo            | BSD-3-Clause             | |
 | cf                      | BSD-3-Clause             | |
 | ChowDSP                 | GPL-3.0-or-later         | |
+| dBiz                    | GPL-3.0-or-later         | |
 | DrumKit                 | CC0-1.0                  | |
 | E-Series                | GPL-3.0-or-later         | |
 | ExpertSleepers Encoders | MIT                      | |
@@ -143,6 +144,9 @@ Below is a list of artwork licenses from plugins
 | cf/VT323-Regular.ttf                    | OFL-1.1-no-RFN   | |
 | ChowDSP/*                               | GPL-3.0-or-later | Same license as source code |
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
+| dBiz/*                                  | CC-BY-NC-ND-4.0  | |
+| dBiz/DejaVuSansMono.ttf                 | Bitstream-Vera   | |
+| dBiz/ShareTechMono-Regular.ttf          | OFL-1.1          | |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
 | E-Series/*                              | Custom           | Copyright © Synthesis Technology, [used and distributed with permission](LICENSE-PERMISSIONS.md#eseries-paul-schreiber--synthtech) |

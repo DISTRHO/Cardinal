@@ -320,6 +320,23 @@ extern Model* modelTestVCF;
 #include "DrumKit/src/DrumKit.hpp"
 void setupSamples();
 
+// dBiz
+#define darkPanelID dBizdarkPanelID
+#define DarkDefaultItem dBizDarkDefaultItem
+#define lightPanelID dBizlightPanelID
+#define OrangeLight dBizOrangeLight
+#define modelChord modeldBizChord
+#define modelVCA4 modeldBizVCA4
+#define modelDivider modeldBizDivider
+#include "dBiz/src/plugin.hpp"
+#undef darkPanelID
+#undef DarkDefaultItem
+#undef lightPanelID
+#undef OrangeLight
+#undef modelChord
+#undef modelVCA4
+#undef modelDivider
+
 // ESeries
 #include "ESeries/src/plugin.hpp"
 
@@ -719,6 +736,7 @@ std::vector<Model*> hostTerminalModels;
 
 // stuff that reads config files, we dont want that
 int loadConsoleType() { return 0; }
+bool loadDarkAsDefault() { return 1; }
 int loadDirectOutMode() { return 0; }
 void saveConsoleType(int) {}
 void saveDarkAsDefault(bool) {}
@@ -750,6 +768,7 @@ Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
+Plugin* pluginInstance__dBiz;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
@@ -1706,6 +1725,56 @@ static void initStatic__ChowDSP()
         p->addModel(modelChowTapeDegrade);
         p->addModel(modelChowTapeLoss);
         p->addModel(modelChowChorus);
+    }
+}
+
+static void initStatic__dBiz()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__dBiz = p;
+
+    const StaticPluginLoader spl(p, "dBiz");
+    if (spl.ok())
+    {
+#define modelChord modeldBizChord
+#define modelVCA4 modeldBizVCA4
+#define modelDivider modeldBizDivider
+        p->addModel(modelNavControl);
+        p->addModel(modelBench);
+        p->addModel(modelContorno);
+        //p->addModel(modelContornoMK2);
+        p->addModel(modelTranspose);
+        p->addModel(modelUtility);
+        p->addModel(modelChord);
+        p->addModel(modelBene);
+        p->addModel(modelBenePads);
+        p->addModel(modelPerfMixer);
+        p->addModel(modelDrMix);
+        p->addModel(modelPerfMixer4);
+        p->addModel(modelVCA4);
+        p->addModel(modelVCA530);
+        p->addModel(modelRemix);
+        p->addModel(modelSmixer);
+        p->addModel(modelVerbo);
+        p->addModel(modelDVCO);
+        p->addModel(modelDAOSC);
+        p->addModel(modelTROSC);
+        p->addModel(modelTROSCMK2);
+        p->addModel(modelSuHa);
+        p->addModel(modelSuHaMK2);
+        p->addModel(modelFourSeq);
+        p->addModel(modelDivider);
+        p->addModel(modelUtil2);
+        p->addModel(modelSmorph);
+        p->addModel(modelBigSmorph);
+        p->addModel(modelSPan);
+        p->addModel(modelQuePasa);
+        p->addModel(modelDualFilter);
+        p->addModel(modelOrder);
+        p->addModel(modelDualMatrix);
+#undef modelChord
+#undef modelVCA4
+#undef modelDivider
     }
 }
 
@@ -2793,6 +2862,7 @@ void initStaticPlugins()
     initStatic__CatroModulo();
     initStatic__cf();
     initStatic__ChowDSP();
+    initStatic__dBiz();
     initStatic__DrumKit();
     initStatic__ESeries();
     initStatic__ExpertSleepersEncoders();

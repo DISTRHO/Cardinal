@@ -394,6 +394,14 @@ AS_CUSTOM = ADSR BpmDisplayWidget LabelDisplayWidget LedLight LowFrequencyOscill
 AS_CUSTOM_PER_FILE = NumberDisplayWidget
 
 # --------------------------------------------------------------
+# dBiz
+
+PLUGIN_FILES += $(filter-out dBiz/src/plugin.cpp,$(wildcard dBiz/src/*.cpp))
+
+# modules/types which are present in other plugins
+DBIZ_CUSTOM = Chord DarkDefaultItem Divider OrangeLight VCA4 darkPanelID lightPanelID
+
+# --------------------------------------------------------------
 # AudibleInstruments
 
 PLUGIN_FILES += $(filter-out AudibleInstruments/src/plugin.cpp,$(wildcard AudibleInstruments/src/*.cpp))
@@ -1594,6 +1602,14 @@ $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 		-IChowDSP/lib \
 		-IChowDSP/lib/chowdsp_utils/modules/chowdsp_dsp/WDF \
 		-Wno-deprecated-copy
+
+
+$(BUILD_DIR)/dBiz/src/%.cpp.o: dBiz/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(DBIZ_CUSTOM),$(call custom_module_names,$(m),dBiz)) \
+		-DpluginInstance=pluginInstance__dBiz
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
