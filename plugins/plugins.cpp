@@ -26,8 +26,8 @@
 // Fundamental (always enabled)
 #include "Fundamental/src/plugin.hpp"
 
-// ZamAudio (always enabled)
-#include "ZamAudio/src/plugin.hpp"
+// ZamAudio (always enabled) - TODO
+// #include "ZamAudio/src/plugin.hpp"
 
 #ifndef NOPLUGINS
 // 21kHz
@@ -748,7 +748,7 @@ void saveHighQualityAsDefault(bool) {}
 // plugin instances
 Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__Fundamental;
-Plugin* pluginInstance__ZamAudio;
+// Plugin* pluginInstance__ZamAudio;
 #ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
@@ -1023,6 +1023,7 @@ static void initStatic__Fundamental()
     }
 }
 
+/*
 static void initStatic__ZamAudio()
 {
     Plugin* const p = new Plugin;
@@ -1034,6 +1035,7 @@ static void initStatic__ZamAudio()
         p->addModel(modelZamComp);
     }
 }
+*/
 
 #ifndef NOPLUGINS
 static void initStatic__21kHz()
@@ -2844,7 +2846,7 @@ void initStaticPlugins()
 {
     initStatic__Cardinal();
     initStatic__Fundamental();
-    initStatic__ZamAudio();
+    // initStatic__ZamAudio();
 #ifndef NOPLUGINS
     initStatic__21kHz();
     initStatic__8Mode();

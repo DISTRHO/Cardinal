@@ -293,9 +293,9 @@ PLUGIN_FILES += Fundamental/src/dr_wav.c
 FUNDAMENTAL_CUSTOM = $(DRWAV)
 
 # --------------------------------------------------------------
-# ZamAudio (always enabled)
+# ZamAudio (always enabled) - TODO
 
-PLUGIN_FILES += $(wildcard ZamAudio/src/*.cpp)
+# PLUGIN_FILES += $(wildcard ZamAudio/src/*.cpp)
 
 ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------

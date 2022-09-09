@@ -465,6 +465,7 @@ jobs:
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Rename macOS bundle
+        if: steps.cache.outputs.cache-hit == 'true'
         run: |
           mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
       - uses: actions/upload-artifact@v2
@@ -552,6 +553,7 @@ jobs:
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Rename macOS bundle
+        if: steps.cache.outputs.cache-hit == 'true'
         run: |
           mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
       - uses: actions/upload-artifact@v2
