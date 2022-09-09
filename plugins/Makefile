@@ -1249,7 +1249,9 @@ VST2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst/Contents/Resources/Pl
 VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/Contents/Resources/%)
 VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst/Contents/Resources/%)
 CLAP_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalFX.clap/Contents/Resources/PluginManifests/%.json)
+CLAP_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.clap/Contents/Resources/PluginManifests/%.json)
 CLAP_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.clap/Contents/Resources/%)
+CLAP_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.clap/Contents/Resources/%)
 else
 VST2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.vst/resources/PluginManifests/%.json)
 VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.vst/resources/%)
@@ -1335,10 +1337,6 @@ ifeq ($(MACOS),true)
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/CardinalFX.clap/Contents/Resources/%: %
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
-
 ../bin/CardinalSynth.vst/Contents/Resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
@@ -1347,11 +1345,23 @@ ifeq ($(MACOS),true)
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
+../bin/CardinalSynth.vst/Contents/Resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalFX.clap/Contents/Resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalSynth.clap/Contents/Resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
 ../bin/CardinalFX.clap/Contents/Resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/CardinalSynth.vst/Contents/Resources/PluginManifests/%.json: %/plugin.json
+../bin/CardinalSynth.clap/Contents/Resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 else
@@ -1359,11 +1369,11 @@ else
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/Cardinal.clap/resources/%: %
+../bin/Cardinal.vst/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/Cardinal.vst/resources/PluginManifests/%.json: %/plugin.json
+../bin/Cardinal.clap/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 

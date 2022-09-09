@@ -360,12 +360,7 @@ endif
 else ifeq ($(CARDINAL_VARIANT),native)
 TARGETS = jack
 else
-TARGETS = lv2 vst2 vst3 static
-endif
-
-# TESTING
-ifeq ($(CARDINAL_VARIANT),fx)
-TARGETS += clap
+TARGETS = lv2 vst2 vst3 clap static
 endif
 
 all: $(TARGETS)
