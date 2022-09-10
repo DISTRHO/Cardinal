@@ -1270,7 +1270,11 @@ protected:
         {
             const TimePosition& timePos(getTimePosition());
 
-            const bool reset = timePos.playing && (timePos.frame == 0 || d_isDiffHigherThanLimit(fNextExpectedFrame, timePos.frame, (uint64_t)2));
+            bool reset = timePos.playing && (timePos.frame == 0 || d_isDiffHigherThanLimit(fNextExpectedFrame, timePos.frame, (uint64_t)2));
+
+            // ignore hosts which cannot supply time frame position
+            if (context->playing == timePos.playing && timePos.frame == 0 && context->frame == 0)
+                reset = false;
 
             context->playing = timePos.playing;
             context->bbtValid = timePos.bbt.valid;
