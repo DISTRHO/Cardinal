@@ -1216,16 +1216,6 @@ RESOURCE_FILES += $(wildcard unless_modules/art/*.art)
 RESOURCE_FILES += $(wildcard unless_modules/art/svg/*/*.svg)
 RESOURCE_FILES += $(wildcard unless_modules/font/*.ttf)
 # RESOURCE_FILES += $(wildcard unless_modules/manual/*)
-RESOURCE_FILES += $(wildcard voxglitch/res/*.json)
-RESOURCE_FILES += $(wildcard voxglitch/res/*/*.png)
-RESOURCE_FILES += $(wildcard voxglitch/res/*/*.svg)
-RESOURCE_FILES += $(wildcard voxglitch/res/components/*/*.png)
-RESOURCE_FILES += $(wildcard voxglitch/res/*/themes/default/*.png)
-RESOURCE_FILES += $(wildcard voxglitch/res/*/themes/default/*.jpg)
-RESOURCE_FILES += $(wildcard voxglitch/res/*/themes/default/*.svg)
-RESOURCE_FILES += $(wildcard voxglitch/res/*/themes/default/*.json)
-RESOURCE_FILES += $(wildcard voxglitch/res/themes/*/*.png)
-RESOURCE_FILES += $(wildcard voxglitch/res/themes/*/*.jpg)
 endif
 
 RESOURCE_FILES += Cardinal/res/Miku/Miku.png
