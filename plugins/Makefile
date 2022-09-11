@@ -580,7 +580,7 @@ PLUGIN_FILES += $(filter-out dBiz/src/plugin.cpp,$(wildcard dBiz/src/*.cpp))
 
 # modules/types which are present in other plugins
 DBIZ_CUSTOM  = Chord DarkDefaultItem Divider FourSeq FourSeqWidget OrangeLight VCA4 Wavefolder darkPanelID lightPanelID
-DBIZ_CUSTOM_PER_FILE = MultiFilter Oscillator calcOutput sineOsc subBank
+DBIZ_CUSTOM_PER_FILE = LERP MultiFilter Oscillator calcOutput sineOsc subBank
 
 # --------------------------------------------------------------
 # DrumKit
