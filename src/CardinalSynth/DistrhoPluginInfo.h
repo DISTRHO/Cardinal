@@ -26,10 +26,11 @@
 #define CARDINAL_NUM_AUDIO_INPUTS  0
 #define CARDINAL_NUM_AUDIO_OUTPUTS 2
 
-#define DISTRHO_PLUGIN_BRAND "DISTRHO"
-#define DISTRHO_PLUGIN_NAME  "Cardinal Synth"
-#define DISTRHO_PLUGIN_LABEL "CardinalSynth"
-#define DISTRHO_PLUGIN_URI   "https://distrho.kx.studio/plugins/cardinal#synth"
+#define DISTRHO_PLUGIN_BRAND   "DISTRHO"
+#define DISTRHO_PLUGIN_NAME    "Cardinal Synth"
+#define DISTRHO_PLUGIN_LABEL   "CardinalSynth"
+#define DISTRHO_PLUGIN_URI     "https://distrho.kx.studio/plugins/cardinal#synth"
+#define DISTRHO_PLUGIN_CLAP_ID "studio.kx.distrho.cardinal#synth"
 
 #ifdef HEADLESS
 #define DISTRHO_PLUGIN_HAS_UI             0
