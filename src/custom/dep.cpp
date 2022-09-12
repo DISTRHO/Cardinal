@@ -393,7 +393,6 @@ static const struct {
     const int shapeNumberToIgnore;
 } svgFilesToInvertForLightMode[] = {
     // GPLv3+
-    /* FIXME does not work very well
     { kModeAutinn, "/Autinn/res/AmpModule.svg", {}, -1 },
     { kModeAutinn, "/Autinn/res/BassModule.svg", {}, -1 },
     { kModeAutinn, "/Autinn/res/CVConverterModule.svg", {}, -1 },
@@ -419,7 +418,6 @@ static const struct {
     { kModeAutinn, "/Autinn/res/VibratoModule.svg", {}, -1 },
     { kModeAutinn, "/Autinn/res/VxyModule.svg", {}, -1 },
     { kModeAutinn, "/Autinn/res/ZodModule.svg", {}, -1 },
-    */
     // Custom, runtime light mode used with permission
     { kModeBefaco, "/Befaco/res/components/Knurlie.svg", {}, -1 },
     { kModeBefaco, "/Befaco/res/panels/ABC.svg", {}, -1 },
@@ -459,7 +457,6 @@ static const struct {
     { kModeCardinal, "/Cardinal/res/Ildaeil.svg", {}, -1 },
     // TODO chowdsp
     // GPLv3+
-    /* FIXME needs color adjustments
     { kModeFehlerFabrik, "/FehlerFabrik/res/Arpanet.svg", {}, -1 },
     { kModeFehlerFabrik, "/FehlerFabrik/res/Aspect.svg", {}, -1 },
     { kModeFehlerFabrik, "/FehlerFabrik/res/Botzinger.svg", {}, -1 },
@@ -475,7 +472,6 @@ static const struct {
     { kModeFehlerFabrik, "/FehlerFabrik/res/Rasoir.svg", {}, -1 },
     { kModeFehlerFabrik, "/FehlerFabrik/res/Sigma.svg", {}, -1 },
     { kModeFehlerFabrik, "/FehlerFabrik/res/Components/FFHexScrew.svg", {}, -1 },
-    */
     // GPLv3+
     { kModeForsitan, "/forsitan-modulare/res/alea.svg", {}, -1 },
     { kModeForsitan, "/forsitan-modulare/res/cumuli.svg", {}, -1 },
@@ -511,7 +507,6 @@ static const struct {
     { kModeFundamental, "/Fundamental/res/WTLFO.svg", {}, -1 },
     { kModeFundamental, "/Fundamental/res/WTVCO.svg", {}, -1 },
     // GPLv3+
-    /* FIXME needs color adjustments
     { kModeGoodSheperd, "/GoodSheperd/res/Holzschnabel.svg", {}, -1 },
     { kModeGoodSheperd, "/GoodSheperd/res/Hurdle.svg", {}, -1 },
     { kModeGoodSheperd, "/GoodSheperd/res/SEQ3st.svg", {}, -1 },
@@ -519,11 +514,10 @@ static const struct {
     { kModeGoodSheperd, "/GoodSheperd/res/Stable16.svg", {}, -1 },
     { kModeGoodSheperd, "/GoodSheperd/res/Stall.svg", {}, -1 },
     { kModeGoodSheperd, "/GoodSheperd/res/Switch1.svg", {}, -1 },
-    */
+    { kModeGoodSheperd, "/GoodSheperd/res/components/SquareSwitch_0.svg", {}, -1 },
+    { kModeGoodSheperd, "/GoodSheperd/res/components/SquareSwitch_1.svg", {}, -1 },
     // GPLv3+
-    /* FIXME needs color adjustments
     { kModeH4n4, "/h4n4-modules/res/XenQnt.svg", {}, -1 },
-    */
     // MIT
     { kModeHamptonHarmonics, "/HamptonHarmonics/res/Arp.svg", {}, -1 },
     { kModeHamptonHarmonics, "/HamptonHarmonics/res/Progress.svg", {}, -1 },
@@ -856,9 +850,107 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
 }
 
 static inline
-bool invertPaintForLightMode(NSVGshape* const shape, NSVGpaint& paint)
+bool invertPaintForLightMode(const LightMode mode, NSVGshape* const shape, NSVGpaint& paint)
 {
-    switch(paint.type)
+    switch (paint.type)
+    {
+    case NSVG_PAINT_NONE:
+        return true;
+    case NSVG_PAINT_LINEAR_GRADIENT:
+        for (int i=0; i<paint.gradient->nstops; ++i)
+            paint.gradient->stops[i].color = invertColor(paint.gradient->stops[i].color);
+        return true;
+    case NSVG_PAINT_COLOR:
+        break;
+    default:
+        return false;
+    }
+
+    switch (mode)
+    {
+    case kModeAutinn:
+        switch (paint.color)
+        {
+        // red stripe
+        case 0xff0a115e:
+            paint.color = 0xffa1a8f5;
+            return true;
+        // logo
+        case 0xff00d7ff:
+            paint.color = 0xff005868;
+            return true;
+        }
+        break;
+    case kModeFehlerFabrik:
+        switch (paint.color)
+        {
+        // make a few colors reverse in luminance/lightness
+        case 0xff3edcfc: paint.color = 0xff039fbf; return true;
+        case 0xff4a6fff: paint.color = 0xff0024b2; return true;
+        case 0xff5c49fd: paint.color = 0xff1502b6; return true;
+        case 0xff61a6ff: paint.color = 0xff00459e; return true;
+        case 0xff6e97ad: paint.color = 0xff537c93; return true;
+        case 0xff78ffb1: paint.color = 0xff008739; return true;
+        case 0xffb5cf00: paint.color = 0xff627000; return true;
+        case 0xffbfa463: paint.color = 0xff9c8140; return true;
+        case 0xffcba5e4: paint.color = 0xff411b5a; return true;
+        case 0xffce86ef: paint.color = 0xff58107a; return true;
+        case 0xffcf7685: paint.color = 0xff8a303e; return true;
+        case 0xffd1e471: paint.color = 0xff798c1b; return true;
+        // screw core
+        case 0xff1a1a1a: paint.color = 0xffcccccc; return true;
+        // keep already darkish colors
+        case 0xff6a8800:
+        case 0xff7cce00:
+            return false;
+        }
+        break;
+    case kModeGoodSheperd:
+        switch (paint.color)
+        {
+        // background
+        case 0xff332e21: paint.color = 0xffdfdacd; return true;
+        case 0xff462f17: paint.color = 0xffe8d2ba; return true;
+        // jack box overlays
+        case 0xff56534a: paint.color = 0xffb6b3aa; return true;
+        case 0xffbc9d8e: paint.color = 0xff705142; return true;
+        case 0xfeede9e2: paint.color = 0xff1c1812; return true;
+        // colors to keep the same
+        case 0xff2400fe:
+        case 0xffcab39b:
+            return false;
+        }
+        break;
+    case kModeH4n4:
+        switch (paint.color)
+        {
+        case 0xffffb380:
+            return false;
+        case 0xffffccaa:
+            paint.color = 0xff572300;
+            return true;
+        }
+        break;
+    case kModeSonusmodular:
+        switch (paint.color)
+        {
+        case 0xff2a2aff:
+        case 0xff87cdde:
+        case 0xffe9afaf:
+        case 0xff4e4ed3:
+        case 0xff55ddff:
+        case 0xffdbdbe3:
+            return false;
+        case 0xff0a1284:
+            paint.color = 0xff7a82f5;
+            return true;
+        }
+        break;
+    default:
+        break;
+    }
+
+    switch (paint.type)
     {
     case NSVG_PAINT_NONE:
         return true;
@@ -1082,11 +1174,13 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             shapesOrig = handle->shapes;
             shapesMOD = nsvg__duplicateShapes(shapesOrig);
 
+            const LightMode mode = svgFilesToInvertForLightMode[i].mode;
+
             // shape paint inversion
             for (NSVGshape* shape = shapesMOD; shape != nullptr; shape = shape->next)
             {
-                if (invertPaintForLightMode(shape, shape->fill))
-                    invertPaintForLightMode(shape, shape->stroke);
+                if (invertPaintForLightMode(mode, shape, shape->fill))
+                    invertPaintForLightMode(mode, shape, shape->stroke);
             }
 
             goto postparse;
