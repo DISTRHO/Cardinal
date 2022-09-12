@@ -56,436 +56,520 @@ NVGcolor nvgRGBblank(const unsigned char r, const unsigned char g, const unsigne
 #undef nsvgParseFromFile
 #include <nanosvg.h>
 
+enum DarkMode {
+    kMode21kHz,
+    kModeAaronStatic,
+    kModeAlefsbits,
+    kModeAlgoritmarte,
+    kModeArableInstruments,
+    kModeAudibleInstruments,
+    kModeBidoo,
+    kModeCf,
+    kModeDrumKit,
+    kModeESeries,
+    kModeHetrickCV,
+    kModeJW,
+    kModeLilacLoop,
+    kModeLittleUtils,
+    kModeKocmoc,
+    kModeMyth,
+    kModeNonlinearcircuits,
+    kModeParableInstruments,
+    kModePathSet,
+    kModeVoxglitch,
+    kModeWhatTheRack,
+};
+
 // Custom Cardinal filtering
 static const struct {
+    const DarkMode mode;
     const char* const filename;
     const char* shapeIdsToIgnore[5];
     const int shapeNumberToIgnore;
 } svgFilesToInvertForDarkMode[] = {
     // MIT
-    { "/21kHz/res/Panels/D_Inf.svg", {}, -1 },
-    { "/21kHz/res/Panels/PalmLoop.svg", {}, -1 },
-    { "/21kHz/res/Panels/TachyonEntangler.svg", {}, -1 },
+    { kMode21kHz, "/21kHz/res/Panels/D_Inf.svg", {}, -1 },
+    { kMode21kHz, "/21kHz/res/Panels/PalmLoop.svg", {}, -1 },
+    { kMode21kHz, "/21kHz/res/Panels/TachyonEntangler.svg", {}, -1 },
     // MIT
-    { "/AaronStatic/res/ChordCV.svg", {}, -1 },
-    { "/AaronStatic/res/DiatonicCV.svg", {}, -1 },
-    { "/AaronStatic/res/RandomNoteCV.svg", {}, -1 },
-    { "/AaronStatic/res/ScaleCV.svg", {}, -1 },
+    { kModeAaronStatic, "/AaronStatic/res/ChordCV.svg", {}, -1 },
+    { kModeAaronStatic, "/AaronStatic/res/DiatonicCV.svg", {}, -1 },
+    { kModeAaronStatic, "/AaronStatic/res/RandomNoteCV.svg", {}, -1 },
+    { kModeAaronStatic, "/AaronStatic/res/ScaleCV.svg", {}, -1 },
     // GPL3.0-or-later
-    { "/alefsbits/res/blank6hp.svg", {}, -1 },
-    { "/alefsbits/res/fibb.svg", {}, -1 },
-    { "/alefsbits/res/logic.svg", {}, -1 },
-    { "/alefsbits/res/math.svg", {}, -1 },
-    { "/alefsbits/res/mlt.svg", {}, -1 },
-    { "/alefsbits/res/noize.svg", {}, -1 },
-    { "/alefsbits/res/octsclr.svg", {}, -1 },
-    { "/alefsbits/res/polyrand.svg", {}, -1 },
-    { "/alefsbits/res/shift.svg", {}, -1 },
-    { "/alefsbits/res/simplexandhold.svg", {}, -1 },
-    { "/alefsbits/res/simplexvco.svg", {}, -1 },
-    { "/alefsbits/res/steps.svg", {}, -1 },
-    { "/alefsbits/res/switch.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/blank6hp.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/fibb.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/logic.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/math.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/mlt.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/noize.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/octsclr.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/polyrand.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/shift.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/simplexandhold.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/simplexvco.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/steps.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/switch.svg", {}, -1 },
     // GPL3.0-or-later
-    { "/Algoritmarte/res/Clockkky.svg", {}, -1 },
-    { "/Algoritmarte/res/CyclicCA.svg", {}, -1 },
-    { "/Algoritmarte/res/HoldMeTight.svg", {}, -1 },
-    { "/Algoritmarte/res/MusiFrog.svg", {}, -1 },
-    { "/Algoritmarte/res/MusiMath.svg", {}, -1 },
-    { "/Algoritmarte/res/Planetz.svg", {}, -1 },
-    { "/Algoritmarte/res/Zefiro.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/Clockkky.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/CyclicCA.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/HoldMeTight.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/MusiFrog.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/MusiMath.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/Planetz.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/Zefiro.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
-    { "/ArableInstruments/res/Joni.svg", {}, -1 },
+    { kModeArableInstruments, "/ArableInstruments/res/Joni.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
-    { "/AudibleInstruments/res/Blinds.svg", {}, -1 },
-    { "/AudibleInstruments/res/Braids.svg", {}, -1 },
-    { "/AudibleInstruments/res/Branches.svg", {}, -1 },
-    { "/AudibleInstruments/res/Clouds.svg", {}, -1 },
-    { "/AudibleInstruments/res/Elements.svg", {}, -1 },
-    { "/AudibleInstruments/res/Frames.svg", {}, -1 },
-    { "/AudibleInstruments/res/Kinks.svg", {}, -1 },
-    { "/AudibleInstruments/res/Links.svg", {}, -1 },
-    { "/AudibleInstruments/res/Marbles.svg", {}, -1 },
-    { "/AudibleInstruments/res/Peaks.svg", {}, -1 },
-    { "/AudibleInstruments/res/Plaits.svg", {}, -1 },
-    { "/AudibleInstruments/res/Rings.svg", {}, -1 },
-    { "/AudibleInstruments/res/Ripples.svg", {}, -1 },
-    { "/AudibleInstruments/res/Shades.svg", {}, -1 },
-    { "/AudibleInstruments/res/Sheep.svg", {}, -1 },
-    { "/AudibleInstruments/res/Shelves.svg", {}, -1 },
-    { "/AudibleInstruments/res/Stages.svg", {}, -1 },
-    { "/AudibleInstruments/res/Streams.svg", {}, -1 },
-    { "/AudibleInstruments/res/Tides.svg", {}, -1 },
-    { "/AudibleInstruments/res/Tides2.svg", {}, -1 },
-    { "/AudibleInstruments/res/Veils.svg", {}, -1 },
-    { "/AudibleInstruments/res/Warps.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Blinds.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Braids.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Branches.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Clouds.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Elements.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Frames.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Kinks.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Links.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Marbles.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Peaks.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Plaits.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Rings.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Ripples.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Shades.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Sheep.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Shelves.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Stages.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Streams.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Tides.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Tides2.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Veils.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Warps.svg", {}, -1 },
     // CC-BY-NC-ND-4.0, runtime dark mode used with permission
-    { "/Bidoo/res/ACNE.svg", {}, -1 },
-    { "/Bidoo/res/ANTN.svg", {}, -1 },
-    { "/Bidoo/res/BAFIS.svg", {}, -1 },
-    { "/Bidoo/res/BANCAU.svg", {}, -1 },
-    { "/Bidoo/res/BAR.svg", {"rect833"}, -1 },
-    { "/Bidoo/res/BISTROT.svg", {}, -1 },
-    { "/Bidoo/res/BORDL.svg", {"rect959-3-0-7-5","rect959-3-0-7","rect959-3-0","rect959-3"}, -1 },
-    { "/Bidoo/res/CANARD.svg", {"rect959-3-7"}, -1 },
-    { "/Bidoo/res/CHUTE.svg", {}, -1 },
-    { "/Bidoo/res/DFUZE.svg", {}, -1 },
-    { "/Bidoo/res/DIKTAT.svg", {"rect843","rect843-0","rect843-0-8"}, -1 },
-    { "/Bidoo/res/DILEMO.svg", {}, -1 },
-    { "/Bidoo/res/DTROY.svg", {"rect959-3"}, -1 },
-    { "/Bidoo/res/DUKE.svg", {}, -1 },
-    { "/Bidoo/res/EDSAROS.svg", {"rect959-3-7","rect959-3-7-8","rect959-3-7-8-1","rect959-3-7-8-1-4"}, -1 },
-    { "/Bidoo/res/EMILE.svg", {}, -1 },
-    { "/Bidoo/res/ENCORE.svg", {}, -1 },
-    { "/Bidoo/res/ENCOREExpander.svg", {}, -1 },
-    { "/Bidoo/res/FLAME.svg", {}, -1 },
-    { "/Bidoo/res/FORK.svg", {}, -1 },
-    { "/Bidoo/res/FREIN.svg", {}, -1 },
-    { "/Bidoo/res/HCTIP.svg", {}, -1 },
-    { "/Bidoo/res/HUITRE.svg", {}, -1 },
-    { "/Bidoo/res/LAMBDA.svg", {}, -1 },
-    { "/Bidoo/res/LATE.svg", {}, -1 },
-    { "/Bidoo/res/LIMBO.svg", {}, -1 },
-    { "/Bidoo/res/LIMONADE.svg", {"rect839","rect839-6"}, -1 },
-    { "/Bidoo/res/LOURDE.svg", {"rect847","rect847-7","rect847-5","rect847-3"}, -1 },
-    { "/Bidoo/res/MAGMA.svg", {}, -1 },
-    { "/Bidoo/res/MINIBAR.svg", {"rect833"}, -1 },
-    { "/Bidoo/res/MOIRE.svg", {"rect843","rect843-7"}, -1 },
-    { "/Bidoo/res/MS.svg", {}, -1 },
-    { "/Bidoo/res/MU.svg", {"rect864"}, -1 },
-    { "/Bidoo/res/OAI.svg", {}, -1 },
-    { "/Bidoo/res/OUAIVE.svg", {"rect959-3-7"}, -1 },
-    { "/Bidoo/res/PERCO.svg", {}, -1 },
-    { "/Bidoo/res/PILOT.svg", {"rect843-6-4-5","rect843","rect843-4","rect843-6-4","rect843-6-7"}, -1 },
-    { "/Bidoo/res/POUPRE.svg", {}, -1 },
-    { "/Bidoo/res/RABBIT.svg", {}, -1 },
-    { "/Bidoo/res/REI.svg", {}, -1 },
-    { "/Bidoo/res/SIGMA.svg", {}, -1 },
-    { "/Bidoo/res/SPORE.svg", {}, -1 },
-    { "/Bidoo/res/TIARE.svg", {}, -1 },
-    { "/Bidoo/res/TOCANTE.svg", {"rect843"}, -1 },
-    { "/Bidoo/res/VOID.svg", {}, -1 },
-    { "/Bidoo/res/ZINC.svg", {}, -1 },
-    { "/Bidoo/res/ZOUMAI.svg", {}, -1 },
-    { "/Bidoo/res/ZOUMAIExpander.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ACNE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ANTN.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/BAFIS.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/BANCAU.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/BAR.svg", {"rect833"}, -1 },
+    { kModeBidoo, "/Bidoo/res/BISTROT.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/BORDL.svg", {"rect959-3-0-7-5","rect959-3-0-7","rect959-3-0","rect959-3"}, -1 },
+    { kModeBidoo, "/Bidoo/res/CANARD.svg", {"rect959-3-7"}, -1 },
+    { kModeBidoo, "/Bidoo/res/CHUTE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/DFUZE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/DIKTAT.svg", {"rect843","rect843-0","rect843-0-8"}, -1 },
+    { kModeBidoo, "/Bidoo/res/DILEMO.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/DTROY.svg", {"rect959-3"}, -1 },
+    { kModeBidoo, "/Bidoo/res/DUKE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/EDSAROS.svg", {"rect959-3-7","rect959-3-7-8","rect959-3-7-8-1","rect959-3-7-8-1-4"}, -1 },
+    { kModeBidoo, "/Bidoo/res/EMILE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ENCORE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ENCOREExpander.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/FLAME.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/FORK.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/FREIN.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/HCTIP.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/HUITRE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/LAMBDA.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/LATE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/LIMBO.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/LIMONADE.svg", {"rect839","rect839-6"}, -1 },
+    { kModeBidoo, "/Bidoo/res/LOURDE.svg", {"rect847","rect847-7","rect847-5","rect847-3"}, -1 },
+    { kModeBidoo, "/Bidoo/res/MAGMA.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/MINIBAR.svg", {"rect833"}, -1 },
+    { kModeBidoo, "/Bidoo/res/MOIRE.svg", {"rect843","rect843-7"}, -1 },
+    { kModeBidoo, "/Bidoo/res/MS.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/MU.svg", {"rect864"}, -1 },
+    { kModeBidoo, "/Bidoo/res/OAI.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/OUAIVE.svg", {"rect959-3-7"}, -1 },
+    { kModeBidoo, "/Bidoo/res/PERCO.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/PILOT.svg", {"rect843-6-4-5","rect843","rect843-4","rect843-6-4","rect843-6-7"}, -1 },
+    { kModeBidoo, "/Bidoo/res/POUPRE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/RABBIT.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/REI.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/SIGMA.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/SPORE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/TIARE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/TOCANTE.svg", {"rect843"}, -1 },
+    { kModeBidoo, "/Bidoo/res/VOID.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ZINC.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ZOUMAI.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ZOUMAIExpander.svg", {}, -1 },
     // BSD-3-Clause
-    { "/cf/res/ALGEBRA.svg", {}, -1 },
-    { "/cf/res/BUFFER.svg", {}, -1 },
-    { "/cf/res/CHOKE.svg", {}, -1 },
-    { "/cf/res/CUBE.svg", {}, -1 },
-    { "/cf/res/CUTS.svg", {}, -1 },
-    { "/cf/res/DISTO.svg", {}, -1 },
-    { "/cf/res/EACH.svg", {}, -1 },
-    { "/cf/res/FOUR.svg", {}, -1 },
-    { "/cf/res/FUNKTION.svg", {}, -1 },
-    { "/cf/res/L3DS3Q.svg", {}, 3 },
-    { "/cf/res/LABEL.svg", {}, -1 },
-    { "/cf/res/LEDS.svg", {}, -1 },
-    { "/cf/res/LEDSEQ.svg", {}, 3 },
-    { "/cf/res/MASTER.svg", {}, -1 },
-    { "/cf/res/METRO.svg", {}, -1 },
-    { "/cf/res/MONO.svg", {}, -1 },
-    { "/cf/res/PATCH.svg", {}, -1 },
-    { "/cf/res/PEAK.svg", {}, -1 },
-    { "/cf/res/PLAY.svg", {}, -1 },
-    { "/cf/res/PLAYER.svg", {}, -1 },
-    { "/cf/res/SLIDERSEQ.svg", {}, -1 },
-    { "/cf/res/STEPS.svg", {}, -1 },
-    { "/cf/res/STEREO.svg", {}, -1 },
-    { "/cf/res/SUB.svg", {}, -1 },
-    { "/cf/res/trSEQ.svg", {}, -1 },
-    { "/cf/res/VARIABLE.svg", {}, -1 },
+    { kModeCf, "/cf/res/ALGEBRA.svg", {}, -1 },
+    { kModeCf, "/cf/res/BUFFER.svg", {}, -1 },
+    { kModeCf, "/cf/res/CHOKE.svg", {}, -1 },
+    { kModeCf, "/cf/res/CUBE.svg", {}, -1 },
+    { kModeCf, "/cf/res/CUTS.svg", {}, -1 },
+    { kModeCf, "/cf/res/DISTO.svg", {}, -1 },
+    { kModeCf, "/cf/res/EACH.svg", {}, -1 },
+    { kModeCf, "/cf/res/FOUR.svg", {}, -1 },
+    { kModeCf, "/cf/res/FUNKTION.svg", {}, -1 },
+    { kModeCf, "/cf/res/L3DS3Q.svg", {}, 3 },
+    { kModeCf, "/cf/res/LABEL.svg", {}, -1 },
+    { kModeCf, "/cf/res/LEDS.svg", {}, -1 },
+    { kModeCf, "/cf/res/LEDSEQ.svg", {}, 3 },
+    { kModeCf, "/cf/res/MASTER.svg", {}, -1 },
+    { kModeCf, "/cf/res/METRO.svg", {}, -1 },
+    { kModeCf, "/cf/res/MONO.svg", {}, -1 },
+    { kModeCf, "/cf/res/PATCH.svg", {}, -1 },
+    { kModeCf, "/cf/res/PEAK.svg", {}, -1 },
+    { kModeCf, "/cf/res/PLAY.svg", {}, -1 },
+    { kModeCf, "/cf/res/PLAYER.svg", {}, -1 },
+    { kModeCf, "/cf/res/SLIDERSEQ.svg", {}, -1 },
+    { kModeCf, "/cf/res/STEPS.svg", {}, -1 },
+    { kModeCf, "/cf/res/STEREO.svg", {}, -1 },
+    { kModeCf, "/cf/res/SUB.svg", {}, -1 },
+    { kModeCf, "/cf/res/trSEQ.svg", {}, -1 },
+    { kModeCf, "/cf/res/VARIABLE.svg", {}, -1 },
     // CC0-1.0
-    { "/DrumKit/res/Baronial.svg", {}, -1 },
-    { "/DrumKit/res/BD9.svg", {}, -1 },
-    { "/DrumKit/res/ClosedHH.svg", {}, -1 },
-    { "/DrumKit/res/CR78.svg", {}, -1 },
-    { "/DrumKit/res/DMX.svg", {}, -1 },
-    { "/DrumKit/res/Gnome.svg", {}, -1 },
-    { "/DrumKit/res/Marionette.svg", {}, -1 },
-    { "/DrumKit/res/OpenHH.svg", {}, -1 },
-    { "/DrumKit/res/SBD.svg", {}, -1 },
-    { "/DrumKit/res/Sequencer.svg", {}, -1 },
-    { "/DrumKit/res/Snare.svg", {}, -1 },
-    { "/DrumKit/res/Tomi.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/Baronial.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/BD9.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/ClosedHH.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/CR78.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/DMX.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/Gnome.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/Marionette.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/OpenHH.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/SBD.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/Sequencer.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/Snare.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/Tomi.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
-    { "/ESeries/res/E340.svg", {}, -1 },
+    { kModeESeries,"/ESeries/res/E340.svg", {}, -1 },
     // CC0-1.0
-    { "/HetrickCV/res/1OpChaos.svg", {}, -1},
-    { "/HetrickCV/res/2OpChaos.svg", {}, -1},
-    { "/HetrickCV/res/2To4.svg", {}, -1},
-    { "/HetrickCV/res/3OpChaos.svg", {}, -1},
-    { "/HetrickCV/res/ASR.svg", {}, -1},
-    { "/HetrickCV/res/AToD.svg", {}, -1},
-    { "/HetrickCV/res/BinaryGate.svg", {}, -1},
-    { "/HetrickCV/res/BinaryNoise.svg", {}, -1},
-    { "/HetrickCV/res/Bitshift.svg", {}, -1},
-    { "/HetrickCV/res/Boolean3.svg", {}, -1},
-    { "/HetrickCV/res/ChaoticAttractors.svg", {}, -1},
-    { "/HetrickCV/res/ClockedNoise.svg", {}, -1},
-    { "/HetrickCV/res/Comparator.svg", {}, -1},
-    { "/HetrickCV/res/Contrast.svg", {}, -1},
-    { "/HetrickCV/res/Crackle.svg", {}, -1},
-    { "/HetrickCV/res/DataCompander.svg", {}, -1},
-    { "/HetrickCV/res/Delta.svg", {}, -1},
-    { "/HetrickCV/res/DToA.svg", {}, -1},
-    { "/HetrickCV/res/Dust.svg", {}, -1},
-    { "/HetrickCV/res/Exponent.svg", {}, -1},
-    { "/HetrickCV/res/FBSineChaos.svg", {}, -1},
-    { "/HetrickCV/res/FlipFlop.svg", {}, -1},
-    { "/HetrickCV/res/FlipPan.svg", {}, -1},
-    { "/HetrickCV/res/GateJunction.svg", {}, -1},
-    { "/HetrickCV/res/Gingerbread.svg", {}, -1},
-    { "/HetrickCV/res/LogicCombiner.svg", {}, -1},
-    { "/HetrickCV/res/LogicInverter.svg", {}, -1},
-    { "/HetrickCV/res/MidSide.svg", {}, -1},
-    { "/HetrickCV/res/MinMax.svg", {}, -1},
-    { "/HetrickCV/res/RandomGates.svg", {}, -1},
-    { "/HetrickCV/res/Rotator.svg", {}, -1},
-    { "/HetrickCV/res/Rungler.svg", {}, -1},
-    { "/HetrickCV/res/Scanner.svg", {}, -1},
-    { "/HetrickCV/res/TrigShaper.svg", {}, -1},
-    { "/HetrickCV/res/Waveshape.svg", {}, -1},
-    { "/HetrickCV/res/XYToPolar.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel1.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel2.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel3.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel5.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel6.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel7.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel8.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/1OpChaos.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/2OpChaos.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/2To4.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/3OpChaos.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/ASR.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/AToD.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/BinaryGate.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/BinaryNoise.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Bitshift.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Boolean3.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/ChaoticAttractors.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/ClockedNoise.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Comparator.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Contrast.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Crackle.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/DataCompander.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Delta.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/DToA.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Dust.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Exponent.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/FBSineChaos.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/FlipFlop.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/FlipPan.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/GateJunction.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Gingerbread.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/LogicCombiner.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/LogicInverter.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/MidSide.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/MinMax.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/RandomGates.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Rotator.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Rungler.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Scanner.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/TrigShaper.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Waveshape.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/XYToPolar.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel1.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel2.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel3.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel5.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel6.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel7.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel8.svg", {}, -1},
     // BSD-3-Clause
-    { "/JW-Modules/res/Add5.svg", {}, -1 },
-    { "/JW-Modules/res/BlankPanel1hp.svg", {}, -1 },
-    { "/JW-Modules/res/BlankPanelLarge.svg", {}, -1 },
-    { "/JW-Modules/res/BlankPanelMedium.svg", {}, -1 },
-    { "/JW-Modules/res/BlankPanelSmall.svg", {}, -1 },
-    { "/JW-Modules/res/BouncyBalls.svg", {}, -1 },
-    { "/JW-Modules/res/D1v1de.svg", {}, -1 },
-    { "/JW-Modules/res/DivSeq.svg", {}, -1 },
-    { "/JW-Modules/res/EightSeq.svg", {}, -1 },
-    { "/JW-Modules/res/GridSeq.svg", {}, -1 },
-    { "/JW-Modules/res/MinMax.svg", {"path38411"}, -1 },
-    { "/JW-Modules/res/NoteSeq.svg", {}, -1 },
-    { "/JW-Modules/res/NoteSeq16.svg", {}, -1 },
-    { "/JW-Modules/res/NoteSeqFu.svg", {}, -1 },
-    { "/JW-Modules/res/OnePattern.svg", {}, -1 },
-    { "/JW-Modules/res/Patterns.svg", {}, -1 },
-    { "/JW-Modules/res/Pres1t.svg", {}, -1 },
-    { "/JW-Modules/res/PT.svg", {}, -1 },
-    { "/JW-Modules/res/Str1ker.svg", {"rect2094","rect995","rect169"}, -1 },
-    { "/JW-Modules/res/Trigs.svg", {}, -1 },
-    { "/JW-Modules/res/WavHeadPanel.svg", {}, -1 },
-    { "/JW-Modules/res/XYPad.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/Add5.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/BlankPanel1hp.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/BlankPanelLarge.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/BlankPanelMedium.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/BlankPanelSmall.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/BouncyBalls.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/D1v1de.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/DivSeq.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/EightSeq.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/GridSeq.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/MinMax.svg", {"path38411"}, -1 },
+    { kModeJW, "/JW-Modules/res/NoteSeq.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/NoteSeq16.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/NoteSeqFu.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/OnePattern.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/Patterns.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/Pres1t.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/PT.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/Str1ker.svg", {"rect2094","rect995","rect169"}, -1 },
+    { kModeJW, "/JW-Modules/res/Trigs.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/WavHeadPanel.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/XYPad.svg", {}, -1 },
     // GPL3.0-or-later
-    { "/LilacLoop/res/Looper.svg", {}, -1 },
+    { kModeLilacLoop, "/LilacLoop/res/Looper.svg", {}, -1 },
     // EUPL-1.2
-    { "/LittleUtils/res/Bias_Semitone.svg", {}, -1 },
-    { "/LittleUtils/res/ButtonModule.svg", {}, -1 },
-    { "/LittleUtils/res/MulDiv.svg", {}, -1 },
-    { "/LittleUtils/res/PulseGenerator.svg", {}, -1 },
-    { "/LittleUtils/res/TeleportIn.svg", {}, -1 },
-    { "/LittleUtils/res/TeleportOut.svg", {}, -1 },
+    { kModeLittleUtils, "/LittleUtils/res/Bias_Semitone.svg", {}, -1 },
+    { kModeLittleUtils, "/LittleUtils/res/ButtonModule.svg", {}, -1 },
+    { kModeLittleUtils, "/LittleUtils/res/MulDiv.svg", {}, -1 },
+    { kModeLittleUtils, "/LittleUtils/res/PulseGenerator.svg", {}, -1 },
+    { kModeLittleUtils, "/LittleUtils/res/TeleportIn.svg", {}, -1 },
+    { kModeLittleUtils, "/LittleUtils/res/TeleportOut.svg", {}, -1 },
     // GPL-3.0-or-later
-    { "/kocmoc/res/DDLY.svg", {}, -1 },
-    { "/kocmoc/res/LADR.svg", {}, -1 },
-    { "/kocmoc/res/MUL.svg", {}, -1 },
-    { "/kocmoc/res/OP.svg", {}, -1 },
-    { "/kocmoc/res/PHASR.svg", {}, -1 },
-    { "/kocmoc/res/SKF.svg", {}, -1 },
-    { "/kocmoc/res/SVF.svg", {}, -1 },
-    { "/kocmoc/res/TRG.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/DDLY.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/LADR.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/MUL.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/OP.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/PHASR.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/SKF.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/SVF.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/TRG.svg", {}, -1 },
     // GPL-3.0-or-later
-    { "/myth-modules/res/Mavka.svg", {}, -1 },
-    { "/myth-modules/res/Molphar.svg", {}, -1 },
+    { kModeMyth, "/myth-modules/res/Mavka.svg", {}, -1 },
+    { kModeMyth, "/myth-modules/res/Molphar.svg", {}, -1 },
     // CC0-1.0
-    { "/nonlinearcircuits/res/BOOLs2.svg", {}, -1 },
-    { "/nonlinearcircuits/res/DoubleNeuronRef.svg", {}, -1 },
-    { "/nonlinearcircuits/res/LetsSplosh.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - 4seq.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - 8 BIT CIPHER.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - DIVIDE & CONQUER.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - DIVINE CMOS.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - GENiE.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - NEURON.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - NUMBERWANG.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - SEGUE.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - STATUES.svg", {}, -1 },
-    { "/nonlinearcircuits/res/squid-axon-papernoise-panel2.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/BOOLs2.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/DoubleNeuronRef.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/LetsSplosh.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - 4seq.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - 8 BIT CIPHER.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - DIVIDE & CONQUER.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - DIVINE CMOS.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - GENiE.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - NEURON.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - NUMBERWANG.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - SEGUE.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - STATUES.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/squid-axon-papernoise-panel2.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
-    { "/ParableInstruments/res/Neil.svg", {}, -1 },
+    { kModeParableInstruments, "/ParableInstruments/res/Neil.svg", {}, -1 },
     // GPL-3.0-or-later
-    { "/PathSet/res/AstroVibe.svg", {}, -1 },
-    { "/PathSet/res/GlassPane.svg", {}, -1 },
-    { "/PathSet/res/IceTray.svg", {}, -1 },
-    { "/PathSet/res/Nudge.svg", {}, -1 },
-    { "/PathSet/res/OneShot.svg", {}, -1 },
-    { "/PathSet/res/ShiftyExpander.svg", {}, -1 },
-    { "/PathSet/res/ShiftyMod.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/AstroVibe.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/GlassPane.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/IceTray.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/Nudge.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/OneShot.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/ShiftyExpander.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/ShiftyMod.svg", {}, -1 },
     // BSD-3-Clause
-    { "/voxglitch/res/autobreak_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/bytebeat_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/digital_programmer_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/digital_sequencer_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/digital_sequencer_xp_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/ghosts_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/glitch_sequencer_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/goblins_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/grain_engine_mk2_expander_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/grain_engine_mk2_front_panel_r3.svg", {}, -1 },
-    { "/voxglitch/res/grain_fx_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/hazumi_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/looper_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/repeater_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/samplerx8_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/satanonaut_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/wav_bank_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/wav_bank_mc_front_panel_v2.svg", {}, -1 },
-    { "/voxglitch/res/xy_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/autobreak_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/bytebeat_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/digital_programmer_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/digital_sequencer_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/digital_sequencer_xp_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/ghosts_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/glitch_sequencer_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/goblins_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/grain_engine_mk2_expander_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/grain_engine_mk2_front_panel_r3.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/grain_fx_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/hazumi_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/looper_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/repeater_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/samplerx8_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/satanonaut_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/wav_bank_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/wav_bank_mc_front_panel_v2.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/xy_front_panel.svg", {}, -1 },
     // WTFPL
-    { "/WhatTheRack/res/WhatTheJack.svg", {}, -1 },
-    { "/WhatTheRack/res/WhatTheMod.svg", {}, -1 },
-    { "/WhatTheRack/res/WhatTheRack.svg", {}, -1 },
+    { kModeWhatTheRack, "/WhatTheRack/res/WhatTheJack.svg", {}, -1 },
+    { kModeWhatTheRack, "/WhatTheRack/res/WhatTheMod.svg", {}, -1 },
+    { kModeWhatTheRack, "/WhatTheRack/res/WhatTheRack.svg", {}, -1 },
+};
+
+enum LightMode {
+    kModeAutinn,
+    kModeBefaco,
+    kModeCardinal,
+    kModeFehlerFabrik,
+    kModeForsitan,
+    kModeFundamental, // FIXME remove
+    kModeGoodSheperd,
+    kModeH4n4,
+    kModeHamptonHarmonics,
+    kModeLomas,
+    kModeSonusmodular,
 };
 
 static const struct {
+    const LightMode mode;
     const char* const filename;
     const char* shapeIdsToIgnore[5];
     const int shapeNumberToIgnore;
 } svgFilesToInvertForLightMode[] = {
     // GPLv3+
     /* FIXME does not work very well
-    { "/Autinn/res/AmpModule.svg", {}, -1 },
-    { "/Autinn/res/BassModule.svg", {}, -1 },
-    { "/Autinn/res/CVConverterModule.svg", {}, -1 },
-    { "/Autinn/res/ComponentLibrary", {}, -1 },
-    { "/Autinn/res/DeadbandModule.svg", {}, -1 },
-    { "/Autinn/res/DigiModule.svg", {}, -1 },
-    { "/Autinn/res/DiseeModule.svg", {}, -1 },
-    { "/Autinn/res/FilModule.svg", {}, -1 },
-    { "/Autinn/res/FlopperModule.svg", {}, -1 },
-    { "/Autinn/res/ImpModule.svg", {}, -1 },
-    { "/Autinn/res/JetteModule.svg", {}, -1 },
-    { "/Autinn/res/MelodyModule.svg", {}, -1 },
-    { "/Autinn/res/MeraModule.svg", {}, -1 },
-    { "/Autinn/res/Mixer6Module.svg", {}, -1 },
-    { "/Autinn/res/NapModule.svg", {}, -1 },
-    { "/Autinn/res/NonModule.svg", {}, -1 },
-    { "/Autinn/res/OxcartModule.svg", {}, -1 },
-    { "/Autinn/res/RebelModule.svg", {}, -1 },
-    { "/Autinn/res/RetriModule.svg", {}, -1 },
-    { "/Autinn/res/SawModule.svg", {}, -1 },
-    { "/Autinn/res/SjipModule.svg", {}, -1 },
-    { "/Autinn/res/SquareModule.svg", {}, -1 },
-    { "/Autinn/res/VibratoModule.svg", {}, -1 },
-    { "/Autinn/res/VxyModule.svg", {}, -1 },
-    { "/Autinn/res/ZodModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/AmpModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/BassModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/CVConverterModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/ComponentLibrary", {}, -1 },
+    { kModeAutinn, "/Autinn/res/DeadbandModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/DigiModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/DiseeModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/FilModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/FlopperModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/ImpModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/JetteModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/MelodyModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/MeraModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/Mixer6Module.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/NapModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/NonModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/OxcartModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/RebelModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/RetriModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/SawModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/SjipModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/SquareModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/VibratoModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/VxyModule.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/ZodModule.svg", {}, -1 },
     */
-    // ??? used for testing, might get turned off
-    { "/Befaco/res/components/Knurlie.svg", {}, -1 },
-    { "/Befaco/res/panels/ABC.svg", {}, -1 },
-    { "/Befaco/res/panels/ADSR.svg", {}, -1 },
-    { "/Befaco/res/panels/ChoppingKinky.svg", {}, -1 },
-    { "/Befaco/res/panels/DualAtenuverter.svg", {}, -1 },
-    { "/Befaco/res/panels/EvenVCO.svg", {}, -1 },
-    { "/Befaco/res/panels/HexmixVCA.svg", {}, -1 },
-    { "/Befaco/res/panels/Kickall.svg", {}, -1 },
-    { "/Befaco/res/panels/Mex.svg", {}, -1 },
-    { "/Befaco/res/panels/Mixer.svg", {}, -1 },
-    { "/Befaco/res/panels/Morphader.svg", {}, -1 },
-    { "/Befaco/res/panels/Muxlicer.svg", {}, -1 },
-    { "/Befaco/res/panels/NoisePlethora.svg", {}, -1 },
-    { "/Befaco/res/panels/Percall.svg", {}, -1 },
-    { "/Befaco/res/panels/Rampage.svg", {}, -1 },
-    { "/Befaco/res/panels/STMix.svg", {}, -1 },
-    { "/Befaco/res/panels/SamplingModulator.svg", {}, -1 },
-    { "/Befaco/res/panels/SlewLimiter.svg", {}, -1 },
-    { "/Befaco/res/panels/SpringReverb.svg", {}, -1 },
-    { "/Befaco/res/panels/StereoStrip.svg", {}, -1 },
+    // Custom, runtime light mode used with permission
+    { kModeBefaco, "/Befaco/res/components/Knurlie.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/ABC.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/ADSR.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/ChoppingKinky.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/DualAtenuverter.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/EvenVCO.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/HexmixVCA.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/Kickall.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/Mex.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/Mixer.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/Morphader.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/Muxlicer.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/NoisePlethora.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/Percall.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/Rampage.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/STMix.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/SamplingModulator.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/SlewLimiter.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/SpringReverb.svg", {}, -1 },
+    { kModeBefaco, "/Befaco/res/panels/StereoStrip.svg", {}, -1 },
     // GPLv3+
-    { "/Cardinal/res/AudioFile.svg", {}, -1 },
-    { "/Cardinal/res/AudioToCVPitch.svg", {}, -1 },
-    { "/Cardinal/res/Carla.svg", {}, -1 },
-    { "/Cardinal/res/ExpanderMIDI.svg", {}, -1 },
-    { "/Cardinal/res/glBars.svg", {}, -1 },
-    { "/Cardinal/res/HostAudio.svg", {}, -1 },
-    { "/Cardinal/res/HostCV.svg", {}, -1 },
-    { "/Cardinal/res/HostMIDI.svg", {}, -1 },
-    { "/Cardinal/res/HostMIDICC.svg", {}, -1 },
-    { "/Cardinal/res/HostMIDIGate.svg", {}, -1 },
-    { "/Cardinal/res/HostMIDIMap.svg", {}, -1 },
-    { "/Cardinal/res/HostParameters.svg", {}, -1 },
-    { "/Cardinal/res/HostParamsMap.svg", {}, -1 },
-    { "/Cardinal/res/HostTime.svg", {}, -1 },
-    { "/Cardinal/res/Ildaeil.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/AudioFile.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/AudioToCVPitch.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/Carla.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/ExpanderMIDI.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/glBars.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/HostAudio.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/HostCV.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/HostMIDI.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/HostMIDICC.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/HostMIDIGate.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/HostMIDIMap.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/HostParameters.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/HostParamsMap.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/HostTime.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/Ildaeil.svg", {}, -1 },
+    // TODO chowdsp
     // GPLv3+
-    { "/forsitan-modulare/res/alea.svg", {}, -1 },
-    { "/forsitan-modulare/res/cumuli.svg", {}, -1 },
-    { "/forsitan-modulare/res/deinde.svg", {}, -1 },
-    { "/forsitan-modulare/res/interea.svg", {}, -1 },
-    { "/forsitan-modulare/res/palette.svg", {}, -1 },
-    { "/forsitan-modulare/res/pavo.svg", {}, -1 },
+    /* FIXME needs color adjustments
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Arpanet.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Aspect.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Botzinger.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Chi.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Components", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Fax.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Lilt.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Luigi.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Monte.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Nova.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Planck.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/PSIOP.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Rasoir.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Sigma.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Components/FFHexScrew.svg", {}, -1 },
+    */
     // GPLv3+
-    { "/Fundamental/res/8vert.svg", {}, -1 },
-    { "/Fundamental/res/ADSR.svg", {}, -1 },
-    { "/Fundamental/res/Delay.svg", {}, -1 },
-    { "/Fundamental/res/LFO.svg", {}, -1 },
-    { "/Fundamental/res/Merge.svg", {}, -1 },
-    { "/Fundamental/res/MidSide.svg", {}, -1 },
-    { "/Fundamental/res/Mixer.svg", {}, -1 },
-    { "/Fundamental/res/Mutes.svg", {}, -1 },
-    { "/Fundamental/res/Noise.svg", {}, -1 },
-    { "/Fundamental/res/Octave.svg", {}, -1 },
-    { "/Fundamental/res/Pulses.svg", {}, -1 },
-    { "/Fundamental/res/Quantizer.svg", {}, -1 },
-    { "/Fundamental/res/Random.svg", {}, -1 },
-    { "/Fundamental/res/SEQ3.svg", {}, -1 },
-    { "/Fundamental/res/Scope.svg", {}, -1 },
-    { "/Fundamental/res/SequentialSwitch1.svg", {}, -1 },
-    { "/Fundamental/res/SequentialSwitch2.svg", {}, -1 },
-    { "/Fundamental/res/Split.svg", {}, -1 },
-    { "/Fundamental/res/Sum.svg", {}, -1 },
-    { "/Fundamental/res/VCA-1.svg", {}, -1 },
-    { "/Fundamental/res/VCA.svg", {}, -1 },
-    { "/Fundamental/res/VCF.svg", {}, -1 },
-    { "/Fundamental/res/VCMixer.svg", {}, -1 },
-    { "/Fundamental/res/VCO.svg", {}, -1 },
-    { "/Fundamental/res/WTLFO.svg", {}, -1 },
-    { "/Fundamental/res/WTVCO.svg", {}, -1 },
+    { kModeForsitan, "/forsitan-modulare/res/alea.svg", {}, -1 },
+    { kModeForsitan, "/forsitan-modulare/res/cumuli.svg", {}, -1 },
+    { kModeForsitan, "/forsitan-modulare/res/deinde.svg", {}, -1 },
+    { kModeForsitan, "/forsitan-modulare/res/interea.svg", {}, -1 },
+    { kModeForsitan, "/forsitan-modulare/res/palette.svg", {}, -1 },
+    { kModeForsitan, "/forsitan-modulare/res/pavo.svg", {}, -1 },
+    // GPLv3+
+    { kModeFundamental, "/Fundamental/res/8vert.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/ADSR.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/Delay.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/LFO.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/Merge.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/MidSide.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/Mixer.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/Mutes.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/Noise.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/Octave.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/Pulses.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/Quantizer.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/Random.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/SEQ3.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/Scope.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/SequentialSwitch1.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/SequentialSwitch2.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/Split.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/Sum.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/VCA-1.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/VCA.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/VCF.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/VCMixer.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/VCO.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/WTLFO.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/WTVCO.svg", {}, -1 },
+    // GPLv3+
+    /* FIXME needs color adjustments
+    { kModeGoodSheperd, "/GoodSheperd/res/Holzschnabel.svg", {}, -1 },
+    { kModeGoodSheperd, "/GoodSheperd/res/Hurdle.svg", {}, -1 },
+    { kModeGoodSheperd, "/GoodSheperd/res/SEQ3st.svg", {}, -1 },
+    { kModeGoodSheperd, "/GoodSheperd/res/Seqtrol.svg", {}, -1 },
+    { kModeGoodSheperd, "/GoodSheperd/res/Stable16.svg", {}, -1 },
+    { kModeGoodSheperd, "/GoodSheperd/res/Stall.svg", {}, -1 },
+    { kModeGoodSheperd, "/GoodSheperd/res/Switch1.svg", {}, -1 },
+    */
+    // GPLv3+
+    /* FIXME needs color adjustments
+    { kModeH4n4, "/h4n4-modules/res/XenQnt.svg", {}, -1 },
+    */
     // MIT
-    { "/HamptonHarmonics/res/Arp.svg", {}, -1 },
-    { "/HamptonHarmonics/res/Progress.svg", {}, -1 },
+    { kModeHamptonHarmonics, "/HamptonHarmonics/res/Arp.svg", {}, -1 },
+    { kModeHamptonHarmonics, "/HamptonHarmonics/res/Progress.svg", {}, -1 },
     // GPLv3+
-    { "/LomasModules/res/AdvancedSampler.svg", {}, -1 },
-    { "/LomasModules/res/GateSequencer.svg", {}, -1 },
+    { kModeLomas, "/LomasModules/res/AdvancedSampler.svg", {}, -1 },
+    { kModeLomas, "/LomasModules/res/GateSequencer.svg", {}, -1 },
+    // MIT
+    // TODO Mockba
+    // CC0
+    // TODO Mog
+    // CC-BY-NC-ND-4.0
+    // TODO Orbits - non compat license
+    // CC-BY-SA-4.0
+    // TODO Prism
+    // CC-BY-SA-4.0
+    // TODO repelzen
     // GPLv3+
-    { "/sonusmodular/res/addiction.svg", {}, -1 },
-    { "/sonusmodular/res/bitter.svg", {}, -1 },
-    { "/sonusmodular/res/bymidside.svg", {}, -1 },
-    { "/sonusmodular/res/campione.svg", {}, -1 },
-    { "/sonusmodular/res/chainsaw.svg", {}, -1 },
-    { "/sonusmodular/res/ctrl.svg", {}, -1 },
-    { "/sonusmodular/res/deathcrush.svg", {}, -1 },
-    { "/sonusmodular/res/fraction.svg", {}, -1 },
-    { "/sonusmodular/res/harmony.svg", {}, -1 },
-    { "/sonusmodular/res/ladrone.svg", {}, -1 },
-    { "/sonusmodular/res/luppolo.svg", {}, -1 },
-    { "/sonusmodular/res/luppolo3.svg", {}, -1 },
-    { "/sonusmodular/res/micromacro.svg", {}, -1 },
-    { "/sonusmodular/res/mrcheb.svg", {}, -1 },
-    { "/sonusmodular/res/multimulti.svg", {}, -1 },
-    { "/sonusmodular/res/neurosc.svg", {}, -1 },
-    { "/sonusmodular/res/oktagon.svg", {}, -1 },
-    { "/sonusmodular/res/osculum.svg", {}, -1 },
-    { "/sonusmodular/res/paramath.svg", {}, -1 },
-    { "/sonusmodular/res/piconoise.svg", {}, -1 },
-    { "/sonusmodular/res/pith.svg", {}, -1 },
-    { "/sonusmodular/res/pusher.svg", {}, -1 },
-    { "/sonusmodular/res/ringo.svg", {}, -1 },
-    { "/sonusmodular/res/scramblase.svg", {}, -1 },
-    { "/sonusmodular/res/tropicana.svg", {}, -1 },
-    { "/sonusmodular/res/twoff.svg", {}, -1 },
-    { "/sonusmodular/res/yabp.svg", {}, -1 },
-    // TODO bacon, chowdsp, ???
+    { kModeSonusmodular, "/sonusmodular/res/addiction.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/bitter.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/bymidside.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/campione.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/chainsaw.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/ctrl.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/deathcrush.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/fraction.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/harmony.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/ladrone.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/luppolo.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/luppolo3.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/micromacro.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/mrcheb.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/multimulti.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/neurosc.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/oktagon.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/osculum.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/paramath.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/piconoise.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/pith.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/pusher.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/ringo.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/scramblase.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/tropicana.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/twoff.svg", {}, -1 },
+    { kModeSonusmodular, "/sonusmodular/res/yabp.svg", {}, -1 },
+    // TODO xtrnt
+    // TODO zzc, needs permission
 };
 
 static inline
@@ -498,24 +582,25 @@ unsigned int invertColor(const unsigned int color) noexcept
 }
 
 static inline
-bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
+bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpaint& paint, const char* const svgFileToInvert)
 {
-    if (paint.type == NSVG_PAINT_LINEAR_GRADIENT && svgFileToInvert != nullptr)
+    if (paint.type == NSVG_PAINT_LINEAR_GRADIENT)
     {
-        // Special case for DrumKit background gradient
-        if (std::strncmp(svgFileToInvert, "/DrumKit/", 9) == 0)
+        switch (mode)
         {
+        // Special case for DrumKit background gradient
+        case kModeDrumKit:
             std::free(paint.gradient);
             paint.type = NSVG_PAINT_COLOR;
             paint.color = 0xff191919;
             return true;
-        }
         // Special case for PathSet shifty gradient
-        if (std::strncmp(svgFileToInvert, "/PathSet/", 9) == 0)
-        {
+        case kModePathSet:
             paint.gradient->stops[0].color = 0xff7c4919; // 50% darker than main blue
             paint.gradient->stops[1].color = 0xff5b3a1a; // 33.3% darker than main blue
             return false;
+        default:
+            break;
         }
     }
 
@@ -524,9 +609,10 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
     if (paint.type != NSVG_PAINT_COLOR)
         return false;
 
-    // Special case for Bidoo red color
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/Bidoo/", 7) == 0)
+    switch (mode)
     {
+    // Special case for Bidoo red color
+    case kModeBidoo:
         if (paint.color == 0xff001fcd)
         {
             paint.color = 0xcf8b94c4;
@@ -544,11 +630,9 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
                 return false;
             }
         }
-    }
-
+        break;
     // Special case for JW-Modules colors
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/JW-Modules/", 12) == 0)
-    {
+    case kModeJW:
         switch (paint.color)
         {
         // do nothing
@@ -582,11 +666,9 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
             paint.color = 0xffc0c0c0;
             return true;
         }
-    }
-
+        break;
     // Special case for Lilac
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/LilacLoop/", 11) == 0)
-    {
+    case kModeLilacLoop:
         switch (paint.color)
         {
         // main bg (custom)
@@ -606,11 +688,9 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
             paint.color = 0x00000000;
             return true;
         }
-    }
-
+        break;
     // Special case for Nonlinear Circuits
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/nonlinearcircuits/", 19) == 0)
-    {
+    case kModeNonlinearcircuits:
         switch (paint.color)
         {
             case 0xff9a7900:
@@ -629,11 +709,9 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
                 paint.color = 0x00000000;
                 return true;
         }
-    }
-
+        break;
     // Special case for PathSet colors
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/PathSet/", 9) == 0)
-    {
+    case kModePathSet:
         // only invert main colors for Nudge.svg
         if (std::strcmp(svgFileToInvert, "/PathSet/res/Nudge.svg") == 0)
         {
@@ -716,11 +794,9 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
                 return true;
             }
         }
-    }
-
+        break;
     // Special case for voxglitch colors
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/voxglitch/", 11) == 0)
-    {
+    case kModeVoxglitch:
         switch (paint.color)
         {
         // wavbank blue
@@ -734,6 +810,9 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
             paint.color = 0x7f3219ac;
             return true;
         }
+        break;
+    default:
+        break;
     }
 
     switch (paint.color)
@@ -952,6 +1031,7 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             if (std::strncmp(filename + (filenamelen-filterlen), svgFileToInvert, filterlen) != 0)
                 continue;
 
+            const DarkMode mode = svgFilesToInvertForDarkMode[i].mode;
             const char* const* const shapeIdsToIgnore = svgFilesToInvertForDarkMode[i].shapeIdsToIgnore;
             const int shapeNumberToIgnore = svgFilesToInvertForDarkMode[i].shapeNumberToIgnore;
             int shapeCounter = 0;
@@ -979,8 +1059,8 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
                 if (ignore)
                     continue;
 
-                if (invertPaintForDarkMode(shape, shape->fill, svgFileToInvert))
-                    invertPaintForDarkMode(shape, shape->stroke, svgFileToInvert);
+                if (invertPaintForDarkMode(mode, shape, shape->fill, svgFileToInvert))
+                    invertPaintForDarkMode(mode, shape, shape->stroke, svgFileToInvert);
             }
 
             goto postparse;
