@@ -135,6 +135,8 @@ static const struct {
     { "/Bidoo/res/DUKE.svg", {}, -1 },
     { "/Bidoo/res/EDSAROS.svg", {"rect959-3-7","rect959-3-7-8","rect959-3-7-8-1","rect959-3-7-8-1-4"}, -1 },
     { "/Bidoo/res/EMILE.svg", {}, -1 },
+    { "/Bidoo/res/ENCORE.svg", {}, -1 },
+    { "/Bidoo/res/ENCOREExpander.svg", {}, -1 },
     { "/Bidoo/res/FLAME.svg", {}, -1 },
     { "/Bidoo/res/FORK.svg", {}, -1 },
     { "/Bidoo/res/FREIN.svg", {}, -1 },
@@ -316,6 +318,7 @@ static const struct {
     { "/PathSet/res/GlassPane.svg", {}, -1 },
     { "/PathSet/res/IceTray.svg", {}, -1 },
     { "/PathSet/res/Nudge.svg", {}, -1 },
+    { "/PathSet/res/OneShot.svg", {}, -1 },
     { "/PathSet/res/ShiftyExpander.svg", {}, -1 },
     { "/PathSet/res/ShiftyMod.svg", {}, -1 },
     // BSD-3-Clause
@@ -653,6 +656,8 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
             {
             // main blue tone
             case 0xffdf7a1a:
+            case 0xffe78a31:
+            case 0xffc26a16:
                 if (shape->opacity == 0.5f && std::strcmp(svgFileToInvert, "/PathSet/res/AstroVibe.svg") == 0)
                 {
                     shape->opacity = 0.2f;
@@ -669,6 +674,13 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
                     return true;
                 }
                 break;
+            /*
+            // OneShot beverage
+            case 0xff021755:
+            case 0xff03299a:
+            case 0xff032ba2:
+                return false;
+            */
             // pink step 2 (pink with 50% opacity on bg)
             case 0xffef73ea:
                 paint.color = 0xff812d7d;
