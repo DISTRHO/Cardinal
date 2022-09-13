@@ -72,6 +72,9 @@ MACHINE = i686-the-rack
 else ifeq ($(CPU_ARM64),true)
 ARCH_NAME = arm64
 MACHINE = x86_64-the-rack
+else ifeq ($(CPU_RISCV64),true)
+ARCH_NAME = riscv64
+MACHINE = x86_64-the-rack
 else ifeq ($(WASM),true)
 MACHINE = i686-wasm
 else

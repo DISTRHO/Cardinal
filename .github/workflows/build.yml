@@ -260,6 +260,92 @@ jobs:
           files: |
             *.tar.gz
 
+  linux-riscv64:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Set up cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/PawPawBuilds
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
+            src/Rack/dep/zstd-1.4.5
+          key: linux-riscv64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+      - name: Fix GitHub's mess
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update -qq
+          sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+          sudo apt-get purge -yqq libclang* libgbm* libllvm* libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
+      - name: Set up dependencies
+        run: |
+          sudo dpkg --add-architecture riscv64
+          sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-riscv64.list
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
+          sudo apt-get update -qq
+          sudo apt-get install -yqq g++-riscv64-linux-gnu libasound2-dev:riscv64 libdbus-1-dev:riscv64 libgl1-mesa-dev:riscv64 libglapi-mesa:riscv64 libglvnd0:riscv64 libglib2.0-dev:riscv64 libpulse-dev:riscv64 libsdl2-dev:riscv64 libx11-dev:riscv64 libxcursor-dev:riscv64 libxext-dev:riscv64 libxrandr-dev:riscv64 qemu-user-static
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-linux-riscv64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+      - name: Build extra dependencies
+        env:
+          PKG_CONFIG_PATH: /usr/lib/riscv64-linux-gnu/pkgconfig
+        run: |
+          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PATH="/usr/lib/ccache:${PATH}"
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-riscv64 && ./deps/PawPaw/.cleanup.sh linux-riscv64
+      - name: Build linux riscv64 cross-compiled
+        run: |
+          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          pushd deps/PawPaw; source local.env linux-riscv64; popd
+          export PATH="/usr/lib/ccache:${PATH}"
+          export PKG_CONFIG_PATH+=:/usr/lib/riscv64-linux-gnu/pkgconfig
+          make features
+          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+          make unzipfx
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        id: slug1
+        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        id: slug2
+        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
+      - name: Set sha8
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+      - name: Pack binaries
+        run: |
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap)  ../CardinalJACK ../CardinalNative
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          path: |
+            *.tar.gz
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            *.tar.gz
+
   linux-x86_64:
     runs-on: ubuntu-20.04
     steps:

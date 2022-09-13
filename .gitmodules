@@ -218,3 +218,6 @@
 [submodule "plugins/dBiz"]
 	path = plugins/dBiz
 	url = https://github.com/dBiz/dBiz.git
+[submodule "include/simde"]
+	path = include/simde
+	url = https://github.com/simd-everywhere/simde.git
