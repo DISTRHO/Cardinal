@@ -30,6 +30,7 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 | Multi-threaded engine          | Yes                       | No, uses host audio thread      | Intentional in Cardinal, for removing jitter |
 | Supports ARM systems           | No                        | Yes                             | This means Apple M1 too, yes |
 | Supports BSD systems           | No                        | Yes                             | Available as FreeBSD port |
+| Supports RISC-V systems        | No                        | Yes                             | |
 | Synth plugin variant           | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
 | FX plugin variant              | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
 | Raw-CV plugin variant          | Unsupported               | 8 audio IO + 10 CV IO           | Available in JACK, LV2 and VST3 formats, not possible in AU and VST2 |
