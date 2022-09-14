@@ -62,8 +62,9 @@ jobs:
       - name: Build linux arm64 cross-compiled
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-aarch64; popd
+          export PATH="/usr/lib/ccache:${PATH}"
+          export PKG_CONFIG_PATH+=:/usr/lib/aarch64-linux-gnu/pkgconfig
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
           make unzipfx
@@ -146,8 +147,9 @@ jobs:
       - name: Build linux armhf cross-compiled
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-armhf; popd
+          export PATH="/usr/lib/ccache:${PATH}"
+          export PKG_CONFIG_PATH+=:/usr/lib/arm-linux-gnueabihf/pkgconfig
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
           make unzipfx
@@ -226,8 +228,9 @@ jobs:
       - name: Build linux i686
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux-i686; popd
+          export PATH="/usr/lib/ccache:${PATH}"
+          export PKG_CONFIG_PATH+=:/usr/lib/i386-linux-gnu/pkgconfig
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
           make unzipfx
@@ -384,8 +387,9 @@ jobs:
       - name: Build linux x86_64
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env linux; popd
+          export PATH="/usr/lib/ccache:${PATH}"
+          export PKG_CONFIG_PATH+=:/usr/lib/x86_64-linux-gnu/pkgconfig
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
           make unzipfx
