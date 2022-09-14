@@ -510,6 +510,8 @@ static const struct {
     { kModeFundamental, "/Fundamental/res/VCO.svg", {}, -1 },
     { kModeFundamental, "/Fundamental/res/WTLFO.svg", {}, -1 },
     { kModeFundamental, "/Fundamental/res/WTVCO.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/components/ADSR-bg.svg", {}, -1 },
+    { kModeFundamental, "/Fundamental/res/components/Scope-bg.svg", {}, -1 },
     // GPLv3+
     { kModeGoodSheperd, "/GoodSheperd/res/Holzschnabel.svg", {}, -1 },
     { kModeGoodSheperd, "/GoodSheperd/res/Hurdle.svg", {}, -1 },
@@ -937,6 +939,24 @@ bool invertPaintForLightMode(const LightMode mode, NSVGshape* const shape, NSVGp
         case 0xff6a8800:
         case 0xff7cce00:
             return false;
+        }
+        break;
+    case kModeFundamental:
+        switch (paint.color)
+        {
+        case 0xc0000000:
+            paint.color = 0xe6000000;
+            return true;
+        case 0xff909092:
+            paint.color = 0xff000000;
+            return true;
+        case 0xff000000:
+            if (shape->opacity == 0.5f)
+            {
+                shape->opacity = 0.9f;
+                return false;
+            }
+            break;
         }
         break;
     case kModeGoodSheperd:
