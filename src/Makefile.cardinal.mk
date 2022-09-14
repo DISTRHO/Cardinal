@@ -110,7 +110,11 @@ endif
 # --------------------------------------------------------------
 # Extra libraries to link against
 
+ifeq ($(NOPLUGINS),true)
+RACK_EXTRA_LIBS  = ../../plugins/noplugins.a
+else
 RACK_EXTRA_LIBS  = ../../plugins/plugins.a
+endif
 RACK_EXTRA_LIBS += ../rack.a
 RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libquickjs.a
 

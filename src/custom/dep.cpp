@@ -378,11 +378,15 @@ enum LightMode {
     kModeCardinal,
     kModeFehlerFabrik,
     kModeForsitan,
-    kModeFundamental, // FIXME remove
+    kModeFundamental,
     kModeGoodSheperd,
     kModeH4n4,
     kModeHamptonHarmonics,
     kModeLomas,
+    kModeMockba,
+    kModeMog,
+    kModePrism,
+    kModeRepelzen,
     kModeSonusmodular,
 };
 
@@ -525,15 +529,31 @@ static const struct {
     { kModeLomas, "/LomasModules/res/AdvancedSampler.svg", {}, -1 },
     { kModeLomas, "/LomasModules/res/GateSequencer.svg", {}, -1 },
     // MIT
-    // TODO Mockba
+    { kModeMockba, "/MockbaModular/res/Blank.svg", {}, -1 },
+    // TODO
     // CC0
-    // TODO Mog
+    { kModeMog, "/Mog/res/Network.svg", {}, -1 },
+    { kModeMog, "/Mog/res/Nexus.svg", {}, -1 },
     // CC-BY-NC-ND-4.0
     // TODO Orbits - non compat license
     // CC-BY-SA-4.0
-    // TODO Prism
+    { kModePrism, "/Prism/res/prism_Droplet.svg", {}, -1 },
+    { kModePrism, "/Prism/res/prism_Rainbow.svg", {}, -1 },
+    { kModePrism, "/Prism/res/RainbowScaleExpander.svg", {}, -1 },
     // CC-BY-SA-4.0
-    // TODO repelzen
+    { kModeRepelzen, "/repelzen/res/reface/reburst_bg.svg", {}, -1 },
+    { kModeRepelzen, "/repelzen/res/reface/refold_bg.svg", {}, -1 },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg1.svg", {}, -1 },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg2.svg", {}, -1 },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg3.svg", {}, -1 },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg4.svg", {}, -1 },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg5.svg", {}, -1 },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg6.svg", {}, -1 },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg7.svg", {}, -1 },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg8.svg", {}, -1 },
+    { kModeRepelzen, "/repelzen/res/reface/retrig_bg.svg", {}, -1 },
+    { kModeRepelzen, "/repelzen/res/reface/rewin_bg.svg", {}, -1 },
+    { kModeRepelzen, "/repelzen/res/reface/rexmix_bg.svg", {}, -1 },
     // GPLv3+
     { kModeSonusmodular, "/sonusmodular/res/addiction.svg", {}, -1 },
     { kModeSonusmodular, "/sonusmodular/res/bitter.svg", {}, -1 },
@@ -852,19 +872,33 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
 static inline
 bool invertPaintForLightMode(const LightMode mode, NSVGshape* const shape, NSVGpaint& paint)
 {
-    switch (paint.type)
+    if (paint.type == NSVG_PAINT_LINEAR_GRADIENT)
     {
-    case NSVG_PAINT_NONE:
-        return true;
-    case NSVG_PAINT_LINEAR_GRADIENT:
-        for (int i=0; i<paint.gradient->nstops; ++i)
-            paint.gradient->stops[i].color = invertColor(paint.gradient->stops[i].color);
-        return true;
-    case NSVG_PAINT_COLOR:
-        break;
-    default:
-        return false;
+        switch (mode)
+        {
+        case kModeFundamental:
+            paint.gradient->stops[0].color = 0xffffffff;
+            paint.gradient->stops[1].color = 0xffe6d6d6;
+            return true;
+        default:
+            for (int i=0; i<paint.gradient->nstops; ++i)
+                paint.gradient->stops[i].color = invertColor(paint.gradient->stops[i].color);
+            return true;
+        }
     }
+
+    if (paint.type == NSVG_PAINT_RADIAL_GRADIENT && mode == kModeMog)
+    {
+        std::free(paint.gradient);
+        paint.type = NSVG_PAINT_COLOR;
+        paint.color = 0xffe5e5e5;
+        return true;
+    }
+
+    if (paint.type == NSVG_PAINT_NONE)
+        return true;
+    if (paint.type != NSVG_PAINT_COLOR)
+        return false;
 
     switch (mode)
     {
@@ -931,15 +965,73 @@ bool invertPaintForLightMode(const LightMode mode, NSVGshape* const shape, NSVGp
             return true;
         }
         break;
+    case kModeMog:
+        switch (paint.color)
+        {
+        case 0xff442499:
+        case 0xff587ee2:
+        case 0xff1ecae8:
+        case 0xff2dd6ac:
+        case 0xffcf924c:
+        case 0xffd8b3bb:
+        case 0xff29165d:
+        case 0xff354d89:
+        case 0xff127b8d:
+        case 0xff1b8269:
+        case 0xff7e592e:
+        case 0xff836d72:
+            return false;
+        }
+        break;
+    case kModePrism:
+        switch (paint.color)
+        {
+        case 0xff000000:
+        case 0xff505770:
+        case 0xff657c9b:
+        case 0xff7ba357:
+        case 0xff7f64f2:
+        case 0xff99e4ff:
+        case 0xffa7ff6c:
+        case 0xffc279e2:
+        case 0xffe079c4:
+        case 0xffe5ff66:
+        case 0xffff88d0:
+        case 0xffffa369:
+            return false;
+        case 0xff0f0f0f:
+            if (std::strcmp(shape->id, "path10") == 0 || std::strcmp(shape->id, "circle506") == 0)
+            {
+                paint.color = 0xffffffff;
+                return true;
+            }
+            return false;
+        case 0xffbababa:
+            paint.color = 0xff000000;
+            return true;
+        }
+        break;
+    case kModeRepelzen:
+        switch (paint.color)
+        {
+        case 0xff4c4ccc:
+        case 0xff87a610:
+        case 0xffb78e09:
+            return false;
+        case 0xff44bbd8:
+            paint.color = 0xff228ba5;
+            return true;
+        }
+        break;
     case kModeSonusmodular:
         switch (paint.color)
         {
         case 0xff2a2aff:
-        case 0xff87cdde:
-        case 0xffe9afaf:
         case 0xff4e4ed3:
         case 0xff55ddff:
+        case 0xff87cdde:
         case 0xffdbdbe3:
+        case 0xffe9afaf:
             return false;
         case 0xff0a1284:
             paint.color = 0xff7a82f5;
@@ -950,20 +1042,8 @@ bool invertPaintForLightMode(const LightMode mode, NSVGshape* const shape, NSVGp
         break;
     }
 
-    switch (paint.type)
-    {
-    case NSVG_PAINT_NONE:
-        return true;
-    case NSVG_PAINT_LINEAR_GRADIENT:
-        for (int i=0; i<paint.gradient->nstops; ++i)
-            paint.gradient->stops[i].color = invertColor(paint.gradient->stops[i].color);
-        return true;
-    case NSVG_PAINT_COLOR:
-        paint.color = invertColor(paint.color);
-        return true;
-    default:
-        return false;
-    }
+    paint.color = invertColor(paint.color);
+    return true;
 }
 
 extern "C" {
@@ -1169,12 +1249,12 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             if (std::strncmp(filename + (filenamelen-filterlen), svgFileToInvert, filterlen) != 0)
                 continue;
 
+            const LightMode mode = svgFilesToInvertForLightMode[i].mode;
+
             hasLightMode = true;
             handleMOD = nullptr;
             shapesOrig = handle->shapes;
             shapesMOD = nsvg__duplicateShapes(shapesOrig);
-
-            const LightMode mode = svgFilesToInvertForLightMode[i].mode;
 
             // shape paint inversion
             for (NSVGshape* shape = shapesMOD; shape != nullptr; shape = shape->next)

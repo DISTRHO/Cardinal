@@ -1155,7 +1155,11 @@ endif
 # --------------------------------------------------------------
 # Build targets
 
+ifeq ($(NOPLUGINS),true)
+TARGET = noplugins.a
+else
 TARGET = plugins.a
+endif
 
 all: $(TARGET)
 
