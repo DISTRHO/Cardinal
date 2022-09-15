@@ -81,7 +81,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap)  ../CardinalJACK ../CardinalNative
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -166,7 +166,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap)  ../CardinalJACK ../CardinalNative
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -247,7 +247,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -333,7 +333,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap)  ../CardinalJACK ../CardinalNative
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -406,7 +406,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap)  ../CardinalJACK ../CardinalNative
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -446,7 +446,7 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap)
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -984,7 +984,10 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
+          pushd bin
+          zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
+          popd
+          zip -u -9 ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip LICENSE README.md docs/*.*
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -1076,7 +1079,10 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
       - name: Pack binaries
         run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
+          pushd bin
+          zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
+          popd
+          zip -u -9 ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip LICENSE README.md docs/*.*
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
