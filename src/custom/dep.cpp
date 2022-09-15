@@ -119,8 +119,6 @@ static const struct {
     { kModeAlgoritmarte, "/Algoritmarte/res/Planetz.svg", {}, -1 },
     { kModeAlgoritmarte, "/Algoritmarte/res/Zefiro.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
-    { kModeArableInstruments, "/ArableInstruments/res/Joni.svg", {}, -1 },
-    // Custom, runtime dark mode used with permission
     { kModeAudibleInstruments, "/AudibleInstruments/res/Blinds.svg", {}, -1 },
     { kModeAudibleInstruments, "/AudibleInstruments/res/Braids.svg", {}, -1 },
     { kModeAudibleInstruments, "/AudibleInstruments/res/Branches.svg", {}, -1 },
@@ -336,8 +334,6 @@ static const struct {
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - SEGUE.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - STATUES.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/squid-axon-papernoise-panel2.svg", {}, -1 },
-    // Custom, runtime dark mode used with permission
-    { kModeParableInstruments, "/ParableInstruments/res/Neil.svg", {}, -1 },
     // GPL-3.0-or-later
     { kModePathSet, "/PathSet/res/AstroVibe.svg", {}, -1 },
     { kModePathSet, "/PathSet/res/GlassPane.svg", {}, -1 },
@@ -373,6 +369,7 @@ static const struct {
 };
 
 enum LightMode {
+    kMode8Mode,
     kModeAutinn,
     kModeBefaco,
     kModeCardinal,
@@ -396,6 +393,8 @@ static const struct {
     const char* shapeIdsToIgnore[5];
     const int shapeNumberToIgnore;
 } svgFilesToInvertForLightMode[] = {
+    // BSD
+    { kMode8Mode, "/8Mode/res/SNsoft_Panel.svg", {}, -1 },
     // GPLv3+
     { kModeAutinn, "/Autinn/res/AmpModule.svg", {}, -1 },
     { kModeAutinn, "/Autinn/res/BassModule.svg", {}, -1 },
@@ -904,6 +903,21 @@ bool invertPaintForLightMode(const LightMode mode, NSVGshape* const shape, NSVGp
 
     switch (mode)
     {
+    case kMode8Mode:
+        switch (paint.color)
+        {
+        case 0xff000000:
+            if (std::strcmp(shape->id, "rect1211") == 0)
+                break;
+            return false;
+        case 0xff1a1a1a:
+            if (std::strcmp(shape->id, "rect1523") != 0)
+                break;
+            return false;
+        default:
+            return false;
+        }
+        break;
     case kModeAutinn:
         switch (paint.color)
         {
