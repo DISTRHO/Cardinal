@@ -284,7 +284,9 @@ struct SassyScopeWidget : ImGuiWidget {
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         ImGui::SetNextWindowSize(ImVec2(box.size.x * scaleFactor, box.size.y * scaleFactor));
 
-        do_show_scope_window(module != nullptr ? &module->scope : getFakeScopeInstance(), scaleFactor);
+        ScopeData* const scope = module != nullptr ? &module->scope : getFakeScopeInstance();
+        scope->darkMode = settings::darkMode;
+        do_show_scope_window(scope, scaleFactor);
     }
 
     void onButton(const ButtonEvent& e) override

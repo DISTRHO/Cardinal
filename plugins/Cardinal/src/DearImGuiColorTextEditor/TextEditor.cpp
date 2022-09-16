@@ -2038,11 +2038,11 @@ const TextEditor::Palette & TextEditor::GetDarkPalette()
 const TextEditor::Palette & TextEditor::GetLightPalette()
 {
 	const static Palette p = { {
-			0xff7f7f7f,	// None
+			0xff000000,	// None
 			0xffff0c06,	// Keyword
 			0xff008000,	// Number
 			0xff2020a0,	// String
-			0xff304070, // Char literal
+			0xff000000, // Char literal
 			0xff000000, // Punctuation
 			0xff406060,	// Preprocessor
 			0xff404040, // Identifier

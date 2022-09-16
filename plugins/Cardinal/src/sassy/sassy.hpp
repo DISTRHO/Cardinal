@@ -59,6 +59,7 @@ struct ScopeData {
     int mDisplay = 0;
     int mFFTZoom = 0;
     int mPot = 0;
+    bool darkMode = true;
     float fft1[65536 * 2];
     float fft2[65536 * 2];
     float ffta[65536 * 2];

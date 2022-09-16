@@ -759,11 +759,13 @@ void do_show_scope_window(ScopeData* gScope, const float uiScale)
     }
     else
     {
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, 0xff3f3f3f);
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, 0xff3f3f3f);
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, 0xff3f3f3f);
-        ImGui::PushStyleColor(ImGuiCol_SliderGrab, 0xff7f7f7f);
-        ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, 0xff7f7f7f);
+        const ImU32 bgCol = gScope->darkMode ? 0xff3f3f3f : 0xffc0c0c0;
+        const ImU32 sliderCol = gScope->darkMode ? 0xff7f7f7f : 0xff808080;
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, bgCol);
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, bgCol);
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, bgCol);
+        ImGui::PushStyleColor(ImGuiCol_SliderGrab, sliderCol);
+        ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, sliderCol);
         ImGui::SetNextItemWidth(grid_size * uiScale);
         float x = gScope->mScroll;
         ImGui::SliderFloat("###scroll", &x, -10.0f, 0.0f, "%.3f s");
@@ -810,12 +812,13 @@ void do_show_scope_window(ScopeData* gScope, const float uiScale)
 
     if (gScope->mMode == 0)
     {
+        const ImU32 bgCol = gScope->darkMode ? 0xff3f3f3f : 0xffc0c0c0;
         if (ImGui::Button("Pause", ImVec2(80 * uiScale, 20 * uiScale)))
             gScope->mMode = 1;
         ImGui::Text("Nudge (ms)");
-        ImGui::PushStyleColor(ImGuiCol_Button, 0xff3f3f3f);
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, 0xff3f3f3f);
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, 0xff3f3f3f);
+        ImGui::PushStyleColor(ImGuiCol_Button, bgCol);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, bgCol);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, bgCol);
         ImGui::Button("-0.1", ImVec2(38 * uiScale, 20 * uiScale));
         ImGui::SameLine();
         ImGui::Button("+0.1", ImVec2(38 * uiScale, 20 * uiScale));
