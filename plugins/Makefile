@@ -1906,8 +1906,7 @@ $(BUILD_DIR)/MSM/%.cpp.o: MSM/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MSM_CUSTOM),$(call custom_module_names,$(m),MSM)) \
-		-DpluginInstance=pluginInstance__MSM \
-		-DDARKTHEME
+		-DpluginInstance=pluginInstance__MSM
 
 $(BUILD_DIR)/myth-modules/%.cpp.o: myth-modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

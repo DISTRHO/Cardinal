@@ -2942,6 +2942,10 @@ void updateStaticPluginsDarkMode()
     {
         panelTheme = darkMode ? 1 : 0;
     }
+    // glue the giant
+    {
+        gtg_default_theme = darkMode ? 1 : 0;
+    }
 #endif
 }
 
