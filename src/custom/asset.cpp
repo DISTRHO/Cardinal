@@ -31,6 +31,9 @@
 namespace rack {
 namespace asset {
 
+extern bool forceBlackScrew;
+extern bool forceSilverScrew;
+
 std::string userDir; // ignored
 std::string systemDir; // points to plugin resources dir (or installed/local Rack dir)
 std::string bundlePath; // points to plugin manifests dir (or empty)
@@ -50,10 +53,14 @@ std::string user(std::string filename) {
 
 // get system resource, trimming "res/" prefix if we are loaded as a plugin bundle
 std::string system(std::string filename) {
+    /**/ if (forceBlackScrew && string::endsWith(filename, "/ScrewBlack.svg"))
+        filename = filename.substr(0, filename.size()-15) + "/./ScrewBlack.svg";
+    else if (forceSilverScrew && string::endsWith(filename, "/ScrewSilver.svg"))
+        filename = filename.substr(0, filename.size()-16) + "/./ScrewSilver.svg";
     return system::join(systemDir, bundlePath.empty() ? filename : trim(filename));
 }
 
-// get plugin resource
+// get plugin resource path
 std::string plugin(plugin::Plugin* plugin, std::string filename) {
     DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, {});
     return system::join(plugin->path, filename);
