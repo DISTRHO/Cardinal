@@ -1202,8 +1202,6 @@ protected:
 
         DISTRHO_SAFE_ASSERT_RETURN(data.size() >= 4,);
 
-        const ScopedContext sc(this);
-
         rack::system::removeRecursively(fAutosavePath);
         rack::system::createDirectories(fAutosavePath);
 
@@ -1223,6 +1221,8 @@ protected:
                 rack::system::unarchiveToDirectory(data, fAutosavePath);
             } DISTRHO_SAFE_EXCEPTION_RETURN("setState unarchiveToDirectory",);
         }
+
+        const ScopedContext sc(this);
 
         try {
             context->patch->loadAutosave();
