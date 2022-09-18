@@ -270,11 +270,11 @@ public:
     {
         if (const double sampleRate = getSampleRate())
             if (sampleRate > 0.0)
-                plugin.setSampleRate(sampleRate);
+                plugin.setSampleRate(sampleRate, true);
 
         if (const int samplesPerBlock = getBlockSize())
             if (samplesPerBlock > 0)
-                plugin.setBufferSize(static_cast<uint32_t>(samplesPerBlock));
+                plugin.setBufferSize(static_cast<uint32_t>(samplesPerBlock), true);
 
         if (parameterCount != 0)
         {
@@ -313,8 +313,8 @@ protected:
         DISTRHO_SAFE_ASSERT_RETURN(samplesPerBlock > 0,);
 
         plugin.deactivateIfNeeded();
-        plugin.setSampleRate(sampleRate);
-        plugin.setBufferSize(static_cast<uint32_t>(samplesPerBlock));
+        plugin.setSampleRate(sampleRate, true);
+        plugin.setBufferSize(static_cast<uint32_t>(samplesPerBlock), true);
         plugin.activate();
     }
 
