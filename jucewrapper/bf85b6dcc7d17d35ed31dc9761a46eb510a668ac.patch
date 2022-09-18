@@ -1,0 +1,51 @@
+From bf85b6dcc7d17d35ed31dc9761a46eb510a668ac Mon Sep 17 00:00:00 2001
+From: Sebastian Kraft <sebastian.kraft@nektartech.com>
+Date: Fri, 6 May 2022 09:09:34 +0200
+Subject: [PATCH] Always set sample rate of hosted AU plugins, fixes a bug with
+ plugins reporting incorrect sample rates
+
+---
+ .../juce_AudioUnitPluginFormat.mm             | 25 ++++++++-----------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
+
+diff --git a/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.mm b/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.mm
+index 59c0e06d368..8ee8f9a465c 100644
+--- a/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.mm
++++ b/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.mm
+@@ -1057,25 +1057,22 @@ void prepareToPlay (double newSampleRate, int estimatedSamplesPerBlock) override
+ 
+                     AudioUnitGetProperty (audioUnit, kAudioUnitProperty_SampleRate, scope, static_cast<UInt32> (i), &sampleRate, &sampleRateSize);
+ 
+-                    if (sampleRate != sr)
++                    if (isAUv3) // setting kAudioUnitProperty_SampleRate fails on AUv3s
+                     {
+-                        if (isAUv3) // setting kAudioUnitProperty_SampleRate fails on AUv3s
+-                        {
+-                            AudioStreamBasicDescription stream;
+-                            UInt32 dataSize = sizeof (stream);
+-                            auto err = AudioUnitGetProperty (audioUnit, kAudioUnitProperty_StreamFormat, scope, static_cast<UInt32> (i), &stream, &dataSize);
++                        AudioStreamBasicDescription stream;
++                        UInt32 dataSize = sizeof (stream);
++                        auto err = AudioUnitGetProperty (audioUnit, kAudioUnitProperty_StreamFormat, scope, static_cast<UInt32> (i), &stream, &dataSize);
+ 
+-                            if (err == noErr && dataSize == sizeof (stream))
+-                            {
+-                                stream.mSampleRate = sr;
+-                                AudioUnitSetProperty (audioUnit, kAudioUnitProperty_StreamFormat, scope, static_cast<UInt32> (i), &stream, sizeof (stream));
+-                            }
+-                        }
+-                        else
++                        if (err == noErr && dataSize == sizeof (stream))
+                         {
+-                            AudioUnitSetProperty (audioUnit, kAudioUnitProperty_SampleRate, scope, static_cast<UInt32> (i), &sr, sizeof (sr));
++                            stream.mSampleRate = sr;
++                            AudioUnitSetProperty (audioUnit, kAudioUnitProperty_StreamFormat, scope, static_cast<UInt32> (i), &stream, sizeof (stream));
+                         }
+                     }
++                    else
++                    {
++                        AudioUnitSetProperty (audioUnit, kAudioUnitProperty_SampleRate, scope, static_cast<UInt32> (i), &sr, sizeof (sr));
++                    }
+ 
+                     if (isInput)
+                     {
