@@ -239,6 +239,7 @@ vst3: $(TARGET)
 
 clap: $(TARGET)
 	$(MAKE) clap -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) clap -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 
 clean:
 	rm -f $(TARGET)
