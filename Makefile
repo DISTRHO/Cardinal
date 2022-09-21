@@ -311,10 +311,12 @@ ifeq ($(VST3_SUPPORTED),true)
 	cp -rL bin/CardinalSynth.vst3/Contents/*-* $(DESTDIR)$(PREFIX)/lib/vst3/CardinalSynth.vst3/Contents/
 endif
 
-	install -m 755 bin/Cardinal$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 bin/Cardinal$(APP_EXT)       $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 bin/CardinalNative$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
+
 	cp -rL bin/Cardinal.lv2/resources/* $(DESTDIR)$(PREFIX)/share/cardinal/
 
-	install -m 644 README.md $(DESTDIR)$(PREFIX)/share/doc/cardinal/
+	install -m 644 README.md            $(DESTDIR)$(PREFIX)/share/doc/cardinal/
 	install -m 644 docs/*.md docs/*.png $(DESTDIR)$(PREFIX)/share/doc/cardinal/docs/
 
 # --------------------------------------------------------------
