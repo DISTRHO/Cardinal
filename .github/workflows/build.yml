@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 33
+  CACHE_VERSION: 34
   CARDINAL_UNDER_WINE: 1
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
@@ -57,7 +57,6 @@ jobs:
           PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64 && ./deps/PawPaw/.cleanup.sh linux-aarch64
       - name: Build linux arm64 cross-compiled
         run: |
@@ -142,7 +141,6 @@ jobs:
           PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh linux-armhf && ./deps/PawPaw/.cleanup.sh linux-armhf
       - name: Build linux armhf cross-compiled
         run: |
@@ -223,7 +221,6 @@ jobs:
           PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh linux-i686 && ./deps/PawPaw/.cleanup.sh linux-i686
       - name: Build linux i686
         run: |
@@ -309,7 +306,6 @@ jobs:
           PKG_CONFIG_PATH: /usr/lib/riscv64-linux-gnu/pkgconfig
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh linux-riscv64 && ./deps/PawPaw/.cleanup.sh linux-riscv64
       - name: Build linux riscv64 cross-compiled
         run: |
@@ -382,7 +378,6 @@ jobs:
       - name: Build extra dependencies
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh linux && ./deps/PawPaw/.cleanup.sh linux
       - name: Build linux x86_64
         run: |
@@ -911,7 +906,7 @@ jobs:
             *.zip
 
   win32:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -936,8 +931,8 @@ jobs:
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-          sudo apt-get purge -yqq libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
+          sudo apt-get install -yqq --allow-downgrades libgd3/jammy
+          sudo apt-get purge -yqq libmono* moby* mono* msbuild* php* libgdiplus libpcre2-posix3 nuget
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture i386
@@ -950,7 +945,6 @@ jobs:
       - name: Build extra dependencies
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh win32 && ./deps/PawPaw/.cleanup.sh win32
       - name: Build win32 cross-compiled (base)
         run: |
@@ -964,7 +958,7 @@ jobs:
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win32; popd
-          make -C carla CARLA_BACKEND_NAMESPACE=Cardinal EXTERNAL_PLUGINS=true HAVE_FLUIDSYNTH=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false HAVE_PYQT=true HAVE_QT5=true HAVE_QT5PKG=true STATIC_PLUGIN_TARGET=true USING_CUSTOM_DPF=true CUSTOM_DPF_PATH=$(pwd)/dpf -j $(nproc)
+          make carla-win32 -j $(nproc)
           make -C carla EMBED_TARGET=true TESTING=true dist
           make -C carla EMBED_TARGET=true TESTING=true dist
       - name: Build win64 cross-compiled (packaging)
@@ -1006,7 +1000,7 @@ jobs:
             *.zip
 
   win64:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -1031,8 +1025,8 @@ jobs:
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-          sudo apt-get purge -yqq libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
+          sudo apt-get install -yqq --allow-downgrades libgd3/jammy
+          sudo apt-get purge -yqq libmono* moby* mono* msbuild* php* libgdiplus libpcre2-posix3 nuget
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture i386
@@ -1045,7 +1039,6 @@ jobs:
       - name: Build extra dependencies
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh win64 && ./deps/PawPaw/.cleanup.sh win64
       - name: Build win64 cross-compiled (base)
         run: |
@@ -1059,7 +1052,7 @@ jobs:
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win64; popd
-          make -C carla CARLA_BACKEND_NAMESPACE=Cardinal EXTERNAL_PLUGINS=true HAVE_FLUIDSYNTH=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false HAVE_PYQT=true HAVE_QT5=true HAVE_QT5PKG=true STATIC_PLUGIN_TARGET=true USING_CUSTOM_DPF=true CUSTOM_DPF_PATH=$(pwd)/dpf all win32r -j $(nproc)
+          make carla-win32 -j $(nproc)
           make -C carla EMBED_TARGET=true TESTING=true dist
           make -C carla EMBED_TARGET=true TESTING=true dist
       - name: Build win64 cross-compiled (packaging)
