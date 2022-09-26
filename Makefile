@@ -140,8 +140,7 @@ endif
 # --------------------------------------------------------------
 # MOD builds
 
-EXTRA_MOD_FLAGS  = -I../include/single-precision -fsingle-precision-constant
-
+EXTRA_MOD_FLAGS  = -I../include/single-precision -fsingle-precision-constant -Wno-attributes
 ifeq ($(MODDUO),true)
 EXTRA_MOD_FLAGS += -mno-unaligned-access
 endif
@@ -149,51 +148,9 @@ ifeq ($(WITH_LTO),true)
 EXTRA_MOD_FLAGS += -ffat-lto-objects
 endif
 
-MOD_WORKDIR ?= $(HOME)/mod-workdir
-MOD_ENVIRONMENT = \
-	AR=${1}/host/usr/bin/${2}-gcc-ar \
-	CC=${1}/host/usr/bin/${2}-gcc \
-	CPP=${1}/host/usr/bin/${2}-cpp \
-	CXX=${1}/host/usr/bin/${2}-g++ \
-	LD=${1}/host/usr/bin/${2}-ld \
-	PKG_CONFIG=${1}/host/usr/bin/pkg-config \
-	STRIP=${1}/host/usr/bin/${2}-strip \
-	CFLAGS="-I${1}/staging/usr/include $(EXTRA_MOD_FLAGS)" \
-	CPPFLAGS= \
-	CXXFLAGS="-I${1}/staging/usr/include $(EXTRA_MOD_FLAGS) -Wno-attributes" \
-	LDFLAGS="-L${1}/staging/usr/lib $(EXTRA_MOD_FLAGS)" \
-	EXE_WRAPPER="qemu-${3}-static -L ${1}/target" \
-	HEADLESS=true \
-	MOD_BUILD=true \
-	NOOPT=true \
-	STATIC_BUILD=true
-
-modduo:
-	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduo-static,arm-mod-linux-gnueabihf.static,arm)
-
-modduox:
-	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduox-static,aarch64-mod-linux-gnueabi.static,aarch64)
-
-moddwarf:
-	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/moddwarf,aarch64-mod-linux-gnu,aarch64)
-
-publish:
-	tar -C bin -cz $(subst bin/,,$(wildcard bin/*.lv2)) | base64 | curl -F 'package=@-' http://192.168.51.1/sdk/install && echo
-
-ifneq (,$(findstring modduo-,$(MAKECMDGOALS)))
-$(MAKECMDGOALS):
-	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduo-static,arm-mod-linux-gnueabihf.static,arm) $(subst modduo-,,$(MAKECMDGOALS))
-endif
-
-ifneq (,$(findstring modduox-,$(MAKECMDGOALS)))
-$(MAKECMDGOALS):
-	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduox-static,aarch64-mod-linux-gnueabi.static,aarch64) $(subst modduox-,,$(MAKECMDGOALS))
-endif
-
-ifneq (,$(findstring moddwarf-,$(MAKECMDGOALS)))
-$(MAKECMDGOALS):
-	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/moddwarf,aarch64-mod-linux-gnu,aarch64) $(subst moddwarf-,,$(MAKECMDGOALS))
-endif
+MOD_ENVIRONMENT += HEADLESS=true
+MOD_ENVIRONMENT += MOD_BUILD=true
+MOD_ENVIRONMENT += STATIC_BUILD=true
 
 # --------------------------------------------------------------
 # Individual targets
