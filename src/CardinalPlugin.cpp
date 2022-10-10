@@ -73,6 +73,8 @@ static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount + 2; /
 static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount;
 #endif
 
+extern const std::string CARDINAL_VERSION;
+
 namespace rack {
 namespace asset {
 std::string patchesPath();
@@ -253,7 +255,7 @@ struct Initializer
         factoryTemplatePath = system::join(patchesPath, CARDINAL_TEMPLATE_NAME);
 
         // Log environment
-        INFO("%s %s v%s", APP_NAME.c_str(), APP_EDITION.c_str(), APP_VERSION.c_str());
+        INFO("%s %s %s, compatible with Rack v%s", APP_NAME.c_str(), APP_EDITION.c_str(), CARDINAL_VERSION.c_str(), APP_VERSION.c_str());
         INFO("%s", system::getOperatingSystemInfo().c_str());
         INFO("Binary filename: %s", getBinaryFilename());
         INFO("Bundle path: %s", plugin->getBundlePath());
