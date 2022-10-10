@@ -23,6 +23,7 @@
 #include <string>
 
 namespace rack {
+#ifndef HEADLESS
 namespace asset {
 bool forceBlackScrew = false;
 bool forceSilverScrew = false;
@@ -59,6 +60,7 @@ void updateForcingBlackSilverScrewMode(std::string slug) {
     );
 }
 }
+#endif
 namespace settings {
 bool darkMode = true;
 int rateLimit = 0;
@@ -92,6 +94,7 @@ NVGcolor nvgRGBblank(const unsigned char r, const unsigned char g, const unsigne
 #undef nsvgParseFromFile
 #include <nanosvg.h>
 
+#ifndef HEADLESS
 enum DarkMode {
     kMode21kHz,
     kModeAaronStatic,
@@ -1149,12 +1152,14 @@ bool invertPaintForLightMode(const LightMode mode, NSVGshape* const shape, NSVGp
     paint.color = invertColor(paint.color);
     return true;
 }
+#endif // HEADLESS
 
 extern "C" {
 NSVGimage* nsvgParseFromFileCardinal(const char* filename, const char* units, float dpi);
 void nsvgDeleteCardinal(NSVGimage*);
 }
 
+#ifndef HEADLESS
 struct ExtendedNSVGimage {
     NSVGimage* const handle;
     NSVGimage* handleOrig;
@@ -1239,11 +1244,13 @@ void deleteExtendedNSVGimage(ExtendedNSVGimage& ext)
         ext.handleOrig = nullptr;
     }
 }
+#endif // HEADLESS
 
 NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* const units, const float dpi)
 {
     if (NSVGimage* const handle = nsvgParseFromFile(filename, units, dpi))
     {
+       #ifndef HEADLESS
         const size_t filenamelen = std::strlen(filename);
 
         bool hasDarkMode = false;
@@ -1419,6 +1426,7 @@ postparse:
                     std::memcpy(handle, handleMOD, sizeof(NSVGimage));
             }
         }
+       #endif // HEADLESS
 
         return handle;
     }
@@ -1428,6 +1436,7 @@ postparse:
 
 void nsvgDeleteCardinal(NSVGimage* const handle)
 {
+   #ifndef HEADLESS
     for (auto it = loadedDarkSVGs.begin(), end = loadedDarkSVGs.end(); it != end; ++it)
     {
         ExtendedNSVGimage& ext(*it);
@@ -1451,12 +1460,14 @@ void nsvgDeleteCardinal(NSVGimage* const handle)
         loadedLightSVGs.erase(it);
         break;
     }
+   #endif
 
     nsvgDelete(handle);
 }
 
 void switchDarkMode(const bool darkMode)
 {
+   #ifndef HEADLESS
     if (rack::settings::darkMode == darkMode)
         return;
 
@@ -1477,12 +1488,14 @@ void switchDarkMode(const bool darkMode)
         else if (ext.handleMOD != nullptr)
             std::memcpy(ext.handle, !darkMode ? ext.handleMOD : ext.handleOrig, sizeof(NSVGimage));
     }
+   #endif
 }
 
 namespace rack {
 namespace asset {
 
 void destroy() {
+   #ifndef HEADLESS
     for (auto it = loadedDarkSVGs.begin(), end = loadedDarkSVGs.end(); it != end; ++it)
     {
         ExtendedNSVGimage& ext(*it);
@@ -1497,6 +1510,7 @@ void destroy() {
 
     loadedDarkSVGs.clear();
     loadedLightSVGs.clear();
+   #endif
 }
 
 }
