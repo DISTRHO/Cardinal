@@ -4,12 +4,12 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 36
+  CACHE_VERSION: 35
   CARDINAL_UNDER_WINE: 1
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
-  WITH_LTO: 'true'
+  WITH_LTO: 'false'
 
 jobs:
   linux-arm64:
