@@ -23,8 +23,8 @@
 #define PLUGIN_BRAND "Valley Audio"
 #define PLUGIN_LABEL "Plateau"
 #define PLUGIN_MODEL modelPlateau
-#define PLUGIN_CV_INPUTS {0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-#define PLUGIN_CV_OUTPUTS {0,0}
+#define PLUGIN_CV_INPUTS {Audio,Audio,Bi,Bi,Bi,Bi,Bi,Bi,Bi,Bi,Bi,Bi,Bi,Bi,Bi,Bi,Bi}
+#define PLUGIN_CV_OUTPUTS {Audio,Audio}
 #define PLUGIN_LV2_CATEGORY "lv2:ReverbPlugin"
 
 #include "lv2plugin.cpp"

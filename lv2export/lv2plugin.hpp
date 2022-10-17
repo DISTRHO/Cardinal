@@ -15,14 +15,33 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#include "MSM/src/Phaser.cpp"
+#pragma once
 
-#define PLUGIN_BRAND "MSM"
-#define PLUGIN_LABEL "Phaser"
-#define PLUGIN_MODEL modelPhaserModule
-#define PLUGIN_CV_INPUTS {Bi,Bi,Bi,Audio}
-#define PLUGIN_CV_OUTPUTS {Audio}
-#define PLUGIN_LV2_CATEGORY "lv2:DistortionPlugin"
+#ifndef PLUGIN_BRAND
+# error PLUGIN_BRAND undefined
+#endif
 
-#include "lv2plugin.cpp"
-#include "export.cpp"
+#ifndef PLUGIN_LABEL
+# error PLUGIN_LABEL undefined
+#endif
+
+#ifndef PLUGIN_MODEL
+# error PLUGIN_MODEL undefined
+#endif
+
+#ifndef PLUGIN_CV_INPUTS
+# error PLUGIN_CV_INPUTS undefined
+#endif
+
+#ifndef PLUGIN_CV_OUTPUTS
+# error PLUGIN_CV_OUTPUTS undefined
+#endif
+
+enum PortType {
+    Audio = 0,
+    Bi = 1,
+    Uni = 2,
+};
+
+static constexpr const PortType kCvInputs[] = PLUGIN_CV_INPUTS;
+static constexpr const PortType kCvOutputs[] = PLUGIN_CV_OUTPUTS;

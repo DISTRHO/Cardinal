@@ -15,26 +15,7 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#ifndef PLUGIN_MODEL
-# error PLUGIN_MODEL undefined
-#endif
-
-#ifndef PLUGIN_CV_INPUTS
-# error PLUGIN_CV_INPUTS undefined
-#endif
-
-#ifndef PLUGIN_CV_OUTPUTS
-# error PLUGIN_CV_OUTPUTS undefined
-#endif
-
-enum PortType {
-    Audio = 0,
-    Bi = 1,
-    Uni = 2,
-};
-
-static constexpr const int kCvInputs[] = PLUGIN_CV_INPUTS;
-static constexpr const int kCvOutputs[] = PLUGIN_CV_OUTPUTS;
+#include "lv2plugin.hpp"
 
 #include "src/lv2/buf-size.h"
 #include "src/lv2/options.h"
@@ -185,21 +166,19 @@ static LV2_Handle lv2_instantiate(const LV2_Descriptor*, double sampleRate, cons
 
 // -----------------------------------------------------------------------
 
-#define instancePtr ((PluginLv2*)instance)
-
 static void lv2_connect_port(LV2_Handle instance, uint32_t port, void* dataLocation)
 {
-    instancePtr->lv2_connect_port(port, dataLocation);
+    static_cast<PluginLv2*>(instance)->lv2_connect_port(port, dataLocation);
 }
 
 static void lv2_run(LV2_Handle instance, uint32_t sampleCount)
 {
-    instancePtr->lv2_run(sampleCount);
+    static_cast<PluginLv2*>(instance)->lv2_run(sampleCount);
 }
 
 static void lv2_cleanup(LV2_Handle instance)
 {
-    delete instancePtr;
+    delete static_cast<PluginLv2*>(instance);
 }
 
 // -----------------------------------------------------------------------
@@ -208,8 +187,6 @@ static const void* lv2_extension_data(const char* uri)
 {
     return nullptr;
 }
-
-#undef instancePtr
 
 // -----------------------------------------------------------------------
 
