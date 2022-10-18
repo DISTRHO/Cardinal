@@ -35,6 +35,7 @@
 #include <context.hpp>
 #include <history.hpp>
 #include <patch.hpp>
+#include <settings.hpp>
 #include <string.hpp>
 #include <system.hpp>
 #include <app/Scene.hpp>
@@ -52,16 +53,17 @@
 # include <unistd.h>
 #endif
 
-const std::string CARDINAL_VERSION = "22.05";
+#ifdef DISTRHO_OS_WASM
+# include <emscripten/emscripten.h>
+#endif
+
+const std::string CARDINAL_VERSION = "22.10";
 
 namespace rack {
-namespace settings {
-int rateLimit = 0;
-}
 
 bool isStandalone()
 {
-    return std::strstr(getPluginFormatName(), "JACK") != nullptr;
+    return std::strstr(getPluginFormatName(), "Standalone") != nullptr;
 }
 
 #ifdef ARCH_WIN
@@ -76,6 +78,12 @@ std::string getSpecialPath(const SpecialPath type)
     case kSpecialPathCommonProgramFiles:
         csidl = CSIDL_PROGRAM_FILES_COMMON;
         break;
+    case kSpecialPathProgramFiles:
+        csidl = CSIDL_PROGRAM_FILES;
+        break;
+    case kSpecialPathAppData:
+        csidl = CSIDL_APPDATA;
+        break;
     default:
         return {};
     }
@@ -88,7 +96,27 @@ std::string getSpecialPath(const SpecialPath type)
     return {};
 }
 #endif
+
+#ifdef DISTRHO_OS_WASM
+char* patchFromURL = nullptr;
+char* patchRemoteURL = nullptr;
+char* patchStorageSlug = nullptr;
+#endif
+
+std::string homeDir()
+{
+# ifdef ARCH_WIN
+    return getSpecialPath(kSpecialPathUserProfile);
+# else
+    if (const char* const home = getenv("HOME"))
+        return home;
+    if (struct passwd* const pwd = getpwuid(getuid()))
+        return pwd->pw_dir;
+# endif
+    return {};
 }
+
+} // namespace rack
 
 namespace patchUtils
 {
@@ -102,19 +130,6 @@ static void promptClear(const char* const message, const std::function<void()> a
         return action();
 
     asyncDialog::create(message, action);
-}
-
-static std::string homeDir()
-{
-# ifdef ARCH_WIN
-    return getSpecialPath(kSpecialPathUserProfile);
-# else
-    if (const char* const home = getenv("HOME"))
-        return home;
-    if (struct passwd* const pwd = getpwuid(getuid()))
-        return pwd->pw_dir;
-# endif
-    return {};
 }
 #endif
 
@@ -134,20 +149,26 @@ void loadDialog()
         CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(pcontext->ui);
         DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
 
-        FileBrowserOptions opts;
-        opts.startDir = dir.c_str();
+        DISTRHO_NAMESPACE::FileBrowserOptions opts;
         opts.saving = ui->saving = false;
+        opts.startDir = dir.c_str();
         opts.title = "Open patch";
         ui->openFileBrowser(opts);
     });
 #endif
 }
 
-void loadPathDialog(const std::string& path)
+void loadPathDialog(const std::string& path, const bool asTemplate)
 {
 #ifndef HEADLESS
-    promptClear("The current patch is unsaved. Clear it and open the new patch?", [path]() {
+    promptClear("The current patch is unsaved. Clear it and open the new patch?", [path, asTemplate]() {
         APP->patch->loadAction(path);
+
+        if (asTemplate)
+        {
+            APP->patch->path = "";
+            APP->history->setSaved();
+        }
     });
 #endif
 }
@@ -159,7 +180,7 @@ void loadSelectionDialog()
     std::string selectionDir = asset::user("selections");
     system::createDirectories(selectionDir);
 
-    async_dialog_filebrowser(false, selectionDir.c_str(), "Import selection", [w](char* pathC) {
+    async_dialog_filebrowser(false, nullptr, selectionDir.c_str(), "Import selection", [w](char* pathC) {
         if (!pathC) {
             // No path selected
             return;
@@ -231,9 +252,10 @@ static void saveAsDialog(const bool uncompressed)
     CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(pcontext->ui);
     DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr,);
 
-    FileBrowserOptions opts;
-    opts.startDir = dir.c_str();
+    DISTRHO_NAMESPACE::FileBrowserOptions opts;
     opts.saving = ui->saving = true;
+    opts.defaultName = "patch.vcv";
+    opts.startDir = dir.c_str();
     opts.title = "Save patch";
     ui->savingUncompressed = uncompressed;
     ui->openFileBrowser(opts);
@@ -254,9 +276,21 @@ void saveAsDialogUncompressed()
 #endif
 }
 
+void openBrowser(const std::string& url)
+{
+#ifdef DISTRHO_OS_WASM
+    EM_ASM({
+        window.open(UTF8ToString($0), '_blank');
+    }, url.c_str());
+#else
+    system::openBrowser(url);
+#endif
+}
+
 }
 
 void async_dialog_filebrowser(const bool saving,
+                              const char* const defaultName,
                               const char* const startDir,
                               const char* const title,
                               const std::function<void(char* path)> action)
@@ -271,8 +305,9 @@ void async_dialog_filebrowser(const bool saving,
     // only 1 dialog possible at a time
     DISTRHO_SAFE_ASSERT_RETURN(ui->filebrowserhandle == nullptr,);
 
-    FileBrowserOptions opts;
+    DISTRHO_NAMESPACE::FileBrowserOptions opts;
     opts.saving = saving;
+    opts.defaultName = defaultName;
     opts.startDir = startDir;
     opts.title = title;
 

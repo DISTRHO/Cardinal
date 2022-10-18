@@ -40,6 +40,7 @@
 #include <ui/ProgressBar.hpp>
 #include <ui/Label.hpp>
 #include <engine/Engine.hpp>
+#include <widget/FramebufferWidget.hpp>
 #include <window/Window.hpp>
 #include <asset.hpp>
 #include <context.hpp>
@@ -50,13 +51,24 @@
 #include <patch.hpp>
 #include <library.hpp>
 
+#include "../CardinalCommon.hpp"
+#include "DistrhoStandaloneUtils.hpp"
+
 #ifdef HAVE_LIBLO
 # include <lo/lo.h>
 #endif
 
-#include "../CardinalCommon.hpp"
+void switchDarkMode(bool darkMode);
 
 namespace rack {
+namespace asset {
+std::string patchesPath();
+}
+
+namespace plugin {
+void updateStaticPluginsDarkMode();
+}
+
 namespace app {
 namespace menuBar {
 
@@ -85,19 +97,41 @@ struct MenuButton : ui::Button {
 
 struct FileButton : MenuButton {
 	const bool isStandalone;
+#if !(defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD))
+	std::vector<std::string> demoPatches;
+#endif
 
 	FileButton(const bool standalone)
-		: MenuButton(),  isStandalone(standalone) {}
+		: MenuButton(),  isStandalone(standalone)
+	{
+#if !(defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD))
+		const std::string patchesDir = asset::patchesPath() + DISTRHO_OS_SEP_STR "examples";
+
+		if (system::isDirectory(patchesDir))
+		{
+			demoPatches = system::getEntries(patchesDir);
+			std::sort(demoPatches.begin(), demoPatches.end(), [](const std::string& a, const std::string& b){
+				return string::lowercase(a) < string::lowercase(b);
+			});
+		}
+#endif
+	}
 
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
-		menu->addChild(createMenuItem("New", RACK_MOD_CTRL_NAME "+N", []() {
+#ifndef DISTRHO_OS_WASM
+		const char* const NewShortcut = RACK_MOD_CTRL_NAME "+N";
+#else
+		const char* const NewShortcut = "";
+#endif
+		menu->addChild(createMenuItem("New", NewShortcut, []() {
 			patchUtils::loadTemplateDialog();
 		}));
 
+#ifndef DISTRHO_OS_WASM
 		menu->addChild(createMenuItem("Open / Import...", RACK_MOD_CTRL_NAME "+O", []() {
 			patchUtils::loadDialog();
 		}));
@@ -110,12 +144,31 @@ struct FileButton : MenuButton {
 		menu->addChild(createMenuItem("Save as / Export...", RACK_MOD_CTRL_NAME "+Shift+S", []() {
 			patchUtils::saveAsDialog();
 		}));
-
-		menu->addChild(createMenuItem("Export uncompressed json...", "", []() {
-			patchUtils::saveAsDialogUncompressed();
+#else
+		menu->addChild(createMenuItem("Import patch...", RACK_MOD_CTRL_NAME "+O", []() {
+			patchUtils::loadDialog();
 		}));
 
+		menu->addChild(createMenuItem("Import selection...", "", [=]() {
+			patchUtils::loadSelectionDialog();
+		}, false, true));
+
+		menu->addChild(createMenuItem("Save and download compressed", RACK_MOD_CTRL_NAME "+Shift+S", []() {
+			patchUtils::saveAsDialog();
+		}));
+
+		menu->addChild(createMenuItem("Save and download uncompressed", "", []() {
+			patchUtils::saveAsDialogUncompressed();
+		}));
+#endif
+
+		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
+			patchUtils::revertDialog();
+		}, APP->patch->path.empty()));
+
 #ifdef HAVE_LIBLO
+		menu->addChild(new ui::MenuSeparator);
+
 		if (patchUtils::isRemoteConnected()) {
 			menu->addChild(createMenuItem("Deploy to MOD", "F7", []() {
 				patchUtils::deployToRemote();
@@ -133,24 +186,56 @@ struct FileButton : MenuButton {
 		}
 #endif
 
-		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
-			patchUtils::revertDialog();
-		}, APP->patch->path.empty()));
-
+#ifndef DISTRHO_OS_WASM
 		menu->addChild(new ui::MenuSeparator);
 
 		// Load selection
-		menu->addChild(createMenuItem("Import selection", "", [=]() {
+		menu->addChild(createMenuItem("Import selection...", "", [=]() {
 			patchUtils::loadSelectionDialog();
 		}, false, true));
 
+		menu->addChild(createMenuItem("Export uncompressed json...", "", []() {
+			patchUtils::saveAsDialogUncompressed();
+		}));
+#endif
+
+#if !(defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD))
+		if (!demoPatches.empty())
+		{
+			menu->addChild(new ui::MenuSeparator);
+
+			menu->addChild(createSubmenuItem("Open Demo / Example project", "", [=](ui::Menu* const menu) {
+				for (std::string path : demoPatches) {
+					std::string label = system::getStem(path);
+
+					for (size_t i=0, len=label.size(); i<len; ++i) {
+						if (label[i] == '_')
+							label[i] = ' ';
+					}
+
+					menu->addChild(createMenuItem(label, "", [path]() {
+						patchUtils::loadPathDialog(path, true);
+					}));
+				}
+
+				menu->addChild(new ui::MenuSeparator);
+
+				menu->addChild(createMenuItem("Open PatchStorage.com for more patches", "", []() {
+					patchUtils::openBrowser("https://patchstorage.com/platform/cardinal/");
+				}));
+			}));
+		}
+#endif
+
+#ifndef DISTRHO_OS_WASM
 		if (isStandalone) {
 			menu->addChild(new ui::MenuSeparator);
 
 			menu->addChild(createMenuItem("Quit", RACK_MOD_CTRL_NAME "+Q", []() {
 				APP->window->close();
 			}));
-		};
+		}
+#endif
 	}
 };
 
@@ -423,11 +508,36 @@ struct KnobScrollSensitivitySlider : ui::Slider {
 };
 
 
+static void setAllFramebufferWidgetsDirty(widget::Widget* const widget)
+{
+	for (widget::Widget* child : widget->children)
+	{
+		if (widget::FramebufferWidget* const fbw = dynamic_cast<widget::FramebufferWidget*>(child))
+		{
+			fbw->setDirty();
+			break;
+		}
+		setAllFramebufferWidgetsDirty(child);
+	}
+}
+
+
 struct ViewButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+
+		menu->addChild(createMenuLabel("Appearance"));
+
+		std::string darkModeText;
+		if (settings::darkMode)
+			darkModeText = CHECKMARK_STRING;
+		menu->addChild(createMenuItem("Dark Mode", darkModeText, []() {
+			switchDarkMode(!settings::darkMode);
+			plugin::updateStaticPluginsDarkMode();
+			setAllFramebufferWidgetsDirty(APP->scene);
+		}));
 
 		menu->addChild(createBoolPtrMenuItem("Show tooltips", "", &settings::tooltips));
 
@@ -452,8 +562,18 @@ struct ViewButton : MenuButton {
 		menu->addChild(haloBrightnessSlider);
 
 		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuLabel("Module dragging"));
 
-		// menu->addChild(createBoolPtrMenuItem("Hide cursor while dragging", "", &settings::allowCursorLock));
+		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
+
+		menu->addChild(createBoolPtrMenuItem("Auto-squeeze modules when dragging", "", &settings::squeezeModules));
+
+		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuLabel("Parameters"));
+
+#ifdef DISTRHO_OS_WASM
+		menu->addChild(createBoolPtrMenuItem("Lock cursor while dragging", "", &settings::allowCursorLock));
+#endif
 
 		static const std::vector<std::string> knobModeLabels = {
 			"Linear",
@@ -477,11 +597,20 @@ struct ViewButton : MenuButton {
 		knobScrollSensitivitySlider->box.size.x = 250.0;
 		menu->addChild(knobScrollSensitivitySlider);
 
-		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
+		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuLabel("Window"));
+
+#ifdef DISTRHO_OS_WASM
+		const bool fullscreen = APP->window->isFullScreen();
+		std::string rightText = "F11";
+		if (fullscreen)
+			rightText += " " CHECKMARK_STRING;
+		menu->addChild(createMenuItem("Fullscreen", rightText, [=]() {
+			APP->window->setFullScreen(!fullscreen);
+		}));
+#endif
 
 		menu->addChild(createBoolPtrMenuItem("Invert zoom", "", &settings::invertZoom));
-
-		menu->addChild(new ui::MenuSeparator);
 
 		static const std::vector<std::string> rateLimitLabels = {
 			"None",
@@ -518,6 +647,41 @@ struct EngineButton : MenuButton {
 		menu->addChild(createMenuItem("Performance meters", cpuMeterText, [=]() {
 			settings::cpuMeter ^= true;
 		}));
+
+		if (isUsingNativeAudio()) {
+			if (supportsAudioInput()) {
+				const bool enabled = isAudioInputEnabled();
+				std::string rightText;
+				if (enabled)
+					rightText = CHECKMARK_STRING;
+				menu->addChild(createMenuItem("Enable Audio Input", rightText, [enabled]() {
+					if (!enabled)
+						requestAudioInput();
+				}));
+			}
+
+			if (supportsMIDI()) {
+				std::string rightText;
+				if (isMIDIEnabled())
+					rightText = CHECKMARK_STRING;
+				menu->addChild(createMenuItem("Enable/Reconnect MIDI", rightText, []() {
+					requestMIDI();
+				}));
+			}
+
+			if (supportsBufferSizeChanges()) {
+				static const std::vector<uint32_t> bufferSizes = {256, 512, 1024, 2048, 4096, 8192, 16384};
+				const uint32_t currentBufferSize = getBufferSize();
+				menu->addChild(createSubmenuItem("Buffer Size", std::to_string(currentBufferSize), [=](ui::Menu* menu) {
+					for (uint32_t bufferSize : bufferSizes) {
+						menu->addChild(createCheckMenuItem(std::to_string(bufferSize), "",
+							[=]() {return currentBufferSize == bufferSize;},
+							[=]() {requestBufferSizeChange(bufferSize);}
+						));
+					}
+				}));
+			}
+		}
 	}
 };
 
@@ -534,11 +698,11 @@ struct HelpButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 		menu->addChild(createMenuItem("Rack User manual", "F1", [=]() {
-			system::openBrowser("https://vcvrack.com/manual");
+			patchUtils::openBrowser("https://vcvrack.com/manual");
 		}));
 
 		menu->addChild(createMenuItem("Cardinal Project page", "", [=]() {
-			system::openBrowser("https://github.com/DISTRHO/Cardinal/");
+			patchUtils::openBrowser("https://github.com/DISTRHO/Cardinal/");
 		}));
 
 		menu->addChild(new ui::MenuSeparator);
@@ -596,7 +760,7 @@ struct MenuBar : widget::OpaqueWidget {
 
 	MenuBar(const bool isStandalone)
 		: widget::OpaqueWidget()
-    {
+	{
 		const float margin = 5;
 		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
 

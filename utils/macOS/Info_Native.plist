@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>CardinalNative</string>
+	<key>CFBundleIconFile</key>
+	<string>distrho.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>CardinalNative</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSRequiresAquaSystemAppearance</key>
+	<false/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Cardinal requires network permissions for remote OSC control.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Cardinal requires microphone permissions for audio input.</string>
+</dict>
+</plist>

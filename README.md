@@ -1,9 +1,10 @@
-<!-- # DISTRHO Cardinal -->
+# DISTRHO Cardinal
 
 *Cardinal, the Rack!*
 
 Cardinal is a free and open-source virtual modular synthesizer plugin,
-available as JACK standalone and AU, LV2, VST2 and VST3 audio plugin for FreeBSD, Linux, macOS and Windows.  
+available as CLAP, LV2, VST2 and VST3 audio plugin for FreeBSD, Linux, macOS and Windows.  
+Plus AU and JACK or Native audio standalone for some systems.  
 It is based on the popular [VCV Rack](https://vcvrack.com/) but with a focus on being a fully self-contained plugin version.
 
 More specifically, this is a [DPF-based](https://github.com/DISTRHO/DPF/)
@@ -19,24 +20,21 @@ All "Core" modules from Rack have been replaced by Cardinal equivalents, simplif
 Cardinal does not load external modules and does not connect to the official Rack library/store.  
 All VCV branding has been removed (to the best of our knowledge) in order to avoid any trademark issues.
 
-The VST3 version is in progress, already part of the build but still experimental.
-
 
 ## Current status
 
-With the exception of a few bugs, Cardinal can be considered stable.  
-Though currently the following should be noted:
+Cardinal should be considered stable, if you spot any bugs please report them.  
+Currently the following should be noted:
 
-- Keyboard input does not always work in some hosts [#24](https://github.com/DISTRHO/Cardinal/issues/24)
-- VST3 support incomplete/experimental [#41](https://github.com/DISTRHO/Cardinal/issues/41)
-- Windows 32bit builds do not work well [#80](https://github.com/DISTRHO/Cardinal/issues/80)
+- CLAP support is a work-in-progress [DPF#383](https://github.com/DISTRHO/DPF/issues/383)
+- Windows 32bit builds still have a few problematic modules [#80](https://github.com/DISTRHO/Cardinal/issues/80)
 
 ### Stable release
 
 Cardinal releases have official builds for Linux, macOS and Windows.  
 You can find these under https://github.com/DISTRHO/Cardinal/releases.
 
-There are Linux builds for various architectures (armhf, arm64, i686 and x86_64), macOS "universal" (arm64 + intel) and Windows 32 and 64bit builds.
+There are Linux builds for various architectures (armhf, arm64, i686, riscv64 and x86_64), macOS "universal" (arm64 + intel) and Windows 32 and 64bit builds.
 Both macOS and Windows builds have an installer.  
 Install instructions are available [here](https://github.com/DISTRHO/Cardinal/wiki/Install).
 
@@ -66,9 +64,10 @@ All variants have MIDI input and output support.
 
 ### Main
 
-This variant provides 8 audio inputs and outputs and 10 CV inputs and outputs.  
+This variant provides 8 audio inputs and outputs and 10 CV inputs and outputs.
 
-NOTE: Due to AU and VST2 formats not supporting CV ports, this variant is not available for those formats.
+NOTE: Due to AU and VST2 formats not supporting CV ports, this variant is not available for those formats.  
+NOTE: This variant is not available in CLAP yet, to be added in a later release
 
 ### Synth
 
@@ -86,10 +85,6 @@ Plugin type is set as regular "effect".
 Because people will ask for it. It is, well... Rack.  
 But a couple of modules background's have their colors flipped, because damn we want proper dark mode!
 
-### Init / Default patch
-
-![screenshot](docs/Screenshot_Init-Patch.png "Screenshot")
-
 ### Module browser
 
 ![screenshot](docs/Screenshot_Module-Browser.png "Screenshot")
@@ -102,6 +97,10 @@ But a couple of modules background's have their colors flipped, because damn we 
 
 ![screenshot](docs/Screenshot_Carla+Ildaeil.png "Screenshot")
 
+### Custom Fundamental modules design
+
+![screenshot](docs/Screenshot_Fundamental.png "Screenshot")
+
 
 ## Included modules
 
@@ -110,11 +109,13 @@ At the moment the following 3rd-party modules are provided:
 - 21kHz
 - 8Mode
 - Aaron Static
+- alef's bits
 - AlgoritmArte
 - Amalgamated Harmonics
 - Animated Circuits
 - Arable Instruments
 - Aria Salvatrice
+- AS
 - Audible Instruments
 - Autinn
 - Axioma
@@ -125,15 +126,18 @@ At the moment the following 3rd-party modules are provided:
 - Catro/Modulo
 - cf
 - ChowDSP
+- dBiz
 - DrumKit
 - E-Series
 - ExpertSleepers Encoders
 - Extratone
 - Fehler Fabrik
+- forsitan modulare
 - Fundamental
 - Glue the Giant
 - GoodSheperd
 - Grande
+- H4N4 Modules
 - Hampton Harmonics
 - HetrickCV
 - ihtsyn
@@ -152,6 +156,7 @@ At the moment the following 3rd-party modules are provided:
 - Mog
 - mscHack
 - MSM
+- Myth
 - Nonlinear Circuits
 - Orbits
 - Parable Instruments
@@ -169,7 +174,7 @@ At the moment the following 3rd-party modules are provided:
 - ZetaCarinae
 - ZZC
 
-Additionally Cardinal provides its own modules for DAW/Host automation, time position and internal plugin hosting.
+Additionally Cardinal provides its own modules for DAW/Host automation, time position, audio to CV pitch conversion and internal plugin hosting.
 
 ### Adding modules
 

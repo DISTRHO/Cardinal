@@ -21,7 +21,7 @@
 #include "DistrhoUtils.hpp"
 
 #ifndef HEADLESS
-# include "dgl/Base.hpp"
+# include "../dgl/Base.hpp"
 #else
 # include "extra/LeakDetector.hpp"
 #endif
@@ -36,6 +36,7 @@ static constexpr const uint32_t kModuleParameters = 24;
 enum CardinalVariant {
     kCardinalVariantMain,
     kCardinalVariantFX,
+    kCardinalVariantNative,
     kCardinalVariantSynth,
 };
 

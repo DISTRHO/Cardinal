@@ -30,6 +30,19 @@
 #include <ui/MenuSeparator.hpp>
 #include <window/Window.hpp>
 
+#ifdef DPF_RUNTIME_TESTING
+# include <plugin.hpp>
+#endif
+
+#ifdef DISTRHO_OS_WASM
+# include <ui/Button.hpp>
+# include <ui/Label.hpp>
+# include <ui/MenuOverlay.hpp>
+# include <ui/SequentialLayout.hpp>
+# include "CardinalCommon.hpp"
+# include <emscripten/emscripten.h>
+#endif
+
 #ifdef NDEBUG
 # undef DEBUG
 #endif
@@ -39,157 +52,6 @@
 #include "PluginContext.hpp"
 #include "WindowParameters.hpp"
 
-GLFWAPI int glfwGetKeyScancode(int) { return 0; }
-
-GLFWAPI const char* glfwGetClipboardString(GLFWwindow*)
-{
-    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
-    DISTRHO_SAFE_ASSERT_RETURN(context != nullptr, nullptr);
-    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr, nullptr);
-
-    const char* mimeType = nullptr;
-    size_t dataSize = 0;
-
-    if (const void* const clipboard = context->ui->getClipboard(mimeType, dataSize))
-    {
-        if (mimeType == nullptr || std::strcmp(mimeType, "text/plain") != 0)
-            return nullptr;
-        return static_cast<const char*>(clipboard);
-    }
-
-    return nullptr;
-}
-
-GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char* const text)
-{
-    DISTRHO_SAFE_ASSERT_RETURN(text != nullptr,);
-
-    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
-    DISTRHO_SAFE_ASSERT_RETURN(context != nullptr,);
-    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr,);
-
-    context->ui->setClipboard(nullptr, text, std::strlen(text)+1);
-}
-
-GLFWAPI void glfwSetCursor(GLFWwindow*, GLFWcursor* const cursor)
-{
-    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
-    DISTRHO_SAFE_ASSERT_RETURN(context != nullptr,);
-    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr,);
-
-    context->ui->setCursor(cursor != nullptr ? kMouseCursorDiagonal : kMouseCursorArrow);
-}
-
-GLFWAPI double glfwGetTime(void)
-{
-    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
-    DISTRHO_SAFE_ASSERT_RETURN(context != nullptr, 0.0);
-    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr, 0.0);
-
-    return context->ui->getApp().getTime();
-}
-
-GLFWAPI const char* glfwGetKeyName(const int key, int)
-{
-    switch (key)
-    {
-    case '\"': return "\"";
-    case '\'': return "\'";
-    case '\\': return "\\";
-    case ' ': return " ";
-    case '!': return "!";
-    case '#': return "#";
-    case '$': return "$";
-    case '%': return "%";
-    case '&': return "&";
-    case '(': return "(";
-    case ')': return ")";
-    case '*': return "*";
-    case '+': return "+";
-    case ',': return ",";
-    case '-': return "-";
-    case '.': return ".";
-    case '/': return "/";
-    case '0': return "0";
-    case '1': return "1";
-    case '2': return "2";
-    case '3': return "3";
-    case '4': return "4";
-    case '5': return "5";
-    case '6': return "6";
-    case '7': return "7";
-    case '8': return "8";
-    case '9': return "9";
-    case ':': return ":";
-    case ';': return ";";
-    case '<': return "<";
-    case '=': return "=";
-    case '>': return ">";
-    case '?': return "?";
-    case '@': return "@";
-    /* Rack expects lowercase, forced below
-    case 'A': return "A";
-    case 'B': return "B";
-    case 'C': return "C";
-    case 'D': return "D";
-    case 'E': return "E";
-    case 'F': return "F";
-    case 'G': return "G";
-    case 'H': return "H";
-    case 'I': return "I";
-    case 'J': return "J";
-    case 'K': return "K";
-    case 'L': return "L";
-    case 'M': return "M";
-    case 'N': return "N";
-    case 'O': return "O";
-    case 'P': return "P";
-    case 'Q': return "Q";
-    case 'R': return "R";
-    case 'S': return "S";
-    case 'T': return "T";
-    case 'U': return "U";
-    case 'V': return "V";
-    case 'W': return "W";
-    case 'X': return "X";
-    case 'Y': return "Y";
-    case 'Z': return "Z";
-    */
-    case '[': return "[";
-    case ']': return "]";
-    case '^': return "^";
-    case '_': return "_";
-    case '`': return "`";
-    case 'a': case 'A': return "a";
-    case 'b': case 'B': return "b";
-    case 'c': case 'C': return "c";
-    case 'd': case 'D': return "d";
-    case 'e': case 'E': return "e";
-    case 'f': case 'F': return "f";
-    case 'g': case 'G': return "g";
-    case 'h': case 'H': return "h";
-    case 'i': case 'I': return "i";
-    case 'j': case 'J': return "j";
-    case 'k': case 'K': return "k";
-    case 'l': case 'L': return "l";
-    case 'm': case 'M': return "m";
-    case 'n': case 'N': return "n";
-    case 'o': case 'O': return "o";
-    case 'p': case 'P': return "p";
-    case 'q': case 'Q': return "q";
-    case 'r': case 'R': return "r";
-    case 's': case 'S': return "s";
-    case 't': case 'T': return "t";
-    case 'u': case 'U': return "u";
-    case 'v': case 'V': return "v";
-    case 'w': case 'W': return "w";
-    case 'x': case 'X': return "x";
-    case 'y': case 'Y': return "y";
-    case 'z': case 'Z': return "z";
-    default: return nullptr;
-    }
-}
-
 namespace rack {
 namespace app {
     widget::Widget* createMenuBar(bool isStandalone);
@@ -197,6 +59,7 @@ namespace app {
 namespace window {
     void WindowSetPluginUI(Window* window, DISTRHO_NAMESPACE::UI* ui);
     void WindowSetMods(Window* window, int mods);
+    void WindowSetInternalSize(rack::window::Window* window, math::Vec size);
 }
 }
 
@@ -238,13 +101,216 @@ void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, 
 
 // -----------------------------------------------------------------------------------------------------------
 
+#ifdef DISTRHO_OS_WASM
+struct WasmWelcomeDialog : rack::widget::OpaqueWidget
+{
+    static const constexpr float margin = 10;
+    static const constexpr float buttonWidth = 110;
+
+    WasmWelcomeDialog()
+    {
+        using rack::ui::Button;
+        using rack::ui::Label;
+        using rack::ui::MenuOverlay;
+        using rack::ui::SequentialLayout;
+
+        box.size = rack::math::Vec(550, 310);
+
+        SequentialLayout* const layout = new SequentialLayout;
+        layout->box.pos = rack::math::Vec(0, 0);
+        layout->box.size = box.size;
+        layout->orientation = SequentialLayout::VERTICAL_ORIENTATION;
+        layout->margin = rack::math::Vec(margin, margin);
+        layout->spacing = rack::math::Vec(margin, margin);
+        layout->wrap = false;
+        addChild(layout);
+
+        SequentialLayout* const contentLayout = new SequentialLayout;
+        contentLayout->spacing = rack::math::Vec(margin, margin);
+        layout->addChild(contentLayout);
+
+        SequentialLayout* const buttonLayout = new SequentialLayout;
+        buttonLayout->alignment = SequentialLayout::CENTER_ALIGNMENT;
+        buttonLayout->box.size = box.size;
+        buttonLayout->spacing = rack::math::Vec(margin, margin);
+        layout->addChild(buttonLayout);
+
+        Label* const label = new Label;
+        label->box.size.x = box.size.x - 2*margin;
+        label->box.size.y = box.size.y - 2*margin - 40;
+        label->fontSize = 20;
+        label->text = ""
+            "Welcome to Cardinal on the Web!\n"
+            "\n"
+            "If using mobile/touch devices, please note:\n"
+            " - Single quick press does simple mouse click\n"
+            " - Press & move does click & drag action\n"
+            " - Press & hold does right-click (and opens module browser)\n"
+            "\n"
+            "Still a bit experimental, so proceed with caution.\n"
+            "Have fun!";
+        contentLayout->addChild(label);
+
+        struct JoinDiscussionButton : Button {
+            WasmWelcomeDialog* dialog;
+            void onAction(const ActionEvent& e) override {
+                patchUtils::openBrowser("https://github.com/DISTRHO/Cardinal/issues/287");
+                dialog->getParent()->requestDelete();
+            }
+        };
+        JoinDiscussionButton* const discussionButton = new JoinDiscussionButton;
+        discussionButton->box.size.x = buttonWidth;
+        discussionButton->text = "Join discussion";
+        discussionButton->dialog = this;
+        buttonLayout->addChild(discussionButton);
+
+        struct DismissButton : Button {
+            WasmWelcomeDialog* dialog;
+            void onAction(const ActionEvent& e) override {
+                dialog->getParent()->requestDelete();
+            }
+        };
+        DismissButton* const dismissButton = new DismissButton;
+        dismissButton->box.size.x = buttonWidth;
+        dismissButton->text = "Dismiss";
+        dismissButton->dialog = this;
+        buttonLayout->addChild(dismissButton);
+
+        MenuOverlay* const overlay = new MenuOverlay;
+        overlay->bgColor = nvgRGBAf(0, 0, 0, 0.33);
+        overlay->addChild(this);
+        APP->scene->addChild(overlay);
+    }
+
+    void step() override
+    {
+        OpaqueWidget::step();
+        box.pos = parent->box.size.minus(box.size).div(2).round();
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
+        Widget::draw(args);
+    }
+};
+
+struct WasmRemotePatchLoadingDialog : rack::widget::OpaqueWidget
+{
+    static const constexpr float margin = 10;
+
+    rack::ui::MenuOverlay* overlay;
+
+    WasmRemotePatchLoadingDialog(const bool isFromPatchStorage)
+    {
+        using rack::ui::Label;
+        using rack::ui::MenuOverlay;
+        using rack::ui::SequentialLayout;
+
+        box.size = rack::math::Vec(300, 40);
+
+        SequentialLayout* const layout = new SequentialLayout;
+        layout->box.pos = rack::math::Vec(0, 0);
+        layout->box.size = box.size;
+        layout->alignment = SequentialLayout::CENTER_ALIGNMENT;
+        layout->margin = rack::math::Vec(margin, margin);
+        layout->spacing = rack::math::Vec(margin, margin);
+        layout->wrap = false;
+        addChild(layout);
+
+        Label* const label = new Label;
+        label->box.size.x = box.size.x - 2*margin;
+        label->box.size.y = box.size.y - 2*margin;
+        label->fontSize = 16;
+        label->text = isFromPatchStorage
+                    ? "Loading patch from PatchStorage...\n"
+                    : "Loading remote patch...\n";
+        layout->addChild(label);
+
+        overlay = new MenuOverlay;
+        overlay->bgColor = nvgRGBAf(0, 0, 0, 0.33);
+        overlay->addChild(this);
+        APP->scene->addChild(overlay);
+    }
+
+    void step() override
+    {
+        OpaqueWidget::step();
+        box.pos = parent->box.size.minus(box.size).div(2).round();
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
+        Widget::draw(args);
+    }
+};
+
+static void downloadRemotePatchFailed(const char* const filename)
+{
+    d_stdout("downloadRemotePatchFailed %s", filename);
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+    CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(context->ui);
+
+    if (ui->psDialog != nullptr)
+    {
+        ui->psDialog->overlay->requestDelete();
+        ui->psDialog = nullptr;
+        asyncDialog::create("Failed to fetch remote patch");
+    }
+
+    using namespace rack;
+    context->patch->templatePath = system::join(asset::systemDir, "init/wasm.vcv"); // FIXME
+    context->patch->loadTemplate();
+    context->scene->rackScroll->reset();
+}
+
+static void downloadRemotePatchSucceeded(const char* const filename)
+{
+    d_stdout("downloadRemotePatchSucceeded %s | %s", filename, APP->patch->templatePath.c_str());
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+    CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(context->ui);
+
+    ui->psDialog->overlay->requestDelete();
+    ui->psDialog = nullptr;
+
+    if (FILE* f = fopen(filename, "r"))
+    {
+        uint8_t buf[8] = {};
+        fread(buf, 8, 1, f);
+        d_stdout("read patch %x %x %x %x %x %x %x %x",
+                buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7]);
+        fclose(f);
+    }
+
+    try {
+        context->patch->load(filename);
+    } catch (rack::Exception& e) {
+        const std::string message = rack::string::f("Could not load patch: %s", e.what());
+        asyncDialog::create(message.c_str());
+        return;
+    }
+
+    context->scene->rackScroll->reset();
+    context->patch->path = "";
+    context->history->setSaved();
+}
+#endif
+
+// -----------------------------------------------------------------------------------------------------------
+
 class CardinalUI : public CardinalBaseUI,
                    public WindowParametersCallback
 {
     rack::math::Vec lastMousePos;
     WindowParameters windowParameters;
     int rateLimitStep = 0;
-    bool firstIdle = true;
+   #ifdef DISTRHO_OS_WASM
+    int8_t counterForFirstIdlePoint = 0;
+   #endif
+   #ifdef DPF_RUNTIME_TESTING
+    bool inSelfTest = false;
+   #endif
 
     struct ScopedContext {
         CardinalPluginContext* const context;
@@ -268,13 +334,12 @@ class CardinalUI : public CardinalBaseUI,
         {
             if (context->window != nullptr)
                 WindowParametersSave(context->window);
-            rack::contextSet(nullptr);
         }
     };
 
 public:
     CardinalUI()
-        : CardinalBaseUI(1228, 666)
+        : CardinalBaseUI(DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT)
     {
         Window& window(getWindow());
 
@@ -286,7 +351,7 @@ public:
         setGeometryConstraints(648 * scaleFactor, 538 * scaleFactor);
 
         if (scaleFactor != 1.0)
-            setSize(1228 * scaleFactor, 666 * scaleFactor);
+            setSize(DISTRHO_UI_DEFAULT_WIDTH * scaleFactor, DISTRHO_UI_DEFAULT_HEIGHT * scaleFactor);
 
         rack::contextSet(context);
 
@@ -333,6 +398,26 @@ public:
             }
         }
 
+       #ifdef DISTRHO_OS_WASM
+        if (rack::patchStorageSlug != nullptr)
+        {
+            psDialog = new WasmRemotePatchLoadingDialog(true);
+        }
+        else if (rack::patchRemoteURL != nullptr)
+        {
+            psDialog = new WasmRemotePatchLoadingDialog(false);
+        }
+        else if (rack::patchFromURL != nullptr)
+        {
+            static_cast<CardinalBasePlugin*>(context->plugin)->setState("patch", rack::patchFromURL);
+            rack::contextSet(context);
+        }
+        else
+        {
+            new WasmWelcomeDialog();
+        }
+       #endif
+
         context->window->step();
 
         rack::contextSet(nullptr);
@@ -368,11 +453,95 @@ public:
 
     void uiIdle() override
     {
-        if (firstIdle)
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest)
         {
-            firstIdle = false;
-            getWindow().focus();
+            context->window->step();
+            return;
         }
+
+        if (context->plugin->isSelfTestInstance())
+        {
+            inSelfTest = true;
+
+            Application& app(getApp());
+
+            const ScopedContext sc(this);
+
+            context->patch->clear();
+            app.idle();
+
+            const rack::math::Vec mousePos(getWidth()/2,getHeight()/2);
+            context->event->handleButton(mousePos, GLFW_MOUSE_BUTTON_LEFT, GLFW_RELEASE, 0x0);
+            context->event->handleHover(mousePos, rack::math::Vec(0,0));
+            app.idle();
+
+            for (rack::plugin::Plugin* p : rack::plugin::plugins)
+            {
+                for (rack::plugin::Model* m : p->models)
+                {
+                    d_stdout(">>>>>>>>>>>>>>>>> LOADING module %s : %s", p->slug.c_str(), m->slug.c_str());
+                    rack::engine::Module* const module = m->createModule();
+                    DISTRHO_SAFE_ASSERT_CONTINUE(module != nullptr);
+
+                    rack::CardinalPluginModelHelper* const helper = dynamic_cast<rack::CardinalPluginModelHelper*>(m);
+                    DISTRHO_SAFE_ASSERT_CONTINUE(helper != nullptr);
+
+                    d_stdout(">>>>>>>>>>>>>>>>> LOADING moduleWidget %s : %s", p->slug.c_str(), m->slug.c_str());
+                    rack::app::ModuleWidget* const moduleWidget = helper->createModuleWidget(module);
+                    DISTRHO_SAFE_ASSERT_CONTINUE(moduleWidget != nullptr);
+
+                    d_stdout(">>>>>>>>>>>>>>>>> ADDING TO ENGINE %s : %s", p->slug.c_str(), m->slug.c_str());
+                    context->engine->addModule(module);
+
+                    d_stdout(">>>>>>>>>>>>>>>>> ADDING TO RACK VIEW %s : %s", p->slug.c_str(), m->slug.c_str());
+                    context->scene->rack->addModuleAtMouse(moduleWidget);
+
+                    for (int i=5; --i>=0;)
+                        app.idle();
+
+                    d_stdout(">>>>>>>>>>>>>>>>> REMOVING FROM RACK VIEW %s : %s", p->slug.c_str(), m->slug.c_str());
+                    context->scene->rack->removeModule(moduleWidget);
+                    app.idle();
+
+                    d_stdout(">>>>>>>>>>>>>>>>> DELETING module + moduleWidget %s : %s", p->slug.c_str(), m->slug.c_str());
+                    delete moduleWidget;
+
+                    app.idle();
+                }
+            }
+
+            inSelfTest = false;
+        }
+       #endif
+
+       #ifdef DISTRHO_OS_WASM
+        if (counterForFirstIdlePoint >= 0 && ++counterForFirstIdlePoint == 30)
+        {
+            counterForFirstIdlePoint = -1;
+
+            if (rack::patchStorageSlug != nullptr)
+            {
+                std::string url("/patchstorage.php?slug=");
+                url += rack::patchStorageSlug;
+                std::free(rack::patchStorageSlug);
+                rack::patchStorageSlug = nullptr;
+
+                emscripten_async_wget(url.c_str(), context->patch->templatePath.c_str(),
+                                      downloadRemotePatchSucceeded, downloadRemotePatchFailed);
+            }
+            else if (rack::patchRemoteURL != nullptr)
+            {
+                std::string url("/patchurl.php?url=");
+                url += rack::patchRemoteURL;
+                std::free(rack::patchRemoteURL);
+                rack::patchRemoteURL = nullptr;
+
+                emscripten_async_wget(url.c_str(), context->patch->templatePath.c_str(),
+                                      downloadRemotePatchSucceeded, downloadRemotePatchFailed);
+            }
+        }
+       #endif
 
         if (filebrowserhandle != nullptr && fileBrowserIdle(filebrowserhandle))
         {
@@ -460,6 +629,9 @@ public:
             break;
         case kWindowParameterInvertZoom:
             windowParameters.invertZoom = value > 0.5f;
+            break;
+        case kWindowParameterSqueezeModulePositions:
+            windowParameters.squeezeModules = value > 0.5f;
             break;
         default:
             return;
@@ -557,6 +729,9 @@ protected:
         case kWindowParameterInvertZoom:
             windowParameters.invertZoom = value > 0.5f;
             break;
+        case kWindowParameterSqueezeModulePositions:
+            windowParameters.squeezeModules = value > 0.5f;
+            break;
         default:
             return;
         }
@@ -611,6 +786,13 @@ protected:
 
     bool onMouse(const MouseEvent& ev) override
     {
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest) return false;
+       #endif
+
+        if (ev.press)
+            getWindow().focus();
+
         const int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
         int mods = glfwMods(ev.mod);
 
@@ -619,13 +801,8 @@ protected:
         switch (ev.button)
         {
         case 1: button = GLFW_MOUSE_BUTTON_LEFT;   break;
-       #ifdef DISTRHO_OS_MAC
         case 2: button = GLFW_MOUSE_BUTTON_RIGHT;  break;
         case 3: button = GLFW_MOUSE_BUTTON_MIDDLE; break;
-       #else
-        case 2: button = GLFW_MOUSE_BUTTON_MIDDLE; break;
-        case 3: button = GLFW_MOUSE_BUTTON_RIGHT;  break;
-       #endif
         default:
             button = ev.button;
             break;
@@ -650,6 +827,10 @@ protected:
 
     bool onMotion(const MotionEvent& ev) override
     {
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest) return false;
+       #endif
+
         const rack::math::Vec mousePos = rack::math::Vec(ev.pos.getX(), ev.pos.getY()).div(getScaleFactor()).round();
         const rack::math::Vec mouseDelta = mousePos.minus(lastMousePos);
 
@@ -661,10 +842,12 @@ protected:
 
     bool onScroll(const ScrollEvent& ev) override
     {
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest) return false;
+       #endif
+
         rack::math::Vec scrollDelta = rack::math::Vec(ev.delta.getX(), ev.delta.getY());
-#ifdef DISTRHO_OS_MAC
-        scrollDelta = scrollDelta.mult(10.0);
-#else
+#ifndef DISTRHO_OS_MAC
         scrollDelta = scrollDelta.mult(50.0);
 #endif
 
@@ -675,6 +858,10 @@ protected:
 
     bool onCharacterInput(const CharacterInputEvent& ev) override
     {
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest) return false;
+       #endif
+
         if (ev.character < ' ' || ev.character >= kKeyDelete)
             return false;
 
@@ -685,6 +872,10 @@ protected:
 
     bool onKeyboard(const KeyboardEvent& ev) override
     {
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest) return false;
+       #endif
+
         const int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
         const int mods = glfwMods(ev.mod);
 
@@ -769,7 +960,7 @@ protected:
         UI::onResize(ev);
 
         if (context->window != nullptr)
-            context->window->setSize(rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
+            WindowSetInternalSize(context->window, rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
 
         const double scaleFactor = getScaleFactor();
         char sizeString[64];
@@ -778,14 +969,13 @@ protected:
         setState("windowSize", sizeString);
     }
 
-    void uiFocus(const bool focus, const CrossingMode mode) override
+    void uiFocus(const bool focus, CrossingMode) override
     {
-        if (focus)
-        {
-            if (mode == kCrossingNormal)
-                getWindow().focus();
-        }
-        else
+       #ifdef DPF_RUNTIME_TESTING
+        if (inSelfTest) return;
+       #endif
+
+        if (!focus)
         {
             const ScopedContext sc(this, 0);
             context->event->handleLeave();

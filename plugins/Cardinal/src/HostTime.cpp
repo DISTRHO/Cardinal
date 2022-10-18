@@ -16,6 +16,7 @@
  */
 
 #include "plugincontext.hpp"
+#include "ModuleWidgets.hpp"
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -92,12 +93,13 @@ struct HostTime : TerminalModule {
         {
             if (d_isZero(tick))
             {
-                pulseReset.trigger();
-                pulseClock.trigger();
                 pulseBeat.trigger();
                 if (timeInfo.beat == 1)
                     pulseBar.trigger();
             }
+
+            if (d_isZero(tickClock))
+                pulseClock.trigger();
 
             if (timeInfo.reset)
             {
@@ -171,7 +173,7 @@ struct HostTime : TerminalModule {
 // --------------------------------------------------------------------------------------------------------------------
 
 #ifndef HEADLESS
-struct HostTimeWidget : ModuleWidget {
+struct HostTimeWidget : ModuleWidgetWith8HP {
     static constexpr const float startX = 10.0f;
     static constexpr const float startY_top = 71.0f;
     static constexpr const float startY_cv = 115.0f;
@@ -187,10 +189,7 @@ struct HostTimeWidget : ModuleWidget {
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostTime.svg")));
         monoFontPath = asset::system("res/fonts/ShareTechMono-Regular.ttf");
 
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        createAndAddScrews();
 
         addOutput(createOutput<PJ301MPort>(Vec(startX, startY_cv + 0 * padding), m, HostTime::kHostTimeRolling));
         addOutput(createOutput<PJ301MPort>(Vec(startX, startY_cv + 1 * padding), m, HostTime::kHostTimeReset));
@@ -214,21 +213,17 @@ struct HostTimeWidget : ModuleWidget {
     {
         const float y = startY_cv + offset * padding;
         nvgBeginPath(vg);
-        nvgRoundedRect(vg, startX - 1.0f, y - 2.0f, box.size.x - (startX + 1) * 2, 28.0f, 4);
-        nvgFillColor(vg, nvgRGB(0xd0, 0xd0, 0xd0));
+        nvgRoundedRect(vg, startX - 1.0f, y - 2.f, box.size.x - startX * 2 + 2.f, 28.f, 4);
+        nvgFillColor(vg, rack::settings::darkMode ? nvgRGB(0xd0, 0xd0, 0xd0) : nvgRGB(0x2f, 0x2f, 0x2f));
         nvgFill(vg);
         nvgBeginPath(vg);
-        nvgFillColor(vg, color::BLACK);
+        nvgFillColor(vg, rack::settings::darkMode ? color::BLACK : color::WHITE);
         nvgText(vg, startX + 36, y + 16, text, nullptr);
     }
 
     void draw(const DrawArgs& args) override
     {
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
-                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
-        nvgFill(args.vg);
+        drawBackground(args.vg);
 
         nvgFontFaceId(args.vg, 0);
         nvgFontSize(args.vg, 14);

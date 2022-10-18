@@ -9,27 +9,40 @@ else
   exit
 fi
 
-rm -rf res
-rm -rf au
-rm -rf lv2
-rm -rf vst2
-rm -rf vst3
+rm -rf res jack native au lv2 vst2 vst3 clap
+mkdir jack native au lv2 vst2 vst3 clap
 
-mkdir au lv2 vst2 vst3
+mv Cardinal.app jack/CardinalJACK.app
+mv CardinalNative.app native/CardinalNative.app
+
 mv *.component au/
 mv *.lv2 lv2/
 mv *.vst vst2/
 mv *.vst3 vst3/
+mv *.clap clap/
 cp -RL lv2/Cardinal.lv2/resources res
 rm -rf lv2/*.lv2/resources
 rm -rf vst2/*.vst/Contents/Resources
 rm -rf vst3/*.vst3/Contents/Resources
+rm -rf clap/*.clap/Contents/Resources
 
 pkgbuild \
   --identifier "studio.kx.distrho.cardinal.resources" \
   --install-location "/Library/Application Support/Cardinal/" \
   --root "${PWD}/res/" \
   ../dpf-cardinal-resources.pkg
+
+pkgbuild \
+  --identifier "studio.kx.distrho.plugins.cardinal.jack" \
+  --install-location "/Applications/" \
+  --root "${PWD}/jack/" \
+  ../dpf-cardinal-jack.pkg
+
+pkgbuild \
+  --identifier "studio.kx.distrho.plugins.cardinal.native" \
+  --install-location "/Applications/" \
+  --root "${PWD}/native/" \
+  ../dpf-cardinal-native.pkg
 
 pkgbuild \
   --identifier "studio.kx.distrho.plugins.cardinal.components" \
@@ -55,9 +68,17 @@ pkgbuild \
   --root "${PWD}/vst3/" \
   ../dpf-cardinal-vst3bundles.pkg
 
+pkgbuild \
+  --identifier "studio.kx.distrho.plugins.cardinal.clapbundles" \
+  --install-location "/Library/Audio/Plug-Ins/CLAP/" \
+  --root "${PWD}/clap/" \
+  ../dpf-cardinal-clapbundles.pkg
+
 cd ..
 
-sed -e "s|@builddir@|${PWD}/build|" utils/macOS/package.xml.in > build/package.xml
+sed -e "s|@builddir@|${PWD}/build|" \
+    -e "s|@buildarchs@|${MACOS_ARCHS}|" \
+    utils/macOS/package.xml.in > build/package.xml
 
 productbuild \
   --distribution build/package.xml \

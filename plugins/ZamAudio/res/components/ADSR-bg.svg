@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="123.5"
+   height="60"
+   viewBox="0 0 123.5 60"
+   version="1.1"
+   id="svg239"
+   sodipodi:docname="ADSR-bg.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <metadata
+     id="metadata243">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1026"
+     id="namedview241"
+     showgrid="false"
+     inkscape:zoom="4.968421"
+     inkscape:cx="76.934835"
+     inkscape:cy="48.509326"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg239"
+     inkscape:pagecheckerboard="0"
+     width="184px" />
+  <defs
+     id="defs7">
+    <linearGradient
+       id="b7084a32-89ea-4051-9fd3-02ae7ae97585"
+       x1="97.500023"
+       x2="97.500023"
+       y2="380"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         stop-color="#ebebeb"
+         id="stop2" />
+      <stop
+         offset="1"
+         stop-color="#e1e1e1"
+         id="stop4" />
+    </linearGradient>
+    <linearGradient
+       id="SVGID_3_"
+       gradientUnits="userSpaceOnUse"
+       x1="520.13452"
+       y1="-5410.3999"
+       x2="530.86426"
+       y2="-5410.3999"
+       gradientTransform="rotate(90,-2442.45,-2960.45)">
+      <stop
+         offset="0.01118"
+         style="stop-color:#4C4C4C"
+         id="stop45383" />
+      <stop
+         offset="0.67017823"
+         style="stop-color:#3b3b3b;stop-opacity:0"
+         id="stop45385" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient46906"
+       gradientUnits="userSpaceOnUse"
+       x1="520.13452"
+       y1="-5410.3999"
+       x2="530.86426"
+       y2="-5410.3999"
+       gradientTransform="rotate(90,-2442.45,-2960.45)">
+      <stop
+         offset="0.02846069"
+         style="stop-color:#ff8c8c;stop-opacity:1"
+         id="stop46902" />
+      <stop
+         offset="0.82481533"
+         style="stop-color:#ff1515;stop-opacity:0"
+         id="stop46904" />
+    </linearGradient>
+    <linearGradient
+       id="SVGID_3_-8"
+       gradientUnits="userSpaceOnUse"
+       x1="520.13452"
+       y1="-5410.3999"
+       x2="530.86426"
+       y2="-5410.3999"
+       gradientTransform="rotate(90,-2442.45,-2960.45)">
+      <stop
+         offset="0.02846069"
+         style="stop-color:#ff8c8c;stop-opacity:1"
+         id="stop45383-7" />
+      <stop
+         offset="0.67017823"
+         style="stop-color:#ff1515;stop-opacity:0"
+         id="stop45385-6" />
+    </linearGradient>
+    <linearGradient
+       id="SVGID_1_"
+       gradientUnits="userSpaceOnUse"
+       x1="518.99988"
+       y1="-5410.3999"
+       x2="531.99988"
+       y2="-5410.3999"
+       gradientTransform="rotate(90,-2442.45,-2960.45)">
+      <stop
+         offset="0.00559"
+         style="stop-color:#303030"
+         id="stop45369" />
+      <stop
+         offset="1"
+         style="stop-color:#222222"
+         id="stop45371" />
+    </linearGradient>
+    <linearGradient
+       id="SVGID_2_"
+       gradientUnits="userSpaceOnUse"
+       x1="519.68744"
+       y1="-5410.3999"
+       x2="531.31134"
+       y2="-5410.3999"
+       gradientTransform="rotate(90,-2442.45,-2960.45)">
+      <stop
+         offset="0.01118"
+         style="stop-color:#636363"
+         id="stop45376" />
+      <stop
+         offset="1"
+         style="stop-color:#2B2B2B"
+         id="stop45378" />
+    </linearGradient>
+    <linearGradient
+       id="SVGID_3_-3"
+       gradientUnits="userSpaceOnUse"
+       x1="520.13452"
+       y1="-5410.3999"
+       x2="530.86426"
+       y2="-5410.3999"
+       gradientTransform="rotate(90,-2442.45,-2960.45)">
+      <stop
+         offset="0.01118"
+         style="stop-color:#4C4C4C"
+         id="stop45383-1" />
+      <stop
+         offset="1"
+         style="stop-color:#3B3B3B"
+         id="stop45385-69" />
+    </linearGradient>
+  </defs>
+  <g
+     id="b1950596-670b-4466-898f-d443ae332145"
+     data-name="components"
+     inkscape:groupmode="layer"
+     style="display:none"
+     transform="translate(0,-93)">
+    <circle
+       id="b021da4b-0fe8-4f1e-b32d-9e773df7a5e4"
+       data-name="1x2#LEDButton"
+       cx="25.521191"
+       cy="238"
+       r="5"
+       style="fill:#ff0000" />
+    <circle
+       id="f46b8a42-c463-489b-805b-fbe2a1576bce"
+       data-name="Trig#LEDButton"
+       cx="169.47881"
+       cy="237.75993"
+       r="5"
+       style="fill:#ff0000" />
+    <circle
+       id="b6107851-233c-454f-b435-4825b228afd5"
+       data-name="In1#PJ301MPort"
+       cx="25.521191"
+       cy="334"
+       r="5"
+       style="fill:#00ff00" />
+    <circle
+       id="e1c8f715-a579-4785-b3bc-4ce088c7be9e"
+       data-name="Trig#PJ301MPort"
+       cx="169.47881"
+       cy="334"
+       r="5"
+       style="fill:#00ff00" />
+    <circle
+       id="ed578b6f-7e3c-4b50-85b1-604681a2f39e"
+       data-name="Out2#PJ301MPort"
+       cx="133.50073"
+       cy="334"
+       r="5"
+       style="fill:#0000ff" />
+    <circle
+       id="b3b89114-537e-4df6-9608-ee818c8b7742"
+       data-name="In2#PJ301MPort"
+       cx="97.507553"
+       cy="334"
+       r="5"
+       style="fill:#00ff00" />
+    <circle
+       id="a8fe9c8d-13ee-4090-a75f-7c992ddf15f2"
+       data-name="Out1#PJ301MPort"
+       cx="61.51437"
+       cy="334"
+       r="5"
+       style="fill:#0000ff" />
+    <circle
+       id="bfcd5dca-3188-4901-91c1-93258e888f7e"
+       data-name="Ofst2#RoundBlackKnob"
+       cx="121.49648"
+       cy="285.87146"
+       r="5"
+       style="fill:#ff0000" />
+    <circle
+       id="e88686ae-5b33-4183-b27d-2e9e655e5bc8"
+       data-name="Time#RoundBlackKnob"
+       cx="25.521191"
+       cy="285.88263"
+       r="5"
+       style="fill:#ff0000" />
+    <circle
+       id="b7cebf3e-0520-412a-9c27-5920e30994e0"
+       data-name="Ofst1#RoundBlackKnob"
+       cx="73.515839"
+       cy="285.79443"
+       r="5"
+       style="fill:#ff0000" />
+    <circle
+       id="a60159ac-1f78-454c-bfed-737ee7e4a0fc"
+       data-name="Gain2#RoundBlackKnob"
+       cx="121.49648"
+       cy="237.84641"
+       r="5"
+       style="fill:#ff0000" />
+    <circle
+       id="a66a76d3-ef14-4827-8a1d-ad97abf66302"
+       data-name="Gain1#RoundBlackKnob"
+       cx="73.515839"
+       cy="237.84641"
+       r="5"
+       style="fill:#ff0000" />
+    <circle
+       id="ac97f6fd-53ce-44fc-93d6-5d500818a3cb"
+       data-name="Thers#RoundBlackKnob"
+       cx="169.47881"
+       cy="285.87146"
+       r="5"
+       style="fill:#ff0000" />
+    <rect
+       id="f07b4a9d-18ee-4999-88d5-97c10d878f46"
+       data-name="Screen"
+       x="3.9999999e-05"
+       y="38.5"
+       width="194.99995"
+       height="165"
+       style="fill:#ffff00" />
+  </g>
+  <rect
+     style="opacity:0.5;fill:#000000;stroke-width:0.54168189"
+     id="rect38031"
+     width="123.5"
+     height="60"
+     x="7.1054274e-15"
+     y="0" />
+</svg>

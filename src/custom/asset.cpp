@@ -31,6 +31,11 @@
 namespace rack {
 namespace asset {
 
+#ifndef HEADLESS
+extern bool forceBlackScrew;
+extern bool forceSilverScrew;
+#endif
+
 std::string userDir; // ignored
 std::string systemDir; // points to plugin resources dir (or installed/local Rack dir)
 std::string bundlePath; // points to plugin manifests dir (or empty)
@@ -50,32 +55,28 @@ std::string user(std::string filename) {
 
 // get system resource, trimming "res/" prefix if we are loaded as a plugin bundle
 std::string system(std::string filename) {
-    // Always use dark screws
-    if (string::endsWith(filename, "/ScrewSilver.svg"))
-        filename = filename.substr(0, filename.size()-10) + "Black.svg";
+   #ifndef HEADLESS
+    /**/ if (forceBlackScrew && string::endsWith(filename, "/ScrewBlack.svg"))
+        filename = filename.substr(0, filename.size()-15) + "/./ScrewBlack.svg";
+    else if (forceSilverScrew && string::endsWith(filename, "/ScrewSilver.svg"))
+        filename = filename.substr(0, filename.size()-16) + "/./ScrewSilver.svg";
+   #endif
     return system::join(systemDir, bundlePath.empty() ? filename : trim(filename));
 }
 
-// get plugin resource
+// get plugin resource path
 std::string plugin(plugin::Plugin* plugin, std::string filename) {
     DISTRHO_SAFE_ASSERT_RETURN(plugin != nullptr, {});
-    // always use dark scheme
-    if (plugin->slug == "GlueTheGiant")
-    {
-        if (filename == "res/BusDepot.svg"
-         || filename == "res/BusRoute.svg"
-         || filename == "res/EnterBus.svg"
-         || filename == "res/ExitBus.svg"
-         || filename == "res/GigBus.svg"
-         || filename == "res/MetroCityBus.svg"
-         || filename == "res/MiniBus.svg"
-         || filename == "res/Road.svg"
-         || filename == "res/SchoolBus.svg")
-        {
-            filename = filename.substr(0, filename.size()-4) + "_Night.svg";
-        }
-    }
     return system::join(plugin->path, filename);
+}
+
+// path to demo patch files
+std::string patchesPath() {
+    // no bundlePath set, assume local source build
+    if (bundlePath.empty())
+        return system::join(systemDir, "..", "..", "patches");
+    // bundlePath is present, use resources from bundle
+    return system::join(systemDir, "patches");
 }
 
 // path to plugin manifest

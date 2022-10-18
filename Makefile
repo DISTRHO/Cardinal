@@ -5,14 +5,14 @@
 #
 
 # also set in:
+# jucewrapper/CMakeList.txt `project`
 # src/CardinalCommon.cpp `CARDINAL_VERSION`
 # src/CardinalPlugin.cpp `getVersion`
-VERSION = 22.05
+VERSION = 22.10
 
 # --------------------------------------------------------------
 # Import base definitions
 
-USE_NANOVG_FBO = true
 include dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -43,7 +43,9 @@ endif
 # --------------------------------------------------------------
 # Carla config
 
-CARLA_EXTRA_ARGS = CARLA_BACKEND_NAMESPACE=Cardinal \
+CARLA_EXTRA_ARGS = \
+	CARLA_BACKEND_NAMESPACE=Cardinal \
+	DGL_NAMESPACE=CardinalDGL \
 	HAVE_FFMPEG=false \
 	HAVE_FLUIDSYNTH=false \
 	HAVE_PROJECTM=false \
@@ -54,20 +56,19 @@ ifneq ($(DEBUG),true)
 CARLA_EXTRA_ARGS += EXTERNAL_PLUGINS=true
 endif
 
-CARLA_EXTRA_ARGS += USING_JUCE=false
-CARLA_EXTRA_ARGS += USING_JUCE_GUI_EXTRA=false
-
 # --------------------------------------------------------------
 # DGL config
 
 DGL_EXTRA_ARGS = \
+	DISTRHO_NAMESPACE=CardinalDISTRHO \
+	DGL_NAMESPACE=CardinalDGL \
 	NVG_DISABLE_SKIPPING_WHITESPACE=true \
 	NVG_FONT_TEXTURE_FLAGS=NVG_IMAGE_NEAREST \
 	USE_NANOVG_FBO=true \
 	WINDOWS_ICON_ID=401
 
 # --------------------------------------------------------------
-# Check for system-wide dependencies
+# Check for required system-wide dependencies
 
 ifeq ($(SYSDEPS),true)
 
@@ -97,8 +98,7 @@ endif
 # --------------------------------------------------------------
 # Check for X11+OpenGL dependencies (unless headless build)
 
-ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
-ifneq ($(WASM),true)
+ifneq ($(HAIKU_OR_MACOS_OR_WASM_OR_WINDOWS),true)
 ifneq ($(HEADLESS),true)
 
 ifneq ($(HAVE_OPENGL),true)
@@ -106,6 +106,9 @@ $(error OpenGL dependency not installed/available)
 endif
 ifneq ($(HAVE_X11),true)
 $(error X11 dependency not installed/available)
+endif
+ifneq ($(HAVE_XCURSOR),true)
+$(warning Xcursor dependency not installed/available)
 endif
 ifneq ($(HAVE_XEXT),true)
 $(warning Xext dependency not installed/available)
@@ -118,18 +121,26 @@ else
 
 CARLA_EXTRA_ARGS += HAVE_OPENGL=false
 CARLA_EXTRA_ARGS += HAVE_X11=false
+CARLA_EXTRA_ARGS += HAVE_XCURSOR=false
 CARLA_EXTRA_ARGS += HAVE_XEXT=false
 CARLA_EXTRA_ARGS += HAVE_XRANDR=false
 
 endif
 endif
+
+# --------------------------------------------------------------
+# Check for optional system-wide dependencies
+
+ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
+HAVE_FFTW3F = true
+else
+$(warning fftw3f dependency not installed/available)
 endif
 
 # --------------------------------------------------------------
 # MOD builds
 
-EXTRA_MOD_FLAGS  = -I../include/single-precision -fsingle-precision-constant
-
+EXTRA_MOD_FLAGS  = -I../include/single-precision -fsingle-precision-constant -Wno-attributes
 ifeq ($(MODDUO),true)
 EXTRA_MOD_FLAGS += -mno-unaligned-access
 endif
@@ -137,63 +148,45 @@ ifeq ($(WITH_LTO),true)
 EXTRA_MOD_FLAGS += -ffat-lto-objects
 endif
 
-MOD_WORKDIR ?= $(HOME)/mod-workdir
-MOD_ENVIRONMENT = \
-	AR=${1}/host/usr/bin/${2}-gcc-ar \
-	CC=${1}/host/usr/bin/${2}-gcc \
-	CPP=${1}/host/usr/bin/${2}-cpp \
-	CXX=${1}/host/usr/bin/${2}-g++ \
-	LD=${1}/host/usr/bin/${2}-ld \
-	PKG_CONFIG=${1}/host/usr/bin/pkg-config \
-	STRIP=${1}/host/usr/bin/${2}-strip \
-	CFLAGS="-I${1}/staging/usr/include $(EXTRA_MOD_FLAGS)" \
-	CPPFLAGS= \
-	CXXFLAGS="-I${1}/staging/usr/include $(EXTRA_MOD_FLAGS) -Wno-attributes" \
-	LDFLAGS="-L${1}/staging/usr/lib $(EXTRA_MOD_FLAGS)" \
-	EXE_WRAPPER="qemu-${3}-static -L ${1}/target" \
-	HEADLESS=true \
-	MOD_BUILD=true \
-	NOOPT=true \
-	STATIC_BUILD=true
-
-modduo:
-	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduo-static,arm-mod-linux-gnueabihf.static,arm)
-
-modduox:
-	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduox-static,aarch64-mod-linux-gnueabi.static,aarch64)
-
-moddwarf:
-	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/moddwarf,aarch64-mod-linux-gnu,aarch64)
-
-publish:
-	tar -C bin -cz $(subst bin/,,$(wildcard bin/*.lv2)) | base64 | curl -F 'package=@-' http://192.168.51.1/sdk/install && echo
-
-ifneq (,$(findstring modduo-,$(MAKECMDGOALS)))
-$(MAKECMDGOALS):
-	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduo-static,arm-mod-linux-gnueabihf.static,arm) $(subst modduo-,,$(MAKECMDGOALS))
-endif
-
-ifneq (,$(findstring modduox-,$(MAKECMDGOALS)))
-$(MAKECMDGOALS):
-	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/modduox-static,aarch64-mod-linux-gnueabi.static,aarch64) $(subst modduox-,,$(MAKECMDGOALS))
-endif
-
-ifneq (,$(findstring moddwarf-,$(MAKECMDGOALS)))
-$(MAKECMDGOALS):
-	$(MAKE) $(call MOD_ENVIRONMENT,$(MOD_WORKDIR)/moddwarf,aarch64-mod-linux-gnu,aarch64) $(subst moddwarf-,,$(MAKECMDGOALS))
-endif
+MOD_ENVIRONMENT += HEADLESS=true
+MOD_ENVIRONMENT += MOD_BUILD=true
+MOD_ENVIRONMENT += STATIC_BUILD=true
 
 # --------------------------------------------------------------
 # Individual targets
 
-cardinal: carla deps dgl plugins
+cardinal: carla deps dgl plugins resources
 	$(MAKE) all -C src $(CARLA_EXTRA_ARGS)
 
 carla:
 ifneq ($(STATIC_BUILD),true)
 	$(MAKE) static-plugin -C carla $(CARLA_EXTRA_ARGS) \
 		CAN_GENERATE_LV2_TTL=false \
-		STATIC_PLUGIN_TARGET=true
+		CUSTOM_DPF_PATH=$(CURDIR)/dpf \
+		STATIC_PLUGIN_TARGET=true \
+		USING_CUSTOM_DPF=true
+endif
+
+carla-win32:
+ifneq ($(STATIC_BUILD),true)
+	$(MAKE) all -C carla $(CARLA_EXTRA_ARGS) \
+		CAN_GENERATE_LV2_TTL=false \
+		CUSTOM_DPF_PATH=$(CURDIR)/dpf \
+		HAVE_PYQT=true \
+		HAVE_QT5=true \
+		HAVE_QT5PKG=true \
+		STATIC_PLUGIN_TARGET=true \
+		USING_CUSTOM_DPF=true
+ifeq ($(CPU_X86_64),true)
+	$(MAKE) win32r -C carla $(CARLA_EXTRA_ARGS) \
+		CAN_GENERATE_LV2_TTL=false \
+		CUSTOM_DPF_PATH=$(CURDIR)/dpf \
+		HAVE_PYQT=true \
+		HAVE_QT5=true \
+		HAVE_QT5PKG=true \
+		STATIC_PLUGIN_TARGET=true \
+		USING_CUSTOM_DPF=true
+endif
 endif
 
 deps:
@@ -201,6 +194,9 @@ ifeq ($(SYSDEPS),true)
 	$(MAKE) quickjs -C deps
 else
 	$(MAKE) all -C deps
+endif
+ifeq ($(HAVE_FFTW3F),true)
+	$(MAKE) all -C deps/aubio
 endif
 
 dgl:
@@ -211,7 +207,7 @@ endif
 plugins: deps
 	$(MAKE) all -C plugins
 
-resources: cardinal
+resources:
 	$(MAKE) resources -C plugins
 
 ifneq ($(CROSS_COMPILING),true)
@@ -227,16 +223,24 @@ endif
 # --------------------------------------------------------------
 # Packaging standalone for CI
 
-unzipfx: deps/unzipfx/unzipfx2cat$(APP_EXT) Cardinal.zip
-	cat deps/unzipfx/unzipfx2cat$(APP_EXT) Cardinal.zip > Cardinal
-	chmod +x Cardinal
+unzipfx: deps/unzipfx/unzipfx2cat$(APP_EXT) CardinalJACK.zip CardinalNative.zip
+	cat deps/unzipfx/unzipfx2cat$(APP_EXT) CardinalJACK.zip > CardinalJACK
+	cat deps/unzipfx/unzipfx2cat$(APP_EXT) CardinalNative.zip > CardinalNative
+	chmod +x CardinalJACK CardinalNative
 
-Cardinal.zip: bin/Cardinal bin/CardinalFX.lv2/resources
-	mkdir -p build/unzipfx
-	ln -sf ../../bin/Cardinal build/unzipfx/Cardinal
-	ln -s ../../bin/CardinalFX.lv2/resources build/unzipfx/resources
-	cd build/unzipfx && \
-		zip -r -9 ../../Cardinal.zip Cardinal resources
+CardinalJACK.zip: bin/Cardinal bin/CardinalFX.lv2/resources
+	mkdir -p build/unzipfx-jack
+	ln -sf ../../bin/Cardinal build/unzipfx-jack/Cardinal
+	ln -s ../../bin/CardinalFX.lv2/resources build/unzipfx-jack/resources
+	cd build/unzipfx-jack && \
+		zip -r -9 ../../$@ Cardinal resources
+
+CardinalNative.zip: bin/CardinalNative bin/CardinalFX.lv2/resources
+	mkdir -p build/unzipfx-native
+	ln -sf ../../bin/CardinalNative build/unzipfx-native/Cardinal
+	ln -s ../../bin/CardinalFX.lv2/resources build/unzipfx-native/resources
+	cd build/unzipfx-native && \
+		zip -r -9 ../../$@ Cardinal resources
 
 deps/unzipfx/unzipfx2cat:
 	make -C deps/unzipfx -f Makefile.linux
@@ -250,6 +254,7 @@ deps/unzipfx/unzipfx2cat.exe:
 clean:
 	$(MAKE) distclean -C carla $(CARLA_EXTRA_ARGS) CAN_GENERATE_LV2_TTL=false STATIC_PLUGIN_TARGET=true
 	$(MAKE) clean -C deps
+	$(MAKE) clean -C deps/aubio
 	$(MAKE) clean -C dpf/dgl
 	$(MAKE) clean -C dpf/utils/lv2-ttl-generator
 	$(MAKE) clean -C plugins
@@ -264,6 +269,7 @@ install:
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/Cardinal.lv2
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/CardinalFX.lv2
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/CardinalSynth.lv2
+	install -d $(DESTDIR)$(PREFIX)/lib/clap/Cardinal.clap
 	install -d $(DESTDIR)$(PREFIX)/lib/vst/Cardinal.vst
 ifeq ($(VST3_SUPPORTED),true)
 	install -d $(DESTDIR)$(PREFIX)/lib/vst3/Cardinal.vst3/Contents
@@ -277,6 +283,7 @@ endif
 	install -m 644 bin/CardinalFX.lv2/*.*    $(DESTDIR)$(PREFIX)/lib/lv2/CardinalFX.lv2/
 	install -m 644 bin/CardinalSynth.lv2/*.* $(DESTDIR)$(PREFIX)/lib/lv2/CardinalSynth.lv2/
 
+	install -m 644 bin/Cardinal.clap/*.*     $(DESTDIR)$(PREFIX)/lib/clap/Cardinal.clap/
 	install -m 644 bin/Cardinal.vst/*.*      $(DESTDIR)$(PREFIX)/lib/vst/Cardinal.vst/
 
 ifeq ($(VST3_SUPPORTED),true)
@@ -285,10 +292,12 @@ ifeq ($(VST3_SUPPORTED),true)
 	cp -rL bin/CardinalSynth.vst3/Contents/*-* $(DESTDIR)$(PREFIX)/lib/vst3/CardinalSynth.vst3/Contents/
 endif
 
-	install -m 755 bin/Cardinal$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 bin/Cardinal$(APP_EXT)       $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 bin/CardinalNative$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
+
 	cp -rL bin/Cardinal.lv2/resources/* $(DESTDIR)$(PREFIX)/share/cardinal/
 
-	install -m 644 README.md $(DESTDIR)$(PREFIX)/share/doc/cardinal/
+	install -m 644 README.md            $(DESTDIR)$(PREFIX)/share/doc/cardinal/
 	install -m 644 docs/*.md docs/*.png $(DESTDIR)$(PREFIX)/share/doc/cardinal/docs/
 
 # --------------------------------------------------------------
@@ -312,7 +321,6 @@ TAR_ARGS = \
 	--exclude=build \
 	--exclude=jucewrapper \
 	--exclude=lv2export \
-	--exclude=patches \
 	--exclude=carla/data \
 	--exclude=carla/source/frontend \
 	--exclude=carla/source/interposer \

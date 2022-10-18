@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,6 +16,7 @@
  */
 
 #include "plugin.hpp"
+#include "ModuleWidgets.hpp"
 
 struct CardinalBlankModule : Module {
     enum ParamIds {
@@ -34,6 +35,9 @@ struct CardinalBlankModule : Module {
     CardinalBlankModule() {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
     }
+
+    void process(const ProcessArgs&) override
+    {}
 };
 
 struct CardinalBlankImage : Widget {
@@ -74,15 +78,12 @@ struct CardinalBlankImage : Widget {
     }
 };
 
-struct CardinalBlankWidget : ModuleWidget {
+struct CardinalBlankWidget : ModuleWidgetWith9HP {
     CardinalBlankWidget(CardinalBlankModule* const module) {
         setModule(module);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Blank.svg")));
 
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-        addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        createAndAddScrews();
 
         FramebufferWidget* const fbWidget = new FramebufferWidget;
         fbWidget->oversample = 2.0;
@@ -92,13 +93,8 @@ struct CardinalBlankWidget : ModuleWidget {
 
     void draw(const DrawArgs& args) override
     {
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-        nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, 0, 0, box.size.y,
-                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
-        nvgFill(args.vg);
-
-        ModuleWidget::draw(args);
+        drawBackground(args.vg);
+        ModuleWidgetWith9HP::draw(args);
     }
 };
 

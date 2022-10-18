@@ -32,6 +32,7 @@
 struct ImGuiTextEditor::PrivateData {
     TextEditor editor;
     std::string file;
+    bool darkMode = true;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -229,4 +230,16 @@ void ImGuiTextEditor::onHoverScroll(const HoverScrollEvent& e)
 
     // if there is a scrollbar, handle the event
     ImGuiWidget::onHoverScroll(e);
+}
+
+void ImGuiTextEditor::step()
+{
+    if (pData->darkMode != settings::darkMode)
+    {
+        pData->darkMode = settings::darkMode;
+        pData->editor.SetPalette(settings::darkMode ? TextEditor::GetDarkPalette()
+                                                    : TextEditor::GetLightPalette());
+    }
+
+    ImGuiWidget::step();
 }

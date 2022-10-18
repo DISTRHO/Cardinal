@@ -1,6 +1,6 @@
---- ../Rack/src/common.cpp	2021-11-23 19:57:23.719015894 +0000
-+++ common.cpp	2022-03-14 23:25:17.492322806 +0000
-@@ -1,6 +1,38 @@
+--- ../Rack/src/common.cpp	2022-04-11 20:05:02.007283878 +0100
++++ common.cpp	2022-07-12 09:45:31.518663160 +0100
+@@ -1,33 +1,77 @@
 +/*
 + * DISTRHO Cardinal Plugin
 + * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
@@ -37,9 +37,27 @@
 +
 +#include "DistrhoPluginUtils.hpp"
  
- #if defined ARCH_WIN
+-#if defined ARCH_WIN
++#if defined(ARCH_WIN)
  #include <windows.h>
-@@ -14,20 +46,21 @@
+ 
+ FILE* fopen_u8(const char* filename, const char* mode) {
++	if (std::strncmp(filename, "\\\\?\\", 4) == 0 && std::getenv("CARDINAL_UNDER_WINE") != nullptr)
++		filename = "Z:\\dev\\null";
+ 	return _wfopen(rack::string::UTF8toUTF16(filename).c_str(), rack::string::UTF8toUTF16(mode).c_str());
+ }
+ 
++#elif defined(DISTRHO_OS_WASM)
++#include <sys/stat.h>
++#undef fopen
++
++FILE* fopen_wasm(const char* filename, const char* mode) {
++	chmod(filename, 0777);
++	return std::fopen(filename, mode);
++}
++
+ #endif
+ 
  
  namespace rack {
  
@@ -52,7 +70,7 @@
 +const std::string APP_EDITION_NAME = "Audio Plugin";
  const std::string APP_VERSION_MAJOR = "2";
 -const std::string APP_VERSION = TOSTRING(_APP_VERSION);
-+const std::string APP_VERSION = "2.1";
++const std::string APP_VERSION = "2.1.2";
  #if defined ARCH_WIN
  	const std::string APP_OS = "win";
 -#elif ARCH_MAC

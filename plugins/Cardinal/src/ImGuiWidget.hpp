@@ -34,11 +34,12 @@ protected:
     void onContextDestroy(const ContextDestroyEvent& e) override;
     void onHover(const HoverEvent& e) override;
     void onDragHover(const DragHoverEvent& e) override;
-    void onDragLeave(const DragLeaveEvent& e) override;
+    void onDragEnd(const DragEndEvent& e) override;
     void onHoverScroll(const HoverScrollEvent& e) override;
     void onButton(const ButtonEvent& e) override;
     void onSelectKey(const SelectKeyEvent& e) override;
     void onSelectText(const SelectTextEvent& e) override;
+    void step() override;
 
     void setAsCurrentContext();
     void setUseMonospaceFont(bool useMonoFont = true);

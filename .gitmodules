@@ -200,6 +200,27 @@
 [submodule "plugins/WhatTheRack"]
 	path = plugins/WhatTheRack
 	url = https://github.com/korfuri/WhatTheRack.git
+[submodule "plugins/AS"]
+	path = plugins/AS
+	url = https://github.com/AScustomWorks/AS.git
+[submodule "plugins/forsitan-modulare"]
+	path = plugins/forsitan-modulare
+	url = https://github.com/gosub/forsitan-modulare.git
+[submodule "plugins/myth-modules"]
+	path = plugins/myth-modules
+	url = https://github.com/Ahineya/vcv-myth-plugin.git
+[submodule "plugins/alefsbits"]
+	path = plugins/alefsbits
+	url = https://github.com/alefnull/alefsbits.git
+[submodule "plugins/h4n4-modules"]
+	path = plugins/h4n4-modules
+	url = https://github.com/hannakoppelaar/h4n4-modules.git
+[submodule "plugins/dBiz"]
+	path = plugins/dBiz
+	url = https://github.com/dBiz/dBiz.git
+[submodule "include/simde"]
+	path = include/simde
+	url = https://github.com/simd-everywhere/simde.git
 [submodule "plugins/RebelTech"]
 	path = plugins/RebelTech
 	url = https://github.com/hemmer/rebel-tech-vcv.git

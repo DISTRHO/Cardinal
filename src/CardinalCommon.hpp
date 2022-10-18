@@ -25,13 +25,17 @@
 # define REMOTE_HOST_PORT "2228"
 #endif
 
+#ifdef DISTRHO_OS_WASM
+# ifdef STATIC_BUILD
+#  define CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME "welcome-wasm-mini.vcv"
+# else
+#  define CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME "welcome-wasm.vcv"
+# endif
+#endif
+
 extern const std::string CARDINAL_VERSION;
 
 namespace rack {
-
-namespace settings {
-extern int rateLimit;
-}
 
 namespace ui {
 struct Menu;
@@ -47,8 +51,16 @@ bool isStandalone();
 enum SpecialPath {
     kSpecialPathUserProfile,
     kSpecialPathCommonProgramFiles,
+    kSpecialPathProgramFiles,
+    kSpecialPathAppData,
 };
 std::string getSpecialPath(SpecialPath type);
+#endif
+
+#ifdef DISTRHO_OS_WASM
+extern char* patchFromURL;
+extern char* patchRemoteURL;
+extern char* patchStorageSlug;
 #endif
 
 } // namespace rack
@@ -56,7 +68,7 @@ std::string getSpecialPath(SpecialPath type);
 namespace patchUtils {
 
 void loadDialog();
-void loadPathDialog(const std::string& path);
+void loadPathDialog(const std::string& path, bool asTemplate = false);
 void loadSelectionDialog();
 void loadTemplateDialog();
 void revertDialog();
@@ -64,6 +76,7 @@ void saveDialog(const std::string& path);
 void saveAsDialog();
 void saveAsDialogUncompressed();
 void appendSelectionContextMenu(rack::ui::Menu* menu);
+void openBrowser(const std::string& url);
 
 bool connectToRemote();
 bool isRemoteConnected();

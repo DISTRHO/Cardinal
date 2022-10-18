@@ -7,7 +7,10 @@
 # --------------------------------------------------------------
 # Import base definitions
 
+DISTRHO_NAMESPACE = CardinalDISTRHO
+DGL_NAMESPACE = CardinalDGL
 USE_NANOVG_FBO = true
+WASM_EXCEPTIONS = true
 include ../dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
@@ -33,14 +36,16 @@ BASE_FLAGS += -DARCH_LIN
 endif
 
 ifeq ($(HAIKU),true)
-BASE_FLAGS += -I../include/haiku-compat
+BASE_FLAGS += -I../include/linux-compat
+else ifeq ($(WASM),true)
+BASE_FLAGS += -I../include/linux-compat
 endif
 
 BASE_FLAGS += -DPRIVATE=
 BASE_FLAGS += -I../dpf/dgl/src/nanovg
 BASE_FLAGS += -I../dpf/distrho
 BASE_FLAGS += -I../include
-BASE_FLAGS += -I../include/neon-compat
+BASE_FLAGS += -I../include/simd-compat
 BASE_FLAGS += -IRack/include
 ifeq ($(SYSDEPS),true)
 BASE_FLAGS += -DCARDINAL_SYSDEPS
@@ -59,6 +64,10 @@ BASE_FLAGS += -IRack/dep/pffft
 
 ifeq ($(DEBUG),true)
 BASE_FLAGS += -UDEBUG
+ifeq ($(WASM),true)
+# SSE must always be enabled on wasm, even in debug builds
+BASE_FLAGS += -msse -msse2 -msse3 -msimd128
+endif
 endif
 
 ifeq ($(HAVE_LIBLO),true)
@@ -77,13 +86,10 @@ ifeq ($(HAIKU),true)
 BASE_FLAGS += -DCLOCK_MONOTONIC_RAW=CLOCK_MONOTONIC
 endif
 
-ifeq ($(WASM),true)
-BASE_FLAGS += -DNANOVG_GLES2=1
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-# FIXME
-BASE_FLAGS += -DRTLD_DEEPBIND=0
-else ifneq ($(HAIKU),true)
+ifneq ($(WASM),true)
+ifneq ($(HAIKU),true)
 BASE_FLAGS += -pthread
+endif
 endif
 
 ifeq ($(WINDOWS),true)
@@ -93,15 +99,29 @@ BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
+ifeq ($(USE_GLES2),true)
+BASE_FLAGS += -DNANOVG_GLES2_FORCED
+else ifeq ($(USE_GLES3),true)
+BASE_FLAGS += -DNANOVG_GLES3_FORCED
+endif
+
 BUILD_C_FLAGS += -std=gnu11
 BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing -faligned-new
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+
+ifneq ($(MACOS),true)
+BUILD_CXX_FLAGS += -faligned-new -Wno-abi
+endif
 
 # use our custom function to invert some colors
+BUILD_CXX_FLAGS += -DnsvgDelete=nsvgDeleteCardinal
 BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
 
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
+
+# Ignore bad behaviour from Rack API
+BUILD_CXX_FLAGS += -Wno-format-security
 
 # --------------------------------------------------------------
 # Rack files to build
@@ -120,6 +140,7 @@ RACK_FILES += override/plugin.cpp
 RACK_FILES += override/Engine.cpp
 RACK_FILES += override/MenuBar.cpp
 RACK_FILES += override/Model.cpp
+RACK_FILES += override/OpenGlWidget.cpp
 RACK_FILES += override/Scene.cpp
 
 RACK_FILES += Rack/dep/pffft/pffft.c
@@ -148,6 +169,7 @@ IGNORED_FILES += Rack/src/app/TipWindow.cpp
 IGNORED_FILES += Rack/src/dsp/minblep.cpp
 IGNORED_FILES += Rack/src/engine/Engine.cpp
 IGNORED_FILES += Rack/src/plugin/Model.cpp
+IGNORED_FILES += Rack/src/widget/OpenGlWidget.cpp
 IGNORED_FILES += Rack/src/window/Window.cpp
 IGNORED_FILES += $(wildcard Rack/src/core/*.cpp)
 
@@ -155,6 +177,10 @@ RACK_FILES += $(wildcard Rack/src/*.c)
 RACK_FILES += $(wildcard Rack/src/*/*.c)
 RACK_FILES += $(filter-out $(IGNORED_FILES),$(wildcard Rack/src/*.cpp))
 RACK_FILES += $(filter-out $(IGNORED_FILES), $(wildcard Rack/src/*/*.cpp))
+
+ifeq ($(WASM),true)
+RACK_FILES += emscripten/WasmUtils.cpp
+endif
 
 # --------------------------------------------------------------
 # lots of warnings from VCV side
@@ -174,21 +200,28 @@ endif
 TARGET = rack.a
 
 ifneq ($(MACOS),true)
-CARDINAL_FX_ARGS = VST2_FILENAME=Cardinal.vst/CardinalFX$(LIB_EXT)
-CARDINAL_SYNTH_ARGS = VST2_FILENAME=Cardinal.vst/CardinalSynth$(LIB_EXT)
+CARDINAL_FX_ARGS = VST2_FILENAME=Cardinal.vst/CardinalFX$(LIB_EXT) CLAP_FILENAME=Cardinal.clap/CardinalFX.clap
+CARDINAL_SYNTH_ARGS = VST2_FILENAME=Cardinal.vst/CardinalSynth$(LIB_EXT) CLAP_FILENAME=Cardinal.clap/CardinalSynth.clap
 endif
 
 all: $(TARGET)
 ifeq ($(MOD_BUILD),true)
+	$(MAKE) -C Cardinal lv2
 	$(MAKE) -C CardinalFX lv2
+else ifeq ($(WASM),true)
+	$(MAKE) -C CardinalNative
 else
 	$(MAKE) -C Cardinal
+	$(MAKE) -C CardinalNative
 	$(MAKE) -C CardinalFX $(CARDINAL_FX_ARGS)
 	$(MAKE) -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 endif
 
 jack: $(TARGET)
 	$(MAKE) jack -C Cardinal
+
+native: $(TARGET)
+	$(MAKE) jack -C CardinalNative
 
 lv2: $(TARGET)
 	$(MAKE) lv2 -C Cardinal
@@ -203,6 +236,10 @@ vst3: $(TARGET)
 	$(MAKE) vst3 -C Cardinal
 	$(MAKE) vst3 -C CardinalFX $(CARDINAL_FX_ARGS)
 	$(MAKE) vst3 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
+
+clap: $(TARGET)
+	$(MAKE) clap -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) clap -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 
 clean:
 	rm -f $(TARGET)
@@ -226,15 +263,12 @@ $(BUILD_DIR)/%.c.o: %.c
 	@echo "Compiling $<"
 	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@
 
-$(BUILD_DIR)/override/MIDI_CV.cpp.o: override/MIDI_CV.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -UPRIVATE -c -o $@
-
 $(BUILD_DIR)/%.cpp.o: %.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
+
+$(BUILD_DIR)/emscripten/WasmUtils.cpp.o: BUILD_CXX_FLAGS += -fno-exceptions
 
 # --------------------------------------------------------------
 

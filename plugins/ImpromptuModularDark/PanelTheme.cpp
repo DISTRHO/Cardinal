@@ -17,12 +17,12 @@ void writeThemeAndContrastAsDefault() {}
 void saveThemeAndContrastAsDefault(int, float) {}
 
 void loadThemeAndContrastFromDefault(int* panelTheme, float* panelContrast) {
-	*panelTheme = 1;
+	*panelTheme = rack::settings::darkMode ? 1 : 0;
 	*panelContrast = panelContrastDefault;
 }
 
 bool isDark(int*) {
-	return true;
+	return rack::settings::darkMode;
 }
 
 void readThemeAndContrastFromDefault() {}
@@ -47,7 +47,7 @@ void PanelBaseWidget::draw(const DrawArgs& args) {
 
 void InverterWidget::draw(const DrawArgs& args) {
 	TransparentWidget::draw(args);
-	{
+	if (rack::settings::darkMode) {
 		// nvgSave(args.vg);
 		nvgBeginPath(args.vg);
 		nvgFillColor(args.vg, SCHEME_WHITE);// this is the source, the current framebuffer is the dest	
@@ -64,4 +64,3 @@ void InverterWidget::draw(const DrawArgs& args) {
 		// nvgRestore(args.vg);
 	}
 }
-

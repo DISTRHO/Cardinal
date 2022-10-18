@@ -12,7 +12,7 @@ By default carla-discovery will do 1 audio processing/run block for testing, whi
 
 ```
 valgrind --leak-check=full --track-origins=yes --suppressions=./dpf/utils/valgrind-dpf.supp \
-/usr/lib/carla/carla-discovery-native vst2 ./bin/CardinalFX.vst/CardinalFX.so
+/usr/lib/carla/carla-discovery-native vst2 ./bin/Cardinal.vst/CardinalFX.so
 ```
 
 ## Plugin usage
@@ -26,5 +26,5 @@ It is recommended to remove all modules from the Rack except for the strictly ne
 ```
 env CARLA_BRIDGE_DUMMY=30 \
 valgrind --leak-check=full --track-origins=yes --suppressions=./dpf/utils/valgrind-dpf.supp \
-/usr/lib/carla/carla-bridge-native vst2 ./bin/CardinalFX.vst/CardinalFX.so ""
+/usr/lib/carla/carla-bridge-native vst2 ./bin/Cardinal.vst/CardinalFX.so ""
 ```

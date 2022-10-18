@@ -16,13 +16,19 @@ void InstantiateExpanderItem::onAction(const event::Action &e) {
 }
 
 json_t* BidooModule::dataToJson() {
-	return nullptr;
+	return json_object();
 }
 
 void BidooModule::dataFromJson(json_t*) {
 }
 
 void BidooWidget::appendContextMenu(Menu*) {
+}
+
+void BidooWidget::writeThemeAndContrastAsDefault() {
+}
+
+void BidooWidget::readThemeAndContrastFromDefault() {
 }
 
 void BidooWidget::prepareThemes(const std::string& filename) {
