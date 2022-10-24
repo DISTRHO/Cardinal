@@ -742,7 +742,7 @@ protected:
         }
         else
         {
-            port.hints = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange;
+            port.hints = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange | kCVPortIsOptional;
             index -= 8;
         }
        #elif CARDINAL_VARIANT_FX || CARDINAL_VARIANT_NATIVE || CARDINAL_VARIANT_SYNTH
