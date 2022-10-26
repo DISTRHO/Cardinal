@@ -324,36 +324,11 @@ static void Engine_updateConnected(Engine* that) {
 	Engine_orderModules(that);
 }
 
+
 template<typename T, typename Y>
 inline bool mapContains(std::unordered_map<T, Y> &id, T what) {
 	return id.find(what) != id.end();
 }
-
-// Stores all Modules' and Cables' relationships
-/*
-struct ModulesNetwork {
-	std::unordered_map<Module*, std::vector<Cable*>> inCables;
-	std::unordered_map<Module*, std::vector<Cable*>> outCables;
-};
-
-inline ModulesNetwork Engine_buildModulesNetwork(Engine* that) {
-	Engine::Internal* internal = that->internal;
-	ModulesNetwork modulesNetwork;
-	for (Cable* cable : internal->cables) {
-		Module* inModule  = cable->inputModule;
-		Module* outModule = cable->outputModule;
-		if (mapContains(modulesNetwork.inCables, inModule))
-			modulesNetwork.inCables[inModule].push_back(cable);
-		else
-			modulesNetwork.inCables[inModule] = std::vector<Cable*>();
-		if (mapContains(modulesNetwork.outCables, outModule))
-			modulesNetwork.outCables[outModule].push_back(cable);
-		else
-			modulesNetwork.outCables[outModule] = std::vector<Cable*>();
-	}
-	return modulesNetwork;
-}
-*/
 
 static bool Engine_resolveFeedbackCable(Module* startingModule, Cable* cable) {
 	Module* outModule = cable->outputModule;
@@ -387,7 +362,7 @@ static void Engine_orderModule(Module* module, std::unordered_map<Module*, Modul
 			}
 		}
 	}
-	
+
 	visitedModules[module] = module; //global
 	orderedModules.push_back(module);
 }
