@@ -33,6 +33,7 @@
 #include <atomic>
 #include <tuple>
 #include <pmmintrin.h>
+#include <unordered_map>
 
 #include <engine/Engine.hpp>
 #include <engine/TerminalModule.hpp>
@@ -319,6 +320,95 @@ static void Engine_updateConnected(Engine* that) {
 	for (Output* output : disconnectedOutputs) {
 		Port_setDisconnected(output);
 		DISTRHO_SAFE_ASSERT(output->cables.empty());
+	}
+	Engine_orderModules(that);
+}
+
+template<typename T, typename Y>
+inline bool mapContains(std::unordered_map<T, Y> &id, T what) {
+	return id.find(what) != id.end();
+}
+
+// Stores all Modules' and Cables' relationships
+/*
+struct ModulesNetwork {
+	std::unordered_map<Module*, std::vector<Cable*>> inCables;
+	std::unordered_map<Module*, std::vector<Cable*>> outCables;
+};
+
+inline ModulesNetwork Engine_buildModulesNetwork(Engine* that) {
+	Engine::Internal* internal = that->internal;
+	ModulesNetwork modulesNetwork;
+	for (Cable* cable : internal->cables) {
+		Module* inModule  = cable->inputModule;
+		Module* outModule = cable->outputModule;
+		if (mapContains(modulesNetwork.inCables, inModule))
+			modulesNetwork.inCables[inModule].push_back(cable);
+		else
+			modulesNetwork.inCables[inModule] = std::vector<Cable*>();
+		if (mapContains(modulesNetwork.outCables, outModule))
+			modulesNetwork.outCables[outModule].push_back(cable);
+		else
+			modulesNetwork.outCables[outModule] = std::vector<Cable*>();
+	}
+	return modulesNetwork;
+}
+*/
+
+static bool Engine_resolveFeedbackCable(Module* startingModule, Cable* cable) {
+	Module* outModule = cable->outputModule;
+	if (outModule == startingModule)
+		return true; //Found FB
+	else
+		return Engine_isFeedback(startingModule, outModule); //Keep going
+}
+
+static bool Engine_isFeedback(Module* startingModule, Module* outModule) {
+	for (Output& output : outModule->outputs) {
+		for (Cable* outCable : output.cables) {
+			if (Engine_resolveFeedbackCable(startingModule, outCable))
+				return true;
+		}
+	}
+	return false;
+}
+
+static void Engine_orderModule(Module* module, std::unordered_map<Module*, Module*> &traversedModules, std::unordered_map<Module*, Module*> &visitedModules, std::vector<Module*> &orderedModules) {
+	traversedModules[module] = module; //per-iteration
+
+	//DFS
+	for (Output& output : module->outputs) {
+		for (Cable* cable : output.cables) {
+			Module* outModule = cable->outputModule;
+			if (!mapContains(visitedModules, outModule)) {
+				if (!(mapContains(traversedModules, outModule) || Engine_isFeedback(module, outModule))) {
+					Engine_orderModule(outModule, traversedModules, visitedModules, orderedModules);
+				}
+			}
+		}
+	}
+	
+	visitedModules[module] = module; //global
+	orderedModules.push_back(module);
+}
+
+/** Order the modules so that they always read the most recent sample from their inputs
+*/
+static void Engine_orderModules(Engine* that) {
+	Engine::Internal* internal = that->internal;
+	std::unordered_map<Module*, Module*> visitedModules; //global
+	std::vector<Module*> unvisitedModules(internal->modules); //copy
+	std::vector<Module*> orderedModules; orderedModules.reserve(internal->modules.size()); //return
+	while (unvisitedModules.size()) {
+		Module* module = unvisitedModules[unvisitedModules.size() - 1]; //get last one
+		std::unordered_map<Module*, Module*> traversedModules; //Per-iteration
+		Engine_orderModule(module, traversedModules, visitedModules, orderedModules);
+		unvisitedModules.pop_back(); //pop last one
+	}
+	std::reverse(orderedModules.begin(), orderedModules.end());
+	if (orderedModules.size() == internal->modules.size()) {
+		for (int i = 0; i < orderedModules.size(); i++)
+			internal->modules[i] = orderedModules[i];
 	}
 }
 
