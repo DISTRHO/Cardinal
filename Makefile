@@ -172,6 +172,7 @@ ifneq ($(STATIC_BUILD),true)
 	$(MAKE) all -C carla $(CARLA_EXTRA_ARGS) \
 		CAN_GENERATE_LV2_TTL=false \
 		CUSTOM_DPF_PATH=$(CURDIR)/dpf \
+		HAVE_FRONTEND=true \
 		HAVE_PYQT=true \
 		HAVE_QT5=true \
 		HAVE_QT5PKG=true \
@@ -181,6 +182,7 @@ ifeq ($(CPU_X86_64),true)
 	$(MAKE) win32r -C carla $(CARLA_EXTRA_ARGS) \
 		CAN_GENERATE_LV2_TTL=false \
 		CUSTOM_DPF_PATH=$(CURDIR)/dpf \
+		HAVE_FRONTEND=true \
 		HAVE_PYQT=true \
 		HAVE_QT5=true \
 		HAVE_QT5PKG=true \

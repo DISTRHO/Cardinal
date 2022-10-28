@@ -15,12 +15,12 @@ jobs:
   linux-arm64:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/PawPawBuilds
@@ -81,7 +81,7 @@ jobs:
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -99,12 +99,12 @@ jobs:
   linux-armhf:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/PawPawBuilds
@@ -165,7 +165,7 @@ jobs:
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -183,12 +183,12 @@ jobs:
   linux-i686:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/PawPawBuilds
@@ -245,7 +245,7 @@ jobs:
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -263,12 +263,12 @@ jobs:
   linux-riscv64:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/PawPawBuilds
@@ -330,7 +330,7 @@ jobs:
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -348,12 +348,12 @@ jobs:
   linux-x86_64:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/PawPawBuilds
@@ -402,7 +402,7 @@ jobs:
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -420,7 +420,7 @@ jobs:
   linux-x86_64-debug:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up dependencies
@@ -442,7 +442,7 @@ jobs:
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../LICENSE ../README.md ../docs
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -451,7 +451,7 @@ jobs:
   linux-x86_64-headless:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up dependencies
@@ -467,7 +467,7 @@ jobs:
   linux-x86_64-sysdeps:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up dependencies
@@ -482,12 +482,12 @@ jobs:
   macos-intel:
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/PawPawBuilds
@@ -553,7 +553,7 @@ jobs:
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -571,12 +571,12 @@ jobs:
   macos-universal:
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/PawPawBuilds
@@ -641,7 +641,7 @@ jobs:
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -659,11 +659,11 @@ jobs:
   modduo:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: mpb-cache
         with:
           path: |
@@ -689,7 +689,7 @@ jobs:
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -698,11 +698,11 @@ jobs:
   modduox:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: mpb-cache
         with:
           path: |
@@ -728,7 +728,7 @@ jobs:
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -737,11 +737,11 @@ jobs:
   moddwarf:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: mpb-cache
         with:
           path: |
@@ -767,7 +767,7 @@ jobs:
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -776,12 +776,12 @@ jobs:
   wasm:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/PawPawBuilds
@@ -823,7 +823,7 @@ jobs:
       - name: Pack binaries
         run: |
           cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls *.html *.data *.js *.wasm)
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -841,12 +841,12 @@ jobs:
   wasm-mini:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/emsdk
@@ -890,7 +890,7 @@ jobs:
       - name: Pack binaries
         run: |
           cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls *.html *.data *.js *.wasm)
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -908,12 +908,12 @@ jobs:
   win32:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/PawPawBuilds
@@ -982,7 +982,7 @@ jobs:
           zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
           popd
           zip -u -9 ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip LICENSE README.md docs/*.*
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -1002,12 +1002,12 @@ jobs:
   win64:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/PawPawBuilds
@@ -1076,7 +1076,7 @@ jobs:
           zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
           popd
           zip -u -9 ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip LICENSE README.md docs/*.*
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -1096,7 +1096,7 @@ jobs:
   source-tarball:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up dependencies
@@ -1118,7 +1118,7 @@ jobs:
       - name: Set sha8
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-source-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
           path: |
@@ -1140,12 +1140,12 @@ jobs:
   plugin-validation:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             src/Rack/dep/bin
