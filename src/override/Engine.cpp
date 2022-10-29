@@ -278,20 +278,13 @@ static void Port_setConnected(Port* that) {
 	that->channels = 1;
 }
 
-template<typename T, typename Y>
-using Dictionary = std::unordered_map<T, Y>;
 
 template<typename T>
 using IdentityDictionary = std::unordered_map<T, T>;
 
-template<typename T, typename Y>
-inline bool dictContains(Dictionary<T, Y> &dict, T key) {
+template<typename T>
+inline bool dictContains(IdentityDictionary<T> &dict, T key) {
 	return dict.find(key) != dict.end();
-}
-
-template<typename T, typename Y>
-inline void dictAdd(Dictionary<T, Y> &dict, T key, Y entry) {
-	dict[key] = entry;
 }
 
 template<typename T>
@@ -299,53 +292,36 @@ inline void dictAdd(IdentityDictionary<T> &dict, T key) {
 	dict[key] = key;
 }
 
-static void Engine_detectFeedback(Module* targetModule, Module* currentModule, Dictionary<Module*, IdentityDictionary<Module*>> &feedbacks, IdentityDictionary<Module*> &touchedModules, IdentityDictionary<int64_t> &terminalModulesIDs) {
-	if (!dictContains(touchedModules, currentModule) && !dictContains(terminalModulesIDs, currentModule->id)) {
-		dictAdd(touchedModules, currentModule);
-		for (Output& currentOutput : currentModule->outputs) {
-			for (Cable* currentOutCable : currentOutput.cables) {
-				Module* outModule = currentOutCable->inputModule; //The input to the cable is the receiving module
-				if ((outModule == targetModule) && !((dictContains(feedbacks[targetModule], outModule) || dictContains(feedbacks[outModule], targetModule)))) {
-					// is this correct? which modules should be added? the starting ones?
-					dictAdd(feedbacks[targetModule], outModule);
-					dictAdd(feedbacks[outModule], targetModule);
-					printf("\nFB: %ld -> %ld\n", currentModule->id, targetModule->id);
-				}
-				else
-					Engine_detectFeedback(targetModule, outModule, feedbacks, touchedModules, terminalModulesIDs);
-			}
-		}
-	}
+static void Engine_storeTerminalModulesIDs(std::vector<TerminalModule*> terminalModules, IdentityDictionary<int64_t> &terminalModulesIDs) {
+	for (TerminalModule* terminalModule : terminalModules)
+		dictAdd(terminalModulesIDs, terminalModule->id);
 }
 
-static void Engine_findFeedbacks(std::vector<Module*> modules, Dictionary<Module*, IdentityDictionary<Module*>> &feedbacks, IdentityDictionary<int64_t> &terminalModulesIDs) {
-	for (Module* module : modules) {
-		IdentityDictionary<Module*> touchedModules;
-		Engine_detectFeedback(module, module, feedbacks, touchedModules, terminalModulesIDs);
-	}
-}
-
-static bool Engine_isFeedback(Module* sender, Module* receiver, Dictionary<Module*, IdentityDictionary<Module*>> &feedbacks) {
-	return dictContains(feedbacks[sender], receiver) || dictContains(feedbacks[receiver], sender);
-}
-
-static void Engine_orderModule(Module* module, IdentityDictionary<Module*> &touchedModules, std::vector<Module*> &orderedModules, Dictionary<Module*, IdentityDictionary<Module*>> &feedbacks, IdentityDictionary<int64_t> &terminalModulesIDs) {
-	if (!dictContains(touchedModules, module) && !dictContains(terminalModulesIDs, module->id)) {
+static void Engine_orderModule(Module* module, IdentityDictionary<Module*> &touchedModules, std::vector<Module*> &orderedModules, IdentityDictionary<int64_t> &terminalModulesIDs) {
+	if (!dictContains(touchedModules, module) && !dictContains(terminalModulesIDs, module->id)) { // Ignore feedback loops and terminal modules
 		dictAdd(touchedModules, module);
 		for (Output& output : module->outputs) {
 			for (Cable* cable : output.cables) {
-				Module* receiver = cable->inputModule;
-				if (!Engine_isFeedback(module, receiver, feedbacks))
-					Engine_orderModule(receiver, touchedModules, orderedModules, feedbacks, terminalModulesIDs);
+				Module* receiver = cable->inputModule; // The input to the cable is the receiving module
+				Engine_orderModule(receiver, touchedModules, orderedModules, terminalModulesIDs);
 			}
 		}
 		orderedModules.push_back(module);
 	}
 }
 
-void Engine_storeTerminalModulesIDs(std::vector<TerminalModule*> terminalModules, IdentityDictionary<int64_t> &terminalModulesIDs) {
-	for (TerminalModule* terminalModule : terminalModules)
-		dictAdd(terminalModulesIDs, terminalModule->id);
+static void Engine_assignOrderedModules(std::vector<Module*> &modules, std::vector<Module*> &orderedModules) {
+	std::reverse(orderedModules.begin(), orderedModules.end()); // These are stored bottom up
+	if (orderedModules.size() == modules.size()) {
+		for (unsigned int i = 0; i < orderedModules.size(); i++)
+			modules[i] = orderedModules[i];
+	}
+}
+
+static void Engine_debugOrderedModules(std::vector<Module*> &modules) {
+	printf("\n--- Ordered modules ---\n");
+	for (unsigned int i = 0; i < modules.size(); i++)
+		printf("%d) %s - %ld\n", i, modules[i]->model->getFullName().c_str(), modules[i]->id);
 }
 
 /** Order the modules so that they always read the most recent sample from their inputs
@@ -356,27 +332,15 @@ static void Engine_orderModules(Engine* that) {
 	IdentityDictionary<int64_t> terminalModulesIDs;
 	Engine_storeTerminalModulesIDs(internal->terminalModules, terminalModulesIDs);
 
-	Dictionary<Module*, IdentityDictionary<Module*>> feedbacks;
-	Engine_findFeedbacks(internal->modules, feedbacks, terminalModulesIDs);
-
-	//IdentityDictionary<Module*> visitedModules; //global
 	IdentityDictionary<Module*> touchedModules;
-	//std::vector<Module*> unvisitedModules(internal->modules); //copy
 	std::vector<Module*> orderedModules; 
-	orderedModules.reserve(internal->modules.size()); //return
-	for (Module* module : internal->modules) {
-		//Module* module = unvisitedModules[unvisitedModules.size() - 1]; //get last one
-		Engine_orderModule(module, touchedModules, orderedModules, feedbacks, terminalModulesIDs);
-		//unvisitedModules.pop_back(); //pop last one
-	}
-	std::reverse(orderedModules.begin(), orderedModules.end());
-	printf("\n\nORDERED MODULES %ld:\n", orderedModules.size());
-	if (orderedModules.size() == internal->modules.size()) {
-		for (unsigned int i = 0; i < orderedModules.size(); i++) {
-			printf("%d) %ld \n", i, orderedModules[i]->id);
-			internal->modules[i] = orderedModules[i];
-		}
-	} 
+	orderedModules.reserve(internal->modules.size());
+	for (Module* module : internal->modules)
+		Engine_orderModule(module, touchedModules, orderedModules, terminalModulesIDs);
+
+	Engine_assignOrderedModules(internal->modules, orderedModules);
+
+	Engine_debugOrderedModules(internal->modules);
 }
 
 
@@ -422,6 +386,7 @@ static void Engine_updateConnected(Engine* that) {
 		Port_setDisconnected(output);
 		DISTRHO_SAFE_ASSERT(output->cables.empty());
 	}
+	// Order the modules according to their connections
 	Engine_orderModules(that);
 }
 
@@ -722,7 +687,7 @@ void Engine::addModule(Module* module) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = module;
 	}
-	printf("NEW MODULE: %ld\n", module->id);
+	printf("New module: %s - %ld\n", module->model->getFullName().c_str(), module->id);
 }
 
 
