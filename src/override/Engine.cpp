@@ -318,11 +318,13 @@ static void Engine_assignOrderedModules(std::vector<Module*> &modules, std::vect
 	}
 }
 
+#if DEBUG_ORDERED_MODULES
 static void Engine_debugOrderedModules(std::vector<Module*> &modules) {
 	printf("\n--- Ordered modules ---\n");
 	for (unsigned int i = 0; i < modules.size(); i++)
 		printf("%d) %s - %ld\n", i, modules[i]->model->getFullName().c_str(), modules[i]->id);
 }
+#endif
 
 /** Order the modules so that they always read the most recent sample from their inputs
 */
@@ -340,7 +342,9 @@ static void Engine_orderModules(Engine* that) {
 
 	Engine_assignOrderedModules(internal->modules, orderedModules);
 
+#if DEBUG_ORDERED_MODULES
 	Engine_debugOrderedModules(internal->modules);
+#endif
 }
 
 
@@ -687,7 +691,9 @@ void Engine::addModule(Module* module) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = module;
 	}
+#if DEBUG_ORDERED_MODULES
 	printf("New module: %s - %ld\n", module->model->getFullName().c_str(), module->id);
+#endif
 }
 
 
