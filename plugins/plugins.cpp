@@ -690,7 +690,11 @@ extern Model* modelBlankPanel;
 #include "rackwindows/src/plugin.hpp"
 
 // RebelTech
+#define BefacoOutputPort BefacoOutputPortRebelTech
+#define BefacoInputPort BefacoInputPortRebelTech
 #include "RebelTech/src/plugin.hpp"
+#undef BefacoOutputPort
+#undef BefacoInputPort
 
 // repelzen
 #define modelBlank modelrepelzenBlank
@@ -2648,12 +2652,16 @@ static void initStatic__RebelTech()
     const StaticPluginLoader spl(p, "RebelTech");
     if (spl.ok())
     {
+#define BefacoOutputPort BefacoOutputPortRebelTech
+#define BefacoInputPort BefacoInputPortRebelTech
         p->addModel(modelStoicheia);
         p->addModel(modelTonic);
         p->addModel(modelKlasmata);
         p->addModel(modelCLK);
         p->addModel(modelLogoi);
         p->addModel(modelPhoreo);
+#undef BefacoOutputPort
+#undef BefacoInputPort
     }
 }
 
