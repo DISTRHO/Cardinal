@@ -1,5 +1,5 @@
---- ../Rack/src/engine/Engine.cpp	2022-04-11 20:05:02.011283836 +0100
-+++ Engine.cpp	2022-06-29 01:30:02.024102120 +0100
+--- ../Rack/src/engine/Engine.cpp	2022-09-21 19:49:12.200540736 +0100
++++ Engine.cpp	2022-11-25 17:57:38.799958734 +0000
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -31,8 +31,11 @@
  #include <algorithm>
  #include <set>
  #include <thread>
-@@ -8,181 +35,35 @@
+@@ -6,183 +33,38 @@
+ #include <atomic>
+ #include <tuple>
  #include <pmmintrin.h>
++#include <unordered_map>
  
  #include <engine/Engine.hpp>
 +#include <engine/TerminalModule.hpp>
@@ -95,21 +98,23 @@
 -		});
 -	}
 -};
--
--
++#include "DistrhoUtils.hpp"
+ 
+ 
 -/** 2-phase barrier based on spin-locking.
 -*/
 -struct SpinBarrier {
 -	std::atomic<int> count{0};
 -	std::atomic<uint8_t> step{0};
 -	int threads = 0;
--
++// known terminal modules
++extern std::vector<rack::plugin::Model*> hostTerminalModels;
+ 
 -	/** Must be called when no threads are calling wait().
 -	*/
 -	void setThreads(int threads) {
 -		this->threads = threads;
 -	}
-+#include "DistrhoUtils.hpp"
  
 -	void wait() {
 -		uint8_t s = step;
@@ -129,10 +134,8 @@
 -		}
 -	}
 -};
- 
-+// known terminal modules
-+extern std::vector<rack::plugin::Model*> hostTerminalModels;
- 
+-
+-
 -/** Barrier that spin-locks until yield() is called, and then all threads switch to a mutex.
 -yield() should be called if it is likely that all threads will block for a while and continuing to spin-lock is unnecessary.
 -Saves CPU power after yield is called.
@@ -169,7 +172,7 @@
 -			}
 -			return;
 -		}
- 
+-
 -		// Spin until the last thread begins waiting
 -		while (!yielded.load(std::memory_order_relaxed)) {
 -			if (step.load(std::memory_order_relaxed) != s)
@@ -224,7 +227,7 @@
  
  	// moduleId
  	std::map<int64_t, Module*> modulesCache;
-@@ -198,7 +79,9 @@
+@@ -198,7 +80,9 @@
  	int64_t blockFrame = 0;
  	double blockTime = 0.0;
  	int blockFrames = 0;
@@ -234,7 +237,7 @@
  	// Meter
  	int meterCount = 0;
  	double meterTotal = 0.0;
-@@ -206,6 +89,7 @@
+@@ -206,6 +90,7 @@
  	double meterLastTime = -INFINITY;
  	double meterLastAverage = 0.0;
  	double meterLastMax = 0.0;
@@ -242,7 +245,7 @@
  
  	// Parameter smoothing
  	Module* smoothModule = NULL;
-@@ -217,22 +101,6 @@
+@@ -217,22 +102,6 @@
  	Readers lock when using the engine's state.
  	*/
  	SharedMutex mutex;
@@ -265,7 +268,7 @@
  };
  
  
-@@ -260,76 +128,11 @@
+@@ -260,76 +129,11 @@
  }
  
  
@@ -343,7 +346,7 @@
  	// Copy all voltages from output to input
  	for (int c = 0; c < channels; c++) {
  		float v = output->voltages[c];
-@@ -346,6 +149,53 @@
+@@ -346,6 +150,53 @@
  }
  
  
@@ -397,7 +400,7 @@
  /** Steps a single frame
  */
  static void Engine_stepFrame(Engine* that) {
-@@ -372,13 +222,8 @@
+@@ -372,13 +223,8 @@
  		}
  	}
  
@@ -412,7 +415,7 @@
  		if (module->leftExpander.messageFlipRequested) {
  			std::swap(module->leftExpander.producerMessage, module->leftExpander.consumerMessage);
  			module->leftExpander.messageFlipRequested = false;
-@@ -389,13 +234,32 @@
+@@ -389,13 +235,32 @@
  		}
  	}
  
@@ -440,19 +443,90 @@
 +				Cable_step(cable);
 +		}
 +	}
- 
--	internal->frame++;
++
 +	// Process terminal outputs last
 +	for (TerminalModule* terminalModule : internal->terminalModules) {
 +		TerminalModule__doProcess(terminalModule, processArgs, false);
 +	}
-+
+ 
+-	internal->frame++;
 +	++internal->frame;
  }
  
  
-@@ -416,32 +280,45 @@
+@@ -414,35 +279,119 @@
+ }
  
+ 
++template<typename T>
++using IdentityDictionary = std::unordered_map<T, T>;
++
++template<typename T>
++inline bool dictContains(IdentityDictionary<T>& dict, T key) {
++	return dict.find(key) != dict.end();
++}
++
++template<typename T>
++inline void dictAdd(IdentityDictionary<T>& dict, T key) {
++	dict[key] = key;
++}
++
++static void Engine_storeTerminalModulesIDs(std::vector<TerminalModule*> terminalModules, IdentityDictionary<int64_t>& terminalModulesIDs) {
++	for (TerminalModule* terminalModule : terminalModules)
++		dictAdd(terminalModulesIDs, terminalModule->id);
++}
++
++static void Engine_orderModule(Module* module, IdentityDictionary<Module*>& touchedModules, std::vector<Module*>& orderedModules, IdentityDictionary<int64_t>& terminalModulesIDs) {
++	if (!dictContains(touchedModules, module) && !dictContains(terminalModulesIDs, module->id)) { // Ignore feedback loops and terminal modules
++		dictAdd(touchedModules, module);
++		for (Output& output : module->outputs) {
++			for (Cable* cable : output.cables) {
++				Module* receiver = cable->inputModule; // The input to the cable is the receiving module
++				Engine_orderModule(receiver, touchedModules, orderedModules, terminalModulesIDs);
++			}
++		}
++		orderedModules.push_back(module);
++	}
++}
++
++static void Engine_assignOrderedModules(std::vector<Module*>& modules, std::vector<Module*>& orderedModules) {
++	std::reverse(orderedModules.begin(), orderedModules.end()); // These are stored bottom up
++	if (orderedModules.size() == modules.size()) {
++		for (unsigned int i = 0; i < orderedModules.size(); i++)
++			modules[i] = orderedModules[i];
++	}
++}
++
++#if DEBUG_ORDERED_MODULES
++static void Engine_debugOrderedModules(std::vector<Module*>& modules) {
++	printf("\n--- Ordered modules ---\n");
++	for (unsigned int i = 0; i < modules.size(); i++)
++		printf("%d) %s - %ld\n", i, modules[i]->model->getFullName().c_str(), modules[i]->id);
++}
++#endif
++
++/** Order the modules so that they always read the most recent sample from their inputs
++*/
++static void Engine_orderModules(Engine* that) {
++	Engine::Internal* internal = that->internal;
++
++	IdentityDictionary<int64_t> terminalModulesIDs;
++	Engine_storeTerminalModulesIDs(internal->terminalModules, terminalModulesIDs);
++
++	IdentityDictionary<Module*> touchedModules;
++	std::vector<Module*> orderedModules; 
++	orderedModules.reserve(internal->modules.size());
++	for (Module* module : internal->modules)
++		Engine_orderModule(module, touchedModules, orderedModules, terminalModulesIDs);
++
++	Engine_assignOrderedModules(internal->modules, orderedModules);
++
++#if DEBUG_ORDERED_MODULES
++	Engine_debugOrderedModules(internal->modules);
++#endif
++}
++
++
  static void Engine_updateConnected(Engine* that) {
  	// Find disconnected ports
 -	std::set<Port*> disconnectedPorts;
@@ -506,9 +580,12 @@
 +		Port_setDisconnected(output);
 +		DISTRHO_SAFE_ASSERT(output->cables.empty());
  	}
++	// Order the modules according to their connections
++	Engine_orderModules(that);
  }
  
-@@ -460,37 +337,23 @@
+ 
+@@ -460,37 +409,23 @@
  
  Engine::Engine() {
  	internal = new Internal;
@@ -554,7 +631,7 @@
  
  	delete internal;
  }
-@@ -519,18 +382,22 @@
+@@ -519,18 +454,22 @@
  		removeModule_NoLock(module);
  		delete module;
  	}
@@ -580,7 +657,7 @@
  	random::init();
  
  	internal->blockFrame = internal->frame;
-@@ -543,18 +410,14 @@
+@@ -543,18 +482,14 @@
  		Engine_updateExpander_NoLock(this, module, true);
  	}
  
@@ -600,7 +677,7 @@
  	// Stop timer
  	double endTime = system::getTime();
  	double meter = (endTime - startTime) / (frames * internal->sampleTime);
-@@ -572,47 +435,20 @@
+@@ -572,47 +507,20 @@
  		internal->meterTotal = 0.0;
  		internal->meterMax = 0.0;
  	}
@@ -650,7 +727,7 @@
  }
  
  
-@@ -635,20 +471,13 @@
+@@ -635,20 +543,13 @@
  	for (Module* module : internal->modules) {
  		module->onSampleRateChange(e);
  	}
@@ -674,7 +751,7 @@
  }
  
  
-@@ -658,7 +487,6 @@
+@@ -658,7 +559,6 @@
  
  
  void Engine::yieldWorkers() {
@@ -682,7 +759,7 @@
  }
  
  
-@@ -698,17 +526,25 @@
+@@ -698,17 +598,25 @@
  
  
  double Engine::getMeterAverage() {
@@ -709,7 +786,7 @@
  }
  
  
-@@ -718,8 +554,12 @@
+@@ -718,8 +626,12 @@
  	for (Module* m : internal->modules) {
  		if (i >= len)
  			break;
@@ -724,7 +801,7 @@
  	}
  	return i;
  }
-@@ -728,27 +568,43 @@
+@@ -728,27 +640,43 @@
  std::vector<int64_t> Engine::getModuleIds() {
  	SharedLock<SharedMutex> lock(internal->mutex);
  	std::vector<int64_t> moduleIds;
@@ -772,7 +849,17 @@
  	internal->modulesCache[module->id] = module;
  	// Dispatch AddEvent
  	Module::AddEvent eAdd;
-@@ -772,11 +628,11 @@
+@@ -763,6 +691,9 @@
+ 		if (paramHandle->moduleId == module->id)
+ 			paramHandle->module = module;
+ 	}
++#if DEBUG_ORDERED_MODULES
++	printf("New module: %s - %ld\n", module->model->getFullName().c_str(), module->id);
++#endif
+ }
+ 
+ 
+@@ -772,11 +703,11 @@
  }
  
  
@@ -789,7 +876,7 @@
  	// Dispatch RemoveEvent
  	Module::RemoveEvent eRemove;
  	module->onRemove(eRemove);
-@@ -785,18 +641,14 @@
+@@ -785,18 +716,14 @@
  		if (paramHandle->moduleId == module->id)
  			paramHandle->module = NULL;
  	}
@@ -810,7 +897,7 @@
  	}
  	// Update expanders of other modules
  	for (Module* m : internal->modules) {
-@@ -809,14 +661,31 @@
+@@ -809,14 +736,31 @@
  			m->rightExpander.module = NULL;
  		}
  	}
@@ -845,7 +932,7 @@
  }
  
  
-@@ -824,7 +693,8 @@
+@@ -824,7 +768,8 @@
  	SharedLock<SharedMutex> lock(internal->mutex);
  	// TODO Performance could be improved by searching modulesCache, but more testing would be needed to make sure it's always valid.
  	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
@@ -855,7 +942,7 @@
  }
  
  
-@@ -844,7 +714,7 @@
+@@ -844,7 +789,7 @@
  
  void Engine::resetModule(Module* module) {
  	std::lock_guard<SharedMutex> lock(internal->mutex);
@@ -864,7 +951,7 @@
  
  	Module::ResetEvent eReset;
  	module->onReset(eReset);
-@@ -853,7 +723,7 @@
+@@ -853,7 +798,7 @@
  
  void Engine::randomizeModule(Module* module) {
  	std::lock_guard<SharedMutex> lock(internal->mutex);
@@ -873,7 +960,7 @@
  
  	Module::RandomizeEvent eRandomize;
  	module->onRandomize(eRandomize);
-@@ -861,7 +731,7 @@
+@@ -861,7 +806,7 @@
  
  
  void Engine::bypassModule(Module* module, bool bypassed) {
@@ -882,7 +969,7 @@
  	if (module->isBypassed() == bypassed)
  		return;
  
-@@ -907,11 +777,17 @@
+@@ -907,11 +852,17 @@
  
  
  void Engine::prepareSave() {
@@ -900,7 +987,7 @@
  }
  
  
-@@ -946,16 +822,16 @@
+@@ -946,16 +897,16 @@
  
  void Engine::addCable(Cable* cable) {
  	std::lock_guard<SharedMutex> lock(internal->mutex);
@@ -922,7 +1009,7 @@
  		// Get connected status of output, to decide whether we need to call a PortChangeEvent.
  		// It's best to not trust `cable->outputModule->outputs[cable->outputId]->isConnected()`
  		if (cable2->outputModule == cable->outputModule && cable2->outputId == cable->outputId)
-@@ -969,6 +845,8 @@
+@@ -969,6 +920,8 @@
  	// Add the cable
  	internal->cables.push_back(cable);
  	internal->cablesCache[cable->id] = cable;
@@ -931,7 +1018,7 @@
  	Engine_updateConnected(this);
  	// Dispatch input port event
  	{
-@@ -996,10 +874,12 @@
+@@ -996,10 +949,12 @@
  
  
  void Engine::removeCable_NoLock(Cable* cable) {
@@ -946,7 +1033,7 @@
  	// Remove the cable
  	internal->cablesCache.erase(cable->id);
  	internal->cables.erase(it);
-@@ -1085,11 +965,11 @@
+@@ -1085,11 +1040,11 @@
  	std::lock_guard<SharedMutex> lock(internal->mutex);
  	// New ParamHandles must be blank.
  	// This means we don't have to refresh the cache.
@@ -960,7 +1047,7 @@
  
  	// Add it
  	internal->paramHandles.insert(paramHandle);
-@@ -1106,7 +986,7 @@
+@@ -1106,7 +1061,7 @@
  void Engine::removeParamHandle_NoLock(ParamHandle* paramHandle) {
  	// Check that the ParamHandle is already added
  	auto it = internal->paramHandles.find(paramHandle);
@@ -969,7 +1056,7 @@
  
  	// Remove it
  	paramHandle->module = NULL;
-@@ -1143,7 +1023,7 @@
+@@ -1143,7 +1098,7 @@
  void Engine::updateParamHandle_NoLock(ParamHandle* paramHandle, int64_t moduleId, int paramId, bool overwrite) {
  	// Check that it exists
  	auto it = internal->paramHandles.find(paramHandle);
@@ -978,7 +1065,7 @@
  
  	// Set IDs
  	paramHandle->moduleId = moduleId;
-@@ -1187,6 +1067,10 @@
+@@ -1187,6 +1142,10 @@
  		json_t* moduleJ = module->toJson();
  		json_array_append_new(modulesJ, moduleJ);
  	}
@@ -989,7 +1076,7 @@
  	json_object_set_new(rootJ, "modules", modulesJ);
  
  	// cables
-@@ -1197,11 +1081,6 @@
+@@ -1197,11 +1156,6 @@
  	}
  	json_object_set_new(rootJ, "cables", cablesJ);
  
@@ -1001,7 +1088,7 @@
  	return rootJ;
  }
  
-@@ -1225,14 +1104,20 @@
+@@ -1225,14 +1179,20 @@
  		}
  		catch (Exception& e) {
  			WARN("Cannot load model: %s", e.what());
@@ -1026,7 +1113,7 @@
  
  		try {
  			// This doesn't need a lock because the Module is not added to the Engine yet.
-@@ -1248,7 +1133,8 @@
+@@ -1248,7 +1208,8 @@
  		}
  		catch (Exception& e) {
  			WARN("Cannot load module: %s", e.what());
@@ -1036,7 +1123,7 @@
  			delete module;
  			continue;
  		}
-@@ -1285,67 +1171,15 @@
+@@ -1285,67 +1246,15 @@
  			continue;
  		}
  	}
@@ -1047,9 +1134,9 @@
 -		Module* masterModule = getModule(json_integer_value(masterModuleIdJ));
 -		setMasterModule(masterModule);
 -	}
- }
- 
- 
+-}
+-
+-
 -void EngineWorker::run() {
 -	// Configure thread
 -	contextSet(engine->internal->context);
@@ -1064,9 +1151,9 @@
 -		Engine_stepWorker(engine, id);
 -		engine->internal->workerBarrier.wait();
 -	}
--}
--
--
+ }
+ 
+ 
 -static void Engine_fallbackRun(Engine* that) {
 -	system::setThreadName("Engine fallback");
 -	contextSet(that->internal->context);

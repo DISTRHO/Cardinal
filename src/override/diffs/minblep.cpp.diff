@@ -1,0 +1,62 @@
+--- ../Rack/src/dsp/minblep.cpp	2022-09-21 19:49:12.200540736 +0100
++++ minblep.cpp	2022-09-21 19:41:45.884648820 +0100
+@@ -1,3 +1,30 @@
++/*
++ * DISTRHO Cardinal Plugin
++ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * For a full copy of the GNU General Public License see the LICENSE file.
++ */
++
++/**
++ * This file is an edited version of VCVRack's dsp/minblep.cpp
++ * Copyright (C) 2016-2021 VCV.
++ *
++ * This program is free software: you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or (at your option) any later version.
++ */
++
+ #include <dsp/minblep.hpp>
+ #include <dsp/fft.hpp>
+ #include <dsp/window.hpp>
+@@ -10,7 +37,7 @@
+ void minBlepImpulse(int z, int o, float* output) {
+ 	// Symmetric sinc array with `z` zero-crossings on each side
+ 	int n = 2 * z * o;
+-	float* x = new float[n];
++	float* x = (float*) pffft_aligned_malloc(sizeof(float) * n);
+ 	for (int i = 0; i < n; i++) {
+ 		float p = math::rescale((float) i, 0.f, (float)(n - 1), (float) - z, (float) z);
+ 		x[i] = sinc(p);
+@@ -20,7 +47,7 @@
+ 	blackmanHarrisWindow(x, n);
+ 
+ 	// Real cepstrum
+-	float* fx = new float[2 * n];
++	float* fx = (float*) pffft_aligned_malloc(sizeof(float) * 2 * n);
+ 	// Valgrind complains that the array is uninitialized for some reason, unless we clear it.
+ 	std::memset(fx, 0, sizeof(float) * 2 * n);
+ 	RealFFT rfft(n);
+@@ -75,8 +102,8 @@
+ 	std::memcpy(output, x, n * sizeof(float));
+ 
+ 	// Cleanup
+-	delete[] x;
+-	delete[] fx;
++	pffft_aligned_free(x);
++	pffft_aligned_free(fx);
+ }
+ 
+ 

@@ -283,21 +283,21 @@ template<typename T>
 using IdentityDictionary = std::unordered_map<T, T>;
 
 template<typename T>
-inline bool dictContains(IdentityDictionary<T> &dict, T key) {
+inline bool dictContains(IdentityDictionary<T>& dict, T key) {
 	return dict.find(key) != dict.end();
 }
 
 template<typename T>
-inline void dictAdd(IdentityDictionary<T> &dict, T key) {
+inline void dictAdd(IdentityDictionary<T>& dict, T key) {
 	dict[key] = key;
 }
 
-static void Engine_storeTerminalModulesIDs(std::vector<TerminalModule*> terminalModules, IdentityDictionary<int64_t> &terminalModulesIDs) {
+static void Engine_storeTerminalModulesIDs(std::vector<TerminalModule*> terminalModules, IdentityDictionary<int64_t>& terminalModulesIDs) {
 	for (TerminalModule* terminalModule : terminalModules)
 		dictAdd(terminalModulesIDs, terminalModule->id);
 }
 
-static void Engine_orderModule(Module* module, IdentityDictionary<Module*> &touchedModules, std::vector<Module*> &orderedModules, IdentityDictionary<int64_t> &terminalModulesIDs) {
+static void Engine_orderModule(Module* module, IdentityDictionary<Module*>& touchedModules, std::vector<Module*>& orderedModules, IdentityDictionary<int64_t>& terminalModulesIDs) {
 	if (!dictContains(touchedModules, module) && !dictContains(terminalModulesIDs, module->id)) { // Ignore feedback loops and terminal modules
 		dictAdd(touchedModules, module);
 		for (Output& output : module->outputs) {
@@ -310,7 +310,7 @@ static void Engine_orderModule(Module* module, IdentityDictionary<Module*> &touc
 	}
 }
 
-static void Engine_assignOrderedModules(std::vector<Module*> &modules, std::vector<Module*> &orderedModules) {
+static void Engine_assignOrderedModules(std::vector<Module*>& modules, std::vector<Module*>& orderedModules) {
 	std::reverse(orderedModules.begin(), orderedModules.end()); // These are stored bottom up
 	if (orderedModules.size() == modules.size()) {
 		for (unsigned int i = 0; i < orderedModules.size(); i++)
@@ -319,7 +319,7 @@ static void Engine_assignOrderedModules(std::vector<Module*> &modules, std::vect
 }
 
 #if DEBUG_ORDERED_MODULES
-static void Engine_debugOrderedModules(std::vector<Module*> &modules) {
+static void Engine_debugOrderedModules(std::vector<Module*>& modules) {
 	printf("\n--- Ordered modules ---\n");
 	for (unsigned int i = 0; i < modules.size(); i++)
 		printf("%d) %s - %ld\n", i, modules[i]->model->getFullName().c_str(), modules[i]->id);

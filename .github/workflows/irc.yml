@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Format message
         run: |
-            echo commitmessage=$(echo "${{ github.event.commits[0].message }}" | head -n 1) >> $GITHUB_ENV
+          echo commitmessage=$(echo "${{ github.event.commits[0].message }}" | head -n 1) >> $GITHUB_ENV
       - name: Format message
         run: |
           echo message="${{ github.actor }} pushed ${{ env.commitmessage }} ${{ github.event.commits[0].url }}" >> $GITHUB_ENV

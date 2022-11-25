@@ -1,5 +1,5 @@
---- ../Rack/src/app/MenuBar.cpp	2022-07-12 09:46:20.716165650 +0100
-+++ MenuBar.cpp	2022-07-12 09:45:31.518663160 +0100
+--- ../Rack/src/app/MenuBar.cpp	2022-09-21 19:49:12.198540676 +0100
++++ MenuBar.cpp	2022-09-21 19:41:45.883648777 +0100
 @@ -1,8 +1,33 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -36,29 +36,40 @@
  #include <app/MenuBar.hpp>
  #include <app/TipWindow.hpp>
  #include <widget/OpaqueWidget.hpp>
-@@ -25,8 +50,21 @@
+@@ -15,6 +40,7 @@
+ #include <ui/ProgressBar.hpp>
+ #include <ui/Label.hpp>
+ #include <engine/Engine.hpp>
++#include <widget/FramebufferWidget.hpp>
+ #include <window/Window.hpp>
+ #include <asset.hpp>
+ #include <context.hpp>
+@@ -25,8 +51,24 @@
  #include <patch.hpp>
  #include <library.hpp>
  
 +#include "../CardinalCommon.hpp"
++#include "DistrhoStandaloneUtils.hpp"
 +
 +#ifdef HAVE_LIBLO
 +# include <lo/lo.h>
 +#endif
 +
-+#ifdef DISTRHO_OS_WASM
-+# include "DistrhoStandaloneUtils.hpp"
-+#endif
++void switchDarkMode(bool darkMode);
  
  namespace rack {
 +namespace asset {
 +std::string patchesPath();
 +}
 +
++namespace plugin {
++void updateStaticPluginsDarkMode();
++}
++
  namespace app {
  namespace menuBar {
  
-@@ -48,79 +86,140 @@
+@@ -48,79 +90,152 @@
  };
  
  
@@ -82,12 +93,15 @@
  
  struct FileButton : MenuButton {
 +	const bool isStandalone;
++#if !(defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD))
 +	std::vector<std::string> demoPatches;
++#endif
 +
 +	FileButton(const bool standalone)
 +		: MenuButton(),  isStandalone(standalone)
 +	{
-+		const std::string patchesDir = asset::patchesPath();
++#if !(defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD))
++		const std::string patchesDir = asset::patchesPath() + DISTRHO_OS_SEP_STR "examples";
 +
 +		if (system::isDirectory(patchesDir))
 +		{
@@ -96,6 +110,7 @@
 +				return string::lowercase(a) < string::lowercase(b);
 +			});
 +		}
++#endif
 +	}
 +
  	void onAction(const ActionEvent& e) override {
@@ -177,7 +192,7 @@
 +			menu->addChild(createMenuItem("Deploy to MOD", "F7", []() {
 +				patchUtils::deployToRemote();
 +			}));
-+
+ 
 +			const bool autoDeploy = patchUtils::isRemoteAutoDeployed();
 +			menu->addChild(createCheckMenuItem("Auto deploy to MOD", "",
 +				[=]() {return autoDeploy;},
@@ -189,7 +204,7 @@
 +			}));
 +		}
 +#endif
- 
++
 +#ifndef DISTRHO_OS_WASM
  		menu->addChild(new ui::MenuSeparator);
  
@@ -209,6 +224,7 @@
  		}));
 +#endif
 +
++#if !(defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD))
 +		if (!demoPatches.empty())
 +		{
 +			menu->addChild(new ui::MenuSeparator);
@@ -226,8 +242,15 @@
 +						patchUtils::loadPathDialog(path, true);
 +					}));
 +				}
++
++				menu->addChild(new ui::MenuSeparator);
++
++				menu->addChild(createMenuItem("Open PatchStorage.com for more patches", "", []() {
++					patchUtils::openBrowser("https://patchstorage.com/platform/cardinal/");
++				}));
 +			}));
 +		}
++#endif
 +
 +#ifndef DISTRHO_OS_WASM
 +		if (isStandalone) {
@@ -241,7 +264,7 @@
  	}
  };
  
-@@ -166,7 +265,7 @@
+@@ -166,7 +281,7 @@
  
  		menu->addChild(new ui::MenuSeparator);
  
@@ -250,7 +273,7 @@
  	}
  };
  
-@@ -256,7 +355,7 @@
+@@ -256,7 +371,7 @@
  		return settings::cableTension;
  	}
  	float getDefaultValue() override {
@@ -259,7 +282,27 @@
  	}
  	float getDisplayValue() override {
  		return getValue() * 100;
-@@ -399,28 +498,6 @@
+@@ -393,36 +508,37 @@
+ };
+ 
+ 
++static void setAllFramebufferWidgetsDirty(widget::Widget* const widget)
++{
++	for (widget::Widget* child : widget->children)
++	{
++		if (widget::FramebufferWidget* const fbw = dynamic_cast<widget::FramebufferWidget*>(child))
++		{
++			fbw->setDirty();
++			break;
++		}
++		setAllFramebufferWidgetsDirty(child);
++	}
++}
++
++
+ struct ViewButton : MenuButton {
+ 	void onAction(const ActionEvent& e) override {
+ 		ui::Menu* menu = createMenu();
  		menu->cornerFlags = BND_CORNER_TOP;
  		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
  
@@ -272,7 +315,8 @@
 -		menu->addChild(createMenuItem("Fullscreen", fullscreenText, [=]() {
 -			APP->window->setFullScreen(!fullscreen);
 -		}));
--
++		menu->addChild(createMenuLabel("Appearance"));
+ 
 -		double frameRate = APP->window->getMonitorRefreshRate() / settings::frameSwapInterval;
 -		menu->addChild(createSubmenuItem("Frame rate", string::f("%.0f Hz", frameRate), [=](ui::Menu* menu) {
 -			for (int i = 1; i <= 6; i++) {
@@ -282,13 +326,22 @@
 -					[=]() {settings::frameSwapInterval = i;}
 -				));
 -			}
--		}));
--
--		menu->addChild(new ui::MenuSeparator);
- 		menu->addChild(createMenuLabel("Appearance"));
++		std::string darkModeText;
++		if (settings::darkMode)
++			darkModeText = CHECKMARK_STRING;
++		menu->addChild(createMenuItem("Dark Mode", darkModeText, []() {
++			switchDarkMode(!settings::darkMode);
++			plugin::updateStaticPluginsDarkMode();
++			setAllFramebufferWidgetsDirty(APP->scene);
+ 		}));
  
+-		menu->addChild(new ui::MenuSeparator);
+-		menu->addChild(createMenuLabel("Appearance"));
+-
  		menu->addChild(createBoolPtrMenuItem("Show tooltips", "", &settings::tooltips));
-@@ -446,9 +523,18 @@
+ 
+ 		ZoomSlider* zoomSlider = new ZoomSlider;
+@@ -446,9 +562,18 @@
  		menu->addChild(haloBrightnessSlider);
  
  		menu->addChild(new ui::MenuSeparator);
@@ -307,7 +360,7 @@
  
  		static const std::vector<std::string> knobModeLabels = {
  			"Linear",
-@@ -473,11 +559,34 @@
+@@ -473,11 +598,34 @@
  		menu->addChild(knobScrollSensitivitySlider);
  
  		menu->addChild(new ui::MenuSeparator);
@@ -317,17 +370,17 @@
 -		menu->addChild(createBoolPtrMenuItem("Lock positions", "", &settings::lockModules));
 +#ifdef DISTRHO_OS_WASM
 +		const bool fullscreen = APP->window->isFullScreen();
-+		std::string fullscreenText = "F11";
++		std::string rightText = "F11";
 +		if (fullscreen)
-+			fullscreenText += " " CHECKMARK_STRING;
-+		menu->addChild(createMenuItem("Fullscreen", fullscreenText, [=]() {
++			rightText += " " CHECKMARK_STRING;
++		menu->addChild(createMenuItem("Fullscreen", rightText, [=]() {
 +			APP->window->setFullScreen(!fullscreen);
 +		}));
 +#endif
++
++		menu->addChild(createBoolPtrMenuItem("Invert zoom", "", &settings::invertZoom));
  
 -		menu->addChild(createBoolPtrMenuItem("Auto-squeeze algorithm (experimental)", "", &settings::squeezeModules));
-+		menu->addChild(createBoolPtrMenuItem("Invert zoom", "", &settings::invertZoom));
-+
 +		static const std::vector<std::string> rateLimitLabels = {
 +			"None",
 +			"2x",
@@ -345,7 +398,7 @@
  	}
  };
  
-@@ -487,47 +596,6 @@
+@@ -487,47 +635,6 @@
  ////////////////////
  
  
@@ -393,7 +446,7 @@
  struct EngineButton : MenuButton {
  	void onAction(const ActionEvent& e) override {
  		ui::Menu* menu = createMenu();
-@@ -541,268 +609,42 @@
+@@ -541,268 +648,40 @@
  			settings::cpuMeter ^= true;
  		}));
  
@@ -404,7 +457,10 @@
 -			int cores = system::getLogicalCoreCount() / 2;
 -
 -			for (int i = 1; i <= 2 * cores; i++) {
--				std::string rightText;
++		if (isUsingNativeAudio()) {
++			if (supportsAudioInput()) {
++				const bool enabled = isAudioInputEnabled();
+ 				std::string rightText;
 -				if (i == cores)
 -					rightText += "(most modules)";
 -				else if (i == 1)
@@ -538,12 +594,18 @@
 -					rightText += p->version + " → ";
 -				}
 -				rightText += update.version;
--			}
++				if (enabled)
++					rightText = CHECKMARK_STRING;
++				menu->addChild(createMenuItem("Enable Audio Input", rightText, [enabled]() {
++					if (!enabled)
++						requestAudioInput();
++				}));
+ 			}
 -		}
 -
 -		MenuItem::step();
 -	}
--
+ 
 -	void onAction(const ActionEvent& e) override {
 -		std::thread t([=] {
 -			library::syncUpdate(slug);
@@ -578,16 +640,7 @@
 -		else if (!library::isLoggedIn()) {
 -			addChild(createMenuItem("Register VCV account", "", [=]() {
 -				system::openBrowser("https://vcvrack.com/login");
-+#ifdef DISTRHO_OS_WASM
-+		if (supportsAudioInput()) {
-+			const bool enabled = isAudioInputEnabled();
-+			std::string text = "Enable Audio Input";
-+			if (enabled)
-+				text += " " CHECKMARK_STRING;
-+			menu->addChild(createMenuItem(text, "", [enabled]() {
-+				if (!enabled)
-+					requestAudioInput();
- 			}));
+-			}));
 -
 -			ui::TextField* emailField = new ui::TextField;
 -			emailField->placeholder = "Email";
@@ -606,23 +659,15 @@
 -			logInItem->passwordField = passwordField;
 -			passwordField->logInItem = logInItem;
 -			addChild(logInItem);
- 		}
+-		}
 -		else {
 -			addChild(createMenuItem("Log out", "", [=]() {
 -				library::logOut();
 -			}));
- 
+-
 -			addChild(createMenuItem("Browse VCV Library", "", [=]() {
 -				system::openBrowser("https://library.vcvrack.com/");
-+		if (supportsMIDI()) {
-+			const bool enabled = isMIDIEnabled();
-+			std::string text = "Enable MIDI";
-+			if (enabled)
-+				text += " " CHECKMARK_STRING;
-+			menu->addChild(createMenuItem(text, "", [enabled]() {
-+				if (!enabled)
-+					requestMIDI();
- 			}));
+-			}));
 -
 -			SyncUpdatesItem* syncItem = new SyncUpdatesItem;
 -			syncItem->text = "Update all";
@@ -637,12 +682,19 @@
 -					updateItem->setUpdate(pair.first);
 -					addChild(updateItem);
 -				}
--			}
- 		}
++			if (supportsMIDI()) {
++				std::string rightText;
++				if (isMIDIEnabled())
++					rightText = CHECKMARK_STRING;
++				menu->addChild(createMenuItem("Enable/Reconnect MIDI", rightText, []() {
++					requestMIDI();
++				}));
+ 			}
+-		}
 -	}
 -};
 -
- 
+-
 -struct LibraryButton : MenuButton {
 -	NotificationIcon* notification;
 -
@@ -662,7 +714,7 @@
 -		});
 -		t.detach();
 -	}
--
+ 
 -	void step() override {
 -		notification->box.pos = math::Vec(0, 0);
 -		notification->visible = library::hasUpdates();
@@ -672,26 +724,25 @@
 -			library::restartRequested = false;
 -			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been downloaded. Close and re-launch Rack to load new updates.")) {
 -				APP->window->close();
--			}
-+		if (supportsBufferSizeChanges()) {
-+			static const std::vector<uint32_t> bufferSizes = {256, 512, 1024, 2048, 4096, 8192, 16384};
-+			const uint32_t currentBufferSize = getBufferSize();
-+			menu->addChild(createSubmenuItem("Buffer Size", std::to_string(currentBufferSize), [=](ui::Menu* menu) {
-+				for (uint32_t bufferSize : bufferSizes) {
-+					menu->addChild(createCheckMenuItem(std::to_string(bufferSize), "",
-+						[=]() {return currentBufferSize == bufferSize;},
-+						[=]() {requestBufferSizeChange(bufferSize);}
-+					));
-+				}
-+			}));
++			if (supportsBufferSizeChanges()) {
++				static const std::vector<uint32_t> bufferSizes = {256, 512, 1024, 2048, 4096, 8192, 16384};
++				const uint32_t currentBufferSize = getBufferSize();
++				menu->addChild(createSubmenuItem("Buffer Size", std::to_string(currentBufferSize), [=](ui::Menu* menu) {
++					for (uint32_t bufferSize : bufferSizes) {
++						menu->addChild(createCheckMenuItem(std::to_string(bufferSize), "",
++							[=]() {return currentBufferSize == bufferSize;},
++							[=]() {requestBufferSizeChange(bufferSize);}
++						));
++					}
++				}));
+ 			}
  		}
 -
 -		MenuButton::step();
-+#endif
  	}
  };
  
-@@ -813,65 +655,23 @@
+@@ -813,65 +692,23 @@
  
  
  struct HelpButton : MenuButton {
@@ -709,14 +760,14 @@
  
 -		menu->addChild(createMenuItem("Tips", "", [=]() {
 -			APP->scene->addChild(tipWindowCreate());
+-		}));
+-
+-		menu->addChild(createMenuItem("User manual", "F1", [=]() {
+-			system::openBrowser("https://vcvrack.com/manual");
 +		menu->addChild(createMenuItem("Rack User manual", "F1", [=]() {
 +			patchUtils::openBrowser("https://vcvrack.com/manual");
  		}));
  
--		menu->addChild(createMenuItem("User manual", "F1", [=]() {
--			system::openBrowser("https://vcvrack.com/manual");
--		}));
--
 -		menu->addChild(createMenuItem("Support", "", [=]() {
 -			system::openBrowser("https://vcvrack.com/support");
 -		}));
@@ -763,7 +814,7 @@
  	}
  };
  
-@@ -921,7 +721,9 @@
+@@ -921,7 +758,9 @@
  struct MenuBar : widget::OpaqueWidget {
  	MeterLabel* meterLabel;
  
@@ -774,7 +825,7 @@
  		const float margin = 5;
  		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
  
-@@ -930,7 +732,7 @@
+@@ -930,7 +769,7 @@
  		layout->spacing = math::Vec(0, 0);
  		addChild(layout);
  
@@ -783,7 +834,7 @@
  		fileButton->text = "File";
  		layout->addChild(fileButton);
  
-@@ -946,10 +748,6 @@
+@@ -946,10 +785,6 @@
  		engineButton->text = "Engine";
  		layout->addChild(engineButton);
  
@@ -794,7 +845,7 @@
  		HelpButton* helpButton = new HelpButton;
  		helpButton->text = "Help";
  		layout->addChild(helpButton);
-@@ -984,7 +782,11 @@
+@@ -984,7 +819,11 @@
  
  
  widget::Widget* createMenuBar() {
