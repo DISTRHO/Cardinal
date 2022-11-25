@@ -33,11 +33,7 @@
 #include <list>
 
 /** NOTE alignas is required in some systems in order to allow SSE usage. */
-#ifndef ARCH_MAC
 #define SIMD_ALIGN alignas(32)
-#else
-#define SIMD_ALIGN
-#endif
 
 
 namespace rack {
