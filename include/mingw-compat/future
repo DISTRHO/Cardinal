@@ -19,6 +19,7 @@
 #include_next <future>
 #include "mingw.future.h"
 
+// fix macro pollution from Windows headers
 #undef IN
 #undef OUT
 #undef far

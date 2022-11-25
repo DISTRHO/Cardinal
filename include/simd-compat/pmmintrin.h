@@ -23,7 +23,19 @@
 // bring in extra SSE3 support via simde
 # define SIMDE_X86_SSE2_NATIVE
 # define SIMDE_X86_SSE3_ENABLE_NATIVE_ALIASES
+
+// make sure to not include windows.h here
+# ifdef _WIN32
+#  define _WIN32_WAS_DEFINED
+#  undef _WIN32
+# endif
+
 # include "../simde/simde/x86/sse3.h"
+
+# ifdef _WIN32_WAS_DEFINED
+#  define _WIN32
+#  undef _WIN32_WAS_DEFINED
+# endif
 
 #elif defined(__EMSCRIPTEN__)
 # include_next <pmmintrin.h>
