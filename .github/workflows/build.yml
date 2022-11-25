@@ -69,21 +69,16 @@ jobs:
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
       - uses: softprops/action-gh-release@v1
@@ -153,21 +148,16 @@ jobs:
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
       - uses: softprops/action-gh-release@v1
@@ -233,21 +223,16 @@ jobs:
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
       - uses: softprops/action-gh-release@v1
@@ -318,21 +303,16 @@ jobs:
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
       - uses: softprops/action-gh-release@v1
@@ -390,21 +370,16 @@ jobs:
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
       - uses: softprops/action-gh-release@v1
@@ -438,13 +413,13 @@ jobs:
           make DEBUG=true HAVE_PULSEAUDIO=false -j 1
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../LICENSE ../README.md ../docs
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
 
@@ -540,22 +515,17 @@ jobs:
           ./utils/create-macos-installer.sh
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Rename macOS bundle
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
+          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || env.SHA8 }}.pkg
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             ${{ github.event.repository.name }}-*.pkg
       - uses: softprops/action-gh-release@v1
@@ -628,22 +598,17 @@ jobs:
           ./utils/create-macos-installer.sh
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Rename macOS bundle
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
+          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || env.SHA8 }}.pkg
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             ${{ github.event.repository.name }}-*.pkg
       - uses: softprops/action-gh-release@v1
@@ -685,13 +650,13 @@ jobs:
           make modduo HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} MODDUO=true -j $(nproc)
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep lv2)
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
 
@@ -724,13 +689,13 @@ jobs:
           make modduox HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep lv2)
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
 
@@ -763,13 +728,13 @@ jobs:
           make moddwarf HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep lv2)
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
 
@@ -811,21 +776,16 @@ jobs:
           make CIBUILD=true NOOPT=true USE_GLES2=true -j $(nproc)
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls *.html *.data *.js *.wasm)
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.html *.data *.js *.wasm)
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.zip
       - uses: softprops/action-gh-release@v1
@@ -878,21 +838,16 @@ jobs:
           make CIBUILD=true NOPLUGINS=true STATIC_BUILD=true USE_GLES2=true -j $(nproc)
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls *.html *.data *.js *.wasm)
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.html *.data *.js *.wasm)
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.zip
       - uses: softprops/action-gh-release@v1
@@ -953,7 +908,7 @@ jobs:
           pushd deps/PawPaw; source local.env win32; popd
           make features
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
-      - name: Build win64 cross-compiled (carla)
+      - name: Build win32 cross-compiled (carla)
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/lib/ccache:${PATH}"
@@ -961,30 +916,25 @@ jobs:
           make carla-win32 -j $(nproc)
           make -C carla EMBED_TARGET=true TESTING=true dist
           make -C carla EMBED_TARGET=true TESTING=true dist
-      - name: Build win64 cross-compiled (packaging)
+      - name: Build win32 cross-compiled (packaging)
         run: |
           pushd deps/PawPaw; source local.env win32; popd
           xvfb-run ./utils/create-windows-installer.sh 32
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
           pushd bin
-          zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
+          zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
           popd
-          zip -u -9 ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip LICENSE README.md docs/*.*
+          zip -u -9 ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || env.SHA8 }}.zip LICENSE README.md docs/*.*
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.exe
             *.zip
@@ -1061,24 +1011,19 @@ jobs:
           xvfb-run ./utils/create-windows-installer.sh 64
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
           pushd bin
-          zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
+          zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
           popd
-          zip -u -9 ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip LICENSE README.md docs/*.*
+          zip -u -9 ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || env.SHA8 }}.zip LICENSE README.md docs/*.*
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.exe
             *.zip
@@ -1109,18 +1054,13 @@ jobs:
           make HEADLESS=true tarball+deps
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-source-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-source-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             /home/runner/cardinal*.tar.xz
             /home/runner/*/cardinal*.tar.xz

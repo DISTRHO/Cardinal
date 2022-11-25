@@ -10,11 +10,10 @@ jobs:
       - name: Format message
         id: message
         run: |
-          message="${{ github.actor }} pushed $(echo '${{ github.event.commits[0].message }}' | head -n 1 | tr -d "'") ${{ github.event.commits[0].url }}"
-          echo ::set-output name=message::"${message}"
+          echo "message=$(echo ${{ github.actor }} pushed $(echo ${{ github.event.commits[0].message }} | head -n 1 | tr -d "'") ${{ github.event.commits[0].url }}" >> $GITHUB_ENV
       - name: IRC notification
         uses: Gottox/irc-message-action@v2
         with:
           channel: '#cardinal'
           nickname: github-event-bot
-          message: ${{ steps.message.outputs.message }}
+          message: ${{ env.message }}
