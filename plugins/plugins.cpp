@@ -689,6 +689,15 @@ extern Model* modelBlankPanel;
 // rackwindows
 #include "rackwindows/src/plugin.hpp"
 
+// RebelTech
+#define BefacoInputPort BefacoInputPortRebelTech
+#define BefacoOutputPort BefacoOutputPortRebelTech
+#include "RebelTech/src/plugin.hpp"
+#undef BefacoInputPort
+#undef BefacoOutputPort
+ModuleTheme defaultPanelTheme = DARK_THEME;
+void addThemeMenuItems(Menu*, ModuleTheme*) {}
+
 // repelzen
 #define modelBlank modelrepelzenBlank
 #define modelMixer modelrepelzenMixer
@@ -736,14 +745,18 @@ extern Model* modelBlankPanel;
 // known terminal modules
 std::vector<Model*> hostTerminalModels;
 
-// stuff that reads config files, we dont want that
+// stuff that reads config files, we don't want that
 int loadConsoleType() { return 0; }
-bool loadDarkAsDefault() { return 1; }
+bool loadDarkAsDefault() { return settings::darkMode; }
+ModuleTheme loadDefaultTheme() { return settings::darkMode ? DARK_THEME : LIGHT_THEME; }
 int loadDirectOutMode() { return 0; }
+void readDefaultTheme() { defaultPanelTheme = loadDefaultTheme(); }
 void saveConsoleType(int) {}
 void saveDarkAsDefault(bool) {}
+void saveDefaultTheme(ModuleTheme) {}
 void saveDirectOutMode(bool) {}
 void saveHighQualityAsDefault(bool) {}
+void writeDefaultTheme() {}
 
 // plugin instances
 Plugin* pluginInstance__Cardinal;
@@ -807,6 +820,7 @@ Plugin* pluginInstance__PathSet;
 Plugin* pluginInstance__PinkTrombone;
 Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
+Plugin* pluginInstance__RebelTech;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__stocaudio;
@@ -2636,6 +2650,23 @@ static void initStatic__rackwindows()
     }
 }
 
+static void initStatic__RebelTech()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__RebelTech = p;
+
+    const StaticPluginLoader spl(p, "RebelTech");
+    if (spl.ok())
+    {
+        p->addModel(modelStoicheia);
+        p->addModel(modelTonic);
+        p->addModel(modelKlasmata);
+        p->addModel(modelCLK);
+        p->addModel(modelLogoi);
+        p->addModel(modelPhoreo);
+    }
+}
+
 static void initStatic__repelzen()
 {
     Plugin* const p = new Plugin;
@@ -2905,6 +2936,7 @@ void initStaticPlugins()
     initStatic__PinkTrombone();
     initStatic__Prism();
     initStatic__rackwindows();
+    initStatic__RebelTech();
     initStatic__repelzen();
     initStatic__sonusmodular();
     initStatic__stocaudio();

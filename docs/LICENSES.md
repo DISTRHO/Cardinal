@@ -72,6 +72,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Prism                   | BSD-3-Clause             | |
 | Rackwindows             | MIT                      | |
 | repelzen                | GPL-3.0-or-later         | |
+| RebelTech               | GPL-2.0-or-later         | |
 | Sonus Modular           | GPL-3.0-or-later         | |
 | stocaudio               | GPL-3.0-or-later         | |
 | unless_modules          | GPL-3.0-or-later         | |
@@ -208,6 +209,7 @@ Below is a list of artwork licenses from plugins
 | Prism/RobotoCondensed-Regular.ttf       | Apache-2.0       | |
 | Rackwindows/*                           | MIT              | [Same license as source code](https://github.com/n0jo/rackwindows/issues/15) |
 | repelzen/*                              | CC-BY-SA-4.0     | |
+| RebelTech/*                             | CC-BY-NC-4.0     | |
 | sonusmodular/*                          | GPL-3.0-or-later | [Same license as source code](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
 | stocaudio/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | unless_modules/*                        | CC-BY-NC-ND-4.0  | |

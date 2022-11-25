@@ -876,6 +876,14 @@ PRISM_CUSTOM = bogaudio Scale
 PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/src/*.cpp))
 
 # --------------------------------------------------------------
+# RebelTech
+
+PLUGIN_FILES += $(filter-out RebelTech/src/plugin.cpp,$(wildcard RebelTech/src/*.cpp))
+
+# modules/types which are present in other plugins
+REBELTECH_CUSTOM = BefacoInputPort BefacoOutputPort
+
+# --------------------------------------------------------------
 # repelzen
 
 PLUGIN_FILES += $(filter-out repelzen/src/repelzen.cpp,$(wildcard repelzen/src/*.cpp))
@@ -1176,8 +1184,8 @@ RESOURCE_FILES = \
 		$(wildcard Cardinal/res/*.svg) \
 		$(wildcard Fundamental/res/*.svg) \
 		$(wildcard Fundamental/res/components/*.svg) \
-		$(wildcard ZamAudio/res/*.svg) \
 		Fundamental/presets
+# $(wildcard ZamAudio/res/*.svg)
 else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 
@@ -1981,6 +1989,13 @@ $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 		-DpluginInstance=pluginInstance__rackwindows \
 		-Wno-implicit-fallthrough \
 		-Wno-sign-compare
+
+$(BUILD_DIR)/RebelTech/%.cpp.o: RebelTech/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(REBELTECH_CUSTOM),$(call custom_module_names,$(m),RebelTech)) \
+		-DpluginInstance=pluginInstance__RebelTech
 
 $(BUILD_DIR)/repelzen/%.cpp.o: repelzen/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

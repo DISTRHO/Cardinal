@@ -164,6 +164,7 @@ At the moment the following 3rd-party modules are provided:
 - PinkTrombone
 - Prism
 - rackwindows
+- RebelTech
 - repelzen
 - Sonus Modular
 - stocaudio

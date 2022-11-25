@@ -221,3 +221,6 @@
 [submodule "include/simde"]
 	path = include/simde
 	url = https://github.com/simd-everywhere/simde.git
+[submodule "plugins/RebelTech"]
+	path = plugins/RebelTech
+	url = https://github.com/hemmer/rebel-tech-vcv.git
