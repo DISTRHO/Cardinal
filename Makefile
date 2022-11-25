@@ -5,10 +5,10 @@
 #
 
 # also set in:
-# jucewrapper/CMakeList.txt `project`
+# jucewrapper/CMakeLists.txt `project`
 # src/CardinalCommon.cpp `CARDINAL_VERSION`
 # src/CardinalPlugin.cpp `getVersion`
-VERSION = 22.10
+VERSION = 22.11
 
 # --------------------------------------------------------------
 # Import base definitions
