@@ -33,6 +33,7 @@
 #include <atomic>
 #include <tuple>
 #include <pmmintrin.h>
+#include <unordered_map>
 
 #include <engine/Engine.hpp>
 #include <engine/TerminalModule.hpp>
@@ -278,6 +279,75 @@ static void Port_setConnected(Port* that) {
 }
 
 
+template<typename T>
+using IdentityDictionary = std::unordered_map<T, T>;
+
+template<typename T>
+inline bool dictContains(IdentityDictionary<T> &dict, T key) {
+	return dict.find(key) != dict.end();
+}
+
+template<typename T>
+inline void dictAdd(IdentityDictionary<T> &dict, T key) {
+	dict[key] = key;
+}
+
+static void Engine_storeTerminalModulesIDs(std::vector<TerminalModule*> terminalModules, IdentityDictionary<int64_t> &terminalModulesIDs) {
+	for (TerminalModule* terminalModule : terminalModules)
+		dictAdd(terminalModulesIDs, terminalModule->id);
+}
+
+static void Engine_orderModule(Module* module, IdentityDictionary<Module*> &touchedModules, std::vector<Module*> &orderedModules, IdentityDictionary<int64_t> &terminalModulesIDs) {
+	if (!dictContains(touchedModules, module) && !dictContains(terminalModulesIDs, module->id)) { // Ignore feedback loops and terminal modules
+		dictAdd(touchedModules, module);
+		for (Output& output : module->outputs) {
+			for (Cable* cable : output.cables) {
+				Module* receiver = cable->inputModule; // The input to the cable is the receiving module
+				Engine_orderModule(receiver, touchedModules, orderedModules, terminalModulesIDs);
+			}
+		}
+		orderedModules.push_back(module);
+	}
+}
+
+static void Engine_assignOrderedModules(std::vector<Module*> &modules, std::vector<Module*> &orderedModules) {
+	std::reverse(orderedModules.begin(), orderedModules.end()); // These are stored bottom up
+	if (orderedModules.size() == modules.size()) {
+		for (unsigned int i = 0; i < orderedModules.size(); i++)
+			modules[i] = orderedModules[i];
+	}
+}
+
+#if DEBUG_ORDERED_MODULES
+static void Engine_debugOrderedModules(std::vector<Module*> &modules) {
+	printf("\n--- Ordered modules ---\n");
+	for (unsigned int i = 0; i < modules.size(); i++)
+		printf("%d) %s - %ld\n", i, modules[i]->model->getFullName().c_str(), modules[i]->id);
+}
+#endif
+
+/** Order the modules so that they always read the most recent sample from their inputs
+*/
+static void Engine_orderModules(Engine* that) {
+	Engine::Internal* internal = that->internal;
+
+	IdentityDictionary<int64_t> terminalModulesIDs;
+	Engine_storeTerminalModulesIDs(internal->terminalModules, terminalModulesIDs);
+
+	IdentityDictionary<Module*> touchedModules;
+	std::vector<Module*> orderedModules; 
+	orderedModules.reserve(internal->modules.size());
+	for (Module* module : internal->modules)
+		Engine_orderModule(module, touchedModules, orderedModules, terminalModulesIDs);
+
+	Engine_assignOrderedModules(internal->modules, orderedModules);
+
+#if DEBUG_ORDERED_MODULES
+	Engine_debugOrderedModules(internal->modules);
+#endif
+}
+
+
 static void Engine_updateConnected(Engine* that) {
 	// Find disconnected ports
 	std::set<Input*> disconnectedInputs;
@@ -320,6 +390,8 @@ static void Engine_updateConnected(Engine* that) {
 		Port_setDisconnected(output);
 		DISTRHO_SAFE_ASSERT(output->cables.empty());
 	}
+	// Order the modules according to their connections
+	Engine_orderModules(that);
 }
 
 
@@ -619,6 +691,9 @@ void Engine::addModule(Module* module) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = module;
 	}
+#if DEBUG_ORDERED_MODULES
+	printf("New module: %s - %ld\n", module->model->getFullName().c_str(), module->id);
+#endif
 }
 
 
