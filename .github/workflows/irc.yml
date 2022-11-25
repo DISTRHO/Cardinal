@@ -8,9 +8,11 @@ jobs:
     name: IRC notification
     steps:
       - name: Format message
-        id: message
         run: |
-          echo "message=$(echo ${{ github.actor }} pushed $(echo ${{ github.event.commits[0].message }} | head -n 1 | tr -d "'") ${{ github.event.commits[0].url }}" >> $GITHUB_ENV
+            echo commitmessage=$(echo "${{ github.event.commits[0].message }}" | head -n 1) >> $GITHUB_ENV
+      - name: Format message
+        run: |
+          echo message="${{ github.actor }} pushed ${{ env.commitmessage }} ${{ github.event.commits[0].url }}" >> $GITHUB_ENV
       - name: IRC notification
         uses: Gottox/irc-message-action@v2
         with:
