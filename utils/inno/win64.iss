@@ -38,6 +38,7 @@ Source: "..\..\utils\distrho.ico"; DestDir: "{app}"; Components: resources; Flag
 Source: "..\..\carla\bin\carla-bridge-*.*"; DestDir: "{commoncf64}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\bin\carla-discovery-*.exe"; DestDir: "{commoncf64}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\bin\libcarla_utils.dll"; DestDir: "{commoncf64}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
+Source: "..\..\carla\bin\libcarla_frontend.dll"; DestDir: "{commoncf64}\Cardinal\Carla"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\build\Carla\libpython3.8.dll"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\build\Carla\Qt5*.dll"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
 Source: "..\..\carla\build\Carla\resources\*.*"; DestDir: "{commoncf64}\Cardinal\Carla\resources"; Components: carla; Flags: ignoreversion;
