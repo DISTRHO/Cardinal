@@ -21,8 +21,6 @@
 # include_next <mmintrin.h>
 #elif defined(__EMSCRIPTEN__)
 # include <wasm_simd128.h>
-#elif defined(__ARM_NEON)
-# include "../sse2neon/sse2neon.h"
 #else
 # define SIMDE_ENABLE_NATIVE_ALIASES
 # include "../simde/simde/x86/mmx.h"

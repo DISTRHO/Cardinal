@@ -20,6 +20,11 @@
 #if defined(__i386__) || defined(__x86_64__)
 # include_next <pmmintrin.h>
 
+// bring in extra SSE3 support via simde
+# define SIMDE_X86_SSE2_NATIVE
+# define SIMDE_X86_SSE3_ENABLE_NATIVE_ALIASES
+# include "../simde/simde/x86/sse3.h"
+
 #elif defined(__EMSCRIPTEN__)
 # include_next <pmmintrin.h>
 
@@ -29,6 +34,7 @@ __m64 _mm_set1_pi16(short w)
     return __extension__ (__m64){ static_cast<float>(w), static_cast<float>(w) };
 }
 
+/*
 #elif defined(__ARM_NEON)
 # include "../sse2neon/sse2neon.h"
 
@@ -43,11 +49,12 @@ __m64 _mm_set1_pi16(short w)
 {
     return vreinterpret_s64_s16(vdup_n_s16(w));
 }
+*/
 
 #else
 # define SIMDE_ENABLE_NATIVE_ALIASES
 # include "../simde/simde/x86/sse.h"
 # include "../simde/simde/x86/sse2.h"
-// # include "../simde/simde/x86/sse3.h"
+# include "../simde/simde/x86/sse3.h"
 
 #endif
