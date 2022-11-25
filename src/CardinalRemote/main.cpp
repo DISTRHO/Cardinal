@@ -106,7 +106,7 @@ int main(const int argc, const char* argv[])
     asset::userDir = asset::systemDir;
 
     // Log environment
-    INFO("%s %s v%s", APP_NAME.c_str(), APP_EDITION.c_str(), APP_VERSION.c_str());
+    INFO("%s %s version %s", APP_NAME.c_str(), APP_EDITION.c_str(), APP_VERSION.c_str());
     INFO("%s", system::getOperatingSystemInfo().c_str());
 //     INFO("Binary filename: %s", getBinaryFilename());
     INFO("System directory: %s", asset::systemDir.c_str());
