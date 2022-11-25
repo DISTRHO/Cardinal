@@ -745,6 +745,7 @@ void addThemeMenuItems(Menu*, ModuleTheme*) {}
 // known terminal modules
 std::vector<Model*> hostTerminalModels;
 
+#ifndef NOPLUGINS
 // stuff that reads config files, we don't want that
 int loadConsoleType() { return 0; }
 bool loadDarkAsDefault() { return settings::darkMode; }
@@ -757,6 +758,7 @@ void saveDefaultTheme(ModuleTheme) {}
 void saveDirectOutMode(bool) {}
 void saveHighQualityAsDefault(bool) {}
 void writeDefaultTheme() {}
+#endif
 
 // plugin instances
 Plugin* pluginInstance__Cardinal;
