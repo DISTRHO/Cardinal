@@ -30,7 +30,10 @@
 #  undef _WIN32
 # endif
 
-# include "../simde/simde/x86/sse3.h"
+// assume SSE3 only on macOS
+# ifndef ARCH_MAC
+#  include "../simde/simde/x86/sse3.h"
+# endif
 
 # ifdef _WIN32_WAS_DEFINED
 #  define _WIN32
