@@ -21,7 +21,7 @@
           "id": 2
         },
         {
-          "value": 0.70723104476928711,
+          "value": 0.64457994699478149,
           "id": 3
         },
         {
@@ -268,11 +268,11 @@
       "version": "2.0",
       "params": [
         {
-          "value": 0.10240961611270905,
+          "value": 0.17951798439025879,
           "id": 0
         },
         {
-          "value": 0.21445769071578979,
+          "value": 0.27710825204849243,
           "id": 1
         },
         {
@@ -354,7 +354,7 @@
       "version": "2.0",
       "params": [
         {
-          "value": 0.89999997615814209,
+          "value": 0.0,
           "id": 0
         },
         {
@@ -362,7 +362,7 @@
           "id": 1
         },
         {
-          "value": 0.89999997615814209,
+          "value": 0.0,
           "id": 2
         },
         {
@@ -481,7 +481,7 @@
       "data": {
         "filepath": "",
         "lang": "None",
-        "etext": "A classic polyphonic 2-oscillator synthesizer\n---------------------------------------------\n\n* 2 VCOs with blendable sawtooth and pulse waves\n* 1 multi-mode filter\n* 1 filter envelope\n* 1 VCA envelope\n* 1 multi-waveform LFO\n\nNotes:\n\n* The LFO is patched to oscillator pitch by default.\n  The amount can be controlled via the 2A and 2B level\n  knobs of the \"Matrix44\" mixer module.\n* You can control additional destinations with the LFO by \n  patching its output(s) into the \"Matrix44\" module's input \n  (optionally via the \"8Vert\" attenuator module) and\n  then the outputs of the \"Matrix44\" module into the \n  destinations. Then use its corresponding level knobs to \n  control the amount.\n* The pitch bend amount can be controlled via the 3A and 3B\n  level knobs of the \"Matrix44\" module (3.5% is roughly 2\n  semitones).\n* The number of polyphonic voices can be set via the \n  context menu of the \"Cardinal Host MIDI\" module.\n\n\n\n\n\n",
+        "etext": "A classic polyphonic 2-oscillator synthesizer\n---------------------------------------------\n\n* 2 VCOs with blendable sawtooth and pulse waves\n* 1 multi-mode filter\n* 1 filter envelope\n* 1 VCA envelope\n* 1 multi-waveform LFO\n\nNotes:\n\n* The LFO is patched to oscillator pitch by default.\n  The amount can be controlled via the 2A and 2B level\n  knobs of the \"Matrix44\" mixer module.\n* You can control additional destinations with the LFO by \n  patching its output(s) into the \"Matrix44\" module's input \n  (optionally via the \"8Vert\" attenuator module) and\n  then the outputs of the \"Matrix44\" module into the \n  destinations. Then use its corresponding level knobs to \n  control the amount.\n* The pitch bend amount can be controlled via the 3A and 3B\n  level knobs of the \"Matrix44\" module (3.5% is roughly 2\n  semitones).\n* The number of polyphonic voices can be set via the \n  context menu of the \"Cardinal Host MIDI\" module.\n\n\n\n\n\n\n",
         "width": 30
       },
       "pos": [
@@ -658,38 +658,6 @@
       "inputModuleId": 6599230938402504,
       "inputId": 6,
       "color": "#52ffff"
-    },
-    {
-      "id": 6034011788891270,
-      "outputModuleId": 4,
-      "outputId": 0,
-      "inputModuleId": 6599230938402504,
-      "inputId": 1,
-      "color": "#e952ff"
-    },
-    {
-      "id": 5198909862757200,
-      "outputModuleId": 4,
-      "outputId": 1,
-      "inputModuleId": 6599230938402504,
-      "inputId": 3,
-      "color": "#ff52d4"
-    },
-    {
-      "id": 8852665925615104,
-      "outputModuleId": 4,
-      "outputId": 2,
-      "inputModuleId": 6599230938402504,
-      "inputId": 5,
-      "color": "#ff9352"
-    },
-    {
-      "id": 8906204691632270,
-      "outputModuleId": 4,
-      "outputId": 3,
-      "inputModuleId": 6599230938402504,
-      "inputId": 7,
-      "color": "#ffd452"
     },
     {
       "id": 5415548314308516,
