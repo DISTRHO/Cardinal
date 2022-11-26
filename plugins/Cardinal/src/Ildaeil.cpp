@@ -488,16 +488,16 @@ struct IldaeilModule : Module {
             if (resetMeterIn)
                 meterInL = meterInR = 0.0f;
 
-            meterInL = std::max(meterInL, d_findMaxNormalizedFloat(audioDataIn1, BUFFER_SIZE));
-            meterInR = std::max(meterInR, d_findMaxNormalizedFloat(audioDataIn2, BUFFER_SIZE));
+            meterInL = std::max(meterInL, d_findMaxNormalizedFloat128(audioDataIn1));
+            meterInR = std::max(meterInR, d_findMaxNormalizedFloat128(audioDataIn2));
 
             fCarlaPluginDescriptor->process(fCarlaPluginHandle, ins, outs, BUFFER_SIZE, midiEvents, midiEventCount);
 
             if (resetMeterOut)
                 meterOutL = meterOutR = 0.0f;
 
-            meterOutL = std::max(meterOutL, d_findMaxNormalizedFloat(audioDataOut1, BUFFER_SIZE));
-            meterOutR = std::max(meterOutR, d_findMaxNormalizedFloat(audioDataOut2, BUFFER_SIZE));
+            meterOutL = std::max(meterOutL, d_findMaxNormalizedFloat128(audioDataOut1));
+            meterOutR = std::max(meterOutR, d_findMaxNormalizedFloat128(audioDataOut2));
 
             resetMeterIn = resetMeterOut = false;
         }

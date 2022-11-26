@@ -127,19 +127,12 @@ struct HostAudio2 : HostAudio<2> {
 #ifndef HEADLESS
     // for stereo meter
     uint32_t internalDataFrame = 0;
-    float internalDataBuffer[2][128];
+    float internalDataBufferL[128] = {};
+    float internalDataBufferR[128] = {};
     volatile bool resetMeters = true;
     float gainMeterL = 0.0f;
     float gainMeterR = 0.0f;
 #endif
-
-    HostAudio2()
-        : HostAudio<2>()
-    {
-#ifndef HEADLESS
-        std::memset(internalDataBuffer, 0, sizeof(internalDataBuffer));
-#endif
-    }
 
 #ifndef HEADLESS
     void onReset() override
@@ -230,8 +223,8 @@ struct HostAudio2 : HostAudio<2> {
         }
 
         const uint32_t j = internalDataFrame++;
-        internalDataBuffer[0][j] = valueL;
-        internalDataBuffer[1][j] = valueR;
+        internalDataBufferL[j] = valueL;
+        internalDataBufferR[j] = valueR;
 
         if (internalDataFrame == 128)
         {
@@ -240,10 +233,10 @@ struct HostAudio2 : HostAudio<2> {
             if (resetMeters)
                 gainMeterL = gainMeterR = 0.0f;
 
-            gainMeterL = std::max(gainMeterL, d_findMaxNormalizedFloat(internalDataBuffer[0], 128));
+            gainMeterL = std::max(gainMeterL, d_findMaxNormalizedFloat128(internalDataBufferL));
 
             if (in2connected)
-                gainMeterR = std::max(gainMeterR, d_findMaxNormalizedFloat(internalDataBuffer[1], 128));
+                gainMeterR = std::max(gainMeterR, d_findMaxNormalizedFloat128(internalDataBufferR));
             else
                 gainMeterR = gainMeterL;
 

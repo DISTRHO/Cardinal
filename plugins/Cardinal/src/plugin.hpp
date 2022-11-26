@@ -56,19 +56,16 @@ extern std::vector<Model*> hostTerminalModels;
  * Find the highest absolute and normalized value within a float array.
  */
 static inline
-float d_findMaxNormalizedFloat(const float floats[], const std::size_t count)
+float d_findMaxNormalizedFloat128(const float floats[128])
 {
-    DISTRHO_SAFE_ASSERT_RETURN(floats != nullptr, 0.0f);
-    DISTRHO_SAFE_ASSERT_RETURN(count > 0, 0.0f);
+    static constexpr const float kEmptyFloats[128] = {};
 
-    static constexpr const float kEmptyFloats[8192] = {};
-
-    if (count <= 8192 && std::memcmp(floats, kEmptyFloats, count) == 0)
+    if (std::memcmp(floats, kEmptyFloats, sizeof(float)*128) == 0)
         return 0.0f;
 
     float tmp, maxf2 = std::abs(floats[0]);
 
-    for (std::size_t i=1; i<count; ++i)
+    for (std::size_t i=1; i<128; ++i)
     {
         if (!std::isfinite(floats[i]))
             __builtin_unreachable();
