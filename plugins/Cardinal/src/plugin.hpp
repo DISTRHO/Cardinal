@@ -70,7 +70,7 @@ float d_findMaxNormalizedFloat128(const float floats[128])
         if (!std::isfinite(floats[i]))
             __builtin_unreachable();
 
-        tmp = std::abs(*floats++);
+        tmp = std::abs(floats[i]);
 
         if (tmp > maxf2)
             maxf2 = tmp;
