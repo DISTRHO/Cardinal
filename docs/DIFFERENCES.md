@@ -20,21 +20,22 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 | Contains internal modules      | Core only                 | Everything is internal          | |
 | Loads external modules         | Yes                       | No                              | |
 | Supports closed-source modules | Yes                       | No                              | |
-| Supports physical devices      | Yes                       | No                              | Audio + MIDI only through the DAW/Host or via JACK in standalone |
-| Plugin in AU format            | No                        | Yes                             | |
+| Supports physical devices      | Yes                       | No (*)                          | CardinalNative binary provides native audio+midi as standalone |
+| Plugin in AU format            | Yes                       | Yes                             | |
 | Plugin in LV2 format           | No                        | Yes                             | |
 | Plugin in VST2 format          | Yes                       | Yes                             | |
-| Plugin in VST3 format          | No                        | Yes                             | |
-| Plugin in CLAP format          | No                        | WIP                             | |
+| Plugin in VST3 format          | Yes                       | Yes                             | |
+| Plugin in CLAP format          | Yes                       | Yes                             | |
 | Plugin inside itself           | No, will crash            | Yes                             | Technical limitations prevent Rack Pro from loading inside itself |
+| Module processing order        | Same as insertion order   | Based on cable connections      | In Cardinal module processing order changes automatically depending on cable connections |
 | Multi-threaded engine          | Yes                       | No, uses host audio thread      | Intentional in Cardinal, for removing jitter |
-| Supports ARM systems           | No                        | Yes                             | This means Apple M1 too, yes |
+| Supports ARM systems           | WIP                       | Yes                             | This means Apple M1 too, yes |
 | Supports BSD systems           | No                        | Yes                             | Available as FreeBSD port |
 | Supports RISC-V systems        | No                        | Yes                             | |
 | Synth plugin variant           | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
 | FX plugin variant              | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
 | Raw-CV plugin variant          | Unsupported               | 8 audio IO + 10 CV IO           | Available in JACK, LV2 and VST3 formats, not possible in AU and VST2 |
-| Arbitrary parameter automation | Yes                       | No                              | Unsupported in Cardinal, tricky to do for many plugin formats at once |
+| Arbitrary parameter automation | Yes                       | No                              | |
 | Integrated plugin host         | No, Host payed separately | Yes, using Carla or Ildaeil     | |
 | Host sync/timing               | Using MIDI signals        | Using dedicated module          | |
 | Linux/X11 event handling       | Runs on 2nd thread        | Runs on main/GUI thread         | |
