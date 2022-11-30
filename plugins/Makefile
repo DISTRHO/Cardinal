@@ -902,7 +902,19 @@ PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular.cpp,$(wildcard sonusm
 PLUGIN_FILES += $(filter-out stocaudio/src/plugin.cpp,$(wildcard stocaudio/src/*.cpp))
 
 # --------------------------------------------------------------
+# stoermelder-packone
 
+STOERMELDER_PACKONE_IGNORED = AudioInterface64 MidiCat MidiKey MidiMon MidiPlug MidiStep Strip StripBay StripPp
+
+# FIXME
+STOERMELDER_PACKONE_IGNORED += Raw
+
+PLUGIN_FILES += $(filter-out $(STOERMELDER_PACKONE_IGNORED:%=stoermelder-packone/src/%.cpp),$(wildcard stoermelder-packone/src/*.cpp stoermelder-packone/src/mb/*.cpp))
+
+# modules/types which are present in other plugins
+STOERMELDER_PACKONE_CUSTOM =
+
+# --------------------------------------------------------------
 # unless_modules
 
 PLUGIN_FILES += $(filter-out unless_modules/src/unless.cpp,$(wildcard unless_modules/src/*.cpp))
@@ -1773,8 +1785,7 @@ $(BUILD_DIR)/ImpromptuModular/src/ImpromptuModular.cpp.o: ImpromptuModular/src/I
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
-		-Dinit=init__ImpromptuModular \
-		-UBUILDING_PLUGIN_MODULES
+		-Dinit=init__ImpromptuModular
 
 $(BUILD_DIR)/ImpromptuModular%.cpp.o: ImpromptuModular%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -2010,6 +2021,14 @@ $(BUILD_DIR)/sonusmodular/%.cpp.o: sonusmodular/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(SONUSMODULAR_CUSTOM),$(call custom_module_names,$(m),sonusmodular)) \
 		-DpluginInstance=pluginInstance__sonusmodular
+
+$(BUILD_DIR)/stoermelder-packone/%.cpp.o: stoermelder-packone/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(STOERMELDER_PACKONE_CUSTOM),$(call custom_module_names,$(m),stoermelder_packone)) \
+		-DpluginInstance=pluginInstance__stoermelder_packone \
+		-Dinit=init__stoermelder_packone
 
 $(BUILD_DIR)/stocaudio/%.cpp.o: stocaudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

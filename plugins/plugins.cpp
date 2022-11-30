@@ -715,6 +715,21 @@ void addThemeMenuItems(Menu*, ModuleTheme*) {}
 // stocaudio
 #include "stocaudio/src/plugin.hpp"
 
+// stoermelder-packone
+#include "stoermelder-packone/src/plugin.hpp"
+Model* modelAudioInterface64;
+Model* modelMidiCat;
+Model* modelMidiCatMem;
+Model* modelMidiCatCtx;
+Model* modelMidiKey;
+Model* modelMidiMon;
+Model* modelMidiPlug;
+Model* modelMidiStep;
+Model* modelRaw;
+Model* modelStrip;
+Model* modelStripBay4;
+Model* modelStripPp;
+
 // unless_modules
 #include "unless_modules/src/unless.hpp"
 
@@ -826,6 +841,7 @@ Plugin* pluginInstance__RebelTech;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__stocaudio;
+extern Plugin* pluginInstance__stoermelder_packone;
 Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__Voxglitch;
@@ -2591,6 +2607,7 @@ static void initStatic__PathSet()
         p->addModel(modelIceTray);
         p->addModel(modelAstroVibe);
         p->addModel(modelGlassPane);
+	    p->addModel(modelPlusPane);
         p->addModel(modelNudge);
         p->addModel(modelOneShot);
     }
@@ -2741,6 +2758,74 @@ static void initStatic__stocaudio()
         p->addModel(modelPolyturing);
         p->addModel(modelPolydelay);
         p->addModel(modelSpread);
+    }
+}
+
+static void initStatic__stoermelder_packone()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__stoermelder_packone = p;
+
+    const StaticPluginLoader spl(p, "stoermelder-packone");
+    if (spl.ok())
+    {
+        p->addModel(modelCVMap);
+        p->addModel(modelCVMapCtx);
+        p->addModel(modelCVMapMicro);
+        p->addModel(modelCVPam);
+        p->addModel(modelRotorA);
+        p->addModel(modelReMoveLite);
+        p->addModel(modelBolt);
+        p->addModel(modelInfix);
+        p->addModel(modelInfixMicro);
+        p->addModel(modelEightFace);
+        p->addModel(modelEightFaceX2);
+        p->addModel(modelSipo);
+        p->addModel(modelFourRounds);
+        p->addModel(modelArena);
+        p->addModel(modelMaze);
+        p->addModel(modelHive);
+        p->addModel(modelIntermix);
+        p->addModel(modelIntermixGate);
+        p->addModel(modelIntermixEnv);
+        p->addModel(modelIntermixFade);
+        p->addModel(modelSail);
+        p->addModel(modelPile);
+        p->addModel(modelPilePoly);
+        p->addModel(modelMirror);
+        p->addModel(modelAffix);
+        p->addModel(modelAffixMicro);
+        p->addModel(modelGrip);
+        p->addModel(modelGlue);
+        p->addModel(modelGoto);
+        p->addModel(modelStroke);
+        p->addModel(modelSpin);
+        p->addModel(modelTransit);
+        p->addModel(modelTransitEx);
+        p->addModel(modelX4);
+        p->addModel(modelMacro);
+        p->addModel(modelOrbit);
+        p->addModel(modelEightFaceMk2);
+        p->addModel(modelEightFaceMk2Ex);
+        p->addModel(modelDirt);
+        p->addModel(modelMb);
+        p->addModel(modelMe);
+
+        // NOTE disabled in Cardinal due to curl usage
+        // p->addModel(modelRaw);
+        spl.removeModule("Raw");
+
+        spl.removeModule("AudioInterface64");
+        spl.removeModule("MidiCat");
+        spl.removeModule("MidiCatEx");
+        spl.removeModule("MidiCatCtx");
+        spl.removeModule("MidiKey");
+        spl.removeModule("MidiMon");
+        spl.removeModule("MidiPlug");
+        spl.removeModule("MidiStep");
+        spl.removeModule("Strip");
+        spl.removeModule("StripBay4");
+        spl.removeModule("StripPp");
     }
 }
 
@@ -2942,6 +3027,7 @@ void initStaticPlugins()
     initStatic__repelzen();
     initStatic__sonusmodular();
     initStatic__stocaudio();
+    initStatic__stoermelder_packone(),
     initStatic__unless_modules();
     initStatic__ValleyAudio();
     initStatic__Voxglitch();
