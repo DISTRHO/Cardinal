@@ -140,6 +140,7 @@ RACK_FILES += override/plugin.cpp
 RACK_FILES += override/Engine.cpp
 RACK_FILES += override/MenuBar.cpp
 RACK_FILES += override/Model.cpp
+RACK_FILES += override/ModuleWidget.cpp
 RACK_FILES += override/OpenGlWidget.cpp
 RACK_FILES += override/Scene.cpp
 
@@ -164,6 +165,7 @@ IGNORED_FILES += Rack/src/rtmidi.cpp
 IGNORED_FILES += Rack/src/app/AudioDisplay.cpp
 IGNORED_FILES += Rack/src/app/MenuBar.cpp
 IGNORED_FILES += Rack/src/app/MidiDisplay.cpp
+IGNORED_FILES += Rack/src/app/ModuleWidget.cpp
 IGNORED_FILES += Rack/src/app/Scene.cpp
 IGNORED_FILES += Rack/src/app/TipWindow.cpp
 IGNORED_FILES += Rack/src/dsp/minblep.cpp

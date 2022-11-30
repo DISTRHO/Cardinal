@@ -1,5 +1,5 @@
---- ../Rack/src/plugin.cpp	2022-09-21 19:49:12.200540736 +0100
-+++ plugin.cpp	2022-09-21 19:41:45.884648820 +0100
+--- ../Rack/src/plugin.cpp	2022-11-23 23:11:38.000000000 +0000
++++ plugin.cpp	2022-11-25 23:27:58.000000000 +0000
 @@ -1,342 +1,41 @@
 -#include <thread>
 -#include <map>
@@ -372,7 +372,15 @@
  
  
  /** Given slug => fallback slug.
-@@ -389,8 +88,19 @@
+@@ -348,6 +47,7 @@
+ 	{"VultModules", "VultModulesFree"},
+ 	{"AudibleInstrumentsPreview", "AudibleInstruments"},
+ 	{"SequelSequencers", "DanielDavies"},
++	{"DelexanderVol1", "DelexandraVol1"},
+ 	// {"", ""},
+ };
+ 
+@@ -389,8 +89,19 @@
  */
  using PluginModuleSlug = std::tuple<std::string, std::string>;
  static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = {
@@ -393,7 +401,7 @@
  	// {{"", ""}, {"", ""}},
  };
  
-@@ -478,7 +188,6 @@
+@@ -478,7 +189,6 @@
  }
  
  

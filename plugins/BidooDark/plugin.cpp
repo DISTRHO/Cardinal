@@ -1,5 +1,4 @@
 #include "../Bidoo/src/plugin.hpp"
-#undef ModuleWidget
 
 void InstantiateExpanderItem::onAction(const event::Action &e) {
 	engine::Module* module = model->createModule();
@@ -36,5 +35,5 @@ void BidooWidget::prepareThemes(const std::string& filename) {
 }
 
 void BidooWidget::step() {
-	CardinalModuleWidget::step();
+	ModuleWidget::step();
 }

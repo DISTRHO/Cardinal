@@ -7,6 +7,7 @@ diff -U3 ../Rack/src/common.cpp common.cpp > diffs/common.cpp.diff
 diff -U3 ../Rack/src/context.cpp context.cpp > diffs/context.cpp.diff
 diff -U3 ../Rack/src/plugin.cpp plugin.cpp > diffs/plugin.cpp.diff
 diff -U3 ../Rack/src/app/MenuBar.cpp MenuBar.cpp > diffs/MenuBar.cpp.diff
+diff -U3 ../Rack/src/app/ModuleWidget.cpp ModuleWidget.cpp > diffs/ModuleWidget.cpp.diff
 diff -U3 ../Rack/src/app/Scene.cpp Scene.cpp > diffs/Scene.cpp.diff
 diff -U3 ../Rack/src/engine/Engine.cpp Engine.cpp > diffs/Engine.cpp.diff
 diff -U3 ../Rack/src/dsp/minblep.cpp minblep.cpp > diffs/minblep.cpp.diff

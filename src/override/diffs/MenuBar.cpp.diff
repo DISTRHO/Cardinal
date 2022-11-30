@@ -1,5 +1,5 @@
---- ../Rack/src/app/MenuBar.cpp	2022-09-21 19:49:12.198540676 +0100
-+++ MenuBar.cpp	2022-09-21 19:41:45.883648777 +0100
+--- ../Rack/src/app/MenuBar.cpp	2022-11-23 23:11:38.000000000 +0000
++++ MenuBar.cpp	2022-11-25 23:27:58.000000000 +0000
 @@ -1,8 +1,33 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -446,7 +446,7 @@
  struct EngineButton : MenuButton {
  	void onAction(const ActionEvent& e) override {
  		ui::Menu* menu = createMenu();
-@@ -541,268 +648,40 @@
+@@ -541,268 +648,46 @@
  			settings::cpuMeter ^= true;
  		}));
  
@@ -725,7 +725,13 @@
 -			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been downloaded. Close and re-launch Rack to load new updates.")) {
 -				APP->window->close();
 +			if (supportsBufferSizeChanges()) {
-+				static const std::vector<uint32_t> bufferSizes = {256, 512, 1024, 2048, 4096, 8192, 16384};
++				static const std::vector<uint32_t> bufferSizes = {
++					#ifdef DISTRHO_OS_WASM
++					256, 512, 1024, 2048, 4096, 8192, 16384
++					#else
++					128, 256, 512, 1024, 2048, 4096, 8192
++					#endif
++				};
 +				const uint32_t currentBufferSize = getBufferSize();
 +				menu->addChild(createSubmenuItem("Buffer Size", std::to_string(currentBufferSize), [=](ui::Menu* menu) {
 +					for (uint32_t bufferSize : bufferSizes) {
@@ -742,7 +748,7 @@
  	}
  };
  
-@@ -813,65 +692,23 @@
+@@ -813,65 +698,23 @@
  
  
  struct HelpButton : MenuButton {
@@ -814,7 +820,7 @@
  	}
  };
  
-@@ -921,7 +758,9 @@
+@@ -921,7 +764,9 @@
  struct MenuBar : widget::OpaqueWidget {
  	MeterLabel* meterLabel;
  
@@ -825,7 +831,7 @@
  		const float margin = 5;
  		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
  
-@@ -930,7 +769,7 @@
+@@ -930,7 +775,7 @@
  		layout->spacing = math::Vec(0, 0);
  		addChild(layout);
  
@@ -834,7 +840,7 @@
  		fileButton->text = "File";
  		layout->addChild(fileButton);
  
-@@ -946,10 +785,6 @@
+@@ -946,10 +791,6 @@
  		engineButton->text = "Engine";
  		layout->addChild(engineButton);
  
@@ -845,7 +851,7 @@
  		HelpButton* helpButton = new HelpButton;
  		helpButton->text = "Help";
  		layout->addChild(helpButton);
-@@ -984,7 +819,11 @@
+@@ -984,7 +825,11 @@
  
  
  widget::Widget* createMenuBar() {
