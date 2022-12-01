@@ -75,6 +75,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | RebelTech               | GPL-2.0-or-later         | |
 | Sonus Modular           | GPL-3.0-or-later         | |
 | stocaudio               | GPL-3.0-or-later         | |
+| Stoermelder Pack-One    | GPL-3.0-or-later         | |
 | unless_modules          | GPL-3.0-or-later         | |
 | Valley                  | GPL-3.0-or-later         | |
 | Voxglitch               | GPL-3.0-or-later         | |
@@ -212,6 +213,8 @@ Below is a list of artwork licenses from plugins
 | RebelTech/*                             | CC-BY-NC-4.0     | |
 | sonusmodular/*                          | GPL-3.0-or-later | [Same license as source code](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
 | stocaudio/*                             | GPL-3.0-or-later | No artwork specific license provided |
+| stoermelder-packone/*                   | GPL-3.0-or-later | No artwork specific license provided |
+| stoermelder-packone/fonts/RedkostComic.otf | OFL-1.1-RFN   | |
 | unless_modules/*                        | CC-BY-NC-ND-4.0  | |
 | unless_modules/font/CuteFont-Regular.ttf| OFL-1.1          | |
 | unless_modules/font/Terminus.ttf        | GPL-2.0-or-later | [Starting from v4.32, font license is OFL-1.1](https://files.ax86.net/terminus-ttf/#license) |

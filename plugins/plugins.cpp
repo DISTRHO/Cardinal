@@ -719,13 +719,12 @@ void addThemeMenuItems(Menu*, ModuleTheme*) {}
 #include "stoermelder-packone/src/plugin.hpp"
 Model* modelAudioInterface64;
 Model* modelMidiCat;
-Model* modelMidiCatMem;
 Model* modelMidiCatCtx;
+Model* modelMidiCatMem;
 Model* modelMidiKey;
 Model* modelMidiMon;
 Model* modelMidiPlug;
 Model* modelMidiStep;
-Model* modelRaw;
 Model* modelStrip;
 Model* modelStripBay4;
 Model* modelStripPp;
@@ -2810,10 +2809,7 @@ static void initStatic__stoermelder_packone()
         p->addModel(modelDirt);
         p->addModel(modelMb);
         p->addModel(modelMe);
-
-        // NOTE disabled in Cardinal due to curl usage
-        // p->addModel(modelRaw);
-        spl.removeModule("Raw");
+        p->addModel(modelRaw);
 
         spl.removeModule("AudioInterface64");
         spl.removeModule("MidiCat");

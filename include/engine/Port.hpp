@@ -33,7 +33,7 @@
 #include <list>
 
 /** NOTE alignas is required in some systems in order to allow SSE usage. */
-#define SIMD_ALIGN alignas(32)
+#define SIMD_ALIGN alignas(16)
 
 
 namespace rack {

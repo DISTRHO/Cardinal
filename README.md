@@ -168,6 +168,7 @@ At the moment the following 3rd-party modules are provided:
 - repelzen
 - Sonus Modular
 - stocaudio
+- Stoermelder Pack-One
 - unless_modules
 - Valley
 - Voxglitch

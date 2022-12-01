@@ -904,10 +904,14 @@ PLUGIN_FILES += $(filter-out stocaudio/src/plugin.cpp,$(wildcard stocaudio/src/*
 # --------------------------------------------------------------
 # stoermelder-packone
 
-STOERMELDER_PACKONE_IGNORED = AudioInterface64 MidiCat MidiKey MidiMon MidiPlug MidiStep Strip StripBay StripPp
+# will never work
+STOERMELDER_PACKONE_IGNORED = AudioInterface64
 
-# FIXME
-STOERMELDER_PACKONE_IGNORED += Raw
+# maybe?
+STOERMELDER_PACKONE_IGNORED += MidiCat MidiCatCtx MidiCatMem MidiKey MidiMon MidiPlug MidiStep
+
+# TODO osdialog replacements
+STOERMELDER_PACKONE_IGNORED += Strip StripBay StripPp
 
 PLUGIN_FILES += $(filter-out $(STOERMELDER_PACKONE_IGNORED:%=stoermelder-packone/src/%.cpp),$(wildcard stoermelder-packone/src/*.cpp stoermelder-packone/src/mb/*.cpp))
 
