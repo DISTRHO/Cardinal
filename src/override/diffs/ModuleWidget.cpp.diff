@@ -1,5 +1,5 @@
---- ../Rack/src/app/ModuleWidget.cpp	2022-11-23 23:11:38.000000000 +0000
-+++ ModuleWidget.cpp	2022-11-30 20:10:06.000000000 +0000
+--- ../Rack/src/app/ModuleWidget.cpp	2022-09-21 20:25:53.590040258 +0100
++++ ModuleWidget.cpp	2022-12-01 20:41:02.583687336 +0000
 @@ -1,3 +1,32 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -33,485 +33,151 @@
  #include <thread>
  #include <regex>
  
-@@ -368,71 +397,71 @@
- }
- 
- void ModuleWidget::onButton(const ButtonEvent& e) {
--	bool selected = APP->scene->rack->isSelected(this);
--
--	if (selected) {
--		if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
--			if (e.action == GLFW_PRESS) {
--				// Open selection context menu on right-click
--				ui::Menu* menu = createMenu();
+@@ -375,7 +404,7 @@
+ 			if (e.action == GLFW_PRESS) {
+ 				// Open selection context menu on right-click
+ 				ui::Menu* menu = createMenu();
 -				APP->scene->rack->appendSelectionContextMenu(menu);
--			}
--			e.consume(this);
--		}
--
--		if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
--			if (e.action == GLFW_PRESS) {
--				// Toggle selection on Shift-click
--				if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
--					APP->scene->rack->select(this, false);
--					e.consume(NULL);
--					return;
--				}
--
--				// If module positions are locked, don't consume left-click
--				if (settings::lockModules) {
--					return;
--				}
-+    const bool selected = APP->scene->rack->isSelected(this);
++				patchUtils::appendSelectionContextMenu(menu);
+ 			}
+ 			e.consume(this);
+ 		}
+@@ -627,6 +656,9 @@
+ 	std::string presetDir = model->getUserPresetDirectory();
+ 	system::createDirectories(presetDir);
  
--				internal->dragOffset = e.pos;
--			}
--
--			e.consume(this);
--		}
--
--		return;
--	}
--
--	// Dispatch event to children
--	Widget::onButton(e);
--	e.stopPropagating();
--	if (e.isConsumed())
--		return;
--
--	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
--		if (e.action == GLFW_PRESS) {
--			// Toggle selection on Shift-click
--			if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
--				APP->scene->rack->select(this, true);
--				e.consume(NULL);
--				return;
--			}
--
--			// If module positions are locked, don't consume left-click
--			if (settings::lockModules) {
--				return;
--			}
--
--			internal->dragOffset = e.pos;
--		}
--		e.consume(this);
--	}
--
--	// Open context menu on right-click
--	if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
--		createContextMenu();
--		e.consume(this);
--	}
-+    if (selected) {
-+        if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-+            if (e.action == GLFW_PRESS) {
-+                // Open selection context menu on right-click
-+                ui::Menu* menu = createMenu();
-+                patchUtils::appendSelectionContextMenu(menu);
-+            }
-+            e.consume(this);
-+        }
++	WeakPtr<ModuleWidget> weakThis = this;
++	async_dialog_filebrowser(false, nullptr, presetDir.c_str(), "Load preset", [=](char* pathC) {
 +
-+        if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
-+            if (e.action == GLFW_PRESS) {
-+                // Toggle selection on Shift-click
-+                if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
-+                    APP->scene->rack->select(this, false);
-+                    e.consume(NULL);
-+                    return;
-+                }
-+
-+                // If module positions are locked, don't consume left-click
-+                if (settings::lockModules) {
-+                    return;
-+                }
-+
-+                internal->dragOffset = e.pos;
-+            }
-+
-+            e.consume(this);
-+        }
-+
-+        return;
-+    }
-+
-+    // Dispatch event to children
-+    Widget::onButton(e);
-+    e.stopPropagating();
-+    if (e.isConsumed())
-+        return;
-+
-+    if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
-+        if (e.action == GLFW_PRESS) {
-+            // Toggle selection on Shift-click
-+            if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
-+                APP->scene->rack->select(this, true);
-+                e.consume(NULL);
-+                return;
-+            }
-+
-+            // If module positions are locked, don't consume left-click
-+            if (settings::lockModules) {
-+                return;
-+            }
-+
-+            internal->dragOffset = e.pos;
-+        }
-+        e.consume(this);
-+    }
-+
-+    // Open context menu on right-click
-+    if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
-+        createContextMenu();
-+        e.consume(this);
-+    }
- }
- 
- void ModuleWidget::onDragStart(const DragStartEvent& e) {
-@@ -624,36 +653,37 @@
- }
- 
- void ModuleWidget::loadDialog() {
--	std::string presetDir = model->getUserPresetDirectory();
--	system::createDirectories(presetDir);
-+    std::string presetDir = model->getUserPresetDirectory();
-+    system::createDirectories(presetDir);
- 
--	// Delete directories if empty
--	DEFER({
--		try {
--			system::remove(presetDir);
--			system::remove(system::getDirectory(presetDir));
--		}
--		catch (Exception& e) {
--			// Ignore exceptions if directory cannot be removed.
--		}
--	});
-+    WeakPtr<ModuleWidget> weakThis = this;
+ 	// Delete directories if empty
+ 	DEFER({
+ 		try {
+@@ -638,10 +670,8 @@
+ 		}
+ 	});
  
 -	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
 -	DEFER({osdialog_filters_free(filters);});
-+    async_dialog_filebrowser(false, nullptr, presetDir.c_str(), "Load preset", [=](char* pathC) {
-+        // Delete directories if empty
-+        DEFER({
-+            try {
-+                system::remove(presetDir);
-+                system::remove(system::getDirectory(presetDir));
-+            }
-+            catch (Exception& e) {
-+                // Ignore exceptions if directory cannot be removed.
-+            }
-+        });
-+
-+        if (!weakThis)
-+            return;
-+        if (!pathC)
-+            return;
-+
-+        try {
-+            weakThis->loadAction(pathC);
-+        }
-+        catch (Exception& e) {
-+            async_dialog_message(e.what());
-+        }
- 
--	char* pathC = osdialog_file(OSDIALOG_OPEN, presetDir.c_str(), NULL, filters);
--	if (!pathC) {
--		// No path selected
--		return;
--	}
--	DEFER({std::free(pathC);});
 -
--	try {
+-	char* pathC = osdialog_file(OSDIALOG_OPEN, presetDir.c_str(), NULL, filters);
++	if (!weakThis)
++		return;
+ 	if (!pathC) {
+ 		// No path selected
+ 		return;
+@@ -649,11 +679,13 @@
+ 	DEFER({std::free(pathC);});
+ 
+ 	try {
 -		loadAction(pathC);
--	}
--	catch (Exception& e) {
++		weakThis->loadAction(pathC);
+ 	}
+ 	catch (Exception& e) {
 -		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, e.what());
--	}
-+        std::free(pathC);
-+    });
++		async_dialog_message(e.what());
+ 	}
++
++	});
  }
  
  void ModuleWidget::save(std::string filename) {
-@@ -712,36 +742,37 @@
- }
+@@ -715,6 +747,9 @@
+ 	std::string presetDir = model->getUserPresetDirectory();
+ 	system::createDirectories(presetDir);
  
- void ModuleWidget::saveDialog() {
--	std::string presetDir = model->getUserPresetDirectory();
--	system::createDirectories(presetDir);
-+    const std::string presetDir = model->getUserPresetDirectory();
-+    system::createDirectories(presetDir);
++	WeakPtr<ModuleWidget> weakThis = this;
++	async_dialog_filebrowser(true, "preset.vcvm", presetDir.c_str(), "Save preset", [=](char* pathC) {
++
+ 	// Delete directories if empty
+ 	DEFER({
+ 		try {
+@@ -726,10 +761,8 @@
+ 		}
+ 	});
  
--	// Delete directories if empty
--	DEFER({
--		try {
--			system::remove(presetDir);
--			system::remove(system::getDirectory(presetDir));
--		}
--		catch (Exception& e) {
--			// Ignore exceptions if directory cannot be removed.
--		}
--	});
--
 -	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
 -	DEFER({osdialog_filters_free(filters);});
 -
 -	char* pathC = osdialog_file(OSDIALOG_SAVE, presetDir.c_str(), "Untitled.vcvm", filters);
--	if (!pathC) {
--		// No path selected
--		return;
--	}
--	DEFER({std::free(pathC);});
-+    WeakPtr<ModuleWidget> weakThis = this;
- 
--	std::string path = pathC;
--	// Automatically append .vcvm extension
--	if (system::getExtension(path) != ".vcvm")
--		path += ".vcvm";
-+    async_dialog_filebrowser(true, "preset.vcvm", presetDir.c_str(), "Save preset", [=](char* pathC) {
-+        // Delete directories if empty
-+        DEFER({
-+            try {
-+                system::remove(presetDir);
-+                system::remove(system::getDirectory(presetDir));
-+            }
-+            catch (Exception& e) {
-+                // Ignore exceptions if directory cannot be removed.
-+            }
-+        });
-+
-+        if (!weakThis)
-+            return;
-+        if (!pathC)
-+            return;
-+
-+        std::string path = pathC;
-+        std::free(pathC);
-+
-+        // Automatically append .vcvm extension
-+        if (system::getExtension(path) != ".vcvm")
-+            path += ".vcvm";
++	if (!weakThis)
++		return;
+ 	if (!pathC) {
+ 		// No path selected
+ 		return;
+@@ -741,7 +774,8 @@
+ 	if (system::getExtension(path) != ".vcvm")
+ 		path += ".vcvm";
  
 -	save(path);
-+        weakThis->save(path);
-+    });
++	weakThis->save(path);
++	});
  }
  
  void ModuleWidget::disconnect() {
-@@ -981,118 +1012,108 @@
+@@ -944,16 +978,12 @@
+ 			std::regex r("^\\d+_");
+ 			name = std::regex_replace(name, r, "");
  
- 	WeakPtr<ModuleWidget> weakThis = this;
+-			if (system::isDirectory(path)) {
+-				hasPresets = true;
+-
+-				menu->addChild(createSubmenuItem(name, "", [=](ui::Menu* menu) {
+-					if (!moduleWidget)
+-						return;
+-					appendPresetItems(menu, moduleWidget, path);
+-				}));
++			if (false) {
+ 			}
+ 			else if (system::getExtension(path) == ".vcvm" && name != "template") {
++				if (!hasPresets)
++					menu->addChild(new ui::MenuSeparator);
++
+ 				hasPresets = true;
  
--	// Brand and module name
--	menu->addChild(createMenuLabel(model->name));
--	menu->addChild(createMenuLabel(model->plugin->brand));
--
--	// Info
--	menu->addChild(createSubmenuItem("Info", "", [=](ui::Menu* menu) {
--		model->appendContextMenu(menu);
--	}));
--
--	// Preset
--	menu->addChild(createSubmenuItem("Preset", "", [=](ui::Menu* menu) {
--		menu->addChild(createMenuItem("Copy", RACK_MOD_CTRL_NAME "+C", [=]() {
--			if (!weakThis)
--				return;
--			weakThis->copyClipboard();
--		}));
--
--		menu->addChild(createMenuItem("Paste", RACK_MOD_CTRL_NAME "+V", [=]() {
--			if (!weakThis)
--				return;
--			weakThis->pasteClipboardAction();
--		}));
--
--		menu->addChild(createMenuItem("Open", "", [=]() {
--			if (!weakThis)
--				return;
--			weakThis->loadDialog();
--		}));
--
--		menu->addChild(createMenuItem("Save as", "", [=]() {
--			if (!weakThis)
--				return;
--			weakThis->saveDialog();
--		}));
--
--		menu->addChild(createMenuItem("Save default", "", [=]() {
--			if (!weakThis)
--				return;
--			weakThis->saveTemplateDialog();
--		}));
--
--		menu->addChild(createMenuItem("Clear default", "", [=]() {
--			if (!weakThis)
--				return;
--			weakThis->clearTemplateDialog();
--		}, !weakThis->hasTemplate()));
--
--		// Scan `<user dir>/presets/<plugin slug>/<module slug>` for presets.
--		menu->addChild(new ui::MenuSeparator);
--		menu->addChild(createMenuLabel("User presets"));
--		appendPresetItems(menu, weakThis, weakThis->model->getUserPresetDirectory());
--
--		// Scan `<plugin dir>/presets/<module slug>` for presets.
--		menu->addChild(new ui::MenuSeparator);
--		menu->addChild(createMenuLabel("Factory presets"));
--		appendPresetItems(menu, weakThis, weakThis->model->getFactoryPresetDirectory());
--	}));
-+    // Brand and module name
-+    menu->addChild(createMenuLabel(model->name));
-+    menu->addChild(createMenuLabel(model->plugin->brand));
+ 				menu->addChild(createMenuItem(name, "", [=]() {
+@@ -963,15 +993,12 @@
+ 						moduleWidget->loadAction(path);
+ 					}
+ 					catch (Exception& e) {
+-						osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, e.what());
++						async_dialog_message(e.what());
+ 					}
+ 				}));
+ 			}
+ 		}
+ 	}
+-	if (!hasPresets) {
+-		menu->addChild(createMenuLabel("(None)"));
+-	}
+ };
  
--	// Initialize
--	menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [=]() {
-+    // Info
-+    menu->addChild(createSubmenuItem("Info", "", [weakThis](ui::Menu* menu) {
- 		if (!weakThis)
- 			return;
--		weakThis->resetAction();
--	}));
-+        weakThis->model->appendContextMenu(menu);
-+    }));
  
--	// Randomize
--	menu->addChild(createMenuItem("Randomize", RACK_MOD_CTRL_NAME "+R", [=]() {
--		if (!weakThis)
--			return;
--		weakThis->randomizeAction();
--	}));
--
--	// Disconnect cables
--	menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [=]() {
--		if (!weakThis)
--			return;
--		weakThis->disconnectAction();
--	}));
--
--	// Bypass
--	std::string bypassText = RACK_MOD_CTRL_NAME "+E";
--	bool bypassed = module && module->isBypassed();
--	if (bypassed)
--		bypassText += " " CHECKMARK_STRING;
--	menu->addChild(createMenuItem("Bypass", bypassText, [=]() {
--		if (!weakThis)
--			return;
--		weakThis->bypassAction(!bypassed);
--	}));
--
--	// Duplicate
--	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
--		if (!weakThis)
--			return;
--		weakThis->cloneAction(false);
--	}));
--
--	// Duplicate with cables
--	menu->addChild(createMenuItem("└ with cables", RACK_MOD_SHIFT_NAME "+" RACK_MOD_CTRL_NAME "+D", [=]() {
--		if (!weakThis)
--			return;
--		weakThis->cloneAction(true);
--	}));
--
--	// Delete
--	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
--		if (!weakThis)
--			return;
--		weakThis->removeAction();
--	}, false, true));
-+    // Preset
-+    menu->addChild(createSubmenuItem("Preset", "", [weakThis](ui::Menu* menu) {
-+        menu->addChild(createMenuItem("Copy", RACK_MOD_CTRL_NAME "+C", [weakThis]() {
-+            if (!weakThis)
-+                return;
-+            weakThis->copyClipboard();
-+        }));
-+
-+        menu->addChild(createMenuItem("Paste", RACK_MOD_CTRL_NAME "+V", [weakThis]() {
-+            if (!weakThis)
-+                return;
-+            weakThis->pasteClipboardAction();
-+        }));
-+
-+        menu->addChild(createMenuItem("Open", "", [weakThis]() {
-+            if (!weakThis)
-+                return;
-+            weakThis->loadDialog();
-+        }));
-+
-+        /* TODO requires setting up user dir
-+        menu->addChild(createMenuItem("Save as", "", [weakThis]() {
-+            if (!weakThis)
-+                return;
-+            CardinalModuleWidget__saveDialog(weakThis);
-+        }));
-+
-+        // Scan `<user dir>/presets/<plugin slug>/<module slug>` for presets.
-+        menu->addChild(new ui::MenuSeparator);
-+        menu->addChild(createMenuLabel("User presets"));
-+        appendPresetItems(menu, weakThis, weakThis->model->getUserPresetDirectory());
-+        */
-+
-+        // Scan `<plugin dir>/presets/<module slug>` for presets.
-+        appendPresetItems(menu, weakThis, weakThis->model->getFactoryPresetDirectory());
-+    }));
-+
-+    // Initialize
-+    menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [weakThis]() {
-+        if (!weakThis)
-+            return;
-+        weakThis->resetAction();
-+    }));
-+
-+    // Randomize
-+    menu->addChild(createMenuItem("Randomize", RACK_MOD_CTRL_NAME "+R", [weakThis]() {
-+        if (!weakThis)
-+            return;
-+        weakThis->randomizeAction();
-+    }));
-+
-+    // Disconnect cables
-+    menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [weakThis]() {
-+        if (!weakThis)
-+            return;
-+        weakThis->disconnectAction();
-+    }));
-+
-+    // Bypass
-+    std::string bypassText = RACK_MOD_CTRL_NAME "+E";
-+    bool bypassed = module && module->isBypassed();
-+    if (bypassed)
-+        bypassText += " " CHECKMARK_STRING;
-+    menu->addChild(createMenuItem("Bypass", bypassText, [weakThis, bypassed]() {
-+        if (!weakThis)
-+            return;
-+        weakThis->bypassAction(!bypassed);
-+    }));
-+
-+    // Duplicate
-+    menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [weakThis]() {
-+        if (!weakThis)
-+            return;
-+        weakThis->cloneAction(false);
-+    }));
-+
-+    // Duplicate with cables
-+    menu->addChild(createMenuItem("└ with cables", RACK_MOD_SHIFT_NAME "+" RACK_MOD_CTRL_NAME "+D", [weakThis]() {
-+        if (!weakThis)
-+            return;
-+        weakThis->cloneAction(true);
-+    }));
-+
-+    // Delete
-+    menu->addChild(createMenuItem("Delete", "Backspace/Delete", [weakThis]() {
-+        if (!weakThis)
-+            return;
-+        weakThis->removeAction();
-+    }, false, true));
+@@ -1010,6 +1037,7 @@
+ 			weakThis->loadDialog();
+ 		}));
  
--	appendContextMenu(menu);
-+    appendContextMenu(menu);
- }
++		/* TODO requires setting up user dir
+ 		menu->addChild(createMenuItem("Save as", "", [=]() {
+ 			if (!weakThis)
+ 				return;
+@@ -1032,10 +1060,13 @@
+ 		menu->addChild(new ui::MenuSeparator);
+ 		menu->addChild(createMenuLabel("User presets"));
+ 		appendPresetItems(menu, weakThis, weakThis->model->getUserPresetDirectory());
++		*/
  
- math::Vec ModuleWidget::getGridPosition() {
+ 		// Scan `<plugin dir>/presets/<module slug>` for presets.
++		/* TODO enable only after setting up user dir
+ 		menu->addChild(new ui::MenuSeparator);
+ 		menu->addChild(createMenuLabel("Factory presets"));
++		*/
+ 		appendPresetItems(menu, weakThis, weakThis->model->getFactoryPresetDirectory());
+ 	}));
+ 
+@@ -1127,4 +1158,4 @@
+ 
+ 
+ } // namespace app
+-} // namespace rack
+\ No newline at end of file
++} // namespace rack

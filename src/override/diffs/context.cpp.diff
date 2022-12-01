@@ -1,5 +1,5 @@
---- ../Rack/src/context.cpp	2022-11-23 23:11:38.000000000 +0000
-+++ context.cpp	2022-11-25 22:31:32.000000000 +0000
+--- ../Rack/src/context.cpp	2022-09-21 20:25:53.591040280 +0100
++++ context.cpp	2022-09-21 20:18:50.294557597 +0100
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -31,22 +31,21 @@
  #include <context.hpp>
  #include <window/Window.hpp>
  #include <patch.hpp>
-@@ -6,10 +33,14 @@
+@@ -6,9 +33,13 @@
  #include <history.hpp>
  #include <settings.hpp>
  
 +#ifdef NDEBUG
 +# undef DEBUG
 +#endif
-+
+ 
+-namespace rack {
 +#include "DistrhoUtils.hpp"
  
- namespace rack {
++namespace rack {
  
--
  Context::~Context() {
  	// Deleting NULL is safe in C++.
- 
 @@ -44,7 +75,7 @@
  static thread_local Context* threadContext = NULL;
  

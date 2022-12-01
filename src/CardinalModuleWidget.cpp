@@ -45,43 +45,6 @@
 namespace rack {
 namespace app {
 
-// Create ModulePresetPathItems for each patch in a directory.
-static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget, std::string presetDir) {
-    bool foundPresets = false;
-
-    if (system::isDirectory(presetDir))
-    {
-        // Note: This is not cached, so opening this menu each time might have a bit of latency.
-        std::vector<std::string> entries = system::getEntries(presetDir);
-        std::sort(entries.begin(), entries.end());
-        for (std::string path : entries) {
-            std::string name = system::getStem(path);
-            // Remove "1_", "42_", "001_", etc at the beginning of preset filenames
-            std::regex r("^\\d+_");
-            name = std::regex_replace(name, r, "");
-
-            if (system::getExtension(path) == ".vcvm" && name != "template")
-            {
-                if (!foundPresets)
-                    menu->addChild(new ui::MenuSeparator);
-
-                foundPresets = true;
-
-                menu->addChild(createMenuItem(name, "", [=]() {
-                    if (!moduleWidget)
-                        return;
-                    try {
-                        moduleWidget->loadAction(path);
-                    }
-                    catch (Exception& e) {
-                        async_dialog_message(e.what());
-                    }
-                }));
-            }
-        }
-    }
-};
-
 static void CardinalModuleWidget__saveSelectionDialog(RackWidget* const w)
 {
     std::string selectionDir = asset::user("selections");
