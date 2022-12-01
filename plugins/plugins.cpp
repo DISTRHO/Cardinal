@@ -725,9 +725,9 @@ Model* modelMidiKey;
 Model* modelMidiMon;
 Model* modelMidiPlug;
 Model* modelMidiStep;
-Model* modelStrip;
-Model* modelStripBay4;
-Model* modelStripPp;
+StoermelderSettings pluginSettings;
+void StoermelderSettings::saveToJson() {}
+void StoermelderSettings::readFromJson() {}
 
 // unless_modules
 #include "unless_modules/src/unless.hpp"
@@ -2810,6 +2810,9 @@ static void initStatic__stoermelder_packone()
         p->addModel(modelMb);
         p->addModel(modelMe);
         p->addModel(modelRaw);
+        p->addModel(modelStrip);
+        p->addModel(modelStripBay4);
+        p->addModel(modelStripPp);
 
         spl.removeModule("AudioInterface64");
         spl.removeModule("MidiCat");
@@ -2819,9 +2822,6 @@ static void initStatic__stoermelder_packone()
         spl.removeModule("MidiMon");
         spl.removeModule("MidiPlug");
         spl.removeModule("MidiStep");
-        spl.removeModule("Strip");
-        spl.removeModule("StripBay4");
-        spl.removeModule("StripPp");
     }
 }
 
