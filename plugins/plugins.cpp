@@ -840,7 +840,7 @@ Plugin* pluginInstance__RebelTech;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__stocaudio;
-extern Plugin* pluginInstance__stoermelder_packone;
+extern Plugin* pluginInstance__stoermelder_p1;
 Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__Voxglitch;
@@ -2760,10 +2760,10 @@ static void initStatic__stocaudio()
     }
 }
 
-static void initStatic__stoermelder_packone()
+static void initStatic__stoermelder_p1()
 {
     Plugin* const p = new Plugin;
-    pluginInstance__stoermelder_packone = p;
+    pluginInstance__stoermelder_p1 = p;
 
     const StaticPluginLoader spl(p, "stoermelder-packone");
     if (spl.ok())
@@ -3023,7 +3023,7 @@ void initStaticPlugins()
     initStatic__repelzen();
     initStatic__sonusmodular();
     initStatic__stocaudio();
-    initStatic__stoermelder_packone(),
+    initStatic__stoermelder_p1(),
     initStatic__unless_modules();
     initStatic__ValleyAudio();
     initStatic__Voxglitch();

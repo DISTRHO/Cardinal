@@ -915,7 +915,8 @@ STOERMELDER_PACKONE_IGNORED += MidiCat MidiCatCtx MidiCatMem MidiKey MidiMon Mid
 PLUGIN_FILES += $(filter-out $(STOERMELDER_PACKONE_IGNORED:%=stoermelder-packone/src/%.cpp),$(wildcard stoermelder-packone/src/*.cpp stoermelder-packone/src/mb/*.cpp))
 
 # modules/types which are present in other plugins
-STOERMELDER_PACKONE_CUSTOM =
+STOERMELDER_PACKONE_CUSTOM = LongPressButton
+STOERMELDER_PACKONE_CUSTOM_PER_FILE = InputLedDisplay IntermixEnvModule
 
 # --------------------------------------------------------------
 # unless_modules
@@ -2029,9 +2030,10 @@ $(BUILD_DIR)/stoermelder-packone/%.cpp.o: stoermelder-packone/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(STOERMELDER_PACKONE_CUSTOM),$(call custom_module_names,$(m),stoermelder_packone)) \
-		-DpluginInstance=pluginInstance__stoermelder_packone \
-		-Dinit=init__stoermelder_packone
+		$(foreach m,$(STOERMELDER_PACKONE_CUSTOM),$(call custom_module_names,$(m),stoermelder_p1)) \
+		$(foreach m,$(STOERMELDER_PACKONE_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),stoermelder_p1_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__stoermelder_p1 \
+		-Dinit=init__stoermelder_p1
 
 $(BUILD_DIR)/stocaudio/%.cpp.o: stocaudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
