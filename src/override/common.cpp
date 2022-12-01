@@ -38,9 +38,11 @@
 #include <windows.h>
 
 FILE* fopen_u8(const char* filename, const char* mode) {
+	if (FILE* const f = _wfopen(rack::string::UTF8toUTF16(filename).c_str(), rack::string::UTF8toUTF16(mode).c_str()))
+		return f;
 	if (std::strncmp(filename, "\\\\?\\", 4) == 0 && std::getenv("CARDINAL_UNDER_WINE") != nullptr)
-		filename = "Z:\\dev\\null";
-	return _wfopen(rack::string::UTF8toUTF16(filename).c_str(), rack::string::UTF8toUTF16(mode).c_str());
+		return _wfopen(L"Z:\\dev\\null", rack::string::UTF8toUTF16(mode).c_str());
+	return nullptr;
 }
 
 #elif defined(DISTRHO_OS_WASM)
