@@ -766,6 +766,7 @@ PLUGIN_FILES += $(wildcard MindMeldModular/src/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/comp/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/EqMaster/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/MixMaster/*.cpp)
+PLUGIN_FILES += $(wildcard MindMeldModular/src/PatchSet/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/ShapeMaster/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/Utilities/*.cpp)
 

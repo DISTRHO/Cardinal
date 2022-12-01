@@ -524,18 +524,25 @@ extern int panelTheme;
 /* NOTE too much noise in original include, do this a different way
 // #include "MindMeldModular/src/MindMeldModular.hpp"
 */
-extern Model* modelMixMasterJr;
-extern Model* modelAuxExpanderJr;
-extern Model* modelMixMaster;
-extern Model* modelAuxExpander;
-extern Model* modelMeld;
-extern Model* modelUnmeld;
-extern Model* modelMSMelder;
-extern Model* modelEqMaster;
-extern Model* modelEqExpander;
-extern Model* modelBassMaster;
-extern Model* modelBassMasterJr;
-extern Model* modelShapeMaster;
+extern Model *modelPatchMaster;
+extern Model *modelPatchMasterBlank;
+extern Model *modelRouteMasterMono5to1;
+extern Model *modelRouteMasterStereo5to1;
+extern Model *modelRouteMasterMono1to5;
+extern Model *modelRouteMasterStereo1to5;
+extern Model *modelMasterChannel;
+extern Model *modelMeld;
+extern Model *modelUnmeld;
+extern Model *modelMSMelder;
+extern Model *modelEqMaster;
+extern Model *modelEqExpander;
+extern Model *modelBassMaster;
+extern Model *modelBassMasterJr;
+extern Model *modelShapeMaster;
+extern Model *modelMixMasterJr;
+extern Model *modelAuxExpanderJr;
+extern Model *modelMixMaster;
+extern Model *modelAuxExpander;
 
 // ML_modules
 /* NOTE too much noise in original include, do this a different way
@@ -2316,10 +2323,13 @@ static void initStatic__MindMeld()
     const StaticPluginLoader spl(p, "MindMeldModular");
     if (spl.ok())
     {
-        p->addModel(modelMixMasterJr);
-        p->addModel(modelAuxExpanderJr);
-        p->addModel(modelMixMaster);
-        p->addModel(modelAuxExpander);
+        p->addModel(modelPatchMaster);
+        p->addModel(modelPatchMasterBlank);
+        p->addModel(modelRouteMasterMono5to1);
+        p->addModel(modelRouteMasterStereo5to1);
+        p->addModel(modelRouteMasterMono1to5);
+        p->addModel(modelRouteMasterStereo1to5);
+        p->addModel(modelMasterChannel);
         p->addModel(modelMeld);
         p->addModel(modelUnmeld);
         p->addModel(modelMSMelder);
@@ -2328,6 +2338,10 @@ static void initStatic__MindMeld()
         p->addModel(modelBassMaster);
         p->addModel(modelBassMasterJr);
         p->addModel(modelShapeMaster);
+        p->addModel(modelMixMasterJr);
+        p->addModel(modelAuxExpanderJr);
+        p->addModel(modelMixMaster);
+        p->addModel(modelAuxExpander);
     }
 }
 
