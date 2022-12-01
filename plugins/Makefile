@@ -519,7 +519,7 @@ PLUGIN_FILES += $(wildcard Befaco/src/noise-plethora/*/*.cpp)
 PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 
 # modules/types which are present in other plugins
-BEFACO_CUSTOM = ADSR Mixer
+BEFACO_CUSTOM = ADSR Mixer chowdsp
 
 # --------------------------------------------------------------
 # Bidoo

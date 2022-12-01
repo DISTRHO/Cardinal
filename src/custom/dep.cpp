@@ -475,6 +475,7 @@ static const struct {
     { kModeBefaco, "/Befaco/res/panels/Muxlicer.svg" },
     { kModeBefaco, "/Befaco/res/panels/NoisePlethora.svg" },
     { kModeBefaco, "/Befaco/res/panels/Percall.svg" },
+    { kModeBefaco, "/Befaco/res/panels/PonyVCO.svg" },
     { kModeBefaco, "/Befaco/res/panels/Rampage.svg" },
     { kModeBefaco, "/Befaco/res/panels/STMix.svg" },
     { kModeBefaco, "/Befaco/res/panels/SamplingModulator.svg" },
