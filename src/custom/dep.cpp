@@ -379,6 +379,7 @@ static const struct {
     { kModePathSet, "/PathSet/res/IceTray.svg", {}, -1 },
     { kModePathSet, "/PathSet/res/Nudge.svg", {}, -1 },
     { kModePathSet, "/PathSet/res/OneShot.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/PlusPane.svg", {}, -1 },
     { kModePathSet, "/PathSet/res/ShiftyExpander.svg", {}, -1 },
     { kModePathSet, "/PathSet/res/ShiftyMod.svg", {}, -1 },
     // BSD-3-Clause
