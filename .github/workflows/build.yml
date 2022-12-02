@@ -937,8 +937,8 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
-            *.exe
-            *.zip
+            Cardinal-*.exe
+            Cardinal-*.zip
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
@@ -947,8 +947,8 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            *.exe
-            *.zip
+            Cardinal-*.exe
+            Cardinal-*.zip
 
   win64:
     runs-on: ubuntu-22.04
@@ -1027,8 +1027,8 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
-            *.exe
-            *.zip
+            Cardinal-*.exe
+            Cardinal-*.zip
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
@@ -1037,8 +1037,8 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            *.exe
-            *.zip
+            Cardinal-*.exe
+            Cardinal-*.zip
 
   source-tarball:
     runs-on: ubuntu-20.04
