@@ -920,6 +920,7 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env win32; popd
           xvfb-run ./utils/create-windows-installer.sh 32
+          make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
@@ -1009,6 +1010,7 @@ jobs:
         run: |
           pushd deps/PawPaw; source local.env win64; popd
           xvfb-run ./utils/create-windows-installer.sh 64
+          make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
