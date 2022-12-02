@@ -929,7 +929,10 @@ jobs:
       - name: Pack binaries
         run: |
           pushd bin
-          zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
+          mkdir CardinalPortable
+          mv CardinalNative.exe CardinalPortable/
+          ln -s ../Cardinal.clap/resources CardinalPortable/
+          zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls | grep -e lv2 -e vst -e clap -e CardinalPortable)
           popd
           zip -u -9 ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || env.SHA8 }}.zip LICENSE README.md docs/*.*
       - uses: actions/upload-artifact@v3
@@ -1018,7 +1021,10 @@ jobs:
       - name: Pack binaries
         run: |
           pushd bin
-          zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
+          mkdir CardinalPortable
+          mv CardinalNative.exe CardinalPortable/
+          ln -s ../Cardinal.clap/resources CardinalPortable/
+          zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls | grep -e lv2 -e vst -e clap -e CardinalPortable)
           popd
           zip -u -9 ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || env.SHA8 }}.zip LICENSE README.md docs/*.*
       - uses: actions/upload-artifact@v3
