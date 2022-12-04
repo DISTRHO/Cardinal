@@ -203,7 +203,7 @@ endif
 
 dgl:
 ifneq ($(HEADLESS),true)
-	$(MAKE) -C dpf/dgl opengl $(DGL_EXTRA_ARGS)
+	$(MAKE) opengl -C dpf/dgl $(DGL_EXTRA_ARGS)
 endif
 
 plugins: deps

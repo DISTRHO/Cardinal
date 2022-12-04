@@ -1056,6 +1056,7 @@ BASE_FLAGS += -I../dpf/distrho
 BASE_FLAGS += -I../include
 BASE_FLAGS += -I../include/osdialog-stub
 BASE_FLAGS += -I../include/simd-compat
+BASE_FLAGS += -I../include/simde
 
 ifeq ($(HAVE_X11),true)
 BASE_FLAGS += -DHAVE_X11
@@ -1150,6 +1151,10 @@ endif
 
 BASE_FLAGS += -Wno-unused-parameter
 BASE_FLAGS += -Wno-unused-variable
+
+ifeq ($(CPU_ARM_OR_ARM64)$(CPU_RISCV64),true)
+BASE_FLAGS += -Wno-attributes
+endif
 
 # --------------------------------------------------------------
 # also from plugins
@@ -1651,7 +1656,6 @@ $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 		-IChowDSP/lib \
 		-IChowDSP/lib/chowdsp_utils/modules/chowdsp_dsp/WDF \
 		-Wno-deprecated-copy
-
 
 $(BUILD_DIR)/dBiz/src/%.cpp.o: dBiz/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

@@ -31,8 +31,12 @@ endif
 # --------------------------------------------------------------
 # custom build flags
 
-BASE_FLAGS += -I../include
-BASE_FLAGS += -I../include/simd-compat
+BASE_FLAGS += -I$(abspath ../include)
+BASE_FLAGS += -I$(abspath ../include/simd-compat)
+
+ifeq ($(HAIKU)$(WASM),true)
+BASE_FLAGS += -I$(abspath ../include/linux-compat)
+endif
 
 ifeq ($(HEADLESS),true)
 ifeq ($(WITH_LTO),true)
@@ -53,8 +57,9 @@ endif
 ifeq ($(WINDOWS),true)
 BASE_FLAGS += -D_USE_MATH_DEFINES
 BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
-BASE_FLAGS += -I../include/mingw-compat
-BASE_FLAGS += -I../include/mingw-std-threads
+BASE_FLAGS += -D_WIN32_WINNT=0x0600
+BASE_FLAGS += -I$(abspath ../include/mingw-compat)
+BASE_FLAGS += -I$(abspath ../include/mingw-std-threads)
 endif
 
 BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
@@ -148,6 +153,27 @@ ifeq ($(shell uname -s),Darwin)
 CMAKE += -DCMAKE_CROSSCOMPILING=ON
 CMAKE += -DCMAKE_SYSTEM_NAME=Generic
 endif
+CMAKE += -DCMAKE_SKIP_COMPATIBILITY_TESTS=1
+CMAKE += -DCMAKE_SIZEOF_CHAR=1
+CMAKE += -DCMAKE_SIZEOF_UNSIGNED_SHORT=2
+CMAKE += -DCMAKE_SIZEOF_SHORT=2
+CMAKE += -DCMAKE_SIZEOF_INT=4
+CMAKE += -DCMAKE_SIZEOF_UNSIGNED_LONG=4
+CMAKE += -DCMAKE_SIZEOF_UNSIGNED_INT=4
+CMAKE += -DCMAKE_SIZEOF_LONG=4
+CMAKE += -DCMAKE_SIZEOF_VOID_P=4
+CMAKE += -DCMAKE_SIZEOF_FLOAT=4
+CMAKE += -DCMAKE_SIZEOF_DOUBLE=8
+CMAKE += -DCMAKE_C_SIZEOF_DATA_PTR=4
+CMAKE += -DCMAKE_CXX_SIZEOF_DATA_PTR=4
+CMAKE += -DCMAKE_HAVE_LIMITS_H=1
+CMAKE += -DCMAKE_HAVE_UNISTD_H=1
+CMAKE += -DCMAKE_HAVE_PTHREAD_H=1
+CMAKE += -DCMAKE_HAVE_SYS_PRCTL_H=1
+CMAKE += -DCMAKE_WORDS_BIGENDIAN=0
+CMAKE += -DCMAKE_DL_LIBS=''
+CMAKE += -DCMAKE_C_BYTE_ORDER=LITTLE_ENDIAN
+CMAKE += -DCMAKE_CXX_BYTE_ORDER=LITTLE_ENDIAN
 endif
 
 # fix cross-compilation for windows
