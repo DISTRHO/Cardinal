@@ -43,8 +43,8 @@
 #elif defined(__EMSCRIPTEN__)
 # include_next <pmmintrin.h>
 
-static inline
-__m64 _mm_set1_pi16(short w)
+static __inline__ __m64 __attribute__((__always_inline__, __nodebug__))
+_mm_set1_pi16(short w)
 {
     return __extension__ (__m64){ static_cast<float>(w), static_cast<float>(w) };
 }
