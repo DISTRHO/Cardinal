@@ -131,6 +131,29 @@ RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libzstd.a
 endif
 
 # --------------------------------------------------------------
+# surgext libraries
+
+ifneq ($(NOPLUGINS),true)
+SURGE_DEP_PATH = $(abspath ../../deps/surge-build)
+RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/src/common/libsurge-common.a
+RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/src/common/libjuce_dsp_rack_sub.a
+RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/airwindows/libairwindows.a
+RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/eurorack/libeurorack.a
+ifeq ($(DEBUG),true)
+RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/fmt/libfmtd.a
+else
+RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/fmt/libfmt.a
+endif
+RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/sqlite-3.23.3/libsqlite.a
+RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/sst/sst-plugininfra/libsst-plugininfra.a
+ifneq ($(WINDOWS),true)
+RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/sst/sst-plugininfra/libs/filesystem/libfilesystem.a
+endif
+RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/sst/sst-plugininfra/libs/strnatcmp/libstrnatcmp.a
+RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/sst/sst-plugininfra/libs/tinyxml/libtinyxml.a
+endif
+
+# --------------------------------------------------------------
 
 # FIXME
 ifeq ($(WASM),true)
@@ -146,6 +169,12 @@ ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
 EXTRA_DEPENDENCIES += ../../deps/aubio/libaubio.a
 EXTRA_LIBS += ../../deps/aubio/libaubio.a
 EXTRA_LIBS += $(shell $(PKG_CONFIG) --libs fftw3f)
+endif
+
+ifneq ($(NOPLUGINS),true)
+ifeq ($(MACOS),true)
+EXTRA_LIBS += -framework Accelerate
+endif
 endif
 
 # --------------------------------------------------------------
@@ -283,6 +312,32 @@ LINK_FLAGS += --preload-file=./jsfx
 LINK_FLAGS += --preload-file=./lv2
 endif
 LINK_FLAGS += --preload-file=../../bin/CardinalNative.lv2/resources@/resources
+ifneq ($(NOPLUGINS),true)
+SYMLINKED_DIRS_RESOURCES  =
+# find . -type l | grep -v svg | grep -v ttf | grep -v art | grep -v json | grep -v png | grep -v otf | sort
+SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/chopin
+SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/debussy
+SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/goldberg
+SYMLINKED_DIRS_RESOURCES += cf/playeroscs
+SYMLINKED_DIRS_RESOURCES += DrumKit/res/samples
+SYMLINKED_DIRS_RESOURCES += Fundamental/presets
+SYMLINKED_DIRS_RESOURCES += GrandeModular/presets
+SYMLINKED_DIRS_RESOURCES += LyraeModules/presets
+SYMLINKED_DIRS_RESOURCES += Meander/res
+SYMLINKED_DIRS_RESOURCES += MindMeldModular/presets
+SYMLINKED_DIRS_RESOURCES += MindMeldModular/res/ShapeMaster/CommunityPresets
+SYMLINKED_DIRS_RESOURCES += MindMeldModular/res/ShapeMaster/CommunityShapes
+SYMLINKED_DIRS_RESOURCES += MindMeldModular/res/ShapeMaster/MindMeldPresets
+SYMLINKED_DIRS_RESOURCES += MindMeldModular/res/ShapeMaster/MindMeldShapes
+SYMLINKED_DIRS_RESOURCES += Mog/res
+SYMLINKED_DIRS_RESOURCES += nonlinearcircuits/res
+SYMLINKED_DIRS_RESOURCES += Orbits/presets
+SYMLINKED_DIRS_RESOURCES += stoermelder-packone/presets
+SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/wavetables
+SYMLINKED_DIRS_RESOURCES += surgext/patches
+SYMLINKED_DIRS_RESOURCES += surgext/presets
+LINK_FLAGS += $(foreach d,$(SYMLINKED_DIRS_RESOURCES),--preload-file=../../bin/CardinalNative.lv2/resources/$(d)@/resources/$(d))
+endif
 LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
 LINK_FLAGS += -sLZ4=1

@@ -736,6 +736,11 @@ StoermelderSettings pluginSettings;
 void StoermelderSettings::saveToJson() {}
 void StoermelderSettings::readFromJson() {}
 
+// surgext
+#include "surgext/src/SurgeXT.h"
+void surgext_rack_initialize();
+void surgext_rack_update_theme();
+
 // unless_modules
 #include "unless_modules/src/unless.hpp"
 
@@ -848,6 +853,7 @@ Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__stocaudio;
 extern Plugin* pluginInstance__stoermelder_p1;
+Plugin* pluginInstance__surgext;
 Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__Voxglitch;
@@ -2840,6 +2846,64 @@ static void initStatic__stoermelder_p1()
     }
 }
 
+static void initStatic__surgext()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__surgext = p;
+
+    const StaticPluginLoader spl(p, "surgext");
+    if (spl.ok())
+    {
+        p->addModel(modelVCOClassic);
+        p->addModel(modelVCOModern);
+        p->addModel(modelVCOWavetable);
+        p->addModel(modelVCOWindow);
+        p->addModel(modelVCOSine);
+        p->addModel(modelVCOFM2);
+        p->addModel(modelVCOFM3);
+        p->addModel(modelVCOSHNoise);
+        p->addModel(modelVCOAlias);
+        p->addModel(modelVCOString);
+        p->addModel(modelVCOTwist);
+
+        // Add the ported ones
+        p->addModel(modelSurgeVCF);
+        p->addModel(modelSurgeDelay);
+        p->addModel(modelSurgeDelayLineByFreq);
+        p->addModel(modelSurgeWaveshaper);
+        p->addModel(modelSurgeLFO);
+        p->addModel(modelSurgeMixer);
+        p->addModel(modelSurgeModMatrix);
+
+        p->addModel(modelFXReverb);
+        p->addModel(modelFXPhaser);
+        p->addModel(modelFXRotarySpeaker);
+        p->addModel(modelFXDistortion);
+        p->addModel(modelFXFrequencyShifter);
+        p->addModel(modelFXChorus);
+        p->addModel(modelFXVocoder);
+        p->addModel(modelFXReverb2);
+        p->addModel(modelFXFlanger);
+        p->addModel(modelFXRingMod);
+        p->addModel(modelFXNeuron);
+        p->addModel(modelFXResonator);
+        p->addModel(modelFXChow);
+        p->addModel(modelFXExciter);
+        p->addModel(modelFXEnsemble);
+        p->addModel(modelFXCombulator);
+        p->addModel(modelFXSpringReverb);
+        p->addModel(modelFXTreeMonster);
+
+        /* v2.1 modules
+        p->addModel(modelEGxVCA);
+        p->addModel(modelQuadAD);
+        p->addModel(modelQuadLFO);
+        */
+
+        surgext_rack_initialize();
+    }
+}
+
 static void initStatic__unless_modules()
 {
     Plugin* const p = new Plugin;
@@ -3038,7 +3102,8 @@ void initStaticPlugins()
     initStatic__repelzen();
     initStatic__sonusmodular();
     initStatic__stocaudio();
-    initStatic__stoermelder_p1(),
+    initStatic__stoermelder_p1();
+    initStatic__surgext();
     initStatic__unless_modules();
     initStatic__ValleyAudio();
     initStatic__Voxglitch();
@@ -3076,6 +3141,10 @@ void updateStaticPluginsDarkMode()
     // glue the giant
     {
         gtg_default_theme = darkMode ? 1 : 0;
+    }
+    // surgext
+    {
+        surgext_rack_update_theme();
     }
 #endif
 }

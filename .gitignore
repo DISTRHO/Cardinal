@@ -18,6 +18,7 @@ compile_commands.json
 
 /bin/
 /build/
+/deps/surge-build/
 /documentation.pdf
 /jucewrapper/build/
 /jucewrapper/JUCE/

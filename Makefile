@@ -193,7 +193,7 @@ endif
 
 deps:
 ifeq ($(SYSDEPS),true)
-	$(MAKE) quickjs -C deps
+	$(MAKE) quickjs surge -C deps
 else
 	$(MAKE) all -C deps
 endif

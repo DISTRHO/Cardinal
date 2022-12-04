@@ -169,6 +169,7 @@ At the moment the following 3rd-party modules are provided:
 - Sonus Modular
 - stocaudio
 - Stoermelder Pack-One
+- Surge XT
 - unless_modules
 - Valley
 - Voxglitch

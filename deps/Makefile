@@ -309,7 +309,59 @@ $(DEP_PATH)/lib/libquickjs.a:
 	install -m644 $(CURDIR)/QuickJS/quickjs.h $(DEP_PATH)/include/quickjs.h
 
 # --------------------------------------------------------------
+# SurgeXT target
+
+SURGE_DEP_PATH = $(abspath surge-build)
+SURGE_SRC_PATH = $(abspath ../plugins/surgext/surge)
+SURGE_NAMES = HysteresisProcessing Patch SolverType Tunings Wavetable clouds ghc plaits stmlib
+
+SURGE_CXX_FLAGS  = $(filter-out -fsingle-precision-constant,$(filter-out -std=gnu++11,$(BUILD_CXX_FLAGS)))
+SURGE_CXX_FLAGS += $(foreach n,$(SURGE_NAMES),-D$(n)=surgext$(n))
+
+# fix JUCE build https://github.com/juce-framework/JUCE/issues/374
+ifeq ($(CPU_I386),true)
+SURGE_CXX_FLAGS += -D__sigemptyset=sigemptyset
+endif
+
+# unwanted in this build
+SURGE_CXX_FLAGS += -DJUCE_DSP_ENABLE_SNAP_TO_ZERO=0
+
+# possibly use fftw?
+# ifeq ($(shell $(PKG_CONFIG) --exists fftw3 fftw3f && echo true),true)
+# SURGE_CXX_FLAGS += -DJUCE_DSP_USE_STATIC_FFTW=1
+# endif
+
+# JUCE_USE_CURL
+SURGE_ENV = env \
+	AR=$(AR) \
+	CC=$(CC) \
+	CXX=$(CXX) \
+	CFLAGS='$(BUILD_C_FLAGS) -w' \
+	CXXFLAGS='$(SURGE_CXX_FLAGS) -w' \
+	LDFLAGS='$(LINK_FLAGS)'
+
+SURGE_LIB = $(SURGE_DEP_PATH)/src/common/libsurge-common.a
+
+$(SURGE_LIB): $(SURGE_DEP_PATH)/Makefile
+	$(DEP_MAKE) -C $(SURGE_DEP_PATH) surge-common
+
+$(SURGE_DEP_PATH)/Makefile: $(SURGE_SRC_PATH)/CMakeLists.txt
+	mkdir -p $(SURGE_DEP_PATH)
+	cd $(SURGE_DEP_PATH) && \
+		$(SURGE_ENV) $(CMAKE) \
+		-DSURGE_COMPILE_BLOCK_SIZE=8 \
+		-DSURGE_SKIP_AIRWINDOWS=TRUE \
+		-DSURGE_SKIP_JUCE_FOR_RACK=TRUE \
+		-DSURGE_SKIP_LUA=TRUE \
+		-DSURGE_SKIP_ODDSOUND_MTS=TRUE \
+		$(SURGE_SRC_PATH)
+
+# --------------------------------------------------------------
 # Build targets
+
+ifneq ($(NOPLUGINS),true)
+TARGETS += $(SURGE_LIB)
+endif
 
 TARGETS += $(DEP_PATH)/lib/libjansson.a
 TARGETS += $(DEP_PATH)/lib/libquickjs.a
@@ -340,6 +392,7 @@ clean:
 	rm -rf $(DEP_PATH)/libsamplerate-0.1.9
 	rm -rf $(DEP_PATH)/speexdsp-SpeexDSP-1.2rc3
 	rm -rf $(DEP_PATH)/zstd-1.4.5
+	rm -rf $(SURGE_DEP_PATH)
 
 download: \
 	$(DEP_PATH)/jansson-2.12 \
@@ -349,5 +402,6 @@ download: \
 	$(DEP_PATH)/zstd-1.4.5/.stamp-patched
 
 quickjs: $(DEP_PATH)/lib/libquickjs.a
+surge: $(SURGE_LIB)
 
 # --------------------------------------------------------------

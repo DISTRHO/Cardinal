@@ -89,6 +89,30 @@ set_property(TARGET libspeexdsp PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR
 add_library(libzstd STATIC IMPORTED)
 set_property(TARGET libzstd PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../src/Rack/dep/lib/libzstd.a")
 
+set(SURGE_DEP_PATH "${PROJECT_SOURCE_DIR}/../deps/surge-build")
+
+add_library(surgedep01 STATIC IMPORTED)
+add_library(surgedep02 STATIC IMPORTED)
+add_library(surgedep03 STATIC IMPORTED)
+add_library(surgedep04 STATIC IMPORTED)
+add_library(surgedep05 STATIC IMPORTED)
+add_library(surgedep06 STATIC IMPORTED)
+add_library(surgedep07 STATIC IMPORTED)
+add_library(surgedep08 STATIC IMPORTED)
+add_library(surgedep09 STATIC IMPORTED)
+add_library(surgedep10 STATIC IMPORTED)
+
+set_property(TARGET surgedep01 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/src/common/libsurge-common.a")
+set_property(TARGET surgedep02 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/src/common/libjuce_dsp_rack_sub.a")
+set_property(TARGET surgedep03 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/airwindows/libairwindows.a")
+set_property(TARGET surgedep04 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/eurorack/libeurorack.a")
+set_property(TARGET surgedep05 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/fmt/libfmt.a")
+set_property(TARGET surgedep06 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sqlite-3.23.3/libsqlite.a")
+set_property(TARGET surgedep07 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libsst-plugininfra.a")
+set_property(TARGET surgedep08 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libs/filesystem/libfilesystem.a")
+set_property(TARGET surgedep09 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libs/strnatcmp/libstrnatcmp.a")
+set_property(TARGET surgedep10 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libs/tinyxml/libtinyxml.a")
+
 # dependencies
 
 find_package(PkgConfig REQUIRED)
@@ -181,6 +205,16 @@ target_link_libraries(Cardinal
         ysfx
         zita_resampler
         dgl
+        surgedep01
+        surgedep02
+        surgedep03
+        surgedep04
+        surgedep05
+        surgedep06
+        surgedep07
+        surgedep08
+        surgedep09
+        surgedep10
         libaubio
         libarchive
         libjansson
@@ -274,6 +308,16 @@ target_link_libraries(CardinalFX
         ysfx
         zita_resampler
         dgl
+        surgedep01
+        surgedep02
+        surgedep03
+        surgedep04
+        surgedep05
+        surgedep06
+        surgedep07
+        surgedep08
+        surgedep09
+        surgedep10
         libaubio
         libarchive
         libjansson
@@ -366,6 +410,16 @@ target_link_libraries(CardinalSynth
         ysfx
         zita_resampler
         dgl
+        surgedep01
+        surgedep02
+        surgedep03
+        surgedep04
+        surgedep05
+        surgedep06
+        surgedep07
+        surgedep08
+        surgedep09
+        surgedep10
         libaubio
         libarchive
         libjansson

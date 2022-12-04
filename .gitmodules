@@ -224,3 +224,6 @@
 [submodule "plugins/stoermelder-packone"]
 	path = plugins/stoermelder-packone
 	url = https://github.com/stoermelder/vcvrack-packone.git
+[submodule "plugins/surgext"]
+	path = plugins/surgext
+	url = https://github.com/surge-synthesizer/surge-rack.git

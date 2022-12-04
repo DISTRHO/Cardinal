@@ -920,6 +920,63 @@ STOERMELDER_PACKONE_CUSTOM = LongPressButton
 STOERMELDER_PACKONE_CUSTOM_PER_FILE = InputLedDisplay IntermixEnvModule
 
 # --------------------------------------------------------------
+# surgext
+
+PLUGIN_FILES += $(filter-out surgext/src/SurgeXT.cpp,$(wildcard surgext/src/*.cpp))
+PLUGIN_FILES += surgext-helper/surgext-helper.cpp
+
+# modules/types which are present in other plugins
+SURGEXT_CUSTOM = HysteresisProcessing Patch SolverType Tunings Wavetable ghc clouds plaits stmlib
+
+SURGEXT_FLAGS  = $(filter-out -fsingle-precision-constant,$(filter-out -std=gnu++11,$(BUILD_CXX_FLAGS)))
+SURGEXT_FLAGS += -std=gnu++17
+SURGEXT_FLAGS += -DTIXML_USE_STL=1
+SURGEXT_FLAGS += -Isurgext/surge/src/common \
+	-Isurgext/surge/src/common/dsp \
+	-Isurgext/surge/src/common/dsp/filters \
+	-Isurgext/surge/src/common/dsp/vembertech \
+	-Isurgext/surge/src/common/dsp/utilities \
+	-Isurgext/surge/src/common/dsp/oscillators \
+	-Isurgext/surge/src/common/dsp/modulators \
+	-Isurgext/surge/src/surge-testrunner \
+	-Isurgext/surge/libs/sst/sst-filters/include \
+	-Isurgext/surge/libs/sst/sst-cpputils/include \
+	-Isurgext/surge/libs/sst/sst-waveshapers/include \
+	-Isurgext/surge/libs/sst/sst-plugininfra/include \
+	-Isurgext/surge/libs/sst/sst-plugininfra/libs/tinyxml/include \
+	-Isurgext/surge/libs/sst/sst-plugininfra/libs/filesystem \
+	-Isurgext/surge/libs/fmt/include \
+	-Isurgext/surge/libs/LuaJitLib/LuaJIT/src \
+	-Isurgext/surge/libs/strnatcmp \
+	-Isurgext/surge/src/headless \
+	-Isurgext/surge/libs/tuning-library/include \
+	-I../deps/surge-build/libs/sst/sst-plugininfra/libs/filesystem/include \
+	-include limits \
+	-DSURGE_COMPILE_BLOCK_SIZE=8
+
+ifneq ($(DEBUG),true)
+SURGEXT_FLAGS += -DRELEASE=1
+endif
+
+ifeq ($(MACOS),true)
+SURGEXT_FLAGS += -Wno-undefined-bool-conversion -Wno-unused-variable -Wno-reorder -Wno-char-subscripts -Wno-sign-compare -Wno-ignored-qualifiers -Wno-c++17-extensions -Wno-unused-private-field
+SURGEXT_FLAGS += -DMAC
+else ifeq ($(WINDOWS),true)
+SURGEXT_FLAGS += -Wno-suggest-override -Wno-sign-compare -Wno-ignored-qualifiers -Wno-unused-variable -Wno-char-subscripts -Wno-reorder -Wno-int-in-bool-context
+SURGEXT_FLAGS += -DWINDOWS
+SURGEXT_FLAGS += -DSKIP_MINGW_FORMAT
+else
+SURGEXT_FLAGS += -Wno-unused-value -Wno-suggest-override -Wno-implicit-fallthrough -Wno-ignored-qualifiers
+SURGEXT_FLAGS += -Wno-nonnull-compare -Wno-sign-compare -Wno-char-subscripts -Wno-unused-variable -Wno-unused-but-set-variable -Wno-reorder -Wno-multichar
+SURGEXT_FLAGS += -DLINUX
+SURGEXT_FLAGS += -Isurge/src/linux
+endif
+
+SURGEXT_FLAGS += -DSURGE_RACK_BASE_VERSION=XT1-0-1
+SURGEXT_FLAGS += -DSURGE_RACK_PLUG_VERSION=Cardinal
+SURGEXT_FLAGS += -DSURGE_RACK_SURGE_VERSION=Cardinal
+
+# --------------------------------------------------------------
 # unless_modules
 
 PLUGIN_FILES += $(filter-out unless_modules/src/unless.cpp,$(wildcard unless_modules/src/*.cpp))
@@ -1197,6 +1254,7 @@ all: $(TARGET)
 clean:
 	rm -f $(TARGET)
 	rm -rf $(BUILD_DIR)
+	rm -rf surgext/build
 
 # --------------------------------------------------------------
 
@@ -1223,6 +1281,8 @@ RESOURCE_FILES = \
 		$(wildcard */res/*.svg) \
 		$(wildcard */res/*/*.svg) \
 		$(wildcard */res/*/*/*.svg) \
+		$(wildcard */res/*/*/*/*.svg) \
+		$(wildcard */res/*/*/*/*/*.svg) \
 		$(wildcard */res/*.otf) \
 		$(wildcard */res/*/*.otf) \
 		$(wildcard */res/*/*/*.otf) \
@@ -1247,10 +1307,21 @@ RESOURCE_FILES += Meander/res
 RESOURCE_FILES += Mog/res
 RESOURCE_FILES += nonlinearcircuits/res
 RESOURCE_FILES += ParableInstruments/res/Neil.png
+RESOURCE_FILES += surgext/build/surge-data/configuration.xml
+RESOURCE_FILES += surgext/build/surge-data/fx_presets
+RESOURCE_FILES += surgext/build/surge-data/wavetables
+RESOURCE_FILES += surgext/build/surge-data/windows.wt
+RESOURCE_FILES += surgext/patches
+RESOURCE_FILES += $(wildcard surgext/res/xt/fonts/quicksand/*.ttf)
 RESOURCE_FILES += $(wildcard unless_modules/art/*.art)
 RESOURCE_FILES += $(wildcard unless_modules/art/svg/*/*.svg)
 RESOURCE_FILES += $(wildcard unless_modules/font/*.ttf)
 # RESOURCE_FILES += $(wildcard unless_modules/manual/*)
+
+JACK_RESOURCES  = $(CURDIR)/surgext/build/surge-data/configuration.xml
+JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/fx_presets
+JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/wavetables
+JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/windows.wt
 endif
 
 RESOURCE_FILES += Cardinal/res/Miku/Miku.png
@@ -1305,7 +1376,7 @@ VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst3/Contents/Resource
 
 endif
 
-resources: $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES) $(CLAP_RESOURCES)
+resources: $(JACK_RESOURCES) $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES) $(CLAP_RESOURCES)
 
 ../bin/Cardinal.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
@@ -1426,6 +1497,23 @@ else
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 endif
+
+%/surgext/build/surge-data/configuration.xml: surgext/surge/resources/surge-shared/configuration.xml
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+%/surgext/build/surge-data/fx_presets:
+	-@mkdir -p "$@"
+	cp -R surgext/surge/resources/data/fx_presets/* $@/
+	cp -R surgext/res/surge_extra_data/fx_presets/* $@/
+
+%/surgext/build/surge-data/wavetables: surgext/surge/resources/data/wavetables
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+%/surgext/build/surge-data/windows.wt: surgext/surge/resources/surge-shared/windows.wt
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
 
 # --------------------------------------------------------------
 # Build commands
@@ -2047,6 +2135,13 @@ $(BUILD_DIR)/stocaudio/%.cpp.o: stocaudio/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(STOCAUDIO_CUSTOM),$(call custom_module_names,$(m),stocaudio)) \
 		-DpluginInstance=pluginInstance__stocaudio
+
+$(BUILD_DIR)/surgext%.cpp.o: surgext%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(SURGEXT_FLAGS) -c -o $@ \
+		$(foreach m,$(SURGEXT_CUSTOM),$(call custom_module_names,$(m),surgext)) \
+		-DpluginInstance=pluginInstance__surgext
 
 $(BUILD_DIR)/unless_modules/%.cpp.o: unless_modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
