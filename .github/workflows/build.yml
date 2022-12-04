@@ -39,6 +39,7 @@ jobs:
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
           sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+          sudo apt-get clean
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture arm64
@@ -48,6 +49,7 @@ jobs:
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           sudo apt-get update -qq
           sudo apt-get install -yqq g++-aarch64-linux-gnu libasound2-dev:arm64 libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libglib2.0-dev:arm64 libsdl2-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
+          sudo apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -118,6 +120,7 @@ jobs:
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
           sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+          sudo apt-get clean
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture armhf
@@ -127,6 +130,7 @@ jobs:
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           sudo apt-get update -qq
           sudo apt-get install -yqq g++-arm-linux-gnueabihf libasound2-dev:armhf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libglib2.0-dev:armhf libsdl2-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static
+          sudo apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -197,11 +201,13 @@ jobs:
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
           sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+          sudo apt-get clean
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
           sudo apt-get install -yqq g++-i686-linux-gnu libasound2-dev:i386 libdbus-1-dev:i386 libgl1-mesa-dev:i386 libglib2.0-dev:i386 libsdl2-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
+          sudo apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -273,6 +279,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
           sudo apt-get purge -yqq libclang* libgbm* libllvm* libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
+          sudo apt-get clean
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture riscv64
@@ -282,6 +289,7 @@ jobs:
           echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
           sudo apt-get update -qq
           sudo apt-get install -yqq g++-riscv64-linux-gnu libasound2-dev:riscv64 libdbus-1-dev:riscv64 libgl1-mesa-dev:riscv64 libglapi-mesa:riscv64 libglvnd0:riscv64 libglib2.0-dev:riscv64 libsdl2-dev:riscv64 libx11-dev:riscv64 libxcursor-dev:riscv64 libxext-dev:riscv64 libxrandr-dev:riscv64 qemu-user-static
+          sudo apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -351,6 +359,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+          sudo apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -402,6 +411,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev liblo-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+          sudo apt-get clean
       - name: Build linux x86_64 (debug)
         env:
           LDFLAGS: -static-libgcc -static-libstdc++
@@ -434,6 +444,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get remove -yqq libcairo2-dev libx11-dev libx11-dev libxext-dev
           sudo apt-get install -yqq liblo-dev
+          sudo apt-get clean
       - name: Build linux x86_64 (headless)
         run: |
           make HEADLESS=true features
@@ -449,6 +460,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libfftw3-dev libjansson-dev libsamplerate0-dev libsndfile1-dev libspeexdsp-dev
+          sudo apt-get clean
       - name: Build linux x86_64 (sysdeps)
         run: |
           make features
@@ -639,6 +651,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
           sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
+          sudo apt-get clean
       - name: Bootstrap toolchain
         if: steps.mpb-cache.outputs.cache-hit != 'true'
         run: |
@@ -678,6 +691,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
           sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
+          sudo apt-get clean
       - name: Bootstrap toolchain
         if: steps.mpb-cache.outputs.cache-hit != 'true'
         run: |
@@ -717,6 +731,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
           sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
+          sudo apt-get clean
       - name: Bootstrap toolchain
         if: steps.mpb-cache.outputs.cache-hit != 'true'
         run: |
@@ -773,7 +788,7 @@ jobs:
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
           pushd deps/PawPaw; source local.env wasm; popd
           make features
-          make CIBUILD=true NOOPT=true USE_GLES2=true WITH_LTO=false -j $(nproc)
+          make CIBUILD=true HAVE_LIBLO=false NOOPT=true USE_GLES2=true WITH_LTO=false -j $(nproc)
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
@@ -888,11 +903,13 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -yqq --allow-downgrades libgd3/jammy
           sudo apt-get purge -yqq libmono* moby* mono* msbuild* php* libgdiplus libpcre2-posix3 nuget
+          sudo apt-get clean
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
           sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 qttools5-dev qttools5-dev-tools xvfb
+          sudo apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -978,11 +995,13 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -yqq --allow-downgrades libgd3/jammy
           sudo apt-get purge -yqq libmono* moby* mono* msbuild* php* libgdiplus libpcre2-posix3 nuget
+          sudo apt-get clean
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
           sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable qttools5-dev qttools5-dev-tools xvfb
+          sudo apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -1050,6 +1069,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -yqq liblo-dev
+          sudo apt-get clean
       - name: Create source tarball
         run: |
           make HEADLESS=true tarball
@@ -1110,6 +1130,7 @@ jobs:
           sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
           # runtime testing
           sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
+          sudo apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -1145,9 +1166,8 @@ jobs:
         run: |
           export LV2_PATH=/tmp/lv2-path
           mkdir ${LV2_PATH}
-          cp -r bin/CardinalFX.lv2 bin/CardinalSynth.lv2 \
-              /usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,instance-access,midi,mod,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 \
-              ${LV2_PATH}
+          mv bin/CardinalFX.lv2 bin/CardinalSynth.lv2 ${LV2_PATH}
+          cp -r /usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,instance-access,midi,mod,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 ${LV2_PATH}
           xvfb-run lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
       - name: Test LV2 plugin
         run: |
