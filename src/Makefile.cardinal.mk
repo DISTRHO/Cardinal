@@ -213,7 +213,7 @@ ifeq ($(WASM),true)
 WASM_RESOURCES  = $(LV2_RESOURCES)
 
 ifneq ($(STATIC_BUILD),true)
-WASM_RESOURCES += $(CURDIR)/lv2
+WASM_RESOURCES += $(CURDIR)/lv2/fomp.lv2/manifest.ttl
 endif
 
 EXTRA_DEPENDENCIES += $(WASM_RESOURCES)
@@ -333,6 +333,7 @@ SYMLINKED_DIRS_RESOURCES += Mog/res
 SYMLINKED_DIRS_RESOURCES += nonlinearcircuits/res
 SYMLINKED_DIRS_RESOURCES += Orbits/presets
 SYMLINKED_DIRS_RESOURCES += stoermelder-packone/presets
+SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/fx_presets
 SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/wavetables
 SYMLINKED_DIRS_RESOURCES += surgext/patches
 SYMLINKED_DIRS_RESOURCES += surgext/presets
@@ -452,8 +453,11 @@ $(TARGET_DIR)/%.app/Contents/Resources/distrho.icns: ../../utils/distrho.icns
 # Extra rules for wasm resources
 
 ifeq ($(WASM),true)
-$(CURDIR)/lv2: $(LV2_RESOURCES)
+$(CURDIR)/lv2/fomp.lv2/manifest.ttl: $(TARGET_DIR)/$(NAME).lv2/resources/PluginManifests/Cardinal.json
 	wget -O - https://falktx.com/data/wasm-things-2022-08-15.tar.gz | tar xz -C $(CURDIR)
+	# FIXME we are past 50Mb compressed assets! :(
+	rm -rf $(CURDIR)/lv2/mda.lv2
+	touch $@
 endif
 
 # --------------------------------------------------------------
