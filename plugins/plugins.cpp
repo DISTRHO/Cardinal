@@ -716,6 +716,9 @@ void addThemeMenuItems(Menu*, ModuleTheme*) {}
 #undef modelWerner
 #undef tanh_pade
 
+// Sapphire
+#include "Sapphire/src/plugin.hpp"
+
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
 
@@ -850,6 +853,7 @@ Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__RebelTech;
 Plugin* pluginInstance__repelzen;
+Plugin* pluginInstance__sapphire;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__stocaudio;
 extern Plugin* pluginInstance__stoermelder_p1;
@@ -2729,6 +2733,19 @@ static void initStatic__repelzen()
     }
 }
 
+static void initStatic__Sapphire()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__sapphire = p;
+
+    const StaticPluginLoader spl(p, "Sapphire");
+    if (spl.ok())
+    {
+        p->addModel(modelElastika);
+        p->addModel(modelMoots);
+    }
+}
+
 static void initStatic__sonusmodular()
 {
     Plugin* const p = new Plugin;
@@ -3100,6 +3117,7 @@ void initStaticPlugins()
     initStatic__rackwindows();
     initStatic__RebelTech();
     initStatic__repelzen();
+    initStatic__Sapphire();
     initStatic__sonusmodular();
     initStatic__stocaudio();
     initStatic__stoermelder_p1();

@@ -166,6 +166,7 @@ At the moment the following 3rd-party modules are provided:
 - rackwindows
 - RebelTech
 - repelzen
+- Sapphire
 - Sonus Modular
 - stocaudio
 - Stoermelder Pack-One

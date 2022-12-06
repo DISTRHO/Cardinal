@@ -73,6 +73,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Rackwindows             | MIT                      | |
 | repelzen                | GPL-3.0-or-later         | |
 | RebelTech               | GPL-2.0-or-later         | |
+| Sapphire                | GPL-3.0-or-later         | |
 | Sonus Modular           | GPL-3.0-or-later         | |
 | stocaudio               | GPL-3.0-or-later         | |
 | Stoermelder Pack-One    | GPL-3.0-or-later         | |
@@ -212,6 +213,7 @@ Below is a list of artwork licenses from plugins
 | Rackwindows/*                           | MIT              | [Same license as source code](https://github.com/n0jo/rackwindows/issues/15) |
 | repelzen/*                              | CC-BY-SA-4.0     | |
 | RebelTech/*                             | CC-BY-NC-4.0     | |
+| Sapphire/*                              | GPL-3.0-or-later | No artwork specific license provided |
 | sonusmodular/*                          | GPL-3.0-or-later | [Same license as source code](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
 | stocaudio/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | stoermelder-packone/*                   | GPL-3.0-or-later | No artwork specific license provided |
