@@ -893,6 +893,11 @@ PLUGIN_FILES += $(filter-out repelzen/src/repelzen.cpp,$(wildcard repelzen/src/*
 REPELZEN_CUSTOM = Blank Mixer Werner tanh_pade
 
 # --------------------------------------------------------------
+# Sapphire
+
+PLUGIN_FILES += $(filter-out Sapphire/src/plugin.cpp,$(wildcard Sapphire/src/*.cpp))
+
+# --------------------------------------------------------------
 # sonusmodular
 
 PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular.cpp,$(wildcard sonusmodular/src/*.cpp))
@@ -2112,6 +2117,13 @@ $(BUILD_DIR)/repelzen/%.cpp.o: repelzen/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(REPELZEN_CUSTOM),$(call custom_module_names,$(m),repelzen)) \
 		-DpluginInstance=pluginInstance__repelzen
+
+$(BUILD_DIR)/Sapphire/%.cpp.o: Sapphire/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(SAPPHIRE_CUSTOM),$(call custom_module_names,$(m),Sapphire)) \
+		-DpluginInstance=pluginInstance__sapphire
 
 $(BUILD_DIR)/sonusmodular/%.cpp.o: sonusmodular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
