@@ -777,8 +777,11 @@ jobs:
           key: wasm-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
-            [ -e ~/PawPawBuilds/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/PawPawBuilds/emsdk
-            cd ~/PawPawBuilds/emsdk && ./emsdk install latest && ./emsdk activate latest
+          sudo apt-get update -qq
+          sudo apt-get install -yqq brotli
+          sudo apt-get clean
+          [ -e ~/PawPawBuilds/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/PawPawBuilds/emsdk
+          cd ~/PawPawBuilds/emsdk && ./emsdk install latest && ./emsdk activate latest
       - name: Build extra dependencies
         run: |
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
@@ -789,6 +792,7 @@ jobs:
           pushd deps/PawPaw; source local.env wasm; popd
           make features
           make CIBUILD=true HAVE_LIBLO=false NOOPT=true USE_GLES2=true WITH_LTO=false -j $(nproc)
+          cd bin; rm -r *.lv2; brotli -k -q 11 *.*
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
@@ -797,7 +801,7 @@ jobs:
         run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.html *.data *.js *.wasm)
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm)
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || env.SHA8 }}
@@ -837,8 +841,11 @@ jobs:
           key: wasm-mini-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
-            [ -e ~/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/emsdk
-            cd ~/emsdk && ./emsdk install latest && ./emsdk activate latest
+          sudo apt-get update -qq
+          sudo apt-get install -yqq brotli
+          sudo apt-get clean
+          [ -e ~/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/emsdk
+          cd ~/emsdk && ./emsdk install latest && ./emsdk activate latest
       - name: Build wasm-mini cross-compiled
         env:
           AR: emar
@@ -851,6 +858,7 @@ jobs:
           source ~/emsdk/emsdk_env.sh
           make features
           make CIBUILD=true NOPLUGINS=true STATIC_BUILD=true USE_GLES2=true WITH_LTO=false -j $(nproc)
+          cd bin; rm -r *.lv2; brotli -k -q 11 *.*
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
@@ -859,7 +867,7 @@ jobs:
         run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.html *.data *.js *.wasm)
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm)
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || env.SHA8 }}
