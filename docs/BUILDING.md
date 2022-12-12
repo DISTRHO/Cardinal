@@ -118,18 +118,22 @@ export CXXFLAGS="${CFLAGS}"
 ## Windows
 
 Cardinal does not support msvc, using mingw is required.  
-You can either cross-compile Cardinal for Windows from Linux, or install and use msys2 natively on a Windows system.
+It also requires a file-system with support for symbolic links, which Windows cannot do.
+For these reasons it is only possible to build Cardinal for Windows from a Linux, macOS or any regular POSIX system.
 
 ### Cross-compile
 
 For cross-compilation, first install the relevant mingw packages.  
 On Ubuntu these are `binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64`.  
-Then build with `CC` and `CXX` pointing to the mingw compiler, like so:
+Then build with `AR`, `CC` and `CXX` pointing to the mingw compiler tools, like so:
 
 ```
+export AR=x86_64-w64-mingw32-gcc
 export CC=x86_64-w64-mingw32-gcc
 export CXX=x86_64-w64-mingw32-g++
-# make etc..
+export EXE_WRAPPER=wine # for running generated windows binaries
+export PKG_CONFIG=false # ignore pkg-config from base system
+# now run make etc..
 ```
 
 # Installing

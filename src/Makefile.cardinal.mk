@@ -464,6 +464,8 @@ endif
 # Extra rules for Windows icon
 
 ifeq ($(WINDOWS),true)
+WINDRES ?= $(subst gcc,windres,$(CC))
+
 JACK_LIBS += -Wl,-subsystem,windows
 
 $(BUILD_DIR)/distrho.rc.o: ../../utils/distrho.rc ../../utils/distrho.ico
