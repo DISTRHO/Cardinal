@@ -156,7 +156,7 @@ endif
 # --------------------------------------------------------------
 
 # FIXME
-ifeq ($(WASM),true)
+ifeq ($(CIBUILD)$(WASM),truetrue)
 ifneq ($(STATIC_BUILD),true)
 STATIC_CARLA_PLUGIN_LIBS = -lsndfile -lopus -lFLAC -lvorbisenc -lvorbis -logg -lm
 endif

@@ -115,6 +115,32 @@ export CXXFLAGS="${CFLAGS}"
 # make etc..
 ```
 
+## Web assembly
+
+Cardinal uses emscripten for its web version, see the official instructions on installing emscripten [here](https://emscripten.org/docs/getting_started/downloads.html).  
+Once installed, setup the build by importing the emscripten environment and setup the default build tools to point to them, like so:
+
+```
+source /path/to/emsdk/emsdk_env.sh
+export AR=emar
+export CC=emcc
+export CXX=em++
+export NM=emnm
+export RANLIB=emranlib
+export STRIP=emstrip
+```
+
+Then for the actual build we just need to force graphics rendering to use GLES2 instead of the default "desktop" OpenGL mode, like so:
+
+```
+make USE_GLES2=true # add any other relevant options..
+```
+
+You can place the generated files on a webserver, or run `emrun bin/CardinalNative.html` for an easy way to test it.
+
+Please note the web build only contains CardinalNative, no other variants will be built.  
+This is expected and intentional.
+
 ## Windows
 
 Cardinal does not support msvc, using mingw is required.  
@@ -133,7 +159,7 @@ export CC=x86_64-w64-mingw32-gcc
 export CXX=x86_64-w64-mingw32-g++
 export EXE_WRAPPER=wine # for running generated windows binaries
 export PKG_CONFIG=false # ignore pkg-config from base system
-# now run make etc..
+# make etc..
 ```
 
 # Installing
