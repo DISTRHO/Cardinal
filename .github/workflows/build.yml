@@ -1178,6 +1178,7 @@ jobs:
                 --error-exitcode=255 \
                 --leak-check=no \
                 --track-origins=yes \
+                --keep-debuginfo=yes \
                 --suppressions=./dpf/utils/valgrind-dpf.supp \
                 ./bin/Cardinal selftest
       - name: Validate LV2 ttl syntax
@@ -1204,6 +1205,7 @@ jobs:
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
+                    --keep-debuginfo=yes \
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
                     /usr/lib/carla/carla-bridge-native lv2 "" ${p}; \
             done
@@ -1215,6 +1217,7 @@ jobs:
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
+                    --keep-debuginfo=yes \
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
                     /usr/lib/carla/carla-bridge-native vst2 ./${p} ""; \
             done
@@ -1226,6 +1229,7 @@ jobs:
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
+                    --keep-debuginfo=yes \
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
                     /usr/lib/carla/carla-bridge-native vst3 ./bin/${p} ""; \
             done
