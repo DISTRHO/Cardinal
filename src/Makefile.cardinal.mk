@@ -312,6 +312,7 @@ LINK_FLAGS += --preload-file=./jsfx
 LINK_FLAGS += --preload-file=./lv2
 endif
 LINK_FLAGS += --preload-file=../../bin/CardinalNative.lv2/resources@/resources
+LINK_FLAGS += --use-preload-cache
 ifneq ($(NOPLUGINS),true)
 SYMLINKED_DIRS_RESOURCES  =
 # find . -type l | grep -v svg | grep -v ttf | grep -v art | grep -v json | grep -v png | grep -v otf | sort
