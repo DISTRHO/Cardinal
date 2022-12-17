@@ -1671,7 +1671,7 @@ $(BUILD_DIR)/Axioma/%.cpp.o: Axioma/%.cpp
 $(BUILD_DIR)/BaconPlugs/%.cpp.o: BaconPlugs/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -std=gnu++17 -c -o $@ \
 		$(foreach m,$(BACON_CUSTOM),$(call custom_module_names,$(m),BaconPlugs)) \
 		-DpluginInstance=pluginInstance__Bacon \
 		-DDARK_BACON \

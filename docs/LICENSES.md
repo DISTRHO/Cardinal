@@ -129,8 +129,15 @@ Below is a list of artwork licenses from plugins
 | BaconPlugs/*                            | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/midi/*                       | CC-BY-SA-3.0-DE  | |
 | BaconPlugs/midi/beeth/*                 | ???              | Unused in Cardinal, taken from http://www.jsbach.net/ |
-| BaconPlugs/1f953.svg                    | CC-BY-4.0        | |
+| BaconPlugs/FiraMono-Regular.ttf         | OFL-1.1-RFN      | |
+| BaconPlugs/Monitorica-Bd.ttf            | CC-BY-SA-4.0     | |
 | BaconPlugs/Keypunch029.json             | OFL-1.1          | |
+| BaconPlugs/1f953.svg                    | CC-BY-4.0        | |
+| BaconPlugs/1f60d.svg                    | CC-BY-4.0        | |
+| BaconPlugs/HelpActive.svg               | CC0-1.0          | |
+| BaconPlugs/HelpActiveSmall.svg          | CC0-1.0          | |
+| BaconPlugs/SABROG-*.svg                 | CC0-1.0          | |
+| BaconPlugs/sabrog-*.svg                 | CC0-1.0          | |
 | Bidoo/*                                 | CC-BY-NC-ND-4.0  | [Special permission granted for runtime dark mode](https://github.com/sebastien-bouffier/Bidoo/issues/191) |
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
 | Befaco/fonts/Segment7Standard.otf       | OFL-1.1-RFN      | |

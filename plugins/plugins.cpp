@@ -1429,23 +1429,16 @@ static void initStatic__Bacon()
         p->addModel(modelPolyGnome);
         p->addModel(modelQuantEyes);
         p->addModel(modelSampleDelay);
-#ifdef BUILD_SORTACHORUS
-        p->addModel(modelSortaChorus);
-#endif
         p->addModel(modelChipNoise);
         p->addModel(modelChipWaves);
         p->addModel(modelChipYourWave);
         p->addModel(modelOpen303);
-#ifdef BUILD_GENERICLSFR
-        p->addModel(modelGenericLFSR);
-#endif
         p->addModel(modelKarplusStrongPoly);
         p->addModel(modelALingADing);
         p->addModel(modelBitulator);
-#ifdef BUILD_PHASER
-        p->addModel(modelPhaser);
-#endif
         p->addModel(modelPolyGenerator);
+        p->addModel(modelLintBuddy);
+        p->addModel(modelLuckyHold);
     }
 }
 
@@ -1479,6 +1472,7 @@ static void initStatic__Befaco()
         p->addModel(modelNoisePlethora);
         p->addModel(modelChannelStrip);
         p->addModel(modelPonyVCO);
+        p->addModel(modelMotionMTR);
 #undef modelADSR
 #undef modelMixer
     }

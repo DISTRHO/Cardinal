@@ -15,17 +15,23 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
+#include "../BaconPlugs/src/Style.hpp"
 #include "../surgext/src/XTStyle.h"
 
+using namespace baconpaul::rackplugs;
 using namespace sst::surgext_rack::style;
 
 void surgext_rack_initialize()
 {
+    BaconStyle::get()->activeStyle = rack::settings::darkMode ? BaconStyle::DARK : BaconStyle::LIGHT;
     XTStyle::initialize();
 }
 
 void surgext_rack_update_theme()
 {
+    BaconStyle::get()->activeStyle = rack::settings::darkMode ? BaconStyle::DARK : BaconStyle::LIGHT;
+    BaconStyle::get()->notifyStyleListeners();
+
     XTStyle::setGlobalStyle(rack::settings::darkMode ? XTStyle::Style::DARK : XTStyle::Style::LIGHT);
     XTStyle::notifyStyleListeners();
 }
