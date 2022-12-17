@@ -456,8 +456,6 @@ $(TARGET_DIR)/%.app/Contents/Resources/distrho.icns: ../../utils/distrho.icns
 ifeq ($(WASM),true)
 $(CURDIR)/lv2/fomp.lv2/manifest.ttl: $(TARGET_DIR)/$(NAME).lv2/resources/PluginManifests/Cardinal.json
 	wget -O - https://falktx.com/data/wasm-things-2022-08-15.tar.gz | tar xz -C $(CURDIR)
-	# FIXME we are past 50Mb compressed assets! :(
-	rm -rf $(CURDIR)/lv2/mda.lv2
 	touch $@
 endif
 
