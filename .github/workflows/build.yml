@@ -508,8 +508,6 @@ jobs:
           make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS intel (AU using juce)
         if: steps.cache.outputs.cache-hit == 'true'
-        env:
-          MACOSX_DEPLOYMENT_TARGET: '10.8'
         run: |
           if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           pushd deps/PawPaw; source local.env macos; popd
@@ -571,31 +569,31 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: macos-universal-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: macos-universal-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PAWPAW_SKIP_LTO=1
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh macos-universal && ./deps/PawPaw/.cleanup.sh macos-universal
       - name: Set up ccache
         if: steps.cache.outputs.cache-hit == 'true'
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-macos-universal-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: ccache-macos-universal-v${{ env.CACHE_VERSION }}
       - name: Build macOS universal (base)
         if: steps.cache.outputs.cache-hit == 'true'
+        env:
+          WITH_LTO: 'false'
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PAWPAW_SKIP_LTO=1
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           pushd deps/PawPaw; source local.env macos-universal; popd
           make features
-          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(sysctl -n hw.logicalcpu)
+          make CIBUILD=true NOOPT=true -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS universal (AU using juce)
         if: steps.cache.outputs.cache-hit == 'true'
-        env:
-          MACOSX_DEPLOYMENT_TARGET: '10.12'
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
+          export PAWPAW_SKIP_LTO=1
           pushd deps/PawPaw; source local.env macos-universal; popd
           git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
           mkdir -p jucewrapper/build
