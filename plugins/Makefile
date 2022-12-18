@@ -1144,9 +1144,11 @@ BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
 
 # SSE must always be enabled, even in debug builds
+ifeq ($(CPU_I386_OR_X86_64),true)
 BASE_FLAGS += -msse -msse2 -msse3
 ifeq ($(WASM),true)
 BASE_FLAGS += -msimd128
+endif
 endif
 
 ifeq ($(DEBUG),true)
