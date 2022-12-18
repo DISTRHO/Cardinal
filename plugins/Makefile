@@ -1143,12 +1143,14 @@ BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
 BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
 
+# SSE must always be enabled, even in debug builds
+BASE_FLAGS += -msse -msse2 -msse3
+ifeq ($(WASM),true)
+BASE_FLAGS += -msimd128
+endif
+
 ifeq ($(DEBUG),true)
 BASE_FLAGS += -UDEBUG
-ifeq ($(WASM),true)
-# SSE must always be enabled on wasm, even in debug builds
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-endif
 endif
 
 ifeq ($(HEADLESS),true)
