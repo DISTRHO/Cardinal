@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 37
+  CACHE_VERSION: 38
   CARDINAL_UNDER_WINE: 1
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
@@ -758,7 +758,7 @@ jobs:
             *.tar.gz
 
   wasm:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -836,7 +836,7 @@ jobs:
             *.zip
 
   wasm-mini:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
