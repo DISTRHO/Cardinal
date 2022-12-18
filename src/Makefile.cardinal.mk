@@ -290,6 +290,7 @@ ifneq ($(MACOS),true)
 BUILD_CXX_FLAGS += -faligned-new -Wno-abi
 ifeq ($(MOD_BUILD),true)
 BUILD_CXX_FLAGS += -fabi-version=11
+LINK_FLAGS      += -fabi-version=11
 endif
 endif
 
