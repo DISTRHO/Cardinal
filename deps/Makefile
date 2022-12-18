@@ -34,14 +34,20 @@ endif
 BASE_FLAGS += -I$(abspath ../include)
 BASE_FLAGS += -I$(abspath ../include/simd-compat)
 
+# SSE must always be enabled, even in debug builds
+ifeq ($(CPU_I386_OR_X86_64),true)
+BASE_FLAGS += -msse -msse2 -msse3
+ifeq ($(WASM),true)
+BASE_FLAGS += -msimd128
+endif
+endif
+
 ifeq ($(HAIKU)$(WASM),true)
 BASE_FLAGS += -I$(abspath ../include/linux-compat)
 endif
 
-ifeq ($(HEADLESS),true)
-ifeq ($(WITH_LTO),true)
+ifeq ($(MOD_BUILD)$(WITH_LTO),true)
 BASE_FLAGS += -ffat-lto-objects
-endif
 endif
 
 ifneq ($(SYSDEPS),true)

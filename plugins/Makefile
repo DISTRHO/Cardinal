@@ -1202,7 +1202,7 @@ BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 ifneq ($(MACOS),true)
 BUILD_CXX_FLAGS += -faligned-new -Wno-abi
 ifeq ($(MOD_BUILD),true)
-BUILD_CXX_FLAGS += -fabi-version=11
+BUILD_CXX_FLAGS += -fabi-version=12
 endif
 endif
 
