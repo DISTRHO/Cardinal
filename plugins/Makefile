@@ -1145,9 +1145,9 @@ BASE_FLAGS += -I../src/Rack/dep/pffft
 
 # SSE must always be enabled, even in debug builds
 ifeq ($(CPU_I386_OR_X86_64),true)
-BASE_FLAGS += -msse -msse2 -msse3
+BASE_FLAGS += -msse -msse2
 ifeq ($(WASM),true)
-BASE_FLAGS += -msimd128
+BASE_FLAGS += -msse3 -msimd128
 endif
 endif
 
@@ -1202,7 +1202,7 @@ BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 ifneq ($(MACOS),true)
 BUILD_CXX_FLAGS += -faligned-new -Wno-abi
 ifeq ($(MOD_BUILD),true)
-BUILD_CXX_FLAGS += -fabi-version=12
+BUILD_CXX_FLAGS += -std=gnu++17
 endif
 endif
 
@@ -1212,8 +1212,9 @@ BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
 # Ignore bad behaviour from Rack API
 BUILD_CXX_FLAGS += -Wno-format-security
 
-ifeq ($(WASM),true)
-BUILD_CXX_FLAGS += -fexceptions
+# Ignore warnings from simde
+ifeq ($(MOD_BUILD),true)
+BUILD_CXX_FLAGS += -Wno-overflow
 endif
 
 # --------------------------------------------------------------
