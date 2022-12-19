@@ -6,6 +6,7 @@ on:
 env:
   CACHE_VERSION: 38
   CARDINAL_UNDER_WINE: 1
+  EMSCRIPTEN_VERSION: 3.1.27
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: 'true'
@@ -785,7 +786,7 @@ jobs:
           sudo apt-get install -yqq brotli gperf
           sudo apt-get clean
           [ -e ~/PawPawBuilds/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/PawPawBuilds/emsdk
-          cd ~/PawPawBuilds/emsdk && ./emsdk install latest && ./emsdk activate latest
+          cd ~/PawPawBuilds/emsdk && ./emsdk install ${{ env.EMSCRIPTEN_VERSION }} && ./emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
       - name: Build extra dependencies
         run: |
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
@@ -863,7 +864,7 @@ jobs:
           sudo apt-get install -yqq brotli
           sudo apt-get clean
           [ -e ~/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/emsdk
-          cd ~/emsdk && ./emsdk install latest && ./emsdk activate latest
+          cd ~/emsdk && ./emsdk install ${{ env.EMSCRIPTEN_VERSION }} && ./emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
       - name: Build wasm-mini cross-compiled
         env:
           AR: emar
