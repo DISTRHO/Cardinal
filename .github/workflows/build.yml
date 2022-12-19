@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 38
+  CACHE_VERSION: 39
   CARDINAL_UNDER_WINE: 1
   EMSCRIPTEN_VERSION: 3.1.27
   DEBIAN_FRONTEND: noninteractive

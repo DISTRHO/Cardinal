@@ -62,6 +62,11 @@ BASE_FLAGS += -IRack/dep/osdialog
 BASE_FLAGS += -IRack/dep/oui-blendish
 BASE_FLAGS += -IRack/dep/pffft
 
+ifeq ($(CPU_I386),true)
+# needed for enabling SSE in pffft
+BASE_FLAGS += -Di386
+endif
+
 ifeq ($(DEBUG),true)
 BASE_FLAGS += -UDEBUG
 ifeq ($(WASM),true)
