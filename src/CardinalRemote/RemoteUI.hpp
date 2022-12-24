@@ -20,10 +20,11 @@
 #include "NanoVG.hpp"
 #include "PluginContext.hpp"
 
+#include <app/common.hpp>
+
 class CardinalRemoteUI : public NanoTopLevelWidget
 {
-    CardinalPluginContext context;
-    std::string autosavePath;
+    rack::math::Vec lastMousePos;
 
 public:
     explicit CardinalRemoteUI(Window& window, const std::string& templatePath);
@@ -31,6 +32,12 @@ public:
     
 protected:
     void onNanoDisplay() override;
+    bool onMouse(const MouseEvent& ev) override;
+    bool onMotion(const MotionEvent& ev) override;
+    bool onScroll(const ScrollEvent& ev) override;
+    bool onCharacterInput(const CharacterInputEvent& ev) override;
+    bool onKeyboard(const KeyboardEvent& ev) override;
+    void onResize(const ResizeEvent& ev) override;
     
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CardinalRemoteUI)
 };

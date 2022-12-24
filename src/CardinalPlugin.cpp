@@ -430,75 +430,6 @@ struct Initializer
 
 // -----------------------------------------------------------------------------------------------------------
 
-void CardinalPluginContext::writeMidiMessage(const rack::midi::Message& message, const uint8_t channel)
-{
-    if (bypassed)
-        return;
-
-    const size_t size = message.bytes.size();
-    DISTRHO_SAFE_ASSERT_RETURN(size > 0,);
-    DISTRHO_SAFE_ASSERT_RETURN(message.frame >= 0,);
-
-    MidiEvent event;
-    event.frame = message.frame;
-
-    switch (message.bytes[0] & 0xF0)
-    {
-    case 0x80:
-    case 0x90:
-    case 0xA0:
-    case 0xB0:
-    case 0xE0:
-        event.size = 3;
-        break;
-    case 0xC0:
-    case 0xD0:
-        event.size = 2;
-        break;
-    case 0xF0:
-        switch (message.bytes[0] & 0x0F)
-        {
-        case 0x0:
-        case 0x4:
-        case 0x5:
-        case 0x7:
-        case 0x9:
-        case 0xD:
-            // unsupported
-            return;
-        case 0x1:
-        case 0x2:
-        case 0x3:
-        case 0xE:
-            event.size = 3;
-            break;
-        case 0x6:
-        case 0x8:
-        case 0xA:
-        case 0xB:
-        case 0xC:
-        case 0xF:
-            event.size = 1;
-            break;
-        }
-        break;
-    default:
-        // invalid
-        return;
-    }
-
-    DISTRHO_SAFE_ASSERT_RETURN(size >= event.size,);
-
-    std::memcpy(event.data, message.bytes.data(), event.size);
-
-    if (channel != 0 && event.data[0] < 0xF0)
-        event.data[0] |= channel & 0x0F;
-
-    plugin->writeMidiEvent(event);
-}
-
-// -----------------------------------------------------------------------------------------------------------
-
 struct ScopedContext {
     ScopedContext(const CardinalBasePlugin* const plugin)
     {
@@ -1393,6 +1324,6 @@ Plugin* createPlugin()
     return new CardinalPlugin();
 }
 
-// -----------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 END_NAMESPACE_DISTRHO

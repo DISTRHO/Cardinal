@@ -30,10 +30,10 @@ GLFWAPI const char* glfwGetClipboardString(GLFWwindow*)
 {
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr, nullptr);
-    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr, nullptr);
+    DISTRHO_SAFE_ASSERT_RETURN(context->tlw != nullptr, nullptr);
 
     size_t dataSize;
-    return static_cast<const char*>(context->ui->getClipboard(dataSize));
+    return static_cast<const char*>(context->tlw->getClipboard(dataSize));
 }
 
 GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char* const text)
@@ -42,9 +42,9 @@ GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char* const text)
 
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr,);
-    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr,);
+    DISTRHO_SAFE_ASSERT_RETURN(context->tlw != nullptr,);
 
-    context->ui->setClipboard(nullptr, text, std::strlen(text)+1);
+    context->tlw->setClipboard(nullptr, text, std::strlen(text)+1);
 }
 
 GLFWAPI GLFWcursor* glfwCreateStandardCursor(const int shape)
@@ -91,18 +91,18 @@ GLFWAPI void glfwSetCursor(GLFWwindow*, GLFWcursor* const cursor)
 {
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr,);
-    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr,);
+    DISTRHO_SAFE_ASSERT_RETURN(context->tlw != nullptr,);
 
-    context->ui->setCursor(cursor != nullptr ? cursor->cursorId : kMouseCursorArrow);
+    context->tlw->setCursor(cursor != nullptr ? cursor->cursorId : kMouseCursorArrow);
 }
 
 GLFWAPI double glfwGetTime(void)
 {
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr, 0.0);
-    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr, 0.0);
+    DISTRHO_SAFE_ASSERT_RETURN(context->tlw != nullptr, 0.0);
 
-    return context->ui->getApp().getTime();
+    return context->tlw->getApp().getTime();
 }
 
 GLFWAPI const char* glfwGetKeyName(const int key, int)

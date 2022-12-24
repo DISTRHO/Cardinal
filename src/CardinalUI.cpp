@@ -67,40 +67,6 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
-bool CardinalPluginContext::addIdleCallback(IdleCallback* const cb) const
-{
-    if (ui == nullptr)
-        return false;
-
-    ui->addIdleCallback(cb);
-    return true;
-}
-
-void CardinalPluginContext::removeIdleCallback(IdleCallback* const cb) const
-{
-    if (ui == nullptr)
-        return;
-
-    ui->removeIdleCallback(cb);
-}
-
-void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, bool started)
-{
-    DISTRHO_SAFE_ASSERT_RETURN(pcontext->ui != nullptr,);
-
-    if (started)
-    {
-        pcontext->ui->editParameter(index, true);
-        pcontext->ui->setParameterValue(index, pcontext->parameters[index]);
-    }
-    else
-    {
-        pcontext->ui->editParameter(index, false);
-    }
-}
-
-// -----------------------------------------------------------------------------------------------------------
-
 #ifdef DISTRHO_OS_WASM
 struct WasmWelcomeDialog : rack::widget::OpaqueWidget
 {

@@ -64,13 +64,14 @@ struct CardinalPluginContext : rack::Context {
     uint32_t midiEventCount;
     Plugin* const plugin;
 #ifndef HEADLESS
+    NanoTopLevelWidget* tlw;
     UI* ui;
 #endif
 
     CardinalPluginContext(Plugin* const p)
-        : bufferSize(p->getBufferSize()),
+        : bufferSize(p != nullptr ? p->getBufferSize() : 0),
           processCounter(0),
-          sampleRate(p->getSampleRate()),
+          sampleRate(p != nullptr ? p->getSampleRate() : 0.0),
          #if CARDINAL_VARIANT_MAIN
           variant(kCardinalVariantMain),
          #elif CARDINAL_VARIANT_FX
@@ -105,6 +106,7 @@ struct CardinalPluginContext : rack::Context {
           midiEventCount(0),
           plugin(p)
 #ifndef HEADLESS
+        , tlw(nullptr)
         , ui(nullptr)
 #endif
     {
@@ -169,6 +171,7 @@ public:
           filebrowseraction(),
           filebrowserhandle(nullptr)
     {
+        context->tlw = this;
         context->ui = this;
     }
 
@@ -177,6 +180,7 @@ public:
         if (filebrowserhandle != nullptr)
             fileBrowserClose(filebrowserhandle);
 
+        context->tlw = nullptr;
         context->ui = nullptr;
     }
 };

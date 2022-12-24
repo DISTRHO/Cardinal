@@ -145,6 +145,7 @@ struct Window::Internal {
 	std::string lastWindowTitle;
 
 	DISTRHO_NAMESPACE::UI* ui = nullptr;
+	DGL_NAMESPACE::NanoTopLevelWidget* tlw = nullptr;
 	DISTRHO_NAMESPACE::WindowParameters params;
 	DISTRHO_NAMESPACE::WindowParametersCallback* callback = nullptr;
 	DGL_NAMESPACE::Application hiddenApp;
@@ -238,6 +239,112 @@ Window::Window() {
 #endif
 }
 
+void WindowSetPluginRemote(Window* const window, NanoTopLevelWidget* const tlw)
+{
+	// if nanovg context failed, init only bare minimum
+	if (window->vg == nullptr)
+	{
+		if (tlw != nullptr)
+		{
+			window->internal->tlw = tlw;
+			window->internal->size = rack::math::Vec(tlw->getWidth(), tlw->getHeight());
+		}
+		else
+		{
+			window->internal->tlw = nullptr;
+			window->internal->callback = nullptr;
+		}
+		return;
+	}
+
+	if (tlw != nullptr)
+	{
+		const GLubyte* vendor = glGetString(GL_VENDOR);
+		const GLubyte* renderer = glGetString(GL_RENDERER);
+		const GLubyte* version = glGetString(GL_VERSION);
+		INFO("Renderer: %s %s", vendor, renderer);
+		INFO("OpenGL: %s", version);
+
+		window->internal->tlw = tlw;
+		window->internal->size = rack::math::Vec(tlw->getWidth(), tlw->getHeight());
+
+		// Set up NanoVG
+		window->internal->r_vg = tlw->getContext();
+#ifdef NANOVG_GLES2
+		window->internal->r_fbVg = nvgCreateSharedGLES2(window->internal->r_vg, NVG_ANTIALIAS);
+#else
+		window->internal->r_fbVg = nvgCreateSharedGL2(window->internal->r_vg, NVG_ANTIALIAS);
+#endif
+
+		// swap contexts
+		window->internal->o_vg = window->vg;
+		window->internal->o_fbVg = window->fbVg;
+		window->vg = window->internal->r_vg;
+		window->fbVg = window->internal->r_fbVg;
+
+		// also for fonts and images
+		window->uiFont->vg = window->vg;
+		window->uiFont->handle = loadFallbackFont(window->vg);
+		for (auto& font : window->internal->fontCache)
+		{
+			font.second->vg = window->vg;
+			font.second->ohandle = font.second->handle;
+			font.second->handle = nvgCreateFont(window->vg,
+			                                    font.second->ofilename.c_str(), font.second->ofilename.c_str());
+		}
+		for (auto& image : window->internal->imageCache)
+		{
+			image.second->vg = window->vg;
+			image.second->ohandle = image.second->handle;
+			image.second->handle = nvgCreateImage(window->vg, image.second->ofilename.c_str(),
+			                                      NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+		}
+
+		// Init settings
+		WindowParametersRestore(window);
+
+		widget::Widget::ContextCreateEvent e;
+		APP->scene->onContextCreate(e);
+	}
+	else
+	{
+		widget::Widget::ContextDestroyEvent e;
+		APP->scene->onContextDestroy(e);
+
+		// swap contexts
+		window->uiFont->vg = window->internal->o_vg;
+		window->vg = window->internal->o_vg;
+		window->fbVg = window->internal->o_fbVg;
+		window->internal->o_vg = nullptr;
+		window->internal->o_fbVg = nullptr;
+
+		// also for fonts and images
+		window->uiFont->vg = window->vg;
+		window->uiFont->handle = loadFallbackFont(window->vg);
+		for (auto& font : window->internal->fontCache)
+		{
+			font.second->vg = window->vg;
+			font.second->handle = font.second->ohandle;
+			font.second->ohandle = -1;
+		}
+		for (auto& image : window->internal->imageCache)
+		{
+			image.second->vg = window->vg;
+			image.second->handle = image.second->ohandle;
+			image.second->ohandle = -1;
+		}
+
+#if defined NANOVG_GLES2
+		nvgDeleteGLES2(window->internal->r_fbVg);
+#else
+		nvgDeleteGL2(window->internal->r_fbVg);
+#endif
+
+		window->internal->tlw = nullptr;
+		window->internal->callback = nullptr;
+	}
+}
+
 void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 {
 	// if nanovg context failed, init only bare minimum
@@ -264,6 +371,7 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 		INFO("Renderer: %s %s", vendor, renderer);
 		INFO("OpenGL: %s", version);
 
+		window->internal->tlw = ui;
 		window->internal->ui = ui;
 		window->internal->size = rack::math::Vec(ui->getWidth(), ui->getHeight());
 
@@ -339,6 +447,7 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 		nvgDeleteGL2(window->internal->r_fbVg);
 #endif
 
+		window->internal->tlw = nullptr;
 		window->internal->ui = nullptr;
 		window->internal->callback = nullptr;
 	}
@@ -384,8 +493,8 @@ void Window::setSize(math::Vec size) {
 	size = size.max(WINDOW_SIZE_MIN);
 	internal->size = size;
 
-	if (DISTRHO_NAMESPACE::UI* const ui = internal->ui)
-		ui->setSize(internal->size.x, internal->size.y);
+	if (DGL_NAMESPACE::NanoTopLevelWidget* const tlw = internal->ui)
+		tlw->setSize(internal->size.x, internal->size.y);
 }
 
 void WindowSetInternalSize(rack::window::Window* const window, math::Vec size) {
@@ -453,7 +562,7 @@ static void Window__writeImagePNG(void* context, void* data, int size) {
 
 
 void Window::step() {
-	DISTRHO_SAFE_ASSERT_RETURN(internal->ui != nullptr,);
+	DISTRHO_SAFE_ASSERT_RETURN(internal->tlw != nullptr,);
 
 	if (vg == nullptr)
 		return;
@@ -480,12 +589,12 @@ void Window::step() {
 		windowTitle += system::getFilename(APP->patch->path);
 	}
 	if (windowTitle != internal->lastWindowTitle) {
-		internal->ui->getWindow().setTitle(windowTitle.c_str());
+		internal->tlw->getWindow().setTitle(windowTitle.c_str());
 		internal->lastWindowTitle = windowTitle;
 	}
 
 	// Get desired pixel ratio
-	float newPixelRatio = internal->ui->getScaleFactor();
+	float newPixelRatio = internal->tlw->getScaleFactor();
 	if (newPixelRatio != pixelRatio) {
 		pixelRatio = newPixelRatio;
 		APP->event->handleDirty();
@@ -504,8 +613,8 @@ void Window::step() {
 #endif
 
 	// Get framebuffer/window ratio
-	int winWidth = internal->ui->getWidth();
-	int winHeight = internal->ui->getHeight();
+	int winWidth = internal->tlw->getWidth();
+	int winHeight = internal->tlw->getHeight();
 	int fbWidth = winWidth;// * newPixelRatio;
 	int fbHeight = winHeight;// * newPixelRatio;
 	windowRatio = (float)fbWidth / winWidth;
@@ -599,9 +708,9 @@ void Window::screenshotModules(const std::string&, float) {
 
 
 void Window::close() {
-	DISTRHO_SAFE_ASSERT_RETURN(internal->ui != nullptr,);
+	DISTRHO_SAFE_ASSERT_RETURN(internal->tlw != nullptr,);
 
-	internal->ui->getWindow().close();
+	internal->tlw->getWindow().close();
 }
 
 
@@ -610,7 +719,7 @@ void Window::cursorLock() {
 	if (!settings::allowCursorLock)
 		return;
 
-	emscripten_request_pointerlock(internal->ui->getWindow().getApp().getClassName(), false);
+	emscripten_request_pointerlock(internal->tlw->getWindow().getApp().getClassName(), false);
 #endif
 }
 
@@ -643,7 +752,7 @@ int Window::getMods() {
 void Window::setFullScreen(const bool fullscreen) {
 #ifdef DISTRHO_OS_WASM
 	if (fullscreen)
-		emscripten_request_fullscreen(internal->ui->getWindow().getApp().getClassName(), false);
+		emscripten_request_fullscreen(internal->tlw->getWindow().getApp().getClassName(), false);
 	else
 		emscripten_exit_fullscreen();
 #endif

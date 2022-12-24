@@ -20,12 +20,18 @@
 #include "RemoteUI.hpp"
 
 #include <asset.hpp>
+#include <patch.hpp>
 #include <random.hpp>
 #include <settings.hpp>
 #include <system.hpp>
 
 #include <app/Browser.hpp>
+#include <app/Scene.hpp>
+#include <engine/Engine.hpp>
 #include <ui/common.hpp>
+
+
+#include "PluginContext.hpp"
 
 namespace rack {
 namespace plugin {
@@ -33,6 +39,26 @@ namespace plugin {
     void destroyStaticPlugins();
 }
 }
+
+START_NAMESPACE_DISTRHO
+
+bool isUsingNativeAudio() noexcept { return false; }
+bool supportsAudioInput() { return false; }
+bool supportsBufferSizeChanges() { return false; }
+bool supportsMIDI() { return false; }
+bool isAudioInputEnabled() { return false; }
+bool isMIDIEnabled() { return false; }
+uint getBufferSize() { return 0; }
+bool requestAudioInput() { return false; }
+bool requestBufferSizeChange(uint) { return false; }
+bool requestMIDI() { return false; }
+const char* getPluginFormatName() noexcept { return "Remote"; }
+
+uint32_t Plugin::getBufferSize() const noexcept { return 128; }
+double Plugin::getSampleRate() const noexcept { return 48000; }
+bool Plugin::writeMidiEvent(const MidiEvent&) noexcept { return false; }
+
+END_NAMESPACE_DISTRHO
 
 int main(const int argc, const char* argv[])
 {
@@ -42,7 +68,6 @@ int main(const int argc, const char* argv[])
     settings::autoCheckUpdates = false;
     settings::autosaveInterval = 0;
     settings::devMode = true;
-    settings::discordUpdateActivity = false;
     settings::isPlugin = true;
     settings::skipLoadOnLaunch = true;
     settings::showTipsOnLaunch = false;
@@ -131,16 +156,67 @@ int main(const int argc, const char* argv[])
     INFO("Initializing plugin browser DB");
     app::browserInit();
 
+    // create unique temporary path for this instance
+    std::string autosavePath;
+
+    try {
+        char uidBuf[24];
+        const std::string tmp = rack::system::getTempDirectory();
+
+        for (int i=1;; ++i)
+        {
+            std::snprintf(uidBuf, sizeof(uidBuf), "CardinalRemote.%04d", i);
+            const std::string trypath = rack::system::join(tmp, uidBuf);
+
+            if (! rack::system::exists(trypath))
+            {
+                if (rack::system::createDirectories(trypath))
+                    autosavePath = trypath;
+                break;
+            }
+        }
+    } DISTRHO_SAFE_EXCEPTION("create unique temporary path");
+
+    CardinalPluginContext context(nullptr);
+    rack::contextSet(&context);
+
+    context.bufferSize = 512;
+    rack::settings::sampleRate = context.sampleRate = 48000;
+
+    context.engine = new rack::engine::Engine;
+    context.engine->setSampleRate(context.sampleRate);
+
+    context.history = new rack::history::State;
+    context.patch = new rack::patch::Manager;
+    context.patch->autosavePath = autosavePath;
+    context.patch->templatePath = templatePath;
+
+    context.event = new rack::widget::EventState;
+    context.scene = new rack::app::Scene;
+    context.event->rootWidget = context.scene;
+    context.window = new rack::window::Window;
+
+    context.patch->loadTemplate();
+    context.scene->rackScroll->reset();
+
     Application app;
     Window win(app);
+    win.setResizable(true);
     win.setTitle("CardinalRemote");
     ScopedPointer<CardinalRemoteUI> remoteUI;
-    
+
     {
+        const Window::ScopedGraphicsContext sgc(win);
         remoteUI = new CardinalRemoteUI(win, templatePath);
     }
 
+    win.show();
     app.exec();
+
+    context.patch->clear();
+
+    if (! autosavePath.empty())
+        rack::system::removeRecursively(autosavePath);
 
     INFO("Clearing asset paths");
     asset::bundlePath.clear();

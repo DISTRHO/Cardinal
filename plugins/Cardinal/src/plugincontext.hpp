@@ -29,6 +29,12 @@
 // -----------------------------------------------------------------------------------------------------------
 // from PluginContext.hpp
 
+#ifndef HEADLESS
+START_NAMESPACE_DGL
+class NanoTopLevelWidget;
+END_NAMESPACE_DGL
+#endif
+
 START_NAMESPACE_DISTRHO
 
 static constexpr const uint32_t kModuleParameters = 24;
@@ -68,6 +74,7 @@ struct CardinalPluginContext : rack::Context {
     uint32_t midiEventCount;
     Plugin* const plugin;
 #ifndef HEADLESS
+    DGL_NAMESPACE::NanoTopLevelWidget* tlw;
     UI* ui;
 #endif
     CardinalPluginContext(Plugin* const p);
