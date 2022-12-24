@@ -297,6 +297,11 @@ FUNDAMENTAL_CUSTOM = $(DRWAV)
 
 # PLUGIN_FILES += $(wildcard ZamAudio/src/*.cpp)
 
+# --------------------------------------------------------------
+# noplugins build
+
+NOPLUGIN_FILES = $(PLUGIN_FILES:%=%)
+
 ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------
 # 21kHz
@@ -1534,14 +1539,21 @@ endif
 PLUGIN_OBJS  = $(PLUGIN_FILES:%=$(BUILD_DIR)/%.o)
 PLUGIN_OBJS += $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.o)
 
+NOPLUGIN_OBJS = $(NOPLUGIN_FILES:%=$(BUILD_DIR)/%.o)
+
 .PRECIOUS: $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.c)
 
 # function for custom module names macro
 custom_module_names = -D${1}=${2}${1} -Dmodel${1}=model${2}${1} -D${1}Widget=${2}${1}Widget
 custom_per_file_names = -D${1}=${2}_${1}
 
-$(TARGET): $(PLUGIN_OBJS)
+plugins.a: $(PLUGIN_OBJS)
 	@echo "Creating $@"
+	$(SILENT)rm -f $@
+	$(SILENT)$(AR) crs $@ $^
+
+noplugins.a: $(NOPLUGIN_OBJS)
+	@echo "Creating $@" $(NOPLUGIN_OBJS)
 	$(SILENT)rm -f $@
 	$(SILENT)$(AR) crs $@ $^
 
