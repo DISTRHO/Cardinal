@@ -40,6 +40,7 @@ static constexpr const uint kModuleParameters = 24;
 
 enum CardinalVariant {
     kCardinalVariantMain,
+    kCardinalVariantMini,
     kCardinalVariantFX,
     kCardinalVariantNative,
     kCardinalVariantSynth,
@@ -74,6 +75,8 @@ struct CardinalPluginContext : rack::Context {
           sampleRate(p != nullptr ? p->getSampleRate() : 0.0),
          #if CARDINAL_VARIANT_MAIN
           variant(kCardinalVariantMain),
+         #elif CARDINAL_VARIANT_MINI
+          variant(kCardinalVariantMini),
          #elif CARDINAL_VARIANT_FX
           variant(kCardinalVariantFX),
          #elif CARDINAL_VARIANT_NATIVE
@@ -162,7 +165,11 @@ public:
 
     CardinalBaseUI(const uint width, const uint height)
         : UI(width, height),
+         #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
           context(getRackContextFromPlugin(getPluginInstancePointer())),
+         #else
+          context(new CardinalPluginContext(nullptr)),
+         #endif
           saving(false),
           savingUncompressed(false),
          #ifdef DISTRHO_OS_WASM
@@ -182,6 +189,9 @@ public:
 
         context->tlw = nullptr;
         context->ui = nullptr;
+       #if !DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        delete context;
+       #endif
     }
 };
 #endif

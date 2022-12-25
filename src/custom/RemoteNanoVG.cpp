@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,8 +15,18 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
+#include "DistrhoPluginInfo.h"
+
+#ifndef DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+# error wrong build
+#endif
+
+#if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+# define HEADLESS
+#endif
+
 #ifndef HEADLESS
-#include "OpenGL.hpp"
+# include "OpenGL.hpp"
 #endif
 
 #include "nanovg.h"

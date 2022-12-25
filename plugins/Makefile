@@ -231,7 +231,13 @@ DRWAV += drwav_write_raw
 # --------------------------------------------------------------
 # Files to build
 
+ifeq ($(NOPLUGINS),true)
+PLUGIN_FILES = noplugins.cpp
+else
 PLUGIN_FILES = plugins.cpp
+endif
+
+MINIPLUGIN_FILES = plugins-mini.cpp
 
 # --------------------------------------------------------------
 # Cardinal (built-in)
@@ -249,6 +255,17 @@ PLUGIN_FILES += Cardinal/src/HostParameters.cpp
 PLUGIN_FILES += Cardinal/src/HostParameters-Map.cpp
 PLUGIN_FILES += Cardinal/src/HostTime.cpp
 PLUGIN_FILES += Cardinal/src/TextEditor.cpp
+
+MINIPLUGIN_FILES += Cardinal/src/HostAudio.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostCV.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostMIDI.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostMIDI-CC.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostMIDI-Gate.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostMIDI-Map.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostParameters.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostParameters-Map.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostTime.cpp
+MINIPLUGIN_FILES += Cardinal/src/TextEditor.cpp
 
 ifneq ($(USE_GLES2),true)
 ifneq ($(USE_GLES3),true)
@@ -280,6 +297,7 @@ endif
 
 ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
 PLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
+MINIPLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
 BASE_FLAGS += -DHAVE_FFTW3F
 endif
 
@@ -1106,7 +1124,11 @@ endif # !NOPLUGINS
 # --------------------------------------------------------------
 # Build setup
 
+ifeq ($(HEADLESS),true)
+BUILD_DIR = ../build-headless/plugins
+else
 BUILD_DIR = ../build/plugins
+endif
 
 ifeq ($(MACOS),true)
 BASE_FLAGS += -DARCH_MAC
@@ -1261,16 +1283,23 @@ endif
 # --------------------------------------------------------------
 # Build targets
 
-ifeq ($(NOPLUGINS),true)
-TARGET = noplugins.a
-else
-TARGET = plugins.a
+ifeq ($(HEADLESS),true)
+TARGET_SUFFIX = -headless
 endif
 
-all: $(TARGET)
+ifeq ($(NOPLUGINS),true)
+TARGETS = noplugins$(TARGET_SUFFIX).a
+else
+TARGETS = plugins$(TARGET_SUFFIX).a plugins-mini-headless.a
+endif
+
+all: $(TARGETS)
+ifneq ($(HEADLESS),true)
+	$(MAKE) HEADLESS=true plugins-mini-headless.a
+endif
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGETS)
 	rm -rf $(BUILD_DIR)
 	rm -rf surgext/build
 
@@ -1342,6 +1371,9 @@ JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/wavetables
 JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/windows.wt
 endif
 
+MINIPLUGIN_LIST = Cardinal
+MINIRESOURCE_FILES = $(wildcard Cardinal/res/*.svg)
+
 RESOURCE_FILES += Cardinal/res/Miku/Miku.png
 
 # MOD builds only have LV2 main and FX variant
@@ -1349,8 +1381,10 @@ ifeq ($(MOD_BUILD),true)
 
 LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(MINIPLUGIN_LIST:%=../bin/CardinalMini.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
+LV2_RESOURCES += $(MINIRESOURCE_FILES:%=../bin/CardinalMini.lv2/resources/%)
 
 # MOD builds only have LV2 FX variant for now
 else ifeq ($(WASM),true)
@@ -1362,10 +1396,12 @@ else
 
 LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(MINIPLUGIN_LIST:%=../bin/CardinalMini.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.lv2/resources/%)
+LV2_RESOURCES += $(MINIRESOURCE_FILES:%=../bin/CardinalMini.lv2/resources/%)
 
 ifeq ($(MACOS),true)
 VST2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json)
@@ -1404,6 +1440,10 @@ resources: $(JACK_RESOURCES) $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
+../bin/CardinalMini.lv2/resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
 ../bin/CardinalNative.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
@@ -1423,6 +1463,10 @@ endif
 	$(SILENT)ln -sf $(abspath $<) $@
 
 ../bin/CardinalFX.lv2/resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalMini.lv2/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
@@ -1539,6 +1583,8 @@ endif
 PLUGIN_OBJS  = $(PLUGIN_FILES:%=$(BUILD_DIR)/%.o)
 PLUGIN_OBJS += $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.o)
 
+MINIPLUGIN_OBJS = $(MINIPLUGIN_FILES:%=$(BUILD_DIR)/%.o)
+
 NOPLUGIN_OBJS = $(NOPLUGIN_FILES:%=$(BUILD_DIR)/%.o)
 
 .PRECIOUS: $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.c)
@@ -1547,12 +1593,17 @@ NOPLUGIN_OBJS = $(NOPLUGIN_FILES:%=$(BUILD_DIR)/%.o)
 custom_module_names = -D${1}=${2}${1} -Dmodel${1}=model${2}${1} -D${1}Widget=${2}${1}Widget
 custom_per_file_names = -D${1}=${2}_${1}
 
-plugins.a: $(PLUGIN_OBJS)
+plugins$(TARGET_SUFFIX).a: $(PLUGIN_OBJS)
 	@echo "Creating $@"
 	$(SILENT)rm -f $@
 	$(SILENT)$(AR) crs $@ $^
 
-noplugins.a: $(NOPLUGIN_OBJS)
+plugins-mini$(TARGET_SUFFIX).a: $(MINIPLUGIN_OBJS)
+	@echo "Creating $@"
+	$(SILENT)rm -f $@
+	$(SILENT)$(AR) crs $@ $^
+
+noplugins$(TARGET_SUFFIX).a: $(NOPLUGIN_OBJS)
 	@echo "Creating $@" $(NOPLUGIN_OBJS)
 	$(SILENT)rm -f $@
 	$(SILENT)$(AR) crs $@ $^
@@ -1568,6 +1619,16 @@ $(BUILD_DIR)/%.bin.o: $(BUILD_DIR)/%.bin.c
 	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@
 
 $(BUILD_DIR)/plugins.cpp.o: plugins.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
+
+$(BUILD_DIR)/plugins-mini.cpp.o: plugins-mini.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
+
+$(BUILD_DIR)/noplugins.cpp.o: plugins.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@

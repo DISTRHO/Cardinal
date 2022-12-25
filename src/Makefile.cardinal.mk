@@ -8,6 +8,8 @@
 
 ifeq ($(NAME),Cardinal)
 CARDINAL_VARIANT = main
+else ifeq ($(NAME),CardinalMini)
+CARDINAL_VARIANT = mini
 else ifeq ($(NAME),CardinalFX)
 CARDINAL_VARIANT = fx
 else ifeq ($(NAME),CardinalNative)
@@ -19,6 +21,7 @@ endif
 # --------------------------------------------------------------
 # Carla stuff
 
+ifneq ($(CARDINAL_VARIANT),mini)
 ifneq ($(STATIC_BUILD),true)
 
 STATIC_PLUGIN_TARGET = true
@@ -49,6 +52,7 @@ CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/ysfx.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/zita-resampler.a
 
 endif # STATIC_BUILD
+endif # CARDINAL_VARIANT mini
 
 # --------------------------------------------------------------
 # Import base definitions
@@ -64,7 +68,7 @@ ifeq ($(CARDINAL_VARIANT),main)
 # main variant should not use rtaudio/sdl2 fallback (it has CV ports)
 SKIP_NATIVE_AUDIO_FALLBACK = true
 else
-# fx and synth variants should only use rtaudio/sdl2 fallbacks
+# other variants should only use rtaudio/sdl2 fallbacks
 FORCE_NATIVE_AUDIO_FALLBACK = true
 endif
 
@@ -94,7 +98,10 @@ FILES_DSP  = CardinalPlugin.cpp
 FILES_DSP += CardinalCommon.cpp
 FILES_DSP += common.cpp
 
-ifeq ($(HEADLESS),true)
+ifeq ($(CARDINAL_VARIANT),mini)
+FILES_DSP += RemoteNanoVG.cpp
+FILES_DSP += RemoteWindow.cpp
+else ifeq ($(HEADLESS),true)
 FILES_DSP += RemoteNanoVG.cpp
 FILES_DSP += RemoteWindow.cpp
 else
@@ -110,12 +117,24 @@ endif
 # --------------------------------------------------------------
 # Extra libraries to link against
 
-ifeq ($(NOPLUGINS),true)
-RACK_EXTRA_LIBS  = ../../plugins/noplugins.a
-else
-RACK_EXTRA_LIBS  = ../../plugins/plugins.a
+ifeq ($(HEADLESS),true)
+TARGET_SUFFIX = -headless
 endif
-RACK_EXTRA_LIBS += ../rack.a
+
+ifeq ($(CARDINAL_VARIANT),mini)
+RACK_EXTRA_LIBS  = ../../plugins/plugins-mini-headless.a
+else ifeq ($(NOPLUGINS),true)
+RACK_EXTRA_LIBS  = ../../plugins/noplugins$(TARGET_SUFFIX).a
+else
+RACK_EXTRA_LIBS  = ../../plugins/plugins$(TARGET_SUFFIX).a
+endif
+
+ifeq ($(CARDINAL_VARIANT),mini)
+RACK_EXTRA_LIBS += ../rack-headless.a
+else
+RACK_EXTRA_LIBS += ../rack$(TARGET_SUFFIX).a
+endif
+
 RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libquickjs.a
 
 ifneq ($(SYSDEPS),true)
@@ -133,6 +152,7 @@ endif
 # --------------------------------------------------------------
 # surgext libraries
 
+ifneq ($(CARDINAL_VARIANT),mini)
 ifneq ($(NOPLUGINS),true)
 SURGE_DEP_PATH = $(abspath ../../deps/surge-build)
 RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/src/common/libsurge-common.a
@@ -152,6 +172,7 @@ endif
 RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/sst/sst-plugininfra/libs/strnatcmp/libstrnatcmp.a
 RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/sst/sst-plugininfra/libs/tinyxml/libtinyxml.a
 endif
+endif
 
 # --------------------------------------------------------------
 
@@ -162,18 +183,18 @@ STATIC_CARLA_PLUGIN_LIBS = -lsndfile -lopus -lFLAC -lvorbisenc -lvorbis -logg -l
 endif
 endif
 
-EXTRA_DEPENDENCIES = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS)
-EXTRA_LIBS = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS) $(STATIC_CARLA_PLUGIN_LIBS)
+EXTRA_DSP_DEPENDENCIES = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS)
+EXTRA_DSP_LIBS = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS) $(STATIC_CARLA_PLUGIN_LIBS)
 
 ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
-EXTRA_DEPENDENCIES += ../../deps/aubio/libaubio.a
-EXTRA_LIBS += ../../deps/aubio/libaubio.a
-EXTRA_LIBS += $(shell $(PKG_CONFIG) --libs fftw3f)
+EXTRA_DSP_DEPENDENCIES += ../../deps/aubio/libaubio.a
+EXTRA_DSP_LIBS += ../../deps/aubio/libaubio.a
+EXTRA_DSP_LIBS += $(shell $(PKG_CONFIG) --libs fftw3f)
 endif
 
 ifneq ($(NOPLUGINS),true)
 ifeq ($(MACOS),true)
-EXTRA_LIBS += -framework Accelerate
+EXTRA_DSP_LIBS += -framework Accelerate
 endif
 endif
 
@@ -216,8 +237,21 @@ ifneq ($(STATIC_BUILD),true)
 WASM_RESOURCES += $(CURDIR)/lv2/fomp.lv2/manifest.ttl
 endif
 
-EXTRA_DEPENDENCIES += $(WASM_RESOURCES)
+EXTRA_DSP_DEPENDENCIES += $(WASM_RESOURCES)
 endif
+
+# --------------------------------------------------------------
+# mini variant UI
+
+# ifeq ($(CARDINAL_VARIANT),mini)
+# ifneq ($(HEADLESS)$(MOD_BUILD),true)
+# FILES_UI  = CardinalUI.cpp
+# FILES_UI += glfw.cpp
+# FILES_UI += Window.cpp
+# EXTRA_UI_DEPENDENCIES = $(subst -headless,,$(EXTRA_DSP_DEPENDENCIES))
+# EXTRA_UI_LIBS = $(subst -headless,,$(EXTRA_DSP_LIBS))
+# endif
+# endif
 
 # --------------------------------------------------------------
 # Do some magic
@@ -370,13 +404,13 @@ ifeq ($(MACOS),true)
 LINK_FLAGS += -framework IOKit
 else ifeq ($(WINDOWS),true)
 # needed by VCVRack
-EXTRA_LIBS += -ldbghelp -lshlwapi -Wl,--stack,0x100000
+EXTRA_DSP_LIBS += -ldbghelp -lshlwapi -Wl,--stack,0x100000
 # needed by JW-Modules
-EXTRA_LIBS += -lws2_32 -lwinmm
+EXTRA_DSP_LIBS += -lws2_32 -lwinmm
 endif
 
 ifeq ($(SYSDEPS),true)
-EXTRA_LIBS += $(shell $(PKG_CONFIG) --libs jansson libarchive samplerate speexdsp)
+EXTRA_DSP_LIBS += $(shell $(PKG_CONFIG) --libs jansson libarchive samplerate speexdsp)
 endif
 
 ifeq ($(WITH_LTO),true)
@@ -393,7 +427,7 @@ endif
 
 ifeq ($(HAVE_LIBLO),true)
 BASE_FLAGS += $(LIBLO_FLAGS)
-LINK_FLAGS += $(LIBLO_LIBS)
+EXTRA_DSP_LIBS += $(LIBLO_LIBS)
 endif
 
 # --------------------------------------------------------------
@@ -422,10 +456,9 @@ BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 # Enable all possible plugin types and setup resources
 
 ifeq ($(CARDINAL_VARIANT),main)
-TARGETS = lv2 vst3 clap
-ifeq ($(HAVE_JACK),true)
-TARGETS += jack
-endif
+TARGETS = jack lv2 vst3 clap
+else ifeq ($(CARDINAL_VARIANT),mini)
+TARGETS = lv2_sep
 else ifeq ($(CARDINAL_VARIANT),native)
 TARGETS = jack
 else

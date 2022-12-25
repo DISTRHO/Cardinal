@@ -57,6 +57,14 @@
 # include <emscripten/emscripten.h>
 #endif
 
+#ifndef DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+# error wrong build
+#endif
+
+#if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+# define HEADLESS
+#endif
+
 const std::string CARDINAL_VERSION = "22.12";
 
 START_NAMESPACE_DISTRHO

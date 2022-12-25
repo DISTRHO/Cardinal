@@ -25,7 +25,11 @@ endif
 # --------------------------------------------------------------
 # Build setup
 
+ifeq ($(HEADLESS),true)
+BUILD_DIR = ../build-headless/rack
+else
 BUILD_DIR = ../build/rack
+endif
 
 ifeq ($(MACOS),true)
 BASE_FLAGS += -DARCH_MAC
@@ -213,14 +217,18 @@ endif
 # --------------------------------------------------------------
 # Build targets
 
-TARGET = rack.a
+ifeq ($(HEADLESS),true)
+TARGET_SUFFIX = -headless
+endif
+
+TARGETS = rack$(TARGET_SUFFIX).a rack-headless.a
 
 ifneq ($(MACOS),true)
 CARDINAL_FX_ARGS = VST2_FILENAME=Cardinal.vst/CardinalFX$(LIB_EXT) CLAP_FILENAME=Cardinal.clap/CardinalFX.clap
 CARDINAL_SYNTH_ARGS = VST2_FILENAME=Cardinal.vst/CardinalSynth$(LIB_EXT) CLAP_FILENAME=Cardinal.clap/CardinalSynth.clap
 endif
 
-all: $(TARGET)
+all: $(TARGETS)
 ifeq ($(MOD_BUILD),true)
 	$(MAKE) -C Cardinal lv2
 	$(MAKE) -C CardinalFX lv2
@@ -228,37 +236,38 @@ else ifeq ($(WASM),true)
 	$(MAKE) -C CardinalNative
 else
 	$(MAKE) -C Cardinal
+	$(MAKE) -C CardinalMini
 	$(MAKE) -C CardinalNative
 	$(MAKE) -C CardinalFX $(CARDINAL_FX_ARGS)
 	$(MAKE) -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 endif
 
-jack: $(TARGET)
+jack: $(TARGETS)
 	$(MAKE) jack -C Cardinal
 
-native: $(TARGET)
+native: $(TARGETS)
 	$(MAKE) jack -C CardinalNative
 
-lv2: $(TARGET)
+lv2: $(TARGETS)
 	$(MAKE) lv2 -C Cardinal
 	$(MAKE) lv2 -C CardinalFX $(CARDINAL_FX_ARGS)
 	$(MAKE) lv2 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 
-vst2: $(TARGET)
+vst2: $(TARGETS)
 	$(MAKE) vst2 -C CardinalFX $(CARDINAL_FX_ARGS)
 	$(MAKE) vst2 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 
-vst3: $(TARGET)
+vst3: $(TARGETS)
 	$(MAKE) vst3 -C Cardinal
 	$(MAKE) vst3 -C CardinalFX $(CARDINAL_FX_ARGS)
 	$(MAKE) vst3 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 
-clap: $(TARGET)
+clap: $(TARGETS)
 	$(MAKE) clap -C CardinalFX $(CARDINAL_FX_ARGS)
 	$(MAKE) clap -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGETS)
 	rm -rf $(BUILD_DIR)
 	$(MAKE) clean -C Cardinal
 	$(MAKE) clean -C CardinalFX $(CARDINAL_FX_ARGS)
@@ -269,10 +278,15 @@ clean:
 
 RACK_OBJS = $(RACK_FILES:%=$(BUILD_DIR)/%.o)
 
-$(TARGET): $(RACK_OBJS)
+rack$(TARGET_SUFFIX).a: $(RACK_OBJS)
 	@echo "Creating $@"
 	$(SILENT)rm -f $@
 	$(SILENT)$(AR) crs $@ $^
+
+ifneq ($(HEADLESS),true)
+rack-headless.a:
+	$(MAKE) HEADLESS=true $@
+endif
 
 $(BUILD_DIR)/%.c.o: %.c
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
