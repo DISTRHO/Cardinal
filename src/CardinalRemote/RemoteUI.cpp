@@ -27,53 +27,31 @@
 #include <engine/Engine.hpp>
 
 #include "AsyncDialog.hpp"
-#include "WindowParameters.hpp"
-
-// --------------------------------------------------------------------------------------------------------------------
-
-namespace rack {
-namespace app {
-    widget::Widget* createMenuBar(bool isStandalone);
-}
-namespace window {
-    void WindowSetPluginRemote(Window* window, NanoTopLevelWidget* tlw);
-    void WindowSetMods(Window* window, int mods);
-    void WindowSetInternalSize(rack::window::Window* window, math::Vec size);
-}
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 
 CardinalRemoteUI::CardinalRemoteUI(Window& window, const std::string& templatePath)
     : NanoTopLevelWidget(window)
 {
-    CardinalPluginContext& context(*static_cast<CardinalPluginContext*>(rack::contextGet()));
-    context.nativeWindowId = getWindow().getNativeWindowHandle();
-    context.tlw = this;
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(rack::contextGet());
+    context->nativeWindowId = window.getNativeWindowHandle();
+    context->tlw = this;
 
-    window.setIgnoringKeyRepeat(true);
-    context.nativeWindowId = window.getNativeWindowHandle();
+    // --------------------------------------------------------------------------
 
-    const double scaleFactor = getScaleFactor();
+    rack::window::WindowSetPluginRemote(context->window, this);
 
-    setGeometryConstraints(648 * scaleFactor, 538 * scaleFactor);
-
-    if (scaleFactor != 1.0)
-        setSize(DISTRHO_UI_DEFAULT_WIDTH * scaleFactor, DISTRHO_UI_DEFAULT_HEIGHT * scaleFactor);
-
-    rack::window::WindowSetPluginRemote(context.window, this);
-
-    if (rack::widget::Widget* const menuBar = context.scene->menuBar)
+    if (rack::widget::Widget* const menuBar = context->scene->menuBar)
     {
-        context.scene->removeChild(menuBar);
+        context->scene->removeChild(menuBar);
         delete menuBar;
     }
 
-    context.scene->menuBar = rack::app::createMenuBar(true);
-    context.scene->addChildBelow(context.scene->menuBar, context.scene->rackScroll);
+    context->scene->menuBar = rack::app::createMenuBar(true);
+    context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
 
     // hide "Browse VCV Library" button
-    rack::widget::Widget* const browser = context.scene->browser->children.back();
+    rack::widget::Widget* const browser = context->scene->browser->children.back();
     rack::widget::Widget* const headerLayout = browser->children.front();
     rack::widget::Widget* const libraryButton = headerLayout->children.back();
     libraryButton->hide();
@@ -84,44 +62,155 @@ CardinalRemoteUI::CardinalRemoteUI(Window& window, const std::string& templatePa
     if (rack::asset::systemDir.empty())
     {
         errorMessage = "Failed to locate Cardinal plugin bundle.\n"
-                        "Install Cardinal with its plugin bundle folder intact and try again.";
+                       "Install Cardinal with its plugin bundle folder intact and try again.";
     }
     else if (! rack::system::exists(rack::asset::systemDir))
     {
         errorMessage = rack::string::f("System directory \"%s\" does not exist. "
-                                        "Make sure Cardinal was downloaded and installed correctly.",
-                                        rack::asset::systemDir.c_str());
+                                       "Make sure Cardinal was downloaded and installed correctly.",
+                                       rack::asset::systemDir.c_str());
     }
 
     if (! errorMessage.empty())
-    {
-        static bool shown = false;
+        asyncDialog::create(errorMessage.c_str());
 
-        if (! shown)
-        {
-            shown = true;
-            asyncDialog::create(errorMessage.c_str());
-        }
-    }
+    context->window->step();
 
-    context.window->step();
+    WindowParametersSetCallback(context->window, this);
 
-    // WindowParametersSetCallback(context.window, this);
+    // --------------------------------------------------------------------------
+
+    addIdleCallback(this);
 }
 
 CardinalRemoteUI::~CardinalRemoteUI()
 {
-    CardinalPluginContext& context(*static_cast<CardinalPluginContext*>(rack::contextGet()));
-    context.nativeWindowId = 0;
+    removeIdleCallback(this);
+
+    // --------------------------------------------------------------------------
+
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(rack::contextGet());
+
+    context->nativeWindowId = 0;
+
+    if (rack::widget::Widget* const menuBar = context->scene->menuBar)
+    {
+        context->scene->removeChild(menuBar);
+        delete menuBar;
+    }
+
+    context->scene->menuBar = rack::app::createMenuBar(true);
+    context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
+
+    rack::window::WindowSetPluginRemote(context->window, nullptr);
 }
 
 void CardinalRemoteUI::onNanoDisplay()
 {
-    CardinalPluginContext& context(*static_cast<CardinalPluginContext*>(rack::contextGet()));
-    context.window->step();
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(rack::contextGet());
+    const ScopedContext sc(context);
+    context->window->step();
+}
 
-    // TODO
+void CardinalRemoteUI::idleCallback()
+{
+    /*
+    if (filebrowserhandle != nullptr && fileBrowserIdle(filebrowserhandle))
+    {
+        {
+            const char* const path = fileBrowserGetPath(filebrowserhandle);
+
+            const ScopedContext sc(this);
+            filebrowseraction(path != nullptr ? strdup(path) : nullptr);
+        }
+
+        fileBrowserClose(filebrowserhandle);
+        filebrowseraction = nullptr;
+        filebrowserhandle = nullptr;
+    }
+    */
+
+    if (windowParameters.rateLimit != 0 && ++rateLimitStep % (windowParameters.rateLimit * 2))
+        return;
+
+    rateLimitStep = 0;
     repaint();
+}
+
+void CardinalRemoteUI::WindowParametersChanged(const WindowParameterList param, float value)
+{
+    float mult = 1.0f;
+
+    switch (param)
+    {
+    case kWindowParameterShowTooltips:
+        windowParameters.tooltips = value > 0.5f;
+        break;
+    case kWindowParameterCableOpacity:
+        mult = 100.0f;
+        windowParameters.cableOpacity = value;
+        break;
+    case kWindowParameterCableTension:
+        mult = 100.0f;
+        windowParameters.cableTension = value;
+        break;
+    case kWindowParameterRackBrightness:
+        mult = 100.0f;
+        windowParameters.rackBrightness = value;
+        break;
+    case kWindowParameterHaloBrightness:
+        mult = 100.0f;
+        windowParameters.haloBrightness = value;
+        break;
+    case kWindowParameterKnobMode:
+        switch (static_cast<int>(value + 0.5f))
+        {
+        case rack::settings::KNOB_MODE_LINEAR:
+            value = 0;
+            windowParameters.knobMode = rack::settings::KNOB_MODE_LINEAR;
+            break;
+        case rack::settings::KNOB_MODE_ROTARY_ABSOLUTE:
+            value = 1;
+            windowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_ABSOLUTE;
+            break;
+        case rack::settings::KNOB_MODE_ROTARY_RELATIVE:
+            value = 2;
+            windowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_RELATIVE;
+            break;
+        }
+        break;
+    case kWindowParameterWheelKnobControl:
+        windowParameters.knobScroll = value > 0.5f;
+        break;
+    case kWindowParameterWheelSensitivity:
+        mult = 1000.0f;
+        windowParameters.knobScrollSensitivity = value;
+        break;
+    case kWindowParameterLockModulePositions:
+        windowParameters.lockModules = value > 0.5f;
+        break;
+    case kWindowParameterUpdateRateLimit:
+        windowParameters.rateLimit = static_cast<int>(value + 0.5f);
+        rateLimitStep = 0;
+        break;
+    case kWindowParameterBrowserSort:
+        windowParameters.browserSort = static_cast<int>(value + 0.5f);
+        break;
+    case kWindowParameterBrowserZoom:
+        windowParameters.browserZoom = value;
+        value = std::pow(2.f, value) * 100.0f;
+        break;
+    case kWindowParameterInvertZoom:
+        windowParameters.invertZoom = value > 0.5f;
+        break;
+    case kWindowParameterSqueezeModulePositions:
+        windowParameters.squeezeModules = value > 0.5f;
+        break;
+    default:
+        return;
+    }
+
+    // setParameterValue(kModuleParameters + param + 1, value * mult);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -187,6 +276,7 @@ bool CardinalRemoteUI::onMouse(const MouseEvent& ev)
    #endif
 
     CardinalPluginContext* context = static_cast<CardinalPluginContext*>(rack::contextGet());
+    const ScopedContext sc(context, mods);
     return context->event->handleButton(lastMousePos, button, action, mods);
 }
 
@@ -198,6 +288,7 @@ bool CardinalRemoteUI::onMotion(const MotionEvent& ev)
     lastMousePos = mousePos;
 
     CardinalPluginContext* context = static_cast<CardinalPluginContext*>(rack::contextGet());
+    const ScopedContext sc(context);
     return context->event->handleHover(mousePos, mouseDelta);
 }
 
@@ -211,6 +302,7 @@ bool CardinalRemoteUI::onScroll(const ScrollEvent& ev)
     const int mods = glfwMods(ev.mod);
 
     CardinalPluginContext* context = static_cast<CardinalPluginContext*>(rack::contextGet());
+    const ScopedContext sc(context, mods);
     return context->event->handleScroll(lastMousePos, scrollDelta);
 }
 
@@ -222,6 +314,7 @@ bool CardinalRemoteUI::onCharacterInput(const CharacterInputEvent& ev)
     const int mods = glfwMods(ev.mod);
 
     CardinalPluginContext* context = static_cast<CardinalPluginContext*>(rack::contextGet());
+    const ScopedContext sc(context, mods);
     return context->event->handleText(lastMousePos, ev.character);
 }
 
@@ -303,6 +396,7 @@ bool CardinalRemoteUI::onKeyboard(const KeyboardEvent& ev)
     }
 
     CardinalPluginContext* context = static_cast<CardinalPluginContext*>(rack::contextGet());
+    const ScopedContext sc(context, mods);
     return context->event->handleKey(lastMousePos, key, ev.keycode, action, mods);
 }
 
@@ -311,8 +405,7 @@ void CardinalRemoteUI::onResize(const ResizeEvent& ev)
     NanoTopLevelWidget::onResize(ev);
 
     CardinalPluginContext* context = static_cast<CardinalPluginContext*>(rack::contextGet());
-    if (context->window != nullptr)
-        WindowSetInternalSize(context->window, rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
+    WindowSetInternalSize(context->window, rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
 }
 
 // --------------------------------------------------------------------------------------------------------------------

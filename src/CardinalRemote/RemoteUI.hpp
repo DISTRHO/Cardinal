@@ -19,12 +19,54 @@
 
 #include "NanoVG.hpp"
 #include "PluginContext.hpp"
+#include "WindowParameters.hpp"
 
-#include <app/common.hpp>
+#include <widget/Widget.hpp>
 
-class CardinalRemoteUI : public NanoTopLevelWidget
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace rack {
+namespace app {
+    widget::Widget* createMenuBar(bool isStandalone);
+}
+namespace window {
+    void WindowSetPluginRemote(Window* window, NanoTopLevelWidget* tlw);
+    void WindowSetMods(Window* window, int mods);
+    void WindowSetInternalSize(rack::window::Window* window, math::Vec size);
+}
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+class CardinalRemoteUI : public NanoTopLevelWidget,
+                         public IdleCallback,
+                         public WindowParametersCallback
 {
     rack::math::Vec lastMousePos;
+    WindowParameters windowParameters;
+    int rateLimitStep = 0;
+
+    struct ScopedContext {
+        CardinalPluginContext* const context;
+
+        ScopedContext(CardinalPluginContext* const c)
+            : context(c)
+        {
+            WindowParametersRestore(context->window);
+        }
+
+        ScopedContext(CardinalPluginContext* const c, const int mods)
+            : context(c)
+        {
+            rack::window::WindowSetMods(context->window, mods);
+            WindowParametersRestore(context->window);
+        }
+
+        ~ScopedContext()
+        {
+            WindowParametersSave(context->window);
+        }
+    };
 
 public:
     explicit CardinalRemoteUI(Window& window, const std::string& templatePath);
@@ -32,6 +74,8 @@ public:
     
 protected:
     void onNanoDisplay() override;
+    void idleCallback() override;
+    void WindowParametersChanged(const WindowParameterList param, float value) override;
     bool onMouse(const MouseEvent& ev) override;
     bool onMotion(const MotionEvent& ev) override;
     bool onScroll(const ScrollEvent& ev) override;
@@ -41,3 +85,5 @@ protected:
     
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CardinalRemoteUI)
 };
+
+// --------------------------------------------------------------------------------------------------------------------

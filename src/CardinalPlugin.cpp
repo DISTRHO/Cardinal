@@ -87,11 +87,6 @@ namespace plugin {
 void initStaticPlugins();
 void destroyStaticPlugins();
 }
-#ifndef HEADLESS
-namespace window {
-void WindowInit(Window* window, DISTRHO_NAMESPACE::Plugin* plugin);
-}
-#endif
 }
 
 START_NAMESPACE_DISTRHO
