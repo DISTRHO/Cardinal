@@ -108,29 +108,29 @@ At the moment the following 3rd-party modules are provided:
 
 - [21kHz](https://github.com/netboy3/21kHz-rack-plugins)
 - [8Mode](https://github.com/8Mode/8Mode-VCV_Modules)
-- Aaron Static
-- alef's bits
-- AlgoritmArte
-- Amalgamated Harmonics
-- Animated Circuits
-- Arable Instruments
-- Aria Salvatrice
-- AS
-- Audible Instruments
-- Autinn
-- Axioma
-- Bacon Music
-- Befaco
-- Bidoo
-- Bogaudio
-- Catro/Modulo
-- cf
-- ChowDSP
-- dBiz
-- DrumKit
-- E-Series
-- ExpertSleepers Encoders
-- Extratone
+- [Aaron Static](https://github.com/aaronstatic/AaronStatic_modules)
+- [alef's bits](https://github.com/alefnull/alefsbits)
+- [AlgoritmArte](https://github.com/algoritmarte/AlgoritmarteVCVPlugin)
+- [Amalgamated Harmonics](https://github.com/jhoar/AmalgamatedHarmonics)
+- [Animated Circuits](https://github.com/AnimatedCircuits/RackModules)
+- [Arable Instruments](https://github.com/adbrant/ArableInstruments)
+- [Aria Salvatrice](https://aria.dog/modules/)
+- [AS](https://github.com/AScustomWorks/AS)
+- [Audible Instruments](https://vcvrack.com/AudibleInstruments)
+- [Autinn](https://github.com/NikolaiVChr/Autinn)
+- [Axioma](https://github.com/kauewerner/Axioma)
+- [Bacon Music](https://github.com/baconpaul/BaconPlugs)
+- [Befaco](https://github.com/VCVRack/Befaco)
+- [Bidoo](https://github.com/sebastien-bouffier/Bidoo)
+- [Bogaudio](https://github.com/bogaudio/BogaudioModules)
+- [Catro/Modulo](https://github.com/catronomix/catro-modulo)
+- [cf](https://github.com/cfoulc/cf)
+- [ChowDSP](https://github.com/jatinchowdhury18/ChowDSP-VCV)
+- [dBiz](https://github.com/dBiz/dBiz)
+- [DrumKit](https://svmodular.com/plugin/vcv/drumkit.html)
+- [E-Series](https://github.com/VCVRack/ESeries)
+- [ExpertSleepers Encoders](https://expert-sleepers.co.uk/vcvrack_encoders.html)
+- [Extratone](http://extratone.xyz/modules)
 - Fehler Fabrik
 - forsitan modulare
 - Fundamental
