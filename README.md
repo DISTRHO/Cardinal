@@ -131,24 +131,24 @@ At the moment the following 3rd-party modules are provided:
 - [E-Series](https://github.com/VCVRack/ESeries)
 - [ExpertSleepers Encoders](https://expert-sleepers.co.uk/vcvrack_encoders.html)
 - [Extratone](http://extratone.xyz/modules)
-- Fehler Fabrik
-- forsitan modulare
-- Fundamental
-- Glue the Giant
-- GoodSheperd
-- Grande
-- H4N4 Modules
-- Hampton Harmonics
-- HetrickCV
-- ihtsyn
-- Impromptu
-- JW-Modules
-- kocmoc
-- LifeFormModular
-- Lilac Loop
-- Little Utils
-- Lomas Modules
-- Lyrae Modules
+- [Fehler Fabrik](https://github.com/RCameron93/FehlerFabrik)
+- [forsitan modulare](tps://github.com/gosub/forsitan-modulare)
+- [Fundamental](https://github.com/VCVRack/Fundamental)
+- [Glue the Giant](https://github.com/gluethegiant/gtg-rack)
+- [GoodSheperd](https://github.com/jensschulze/GoodSheperd)
+- [Grande](https://github.com/dbgrande/GrandeModular)
+- [H4N4 Modules](https://github.com/hannakoppelaar/h4n4-modules)
+- [Hampton Harmonics](https://gitlab.com/hampton-harmonics/hampton-harmonics-modules)
+- [HetrickCV](https://github.com/mhetrick/hetrickcv)
+- [ihtsyn](https://github.com/nysthi/ihtsyn)
+- [Impromptu](https://github.com/MarcBoule/ImpromptuModular)
+- [JW-Modules](https://github.com/jeremywen/JW-Modules)
+- [kocmoc](https://github.com/janne808/kocmoc-rack-modules)
+- [LifeFormModular](https://github.com/TimeControlledOrganism/LifeFormModular)
+- [Lilac Loop](https://grough.github.io/lilac-loop-vcv)
+- [Little Utils](https://github.com/mgunyho/Little-Utils)
+- [Lomas Modules](https://github.com/LomasModules/LomasModules)
+- [Lyrae Modules](https://github.com/VegaDeftwing/LyraeModules)
 - Meander
 - MindMeld
 - ML Modules
