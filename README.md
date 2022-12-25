@@ -106,8 +106,8 @@ But a couple of modules background's have their colors flipped, because damn we 
 
 At the moment the following 3rd-party modules are provided:
 
-- 21kHz
-- 8Mode
+- [21kHz](https://github.com/netboy3/21kHz-rack-plugins)
+- [8Mode](https://github.com/8Mode/8Mode-VCV_Modules)
 - Aaron Static
 - alef's bits
 - AlgoritmArte
