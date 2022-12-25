@@ -149,34 +149,34 @@ At the moment the following 3rd-party modules are provided:
 - [Little Utils](https://github.com/mgunyho/Little-Utils)
 - [Lomas Modules](https://github.com/LomasModules/LomasModules)
 - [Lyrae Modules](https://github.com/VegaDeftwing/LyraeModules)
-- Meander
-- MindMeld
-- ML Modules
-- Mockba Modular
-- Mog
-- mscHack
-- MSM
-- Myth
-- Nonlinear Circuits
-- Orbits
-- Parable Instruments
-- Path Set
-- PinkTrombone
-- Prism
-- rackwindows
-- RebelTech
-- repelzen
-- Sapphire
-- Sonus Modular
-- stocaudio
-- Stoermelder Pack-One
-- Surge XT
-- unless_modules
-- Valley
-- Voxglitch
-- WhatTheRack
-- ZetaCarinae
-- ZZC
+- [Meander](https://github.com/knchaffin/Meander)
+- [MindMeld](https://github.com/MarcBoule/MindMeldModular)
+- [ML Modules](https://github.com/martin-lueders/ML_modules)
+- [Mockba Modular](https://github.com/MockbaTheBorg/MockbaModular)
+- [Mog](https://github.com/JustMog/Mog-VCV)
+- [mscHack](https://github.com/mschack/VCV-Rack-Plugins)
+- [MSM](https://github.com/netboy3/MSM-vcvrack-plugin)
+- [Myth](https://github.com/Ahineya/vcv-myth-plugin)
+- [Nonlinear Circuits](https://github.com/mhetrick/nonlinearcircuits)
+- [Orbits](https://github.com/RareBreeds/Orbits)
+- [Parable Instruments](https://github.com/adbrant/ArableInstruments)
+- [Path Set](https://github.com/patheros/PathSetModules)
+- [PinkTrombone](https://github.com/VegaDeftwing/PinkTromboneVCV)
+- [Prism](https://github.com/SteveRussell33/Prism)
+- [rackwindows](https://github.com/n0jo/rackwindows)
+- [RebelTech](https://github.com/hemmer/rebel-tech-vcv)
+- [repelzen](https://github.com/wiqid/repelzen)
+- [Sapphire](https://github.com/cosinekitty/sapphire)
+- [Sonus Modular](https://gitlab.com/sonusdept/sonusmodular)
+- [stocaudio](https://github.com/aptrn/stocaudio-modules)
+- [Stoermelder Pack-One](https://github.com/stoermelder/vcvrack-packone)
+- [Surge XT](https://github.com/surge-synthesizer/surge-rack)
+- [unless_modules](https://gitlab.com/unlessgames/unless_modules)
+- [Valley](https://github.com/ValleyAudio/ValleyRackFree)
+- [Voxglitch](https://github.com/clone45/voxglitch)
+- [WhatTheRack](https://github.com/korfuri/WhatTheRack)
+- [ZetaCarinae](https://github.com/mhampton/ZetaCarinaeModules)
+- [ZZC](https://github.com/zezic/ZZC)
 
 Additionally Cardinal provides its own modules for DAW/Host automation, time position, audio to CV pitch conversion and internal plugin hosting.
 
