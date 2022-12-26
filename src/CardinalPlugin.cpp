@@ -15,7 +15,6 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#include <asset.hpp>
 #include <library.hpp>
 #include <midi.hpp>
 #include <patch.hpp>
@@ -24,7 +23,6 @@
 #include <settings.hpp>
 #include <system.hpp>
 
-#include <app/Browser.hpp>
 #include <app/Scene.hpp>
 #include <engine/Engine.hpp>
 #include <ui/common.hpp>
@@ -52,16 +50,6 @@
 # include "extra/SharedResourcePointer.hpp"
 #endif
 
-#if CARDINAL_VARIANT_FX
-# define CARDINAL_TEMPLATE_NAME "init/fx.vcv"
-#elif CARDINAL_VARIANT_NATIVE
-# define CARDINAL_TEMPLATE_NAME "init/native.vcv"
-#elif CARDINAL_VARIANT_SYNTH
-# define CARDINAL_TEMPLATE_NAME "init/synth.vcv"
-#else
-# define CARDINAL_TEMPLATE_NAME "init/main.vcv"
-#endif
-
 static const constexpr uint kCardinalStateBaseCount = 3; // patch, screenshot, comment
 
 #ifndef HEADLESS
@@ -76,16 +64,8 @@ static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount;
 extern const std::string CARDINAL_VERSION;
 
 namespace rack {
-namespace asset {
-std::string patchesPath();
-void destroy();
-}
 namespace engine {
 void Engine_setAboutToClose(Engine*);
-}
-namespace plugin {
-void initStaticPlugins();
-void destroyStaticPlugins();
 }
 }
 
@@ -97,6 +77,10 @@ bool d_isDiffHigherThanLimit(const T& v1, const T& v2, const T& limit)
 {
     return v1 != v2 ? (v1 > v2 ? v1 - v2 : v2 - v1) > limit : false;
 }
+
+#if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+const char* UI::getBundlePath() const noexcept { return nullptr; }
+#endif
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -140,288 +124,6 @@ static char* getPatchStorageSlug() {
     }));
 };
 #endif
-
-// -----------------------------------------------------------------------------------------------------------
-
-struct Initializer
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
-: public Thread
-#endif
-{
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
-    lo_server oscServer = nullptr;
-    CardinalBasePlugin* oscPlugin = nullptr;
-#endif
-    std::string templatePath;
-    std::string factoryTemplatePath;
-
-    Initializer(const CardinalBasePlugin* const plugin)
-    {
-        using namespace rack;
-
-#ifdef DISTRHO_OS_WASM
-        settings::allowCursorLock = true;
-#else
-        settings::allowCursorLock = false;
-#endif
-        settings::autoCheckUpdates = false;
-        settings::autosaveInterval = 0;
-        settings::devMode = true;
-        settings::isPlugin = true;
-        settings::skipLoadOnLaunch = true;
-        settings::showTipsOnLaunch = false;
-        settings::windowPos = math::Vec(0, 0);
-#ifdef HEADLESS
-        settings::headless = true;
-#endif
-
-        // copied from https://community.vcvrack.com/t/16-colour-cable-palette/15951
-        settings::cableColors = {
-            color::fromHexString("#ff5252"),
-            color::fromHexString("#ff9352"),
-            color::fromHexString("#ffd452"),
-            color::fromHexString("#e8ff52"),
-            color::fromHexString("#a8ff52"),
-            color::fromHexString("#67ff52"),
-            color::fromHexString("#52ff7d"),
-            color::fromHexString("#52ffbe"),
-            color::fromHexString("#52ffff"),
-            color::fromHexString("#52beff"),
-            color::fromHexString("#527dff"),
-            color::fromHexString("#6752ff"),
-            color::fromHexString("#a852ff"),
-            color::fromHexString("#e952ff"),
-            color::fromHexString("#ff52d4"),
-            color::fromHexString("#ff5293"),
-        };
-
-        system::init();
-        logger::init();
-        random::init();
-        ui::init();
-
-        if (asset::systemDir.empty())
-        {
-            if (const char* const bundlePath = plugin->getBundlePath())
-            {
-                if (const char* const resourcePath = getResourcePath(bundlePath))
-                {
-                    asset::systemDir = resourcePath;
-                    asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
-                }
-            }
-
-            if (asset::systemDir.empty() || ! system::exists(asset::systemDir) || ! system::exists(asset::bundlePath))
-            {
-               #ifdef CARDINAL_PLUGIN_SOURCE_DIR
-                // Make system dir point to source code location as fallback
-                asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
-                asset::bundlePath.clear();
-
-                // If source code dir does not exist use install target prefix as system dir
-                if (!system::exists(system::join(asset::systemDir, "res")))
-               #endif
-                {
-                   #if defined(DISTRHO_OS_WASM)
-                    asset::systemDir = "/resources";
-                   #elif defined(ARCH_MAC)
-                    asset::systemDir = "/Library/Application Support/Cardinal";
-                   #elif defined(ARCH_WIN)
-                    const std::string commonprogfiles = getSpecialPath(kSpecialPathCommonProgramFiles);
-                    if (! commonprogfiles.empty())
-                        asset::systemDir = system::join(commonprogfiles, "Cardinal");
-                   #else
-                    asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/cardinal";
-                   #endif
-
-                    asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
-                }
-            }
-
-            asset::userDir = asset::systemDir;
-        }
-
-        const std::string patchesPath = asset::patchesPath();
-       #ifdef DISTRHO_OS_WASM
-        templatePath = system::join(patchesPath, CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME);
-       #else
-        templatePath = system::join(patchesPath, CARDINAL_TEMPLATE_NAME);
-       #endif
-        factoryTemplatePath = system::join(patchesPath, CARDINAL_TEMPLATE_NAME);
-
-        // Log environment
-        INFO("%s %s %s, compatible with Rack version %s", APP_NAME.c_str(), APP_EDITION.c_str(), CARDINAL_VERSION.c_str(), APP_VERSION.c_str());
-        INFO("%s", system::getOperatingSystemInfo().c_str());
-        INFO("Binary filename: %s", getBinaryFilename());
-        INFO("Bundle path: %s", plugin->getBundlePath());
-        INFO("System directory: %s", asset::systemDir.c_str());
-        INFO("User directory: %s", asset::userDir.c_str());
-        INFO("Template patch: %s", templatePath.c_str());
-        INFO("System template patch: %s", factoryTemplatePath.c_str());
-
-        // Report to user if something is wrong with the installation
-        if (asset::systemDir.empty())
-        {
-            d_stderr2("Failed to locate Cardinal plugin bundle.\n"
-                      "Install Cardinal with its bundle folder intact and try again.");
-        }
-        else if (! system::exists(asset::systemDir))
-        {
-            d_stderr2("System directory \"%s\" does not exist.\n"
-                      "Make sure Cardinal was downloaded and installed correctly.", asset::systemDir.c_str());
-        }
-
-        INFO("Initializing plugins");
-        plugin::initStaticPlugins();
-
-        INFO("Initializing plugin browser DB");
-        app::browserInit();
-
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
-        INFO("Initializing OSC Remote control");
-        oscServer = lo_server_new_with_proto(REMOTE_HOST_PORT, LO_UDP, osc_error_handler);
-        DISTRHO_SAFE_ASSERT_RETURN(oscServer != nullptr,);
-
-        lo_server_add_method(oscServer, "/hello", "", osc_hello_handler, this);
-        lo_server_add_method(oscServer, "/load", "b", osc_load_handler, this);
-        lo_server_add_method(oscServer, "/screenshot", "b", osc_screenshot_handler, this);
-        lo_server_add_method(oscServer, nullptr, nullptr, osc_fallback_handler, nullptr);
-
-        startThread();
-#elif defined(HEADLESS)
-        INFO("OSC Remote control is not enabled in this build");
-#endif
-    }
-
-    ~Initializer()
-    {
-        using namespace rack;
-
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
-        if (oscServer != nullptr)
-        {
-            stopThread(5000);
-            lo_server_del_method(oscServer, nullptr, nullptr);
-            lo_server_free(oscServer);
-            oscServer = nullptr;
-        }
-#endif
-
-        INFO("Clearing asset paths");
-        asset::bundlePath.clear();
-        asset::systemDir.clear();
-        asset::userDir.clear();
-
-        INFO("Destroying plugins");
-        plugin::destroyStaticPlugins();
-
-        INFO("Destroying colourized assets");
-        asset::destroy();
-
-        INFO("Destroying settings");
-        settings::destroy();
-
-        INFO("Destroying logger");
-        logger::destroy();
-    }
-
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
-    void run() override
-    {
-        INFO("OSC Thread Listening for remote commands");
-
-        while (! shouldThreadExit())
-        {
-            d_msleep(200);
-            while (lo_server_recv_noblock(oscServer, 0) != 0) {}
-        }
-
-        INFO("OSC Thread Closed");
-    }
-
-    static void osc_error_handler(int num, const char* msg, const char* path)
-    {
-        d_stderr("Cardinal OSC Error: code: %i, msg: \"%s\", path: \"%s\")", num, msg, path);
-    }
-
-    static int osc_fallback_handler(const char* const path, const char* const types, lo_arg**, int, lo_message, void*)
-    {
-        d_stderr("Cardinal OSC unhandled message \"%s\" with types \"%s\"", path, types);
-        return 0;
-    }
-
-    static int osc_hello_handler(const char*, const char*, lo_arg**, int, const lo_message m, void* const self)
-    {
-        d_stdout("osc_hello_handler()");
-        const lo_address source = lo_message_get_source(m);
-        lo_send_from(source, static_cast<Initializer*>(self)->oscServer, LO_TT_IMMEDIATE, "/resp", "ss", "hello", "ok");
-        return 0;
-    }
-
-    static int osc_load_handler(const char*, const char* types, lo_arg** argv, int argc, const lo_message m, void* const self)
-    {
-        d_stdout("osc_load_handler()");
-        DISTRHO_SAFE_ASSERT_RETURN(argc == 1, 0);
-        DISTRHO_SAFE_ASSERT_RETURN(types != nullptr && types[0] == 'b', 0);
-
-        const int32_t size = argv[0]->blob.size;
-        DISTRHO_SAFE_ASSERT_RETURN(size > 4, 0);
-
-        const uint8_t* const blob = (uint8_t*)(&argv[0]->blob.data);
-        DISTRHO_SAFE_ASSERT_RETURN(blob != nullptr, 0);
-
-        bool ok = false;
-
-        if (CardinalBasePlugin* const plugin = static_cast<Initializer*>(self)->oscPlugin)
-        {
-            CardinalPluginContext* const context = plugin->context;
-            std::vector<uint8_t> data(size);
-            std::memcpy(data.data(), blob, size);
-
-            rack::contextSet(context);
-            rack::system::removeRecursively(context->patch->autosavePath);
-            rack::system::createDirectories(context->patch->autosavePath);
-            try {
-                rack::system::unarchiveToDirectory(data, context->patch->autosavePath);
-                context->patch->loadAutosave();
-                ok = true;
-            }
-            catch (rack::Exception& e) {
-                WARN("%s", e.what());
-            }
-            rack::contextSet(nullptr);
-        }
-
-        const lo_address source = lo_message_get_source(m);
-        lo_send_from(source, static_cast<Initializer*>(self)->oscServer,
-                     LO_TT_IMMEDIATE, "/resp", "ss", "load", ok ? "ok" : "fail");
-        return 0;
-    }
-
-    static int osc_screenshot_handler(const char*, const char* types, lo_arg** argv, int argc, const lo_message m, void* const self)
-    {
-        d_stdout("osc_screenshot_handler()");
-        DISTRHO_SAFE_ASSERT_RETURN(argc == 1, 0);
-        DISTRHO_SAFE_ASSERT_RETURN(types != nullptr && types[0] == 'b', 0);
-
-        const int32_t size = argv[0]->blob.size;
-        DISTRHO_SAFE_ASSERT_RETURN(size > 4, 0);
-
-        const uint8_t* const blob = (uint8_t*)(&argv[0]->blob.data);
-        DISTRHO_SAFE_ASSERT_RETURN(blob != nullptr, 0);
-
-        bool ok = false;
-
-        if (CardinalBasePlugin* const plugin = static_cast<Initializer*>(self)->oscPlugin)
-            ok = plugin->updateStateValue("screenshot", String::asBase64(blob, size).buffer());
-
-        const lo_address source = lo_message_get_source(m);
-        lo_send_from(source, static_cast<Initializer*>(self)->oscServer,
-                     LO_TT_IMMEDIATE, "/resp", "ss", "screenshot", ok ? "ok" : "fail");
-        return 0;
-    }
-#endif
-};
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -479,9 +181,9 @@ public:
     CardinalPlugin()
         : CardinalBasePlugin(kModuleParameters + kWindowParameterCount + 1, 0, kCardinalStateCount),
          #ifdef DISTRHO_OS_WASM
-          fInitializer(new Initializer(this)),
+          fInitializer(new Initializer(this, static_cast<const CardinalBaseUI*>(nullptr))),
          #else
-          fInitializer(this),
+          fInitializer(this, static_cast<const CardinalBaseUI*>(nullptr)),
          #endif
          #if DISTRHO_PLUGIN_NUM_INPUTS != 0
           fAudioBufferCopy(nullptr),
@@ -571,14 +273,14 @@ public:
             context->patch->templatePath = context->patch->factoryTemplatePath;
         }
 
-       #if defined(HAVE_LIBLO) && defined(HEADLESS)
+       #ifdef CARDINAL_INIT_OSC_THREAD
         fInitializer->oscPlugin = this;
        #endif
     }
 
     ~CardinalPlugin() override
     {
-       #if defined(HAVE_LIBLO) && defined(HEADLESS)
+       #ifdef CARDINAL_INIT_OSC_THREAD
         fInitializer->oscPlugin = nullptr;
        #endif
 

@@ -189,9 +189,6 @@ public:
 
         context->tlw = nullptr;
         context->ui = nullptr;
-       #if !DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
-        delete context;
-       #endif
     }
 };
 #endif

@@ -107,6 +107,13 @@ public:
         initialise_variant<T>(variant);
     }
 
+    template<class T1, class T2>
+    SharedResourcePointer(const T1* const v1, const T2* const v2)
+      : sharedObject(nullptr)
+    {
+        initialise_variant2<T1, T2>(v1, v2);
+    }
+
     SharedResourcePointer (const SharedResourcePointer&)
       : sharedObject(nullptr)
     {
@@ -175,6 +182,18 @@ private:
 
         if (++(holder.refCount) == 1)
             holder.sharedInstance = new SharedObjectType(variant);
+
+        sharedObject = holder.sharedInstance;
+    }
+
+    template<class T1, class T2>
+    void initialise_variant2(const T1* const v1, const T2* const v2)
+    {
+        SharedObjectHolder& holder = getSharedObjectHolder();
+        const SpinLock::ScopedLockType sl (holder.lock);
+
+        if (++(holder.refCount) == 1)
+            holder.sharedInstance = new SharedObjectType(v1, v2);
 
         sharedObject = holder.sharedInstance;
     }

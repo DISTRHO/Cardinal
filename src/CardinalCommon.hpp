@@ -15,14 +15,17 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#include <string>
-
 #pragma once
+
+#include "DistrhoUtils.hpp"
+
+#include <string>
 
 #ifdef HAVE_LIBLO
 // # define REMOTE_HOST "localhost"
 # define REMOTE_HOST "192.168.51.1"
 # define REMOTE_HOST_PORT "2228"
+# include "extra/Thread.hpp"
 #endif
 
 #ifdef DISTRHO_OS_WASM
@@ -34,6 +37,8 @@
 #endif
 
 extern const std::string CARDINAL_VERSION;
+
+// -----------------------------------------------------------------------------------------------------------
 
 namespace rack {
 
@@ -65,6 +70,8 @@ extern char* patchStorageSlug;
 
 } // namespace rack
 
+// -----------------------------------------------------------------------------------------------------------
+
 namespace patchUtils {
 
 void loadDialog();
@@ -86,3 +93,37 @@ void deployToRemote();
 void sendScreenshotToRemote(const char* screenshot);
 
 } // namespace patchUtils
+
+// -----------------------------------------------------------------------------------------------------------
+
+#if defined(HAVE_LIBLO) && defined(HEADLESS) && DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+# define CARDINAL_INIT_OSC_THREAD
+#endif
+
+START_NAMESPACE_DISTRHO
+
+class CardinalBasePlugin;
+class CardinalBaseUI;
+
+struct Initializer
+#ifdef CARDINAL_INIT_OSC_THREAD
+    : public Thread
+#endif
+{
+#ifdef CARDINAL_INIT_OSC_THREAD
+    lo_server oscServer = nullptr;
+    CardinalBasePlugin* oscPlugin = nullptr;
+#endif
+    std::string templatePath;
+    std::string factoryTemplatePath;
+
+    Initializer(const CardinalBasePlugin* plugin, const CardinalBaseUI* ui);
+    ~Initializer();
+#ifdef CARDINAL_INIT_OSC_THREAD
+    void run() override;
+#endif
+};
+
+END_NAMESPACE_DISTRHO
+
+// -----------------------------------------------------------------------------------------------------------

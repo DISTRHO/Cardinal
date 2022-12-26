@@ -56,6 +56,7 @@
 #include "Application.hpp"
 #include "extra/String.hpp"
 #include "../CardinalCommon.hpp"
+#include "../PluginContext.hpp"
 #include "../WindowParameters.hpp"
 
 #ifndef DGL_NO_SHARED_RESOURCES
@@ -148,12 +149,14 @@ struct Window::Internal {
 	DGL_NAMESPACE::NanoTopLevelWidget* tlw = nullptr;
 	DISTRHO_NAMESPACE::WindowParameters params;
 	DISTRHO_NAMESPACE::WindowParametersCallback* callback = nullptr;
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 	DGL_NAMESPACE::Application hiddenApp;
 	DGL_NAMESPACE::Window hiddenWindow;
 	NVGcontext* r_vg = nullptr;
 	NVGcontext* r_fbVg = nullptr;
 	NVGcontext* o_vg = nullptr;
 	NVGcontext* o_fbVg = nullptr;
+#endif
 
 	math::Vec size = WINDOW_SIZE_MIN;
 
@@ -176,12 +179,16 @@ struct Window::Internal {
 	int fbCount = 0;
 
 	Internal()
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		: hiddenApp(false),
 		  hiddenWindow(hiddenApp)
 	{
 		hiddenWindow.setIgnoringKeyRepeat(true);
 		hiddenApp.idle();
 	}
+#else
+	{}
+#endif
 };
 
 
@@ -203,12 +210,17 @@ static int loadFallbackFont(NVGcontext* const vg)
 Window::Window() {
 	internal = new Internal;
 
-	DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
-
 	// Set up NanoVG
 	const int nvgFlags = NVG_ANTIALIAS;
+
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+	DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
 	vg = nvgCreateGL(nvgFlags);
+#else
+	vg = static_cast<CardinalPluginContext*>(APP)->tlw->getContext();
+#endif
 	DISTRHO_SAFE_ASSERT_RETURN(vg != nullptr,);
+
 #ifdef NANOVG_GLES2
 	fbVg = nvgCreateSharedGLES2(vg, nvgFlags);
 #else
@@ -268,6 +280,7 @@ void WindowSetPluginRemote(Window* const window, NanoTopLevelWidget* const tlw)
 		window->internal->tlw = tlw;
 		window->internal->size = rack::math::Vec(tlw->getWidth(), tlw->getHeight());
 
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		// Set up NanoVG
 		window->internal->r_vg = tlw->getContext();
 #ifdef NANOVG_GLES2
@@ -299,6 +312,7 @@ void WindowSetPluginRemote(Window* const window, NanoTopLevelWidget* const tlw)
 			image.second->handle = nvgCreateImage(window->vg, image.second->ofilename.c_str(),
 			                                      NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 		}
+#endif
 
 		// Init settings
 		WindowParametersRestore(window);
@@ -311,6 +325,7 @@ void WindowSetPluginRemote(Window* const window, NanoTopLevelWidget* const tlw)
 		widget::Widget::ContextDestroyEvent e;
 		APP->scene->onContextDestroy(e);
 
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		// swap contexts
 		window->uiFont->vg = window->internal->o_vg;
 		window->vg = window->internal->o_vg;
@@ -338,6 +353,7 @@ void WindowSetPluginRemote(Window* const window, NanoTopLevelWidget* const tlw)
 		nvgDeleteGLES2(window->internal->r_fbVg);
 #else
 		nvgDeleteGL2(window->internal->r_fbVg);
+#endif
 #endif
 
 		window->internal->tlw = nullptr;
@@ -375,6 +391,7 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 		window->internal->ui = ui;
 		window->internal->size = rack::math::Vec(ui->getWidth(), ui->getHeight());
 
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		// Set up NanoVG
 		window->internal->r_vg = ui->getContext();
 #ifdef NANOVG_GLES2
@@ -406,6 +423,7 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 			image.second->handle = nvgCreateImage(window->vg, image.second->ofilename.c_str(),
 			                                      NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 		}
+#endif
 
 		// Init settings
 		WindowParametersRestore(window);
@@ -418,6 +436,7 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 		widget::Widget::ContextDestroyEvent e;
 		APP->scene->onContextDestroy(e);
 
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		// swap contexts
 		window->uiFont->vg = window->internal->o_vg;
 		window->vg = window->internal->o_vg;
@@ -446,6 +465,7 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 #else
 		nvgDeleteGL2(window->internal->r_fbVg);
 #endif
+#endif
 
 		window->internal->tlw = nullptr;
 		window->internal->ui = nullptr;
@@ -460,9 +480,11 @@ void WindowSetMods(Window* const window, const int mods)
 
 Window::~Window() {
 	{
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
 		internal->hiddenWindow.close();
 		internal->hiddenApp.idle();
+#endif
 
 		// Fonts and Images in the cache must be deleted before the NanoVG context is deleted
 		internal->fontCache.clear();
@@ -470,12 +492,20 @@ Window::~Window() {
 
 		if (vg != nullptr)
 		{
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 #if defined NANOVG_GLES2
 			nvgDeleteGLES2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
 			nvgDeleteGLES2(internal->o_vg != nullptr ? internal->o_vg : vg);
 #else
 			nvgDeleteGL2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
 			nvgDeleteGL2(internal->o_vg != nullptr ? internal->o_vg : vg);
+#endif
+#else
+#if defined NANOVG_GLES2
+			nvgDeleteGLES2(fbVg);
+#else
+			nvgDeleteGL2(fbVg);
+#endif
 #endif
 		}
 	}

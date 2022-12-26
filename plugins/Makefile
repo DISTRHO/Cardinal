@@ -293,6 +293,10 @@ PLUGIN_FILES += Cardinal/src/ImGuiTextEditor.cpp
 PLUGIN_FILES += Cardinal/src/SassyScope.cpp
 PLUGIN_FILES += Cardinal/src/DearImGui.cpp
 PLUGIN_FILES += Cardinal/src/DearImGuiColorTextEditor.cpp
+MINIPLUGIN_FILES += Cardinal/src/ImGuiWidget.cpp
+MINIPLUGIN_FILES += Cardinal/src/ImGuiTextEditor.cpp
+MINIPLUGIN_FILES += Cardinal/src/DearImGui.cpp
+MINIPLUGIN_FILES += Cardinal/src/DearImGuiColorTextEditor.cpp
 endif
 
 ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
@@ -1290,7 +1294,7 @@ endif
 ifeq ($(NOPLUGINS),true)
 TARGETS = noplugins$(TARGET_SUFFIX).a
 else
-TARGETS = plugins$(TARGET_SUFFIX).a plugins-mini-headless.a
+TARGETS = plugins$(TARGET_SUFFIX).a plugins-mini.a
 endif
 
 all: $(TARGETS)

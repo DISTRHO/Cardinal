@@ -39,7 +39,6 @@
 # include <ui/Label.hpp>
 # include <ui/MenuOverlay.hpp>
 # include <ui/SequentialLayout.hpp>
-# include "CardinalCommon.hpp"
 # include <emscripten/emscripten.h>
 #endif
 
@@ -47,14 +46,26 @@
 # undef DEBUG
 #endif
 
-#include <Application.hpp>
+#include "Application.hpp"
 #include "AsyncDialog.hpp"
+#include "CardinalCommon.hpp"
 #include "PluginContext.hpp"
 #include "WindowParameters.hpp"
+
+#ifndef DISTRHO_OS_WASM
+# include "extra/SharedResourcePointer.hpp"
+#endif
+
+#ifndef HEADLESS
+# include "extra/ScopedValueSetter.hpp"
+#endif
 
 namespace rack {
 namespace app {
     widget::Widget* createMenuBar(bool isStandalone);
+}
+namespace engine {
+void Engine_setAboutToClose(Engine*);
 }
 namespace window {
     void WindowSetPluginUI(Window* window, DISTRHO_NAMESPACE::UI* ui);
@@ -65,7 +76,14 @@ namespace window {
 
 START_NAMESPACE_DISTRHO
 
-// -----------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
+
+#if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+const char* Plugin::getBundlePath() const noexcept { return nullptr; }
+bool Plugin::writeMidiEvent(const MidiEvent&) noexcept { return false; }
+#endif
+
+// --------------------------------------------------------------------------------------------------------------------
 
 #ifdef DISTRHO_OS_WASM
 struct WasmWelcomeDialog : rack::widget::OpaqueWidget
@@ -268,6 +286,15 @@ static void downloadRemotePatchSucceeded(const char* const filename)
 class CardinalUI : public CardinalBaseUI,
                    public WindowParametersCallback
 {
+  #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+   #ifdef DISTRHO_OS_WASM
+    ScopedPointer<Initializer> fInitializer;
+   #else
+    SharedResourcePointer<Initializer> fInitializer;
+   #endif
+    std::string fAutosavePath;
+  #endif
+
     rack::math::Vec lastMousePos;
     WindowParameters windowParameters;
     int rateLimitStep = 0;
@@ -305,8 +332,65 @@ class CardinalUI : public CardinalBaseUI,
 
 public:
     CardinalUI()
-        : CardinalBaseUI(DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT)
+        : CardinalBaseUI(DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT),
+        #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+         #ifdef DISTRHO_OS_WASM
+          fInitializer(new Initializer(static_cast<const CardinalBasePlugin*>(nullptr), this)),
+         #else
+          fInitializer(static_cast<const CardinalBasePlugin*>(nullptr), this),
+         #endif
+        #endif
+          lastMousePos()
     {
+        rack::contextSet(context);
+
+       #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        // create unique temporary path for this instance
+        try {
+            char uidBuf[24];
+            const std::string tmp = rack::system::getTempDirectory();
+
+            for (int i=1;; ++i)
+            {
+                std::snprintf(uidBuf, sizeof(uidBuf), "Cardinal.%04d", i);
+                const std::string trypath = rack::system::join(tmp, uidBuf);
+
+                if (! rack::system::exists(trypath))
+                {
+                    if (rack::system::createDirectories(trypath))
+                        fAutosavePath = trypath;
+                    break;
+                }
+            }
+        } DISTRHO_SAFE_EXCEPTION("create unique temporary path");
+
+        const float sampleRate = getSampleRate();
+        rack::settings::sampleRate = sampleRate;
+
+        context->bufferSize = 128;
+        context->sampleRate = sampleRate;
+
+        context->engine = new rack::engine::Engine;
+        context->engine->setSampleRate(sampleRate);
+
+        context->history = new rack::history::State;
+        context->patch = new rack::patch::Manager;
+        context->patch->autosavePath = fAutosavePath;
+        context->patch->templatePath = fInitializer->templatePath;
+        context->patch->factoryTemplatePath = fInitializer->factoryTemplatePath;
+
+        context->event = new rack::widget::EventState;
+        context->scene = new rack::app::Scene;
+        context->event->rootWidget = context->scene;
+
+        context->window = new rack::window::Window;
+
+        context->patch->loadTemplate();
+        context->scene->rackScroll->reset();
+        // swap to factory template after first load
+        context->patch->templatePath = context->patch->factoryTemplatePath;
+       #endif
+
         Window& window(getWindow());
 
         window.setIgnoringKeyRepeat(true);
@@ -318,8 +402,6 @@ public:
 
         if (scaleFactor != 1.0)
             setSize(DISTRHO_UI_DEFAULT_WIDTH * scaleFactor, DISTRHO_UI_DEFAULT_HEIGHT * scaleFactor);
-
-        rack::contextSet(context);
 
         rack::window::WindowSetPluginUI(context->window, this);
 
@@ -407,6 +489,23 @@ public:
         context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
 
         rack::window::WindowSetPluginUI(context->window, nullptr);
+
+       #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        {
+            const ScopedContext sc(this);
+            context->patch->clear();
+
+            // do a little dance to prevent context scene deletion from saving to temp dir
+           #ifndef HEADLESS
+            const ScopedValueSetter<bool> svs(rack::settings::headless, true);
+           #endif
+            Engine_setAboutToClose(context->engine);
+            delete context;
+        }
+
+        if (! fAutosavePath.empty())
+            rack::system::removeRecursively(fAutosavePath);
+       #endif
 
         rack::contextSet(nullptr);
     }

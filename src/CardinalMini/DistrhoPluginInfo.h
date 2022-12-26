@@ -31,8 +31,8 @@
 #define DISTRHO_PLUGIN_URI     "https://distrho.kx.studio/plugins/cardinal#mini"
 #define DISTRHO_PLUGIN_CLAP_ID "studio.kx.distrho.cardinal#mini"
 
-#define DISTRHO_PLUGIN_NAME  "Cardinal FX"
-#define DISTRHO_PLUGIN_LABEL "CardinalFX"
+#define DISTRHO_PLUGIN_NAME  "Cardinal Mini"
+#define DISTRHO_PLUGIN_LABEL "CardinalMini"
 
 #define DISTRHO_PLUGIN_HAS_UI             1
 #define DISTRHO_PLUGIN_WANT_DIRECT_ACCESS 0

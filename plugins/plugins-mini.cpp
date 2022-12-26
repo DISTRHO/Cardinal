@@ -189,6 +189,7 @@ void destroyStaticPlugins()
 
 void updateStaticPluginsDarkMode()
 {
+    d_stdout("TODO");
 }
 
 }

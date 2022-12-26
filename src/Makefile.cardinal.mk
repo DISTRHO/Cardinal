@@ -201,8 +201,10 @@ endif
 # --------------------------------------------------------------
 # Setup resources
 
-CORE_RESOURCES  = patches
-CORE_RESOURCES += $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
+CORE_RESOURCES  = $(subst ../Rack/res/,,$(wildcard ../Rack/res/ComponentLibrary/*.svg ../Rack/res/fonts/*.ttf))
+# ifneq ($(CARDINAL_VARIANT),mini)
+CORE_RESOURCES += patches
+# endif
 
 LV2_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
 VST3_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
@@ -243,15 +245,19 @@ endif
 # --------------------------------------------------------------
 # mini variant UI
 
-# ifeq ($(CARDINAL_VARIANT),mini)
-# ifneq ($(HEADLESS)$(MOD_BUILD),true)
-# FILES_UI  = CardinalUI.cpp
-# FILES_UI += glfw.cpp
-# FILES_UI += Window.cpp
-# EXTRA_UI_DEPENDENCIES = $(subst -headless,,$(EXTRA_DSP_DEPENDENCIES))
-# EXTRA_UI_LIBS = $(subst -headless,,$(EXTRA_DSP_LIBS))
-# endif
-# endif
+ifeq ($(CARDINAL_VARIANT),mini)
+ifneq ($(HEADLESS)$(MOD_BUILD),true)
+FILES_UI  = CardinalUI.cpp
+FILES_UI += CardinalCommon.cpp
+FILES_UI += common.cpp
+FILES_UI += glfw.cpp
+FILES_UI += Window.cpp
+EXTRA_UI_DEPENDENCIES = $(subst -headless,,$(EXTRA_DSP_DEPENDENCIES))
+EXTRA_UI_LIBS  = -Wl,--start-group
+EXTRA_UI_LIBS += $(subst -headless,,$(EXTRA_DSP_LIBS))
+EXTRA_UI_LIBS += -Wl,--end-group
+endif
+endif
 
 # --------------------------------------------------------------
 # Do some magic
@@ -467,6 +473,7 @@ endif
 
 all: $(TARGETS)
 lv2: $(LV2_RESOURCES)
+lv2_sep: $(LV2_RESOURCES)
 vst2: $(VST2_RESOURCES)
 vst3: $(VST3_RESOURCES)
 clap: $(CLAP_RESOURCES)
