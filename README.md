@@ -106,77 +106,77 @@ But a couple of modules background's have their colors flipped, because damn we 
 
 At the moment the following 3rd-party modules are provided:
 
-- 21kHz
-- 8Mode
-- Aaron Static
-- alef's bits
-- AlgoritmArte
-- Amalgamated Harmonics
-- Animated Circuits
-- Arable Instruments
-- Aria Salvatrice
-- AS
-- Audible Instruments
-- Autinn
-- Axioma
-- Bacon Music
-- Befaco
-- Bidoo
-- Bogaudio
-- Catro/Modulo
-- cf
-- ChowDSP
-- dBiz
-- DrumKit
-- E-Series
-- ExpertSleepers Encoders
-- Extratone
-- Fehler Fabrik
-- forsitan modulare
-- Fundamental
-- Glue the Giant
-- GoodSheperd
-- Grande
-- H4N4 Modules
-- Hampton Harmonics
-- HetrickCV
-- ihtsyn
-- Impromptu
-- JW-Modules
-- kocmoc
-- LifeFormModular
-- Lilac Loop
-- Little Utils
-- Lomas Modules
-- Lyrae Modules
-- Meander
-- MindMeld
-- ML Modules
-- Mockba Modular
-- Mog
-- mscHack
-- MSM
-- Myth
-- Nonlinear Circuits
-- Orbits
-- Parable Instruments
-- Path Set
-- PinkTrombone
-- Prism
-- rackwindows
-- RebelTech
-- repelzen
-- Sapphire
-- Sonus Modular
-- stocaudio
-- Stoermelder Pack-One
-- Surge XT
-- unless_modules
-- Valley
-- Voxglitch
-- WhatTheRack
-- ZetaCarinae
-- ZZC
+- [21kHz](https://github.com/netboy3/21kHz-rack-plugins)
+- [8Mode](https://github.com/8Mode/8Mode-VCV_Modules)
+- [Aaron Static](https://github.com/aaronstatic/AaronStatic_modules)
+- [alef's bits](https://github.com/alefnull/alefsbits)
+- [AlgoritmArte](https://github.com/algoritmarte/AlgoritmarteVCVPlugin)
+- [Amalgamated Harmonics](https://github.com/jhoar/AmalgamatedHarmonics)
+- [Animated Circuits](https://github.com/AnimatedCircuits/RackModules)
+- [Arable Instruments](https://github.com/adbrant/ArableInstruments)
+- [Aria Salvatrice](https://aria.dog/modules/)
+- [AS](https://github.com/AScustomWorks/AS)
+- [Audible Instruments](https://vcvrack.com/AudibleInstruments)
+- [Autinn](https://github.com/NikolaiVChr/Autinn)
+- [Axioma](https://github.com/kauewerner/Axioma)
+- [Bacon Music](https://github.com/baconpaul/BaconPlugs)
+- [Befaco](https://github.com/VCVRack/Befaco)
+- [Bidoo](https://github.com/sebastien-bouffier/Bidoo)
+- [Bogaudio](https://github.com/bogaudio/BogaudioModules)
+- [Catro/Modulo](https://github.com/catronomix/catro-modulo)
+- [cf](https://github.com/cfoulc/cf)
+- [ChowDSP](https://github.com/jatinchowdhury18/ChowDSP-VCV)
+- [dBiz](https://github.com/dBiz/dBiz)
+- [DrumKit](https://svmodular.com/plugin/vcv/drumkit.html)
+- [E-Series](https://github.com/VCVRack/ESeries)
+- [ExpertSleepers Encoders](https://expert-sleepers.co.uk/vcvrack_encoders.html)
+- [Extratone](http://extratone.xyz/modules)
+- [Fehler Fabrik](https://github.com/RCameron93/FehlerFabrik)
+- [forsitan modulare](tps://github.com/gosub/forsitan-modulare)
+- [Fundamental](https://github.com/VCVRack/Fundamental)
+- [Glue the Giant](https://github.com/gluethegiant/gtg-rack)
+- [GoodSheperd](https://github.com/jensschulze/GoodSheperd)
+- [Grande](https://github.com/dbgrande/GrandeModular)
+- [H4N4 Modules](https://github.com/hannakoppelaar/h4n4-modules)
+- [Hampton Harmonics](https://gitlab.com/hampton-harmonics/hampton-harmonics-modules)
+- [HetrickCV](https://github.com/mhetrick/hetrickcv)
+- [ihtsyn](https://github.com/nysthi/ihtsyn)
+- [Impromptu](https://github.com/MarcBoule/ImpromptuModular)
+- [JW-Modules](https://github.com/jeremywen/JW-Modules)
+- [kocmoc](https://github.com/janne808/kocmoc-rack-modules)
+- [LifeFormModular](https://github.com/TimeControlledOrganism/LifeFormModular)
+- [Lilac Loop](https://grough.github.io/lilac-loop-vcv)
+- [Little Utils](https://github.com/mgunyho/Little-Utils)
+- [Lomas Modules](https://github.com/LomasModules/LomasModules)
+- [Lyrae Modules](https://github.com/VegaDeftwing/LyraeModules)
+- [Meander](https://github.com/knchaffin/Meander)
+- [MindMeld](https://github.com/MarcBoule/MindMeldModular)
+- [ML Modules](https://github.com/martin-lueders/ML_modules)
+- [Mockba Modular](https://github.com/MockbaTheBorg/MockbaModular)
+- [Mog](https://github.com/JustMog/Mog-VCV)
+- [mscHack](https://github.com/mschack/VCV-Rack-Plugins)
+- [MSM](https://github.com/netboy3/MSM-vcvrack-plugin)
+- [Myth](https://github.com/Ahineya/vcv-myth-plugin)
+- [Nonlinear Circuits](https://github.com/mhetrick/nonlinearcircuits)
+- [Orbits](https://github.com/RareBreeds/Orbits)
+- [Parable Instruments](https://github.com/adbrant/ArableInstruments)
+- [Path Set](https://github.com/patheros/PathSetModules)
+- [PinkTrombone](https://github.com/VegaDeftwing/PinkTromboneVCV)
+- [Prism](https://github.com/SteveRussell33/Prism)
+- [rackwindows](https://github.com/n0jo/rackwindows)
+- [RebelTech](https://github.com/hemmer/rebel-tech-vcv)
+- [repelzen](https://github.com/wiqid/repelzen)
+- [Sapphire](https://github.com/cosinekitty/sapphire)
+- [Sonus Modular](https://gitlab.com/sonusdept/sonusmodular)
+- [stocaudio](https://github.com/aptrn/stocaudio-modules)
+- [Stoermelder Pack-One](https://github.com/stoermelder/vcvrack-packone)
+- [Surge XT](https://github.com/surge-synthesizer/surge-rack)
+- [unless_modules](https://gitlab.com/unlessgames/unless_modules)
+- [Valley](https://github.com/ValleyAudio/ValleyRackFree)
+- [Voxglitch](https://github.com/clone45/voxglitch)
+- [WhatTheRack](https://github.com/korfuri/WhatTheRack)
+- [ZetaCarinae](https://github.com/mhampton/ZetaCarinaeModules)
+- [ZZC](https://github.com/zezic/ZZC)
 
 Additionally Cardinal provides its own modules for DAW/Host automation, time position, audio to CV pitch conversion and internal plugin hosting.
 
