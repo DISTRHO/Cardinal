@@ -23,11 +23,15 @@
 // Cardinal (built-in)
 #include "Cardinal/src/plugin.hpp"
 
+// Fundamental
+#include "Fundamental/src/plugin.hpp"
+
 // known terminal modules
 std::vector<Model*> hostTerminalModels;
 
 // plugin instances
 Plugin* pluginInstance__Cardinal;
+Plugin* pluginInstance__Fundamental;
 
 namespace rack {
 
@@ -175,9 +179,47 @@ static void initStatic__Cardinal()
     }
 }
 
+static void initStatic__Fundamental()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Fundamental = p;
+
+    const StaticPluginLoader spl(p, "Fundamental");
+    if (spl.ok())
+    {
+        p->addModel(modelADSR);
+        p->addModel(modelLFO);
+        p->addModel(modelVCF);
+        p->addModel(modelVCO);
+        spl.removeModule("VCO2");
+        spl.removeModule("VCA-1");
+        spl.removeModule("VCA");
+        spl.removeModule("LFO2");
+        spl.removeModule("Delay");
+        spl.removeModule("Mixer");
+        spl.removeModule("VCMixer");
+        spl.removeModule("8vert");
+        spl.removeModule("Mutes");
+        spl.removeModule("Pulses");
+        spl.removeModule("Scope");
+        spl.removeModule("SEQ3");
+        spl.removeModule("SequentialSwitch1");
+        spl.removeModule("SequentialSwitch2");
+        spl.removeModule("Octave");
+        spl.removeModule("Quantizer");
+        spl.removeModule("Split");
+        spl.removeModule("Merge");
+        spl.removeModule("Sum");
+        spl.removeModule("MidSide");
+        spl.removeModule("Noise");
+        spl.removeModule("Random");
+    }
+}
+
 void initStaticPlugins()
 {
     initStatic__Cardinal();
+    initStatic__Fundamental();
 }
 
 void destroyStaticPlugins()

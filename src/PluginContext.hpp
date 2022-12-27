@@ -124,10 +124,6 @@ struct CardinalPluginContext : rack::Context {
 #endif
 };
 
-#ifndef HEADLESS
-void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, bool started);
-#endif
-
 // -----------------------------------------------------------------------------------------------------------
 
 CardinalPluginContext* getRackContextFromPlugin(void* ptr);

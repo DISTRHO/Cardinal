@@ -104,6 +104,7 @@ START_NAMESPACE_DISTRHO
 
 class CardinalBasePlugin;
 class CardinalBaseUI;
+struct CardinalPluginContext;
 
 struct Initializer
 #ifdef CARDINAL_INIT_OSC_THREAD
@@ -123,6 +124,10 @@ struct Initializer
     void run() override;
 #endif
 };
+
+#ifndef HEADLESS
+void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, bool started);
+#endif
 
 END_NAMESPACE_DISTRHO
 

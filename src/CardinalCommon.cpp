@@ -62,12 +62,14 @@
 # error wrong build
 #endif
 
-#if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
-# define HEADLESS
+#if defined(CARDINAL_COMMON_DSP_ONLY) || defined(HEADLESS)
+# define HEADLESS_BEHAVIOUR
 #endif
 
 #if CARDINAL_VARIANT_FX
 # define CARDINAL_TEMPLATE_NAME "init/fx.vcv"
+#elif CARDINAL_VARIANT_MINI
+# define CARDINAL_TEMPLATE_NAME "init/mini.vcv"
 #elif CARDINAL_VARIANT_NATIVE
 # define CARDINAL_TEMPLATE_NAME "init/native.vcv"
 #elif CARDINAL_VARIANT_SYNTH
@@ -93,10 +95,12 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
+#ifndef HEADLESS
 void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, bool started)
 {
     DISTRHO_SAFE_ASSERT_RETURN(pcontext->ui != nullptr,);
 
+   #ifndef CARDINAL_COMMON_DSP_ONLY
     if (started)
     {
         pcontext->ui->editParameter(index, true);
@@ -106,26 +110,40 @@ void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, 
     {
         pcontext->ui->editParameter(index, false);
     }
+   #endif
 }
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 
+#ifndef HEADLESS
 bool CardinalPluginContext::addIdleCallback(IdleCallback* const cb) const
 {
-    if (ui == nullptr)
-        return false;
+   #ifndef CARDINAL_COMMON_DSP_ONLY
+    if (ui != nullptr)
+    {
+        ui->addIdleCallback(cb);
+        return true;
+    }
+   #else
+    // unused
+    (void)cb;
+   #endif
 
-    ui->addIdleCallback(cb);
-    return true;
+    return false;
 }
 
 void CardinalPluginContext::removeIdleCallback(IdleCallback* const cb) const
 {
-    if (ui == nullptr)
-        return;
-
-    ui->removeIdleCallback(cb);
+   #ifndef CARDINAL_COMMON_DSP_ONLY
+    if (ui != nullptr)
+        ui->removeIdleCallback(cb);
+   #else
+    // unused
+    (void)cb;
+   #endif
 }
+#endif
 
 void CardinalPluginContext::writeMidiMessage(const rack::midi::Message& message, const uint8_t channel)
 {
@@ -296,7 +314,7 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     settings::skipLoadOnLaunch = true;
     settings::showTipsOnLaunch = false;
     settings::windowPos = math::Vec(0, 0);
-#ifdef HEADLESS
+#ifdef HEADLESS_BEHAVIOUR
     settings::headless = true;
 #endif
 
@@ -348,17 +366,17 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
             if (!system::exists(system::join(asset::systemDir, "res")))
            #endif
             {
-                #if defined(DISTRHO_OS_WASM)
+               #if defined(DISTRHO_OS_WASM)
                 asset::systemDir = "/resources";
-                #elif defined(ARCH_MAC)
+               #elif defined(ARCH_MAC)
                 asset::systemDir = "/Library/Application Support/Cardinal";
-                #elif defined(ARCH_WIN)
+               #elif defined(ARCH_WIN)
                 const std::string commonprogfiles = getSpecialPath(kSpecialPathCommonProgramFiles);
                 if (! commonprogfiles.empty())
                     asset::systemDir = system::join(commonprogfiles, "Cardinal");
-                #else
+               #else
                 asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/cardinal";
-                #endif
+               #endif
 
                 asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
             }
@@ -542,7 +560,7 @@ namespace patchUtils
 
 using namespace rack;
 
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
 static void promptClear(const char* const message, const std::function<void()> action)
 {
     if (APP->history->isSaved() || APP->scene->rack->hasModules())
@@ -554,7 +572,7 @@ static void promptClear(const char* const message, const std::function<void()> a
 
 void loadDialog()
 {
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
     promptClear("The current patch is unsaved. Clear it and open a new patch?", []() {
         std::string dir;
         if (! APP->patch->path.empty())
@@ -579,7 +597,7 @@ void loadDialog()
 
 void loadPathDialog(const std::string& path, const bool asTemplate)
 {
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
     promptClear("The current patch is unsaved. Clear it and open the new patch?", [path, asTemplate]() {
         APP->patch->loadAction(path);
 
@@ -618,7 +636,7 @@ void loadSelectionDialog()
 
 void loadTemplateDialog()
 {
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
     promptClear("The current patch is unsaved. Clear it and start a new patch?", []() {
         APP->patch->loadTemplate();
     });
@@ -627,7 +645,7 @@ void loadTemplateDialog()
 
 void revertDialog()
 {
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
     if (APP->patch->path.empty())
         return;
     promptClear("Revert patch to the last saved state?", []{
@@ -638,7 +656,7 @@ void revertDialog()
 
 void saveDialog(const std::string& path)
 {
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
     if (path.empty()) {
         return;
     }
@@ -656,7 +674,7 @@ void saveDialog(const std::string& path)
 #endif
 }
 
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
 static void saveAsDialog(const bool uncompressed)
 {
     std::string dir;
@@ -683,14 +701,14 @@ static void saveAsDialog(const bool uncompressed)
 
 void saveAsDialog()
 {
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
     saveAsDialog(false);
 #endif
 }
 
 void saveAsDialogUncompressed()
 {
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
     saveAsDialog(true);
 #endif
 }
@@ -716,7 +734,7 @@ void async_dialog_filebrowser(const bool saving,
                               const char* const title,
                               const std::function<void(char* path)> action)
 {
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
     CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(pcontext != nullptr,);
 
@@ -739,14 +757,14 @@ void async_dialog_filebrowser(const bool saving,
 
 void async_dialog_message(const char* const message)
 {
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
     asyncDialog::create(message);
 #endif
 }
 
 void async_dialog_message(const char* const message, const std::function<void()> action)
 {
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
     asyncDialog::create(message, action);
 #endif
 }
@@ -754,7 +772,7 @@ void async_dialog_message(const char* const message, const std::function<void()>
 void async_dialog_text_input(const char* const message, const char* const text,
                              const std::function<void(char* newText)> action)
 {
-#ifndef HEADLESS
+#ifndef HEADLESS_BEHAVIOUR
     asyncDialog::textInput(message, text, action);
 #endif
 }

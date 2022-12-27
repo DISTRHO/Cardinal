@@ -21,27 +21,27 @@
 # error wrong build
 #endif
 
-#if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
-# define HEADLESS
-#endif
-
-#ifndef HEADLESS
-# include "OpenGL.hpp"
-#endif
+// #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+// # define HEADLESS
+// #endif
+// 
+// #ifndef HEADLESS
+// # include "OpenGL.hpp"
+// #endif
 
 #include "nanovg.h"
 
-#ifdef HEADLESS
+// #ifdef HEADLESS
 struct NVGLUframebuffer;
 void nvgluBindFramebuffer(NVGLUframebuffer* fb) {}
 NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags) { return nullptr; }
 void nvgluDeleteFramebuffer(NVGLUframebuffer* fb) {}
-#else
-# define NANOVG_GLES2_IMPLEMENTATION
-# define NANOVG_FBO_VALID 1
-# include "nanovg_gl.h"
-# include "nanovg_gl_utils.h"
-#endif
+// #else
+// # define NANOVG_GLES2_IMPLEMENTATION
+// # define NANOVG_FBO_VALID 1
+// # include "nanovg_gl.h"
+// # include "nanovg_gl_utils.h"
+// #endif
 
 #if defined(__GNUC__) && (__GNUC__ >= 6)
 # pragma GCC diagnostic push
@@ -72,7 +72,7 @@ GLFWAPI double glfwGetTime(void) { return 0.0; }
 
 }
 
-#ifndef HEADLESS
-# define STB_IMAGE_WRITE_IMPLEMENTATION
-# include "../src/Rack/dep/glfw/deps/stb_image_write.h"
-#endif
+// #ifndef HEADLESS
+// # define STB_IMAGE_WRITE_IMPLEMENTATION
+// # include "../src/Rack/dep/glfw/deps/stb_image_write.h"
+// #endif

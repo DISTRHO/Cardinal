@@ -311,6 +311,11 @@ endif
 PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
 PLUGIN_FILES += Fundamental/src/dr_wav.c
 
+MINIPLUGIN_FILES += Fundamental/src/ADSR.cpp
+MINIPLUGIN_FILES += Fundamental/src/LFO.cpp
+MINIPLUGIN_FILES += Fundamental/src/VCF.cpp
+MINIPLUGIN_FILES += Fundamental/src/VCO.cpp
+
 # modules/types which are present in other plugins
 FUNDAMENTAL_CUSTOM = $(DRWAV)
 
@@ -1294,7 +1299,7 @@ endif
 ifeq ($(NOPLUGINS),true)
 TARGETS = noplugins$(TARGET_SUFFIX).a
 else
-TARGETS = plugins$(TARGET_SUFFIX).a plugins-mini.a
+TARGETS = plugins$(TARGET_SUFFIX).a plugins-mini$(TARGET_SUFFIX).a
 endif
 
 all: $(TARGETS)
@@ -1375,10 +1380,13 @@ JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/wavetables
 JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/windows.wt
 endif
 
-MINIPLUGIN_LIST = Cardinal
-MINIRESOURCE_FILES = $(wildcard Cardinal/res/*.svg)
-
 RESOURCE_FILES += Cardinal/res/Miku/Miku.png
+
+MINIPLUGIN_LIST     = Cardinal Fundamental
+MINIRESOURCE_FILES  = $(wildcard Cardinal/res/*.svg)
+MINIRESOURCE_FILES += $(wildcard Fundamental/res/*.svg)
+MINIRESOURCE_FILES += $(wildcard Fundamental/res/components/*.svg)
+MINIRESOURCE_FILES += Fundamental/presets
 
 # MOD builds only have LV2 main and FX variant
 ifeq ($(MOD_BUILD),true)

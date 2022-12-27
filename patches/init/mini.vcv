@@ -1,0 +1,119 @@
+{
+  "version": "2.1",
+  "zoom": 1.0,
+  "modules": [
+    {
+      "id": 2799203590388841,
+      "plugin": "Cardinal",
+      "model": "TextEditor",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 4,
+      "data": {
+        "filepath": "",
+        "lang": "None",
+        "etext": "Welcome to Cardinal!\n\nThis is the mini variant\nIt has 2 audio ports, 5 CV ports, plus MIDI\n\nThe most relevant modules for host\nintegration are in this default patch\n\nHave fun!\n\n",
+        "width": 23
+      },
+      "pos": [
+        42,
+        0
+      ]
+    },
+    {
+      "id": 2,
+      "plugin": "Cardinal",
+      "model": "HostMIDI",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 7249509538355161,
+      "rightModuleId": 3,
+      "data": {
+        "pwRange": 0.0,
+        "smooth": false,
+        "channels": 1,
+        "polyMode": 0,
+        "lastPitch": 8192,
+        "lastMod": 0,
+        "inputChannel": 0,
+        "outputChannel": 0
+      },
+      "pos": [
+        16,
+        0
+      ]
+    },
+    {
+      "id": 3,
+      "plugin": "Cardinal",
+      "model": "HostTime",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 2,
+      "rightModuleId": 4,
+      "pos": [
+        25,
+        0
+      ]
+    },
+    {
+      "id": 4,
+      "plugin": "Cardinal",
+      "model": "HostParameters",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 3,
+      "rightModuleId": 2799203590388841,
+      "pos": [
+        33,
+        0
+      ]
+    },
+    {
+      "id": 7249509538355161,
+      "plugin": "Cardinal",
+      "model": "HostCV",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        },
+        {
+          "value": 0.0,
+          "id": 1
+        },
+        {
+          "value": 0.0,
+          "id": 2
+        },
+        {
+          "value": 0.0,
+          "id": 3
+        }
+      ],
+      "leftModuleId": 3606136179759592,
+      "rightModuleId": 2,
+      "pos": [
+        8,
+        0
+      ]
+    },
+    {
+      "id": 3606136179759592,
+      "plugin": "Cardinal",
+      "model": "HostAudio2",
+      "version": "2.0",
+      "params": [],
+      "rightModuleId": 7249509538355161,
+      "data": {
+        "dcFilter": false
+      },
+      "pos": [
+        0,
+        0
+      ]
+    }
+  ],
+  "cables": []
+}

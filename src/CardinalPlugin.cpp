@@ -609,7 +609,27 @@ protected:
         switch (index)
         {
         case 0:
-            state.hints = kStateIsBase64Blob | kStateIsOnlyForDSP;
+            state.hints = kStateIsBase64Blob;
+           #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+            state.hints |= kStateIsOnlyForDSP;
+           #endif
+            if (FILE* const f = std::fopen(context->patch->factoryTemplatePath.c_str(), "r"))
+            {
+                std::fseek(f, 0, SEEK_END);
+                if (const long fileSize = std::ftell(f))
+                {
+                    std::fseek(f, 0, SEEK_SET);
+                    char* const fileContent = new char[fileSize];
+
+                    if (std::fread(fileContent, fileSize, 1, f) == 1)
+                    {
+                        state.defaultValue = String::asBase64(fileContent, fileSize);
+                    }
+
+                    delete[] fileContent;
+                }
+                std::fclose(f);
+            }
             state.key = "patch";
             state.label = "Patch";
             break;
@@ -624,12 +644,17 @@ protected:
             state.label = "Comment";
             break;
         case 3:
-            state.hints = kStateIsOnlyForUI;
+            state.hints = 0x0;
+           #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+            state.hints |= kStateIsOnlyForDSP;
+           #endif
+            state.defaultValue = "{}";
             state.key = "moduleInfos";
             state.label = "moduleInfos";
             break;
         case 4:
             state.hints = kStateIsOnlyForUI;
+            // state.defaultValue = String("%d:%d", DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT);
             state.key = "windowSize";
             state.label = "Window size";
             break;

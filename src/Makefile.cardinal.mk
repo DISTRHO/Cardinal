@@ -248,14 +248,12 @@ endif
 ifeq ($(CARDINAL_VARIANT),mini)
 ifneq ($(HEADLESS)$(MOD_BUILD),true)
 FILES_UI  = CardinalUI.cpp
-FILES_UI += CardinalCommon.cpp
+FILES_UI += CardinalCommon-UI.cpp
 FILES_UI += common.cpp
 FILES_UI += glfw.cpp
 FILES_UI += Window.cpp
 EXTRA_UI_DEPENDENCIES = $(subst -headless,,$(EXTRA_DSP_DEPENDENCIES))
-EXTRA_UI_LIBS  = -Wl,--start-group
 EXTRA_UI_LIBS += $(subst -headless,,$(EXTRA_DSP_LIBS))
-EXTRA_UI_LIBS += -Wl,--end-group
 endif
 endif
 

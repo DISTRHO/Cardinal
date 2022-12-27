@@ -15,5 +15,5 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#define CARDINAL_COMMON_DSP_ONLY
-#include "../CardinalCommon.cpp"
+#define CARDINAL_COMMON_UI_ONLY
+#include "CardinalCommon.cpp"

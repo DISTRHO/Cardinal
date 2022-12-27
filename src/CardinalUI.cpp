@@ -51,6 +51,7 @@
 #include "CardinalCommon.hpp"
 #include "PluginContext.hpp"
 #include "WindowParameters.hpp"
+#include "extra/Base64.hpp"
 
 #ifndef DISTRHO_OS_WASM
 # include "extra/SharedResourcePointer.hpp"
@@ -376,8 +377,7 @@ public:
         context->history = new rack::history::State;
         context->patch = new rack::patch::Manager;
         context->patch->autosavePath = fAutosavePath;
-        context->patch->templatePath = fInitializer->templatePath;
-        context->patch->factoryTemplatePath = fInitializer->factoryTemplatePath;
+        context->patch->templatePath = context->patch->factoryTemplatePath = fInitializer->templatePath;
 
         context->event = new rack::widget::EventState;
         context->scene = new rack::app::Scene;
@@ -385,10 +385,7 @@ public:
 
         context->window = new rack::window::Window;
 
-        context->patch->loadTemplate();
         context->scene->rackScroll->reset();
-        // swap to factory template after first load
-        context->patch->templatePath = context->patch->factoryTemplatePath;
        #endif
 
         Window& window(getWindow());
@@ -806,17 +803,59 @@ protected:
 
     void stateChanged(const char* const key, const char* const value) override
     {
-        if (std::strcmp(key, "windowSize") != 0)
-            return;
-
-        int width = 0;
-        int height = 0;
-        std::sscanf(value, "%i:%i", &width, &height);
-
-        if (width > 0 && height > 0)
+       #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        if (std::strcmp(key, "patch") == 0)
         {
-            const double scaleFactor = getScaleFactor();
-            setSize(width * scaleFactor, height * scaleFactor);
+            if (fAutosavePath.empty())
+                return;
+
+            const std::vector<uint8_t> data(d_getChunkFromBase64String(value));
+
+            DISTRHO_SAFE_ASSERT_RETURN(data.size() >= 4,);
+
+            rack::system::removeRecursively(fAutosavePath);
+            rack::system::createDirectories(fAutosavePath);
+
+            static constexpr const char zstdMagic[] = "\x28\xb5\x2f\xfd";
+
+            if (std::memcmp(data.data(), zstdMagic, sizeof(zstdMagic)) != 0)
+            {
+                FILE* const f = std::fopen(rack::system::join(fAutosavePath, "patch.json").c_str(), "w");
+                DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
+
+                std::fwrite(data.data(), data.size(), 1, f);
+                std::fclose(f);
+            }
+            else
+            {
+                try {
+                    rack::system::unarchiveToDirectory(data, fAutosavePath);
+                } DISTRHO_SAFE_EXCEPTION_RETURN("setState unarchiveToDirectory",);
+            }
+
+            const ScopedContext sc(this);
+
+            try {
+                context->patch->loadAutosave();
+            } DISTRHO_SAFE_EXCEPTION_RETURN("setState loadAutosave",);
+
+            return;
+        }
+       #endif
+
+        if (std::strcmp(key, "windowSize") == 0)
+        {
+            int width = 0;
+            int height = 0;
+            std::sscanf(value, "%d:%d", &width, &height);
+
+            if (width > 0 && height > 0)
+            {
+                const double scaleFactor = getScaleFactor();
+                setSize(width * scaleFactor, height * scaleFactor);
+            }
+
+            return;
         }
     }
 
