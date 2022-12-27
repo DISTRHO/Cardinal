@@ -234,6 +234,7 @@ ifeq ($(MOD_BUILD),true)
 	$(MAKE) -C CardinalFX lv2
 else ifeq ($(WASM),true)
 	$(MAKE) -C CardinalNative
+# 	$(MAKE) -C CardinalMini modgui
 else
 	$(MAKE) -C Cardinal
 	$(MAKE) -C CardinalMini

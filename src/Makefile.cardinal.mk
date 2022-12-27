@@ -177,7 +177,7 @@ endif
 # --------------------------------------------------------------
 
 # FIXME
-ifeq ($(CIBUILD)$(WASM),truetrue)
+ifeq ($(CARDINAL_VARIANT)$(CIBUILD)$(WASM),nativetruetrue)
 ifneq ($(STATIC_BUILD),true)
 STATIC_CARLA_PLUGIN_LIBS = -lsndfile -lopus -lFLAC -lvorbisenc -lvorbis -logg -lm
 endif
@@ -350,21 +350,26 @@ BASE_FLAGS += -Wno-unused-variable
 
 ifeq ($(WASM),true)
 ifneq ($(STATIC_BUILD),true)
+ifeq ($(CARDINAL_VARIANT),mini)
+LINK_FLAGS += --preload-file=../../bin/CardinalMini.lv2/resources@/resources
+else
 LINK_FLAGS += --use-preload-plugins
 LINK_FLAGS += --preload-file=./jsfx
 LINK_FLAGS += --preload-file=./lv2
-endif
 LINK_FLAGS += --preload-file=../../bin/CardinalNative.lv2/resources@/resources
+endif
 LINK_FLAGS += --use-preload-cache
+endif
 ifneq ($(NOPLUGINS),true)
 SYMLINKED_DIRS_RESOURCES  =
 # find . -type l | grep -v svg | grep -v ttf | grep -v art | grep -v json | grep -v png | grep -v otf | sort
+SYMLINKED_DIRS_RESOURCES += Fundamental/presets
+ifneq ($(CARDINAL_VARIANT),mini)
 SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/chopin
 SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/debussy
 SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/goldberg
 SYMLINKED_DIRS_RESOURCES += cf/playeroscs
 SYMLINKED_DIRS_RESOURCES += DrumKit/res/samples
-SYMLINKED_DIRS_RESOURCES += Fundamental/presets
 SYMLINKED_DIRS_RESOURCES += GrandeModular/presets
 SYMLINKED_DIRS_RESOURCES += LyraeModules/presets
 SYMLINKED_DIRS_RESOURCES += Meander/res
@@ -381,12 +386,15 @@ SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/fx_presets
 SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/wavetables
 SYMLINKED_DIRS_RESOURCES += surgext/patches
 SYMLINKED_DIRS_RESOURCES += surgext/presets
+endif
 LINK_FLAGS += $(foreach d,$(SYMLINKED_DIRS_RESOURCES),--preload-file=../../bin/CardinalNative.lv2/resources/$(d)@/resources/$(d))
 endif
 LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
 LINK_FLAGS += -sLZ4=1
+ifneq ($(CARDINAL_VARIANT),mini)
 LINK_FLAGS += --shell-file=../emscripten/shell.html
+endif
 LINK_FLAGS += -O3
 else ifeq ($(HAIKU),true)
 LINK_FLAGS += -lpthread
