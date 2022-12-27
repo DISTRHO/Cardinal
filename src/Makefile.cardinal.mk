@@ -217,10 +217,12 @@ endif
 
 # Install modgui resources if MOD build
 ifeq ($(MOD_BUILD),true)
+ifneq ($(CARDINAL_VARIANT),mini)
 LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/Plateau_Reverb.ttl
 LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui.ttl
 LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui/documentation.pdf
 LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui
+endif
 endif
 
 # Cardinal main variant is not available as VST2 due to lack of CV ports
@@ -246,7 +248,7 @@ endif
 # mini variant UI
 
 ifeq ($(CARDINAL_VARIANT),mini)
-ifneq ($(HEADLESS)$(MOD_BUILD),true)
+ifneq ($(HEADLESS),true)
 FILES_UI  = CardinalUI.cpp
 FILES_UI += CardinalCommon-UI.cpp
 FILES_UI += common.cpp

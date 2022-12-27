@@ -1308,7 +1308,7 @@ ifneq ($(HEADLESS),true)
 endif
 
 clean:
-	rm -f $(TARGETS)
+	rm -f *.a
 	rm -rf $(BUILD_DIR)
 	rm -rf surgext/build
 
@@ -1465,6 +1465,10 @@ resources: $(JACK_RESOURCES) $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES
 	$(SILENT)ln -sf $(abspath $<) $@
 
 ifeq ($(MOD_BUILD),true)
+../bin/Cardinal.lv2/resources/%.svg: %.svg ../deps/svg2stub.py
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)python3 ../deps/svg2stub.py $< $@
+
 ../bin/CardinalFX.lv2/resources/%.svg: %.svg ../deps/svg2stub.py
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)python3 ../deps/svg2stub.py $< $@

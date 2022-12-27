@@ -78,7 +78,7 @@ bool d_isDiffHigherThanLimit(const T& v1, const T& v2, const T& limit)
     return v1 != v2 ? (v1 > v2 ? v1 - v2 : v2 - v1) > limit : false;
 }
 
-#if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+#if DISTRHO_PLUGIN_HAS_UI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 const char* UI::getBundlePath() const noexcept { return nullptr; }
 #endif
 

@@ -52,4 +52,8 @@
 #define DISTRHO_PLUGIN_LV2_CATEGORY       "lv2:UtilityPlugin"
 #define DISTRHO_PLUGIN_VST3_CATEGORIES    "Fx|Generator"
 
+// #ifdef __MOD_DEVICES__
+// # define DISTRHO_PLUGIN_USES_MODGUI 1
+// #endif
+
 #endif // DISTRHO_PLUGIN_INFO_H_INCLUDED

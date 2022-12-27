@@ -346,7 +346,10 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     if (asset::systemDir.empty())
     {
         if (const char* const bundlePath = (plugin != nullptr ? plugin->getBundlePath() :
-                                            ui != nullptr ? ui->getBundlePath() : nullptr))
+                                           #if DISTRHO_PLUGIN_HAS_UI
+                                            ui != nullptr ? ui->getBundlePath() :
+                                           #endif
+                                            nullptr))
         {
             if (const char* const resourcePath = getResourcePath(bundlePath))
             {
@@ -399,8 +402,10 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     INFO("Binary filename: %s", getBinaryFilename());
     if (plugin != nullptr) {
         INFO("Bundle path: %s", plugin->getBundlePath());
+   #if DISTRHO_PLUGIN_HAS_UI
     } else if (ui != nullptr) {
         INFO("Bundle path: %s", ui->getBundlePath());
+   #endif
     }
     INFO("System directory: %s", asset::systemDir.c_str());
     INFO("User directory: %s", asset::userDir.c_str());
