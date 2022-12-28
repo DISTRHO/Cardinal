@@ -18,7 +18,10 @@
 #include "DistrhoPluginInfo.h"
 
 #ifndef DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
-# error wrong build
+# error wrong build 1
+#endif
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+# error wrong build 2
 #endif
 
 // #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS

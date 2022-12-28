@@ -34,6 +34,7 @@
 
 #ifdef HEADLESS
 #define DISTRHO_PLUGIN_HAS_UI             0
+#define DISTRHO_PLUGIN_WANT_DIRECT_ACCESS 0
 #else
 #define DISTRHO_PLUGIN_HAS_UI             1
 #define DISTRHO_PLUGIN_WANT_DIRECT_ACCESS 1

@@ -81,6 +81,7 @@ START_NAMESPACE_DISTRHO
 
 #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 const char* Plugin::getBundlePath() const noexcept { return nullptr; }
+bool Plugin::isSelfTestInstance() const noexcept { return false; }
 bool Plugin::writeMidiEvent(const MidiEvent&) noexcept { return false; }
 #endif
 
