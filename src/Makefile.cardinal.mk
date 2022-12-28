@@ -353,22 +353,29 @@ BASE_FLAGS += -Wno-unused-variable
 # extra linker flags
 
 ifeq ($(WASM),true)
-ifneq ($(STATIC_BUILD),true)
+
+LINK_FLAGS += -O3
+LINK_FLAGS += -sALLOW_MEMORY_GROWTH
+LINK_FLAGS += -sINITIAL_MEMORY=64Mb
+LINK_FLAGS += -sLZ4=1
+
 ifeq ($(CARDINAL_VARIANT),mini)
 LINK_FLAGS += --preload-file=../../bin/CardinalMini.lv2/resources@/resources
 else
+LINK_FLAGS += --shell-file=../emscripten/shell.html
+ifneq ($(STATIC_BUILD),true)
+LINK_FLAGS += --use-preload-cache
 LINK_FLAGS += --use-preload-plugins
 LINK_FLAGS += --preload-file=./jsfx
 LINK_FLAGS += --preload-file=./lv2
+endif
 LINK_FLAGS += --preload-file=../../bin/CardinalNative.lv2/resources@/resources
 endif
-LINK_FLAGS += --use-preload-cache
-endif
-ifneq ($(NOPLUGINS),true)
-SYMLINKED_DIRS_RESOURCES  =
+
 # find . -type l | grep -v svg | grep -v ttf | grep -v art | grep -v json | grep -v png | grep -v otf | sort
-SYMLINKED_DIRS_RESOURCES += Fundamental/presets
+SYMLINKED_DIRS_RESOURCES  = Fundamental/presets
 ifneq ($(CARDINAL_VARIANT),mini)
+ifneq ($(NOPLUGINS),true)
 SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/chopin
 SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/debussy
 SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/goldberg
@@ -391,15 +398,9 @@ SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/wavetables
 SYMLINKED_DIRS_RESOURCES += surgext/patches
 SYMLINKED_DIRS_RESOURCES += surgext/presets
 endif
+endif
 LINK_FLAGS += $(foreach d,$(SYMLINKED_DIRS_RESOURCES),--preload-file=../../bin/CardinalNative.lv2/resources/$(d)@/resources/$(d))
-endif
-LINK_FLAGS += -sALLOW_MEMORY_GROWTH
-LINK_FLAGS += -sINITIAL_MEMORY=64Mb
-LINK_FLAGS += -sLZ4=1
-ifneq ($(CARDINAL_VARIANT),mini)
-LINK_FLAGS += --shell-file=../emscripten/shell.html
-endif
-LINK_FLAGS += -O3
+
 else ifeq ($(HAIKU),true)
 LINK_FLAGS += -lpthread
 else
