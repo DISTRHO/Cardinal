@@ -1179,23 +1179,16 @@ BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
 BASE_FLAGS += -I../src/Rack/dep/oui-blendish
 BASE_FLAGS += -I../src/Rack/dep/pffft
 
-# SSE must always be enabled, even in debug builds
-ifeq ($(CPU_I386_OR_X86_64),true)
-BASE_FLAGS += -msse -msse2
-ifeq ($(WASM),true)
-BASE_FLAGS += -msse3 -msimd128
-endif
-endif
-
 ifeq ($(DEBUG),true)
 BASE_FLAGS += -UDEBUG
 endif
 
 ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
-ifeq ($(WITH_LTO),true)
-BASE_FLAGS += -ffat-lto-objects
 endif
+
+ifneq (,$(findstring true,$(DEBUG)$(NOOPT)))
+BASE_FLAGS += -DCARDINAL_NOOPT
 endif
 
 ifeq ($(BSD)$(WASM),true)

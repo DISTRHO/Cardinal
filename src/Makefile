@@ -73,10 +73,6 @@ endif
 
 ifeq ($(DEBUG),true)
 BASE_FLAGS += -UDEBUG
-ifeq ($(WASM),true)
-# SSE must always be enabled on wasm, even in debug builds
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-endif
 endif
 
 ifeq ($(HAVE_LIBLO),true)
@@ -85,6 +81,10 @@ endif
 
 ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
+endif
+
+ifneq (,$(findstring true,$(DEBUG)$(NOOPT)))
+BASE_FLAGS += -DCARDINAL_NOOPT
 endif
 
 ifeq ($(BSD),true)

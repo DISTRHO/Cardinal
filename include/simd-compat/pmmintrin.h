@@ -17,7 +17,7 @@
 
 #pragma once
 
-#if defined(__i386__) || defined(__x86_64__)
+#if (defined(__i386__) || defined(__x86_64__)) && !defined(CARDINAL_NOOPT)
 # include_next <pmmintrin.h>
 
 // bring in extra SSE3 support via simde
@@ -40,7 +40,7 @@
 #  undef _WIN32_WAS_DEFINED
 # endif
 
-#elif defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__) && !defined(CARDINAL_NOOPT)
 # include_next <pmmintrin.h>
 
 static __inline__ __m64 __attribute__((__always_inline__, __nodebug__))

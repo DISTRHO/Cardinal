@@ -877,7 +877,7 @@ jobs:
         run: |
           source ~/emsdk/emsdk_env.sh
           make features
-          make CIBUILD=true NOPLUGINS=true STATIC_BUILD=true USE_GLES2=true -j $(nproc)
+          make CIBUILD=true NOPLUGINS=true NOOPT=true STATIC_BUILD=true USE_GLES2=true -j $(nproc)
       - name: Make wasm versioned and compress
         run: |
           VERSION=$(cat Makefile | awk 'sub("VERSION = ","")')

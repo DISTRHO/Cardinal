@@ -17,9 +17,9 @@
 
 #pragma once
 
-#if defined(__i386__) || defined(__x86_64__)
+#if (defined(__i386__) || defined(__x86_64__)) && !defined(CARDINAL_NOOPT)
 # include_next <mmintrin.h>
-#elif defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__) && !defined(CARDINAL_NOOPT)
 # include <wasm_simd128.h>
 #else
 # define SIMDE_ENABLE_NATIVE_ALIASES

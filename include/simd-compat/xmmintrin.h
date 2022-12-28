@@ -17,7 +17,7 @@
 
 #pragma once
 
-#if defined(__i386__) || defined(__x86_64__) || defined(__EMSCRIPTEN__)
+#if (defined(__i386__) || defined(__x86_64__) || defined(__EMSCRIPTEN__)) && !defined(CARDINAL_NOOPT)
 # include_next <xmmintrin.h>
 #else
 # define SIMDE_ENABLE_NATIVE_ALIASES

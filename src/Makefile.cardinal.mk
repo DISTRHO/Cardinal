@@ -298,6 +298,10 @@ ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
 endif
 
+ifneq (,$(findstring true,$(DEBUG)$(NOOPT)))
+BASE_FLAGS += -DCARDINAL_NOOPT
+endif
+
 ifeq ($(MOD_BUILD),true)
 BASE_FLAGS += -DDISTRHO_PLUGIN_USES_MODGUI=1 -DDISTRHO_PLUGIN_MINIMUM_BUFFER_SIZE=0xffff
 endif
