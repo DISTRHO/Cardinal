@@ -1187,8 +1187,8 @@ ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
 endif
 
-ifneq (,$(findstring true,$(DEBUG)$(NOOPT)))
-BASE_FLAGS += -DCARDINAL_NOOPT
+ifneq (,$(findstring true,$(DEBUG)$(NOSIMD)))
+BASE_FLAGS += -DCARDINAL_NOSIMD
 endif
 
 ifeq ($(BSD)$(WASM),true)

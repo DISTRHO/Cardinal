@@ -34,12 +34,12 @@ endif
 BASE_FLAGS += -I$(abspath ../include)
 BASE_FLAGS += -I$(abspath ../include/simd-compat)
 
-ifeq ($(HAIKU)$(WASM),true)
-BASE_FLAGS += -I$(abspath ../include/linux-compat)
+ifneq (,$(findstring true,$(DEBUG)$(NOSIMD)))
+BASE_FLAGS += -DCARDINAL_NOSIMD
 endif
 
-ifeq ($(MOD_BUILD)$(WITH_LTO),true)
-BASE_FLAGS += -ffat-lto-objects
+ifeq ($(HAIKU)$(WASM),true)
+BASE_FLAGS += -I$(abspath ../include/linux-compat)
 endif
 
 ifneq ($(SYSDEPS),true)

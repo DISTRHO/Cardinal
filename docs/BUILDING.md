@@ -23,6 +23,7 @@ Developer related options:
 
 * `DEBUG=true` build non-stripped debug binaries (terrible performance, only useful for developers)
 * `NOPLUGINS=true` build only the Cardinal Core plugins (not recommended, only useful for developers)
+* `NOSIMD=true` build without SIMD (not recommended, only useful for developers)
 
 Packaging related options:
 
