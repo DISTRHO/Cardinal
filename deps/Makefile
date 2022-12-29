@@ -34,7 +34,7 @@ endif
 BASE_FLAGS += -I$(abspath ../include)
 BASE_FLAGS += -I$(abspath ../include/simd-compat)
 
-ifneq (,$(findstring true,$(DEBUG)$(NOSIMD)))
+ifeq ($(NOSIMD),true)
 BASE_FLAGS += -DCARDINAL_NOSIMD
 endif
 
@@ -325,12 +325,14 @@ endif
 SURGE_CXX_FLAGS += -DJUCE_DSP_ENABLE_SNAP_TO_ZERO=0
 
 # required by JUCE
+ifneq ($(NOSIMD),true)
 ifeq ($(WASM),true)
 SURGE_CXX_FLAGS += -msse -msse2 -msse3 -msimd128
 else ifeq ($(CPU_ARM32),true)
 SURGE_CXX_FLAGS += -mfpu=neon-vfpv4 -mfloat-abi=hard
 else ifeq ($(CPU_I386_OR_X86_64),true)
 SURGE_CXX_FLAGS += -msse -msse2
+endif
 endif
 
 # possibly use fftw?
