@@ -324,14 +324,16 @@ endif
 # unwanted in this build
 SURGE_CXX_FLAGS += -DJUCE_DSP_ENABLE_SNAP_TO_ZERO=0
 
-# required by JUCE
-ifneq ($(NOSIMD),true)
+# SIMD must always be enabled, even in debug builds
+ifeq ($(NOSIMD),true)
+SURGE_CXX_FLAGS += -DCARDINAL_NOSIMD
+else ifeq ($(DEBUG),true)
 ifeq ($(WASM),true)
 SURGE_CXX_FLAGS += -msse -msse2 -msse3 -msimd128
 else ifeq ($(CPU_ARM32),true)
 SURGE_CXX_FLAGS += -mfpu=neon-vfpv4 -mfloat-abi=hard
 else ifeq ($(CPU_I386_OR_X86_64),true)
-SURGE_CXX_FLAGS += -msse -msse2
+SURGE_CXX_FLAGS += -msse -msse2 -mfpmath=sse
 endif
 endif
 

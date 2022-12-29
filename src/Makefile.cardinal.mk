@@ -298,8 +298,17 @@ ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
 endif
 
-ifneq (,$(findstring true,$(DEBUG)$(NOSIMD)))
+# SIMD must always be enabled, even in debug builds
+ifeq ($(NOSIMD),true)
 BASE_FLAGS += -DCARDINAL_NOSIMD
+else ifeq ($(DEBUG),true)
+ifeq ($(WASM),true)
+BASE_FLAGS += -msse -msse2 -msse3 -msimd128
+else ifeq ($(CPU_ARM32),true)
+BASE_FLAGS += -mfpu=neon-vfpv4 -mfloat-abi=hard
+else ifeq ($(CPU_I386_OR_X86_64),true)
+BASE_FLAGS += -msse -msse2 -mfpmath=sse
+endif
 endif
 
 ifeq ($(MOD_BUILD),true)
