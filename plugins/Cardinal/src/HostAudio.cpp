@@ -222,25 +222,51 @@ struct HostAudio2 : HostAudio<2> {
             valueR = 0.0f;
         }
 
-        const uint32_t j = internalDataFrame++;
-        internalDataBufferL[j] = valueL;
-        internalDataBufferR[j] = valueR;
-
-        if (internalDataFrame == 128)
+        if (pcontext->variant == kCardinalVariantMini)
         {
-            internalDataFrame = 0;
+            const uint32_t j = internalDataFrame++;
+            internalDataBufferL[j] = valueL;
+            internalDataBufferR[j] = valueR;
 
-            if (resetMeters)
-                gainMeterL = gainMeterR = 0.0f;
+            if (internalDataFrame == 4)
+            {
+                internalDataFrame = 0;
 
-            gainMeterL = std::max(gainMeterL, d_findMaxNormalizedFloat128(internalDataBufferL));
+                if (resetMeters)
+                    gainMeterL = gainMeterR = 0.0f;
 
-            if (in2connected)
-                gainMeterR = std::max(gainMeterR, d_findMaxNormalizedFloat128(internalDataBufferR));
-            else
-                gainMeterR = gainMeterL;
+                gainMeterL = std::max(gainMeterL, d_findMaxNormalizedFloat<4>(internalDataBufferL));
 
-            resetMeters = false;
+                if (in2connected)
+                    gainMeterR = std::max(gainMeterR, d_findMaxNormalizedFloat<4>(internalDataBufferR));
+                else
+                    gainMeterR = gainMeterL;
+
+                resetMeters = false;
+            }
+        }
+        else
+        {
+            const uint32_t j = internalDataFrame++;
+            internalDataBufferL[j] = valueL;
+            internalDataBufferR[j] = valueR;
+
+            if (internalDataFrame == 128)
+            {
+                internalDataFrame = 0;
+
+                if (resetMeters)
+                    gainMeterL = gainMeterR = 0.0f;
+
+                gainMeterL = std::max(gainMeterL, d_findMaxNormalizedFloat128(internalDataBufferL));
+
+                if (in2connected)
+                    gainMeterR = std::max(gainMeterR, d_findMaxNormalizedFloat128(internalDataBufferR));
+                else
+                    gainMeterR = gainMeterL;
+
+                resetMeters = false;
+            }
         }
 #endif
     }

@@ -135,6 +135,7 @@ struct FileButton : MenuButton {
 			patchUtils::loadTemplateDialog();
 		}));
 
+#if ! CARDINAL_VARIANT_MINI
 #ifndef DISTRHO_OS_WASM
 		menu->addChild(createMenuItem("Open / Import...", RACK_MOD_CTRL_NAME "+O", []() {
 			patchUtils::loadDialog();
@@ -165,6 +166,7 @@ struct FileButton : MenuButton {
 			patchUtils::saveAsDialogUncompressed();
 		}));
 #endif
+#endif
 
 		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
 			patchUtils::revertDialog();
@@ -194,6 +196,7 @@ struct FileButton : MenuButton {
 		}
 #endif
 
+#if ! CARDINAL_VARIANT_MINI
 #ifndef DISTRHO_OS_WASM
 		menu->addChild(new ui::MenuSeparator);
 
@@ -205,6 +208,7 @@ struct FileButton : MenuButton {
 		menu->addChild(createMenuItem("Export uncompressed json...", "", []() {
 			patchUtils::saveAsDialogUncompressed();
 		}));
+#endif
 #endif
 
 #if ! CARDINAL_VARIANT_MINI
@@ -761,9 +765,14 @@ struct MeterLabel : ui::Label {
 		// 	uiLastTime = time;
 		// }
 
+#if CARDINAL_VARIANT_MINI
+		text = string::f("%.1f fps", 1.0 / frameDurationAvg);
+#else
 		double meterAverage = APP->engine->getMeterAverage();
 		double meterMax = APP->engine->getMeterMax();
 		text = string::f("%.1f fps  %.1f%% avg  %.1f%% max", 1.0 / frameDurationAvg, meterAverage * 100, meterMax * 100);
+#endif
+
 		Label::step();
 	}
 };
@@ -795,9 +804,11 @@ struct MenuBar : widget::OpaqueWidget {
 		viewButton->text = "View";
 		layout->addChild(viewButton);
 
+#if ! CARDINAL_VARIANT_MINI
 		EngineButton* engineButton = new EngineButton;
 		engineButton->text = "Engine";
 		layout->addChild(engineButton);
+#endif
 
 		HelpButton* helpButton = new HelpButton;
 		helpButton->text = "Help";

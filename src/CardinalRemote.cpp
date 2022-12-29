@@ -139,7 +139,7 @@ void sendParamChangeToRemote(RemoteDetails* const remote, int64_t moduleId, int 
 {
 #if CARDINAL_VARIANT_MINI
     char paramBuf[512] = {};
-    std::snprintf(paramBuf, sizeof(paramBuf), "%lu:%d:%f", moduleId, paramId, value);
+    std::snprintf(paramBuf, sizeof(paramBuf), "%llu:%d:%f", (ulonglong)moduleId, paramId, value);
     static_cast<CardinalBaseUI*>(remote->handle)->setState("param", paramBuf);
 #elif defined(HAVE_LIBLO)
     const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, CARDINAL_DEFAULT_REMOTE_HOST_PORT);
@@ -159,17 +159,23 @@ void sendFullPatchToRemote(RemoteDetails* const remote)
     context->engine->prepareSave();
     context->patch->saveAutosave();
     context->patch->cleanAutosave();
-    std::vector<uint8_t> data(rack::system::archiveDirectory(context->patch->autosavePath, 1));
+
+    std::vector<uint8_t> data;
+    using namespace rack::system;
+
+   #if CARDINAL_VARIANT_MINI
+    try {
+        data = readFile(join(context->patch->autosavePath, "patch.json"));
+    } DISTRHO_SAFE_EXCEPTION_RETURN("sendFullPatchToRemote",);
+
+    static_cast<CardinalBaseUI*>(remote->handle)->setState("patch", reinterpret_cast<const char*>(data.data()));
+   #elif defined(HAVE_LIBLO)
+    try {
+        data = archiveDirectory(context->patch->autosavePath, 1);
+    } DISTRHO_SAFE_EXCEPTION_RETURN("sendFullPatchToRemote",);
 
     DISTRHO_SAFE_ASSERT_RETURN(data.size() >= 4,);
 
-#if CARDINAL_VARIANT_MINI
-    if (char* const patch = String::asBase64(data.data(), data.size()).getAndReleaseBuffer())
-    {
-        static_cast<CardinalBaseUI*>(remote->handle)->setState("patch", patch);
-        std::free(patch);
-    }
-#elif defined(HAVE_LIBLO)
     const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, CARDINAL_DEFAULT_REMOTE_HOST_PORT);
     DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
 
@@ -180,7 +186,7 @@ void sendFullPatchToRemote(RemoteDetails* const remote)
     }
 
     lo_address_free(addr);
-#endif
+   #endif
 }
 
 void sendScreenshotToRemote(RemoteDetails*, const char* const screenshot)

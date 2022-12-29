@@ -180,7 +180,7 @@ endif
 
 # FIXME
 ifeq ($(CARDINAL_VARIANT)$(CIBUILD)$(WASM),nativetruetrue)
-ifneq ($(STATIC_BUILD),true)
+ifneq ($(OLD_PATH),)
 STATIC_CARLA_PLUGIN_LIBS = -lsndfile -lopus -lFLAC -lvorbisenc -lvorbis -logg -lm
 endif
 endif
@@ -380,6 +380,7 @@ LINK_FLAGS += -sLZ4=1
 
 ifeq ($(CARDINAL_VARIANT),mini)
 LINK_FLAGS += --preload-file=../../bin/CardinalMini.lv2/resources@/resources
+# LINK_FLAGS += -sEXPORTED_RUNTIME_METHODS=FS,cwrap
 else
 LINK_FLAGS += --shell-file=../emscripten/shell.html
 ifneq ($(STATIC_BUILD),true)

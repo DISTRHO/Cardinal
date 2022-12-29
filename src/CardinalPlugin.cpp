@@ -52,7 +52,7 @@
 
 static const constexpr uint kCardinalStateBaseCount = 3; // patch, screenshot, comment
 
-#ifndef HEADLESS
+#if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
 # include "extra/ScopedValueSetter.hpp"
 # include "WindowParameters.hpp"
 static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount + 2; // moduleInfos, windowSize
@@ -163,7 +163,7 @@ class CardinalPlugin : public CardinalBasePlugin
     struct {
         String comment;
         String screenshot;
-       #ifndef HEADLESS
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         String windowSize;
        #endif
     } fState;
@@ -172,7 +172,7 @@ class CardinalPlugin : public CardinalBasePlugin
     bool fWasBypassed;
     MidiEvent bypassMidiEvents[16];
 
-   #ifndef HEADLESS
+   #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
     // real values, not VCV interpreted ones
     float fWindowParameters[kWindowParameterCount];
    #endif
@@ -191,7 +191,7 @@ public:
           fNextExpectedFrame(0),
           fWasBypassed(false)
     {
-       #ifndef HEADLESS
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         fWindowParameters[kWindowParameterShowTooltips] = 1.0f;
         fWindowParameters[kWindowParameterCableOpacity] = 50.0f;
         fWindowParameters[kWindowParameterCableTension] = 75.0f;
@@ -290,7 +290,7 @@ public:
             context->patch->clear();
 
             // do a little dance to prevent context scene deletion from saving to temp dir
-           #ifndef HEADLESS
+           #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
             const ScopedValueSetter<bool> svs(rack::settings::headless, true);
            #endif
             Engine_setAboutToClose(context->engine);
@@ -419,6 +419,10 @@ protected:
             parameter.symbol += String(index + 1);
             parameter.unit = "v";
             parameter.hints = kParameterIsAutomatable;
+           #if CARDINAL_VARIANT_MINI
+            // TODO is hidden
+            // parameter.hints |= kParameterIsAutomatable;
+           #endif
             parameter.ranges.def = 0.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 10.0f;
@@ -431,7 +435,7 @@ protected:
             return;
         }
 
-       #ifndef HEADLESS
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         switch (index - kModuleParameters - 1)
         {
         case kWindowParameterShowTooltips:
@@ -610,7 +614,11 @@ protected:
         switch (index)
         {
         case 0:
+           #if CARDINAL_VARIANT_MINI
+            state.hints = kStateIsHostWritable;
+           #else
             state.hints = kStateIsBase64Blob;
+           #endif
            #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
             state.hints |= kStateIsOnlyForDSP;
            #endif
@@ -620,11 +628,16 @@ protected:
                 if (const long fileSize = std::ftell(f))
                 {
                     std::fseek(f, 0, SEEK_SET);
-                    char* const fileContent = new char[fileSize];
+                    char* const fileContent = new char[fileSize+1];
 
                     if (std::fread(fileContent, fileSize, 1, f) == 1)
                     {
+                        fileContent[fileSize] = '\0';
+                       #if CARDINAL_VARIANT_MINI
+                        state.defaultValue = fileContent;
+                       #else
                         state.defaultValue = String::asBase64(fileContent, fileSize);
+                       #endif
                     }
 
                     delete[] fileContent;
@@ -675,7 +688,7 @@ protected:
         if (index == kModuleParameters)
             return context->bypassed ? 1.0f : 0.0f;
 
-       #ifndef HEADLESS
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         // window related parameters
         index -= kModuleParameters + 1;
 
@@ -702,7 +715,7 @@ protected:
             return;
         }
 
-       #ifndef HEADLESS
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         // window related parameters
         index -= kModuleParameters + 1;
 
@@ -716,7 +729,7 @@ protected:
 
     String getState(const char* const key) const override
     {
-       #ifndef HEADLESS
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         if (std::strcmp(key, "moduleInfos") == 0)
         {
             json_t* const rootJ = json_object();
@@ -784,9 +797,12 @@ protected:
             context->patch->cleanAutosave();
             // context->history->setSaved();
 
+           #if CARDINAL_VARIANT_MINI
+           #else
             try {
                 data = rack::system::archiveDirectory(fAutosavePath, 1);
             } DISTRHO_SAFE_EXCEPTION_RETURN("getState archiveDirectory", String());
+           #endif
         }
 
         return String::asBase64(data.data(), data.size());
@@ -797,10 +813,10 @@ protected:
        #if CARDINAL_VARIANT_MINI
         if (std::strcmp(key, "param") == 0)
         {
-            int64_t moduleId = 0;
+            longlong moduleId = 0;
             int paramId = 0;
             float paramValue = 0.f;
-            std::sscanf(value, "%lu:%d:%f", &moduleId, &paramId, &paramValue);
+            std::sscanf(value, "%lld:%d:%f", &moduleId, &paramId, &paramValue);
 
             rack::engine::Module* const module = context->engine->getModule(moduleId);
             DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);
@@ -810,7 +826,7 @@ protected:
         }
        #endif
 
-       #ifndef HEADLESS
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         if (std::strcmp(key, "moduleInfos") == 0)
         {
             json_error_t error;
@@ -869,6 +885,16 @@ protected:
         if (fAutosavePath.empty())
             return;
 
+       #if CARDINAL_VARIANT_MINI
+        FILE* const f = std::fopen(rack::system::join(fAutosavePath, "patch.json").c_str(), "w");
+        DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
+
+        rack::system::removeRecursively(fAutosavePath);
+        rack::system::createDirectories(fAutosavePath);
+
+        std::fwrite(value, std::strlen(value)+1, 1, f);
+        std::fclose(f);
+       #else
         const std::vector<uint8_t> data(d_getChunkFromBase64String(value));
 
         DISTRHO_SAFE_ASSERT_RETURN(data.size() >= 4,);
@@ -892,6 +918,7 @@ protected:
                 rack::system::unarchiveToDirectory(data, fAutosavePath);
             } DISTRHO_SAFE_EXCEPTION_RETURN("setState unarchiveToDirectory",);
         }
+       #endif
 
         const ScopedContext sc(this);
 

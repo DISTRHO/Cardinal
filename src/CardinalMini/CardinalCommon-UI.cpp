@@ -16,4 +16,4 @@
  */
 
 #define CARDINAL_COMMON_UI_ONLY
-#include "CardinalCommon.cpp"
+#include "../CardinalCommon.cpp"

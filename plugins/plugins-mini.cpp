@@ -209,13 +209,16 @@ static void initStatic__Fundamental()
     const StaticPluginLoader spl(p, "Fundamental");
     if (spl.ok())
     {
+        p->addModel(modelADSR);
         p->addModel(modelLFO);
         p->addModel(modelNoise);
         p->addModel(modelRandom);
+        p->addModel(modelScope);
+        p->addModel(modelVCA_1);
         p->addModel(modelVCF);
         p->addModel(modelVCMixer);
+        p->addModel(modelVCO);
         spl.removeModule("8vert");
-        spl.removeModule("ADSR");
         spl.removeModule("Delay");
         spl.removeModule("LFO2");
         spl.removeModule("Merge");
@@ -226,14 +229,11 @@ static void initStatic__Fundamental()
         spl.removeModule("Pulses");
         spl.removeModule("Quantizer");
         spl.removeModule("SEQ3");
-        spl.removeModule("Scope");
         spl.removeModule("SequentialSwitch1");
         spl.removeModule("SequentialSwitch2");
         spl.removeModule("Split");
         spl.removeModule("Sum");
         spl.removeModule("VCA");
-        spl.removeModule("VCA-1");
-        spl.removeModule("VCO");
         spl.removeModule("VCO2");
     }
 }

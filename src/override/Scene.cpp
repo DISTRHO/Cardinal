@@ -212,7 +212,11 @@ void Scene::step() {
 		if (remoteDetails->autoDeploy) {
 			const int actionIndex = APP->history->actionIndex;
 			const double time = system::getTime();
-			if (internal->historyActionIndex != actionIndex && actionIndex > 0 && time - internal->lastSceneChangeTime >= 1.0) {
+
+			if (internal->historyActionIndex == -1) {
+				internal->historyActionIndex = actionIndex;
+				internal->lastSceneChangeTime = time;
+			} else if (internal->historyActionIndex != actionIndex && actionIndex > 0 && time - internal->lastSceneChangeTime >= 1.0) {
 				const std::string& name(APP->history->actions[actionIndex - 1]->name);
 				if (/*std::abs(internal->historyActionIndex = actionIndex) > 1 ||*/ name != "move knob") {
 					printf("action '%s'\n", APP->history->actions[actionIndex - 1]->name.c_str());

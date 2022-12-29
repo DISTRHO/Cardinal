@@ -311,9 +311,12 @@ endif
 PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
 PLUGIN_FILES += Fundamental/src/dr_wav.c
 
+MINIPLUGIN_FILES += Fundamental/src/ADSR.cpp
 MINIPLUGIN_FILES += Fundamental/src/LFO.cpp
 MINIPLUGIN_FILES += Fundamental/src/Noise.cpp
 MINIPLUGIN_FILES += Fundamental/src/Random.cpp
+MINIPLUGIN_FILES += Fundamental/src/Scope.cpp
+MINIPLUGIN_FILES += Fundamental/src/VCA-1.cpp
 MINIPLUGIN_FILES += Fundamental/src/VCF.cpp
 MINIPLUGIN_FILES += Fundamental/src/VCMixer.cpp
 MINIPLUGIN_FILES += Fundamental/src/VCO.cpp

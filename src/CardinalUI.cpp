@@ -298,7 +298,7 @@ class CardinalUI : public CardinalBaseUI,
     rack::math::Vec lastMousePos;
     WindowParameters windowParameters;
     int rateLimitStep = 0;
-   #ifdef DISTRHO_OS_WASM
+   #if defined(DISTRHO_OS_WASM) && ! CARDINAL_VARIANT_MINI
     int8_t counterForFirstIdlePoint = 0;
    #endif
    #ifdef DPF_RUNTIME_TESTING
@@ -345,7 +345,7 @@ public:
         rack::contextSet(context);
 
        #if CARDINAL_VARIANT_MINI
-        remoteUtils::connectToRemote();
+        DISTRHO_SAFE_ASSERT(remoteUtils::connectToRemote());
 
         // create unique temporary path for this instance
         try {
@@ -366,8 +366,16 @@ public:
             }
         } DISTRHO_SAFE_EXCEPTION("create unique temporary path");
 
-        const float sampleRate = getSampleRate();
+        const float sampleRate = 60; // fake audio running at 60 fps
         rack::settings::sampleRate = sampleRate;
+
+        context->dataIns = new const float*[DISTRHO_PLUGIN_NUM_INPUTS];
+        context->dataOuts = new float*[DISTRHO_PLUGIN_NUM_OUTPUTS];
+
+        for (uint32_t i=0; i<DISTRHO_PLUGIN_NUM_INPUTS;++i)
+            *const_cast<float**>(&context->dataIns[i]) = new float[1];
+        for (uint32_t i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS;++i)
+            context->dataOuts[i] = new float[1];
 
         context->bufferSize = 1;
         context->sampleRate = sampleRate;
@@ -378,7 +386,7 @@ public:
         context->history = new rack::history::State;
         context->patch = new rack::patch::Manager;
         context->patch->autosavePath = fAutosavePath;
-        context->patch->templatePath = context->patch->factoryTemplatePath = fInitializer->templatePath;
+        context->patch->templatePath = context->patch->factoryTemplatePath = fInitializer->factoryTemplatePath;
 
         context->event = new rack::widget::EventState;
         context->scene = new rack::app::Scene;
@@ -386,6 +394,7 @@ public:
 
         context->window = new rack::window::Window;
 
+        context->patch->loadTemplate();
         context->scene->rackScroll->reset();
 
         Engine_setRemoteDetails(context->engine, remoteDetails);
@@ -563,7 +572,7 @@ public:
         }
        #endif
 
-       #ifdef DISTRHO_OS_WASM
+       #if defined(DISTRHO_OS_WASM) && ! CARDINAL_VARIANT_MINI
         if (counterForFirstIdlePoint >= 0 && ++counterForFirstIdlePoint == 30)
         {
             counterForFirstIdlePoint = -1;
@@ -606,7 +615,11 @@ public:
         }
 
        #if CARDINAL_VARIANT_MINI
-        context->engine->stepBlock(1);
+        {
+            const ScopedContext sc(this);
+            ++context->processCounter;
+            context->engine->stepBlock(1);
+        }
        #endif
 
         if (windowParameters.rateLimit != 0 && ++rateLimitStep % (windowParameters.rateLimit * 2))
@@ -702,9 +715,23 @@ protected:
     */
     void parameterChanged(const uint32_t index, const float value) override
     {
-        // host mapped parameters + bypass
-        if (index <= kModuleParameters)
+        // host mapped parameters
+        if (index < kModuleParameters)
+        {
+           #if CARDINAL_VARIANT_MINI
+            context->parameters[index] = value;
+           #endif
             return;
+        }
+
+        // bypass
+        if (index == kModuleParameters)
+        {
+           #if CARDINAL_VARIANT_MINI
+            context->bypassed = value > 0.5f;
+           #endif
+            return;
+        }
 
         switch (index - kModuleParameters - 1)
         {
