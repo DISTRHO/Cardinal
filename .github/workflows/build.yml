@@ -4,13 +4,13 @@ on:
   push:
 
 env:
-  CACHE_VERSION: 39
+  CACHE_VERSION: 1
   CARDINAL_UNDER_WINE: 1
   EMSCRIPTEN_VERSION: 3.1.27
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
-  LIBGL_ALWAYS_SOFTWARE: 'true'
-  WITH_LTO: 'false'
+  LIBGL_ALWAYS_SOFTWARE: true
+  WITH_LTO: false
 
 jobs:
   linux-arm64:
@@ -584,7 +584,7 @@ jobs:
       - name: Build macOS universal (base)
         if: steps.cache.outputs.cache-hit == 'true'
         env:
-          WITH_LTO: 'false'
+          WITH_LTO: false
         run: |
           export PAWPAW_SKIP_LTO=1
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
@@ -794,7 +794,7 @@ jobs:
       - name: Build wasm cross-compiled
         if: steps.cache.outputs.cache-hit == 'true'
         env:
-          WITH_LTO: 'false'
+          WITH_LTO: false
         run: |
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
           pushd deps/PawPaw; source local.env wasm; popd
@@ -873,7 +873,7 @@ jobs:
           NM: emnm
           RANLIB: emranlib
           STRIP: emstrip
-          WITH_LTO: 'false'
+          WITH_LTO: false
         run: |
           source ~/emsdk/emsdk_env.sh
           make features
@@ -1183,8 +1183,9 @@ jobs:
       - name: Build Cardinal
         env:
           CFLAGS: -g
-          CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING
+          CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING -Wno-pmf-conversions
           LDFLAGS: -static-libgcc -static-libstdc++
+          WITH_LTO: false
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           make features
