@@ -52,6 +52,7 @@
 #include <library.hpp>
 
 #include "../CardinalCommon.hpp"
+#include "../CardinalRemote.hpp"
 #include "DistrhoStandaloneUtils.hpp"
 
 #ifdef HAVE_LIBLO
@@ -169,19 +170,20 @@ struct FileButton : MenuButton {
 #ifdef HAVE_LIBLO
 		menu->addChild(new ui::MenuSeparator);
 
-		if (patchUtils::isRemoteConnected()) {
-			menu->addChild(createMenuItem("Deploy to MOD", "F7", []() {
-				patchUtils::deployToRemote();
+		remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote();
+
+		if (remoteDetails != nullptr && remoteDetails->connected) {
+			menu->addChild(createMenuItem("Deploy to MOD", "F7", [remoteDetails]() {
+				remoteUtils::deployToRemote(remoteDetails);
 			}));
 
-			const bool autoDeploy = patchUtils::isRemoteAutoDeployed();
 			menu->addChild(createCheckMenuItem("Auto deploy to MOD", "",
-				[=]() {return autoDeploy;},
-				[=]() {patchUtils::setRemoteAutoDeploy(!autoDeploy);}
+				[remoteDetails]() {return remoteDetails->autoDeploy;},
+				[remoteDetails]() {remoteDetails->autoDeploy = !remoteDetails->autoDeploy;}
 			));
 		} else {
 			menu->addChild(createMenuItem("Connect to MOD", "", []() {
-				patchUtils::connectToRemote();
+				remoteUtils::connectToRemote();
 			}));
 		}
 #endif

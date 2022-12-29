@@ -25,8 +25,8 @@
 # undef DEBUG
 #endif
 
+#include "CardinalRemote.hpp"
 #include "DistrhoPlugin.hpp"
-#include "extra/Mutex.hpp"
 
 #ifndef HEADLESS
 # include "DistrhoUI.hpp"
@@ -148,6 +148,7 @@ struct WasmRemotePatchLoadingDialog;
 class CardinalBaseUI : public UI {
 public:
     CardinalPluginContext* const context;
+    remoteUtils::RemoteDetails* remoteDetails;
     bool saving;
     bool savingUncompressed;
 
@@ -166,6 +167,7 @@ public:
          #else
           context(new CardinalPluginContext(nullptr)),
          #endif
+          remoteDetails(nullptr),
           saving(false),
           savingUncompressed(false),
          #ifdef DISTRHO_OS_WASM
@@ -180,6 +182,8 @@ public:
 
     ~CardinalBaseUI() override
     {
+        disconnectFromRemote(remoteDetails);
+
         if (filebrowserhandle != nullptr)
             fileBrowserClose(filebrowserhandle);
 

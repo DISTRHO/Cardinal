@@ -21,13 +21,6 @@
 
 #include <string>
 
-#ifdef HAVE_LIBLO
-// # define REMOTE_HOST "localhost"
-# define REMOTE_HOST "192.168.51.1"
-# define REMOTE_HOST_PORT "2228"
-# include "extra/Thread.hpp"
-#endif
-
 #ifdef DISTRHO_OS_WASM
 # ifdef STATIC_BUILD
 #  define CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME "welcome-wasm-mini.vcv"
@@ -85,20 +78,16 @@ void saveAsDialogUncompressed();
 void appendSelectionContextMenu(rack::ui::Menu* menu);
 void openBrowser(const std::string& url);
 
-bool connectToRemote();
-bool isRemoteConnected();
-bool isRemoteAutoDeployed();
-void setRemoteAutoDeploy(bool autoDeploy);
-void deployToRemote();
-void sendScreenshotToRemote(const char* screenshot);
-
 } // namespace patchUtils
 
 // -----------------------------------------------------------------------------------------------------------
 
-#if defined(HAVE_LIBLO) && defined(HEADLESS) && DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+// && defined(HEADLESS)
+#if defined(HAVE_LIBLO)
 # define CARDINAL_INIT_OSC_THREAD
 #endif
+
+typedef void* lo_server_thread;
 
 START_NAMESPACE_DISTRHO
 
@@ -107,22 +96,16 @@ class CardinalBaseUI;
 struct CardinalPluginContext;
 
 struct Initializer
-#ifdef CARDINAL_INIT_OSC_THREAD
-    : public Thread
-#endif
 {
 #ifdef CARDINAL_INIT_OSC_THREAD
-    lo_server oscServer = nullptr;
-    CardinalBasePlugin* oscPlugin = nullptr;
+    lo_server_thread oscServerThread = nullptr;
+    CardinalBasePlugin* remotePluginInstance = nullptr;
 #endif
     std::string templatePath;
     std::string factoryTemplatePath;
 
     Initializer(const CardinalBasePlugin* plugin, const CardinalBaseUI* ui);
     ~Initializer();
-#ifdef CARDINAL_INIT_OSC_THREAD
-    void run() override;
-#endif
 };
 
 #ifndef HEADLESS

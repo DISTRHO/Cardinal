@@ -274,14 +274,15 @@ public:
         }
 
        #ifdef CARDINAL_INIT_OSC_THREAD
-        fInitializer->oscPlugin = this;
+        fInitializer->remotePluginInstance = this;
        #endif
     }
 
     ~CardinalPlugin() override
     {
        #ifdef CARDINAL_INIT_OSC_THREAD
-        fInitializer->oscPlugin = nullptr;
+        if (fInitializer->remotePluginInstance == this)
+            fInitializer->remotePluginInstance = nullptr;
        #endif
 
         {
@@ -844,9 +845,6 @@ protected:
         if (std::strcmp(key, "screenshot") == 0)
         {
             fState.screenshot = value;
-           #if defined(HAVE_LIBLO) && !defined(HEADLESS)
-            patchUtils::sendScreenshotToRemote(value);
-           #endif
             return;
         }
 

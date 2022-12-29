@@ -25,10 +25,6 @@
  * the License, or (at your option) any later version.
  */
 
-#include <thread>
-
-#include <osdialog.h>
-
 #include <app/Scene.hpp>
 #include <app/Browser.hpp>
 #include <app/TipWindow.hpp>
@@ -46,17 +42,8 @@
 # undef DEBUG
 #endif
 
-#ifdef STATIC_BUILD
-# undef HAVE_LIBLO
-#endif
-
-#ifdef HAVE_LIBLO
-# include <lo/lo.h>
-#endif
-
 #include "../CardinalCommon.hpp"
-#include "extra/Base64.hpp"
-#include "DistrhoUtils.hpp"
+#include "../CardinalRemote.hpp"
 
 
 namespace rack {
@@ -131,30 +118,8 @@ struct Scene::Internal {
 
 	bool heldArrowKeys[4] = {};
 
-#ifdef HAVE_LIBLO
 	double lastSceneChangeTime = 0.0;
 	int historyActionIndex = -1;
-
-	bool oscAutoDeploy = false;
-	bool oscConnected = false;
-	lo_server oscServer = nullptr;
-
-	static int osc_handler(const char* const path, const char* const types, lo_arg** argv, const int argc, lo_message, void* const self)
-	{
-		d_stdout("osc_handler(\"%s\", \"%s\", %p, %i)", path, types, argv, argc);
-
-		if (std::strcmp(path, "/resp") == 0 && argc == 2 && types[0] == 's' && types[1] == 's') {
-			d_stdout("osc_handler(\"%s\", ...) - got resp | '%s' '%s'", path, &argv[0]->s, &argv[1]->s);
-			if (std::strcmp(&argv[0]->s, "hello") == 0 && std::strcmp(&argv[1]->s, "ok") == 0)
-				static_cast<Internal*>(self)->oscConnected = true;
-		}
-		return 0;
-	}
-
-	~Internal() {
-		lo_server_free(oscServer);
-	}
-#endif
 };
 
 
@@ -238,22 +203,20 @@ void Scene::step() {
 		rackScroll->offset += arrowDelta * arrowSpeed;
 	}
 
-#ifdef HAVE_LIBLO
-	if (internal->oscServer != nullptr) {
-		while (lo_server_recv_noblock(internal->oscServer, 0) != 0) {}
+	if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote()) {
+		idleRemote(remoteDetails);
 
-		if (internal->oscAutoDeploy) {
+		if (remoteDetails->autoDeploy) {
 			const int actionIndex = APP->history->actionIndex;
 			const double time = system::getTime();
 			if (internal->historyActionIndex != actionIndex && time - internal->lastSceneChangeTime >= 5.0) {
 				internal->historyActionIndex = actionIndex;
 				internal->lastSceneChangeTime = time;
-				patchUtils::deployToRemote();
+				remoteUtils::deployToRemote(remoteDetails);
 				window::generateScreenshot();
 			}
 		}
 	}
-#endif
 
 	Widget::step();
 }
@@ -352,7 +315,7 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
-			patchUtils::deployToRemote();
+			remoteUtils::deployToRemote(remoteUtils::getRemote());
 			window::generateScreenshot();
 			e.consume(this);
 		}
@@ -489,94 +452,3 @@ void Scene::onPathDrop(const PathDropEvent& e) {
 
 } // namespace app
 } // namespace rack
-
-
-namespace patchUtils {
-
-
-bool connectToRemote() {
-#ifdef HAVE_LIBLO
-	rack::app::Scene::Internal* const internal = APP->scene->internal;
-
-	if (internal->oscServer == nullptr) {
-		const lo_server oscServer = lo_server_new_with_proto(nullptr, LO_UDP, nullptr);
-		DISTRHO_SAFE_ASSERT_RETURN(oscServer != nullptr, false);
-		lo_server_add_method(oscServer, "/resp", nullptr, rack::app::Scene::Internal::osc_handler, internal);
-		internal->oscServer = oscServer;
-	}
-
-	const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
-	DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr, false);
-	lo_send(addr, "/hello", "");
-	lo_address_free(addr);
-
-	return true;
-#else
-	return false;
-#endif
-}
-
-
-bool isRemoteConnected() {
-#ifdef HAVE_LIBLO
-	return APP->scene->internal->oscConnected;
-#else
-	return false;
-#endif
-}
-
-
-bool isRemoteAutoDeployed() {
-#ifdef HAVE_LIBLO
-	return APP->scene->internal->oscAutoDeploy;
-#else
-	return false;
-#endif
-}
-
-
-void setRemoteAutoDeploy(bool autoDeploy) {
-#ifdef HAVE_LIBLO
-	APP->scene->internal->oscAutoDeploy = autoDeploy;
-#endif
-}
-
-
-void deployToRemote() {
-#ifdef HAVE_LIBLO
-	const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
-	DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
-
-	APP->engine->prepareSave();
-	APP->patch->saveAutosave();
-	APP->patch->cleanAutosave();
-	std::vector<uint8_t> data(rack::system::archiveDirectory(APP->patch->autosavePath, 1));
-
-	if (const lo_blob blob = lo_blob_new(data.size(), data.data())) {
-		lo_send(addr, "/load", "b", blob);
-		lo_blob_free(blob);
-	}
-
-	lo_address_free(addr);
-#endif
-}
-
-
-void sendScreenshotToRemote(const char* const screenshot) {
-#ifdef HAVE_LIBLO
-	const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
-	DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
-
-	std::vector<uint8_t> data(d_getChunkFromBase64String(screenshot));
-
-	if (const lo_blob blob = lo_blob_new(data.size(), data.data())) {
-		lo_send(addr, "/screenshot", "b", blob);
-		lo_blob_free(blob);
-	}
-
-	lo_address_free(addr);
-#endif
-}
-
-
-} // namespace patchUtils

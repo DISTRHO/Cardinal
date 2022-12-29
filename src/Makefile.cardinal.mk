@@ -96,6 +96,7 @@ endif
 
 FILES_DSP  = CardinalPlugin.cpp
 FILES_DSP += CardinalCommon.cpp
+FILES_DSP += CardinalRemote.cpp
 FILES_DSP += common.cpp
 
 ifeq ($(CARDINAL_VARIANT),mini)
@@ -251,6 +252,7 @@ ifeq ($(CARDINAL_VARIANT),mini)
 ifneq ($(HEADLESS),true)
 FILES_UI  = CardinalUI.cpp
 FILES_UI += CardinalCommon-UI.cpp
+FILES_UI += CardinalRemote.cpp
 FILES_UI += common.cpp
 FILES_UI += glfw.cpp
 FILES_UI += Window.cpp
