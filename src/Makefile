@@ -165,7 +165,6 @@ RACK_FILES += override/context.cpp
 RACK_FILES += override/minblep.cpp
 RACK_FILES += override/plugin.cpp
 RACK_FILES += override/Engine.cpp
-RACK_FILES += override/MenuBar.cpp
 RACK_FILES += override/Model.cpp
 RACK_FILES += override/ModuleWidget.cpp
 RACK_FILES += override/OpenGlWidget.cpp

@@ -108,6 +108,7 @@ FILES_DSP += RemoteWindow.cpp
 else
 FILES_UI  = CardinalUI.cpp
 FILES_UI += glfw.cpp
+FILES_UI += MenuBar.cpp
 FILES_UI += Window.cpp
 endif
 
@@ -255,6 +256,7 @@ FILES_UI += CardinalCommon-UI.cpp
 FILES_UI += CardinalRemote.cpp
 FILES_UI += common.cpp
 FILES_UI += glfw.cpp
+FILES_UI += MenuBar.cpp
 FILES_UI += Window.cpp
 EXTRA_UI_DEPENDENCIES = $(subst -headless,,$(EXTRA_DSP_DEPENDENCIES))
 EXTRA_UI_LIBS += $(subst -headless,,$(EXTRA_DSP_LIBS))

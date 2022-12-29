@@ -209,10 +209,15 @@ static void Engine_stepFrame(Engine* that) {
 		float smoothValue = internal->smoothValue;
 		Param* smoothParam = &smoothModule->params[smoothParamId];
 		float value = smoothParam->value;
-		// Use decay rate of roughly 1 graphics frame
-		const float smoothLambda = 60.f;
-		float newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
-		if (value == newValue) {
+		float newValue;
+		if (internal->blockFrames != 1) {
+			// Use decay rate of roughly 1 graphics frame
+			const float smoothLambda = 60.f;
+			newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
+		} else {
+			newValue = value;
+		}
+		if (d_isEqual(value, newValue)) {
 			// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats)
 			smoothParam->setValue(smoothValue);
 			internal->smoothModule = NULL;

@@ -76,13 +76,21 @@ bool connectToRemote()
 
     RemoteDetails* remoteDetails = ui->remoteDetails;
 
-#ifdef HAVE_LIBLO
+#if CARDINAL_VARIANT_MINI
+    if (remoteDetails == nullptr)
+    {
+        ui->remoteDetails = remoteDetails = new RemoteDetails;
+        remoteDetails->handle = ui;
+        remoteDetails->connected = true;
+        remoteDetails->autoDeploy = true;
+    }
+#elif defined(HAVE_LIBLO)
     if (remoteDetails == nullptr)
     {
         const lo_server oscServer = lo_server_new_with_proto(nullptr, LO_UDP, nullptr);
         DISTRHO_SAFE_ASSERT_RETURN(oscServer != nullptr, false);
 
-        remoteDetails = new RemoteDetails;
+        ui->remoteDetails = remoteDetails = new RemoteDetails;
         remoteDetails->handle = oscServer;
         remoteDetails->connected = false;
         remoteDetails->autoDeploy = false;
@@ -106,13 +114,14 @@ void disconnectFromRemote(RemoteDetails* const remote)
     {
        #ifdef HAVE_LIBLO
         lo_server_free(static_cast<lo_server>(remote->handle));
-        delete remote;
        #endif
+        delete remote;
     }
 }
 
 void idleRemote(RemoteDetails* const remote)
 {
+    DISTRHO_SAFE_ASSERT_RETURN(remote != nullptr,);
 #ifdef HAVE_LIBLO
     while (lo_server_recv_noblock(static_cast<lo_server>(remote->handle), 0) != 0) {}
 #endif
@@ -120,14 +129,25 @@ void idleRemote(RemoteDetails* const remote)
 
 void deployToRemote(RemoteDetails* const remote)
 {
-#ifdef HAVE_LIBLO
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+    DISTRHO_SAFE_ASSERT_RETURN(context != nullptr,);
+
+    context->engine->prepareSave();
+    context->patch->saveAutosave();
+    context->patch->cleanAutosave();
+    std::vector<uint8_t> data(rack::system::archiveDirectory(context->patch->autosavePath, 1));
+
+    DISTRHO_SAFE_ASSERT_RETURN(data.size() >= 4,);
+
+#if CARDINAL_VARIANT_MINI
+    if (char* const patch = String::asBase64(data.data(), data.size()).getAndReleaseBuffer())
+    {
+        static_cast<CardinalBaseUI*>(remote->handle)->setState("patch", patch);
+        std::free(patch);
+    }
+#elif defined(HAVE_LIBLO)
     const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
     DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
-
-    APP->engine->prepareSave();
-    APP->patch->saveAutosave();
-    APP->patch->cleanAutosave();
-    std::vector<uint8_t> data(rack::system::archiveDirectory(APP->patch->autosavePath, 1));
 
     if (const lo_blob blob = lo_blob_new(data.size(), data.data()))
     {
@@ -139,7 +159,7 @@ void deployToRemote(RemoteDetails* const remote)
 #endif
 }
 
-void sendScreenshotToRemote(RemoteDetails* const remote, const char* const screenshot)
+void sendScreenshotToRemote(RemoteDetails*, const char* const screenshot)
 {
 #ifdef HAVE_LIBLO
     const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);

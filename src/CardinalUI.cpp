@@ -62,9 +62,6 @@
 #endif
 
 namespace rack {
-namespace app {
-    widget::Widget* createMenuBar(bool isStandalone);
-}
 namespace engine {
 void Engine_setAboutToClose(Engine*);
 }
@@ -87,7 +84,7 @@ bool Plugin::writeMidiEvent(const MidiEvent&) noexcept { return false; }
 
 // --------------------------------------------------------------------------------------------------------------------
 
-#ifdef DISTRHO_OS_WASM
+#if defined(DISTRHO_OS_WASM) && ! CARDINAL_VARIANT_MINI
 struct WasmWelcomeDialog : rack::widget::OpaqueWidget
 {
     static const constexpr float margin = 10;
@@ -346,7 +343,10 @@ public:
     {
         rack::contextSet(context);
 
-       #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+       #if CARDINAL_VARIANT_MINI
+        DISTRHO_SAFE_ASSERT_RETURN(remoteUtils::connectToRemote(),);
+        DISTRHO_SAFE_ASSERT_RETURN(remoteDetails != nullptr,);
+
         // create unique temporary path for this instance
         try {
             char uidBuf[24];
@@ -369,7 +369,7 @@ public:
         const float sampleRate = getSampleRate();
         rack::settings::sampleRate = sampleRate;
 
-        context->bufferSize = 128;
+        context->bufferSize = 1;
         context->sampleRate = sampleRate;
 
         context->engine = new rack::engine::Engine;
@@ -403,15 +403,6 @@ public:
 
         rack::window::WindowSetPluginUI(context->window, this);
 
-        if (rack::widget::Widget* const menuBar = context->scene->menuBar)
-        {
-            context->scene->removeChild(menuBar);
-            delete menuBar;
-        }
-
-        context->scene->menuBar = rack::app::createMenuBar(getApp().isStandalone());
-        context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
-
         // hide "Browse VCV Library" button
         rack::widget::Widget* const browser = context->scene->browser->children.back();
         rack::widget::Widget* const headerLayout = browser->children.front();
@@ -444,7 +435,7 @@ public:
             }
         }
 
-       #ifdef DISTRHO_OS_WASM
+       #if defined(DISTRHO_OS_WASM) && ! CARDINAL_VARIANT_MINI
         if (rack::patchStorageSlug != nullptr)
         {
             psDialog = new WasmRemotePatchLoadingDialog(true);
@@ -477,26 +468,18 @@ public:
 
         context->nativeWindowId = 0;
 
-        if (rack::widget::Widget* const menuBar = context->scene->menuBar)
-        {
-            context->scene->removeChild(menuBar);
-            delete menuBar;
-        }
-
-        context->scene->menuBar = rack::app::createMenuBar();
-        context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
-
         rack::window::WindowSetPluginUI(context->window, nullptr);
 
-       #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        context->tlw = nullptr;
+        context->ui = nullptr;
+
+       #if CARDINAL_VARIANT_MINI
         {
             const ScopedContext sc(this);
             context->patch->clear();
 
             // do a little dance to prevent context scene deletion from saving to temp dir
-           #ifndef HEADLESS
             const ScopedValueSetter<bool> svs(rack::settings::headless, true);
-           #endif
             Engine_setAboutToClose(context->engine);
             delete context;
         }
@@ -619,6 +602,10 @@ public:
             filebrowseraction = nullptr;
             filebrowserhandle = nullptr;
         }
+
+       #if CARDINAL_VARIANT_MINI
+        context->engine->stepBlock(1);
+       #endif
 
         if (windowParameters.rateLimit != 0 && ++rateLimitStep % (windowParameters.rateLimit * 2))
             return;
@@ -804,7 +791,7 @@ protected:
 
     void stateChanged(const char* const key, const char* const value) override
     {
-       #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+       #if CARDINAL_VARIANT_MINI
         if (std::strcmp(key, "patch") == 0)
         {
             if (fAutosavePath.empty())
@@ -952,9 +939,9 @@ protected:
        #endif
 
         rack::math::Vec scrollDelta = rack::math::Vec(ev.delta.getX(), ev.delta.getY());
-#ifndef DISTRHO_OS_MAC
+       #ifndef DISTRHO_OS_MAC
         scrollDelta = scrollDelta.mult(50.0);
-#endif
+       #endif
 
         const int mods = glfwMods(ev.mod);
         const ScopedContext sc(this, mods);

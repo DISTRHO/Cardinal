@@ -156,7 +156,7 @@ extern Model* modelChord;
 // Bidoo
 #include "Bidoo/src/plugin.hpp"
 
-// BogaudioModules - force dark skin as default
+// BogaudioModules - integrate theme/skin support
 #include <mutex>
 #include <string>
 #include <unordered_map>

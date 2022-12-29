@@ -182,13 +182,10 @@ public:
 
     ~CardinalBaseUI() override
     {
-        disconnectFromRemote(remoteDetails);
+        remoteUtils::disconnectFromRemote(remoteDetails);
 
         if (filebrowserhandle != nullptr)
             fileBrowserClose(filebrowserhandle);
-
-        context->tlw = nullptr;
-        context->ui = nullptr;
     }
 };
 #endif

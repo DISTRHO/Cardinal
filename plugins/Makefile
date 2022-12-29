@@ -311,9 +311,11 @@ endif
 PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
 PLUGIN_FILES += Fundamental/src/dr_wav.c
 
-MINIPLUGIN_FILES += Fundamental/src/ADSR.cpp
 MINIPLUGIN_FILES += Fundamental/src/LFO.cpp
+MINIPLUGIN_FILES += Fundamental/src/Noise.cpp
+MINIPLUGIN_FILES += Fundamental/src/Random.cpp
 MINIPLUGIN_FILES += Fundamental/src/VCF.cpp
+MINIPLUGIN_FILES += Fundamental/src/VCMixer.cpp
 MINIPLUGIN_FILES += Fundamental/src/VCO.cpp
 
 # modules/types which are present in other plugins
@@ -524,6 +526,16 @@ PLUGIN_FILES += AudibleInstruments/eurorack/streams/svf.cc
 PLUGIN_FILES += AudibleInstruments/eurorack/streams/vactrol.cc
 PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
 
+MINIPLUGIN_FILES += AudibleInstruments/src/Plaits.cpp
+MINIPLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/*.cc)
+MINIPLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/engine/*.cc)
+MINIPLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/speech/*.cc)
+MINIPLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/physical_modelling/*.cc)
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/plaits/resources.cc
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/atan.cc
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/units.cc
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
+
 # --------------------------------------------------------------
 # Autinn
 
@@ -574,6 +586,29 @@ BIDOO_CUSTOM_PER_FILE = channel channel filterType
 PLUGIN_FILES += $(filter-out BogaudioModules/src/bogaudio.cpp,$(wildcard BogaudioModules/src/*.cpp))
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/*.cpp)
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/filters/*.cpp)
+
+MINIPLUGIN_FILES += BogaudioModules/src/LFO.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/Noise.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/VCA.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/VCF.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/VCO.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/lfo_base.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/menu.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/module.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/param_quantities.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/poly_channels.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/skins.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/utils.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/vco_base.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/widgets.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/analyzer.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/math.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/noise.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/oscillator.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/signal.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/table.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/multimode.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/resample.cpp
 
 # modules/types which are present in other plugins
 BOGAUDIO_CUSTOM = ADSR BlueNoiseGenerator LFO Noise VCA VCO VCF
@@ -1384,8 +1419,10 @@ endif
 
 RESOURCE_FILES += Cardinal/res/Miku/Miku.png
 
-MINIPLUGIN_LIST     = Cardinal Fundamental
-MINIRESOURCE_FILES  = $(wildcard Cardinal/res/*.svg)
+MINIPLUGIN_LIST     = AudibleInstruments BogaudioModules Cardinal Fundamental
+MINIRESOURCE_FILES  = $(wildcard AudibleInstruments/res/*.svg)
+MINIRESOURCE_FILES += $(wildcard BogaudioModules/res/*.svg)
+MINIRESOURCE_FILES += $(wildcard Cardinal/res/*.svg)
 MINIRESOURCE_FILES += $(wildcard Fundamental/res/*.svg)
 MINIRESOURCE_FILES += $(wildcard Fundamental/res/components/*.svg)
 MINIRESOURCE_FILES += Fundamental/presets

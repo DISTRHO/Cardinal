@@ -26,12 +26,34 @@
 // Fundamental
 #include "Fundamental/src/plugin.hpp"
 
+// AudibleInstruments
+#include "AudibleInstruments/src/plugin.hpp"
+
+// BogaudioModules - integrate theme/skin support
+#include <mutex>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#define private public
+#include "BogaudioModules/src/skins.hpp"
+#undef private
+
+// BogaudioModules
+extern Model* modelBogaudioLFO;
+extern Model* modelBogaudioNoise;
+extern Model* modelBogaudioVCA;
+extern Model* modelBogaudioVCF;
+extern Model* modelBogaudioVCO;
+
 // known terminal modules
 std::vector<Model*> hostTerminalModels;
 
 // plugin instances
 Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__Fundamental;
+Plugin* pluginInstance__AudibleInstruments;
+Plugin* pluginInstance__BogaudioModules;
 
 namespace rack {
 
@@ -187,32 +209,192 @@ static void initStatic__Fundamental()
     const StaticPluginLoader spl(p, "Fundamental");
     if (spl.ok())
     {
-        p->addModel(modelADSR);
         p->addModel(modelLFO);
+        p->addModel(modelNoise);
+        p->addModel(modelRandom);
         p->addModel(modelVCF);
-        p->addModel(modelVCO);
-        spl.removeModule("VCO2");
-        spl.removeModule("VCA-1");
-        spl.removeModule("VCA");
-        spl.removeModule("LFO2");
-        spl.removeModule("Delay");
-        spl.removeModule("Mixer");
-        spl.removeModule("VCMixer");
+        p->addModel(modelVCMixer);
         spl.removeModule("8vert");
+        spl.removeModule("ADSR");
+        spl.removeModule("Delay");
+        spl.removeModule("LFO2");
+        spl.removeModule("Merge");
+        spl.removeModule("MidSide");
+        spl.removeModule("Mixer");
         spl.removeModule("Mutes");
+        spl.removeModule("Octave");
         spl.removeModule("Pulses");
-        spl.removeModule("Scope");
+        spl.removeModule("Quantizer");
         spl.removeModule("SEQ3");
+        spl.removeModule("Scope");
         spl.removeModule("SequentialSwitch1");
         spl.removeModule("SequentialSwitch2");
-        spl.removeModule("Octave");
-        spl.removeModule("Quantizer");
         spl.removeModule("Split");
-        spl.removeModule("Merge");
         spl.removeModule("Sum");
-        spl.removeModule("MidSide");
-        spl.removeModule("Noise");
-        spl.removeModule("Random");
+        spl.removeModule("VCA");
+        spl.removeModule("VCA-1");
+        spl.removeModule("VCO");
+        spl.removeModule("VCO2");
+    }
+}
+
+static void initStatic__AudibleInstruments()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__AudibleInstruments = p;
+
+    const StaticPluginLoader spl(p, "AudibleInstruments");
+    if (spl.ok())
+    {
+        p->addModel(modelPlaits);
+
+        spl.removeModule("Blinds");
+        spl.removeModule("Braids");
+        spl.removeModule("Branches");
+        spl.removeModule("Clouds");
+        spl.removeModule("Elements");
+        spl.removeModule("Frames");
+        spl.removeModule("Kinks");
+        spl.removeModule("Links");
+        spl.removeModule("Marbles");
+        spl.removeModule("Rings");
+        spl.removeModule("Ripples");
+        spl.removeModule("Shades");
+        spl.removeModule("Shelves");
+        spl.removeModule("Stages");
+        spl.removeModule("Streams");
+        spl.removeModule("Tides");
+        spl.removeModule("Tides2");
+        spl.removeModule("Veils");
+        spl.removeModule("Warps");
+    }
+}
+
+static void initStatic__BogaudioModules()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__BogaudioModules = p;
+
+    const StaticPluginLoader spl(p, "BogaudioModules");
+    if (spl.ok())
+    {
+        // Make sure to use match Cardinal theme
+        Skins& skins(Skins::skins());
+        skins._default = settings::darkMode ? "dark" : "light";
+
+        p->addModel(modelBogaudioLFO);
+        p->addModel(modelBogaudioNoise);
+        p->addModel(modelBogaudioVCA);
+        p->addModel(modelBogaudioVCF);
+        p->addModel(modelBogaudioVCO);
+
+        // cat plugins/BogaudioModules/plugin.json  | jq -r .modules[].slug - | sort
+        spl.removeModule("Bogaudio-AD");
+        spl.removeModule("Bogaudio-Additator");
+        spl.removeModule("Bogaudio-AddrSeq");
+        spl.removeModule("Bogaudio-AddrSeqX");
+        spl.removeModule("Bogaudio-ADSR");
+        spl.removeModule("Bogaudio-AMRM");
+        spl.removeModule("Bogaudio-Analyzer");
+        spl.removeModule("Bogaudio-AnalyzerXL");
+        spl.removeModule("Bogaudio-Arp");
+        spl.removeModule("Bogaudio-ASR");
+        spl.removeModule("Bogaudio-Assign");
+        spl.removeModule("Bogaudio-Blank3");
+        spl.removeModule("Bogaudio-Blank6");
+        spl.removeModule("Bogaudio-Bool");
+        spl.removeModule("Bogaudio-Chirp");
+        spl.removeModule("Bogaudio-Clpr");
+        spl.removeModule("Bogaudio-Cmp");
+        spl.removeModule("Bogaudio-CmpDist");
+        spl.removeModule("Bogaudio-CVD");
+        spl.removeModule("Bogaudio-DADSRH");
+        spl.removeModule("Bogaudio-DADSRHPlus");
+        spl.removeModule("Bogaudio-Detune");
+        spl.removeModule("Bogaudio-DGate");
+        spl.removeModule("Bogaudio-Edge");
+        spl.removeModule("Bogaudio-EightFO");
+        spl.removeModule("Bogaudio-EightOne");
+        spl.removeModule("Bogaudio-EQ");
+        spl.removeModule("Bogaudio-EQS");
+        spl.removeModule("Bogaudio-FFB");
+        spl.removeModule("Bogaudio-FlipFlop");
+        spl.removeModule("Bogaudio-FMOp");
+        spl.removeModule("Bogaudio-Follow");
+        spl.removeModule("Bogaudio-FourFO");
+        spl.removeModule("Bogaudio-FourMan");
+        spl.removeModule("Bogaudio-Inv");
+        spl.removeModule("Bogaudio-Lgsw");
+        spl.removeModule("Bogaudio-LLFO");
+        spl.removeModule("Bogaudio-LLPG");
+        spl.removeModule("Bogaudio-Lmtr");
+        spl.removeModule("Bogaudio-LPG");
+        spl.removeModule("Bogaudio-LVCF");
+        spl.removeModule("Bogaudio-LVCO");
+        spl.removeModule("Bogaudio-Manual");
+        spl.removeModule("Bogaudio-Matrix18");
+        spl.removeModule("Bogaudio-Matrix44");
+        spl.removeModule("Bogaudio-Matrix44Cvm");
+        spl.removeModule("Bogaudio-Matrix81");
+        spl.removeModule("Bogaudio-Matrix88");
+        spl.removeModule("Bogaudio-Matrix88Cv");
+        spl.removeModule("Bogaudio-Matrix88M");
+        spl.removeModule("Bogaudio-MegaGate");
+        spl.removeModule("Bogaudio-Mix1");
+        spl.removeModule("Bogaudio-Mix2");
+        spl.removeModule("Bogaudio-Mix4");
+        spl.removeModule("Bogaudio-Mix4x");
+        spl.removeModule("Bogaudio-Mix8");
+        spl.removeModule("Bogaudio-Mix8x");
+        spl.removeModule("Bogaudio-Mono");
+        spl.removeModule("Bogaudio-Mult");
+        spl.removeModule("Bogaudio-Mumix");
+        spl.removeModule("Bogaudio-Mute8");
+        spl.removeModule("Bogaudio-Nsgt");
+        spl.removeModule("Bogaudio-Offset");
+        spl.removeModule("Bogaudio-OneEight");
+        spl.removeModule("Bogaudio-Pan");
+        spl.removeModule("Bogaudio-PEQ");
+        spl.removeModule("Bogaudio-PEQ14");
+        spl.removeModule("Bogaudio-PEQ14XF");
+        spl.removeModule("Bogaudio-PEQ6");
+        spl.removeModule("Bogaudio-PEQ6XF");
+        spl.removeModule("Bogaudio-Pgmr");
+        spl.removeModule("Bogaudio-PgmrX");
+        spl.removeModule("Bogaudio-PolyCon");
+        spl.removeModule("Bogaudio-PolyCon8");
+        spl.removeModule("Bogaudio-PolyMult");
+        spl.removeModule("Bogaudio-PolyOff16");
+        spl.removeModule("Bogaudio-PolyOff8");
+        spl.removeModule("Bogaudio-Pressor");
+        spl.removeModule("Bogaudio-Pulse");
+        spl.removeModule("Bogaudio-Ranalyzer");
+        spl.removeModule("Bogaudio-Reftone");
+        spl.removeModule("Bogaudio-RGate");
+        spl.removeModule("Bogaudio-SampleHold");
+        spl.removeModule("Bogaudio-Shaper");
+        spl.removeModule("Bogaudio-ShaperPlus");
+        spl.removeModule("Bogaudio-Sine");
+        spl.removeModule("Bogaudio-Slew");
+        spl.removeModule("Bogaudio-Stack");
+        spl.removeModule("Bogaudio-Sums");
+        spl.removeModule("Bogaudio-Switch");
+        spl.removeModule("Bogaudio-Switch1616");
+        spl.removeModule("Bogaudio-Switch18");
+        spl.removeModule("Bogaudio-Switch44");
+        spl.removeModule("Bogaudio-Switch81");
+        spl.removeModule("Bogaudio-Switch88");
+        spl.removeModule("Bogaudio-UMix");
+        spl.removeModule("Bogaudio-Unison");
+        spl.removeModule("Bogaudio-VCAmp");
+        spl.removeModule("Bogaudio-VCM");
+        spl.removeModule("Bogaudio-Velo");
+        spl.removeModule("Bogaudio-Vish");
+        spl.removeModule("Bogaudio-VU");
+        spl.removeModule("Bogaudio-Walk");
+        spl.removeModule("Bogaudio-Walk2");
+        spl.removeModule("Bogaudio-XCO");
+        spl.removeModule("Bogaudio-XFade");
     }
 }
 
@@ -220,6 +402,8 @@ void initStaticPlugins()
 {
     initStatic__Cardinal();
     initStatic__Fundamental();
+    initStatic__AudibleInstruments();
+    initStatic__BogaudioModules();
 }
 
 void destroyStaticPlugins()
@@ -231,7 +415,17 @@ void destroyStaticPlugins()
 
 void updateStaticPluginsDarkMode()
 {
-    d_stdout("TODO");
+    const bool darkMode = settings::darkMode;
+    // bogaudio
+    {
+        Skins& skins(Skins::skins());
+        skins._default = darkMode ? "dark" : "light";
+
+        std::lock_guard<std::mutex> lock(skins._defaultSkinListenersLock);
+        for (auto listener : skins._defaultSkinListeners) {
+            listener->defaultSkinChanged(skins._default);
+        }
+    }
 }
 
 }

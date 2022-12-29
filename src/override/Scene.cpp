@@ -50,6 +50,9 @@ namespace rack {
 namespace app {
 
 
+widget::Widget* createMenuBar(bool isStandalone);
+
+
 struct ResizeHandle : widget::OpaqueWidget {
 	math::Vec size;
 
@@ -131,7 +134,7 @@ Scene::Scene() {
 
 	rack = rackScroll->rackWidget;
 
-	menuBar = createMenuBar();
+	menuBar = createMenuBar(isStandalone());
 	addChild(menuBar);
 
 	browser = browserCreate();
@@ -209,7 +212,7 @@ void Scene::step() {
 		if (remoteDetails->autoDeploy) {
 			const int actionIndex = APP->history->actionIndex;
 			const double time = system::getTime();
-			if (internal->historyActionIndex != actionIndex && time - internal->lastSceneChangeTime >= 5.0) {
+			if (internal->historyActionIndex != actionIndex && time - internal->lastSceneChangeTime >= 1.0) {
 				internal->historyActionIndex = actionIndex;
 				internal->lastSceneChangeTime = time;
 				remoteUtils::deployToRemote(remoteDetails);
@@ -315,7 +318,8 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
-			remoteUtils::deployToRemote(remoteUtils::getRemote());
+			if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
+				remoteUtils::deployToRemote(remoteDetails);
 			window::generateScreenshot();
 			e.consume(this);
 		}

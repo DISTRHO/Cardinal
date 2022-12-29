@@ -53,6 +53,7 @@
 
 #include "../CardinalCommon.hpp"
 #include "../CardinalRemote.hpp"
+#include "DistrhoPlugin.hpp"
 #include "DistrhoStandaloneUtils.hpp"
 
 #ifdef HAVE_LIBLO
@@ -98,14 +99,14 @@ struct MenuButton : ui::Button {
 
 struct FileButton : MenuButton {
 	const bool isStandalone;
-#if !(defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD))
+#if ! CARDINAL_VARIANT_MINI
 	std::vector<std::string> demoPatches;
 #endif
 
 	FileButton(const bool standalone)
 		: MenuButton(),  isStandalone(standalone)
 	{
-#if !(defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD))
+#if ! CARDINAL_VARIANT_MINI
 		const std::string patchesDir = asset::patchesPath() + DISTRHO_OS_SEP_STR "examples";
 
 		if (system::isDirectory(patchesDir))
@@ -167,7 +168,7 @@ struct FileButton : MenuButton {
 			patchUtils::revertDialog();
 		}, APP->patch->path.empty()));
 
-#ifdef HAVE_LIBLO
+// #if defined(HAVE_LIBLO) && ! CARDINAL_VARIANT_MINI
 		menu->addChild(new ui::MenuSeparator);
 
 		remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote();
@@ -186,7 +187,7 @@ struct FileButton : MenuButton {
 				remoteUtils::connectToRemote();
 			}));
 		}
-#endif
+// #endif
 
 #ifndef DISTRHO_OS_WASM
 		menu->addChild(new ui::MenuSeparator);
@@ -201,7 +202,7 @@ struct FileButton : MenuButton {
 		}));
 #endif
 
-#if !(defined(DISTRHO_OS_WASM) && defined(STATIC_BUILD))
+#if ! CARDINAL_VARIANT_MINI
 		if (!demoPatches.empty())
 		{
 			menu->addChild(new ui::MenuSeparator);
