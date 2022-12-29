@@ -235,10 +235,11 @@ ifeq ($(MOD_BUILD),true)
 	$(MAKE) -C CardinalMini lv2
 else ifeq ($(WASM),true)
 	$(MAKE) -C CardinalNative
-# 	$(MAKE) -C CardinalMini modgui
 else
 	$(MAKE) -C Cardinal
+ifneq ($(NOPLUGINS),true)
 	$(MAKE) -C CardinalMini
+endif
 	$(MAKE) -C CardinalNative
 	$(MAKE) -C CardinalFX $(CARDINAL_FX_ARGS)
 	$(MAKE) -C CardinalSynth $(CARDINAL_SYNTH_ARGS)

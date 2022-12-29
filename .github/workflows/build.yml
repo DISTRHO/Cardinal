@@ -800,17 +800,17 @@ jobs:
           pushd deps/PawPaw; source local.env wasm; popd
           make features
           make CIBUILD=true HAVE_LIBLO=false NOOPT=true USE_GLES2=true -j $(nproc)
+          make CIBUILD=true HAVE_LIBLO=false NOOPT=true USE_GLES2=true -j $(nproc) -C CardinalMini modgui
       - name: Make wasm versioned and compress
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           VERSION=$(cat Makefile | awk 'sub("VERSION = ","")')
           cd bin
-          rm -r *.lv2
           sed -i "s/CardinalNative\./CardinalNative-v${VERSION}\./g" *.html *.js
           mv CardinalNative.data CardinalNative-v${VERSION}.data
           mv CardinalNative.js   CardinalNative-v${VERSION}.js
           mv CardinalNative.wasm CardinalNative-v${VERSION}.wasm
-          brotli -k -q 11 *.*
+          brotli -k -q 11 *.data *.html *.js *.wasm
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
@@ -820,7 +820,7 @@ jobs:
       - name: Pack binaries
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm)
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm) CardinalMini.lv2/modgui
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || env.SHA8 }}
@@ -887,7 +887,7 @@ jobs:
           mv CardinalNative.data CardinalNative-v${VERSION}.data
           mv CardinalNative.js   CardinalNative-v${VERSION}.js
           mv CardinalNative.wasm CardinalNative-v${VERSION}.wasm
-          brotli -k -q 11 *.*
+          brotli -k -q 11 brotli -k -q 11 *.data *.html *.js *.wasm
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
