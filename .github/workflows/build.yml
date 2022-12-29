@@ -887,7 +887,7 @@ jobs:
           mv CardinalNative.data CardinalNative-v${VERSION}.data
           mv CardinalNative.js   CardinalNative-v${VERSION}.js
           mv CardinalNative.wasm CardinalNative-v${VERSION}.wasm
-          brotli -k -q 11 brotli -k -q 11 *.data *.html *.js *.wasm
+          brotli -k -q 11 *.data *.html *.js *.wasm
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
