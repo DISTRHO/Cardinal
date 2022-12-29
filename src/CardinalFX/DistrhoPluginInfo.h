@@ -31,13 +31,8 @@
 #define DISTRHO_PLUGIN_URI     "https://distrho.kx.studio/plugins/cardinal#fx"
 #define DISTRHO_PLUGIN_CLAP_ID "studio.kx.distrho.cardinal#fx"
 
-#if defined(__MOD_DEVICES__)
-# define DISTRHO_PLUGIN_NAME  "Cardinal Mini"
-# define DISTRHO_PLUGIN_LABEL "CardinalMini"
-#else
-# define DISTRHO_PLUGIN_NAME  "Cardinal FX"
-# define DISTRHO_PLUGIN_LABEL "CardinalFX"
-#endif
+#define DISTRHO_PLUGIN_NAME  "Cardinal FX"
+#define DISTRHO_PLUGIN_LABEL "CardinalFX"
 
 #ifdef HEADLESS
 #define DISTRHO_PLUGIN_HAS_UI             0

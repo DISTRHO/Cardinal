@@ -5,6 +5,5 @@
 #
 
 NAME = CardinalMini
-PLUGIN_CLASS = distrho_cardinal_mini
-PLUGIN_URI = https://distrho.kx.studio/plugins/cardinal\#mini
+MODGUI_CLASS_NAME = distrho_cardinal_mini
 include ../Makefile.cardinal.mk

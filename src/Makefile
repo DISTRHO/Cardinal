@@ -232,6 +232,7 @@ all: $(TARGETS)
 ifeq ($(MOD_BUILD),true)
 	$(MAKE) -C Cardinal lv2
 	$(MAKE) -C CardinalFX lv2
+	$(MAKE) -C CardinalMini lv2
 else ifeq ($(WASM),true)
 	$(MAKE) -C CardinalNative
 # 	$(MAKE) -C CardinalMini modgui
