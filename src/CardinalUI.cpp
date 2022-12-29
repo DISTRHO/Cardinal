@@ -64,6 +64,7 @@
 namespace rack {
 namespace engine {
 void Engine_setAboutToClose(Engine*);
+void Engine_setRemoteDetails(Engine*, remoteUtils::RemoteDetails*);
 }
 namespace window {
     void WindowSetPluginUI(Window* window, DISTRHO_NAMESPACE::UI* ui);
@@ -344,8 +345,7 @@ public:
         rack::contextSet(context);
 
        #if CARDINAL_VARIANT_MINI
-        DISTRHO_SAFE_ASSERT_RETURN(remoteUtils::connectToRemote(),);
-        DISTRHO_SAFE_ASSERT_RETURN(remoteDetails != nullptr,);
+        remoteUtils::connectToRemote();
 
         // create unique temporary path for this instance
         try {
@@ -387,6 +387,8 @@ public:
         context->window = new rack::window::Window;
 
         context->scene->rackScroll->reset();
+
+        Engine_setRemoteDetails(context->engine, remoteDetails);
        #endif
 
         Window& window(getWindow());

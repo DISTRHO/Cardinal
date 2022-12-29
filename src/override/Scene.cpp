@@ -212,11 +212,15 @@ void Scene::step() {
 		if (remoteDetails->autoDeploy) {
 			const int actionIndex = APP->history->actionIndex;
 			const double time = system::getTime();
-			if (internal->historyActionIndex != actionIndex && time - internal->lastSceneChangeTime >= 1.0) {
+			if (internal->historyActionIndex != actionIndex && actionIndex > 0 && time - internal->lastSceneChangeTime >= 1.0) {
+				const std::string& name(APP->history->actions[actionIndex - 1]->name);
+				if (/*std::abs(internal->historyActionIndex = actionIndex) > 1 ||*/ name != "move knob") {
+					printf("action '%s'\n", APP->history->actions[actionIndex - 1]->name.c_str());
+					remoteUtils::sendFullPatchToRemote(remoteDetails);
+					window::generateScreenshot();
+				}
 				internal->historyActionIndex = actionIndex;
 				internal->lastSceneChangeTime = time;
-				remoteUtils::deployToRemote(remoteDetails);
-				window::generateScreenshot();
 			}
 		}
 	}
@@ -319,7 +323,7 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 		}
 		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
 			if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
-				remoteUtils::deployToRemote(remoteDetails);
+				remoteUtils::sendFullPatchToRemote(remoteDetails);
 			window::generateScreenshot();
 			e.consume(this);
 		}

@@ -1550,7 +1550,7 @@ static void initStatic__BogaudioModules()
     {
         // Make sure to use dark theme as default
         Skins& skins(Skins::skins());
-        skins._default = "dark";
+        skins._default = settings::darkMode ? "dark" : "light";
 #define modelADSR modelBogaudioADSR
 #define modelLFO modelBogaudioLFO
 #define modelNoise modelBogaudioNoise

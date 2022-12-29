@@ -40,6 +40,7 @@
 #include <system.hpp>
 #include <app/Browser.hpp>
 #include <app/Scene.hpp>
+#include <engine/Engine.hpp>
 #include <window/Window.hpp>
 
 #ifndef DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
@@ -236,7 +237,7 @@ static int osc_fallback_handler(const char* const path, const char* const types,
 
 static int osc_hello_handler(const char*, const char*, lo_arg**, int, const lo_message m, void* const self)
 {
-    d_stdout("osc_hello_handler()");
+    d_debug("osc_hello_handler()");
     const lo_address source = lo_message_get_source(m);
     const lo_server server = lo_server_thread_get_server(static_cast<Initializer*>(self)->oscServerThread);
     lo_send_from(source, server, LO_TT_IMMEDIATE, "/resp", "ss", "hello", "ok");
@@ -245,7 +246,7 @@ static int osc_hello_handler(const char*, const char*, lo_arg**, int, const lo_m
 
 static int osc_load_handler(const char*, const char* types, lo_arg** argv, int argc, const lo_message m, void* const self)
 {
-    d_stdout("osc_load_handler()");
+    d_debug("osc_load_handler()");
     DISTRHO_SAFE_ASSERT_RETURN(argc == 1, 0);
     DISTRHO_SAFE_ASSERT_RETURN(types != nullptr && types[0] == 'b', 0);
 
@@ -283,9 +284,35 @@ static int osc_load_handler(const char*, const char* types, lo_arg** argv, int a
     return 0;
 }
 
+static int osc_param_handler(const char*, const char* types, lo_arg** argv, int argc, const lo_message m, void* const self)
+{
+    d_debug("osc_param_handler()");
+    DISTRHO_SAFE_ASSERT_RETURN(argc == 3, 0);
+    DISTRHO_SAFE_ASSERT_RETURN(types != nullptr, 0);
+    DISTRHO_SAFE_ASSERT_RETURN(types[0] == 'h', 0);
+    DISTRHO_SAFE_ASSERT_RETURN(types[1] == 'i', 0);
+    DISTRHO_SAFE_ASSERT_RETURN(types[2] == 'f', 0);
+
+    if (CardinalBasePlugin* const plugin = static_cast<Initializer*>(self)->remotePluginInstance)
+    {
+        CardinalPluginContext* const context = plugin->context;
+
+        const int64_t moduleId = argv[0]->h;
+        const int paramId = argv[1]->i;
+        const float paramValue = argv[2]->f;
+
+        rack::engine::Module* const module = context->engine->getModule(moduleId);
+        DISTRHO_SAFE_ASSERT_RETURN(module != nullptr, 0);
+
+        context->engine->setParamValue(module, paramId, paramValue);
+    }
+
+    return 0;
+}
+
 static int osc_screenshot_handler(const char*, const char* types, lo_arg** argv, int argc, const lo_message m, void* const self)
 {
-    d_stdout("osc_screenshot_handler()");
+    d_debug("osc_screenshot_handler()");
     DISTRHO_SAFE_ASSERT_RETURN(argc == 1, 0);
     DISTRHO_SAFE_ASSERT_RETURN(types != nullptr && types[0] == 'b', 0);
 
@@ -298,7 +325,13 @@ static int osc_screenshot_handler(const char*, const char* types, lo_arg** argv,
     bool ok = false;
 
     if (CardinalBasePlugin* const plugin = static_cast<Initializer*>(self)->remotePluginInstance)
-        ok = plugin->updateStateValue("screenshot", String::asBase64(blob, size).buffer());
+    {
+        if (char* const screenshot = String::asBase64(blob, size).getAndReleaseBuffer())
+        {
+            ok = plugin->updateStateValue("screenshot", screenshot);
+            std::free(screenshot);
+        }
+    }
 
     const lo_address source = lo_message_get_source(m);
     const lo_server server = lo_server_thread_get_server(static_cast<Initializer*>(self)->oscServerThread);
@@ -441,13 +474,20 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
 
 #ifdef CARDINAL_INIT_OSC_THREAD
     INFO("Initializing OSC Remote control");
-    oscServerThread = lo_server_thread_new_with_proto(REMOTE_HOST_PORT, LO_UDP, osc_error_handler);
+    const char* port;
+    if (const char* const portEnv = std::getenv("CARDINAL_REMOTE_HOST_PORT"))
+        port = portEnv;
+    else
+        port = CARDINAL_DEFAULT_REMOTE_HOST_PORT;
+    oscServerThread = lo_server_thread_new_with_proto(port, LO_UDP, osc_error_handler);
     DISTRHO_SAFE_ASSERT_RETURN(oscServerThread != nullptr,);
 
     lo_server_thread_add_method(oscServerThread, "/hello", "", osc_hello_handler, this);
     lo_server_thread_add_method(oscServerThread, "/load", "b", osc_load_handler, this);
+    lo_server_thread_add_method(oscServerThread, "/param", "hif", osc_param_handler, this);
     lo_server_thread_add_method(oscServerThread, "/screenshot", "b", osc_screenshot_handler, this);
     lo_server_thread_add_method(oscServerThread, nullptr, nullptr, osc_fallback_handler, nullptr);
+    lo_server_thread_start(oscServerThread);
 #else
     INFO("OSC Remote control is not enabled in this build");
 #endif
@@ -460,6 +500,7 @@ Initializer::~Initializer()
 #ifdef CARDINAL_INIT_OSC_THREAD
     if (oscServerThread != nullptr)
     {
+        lo_server_thread_stop(oscServerThread);
         lo_server_thread_del_method(oscServerThread, nullptr, nullptr);
         lo_server_thread_free(oscServerThread);
         oscServerThread = nullptr;

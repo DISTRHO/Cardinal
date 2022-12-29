@@ -35,6 +35,11 @@
 # include <lo/lo.h>
 #endif
 
+#ifdef HAVE_LIBLO
+// # define REMOTE_HOST "localhost"
+# define REMOTE_HOST "192.168.51.1"
+#endif
+
 // -----------------------------------------------------------------------------------------------------------
 
 namespace remoteUtils {
@@ -98,7 +103,10 @@ bool connectToRemote()
         lo_server_add_method(oscServer, "/resp", nullptr, osc_handler, remoteDetails);
     }
 
-    if (const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT))
+    const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, CARDINAL_DEFAULT_REMOTE_HOST_PORT);
+    DISTRHO_SAFE_ASSERT(addr != nullptr);
+
+    if (addr != nullptr)
     {
         lo_send(addr, "/hello", "");
         lo_address_free(addr);
@@ -127,7 +135,23 @@ void idleRemote(RemoteDetails* const remote)
 #endif
 }
 
-void deployToRemote(RemoteDetails* const remote)
+void sendParamChangeToRemote(RemoteDetails* const remote, int64_t moduleId, int paramId, float value)
+{
+#if CARDINAL_VARIANT_MINI
+    char paramBuf[512] = {};
+    std::snprintf(paramBuf, sizeof(paramBuf), "%lu:%d:%f", moduleId, paramId, value);
+    static_cast<CardinalBaseUI*>(remote->handle)->setState("param", paramBuf);
+#elif defined(HAVE_LIBLO)
+    const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, CARDINAL_DEFAULT_REMOTE_HOST_PORT);
+    DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
+
+    lo_send(addr, "/param", "hif", moduleId, paramId, value);
+
+    lo_address_free(addr);
+#endif
+}
+
+void sendFullPatchToRemote(RemoteDetails* const remote)
 {
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr,);
@@ -146,7 +170,7 @@ void deployToRemote(RemoteDetails* const remote)
         std::free(patch);
     }
 #elif defined(HAVE_LIBLO)
-    const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
+    const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, CARDINAL_DEFAULT_REMOTE_HOST_PORT);
     DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
 
     if (const lo_blob blob = lo_blob_new(data.size(), data.data()))
@@ -162,7 +186,7 @@ void deployToRemote(RemoteDetails* const remote)
 void sendScreenshotToRemote(RemoteDetails*, const char* const screenshot)
 {
 #ifdef HAVE_LIBLO
-    const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
+    const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, CARDINAL_DEFAULT_REMOTE_HOST_PORT);
     DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
 
     std::vector<uint8_t> data(d_getChunkFromBase64String(screenshot));

@@ -49,6 +49,7 @@
 # undef DEBUG
 #endif
 
+#include "../CardinalRemote.hpp"
 #include "DistrhoUtils.hpp"
 
 
@@ -96,6 +97,9 @@ struct Engine::Internal {
 	Module* smoothModule = NULL;
 	int smoothParamId = 0;
 	float smoothValue = 0.f;
+
+	// Remote control
+	remoteUtils::RemoteDetails* remoteDetails = nullptr;
 
 	/** Mutex that guards the Engine state, such as settings, Modules, and Cables.
 	Writers lock when mutating the engine's state or stepping the block.
@@ -210,12 +214,13 @@ static void Engine_stepFrame(Engine* that) {
 		Param* smoothParam = &smoothModule->params[smoothParamId];
 		float value = smoothParam->value;
 		float newValue;
-		if (internal->blockFrames != 1) {
+		if (internal->remoteDetails != nullptr) {
+			newValue = value;
+			sendParamChangeToRemote(internal->remoteDetails, smoothModule->id, smoothParamId, value);
+		} else {
 			// Use decay rate of roughly 1 graphics frame
 			const float smoothLambda = 60.f;
 			newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
-		} else {
-			newValue = value;
 		}
 		if (d_isEqual(value, newValue)) {
 			// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats)
@@ -1013,6 +1018,9 @@ void Engine::setParamValue(Module* module, int paramId, float value) {
 		internal->smoothModule = NULL;
 		internal->smoothParamId = 0;
 	}
+	if (internal->remoteDetails != nullptr) {
+		sendParamChangeToRemote(internal->remoteDetails, module->id, paramId, value);
+	}
 	module->params[paramId].value = value;
 }
 
@@ -1260,6 +1268,11 @@ void Engine::startFallbackThread() {
 
 void Engine_setAboutToClose(Engine* const engine) {
 	engine->internal->aboutToClose = true;
+}
+
+
+void Engine_setRemoteDetails(Engine* const engine, remoteUtils::RemoteDetails* const remoteDetails) {
+	engine->internal->remoteDetails = remoteDetails;
 }
 
 

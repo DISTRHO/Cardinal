@@ -794,6 +794,22 @@ protected:
 
     void setState(const char* const key, const char* const value) override
     {
+       #if CARDINAL_VARIANT_MINI
+        if (std::strcmp(key, "param") == 0)
+        {
+            int64_t moduleId = 0;
+            int paramId = 0;
+            float paramValue = 0.f;
+            std::sscanf(value, "%lu:%d:%f", &moduleId, &paramId, &paramValue);
+
+            rack::engine::Module* const module = context->engine->getModule(moduleId);
+            DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);
+
+            context->engine->setParamValue(module, paramId, paramValue);
+            return;
+        }
+       #endif
+
        #ifndef HEADLESS
         if (std::strcmp(key, "moduleInfos") == 0)
         {

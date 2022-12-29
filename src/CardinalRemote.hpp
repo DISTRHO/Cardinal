@@ -17,11 +17,7 @@
 
 #pragma once
 
-#ifdef HAVE_LIBLO
-// # define REMOTE_HOST "localhost"
-# define REMOTE_HOST "192.168.51.1"
-# define REMOTE_HOST_PORT "2228"
-#endif
+#define CARDINAL_DEFAULT_REMOTE_HOST_PORT "2228"
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -37,7 +33,8 @@ RemoteDetails* getRemote();
 bool connectToRemote();
 void disconnectFromRemote(RemoteDetails* remote);
 void idleRemote(RemoteDetails* remote);
-void deployToRemote(RemoteDetails* remote);
+void sendParamChangeToRemote(RemoteDetails* remote, int64_t moduleId, int paramId, float value);
+void sendFullPatchToRemote(RemoteDetails* remote);
 void sendScreenshotToRemote(RemoteDetails* remote, const char* screenshot);
 
 }

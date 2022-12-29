@@ -66,7 +66,9 @@ namespace rack {
 namespace asset {
 std::string patchesPath();
 }
-
+namespace engine {
+void Engine_setRemoteDetails(Engine*, remoteUtils::RemoteDetails*);
+}
 namespace plugin {
 void updateStaticPluginsDarkMode();
 }
@@ -168,26 +170,29 @@ struct FileButton : MenuButton {
 			patchUtils::revertDialog();
 		}, APP->patch->path.empty()));
 
-// #if defined(HAVE_LIBLO) && ! CARDINAL_VARIANT_MINI
+#if defined(HAVE_LIBLO) && ! CARDINAL_VARIANT_MINI
 		menu->addChild(new ui::MenuSeparator);
 
 		remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote();
 
 		if (remoteDetails != nullptr && remoteDetails->connected) {
 			menu->addChild(createMenuItem("Deploy to MOD", "F7", [remoteDetails]() {
-				remoteUtils::deployToRemote(remoteDetails);
+				remoteUtils::sendFullPatchToRemote(remoteDetails);
 			}));
 
 			menu->addChild(createCheckMenuItem("Auto deploy to MOD", "",
 				[remoteDetails]() {return remoteDetails->autoDeploy;},
-				[remoteDetails]() {remoteDetails->autoDeploy = !remoteDetails->autoDeploy;}
+				[remoteDetails]() {
+					remoteDetails->autoDeploy = !remoteDetails->autoDeploy;
+					Engine_setRemoteDetails(APP->engine, remoteDetails->autoDeploy ? remoteDetails : nullptr);
+				}
 			));
 		} else {
 			menu->addChild(createMenuItem("Connect to MOD", "", []() {
-				remoteUtils::connectToRemote();
+				DISTRHO_SAFE_ASSERT(remoteUtils::connectToRemote());
 			}));
 		}
-// #endif
+#endif
 
 #ifndef DISTRHO_OS_WASM
 		menu->addChild(new ui::MenuSeparator);

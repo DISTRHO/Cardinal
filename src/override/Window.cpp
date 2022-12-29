@@ -585,9 +585,10 @@ static void Window__downscaleBitmap(uint8_t* pixels, int& width, int& height) {
 static void Window__writeImagePNG(void* context, void* data, int size) {
 	USE_NAMESPACE_DISTRHO
 	CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(context);
-	if (const char* const screenshot = String::asBase64(data, size).buffer()) {
+	if (char* const screenshot = String::asBase64(data, size).getAndReleaseBuffer()) {
 		ui->setState("screenshot", screenshot);
 		remoteUtils::sendScreenshotToRemote(ui->remoteDetails, screenshot);
+		std::free(screenshot);
 	}
 }
 #endif
