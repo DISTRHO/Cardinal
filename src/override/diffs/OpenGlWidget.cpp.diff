@@ -1,5 +1,5 @@
---- ../Rack/src/widget/OpenGlWidget.cpp	2022-09-21 20:25:53.593040323 +0100
-+++ OpenGlWidget.cpp	2022-09-21 20:18:50.294557597 +0100
+--- ../Rack/src/widget/OpenGlWidget.cpp	2022-09-21 19:49:12.201540766 +0100
++++ OpenGlWidget.cpp	2022-09-21 19:41:45.883648777 +0100
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin

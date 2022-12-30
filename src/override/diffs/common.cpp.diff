@@ -1,6 +1,6 @@
---- ../Rack/src/common.cpp	2022-09-21 20:25:53.591040280 +0100
-+++ common.cpp	2022-09-21 20:18:50.294557597 +0100
-@@ -1,33 +1,77 @@
+--- ../Rack/src/common.cpp	2022-09-21 19:49:12.199540706 +0100
++++ common.cpp	2022-12-02 19:11:45.780215974 +0000
+@@ -1,12 +1,57 @@
 +/*
 + * DISTRHO Cardinal Plugin
 + * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
@@ -42,11 +42,14 @@
  #include <windows.h>
  
  FILE* fopen_u8(const char* filename, const char* mode) {
+-	return _wfopen(rack::string::UTF8toUTF16(filename).c_str(), rack::string::UTF8toUTF16(mode).c_str());
++	if (FILE* const f = _wfopen(rack::string::UTF8toUTF16(filename).c_str(), rack::string::UTF8toUTF16(mode).c_str()))
++		return f;
 +	if (std::strncmp(filename, "\\\\?\\", 4) == 0 && std::getenv("CARDINAL_UNDER_WINE") != nullptr)
-+		filename = "Z:\\dev\\null";
- 	return _wfopen(rack::string::UTF8toUTF16(filename).c_str(), rack::string::UTF8toUTF16(mode).c_str());
- }
- 
++		return _wfopen(L"Z:\\dev\\null", rack::string::UTF8toUTF16(mode).c_str());
++	return nullptr;
++}
++
 +#elif defined(DISTRHO_OS_WASM)
 +#include <sys/stat.h>
 +#undef fopen
@@ -54,10 +57,10 @@
 +FILE* fopen_wasm(const char* filename, const char* mode) {
 +	chmod(filename, 0777);
 +	return std::fopen(filename, mode);
-+}
-+
- #endif
+ }
  
+ #endif
+@@ -14,20 +59,21 @@
  
  namespace rack {
  
