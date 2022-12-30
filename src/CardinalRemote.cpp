@@ -32,11 +32,12 @@
 # undef HAVE_LIBLO
 #endif
 
-#ifdef HAVE_LIBLO
-# include <lo/lo.h>
+#if (CARDINAL_VARIANT_MINI && !defined(HEADLESS)) || defined(HAVE_LIBLO)
+# define CARDINAL_REMOTE_ENABLED
 #endif
 
 #ifdef HAVE_LIBLO
+# include <lo/lo.h>
 // # define REMOTE_HOST "localhost"
 # define REMOTE_HOST "192.168.51.1"
 #endif
@@ -63,6 +64,7 @@ static int osc_handler(const char* const path, const char* const types, lo_arg**
 
 RemoteDetails* getRemote()
 {
+#ifdef CARDINAL_REMOTE_ENABLED
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr, nullptr);
 
@@ -70,10 +72,14 @@ RemoteDetails* getRemote()
     DISTRHO_SAFE_ASSERT_RETURN(ui != nullptr, nullptr);
 
     return ui->remoteDetails;
+#else
+    return nullptr;
+#endif
 }
 
 bool connectToRemote()
 {
+#ifdef CARDINAL_REMOTE_ENABLED
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr, false);
 
@@ -82,7 +88,7 @@ bool connectToRemote()
 
     RemoteDetails* remoteDetails = ui->remoteDetails;
 
-#if CARDINAL_VARIANT_MINI
+   #if CARDINAL_VARIANT_MINI
     if (remoteDetails == nullptr)
     {
         ui->remoteDetails = remoteDetails = new RemoteDetails;
@@ -90,7 +96,7 @@ bool connectToRemote()
         remoteDetails->connected = true;
         remoteDetails->autoDeploy = true;
     }
-#elif defined(HAVE_LIBLO)
+   #elif defined(HAVE_LIBLO)
     if (remoteDetails == nullptr)
     {
         const lo_server oscServer = lo_server_new_with_proto(nullptr, LO_UDP, nullptr);
@@ -112,9 +118,12 @@ bool connectToRemote()
         lo_send(addr, "/hello", "");
         lo_address_free(addr);
     }
-#endif
+   #endif
 
     return remoteDetails != nullptr;
+#else
+    return false;
+#endif
 }
 
 void disconnectFromRemote(RemoteDetails* const remote)
@@ -138,6 +147,7 @@ void idleRemote(RemoteDetails* const remote)
 
 void sendParamChangeToRemote(RemoteDetails* const remote, int64_t moduleId, int paramId, float value)
 {
+#ifdef CARDINAL_REMOTE_ENABLED
 #if CARDINAL_VARIANT_MINI
     char paramBuf[512] = {};
     {
@@ -153,10 +163,12 @@ void sendParamChangeToRemote(RemoteDetails* const remote, int64_t moduleId, int 
 
     lo_address_free(addr);
 #endif
+#endif
 }
 
 void sendFullPatchToRemote(RemoteDetails* const remote)
 {
+#ifdef CARDINAL_REMOTE_ENABLED
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr,);
 
@@ -204,11 +216,12 @@ void sendFullPatchToRemote(RemoteDetails* const remote)
 
     lo_address_free(addr);
    #endif
+#endif
 }
 
 void sendScreenshotToRemote(RemoteDetails*, const char* const screenshot)
 {
-#ifdef HAVE_LIBLO
+#if defined(HAVE_LIBLO) && ! CARDINAL_VARIANT_MINI
     const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, CARDINAL_DEFAULT_REMOTE_HOST_PORT);
     DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
 

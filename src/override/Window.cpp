@@ -42,6 +42,21 @@
 # undef DEBUG
 #endif
 
+#include "DistrhoUI.hpp"
+#include "Application.hpp"
+#include "extra/String.hpp"
+#include "../CardinalCommon.hpp"
+#include "../PluginContext.hpp"
+#include "../WindowParameters.hpp"
+
+#ifndef DGL_NO_SHARED_RESOURCES
+# include "src/Resources.hpp"
+#endif
+
+#if !(defined(DGL_USE_GLES) || CARDINAL_VARIANT_MINI)
+
+#define CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
+
 // comment out if wanting to generate a local screenshot.png
 #define STBI_WRITE_NO_STDIO
 
@@ -52,15 +67,6 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#include "DistrhoUI.hpp"
-#include "Application.hpp"
-#include "extra/String.hpp"
-#include "../CardinalCommon.hpp"
-#include "../PluginContext.hpp"
-#include "../WindowParameters.hpp"
-
-#ifndef DGL_NO_SHARED_RESOURCES
-# include "src/Resources.hpp"
 #endif
 
 #ifdef DISTRHO_OS_WASM
@@ -133,6 +139,7 @@ std::shared_ptr<Image> Image::load(const std::string& filename) {
 }
 
 
+#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 enum ScreenshotStep {
 	kScreenshotStepNone,
 	kScreenshotStepStarted,
@@ -140,6 +147,7 @@ enum ScreenshotStep {
 	kScreenshotStepSecondPass,
 	kScreenshotStepSaving
 };
+#endif
 
 
 struct Window::Internal {
@@ -165,7 +173,7 @@ struct Window::Internal {
 
 	int frame = 0;
 	int frameSwapInterval = 1;
-#ifndef DGL_USE_GLES
+#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 	int generateScreenshotStep = kScreenshotStepNone;
 #endif
 	double monitorRefreshRate = 60.0;
@@ -538,7 +546,7 @@ void Window::run() {
 }
 
 
-#ifndef DGL_USE_GLES
+#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 static void Window__flipBitmap(uint8_t* pixels, const int width, const int height, const int depth) {
 	for (int y = 0; y < height / 2; y++) {
 		const int flipY = height - y - 1;
@@ -634,7 +642,7 @@ void Window::step() {
 		APP->event->handleDirty();
 	}
 
-#ifndef DGL_USE_GLES
+#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 	// Hide menu and background if generating screenshot
 	if (internal->generateScreenshotStep == kScreenshotStepStarted) {
 #ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
@@ -684,7 +692,7 @@ void Window::step() {
 
 	++internal->frame;
 
-#ifndef DGL_USE_GLES
+#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 	if (internal->generateScreenshotStep != kScreenshotStepNone) {
 		++internal->generateScreenshotStep;
 
@@ -799,7 +807,7 @@ bool Window::isFullScreen() {
 	if (emscripten_get_fullscreen_status(&status) == EMSCRIPTEN_RESULT_SUCCESS)
 		return status.isFullscreen;
 	return false;
-#elif defined(CARDINAL_TRANSPARENT_SCREENSHOTS) && !defined(DGL_USE_GLES)
+#elif defined(CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS) && defined(CARDINAL_TRANSPARENT_SCREENSHOTS)
 	return internal->generateScreenshotStep != kScreenshotStepNone;
 #else
 	return false;
@@ -880,7 +888,7 @@ int& Window::fbCount() {
 
 
 void generateScreenshot() {
-#ifndef DGL_USE_GLES
+#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 	APP->window->internal->generateScreenshotStep = kScreenshotStepStarted;
 #endif
 }

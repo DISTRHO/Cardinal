@@ -66,7 +66,7 @@ static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount;
 extern const std::string CARDINAL_VERSION;
 
 namespace rack {
-#if DISTRHO_PLUGIN_HAS_UI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+#if CARDINAL_VARIANT_MINI || defined(HEADLESS)
 namespace app {
 rack::widget::Widget* createMenuBar() { return new rack::widget::Widget; }
 }
