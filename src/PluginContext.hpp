@@ -30,6 +30,13 @@
 
 #ifndef HEADLESS
 # include "DistrhoUI.hpp"
+#else
+# include "Base.hpp"
+START_NAMESPACE_DGL
+class TopLevelWidget;
+template <class BaseWidget> class NanoBaseWidget;
+typedef NanoBaseWidget<TopLevelWidget> NanoTopLevelWidget;
+END_NAMESPACE_DGL
 #endif
 
 START_NAMESPACE_DISTRHO
@@ -64,10 +71,8 @@ struct CardinalPluginContext : rack::Context {
     const MidiEvent* midiEvents;
     uint32_t midiEventCount;
     Plugin* const plugin;
-#ifndef HEADLESS
     NanoTopLevelWidget* tlw;
     UI* ui;
-#endif
 
     CardinalPluginContext(Plugin* const p)
         : bufferSize(p != nullptr ? p->getBufferSize() : 0),
@@ -107,21 +112,19 @@ struct CardinalPluginContext : rack::Context {
           dataOuts(nullptr),
           midiEvents(nullptr),
           midiEventCount(0),
-          plugin(p)
-#ifndef HEADLESS
-        , tlw(nullptr)
-        , ui(nullptr)
-#endif
+          plugin(p),
+          tlw(nullptr),
+          ui(nullptr)
     {
         std::memset(parameters, 0, sizeof(parameters));
     }
 
     void writeMidiMessage(const rack::midi::Message& message, uint8_t channel);
 
-#ifndef HEADLESS
+   #ifndef HEADLESS
     bool addIdleCallback(IdleCallback* cb) const;
     void removeIdleCallback(IdleCallback* cb) const;
-#endif
+   #endif
 };
 
 // -----------------------------------------------------------------------------------------------------------
@@ -137,9 +140,9 @@ public:
           context(new CardinalPluginContext(this)) {}
     ~CardinalBasePlugin() override {}
 
-#ifndef HEADLESS
+   #ifndef HEADLESS
     friend class CardinalUI;
-#endif
+   #endif
 };
 
 #ifndef HEADLESS

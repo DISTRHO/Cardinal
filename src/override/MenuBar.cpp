@@ -844,11 +844,7 @@ struct MenuBar : widget::OpaqueWidget {
 
 
 widget::Widget* createMenuBar() {
-	return new widget::Widget;
-}
-
-widget::Widget* createMenuBar(const bool isStandalone) {
-	menuBar::MenuBar* menuBar = new menuBar::MenuBar(isStandalone);
+	menuBar::MenuBar* menuBar = new menuBar::MenuBar(isStandalone());
 	return menuBar;
 }
 

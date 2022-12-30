@@ -41,15 +41,6 @@ CardinalRemoteUI::CardinalRemoteUI(Window& window, const std::string& templatePa
 
     rack::window::WindowSetPluginRemote(context->window, this);
 
-    if (rack::widget::Widget* const menuBar = context->scene->menuBar)
-    {
-        context->scene->removeChild(menuBar);
-        delete menuBar;
-    }
-
-    context->scene->menuBar = rack::app::createMenuBar(true);
-    context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
-
     // hide "Browse VCV Library" button
     rack::widget::Widget* const browser = context->scene->browser->children.back();
     rack::widget::Widget* const headerLayout = browser->children.front();
@@ -92,15 +83,6 @@ CardinalRemoteUI::~CardinalRemoteUI()
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(rack::contextGet());
 
     context->nativeWindowId = 0;
-
-    if (rack::widget::Widget* const menuBar = context->scene->menuBar)
-    {
-        context->scene->removeChild(menuBar);
-        delete menuBar;
-    }
-
-    context->scene->menuBar = rack::app::createMenuBar(true);
-    context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
 
     rack::window::WindowSetPluginRemote(context->window, nullptr);
 }

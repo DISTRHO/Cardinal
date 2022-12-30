@@ -26,13 +26,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace rack {
-namespace app {
-    widget::Widget* createMenuBar(bool isStandalone);
-}
 namespace window {
-    void WindowSetPluginRemote(Window* window, NanoTopLevelWidget* tlw);
-    void WindowSetMods(Window* window, int mods);
-    void WindowSetInternalSize(rack::window::Window* window, math::Vec size);
+void WindowSetPluginRemote(Window* window, NanoTopLevelWidget* tlw);
+void WindowSetMods(Window* window, int mods);
+void WindowSetInternalSize(rack::window::Window* window, math::Vec size);
 }
 }
 

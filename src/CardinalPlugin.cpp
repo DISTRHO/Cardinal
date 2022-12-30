@@ -26,6 +26,7 @@
 #include <app/Scene.hpp>
 #include <engine/Engine.hpp>
 #include <ui/common.hpp>
+#include <widget/Widget.hpp>
 #include <window/Window.hpp>
 
 #ifdef NDEBUG
@@ -64,6 +65,11 @@ static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount;
 extern const std::string CARDINAL_VERSION;
 
 namespace rack {
+#if DISTRHO_PLUGIN_HAS_UI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+namespace app {
+rack::widget::Widget* createMenuBar() { return new rack::widget::Widget; }
+}
+#endif
 namespace engine {
 void Engine_setAboutToClose(Engine*);
 }
@@ -80,6 +86,7 @@ bool d_isDiffHigherThanLimit(const T& v1, const T& v2, const T& limit)
 
 #if DISTRHO_PLUGIN_HAS_UI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 const char* UI::getBundlePath() const noexcept { return nullptr; }
+void UI::setState(const char*, const char*) {}
 #endif
 
 // -----------------------------------------------------------------------------------------------------------

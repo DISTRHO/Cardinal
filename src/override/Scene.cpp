@@ -50,9 +50,6 @@ namespace rack {
 namespace app {
 
 
-widget::Widget* createMenuBar(bool isStandalone);
-
-
 struct ResizeHandle : widget::OpaqueWidget {
 	math::Vec size;
 
@@ -134,7 +131,7 @@ Scene::Scene() {
 
 	rack = rackScroll->rackWidget;
 
-	menuBar = createMenuBar(isStandalone());
+	menuBar = createMenuBar();
 	addChild(menuBar);
 
 	browser = browserCreate();

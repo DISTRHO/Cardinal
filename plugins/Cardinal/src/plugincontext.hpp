@@ -20,22 +20,16 @@
 #include "plugin.hpp"
 #include "DistrhoUtils.hpp"
 
-#ifndef HEADLESS
-# include "../dgl/Base.hpp"
-#else
-# include "extra/LeakDetector.hpp"
-#endif
+#include "../dgl/Base.hpp"
 
 // -----------------------------------------------------------------------------------------------------------
 // from PluginContext.hpp
 
-#ifndef HEADLESS
 START_NAMESPACE_DGL
 class TopLevelWidget;
 template <class BaseWidget> class NanoBaseWidget;
 typedef NanoBaseWidget<TopLevelWidget> NanoTopLevelWidget;
 END_NAMESPACE_DGL
-#endif
 
 START_NAMESPACE_DISTRHO
 
@@ -76,10 +70,8 @@ struct CardinalPluginContext : rack::Context {
     const MidiEvent* midiEvents;
     uint32_t midiEventCount;
     Plugin* const plugin;
-#ifndef HEADLESS
     DGL_NAMESPACE::NanoTopLevelWidget* tlw;
     UI* ui;
-#endif
     CardinalPluginContext(Plugin* const p);
     void writeMidiMessage(const rack::midi::Message& message, uint8_t channel);
 #ifndef HEADLESS

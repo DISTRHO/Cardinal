@@ -330,8 +330,10 @@ BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 FILES  = main.cpp
 FILES += RemoteUI.cpp
 FILES += CardinalCommon.cpp
+FILES += CardinalRemote.cpp
 FILES += common.cpp
 FILES += glfw.cpp
+FILES += MenuBar.cpp
 FILES += Window.cpp
 
 ifeq ($(WINDOWS),true)

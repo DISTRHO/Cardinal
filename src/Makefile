@@ -240,13 +240,13 @@ all: $(TARGETS)
 ifeq ($(MOD_BUILD),true)
 	$(MAKE) -C Cardinal lv2
 	$(MAKE) -C CardinalFX lv2
-	#$(MAKE) -C CardinalMini lv2
+	$(MAKE) -C CardinalMini lv2
 else ifeq ($(WASM),true)
 	$(MAKE) -C CardinalNative
 else
 	$(MAKE) -C Cardinal
 ifneq ($(NOPLUGINS),true)
-	#$(MAKE) -C CardinalMini
+	$(MAKE) -C CardinalMini
 endif
 	$(MAKE) -C CardinalNative
 	$(MAKE) -C CardinalFX $(CARDINAL_FX_ARGS)

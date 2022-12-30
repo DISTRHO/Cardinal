@@ -171,15 +171,18 @@ static void initStatic__Cardinal()
         p->addModel(modelHostParametersMap);
         p->addModel(modelHostTime);
         p->addModel(modelTextEditor);
+        /* TODO
        #ifdef HAVE_FFTW3F
         p->addModel(modelAudioToCVPitch);
        #else
+        */
         spl.removeModule("AudioToCVPitch");
+        /*
        #endif
+        */
         spl.removeModule("AudioFile");
         spl.removeModule("Blank");
         spl.removeModule("Carla");
-        spl.removeModule("ExpanderInputMIDI");
         spl.removeModule("ExpanderOutputMIDI");
         spl.removeModule("HostAudio8");
         spl.removeModule("Ildaeil");

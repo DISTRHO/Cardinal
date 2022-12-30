@@ -301,7 +301,7 @@ endif
 
 ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
 PLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
-MINIPLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
+# MINIPLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
 BASE_FLAGS += -DHAVE_FFTW3F
 endif
 
