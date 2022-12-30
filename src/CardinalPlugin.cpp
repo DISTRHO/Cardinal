@@ -798,7 +798,7 @@ protected:
             // context->history->setSaved();
 
            #if CARDINAL_VARIANT_MINI
-            FILE* const f = std::fopen(join(context->patch->autosavePath, "patch.json").c_str(), "r");
+            FILE* const f = std::fopen(rack::system::join(context->patch->autosavePath, "patch.json").c_str(), "r");
             DISTRHO_SAFE_ASSERT_RETURN(f != nullptr, String());
 
             DEFER({
