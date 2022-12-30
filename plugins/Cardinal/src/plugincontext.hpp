@@ -31,7 +31,9 @@
 
 #ifndef HEADLESS
 START_NAMESPACE_DGL
-class NanoTopLevelWidget;
+class TopLevelWidget;
+template <class BaseWidget> class NanoBaseWidget;
+typedef NanoBaseWidget<TopLevelWidget> NanoTopLevelWidget;
 END_NAMESPACE_DGL
 #endif
 
