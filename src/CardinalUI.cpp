@@ -826,34 +826,21 @@ protected:
             if (fAutosavePath.empty())
                 return;
 
-            const std::vector<uint8_t> data(d_getChunkFromBase64String(value));
-
-            DISTRHO_SAFE_ASSERT_RETURN(data.size() >= 4,);
-
             rack::system::removeRecursively(fAutosavePath);
             rack::system::createDirectories(fAutosavePath);
 
-            static constexpr const char zstdMagic[] = "\x28\xb5\x2f\xfd";
+            FILE* const f = std::fopen(rack::system::join(fAutosavePath, "patch.json").c_str(), "w");
+            DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
 
-            if (std::memcmp(data.data(), zstdMagic, sizeof(zstdMagic)) != 0)
-            {
-                FILE* const f = std::fopen(rack::system::join(fAutosavePath, "patch.json").c_str(), "w");
-                DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
-
-                std::fwrite(data.data(), data.size(), 1, f);
-                std::fclose(f);
-            }
-            else
-            {
-                try {
-                    rack::system::unarchiveToDirectory(data, fAutosavePath);
-                } DISTRHO_SAFE_EXCEPTION_RETURN("setState unarchiveToDirectory",);
-            }
+            std::fwrite(value, std::strlen(value), 1, f);
+            std::fclose(f);
 
             const ScopedContext sc(this);
 
             try {
                 context->patch->loadAutosave();
+            } catch(const rack::Exception& e) {
+                d_stderr(e.what());
             } DISTRHO_SAFE_EXCEPTION_RETURN("setState loadAutosave",);
 
             return;

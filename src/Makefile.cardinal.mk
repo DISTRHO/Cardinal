@@ -356,6 +356,10 @@ BUILD_CXX_FLAGS += -std=gnu++17
 endif
 endif
 
+ifeq ($(CARDINAL_VARIANT),mini)
+BUILD_CXX_FLAGS += -DDISTRHO_PLUGIN_MINIMUM_BUFFER_SIZE=0xffff
+endif
+
 # Rack code is not tested for this flag, unset it
 BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
 

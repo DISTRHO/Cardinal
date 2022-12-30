@@ -139,7 +139,7 @@ void sendParamChangeToRemote(RemoteDetails* const remote, int64_t moduleId, int 
 {
 #if CARDINAL_VARIANT_MINI
     char paramBuf[512] = {};
-    std::snprintf(paramBuf, sizeof(paramBuf), "%llu:%d:%f", (ulonglong)moduleId, paramId, value);
+    std::snprintf(paramBuf, sizeof(paramBuf), "%lld:%d:%f", (long long)moduleId, paramId, value);
     static_cast<CardinalBaseUI*>(remote->handle)->setState("param", paramBuf);
 #elif defined(HAVE_LIBLO)
     const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, CARDINAL_DEFAULT_REMOTE_HOST_PORT);
@@ -164,11 +164,24 @@ void sendFullPatchToRemote(RemoteDetails* const remote)
     using namespace rack::system;
 
    #if CARDINAL_VARIANT_MINI
-    try {
-        data = readFile(join(context->patch->autosavePath, "patch.json"));
-    } DISTRHO_SAFE_EXCEPTION_RETURN("sendFullPatchToRemote",);
+    FILE* const f = std::fopen(join(context->patch->autosavePath, "patch.json").c_str(), "r");
+    DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
 
-    static_cast<CardinalBaseUI*>(remote->handle)->setState("patch", reinterpret_cast<const char*>(data.data()));
+    DEFER({
+        std::fclose(f);
+    });
+
+    std::fseek(f, 0, SEEK_END);
+    const long fileSize = std::ftell(f);
+    DISTRHO_SAFE_ASSERT_RETURN(fileSize > 0,);
+
+    std::fseek(f, 0, SEEK_SET);
+    char* const fileContent = new char[fileSize+1];
+
+    DISTRHO_SAFE_ASSERT_RETURN(std::fread(fileContent, fileSize, 1, f) == 1,);
+    fileContent[fileSize] = '\0';
+    static_cast<CardinalBaseUI*>(remote->handle)->setState("patch", fileContent);
+    delete[] fileContent;
    #elif defined(HAVE_LIBLO)
     try {
         data = archiveDirectory(context->patch->autosavePath, 1);

@@ -798,6 +798,24 @@ protected:
             // context->history->setSaved();
 
            #if CARDINAL_VARIANT_MINI
+            FILE* const f = std::fopen(join(context->patch->autosavePath, "patch.json").c_str(), "r");
+            DISTRHO_SAFE_ASSERT_RETURN(f != nullptr, String());
+
+            DEFER({
+                std::fclose(f);
+            });
+
+            std::fseek(f, 0, SEEK_END);
+            const long fileSize = std::ftell(f);
+            DISTRHO_SAFE_ASSERT_RETURN(fileSize > 0, String());
+
+            std::fseek(f, 0, SEEK_SET);
+            char* const fileContent = static_cast<char*>(std::malloc(fileSize+1));
+
+            DISTRHO_SAFE_ASSERT_RETURN(std::fread(fileContent, fileSize, 1, f) == 1, String());
+            fileContent[fileSize] = '\0';
+
+            return String(fileContent, false);
            #else
             try {
                 data = rack::system::archiveDirectory(fAutosavePath, 1);
@@ -813,7 +831,7 @@ protected:
        #if CARDINAL_VARIANT_MINI
         if (std::strcmp(key, "param") == 0)
         {
-            longlong moduleId = 0;
+            long long moduleId = 0;
             int paramId = 0;
             float paramValue = 0.f;
             std::sscanf(value, "%lld:%d:%f", &moduleId, &paramId, &paramValue);
@@ -886,13 +904,13 @@ protected:
             return;
 
        #if CARDINAL_VARIANT_MINI
-        FILE* const f = std::fopen(rack::system::join(fAutosavePath, "patch.json").c_str(), "w");
-        DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
-
         rack::system::removeRecursively(fAutosavePath);
         rack::system::createDirectories(fAutosavePath);
 
-        std::fwrite(value, std::strlen(value)+1, 1, f);
+        FILE* const f = std::fopen(rack::system::join(fAutosavePath, "patch.json").c_str(), "w");
+        DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
+
+        std::fwrite(value, std::strlen(value), 1, f);
         std::fclose(f);
        #else
         const std::vector<uint8_t> data(d_getChunkFromBase64String(value));
@@ -924,6 +942,8 @@ protected:
 
         try {
             context->patch->loadAutosave();
+        } catch(const rack::Exception& e) {
+            d_stderr(e.what());
         } DISTRHO_SAFE_EXCEPTION_RETURN("setState loadAutosave",);
 
         // context->history->setSaved();
