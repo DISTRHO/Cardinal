@@ -52,16 +52,26 @@
 # include "extra/SharedResourcePointer.hpp"
 #endif
 
-static const constexpr uint kCardinalStateBaseCount = 3; // patch, screenshot, comment
-
 #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
 # include "extra/ScopedValueSetter.hpp"
 # include "WindowParameters.hpp"
-static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount + 2; // moduleInfos, windowSize
 #else
 # define kWindowParameterCount 0
-static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount;
 #endif
+
+enum CardinalStates {
+    kCardinalStatePatch,
+    kCardinalStateScreenshot,
+    kCardinalStateComment,
+   #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+    kCardinalStateModuleInfos,
+    kCardinalStateWindowSize,
+   #endif
+   #if CARDINAL_VARIANT_MINI
+    kCardinalStateParamChange,
+   #endif
+    kCardinalStateCount
+};
 
 extern const std::string CARDINAL_VERSION;
 
@@ -621,7 +631,7 @@ protected:
     {
         switch (index)
         {
-        case 0:
+        case kCardinalStatePatch:
            #if CARDINAL_VARIANT_MINI
             state.hints = kStateIsHostWritable;
            #else
@@ -655,17 +665,18 @@ protected:
             state.key = "patch";
             state.label = "Patch";
             break;
-        case 1:
+        case kCardinalStateScreenshot:
             state.hints = kStateIsHostReadable | kStateIsBase64Blob;
             state.key = "screenshot";
             state.label = "Screenshot";
             break;
-        case 2:
+        case kCardinalStateComment:
             state.hints = kStateIsHostWritable;
             state.key = "comment";
             state.label = "Comment";
             break;
-        case 3:
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+        case kCardinalStateModuleInfos:
             state.hints = 0x0;
            #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
             state.hints |= kStateIsOnlyForDSP;
@@ -674,12 +685,20 @@ protected:
             state.key = "moduleInfos";
             state.label = "moduleInfos";
             break;
-        case 4:
+        case kCardinalStateWindowSize:
             state.hints = kStateIsOnlyForUI;
             // state.defaultValue = String("%d:%d", DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT);
             state.key = "windowSize";
             state.label = "Window size";
             break;
+       #endif
+       #if CARDINAL_VARIANT_MINI
+        case kCardinalStateParamChange:
+            state.hints = kStateIsHostReadable | kStateIsOnlyForDSP;
+            state.key = "param";
+            state.label = "ParamChange";
+            break;
+       #endif
         }
     }
 
