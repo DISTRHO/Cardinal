@@ -44,6 +44,7 @@
 #include "DistrhoPluginUtils.hpp"
 #include "PluginContext.hpp"
 #include "extra/Base64.hpp"
+#include "extra/ScopedSafeLocale.hpp"
 
 #ifdef DISTRHO_OS_WASM
 # include <emscripten/emscripten.h>
@@ -841,7 +842,10 @@ protected:
             long long moduleId = 0;
             int paramId = 0;
             float paramValue = 0.f;
-            std::sscanf(value, "%lld:%d:%f", &moduleId, &paramId, &paramValue);
+            {
+                const ScopedSafeLocale cssl;
+                std::sscanf(value, "%lld:%d:%f", &moduleId, &paramId, &paramValue);
+            }
 
             rack::engine::Module* const module = context->engine->getModule(moduleId);
             DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);

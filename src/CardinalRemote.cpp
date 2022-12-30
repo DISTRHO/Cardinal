@@ -26,6 +26,7 @@
 #include "CardinalRemote.hpp"
 #include "PluginContext.hpp"
 #include "extra/Base64.hpp"
+#include "extra/ScopedSafeLocale.hpp"
 
 #if defined(STATIC_BUILD) || CARDINAL_VARIANT_MINI
 # undef HAVE_LIBLO
@@ -139,7 +140,10 @@ void sendParamChangeToRemote(RemoteDetails* const remote, int64_t moduleId, int 
 {
 #if CARDINAL_VARIANT_MINI
     char paramBuf[512] = {};
-    std::snprintf(paramBuf, sizeof(paramBuf), "%lld:%d:%f", (long long)moduleId, paramId, value);
+    {
+        const ScopedSafeLocale cssl;
+        std::snprintf(paramBuf, sizeof(paramBuf), "%lld:%d:%f", (long long)moduleId, paramId, value);
+    }
     static_cast<CardinalBaseUI*>(remote->handle)->setState("param", paramBuf);
 #elif defined(HAVE_LIBLO)
     const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, CARDINAL_DEFAULT_REMOTE_HOST_PORT);
