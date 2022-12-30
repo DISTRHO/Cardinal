@@ -610,6 +610,8 @@ MINIPLUGIN_FILES += BogaudioModules/src/dsp/noise.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/oscillator.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/signal.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/table.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/experiments.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/filter.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/multimode.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/resample.cpp
 

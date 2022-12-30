@@ -53,6 +53,8 @@ enum CardinalVariant {
     kCardinalVariantSynth,
 };
 
+class UI;
+
 // -----------------------------------------------------------------------------------------------------------
 
 struct CardinalPluginContext : rack::Context {
