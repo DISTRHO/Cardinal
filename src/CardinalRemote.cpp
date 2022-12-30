@@ -32,7 +32,7 @@
 # undef HAVE_LIBLO
 #endif
 
-#if (CARDINAL_VARIANT_MINI && !defined(HEADLESS)) || defined(HAVE_LIBLO)
+#if (CARDINAL_VARIANT_MINI || defined(HAVE_LIBLO)) && !defined(HEADLESS)
 # define CARDINAL_REMOTE_ENABLED
 #endif
 
