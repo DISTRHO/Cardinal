@@ -420,7 +420,7 @@ jobs:
           make features
           # multiple jobs for building carla, deps and plugins
           make DEBUG=true carla deps dgl plugins resources -j $(nproc)
-          # single job for final build stage, otherwise we might killed due to OOM
+          # single job for final build stage, otherwise we might get killed due to OOM
           make DEBUG=true HAVE_PULSEAUDIO=false -j 1
       - name: Set sha8
         id: slug
@@ -1180,7 +1180,8 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           key: ccache-pluginval-v${{ env.CACHE_VERSION }}
-      - name: Build Cardinal
+      # multiple jobs for building carla, deps and plugins
+      - name: Build Cardinal (carla, deps and plugins)
         env:
           CFLAGS: -g
           CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING -Wno-pmf-conversions
@@ -1189,7 +1190,18 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           make features
-          make NOOPT=true SKIP_STRIPPING=true -j $(nproc)
+          make NOOPT=true SKIP_STRIPPING=true carla deps dgl plugins resources -j $(nproc)
+      # single job for final build stage, otherwise we might get killed due to OOM
+      - name: Build Cardinal (final build stage)
+        env:
+          CFLAGS: -g
+          CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING -Wno-pmf-conversions
+          LDFLAGS: -static-libgcc -static-libstdc++
+          WITH_LTO: false
+        run: |
+          export PATH="/usr/lib/ccache:${PATH}"
+          make features
+          make NOOPT=true SKIP_STRIPPING=true -j 1
       - name: Run Cardinal self-tests
         run: |
           # --exit-on-first-error=yes
