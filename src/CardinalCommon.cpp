@@ -643,6 +643,10 @@ void loadPathDialog(const std::string& path, const bool asTemplate)
             APP->patch->path = "";
             APP->history->setSaved();
         }
+
+        if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
+            if (remoteDetails->autoDeploy)
+                remoteUtils::sendFullPatchToRemote(remoteDetails);
     });
 #endif
 }
@@ -668,6 +672,10 @@ void loadSelectionDialog()
         }
 
         std::free(pathC);
+
+        if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
+            if (remoteDetails->autoDeploy)
+                remoteUtils::sendFullPatchToRemote(remoteDetails);
     });
 }
 
@@ -676,6 +684,10 @@ void loadTemplateDialog()
 #ifndef HEADLESS_BEHAVIOUR
     promptClear("The current patch is unsaved. Clear it and start a new patch?", []() {
         APP->patch->loadTemplate();
+
+        if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
+            if (remoteDetails->autoDeploy)
+                remoteUtils::sendFullPatchToRemote(remoteDetails);
     });
 #endif
 }
@@ -687,6 +699,10 @@ void revertDialog()
         return;
     promptClear("Revert patch to the last saved state?", []{
         APP->patch->loadAction(APP->patch->path);
+
+        if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
+            if (remoteDetails->autoDeploy)
+                remoteUtils::sendFullPatchToRemote(remoteDetails);
     });
 #endif
 }
