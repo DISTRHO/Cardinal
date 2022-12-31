@@ -28,15 +28,15 @@ struct HostParameters : TerminalModule {
         NUM_INPUTS
     };
     enum OutputIds {
-        NUM_OUTPUTS = 24
+        NUM_OUTPUTS = kModuleParameterCount
     };
     enum LightIds {
         NUM_LIGHTS
     };
 
     CardinalPluginContext* const pcontext;
-    rack::dsp::SlewLimiter parameters[kModuleParameters];
-    bool parametersConnected[kModuleParameters] = {};
+    rack::dsp::SlewLimiter parameters[kModuleParameterCount];
+    bool parametersConnected[kModuleParameterCount] = {};
     bool bypassed = false;
     bool smooth = true;
     uint32_t lastProcessCounter = 0;
@@ -59,7 +59,7 @@ struct HostParameters : TerminalModule {
             bypassed = isBypassed();
             lastProcessCounter = processCounter;
 
-            for (uint32_t i=0; i<kModuleParameters; ++i)
+            for (uint32_t i=0; i<kModuleParameterCount; ++i)
             {
                 const bool connected = outputs[i].isConnected();
 
@@ -74,7 +74,7 @@ struct HostParameters : TerminalModule {
         if (bypassed)
             return;
 
-        for (uint32_t i=0; i<kModuleParameters; ++i)
+        for (uint32_t i=0; i<kModuleParameterCount; ++i)
         {
             if (parametersConnected[i])
                 outputs[i].setVoltage(smooth ? parameters[i].process(args.sampleTime, pcontext->parameters[i])
@@ -89,7 +89,7 @@ struct HostParameters : TerminalModule {
     {
         const double fall = 1.0 / (double(pcontext->bufferSize) / e.sampleRate);
 
-        for (uint32_t i=0; i<kModuleParameters; ++i)
+        for (uint32_t i=0; i<kModuleParameterCount; ++i)
         {
             parameters[i].reset();
             parameters[i].setRiseFall(fall, fall);

@@ -33,7 +33,7 @@ END_NAMESPACE_DGL
 
 START_NAMESPACE_DISTRHO
 
-static constexpr const uint32_t kModuleParameters = 24;
+static constexpr const uint32_t kModuleParameterCount = 24;
 
 enum CardinalVariant {
     kCardinalVariantMain,
@@ -57,7 +57,7 @@ struct MidiEvent {
 struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize, processCounter;
     double sampleRate;
-    float parameters[kModuleParameters];
+    float parameters[kModuleParameterCount];
     CardinalVariant variant;
     bool bypassed, playing, reset, bbtValid;
     int32_t bar, beat, beatsPerBar, beatType;

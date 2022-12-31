@@ -38,6 +38,7 @@
 # include "extra/Thread.hpp"
 #endif
 
+#include <cfloat>
 #include <list>
 
 #include "CardinalCommon.hpp"
@@ -54,24 +55,7 @@
 
 #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
 # include "extra/ScopedValueSetter.hpp"
-# include "WindowParameters.hpp"
-#else
-# define kWindowParameterCount 0
 #endif
-
-enum CardinalStates {
-    kCardinalStatePatch,
-    kCardinalStateScreenshot,
-    kCardinalStateComment,
-   #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
-    kCardinalStateModuleInfos,
-    kCardinalStateWindowSize,
-   #endif
-   #if CARDINAL_VARIANT_MINI
-    kCardinalStateParamChange,
-   #endif
-    kCardinalStateCount
-};
 
 extern const std::string CARDINAL_VERSION;
 
@@ -194,10 +178,13 @@ class CardinalPlugin : public CardinalBasePlugin
     // real values, not VCV interpreted ones
     float fWindowParameters[kWindowParameterCount];
    #endif
+   #if CARDINAL_VARIANT_MINI
+    float fMiniReportValues[kCardinalParameterCountAtMini - kCardinalParameterStartMini];
+   #endif
 
 public:
     CardinalPlugin()
-        : CardinalBasePlugin(kModuleParameters + kWindowParameterCount + 1, 0, kCardinalStateCount),
+        : CardinalBasePlugin(kCardinalParameterCount, 0, kCardinalStateCount),
          #ifdef DISTRHO_OS_WASM
           fInitializer(new Initializer(this, static_cast<const CardinalBaseUI*>(nullptr))),
          #else
@@ -224,6 +211,14 @@ public:
         fWindowParameters[kWindowParameterBrowserZoom] = 50.0f;
         fWindowParameters[kWindowParameterInvertZoom] = 0.0f;
         fWindowParameters[kWindowParameterSqueezeModulePositions] = 1.0f;
+       #endif
+       #if CARDINAL_VARIANT_MINI
+        std::memset(fMiniReportValues, 0, sizeof(fMiniReportValues));
+        fMiniReportValues[kCardinalParameterMiniTimeBar - kCardinalParameterStartMini] = 1;
+        fMiniReportValues[kCardinalParameterMiniTimeBeat - kCardinalParameterStartMini] = 1;
+        fMiniReportValues[kCardinalParameterMiniTimeBeatsPerBar - kCardinalParameterStartMini] = 4;
+        fMiniReportValues[kCardinalParameterMiniTimeBeatType - kCardinalParameterStartMini] = 4;
+        fMiniReportValues[kCardinalParameterMiniTimeBeatsPerMinute - kCardinalParameterStartMini] = 120;
        #endif
 
         // create unique temporary path for this instance
@@ -384,17 +379,23 @@ protected:
 
     void initAudioPort(const bool input, uint32_t index, AudioPort& port) override
     {
-       #if CARDINAL_VARIANT_MAIN
-        if (index < 8)
+       #if CARDINAL_VARIANT_MAIN || CARDINAL_VARIANT_MINI
+        static_assert(CARDINAL_NUM_AUDIO_INPUTS == CARDINAL_NUM_AUDIO_OUTPUTS, "inputs == outputs");
+
+        if (index < CARDINAL_NUM_AUDIO_INPUTS)
         {
+           #if CARDINAL_VARIANT_MINI
+            port.groupId = kPortGroupStereo;
+           #else
             port.groupId = index / 2;
+           #endif
         }
         else
         {
             port.hints = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange | kCVPortIsOptional;
-            index -= 8;
+            index -= CARDINAL_NUM_AUDIO_INPUTS;
         }
-       #elif CARDINAL_VARIANT_MINI || CARDINAL_VARIANT_NATIVE || CARDINAL_VARIANT_FX || CARDINAL_VARIANT_SYNTH
+       #elif CARDINAL_VARIANT_NATIVE || CARDINAL_VARIANT_FX || CARDINAL_VARIANT_SYNTH
         if (index < 2)
             port.groupId = kPortGroupStereo;
        #endif
@@ -429,7 +430,7 @@ protected:
 
     void initParameter(const uint32_t index, Parameter& parameter) override
     {
-        if (index < kModuleParameters)
+        if (index < kCardinalParameterCountAtModules)
         {
             parameter.name = "Parameter ";
             parameter.name += String(index + 1);
@@ -447,181 +448,326 @@ protected:
             return;
         }
 
-        if (index == kModuleParameters)
+        if (index == kCardinalParameterBypass)
         {
             parameter.initDesignation(kParameterDesignationBypass);
             return;
         }
 
        #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
-        switch (index - kModuleParameters - 1)
+        if (index < kCardinalParameterCountAtWindow)
         {
-        case kWindowParameterShowTooltips:
-            parameter.name = "Show tooltips";
-            parameter.symbol = "tooltips";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
-            parameter.ranges.def = 1.0f;
+            switch (index - kCardinalParameterStartWindow)
+            {
+            case kWindowParameterShowTooltips:
+                parameter.name = "Show tooltips";
+                parameter.symbol = "tooltips";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+                parameter.ranges.def = 1.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 1.0f;
+                break;
+            case kWindowParameterCableOpacity:
+                parameter.name = "Cable opacity";
+                parameter.symbol = "cableOpacity";
+                parameter.unit = "%";
+                parameter.hints = kParameterIsAutomatable;
+                parameter.ranges.def = 50.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 100.0f;
+                break;
+            case kWindowParameterCableTension:
+                parameter.name = "Cable tension";
+                parameter.symbol = "cableTension";
+                parameter.unit = "%";
+                parameter.hints = kParameterIsAutomatable;
+                parameter.ranges.def = 75.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 100.0f;
+                break;
+            case kWindowParameterRackBrightness:
+                parameter.name = "Room brightness";
+                parameter.symbol = "rackBrightness";
+                parameter.unit = "%";
+                parameter.hints = kParameterIsAutomatable;
+                parameter.ranges.def = 100.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 100.0f;
+                break;
+            case kWindowParameterHaloBrightness:
+                parameter.name = "Light Bloom";
+                parameter.symbol = "haloBrightness";
+                parameter.unit = "%";
+                parameter.hints = kParameterIsAutomatable;
+                parameter.ranges.def = 25.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 100.0f;
+                break;
+            case kWindowParameterKnobMode:
+                parameter.name = "Knob mode";
+                parameter.symbol = "knobMode";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
+                parameter.ranges.def = 0.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 2.0f;
+                parameter.enumValues.count = 3;
+                parameter.enumValues.restrictedMode = true;
+                parameter.enumValues.values = new ParameterEnumerationValue[3];
+                parameter.enumValues.values[0].label = "Linear";
+                parameter.enumValues.values[0].value = 0.0f;
+                parameter.enumValues.values[1].label = "Absolute rotary";
+                parameter.enumValues.values[1].value = 1.0f;
+                parameter.enumValues.values[2].label = "Relative rotary";
+                parameter.enumValues.values[2].value = 2.0f;
+                break;
+            case kWindowParameterWheelKnobControl:
+                parameter.name = "Scroll wheel knob control";
+                parameter.symbol = "knobScroll";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+                parameter.ranges.def = 0.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 1.0f;
+                break;
+            case kWindowParameterWheelSensitivity:
+                parameter.name = "Scroll wheel knob sensitivity";
+                parameter.symbol = "knobScrollSensitivity";
+                parameter.hints = kParameterIsAutomatable|kParameterIsLogarithmic;
+                parameter.ranges.def = 1.0f;
+                parameter.ranges.min = 0.1f;
+                parameter.ranges.max = 10.0f;
+                break;
+            case kWindowParameterLockModulePositions:
+                parameter.name = "Lock module positions";
+                parameter.symbol = "lockModules";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+                parameter.ranges.def = 0.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 1.0f;
+                break;
+            case kWindowParameterUpdateRateLimit:
+                parameter.name = "Update rate limit";
+                parameter.symbol = "rateLimit";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
+                parameter.ranges.def = 0.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 2.0f;
+                parameter.enumValues.count = 3;
+                parameter.enumValues.restrictedMode = true;
+                parameter.enumValues.values = new ParameterEnumerationValue[3];
+                parameter.enumValues.values[0].label = "None";
+                parameter.enumValues.values[0].value = 0.0f;
+                parameter.enumValues.values[1].label = "2x";
+                parameter.enumValues.values[1].value = 1.0f;
+                parameter.enumValues.values[2].label = "4x";
+                parameter.enumValues.values[2].value = 2.0f;
+                break;
+            case kWindowParameterBrowserSort:
+                parameter.name = "Browser sort";
+                parameter.symbol = "browserSort";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
+                parameter.ranges.def = 3.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 5.0f;
+                parameter.enumValues.count = 6;
+                parameter.enumValues.restrictedMode = true;
+                parameter.enumValues.values = new ParameterEnumerationValue[6];
+                parameter.enumValues.values[0].label = "Updated";
+                parameter.enumValues.values[0].value = 0.0f;
+                parameter.enumValues.values[1].label = "Last used";
+                parameter.enumValues.values[1].value = 1.0f;
+                parameter.enumValues.values[2].label = "Most used";
+                parameter.enumValues.values[2].value = 2.0f;
+                parameter.enumValues.values[3].label = "Brand";
+                parameter.enumValues.values[3].value = 3.0f;
+                parameter.enumValues.values[4].label = "Name";
+                parameter.enumValues.values[4].value = 4.0f;
+                parameter.enumValues.values[5].label = "Random";
+                parameter.enumValues.values[5].value = 5.0f;
+                break;
+            case kWindowParameterBrowserZoom:
+                parameter.name = "Browser zoom";
+                parameter.symbol = "browserZoom";
+                parameter.hints = kParameterIsAutomatable;
+                parameter.unit = "%";
+                parameter.ranges.def = 50.0f;
+                parameter.ranges.min = 25.0f;
+                parameter.ranges.max = 200.0f;
+                parameter.enumValues.count = 7;
+                parameter.enumValues.restrictedMode = true;
+                parameter.enumValues.values = new ParameterEnumerationValue[7];
+                parameter.enumValues.values[0].label = "25";
+                parameter.enumValues.values[0].value = 25.0f;
+                parameter.enumValues.values[1].label = "35";
+                parameter.enumValues.values[1].value = 35.0f;
+                parameter.enumValues.values[2].label = "50";
+                parameter.enumValues.values[2].value = 50.0f;
+                parameter.enumValues.values[3].label = "71";
+                parameter.enumValues.values[3].value = 71.0f;
+                parameter.enumValues.values[4].label = "100";
+                parameter.enumValues.values[4].value = 100.0f;
+                parameter.enumValues.values[5].label = "141";
+                parameter.enumValues.values[5].value = 141.0f;
+                parameter.enumValues.values[6].label = "200";
+                parameter.enumValues.values[6].value = 200.0f;
+                break;
+            case kWindowParameterInvertZoom:
+                parameter.name = "Invert zoom";
+                parameter.symbol = "invertZoom";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+                parameter.ranges.def = 0.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 1.0f;
+                break;
+            case kWindowParameterSqueezeModulePositions:
+                parameter.name = "Auto-squeeze module positions";
+                parameter.symbol = "squeezeModules";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+                parameter.ranges.def = 1.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 1.0f;
+                break;
+            }
+        }
+       #endif
+
+       #if CARDINAL_VARIANT_MINI
+        switch (index)
+        {
+        case kCardinalParameterMiniAudioIn1:
+            parameter.name = "Report Audio Input 1";
+            parameter.symbol = "r_audio_in_1";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 0.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 1.0f;
             break;
-        case kWindowParameterCableOpacity:
-            parameter.name = "Cable opacity";
-            parameter.symbol = "cableOpacity";
-            parameter.unit = "%";
-            parameter.hints = kParameterIsAutomatable;
-            parameter.ranges.def = 50.0f;
-            parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 100.0f;
-            break;
-        case kWindowParameterCableTension:
-            parameter.name = "Cable tension";
-            parameter.symbol = "cableTension";
-            parameter.unit = "%";
-            parameter.hints = kParameterIsAutomatable;
-            parameter.ranges.def = 75.0f;
-            parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 100.0f;
-            break;
-        case kWindowParameterRackBrightness:
-            parameter.name = "Room brightness";
-            parameter.symbol = "rackBrightness";
-            parameter.unit = "%";
-            parameter.hints = kParameterIsAutomatable;
-            parameter.ranges.def = 100.0f;
-            parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 100.0f;
-            break;
-        case kWindowParameterHaloBrightness:
-            parameter.name = "Light Bloom";
-            parameter.symbol = "haloBrightness";
-            parameter.unit = "%";
-            parameter.hints = kParameterIsAutomatable;
-            parameter.ranges.def = 25.0f;
-            parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 100.0f;
-            break;
-        case kWindowParameterKnobMode:
-            parameter.name = "Knob mode";
-            parameter.symbol = "knobMode";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
-            parameter.ranges.def = 0.0f;
-            parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 2.0f;
-            parameter.enumValues.count = 3;
-            parameter.enumValues.restrictedMode = true;
-            parameter.enumValues.values = new ParameterEnumerationValue[3];
-            parameter.enumValues.values[0].label = "Linear";
-            parameter.enumValues.values[0].value = 0.0f;
-            parameter.enumValues.values[1].label = "Absolute rotary";
-            parameter.enumValues.values[1].value = 1.0f;
-            parameter.enumValues.values[2].label = "Relative rotary";
-            parameter.enumValues.values[2].value = 2.0f;
-            break;
-        case kWindowParameterWheelKnobControl:
-            parameter.name = "Scroll wheel knob control";
-            parameter.symbol = "knobScroll";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+        case kCardinalParameterMiniAudioIn2:
+            parameter.name = "Report Audio Input 2";
+            parameter.symbol = "r_audio_in_2";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
             parameter.ranges.def = 0.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 1.0f;
             break;
-        case kWindowParameterWheelSensitivity:
-            parameter.name = "Scroll wheel knob sensitivity";
-            parameter.symbol = "knobScrollSensitivity";
-            parameter.hints = kParameterIsAutomatable|kParameterIsLogarithmic;
-            parameter.ranges.def = 1.0f;
-            parameter.ranges.min = 0.1f;
+        case kCardinalParameterMiniCVIn1:
+            parameter.name = "Report CV Input 1";
+            parameter.symbol = "r_cv_in_1";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = -10.0f;
+            parameter.ranges.min = 0.0f;
             parameter.ranges.max = 10.0f;
             break;
-        case kWindowParameterLockModulePositions:
-            parameter.name = "Lock module positions";
-            parameter.symbol = "lockModules";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
-            parameter.ranges.def = 0.0f;
+        case kCardinalParameterMiniCVIn2:
+            parameter.name = "Report CV Input 2";
+            parameter.symbol = "r_cv_in_2";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = -10.0f;
             parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 1.0f;
+            parameter.ranges.max = 10.0f;
             break;
-        case kWindowParameterUpdateRateLimit:
-            parameter.name = "Update rate limit";
-            parameter.symbol = "rateLimit";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
-            parameter.ranges.def = 0.0f;
+        case kCardinalParameterMiniCVIn3:
+            parameter.name = "Report CV Input 3";
+            parameter.symbol = "r_cv_in_3";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = -10.0f;
             parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 2.0f;
-            parameter.enumValues.count = 3;
-            parameter.enumValues.restrictedMode = true;
-            parameter.enumValues.values = new ParameterEnumerationValue[3];
-            parameter.enumValues.values[0].label = "None";
-            parameter.enumValues.values[0].value = 0.0f;
-            parameter.enumValues.values[1].label = "2x";
-            parameter.enumValues.values[1].value = 1.0f;
-            parameter.enumValues.values[2].label = "4x";
-            parameter.enumValues.values[2].value = 2.0f;
+            parameter.ranges.max = 10.0f;
             break;
-        case kWindowParameterBrowserSort:
-            parameter.name = "Browser sort";
-            parameter.symbol = "browserSort";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
-            parameter.ranges.def = 3.0f;
+        case kCardinalParameterMiniCVIn4:
+            parameter.name = "Report CV Input 4";
+            parameter.symbol = "r_cv_in_4";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = -10.0f;
             parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 5.0f;
-            parameter.enumValues.count = 6;
-            parameter.enumValues.restrictedMode = true;
-            parameter.enumValues.values = new ParameterEnumerationValue[6];
-            parameter.enumValues.values[0].label = "Updated";
-            parameter.enumValues.values[0].value = 0.0f;
-            parameter.enumValues.values[1].label = "Last used";
-            parameter.enumValues.values[1].value = 1.0f;
-            parameter.enumValues.values[2].label = "Most used";
-            parameter.enumValues.values[2].value = 2.0f;
-            parameter.enumValues.values[3].label = "Brand";
-            parameter.enumValues.values[3].value = 3.0f;
-            parameter.enumValues.values[4].label = "Name";
-            parameter.enumValues.values[4].value = 4.0f;
-            parameter.enumValues.values[5].label = "Random";
-            parameter.enumValues.values[5].value = 5.0f;
+            parameter.ranges.max = 10.0f;
             break;
-        case kWindowParameterBrowserZoom:
-            parameter.name = "Browser zoom";
-            parameter.symbol = "browserZoom";
-            parameter.hints = kParameterIsAutomatable;
-            parameter.unit = "%";
-            parameter.ranges.def = 50.0f;
-            parameter.ranges.min = 25.0f;
-            parameter.ranges.max = 200.0f;
-            parameter.enumValues.count = 7;
-            parameter.enumValues.restrictedMode = true;
-            parameter.enumValues.values = new ParameterEnumerationValue[7];
-            parameter.enumValues.values[0].label = "25";
-            parameter.enumValues.values[0].value = 25.0f;
-            parameter.enumValues.values[1].label = "35";
-            parameter.enumValues.values[1].value = 35.0f;
-            parameter.enumValues.values[2].label = "50";
-            parameter.enumValues.values[2].value = 50.0f;
-            parameter.enumValues.values[3].label = "71";
-            parameter.enumValues.values[3].value = 71.0f;
-            parameter.enumValues.values[4].label = "100";
-            parameter.enumValues.values[4].value = 100.0f;
-            parameter.enumValues.values[5].label = "141";
-            parameter.enumValues.values[5].value = 141.0f;
-            parameter.enumValues.values[6].label = "200";
-            parameter.enumValues.values[6].value = 200.0f;
-            break;
-        case kWindowParameterInvertZoom:
-            parameter.name = "Invert zoom";
-            parameter.symbol = "invertZoom";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
-            parameter.ranges.def = 0.0f;
+        case kCardinalParameterMiniCVIn5:
+            parameter.name = "Report CV Input 5";
+            parameter.symbol = "r_cv_in_5";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = -10.0f;
             parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 1.0f;
+            parameter.ranges.max = 10.0f;
             break;
-        case kWindowParameterSqueezeModulePositions:
-            parameter.name = "Auto-squeeze module positions";
-            parameter.symbol = "squeezeModules";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+        case kCardinalParameterMiniTimeFlags:
+            parameter.name = "Report Time Flags";
+            parameter.symbol = "r_time_flags";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 0x0;
+            parameter.ranges.min = 0x0;
+            parameter.ranges.max = 0x7;
+            break;
+        case kCardinalParameterMiniTimeBar:
+            parameter.name = "Report Time Bar";
+            parameter.symbol = "r_time_bar";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
             parameter.ranges.def = 1.0f;
+            parameter.ranges.min = 1.0f;
+            parameter.ranges.max = FLT_MAX;
+            break;
+        case kCardinalParameterMiniTimeBeat:
+            parameter.name = "Report Time Beat";
+            parameter.symbol = "r_time_beat";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 1.0f;
+            parameter.ranges.min = 1.0f;
+            parameter.ranges.max = 128.0f;
+            break;
+        case kCardinalParameterMiniTimeBeatsPerBar:
+            parameter.name = "Report Time Beats Per Bar";
+            parameter.symbol = "r_time_beatsPerBar";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 4.0f;
             parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 1.0f;
+            parameter.ranges.max = 128.0f;
+            break;
+        case kCardinalParameterMiniTimeBeatType:
+            parameter.name = "Report Time Beat Type";
+            parameter.symbol = "r_time_beatType";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 4.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 128.0f;
+            break;
+        case kCardinalParameterMiniTimeFrame:
+            parameter.name = "Report Time Frame";
+            parameter.symbol = "r_time_frame";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = FLT_MAX;
+            break;
+        case kCardinalParameterMiniTimeBarStartTick:
+            parameter.name = "Report Time BarStartTick";
+            parameter.symbol = "r_time_barStartTick";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = FLT_MAX;
+            break;
+        case kCardinalParameterMiniTimeBeatsPerMinute:
+            parameter.name = "Report Time Beats Per Minute";
+            parameter.symbol = "r_time_bpm";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 20.0f;
+            parameter.ranges.min = 120.0f;
+            parameter.ranges.max = 999.0f;
+            break;
+        case kCardinalParameterMiniTimeTick:
+            parameter.name = "Report Time Tick";
+            parameter.symbol = "r_time_tick";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 8192.0f;
+            break;
+        case kCardinalParameterMiniTimeTicksPerBeat:
+            parameter.name = "Report Time Ticks Per Beat";
+            parameter.symbol = "r_time_ticksPerBeat";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 8192.0f;
             break;
         }
        #endif
@@ -708,19 +854,21 @@ protected:
     float getParameterValue(uint32_t index) const override
     {
         // host mapped parameters
-        if (index < kModuleParameters)
+        if (index < kCardinalParameterCountAtModules)
             return context->parameters[index];
 
         // bypass
-        if (index == kModuleParameters)
+        if (index == kCardinalParameterBypass)
             return context->bypassed ? 1.0f : 0.0f;
 
        #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
-        // window related parameters
-        index -= kModuleParameters + 1;
+        if (index < kCardinalParameterCountAtWindow)
+            return fWindowParameters[index - kCardinalParameterStartWindow];
+       #endif
 
-        if (index < kWindowParameterCount)
-            return fWindowParameters[index];
+       #if CARDINAL_VARIANT_MINI
+        if (index < kCardinalParameterCountAtMini)
+            return fMiniReportValues[index - kCardinalParameterStartMini];
        #endif
 
         return 0.0f;
@@ -729,26 +877,23 @@ protected:
     void setParameterValue(uint32_t index, float value) override
     {
         // host mapped parameters
-        if (index < kModuleParameters)
+        if (index < kCardinalParameterCountAtModules)
         {
             context->parameters[index] = value;
             return;
         }
 
         // bypass
-        if (index == kModuleParameters)
+        if (index == kCardinalParameterBypass)
         {
             context->bypassed = value > 0.5f;
             return;
         }
 
        #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
-        // window related parameters
-        index -= kModuleParameters + 1;
-
-        if (index < kWindowParameterCount)
+        if (index < kCardinalParameterCountAtWindow)
         {
-            fWindowParameters[index] = value;
+            fWindowParameters[index - kCardinalParameterStartWindow] = value;
             return;
         }
        #endif
@@ -1044,10 +1189,28 @@ protected:
                 context->ticksPerClock = timePos.bbt.ticksPerBeat / timePos.bbt.beatType;
                 context->ticksPerFrame = 1.0 / samplesPerTick;
                 context->tickClock = std::fmod(timePos.bbt.tick, context->ticksPerClock);
+               #if CARDINAL_VARIANT_MINI
+                fMiniReportValues[kCardinalParameterMiniTimeBar - kCardinalParameterStartMini] = timePos.bbt.bar;
+                fMiniReportValues[kCardinalParameterMiniTimeBeat - kCardinalParameterStartMini] = timePos.bbt.beat;
+                fMiniReportValues[kCardinalParameterMiniTimeBeatsPerBar - kCardinalParameterStartMini] = timePos.bbt.beatsPerBar;
+                fMiniReportValues[kCardinalParameterMiniTimeBeatType - kCardinalParameterStartMini] = timePos.bbt.beatType;
+                fMiniReportValues[kCardinalParameterMiniTimeBarStartTick - kCardinalParameterStartMini] = timePos.bbt.barStartTick;
+                fMiniReportValues[kCardinalParameterMiniTimeBeatsPerMinute - kCardinalParameterStartMini] = timePos.bbt.beatsPerMinute;
+                fMiniReportValues[kCardinalParameterMiniTimeTick - kCardinalParameterStartMini] = timePos.bbt.tick;
+                fMiniReportValues[kCardinalParameterMiniTimeTicksPerBeat - kCardinalParameterStartMini] = timePos.bbt.ticksPerBeat;
+               #endif
             }
 
             context->reset = reset;
             fNextExpectedFrame = timePos.playing ? timePos.frame + frames : 0;
+
+           #if CARDINAL_VARIANT_MINI
+            const int flags = (timePos.playing ? 0x1 : 0x0)
+                            | (timePos.bbt.valid ? 0x2 : 0x0)
+                            | (reset ? 0x4 : 0x0);
+            fMiniReportValues[kCardinalParameterMiniTimeFlags - kCardinalParameterStartMini] = flags;
+            fMiniReportValues[kCardinalParameterMiniTimeFrame - kCardinalParameterStartMini] = timePos.frame / getSampleRate();
+           #endif
         }
 
         // separate buffers, use them
@@ -1062,8 +1225,8 @@ protected:
            #if DISTRHO_PLUGIN_NUM_INPUTS != 0
             for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
             {
-               #if CARDINAL_VARIANT_MAIN
-                // can be null on main variant
+               #if CARDINAL_VARIANT_MAIN || CARDINAL_VARIANT_MINI
+                // can be null on main and mini variants
                 if (inputs[i] != nullptr)
                #endif
                     std::memcpy(fAudioBufferCopy[i], inputs[i], sizeof(float)*frames);
@@ -1077,12 +1240,17 @@ protected:
 
         for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
         {
-           #if CARDINAL_VARIANT_MAIN
-            // can be null on main variant
+           #if CARDINAL_VARIANT_MAIN || CARDINAL_VARIANT_MINI
+            // can be null on main and mini variants
             if (outputs[i] != nullptr)
            #endif
                 std::memset(outputs[i], 0, sizeof(float)*frames);
         }
+
+        #if CARDINAL_VARIANT_MINI
+        for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
+            fMiniReportValues[i] = context->dataIns[i][0];
+        #endif
 
         if (bypassed)
         {

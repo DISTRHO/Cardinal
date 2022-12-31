@@ -704,7 +704,7 @@ public:
             return;
         }
 
-        setParameterValue(kModuleParameters + param + 1, value * mult);
+        setParameterValue(kCardinalParameterStartWindow + param, value * mult);
     }
 
 protected:
@@ -718,7 +718,7 @@ protected:
     void parameterChanged(const uint32_t index, const float value) override
     {
         // host mapped parameters
-        if (index < kModuleParameters)
+        if (index < kCardinalParameterCountAtModules)
         {
            #if CARDINAL_VARIANT_MINI
             context->parameters[index] = value;
@@ -727,7 +727,7 @@ protected:
         }
 
         // bypass
-        if (index == kModuleParameters)
+        if (index == kCardinalParameterBypass)
         {
            #if CARDINAL_VARIANT_MINI
             context->bypassed = value > 0.5f;
@@ -735,89 +735,147 @@ protected:
             return;
         }
 
-        switch (index - kModuleParameters - 1)
+        if (index < kCardinalParameterCountAtWindow)
         {
-        case kWindowParameterShowTooltips:
-            windowParameters.tooltips = value > 0.5f;
-            break;
-        case kWindowParameterCableOpacity:
-            windowParameters.cableOpacity = value / 100.0f;
-            break;
-        case kWindowParameterCableTension:
-            windowParameters.cableTension = value / 100.0f;
-            break;
-        case kWindowParameterRackBrightness:
-            windowParameters.rackBrightness = value / 100.0f;
-            break;
-        case kWindowParameterHaloBrightness:
-            windowParameters.haloBrightness = value / 100.0f;
-            break;
-        case kWindowParameterKnobMode:
-            switch (static_cast<int>(value + 0.5f))
+            switch (index - kCardinalParameterStartWindow)
             {
-            case 0:
-                windowParameters.knobMode = rack::settings::KNOB_MODE_LINEAR;
+            case kWindowParameterShowTooltips:
+                windowParameters.tooltips = value > 0.5f;
                 break;
-            case 1:
-                windowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_ABSOLUTE;
+            case kWindowParameterCableOpacity:
+                windowParameters.cableOpacity = value / 100.0f;
                 break;
-            case 2:
-                windowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_RELATIVE;
+            case kWindowParameterCableTension:
+                windowParameters.cableTension = value / 100.0f;
                 break;
-            }
-            break;
-        case kWindowParameterWheelKnobControl:
-            windowParameters.knobScroll = value > 0.5f;
-            break;
-        case kWindowParameterWheelSensitivity:
-            windowParameters.knobScrollSensitivity = value / 1000.0f;
-            break;
-        case kWindowParameterLockModulePositions:
-            windowParameters.lockModules = value > 0.5f;
-            break;
-        case kWindowParameterUpdateRateLimit:
-            windowParameters.rateLimit = static_cast<int>(value + 0.5f);
-            rateLimitStep = 0;
-            break;
-        case kWindowParameterBrowserSort:
-            windowParameters.browserSort = static_cast<int>(value + 0.5f);
-            break;
-        case kWindowParameterBrowserZoom:
-            // round up to nearest valid value
-            {
-                float rvalue = value - 1.0f;
+            case kWindowParameterRackBrightness:
+                windowParameters.rackBrightness = value / 100.0f;
+                break;
+            case kWindowParameterHaloBrightness:
+                windowParameters.haloBrightness = value / 100.0f;
+                break;
+            case kWindowParameterKnobMode:
+                switch (static_cast<int>(value + 0.5f))
+                {
+                case 0:
+                    windowParameters.knobMode = rack::settings::KNOB_MODE_LINEAR;
+                    break;
+                case 1:
+                    windowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_ABSOLUTE;
+                    break;
+                case 2:
+                    windowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_RELATIVE;
+                    break;
+                }
+                break;
+            case kWindowParameterWheelKnobControl:
+                windowParameters.knobScroll = value > 0.5f;
+                break;
+            case kWindowParameterWheelSensitivity:
+                windowParameters.knobScrollSensitivity = value / 1000.0f;
+                break;
+            case kWindowParameterLockModulePositions:
+                windowParameters.lockModules = value > 0.5f;
+                break;
+            case kWindowParameterUpdateRateLimit:
+                windowParameters.rateLimit = static_cast<int>(value + 0.5f);
+                rateLimitStep = 0;
+                break;
+            case kWindowParameterBrowserSort:
+                windowParameters.browserSort = static_cast<int>(value + 0.5f);
+                break;
+            case kWindowParameterBrowserZoom:
+                // round up to nearest valid value
+                {
+                    float rvalue = value - 1.0f;
 
-                if (rvalue <= 25.0f)
-                    rvalue = -2.0f;
-                else if (rvalue <= 35.0f)
-                    rvalue = -1.5f;
-                else if (rvalue <= 50.0f)
-                    rvalue = -1.0f;
-                else if (rvalue <= 71.0f)
-                    rvalue = -0.5f;
-                else if (rvalue <= 100.0f)
-                    rvalue = 0.0f;
-                else if (rvalue <= 141.0f)
-                    rvalue = 0.5f;
-                else if (rvalue <= 200.0f)
-                    rvalue = 1.0f;
-                else
-                    rvalue = 0.0f;
+                    if (rvalue <= 25.0f)
+                        rvalue = -2.0f;
+                    else if (rvalue <= 35.0f)
+                        rvalue = -1.5f;
+                    else if (rvalue <= 50.0f)
+                        rvalue = -1.0f;
+                    else if (rvalue <= 71.0f)
+                        rvalue = -0.5f;
+                    else if (rvalue <= 100.0f)
+                        rvalue = 0.0f;
+                    else if (rvalue <= 141.0f)
+                        rvalue = 0.5f;
+                    else if (rvalue <= 200.0f)
+                        rvalue = 1.0f;
+                    else
+                        rvalue = 0.0f;
 
-                windowParameters.browserZoom = rvalue;
+                    windowParameters.browserZoom = rvalue;
+                }
+                break;
+            case kWindowParameterInvertZoom:
+                windowParameters.invertZoom = value > 0.5f;
+                break;
+            case kWindowParameterSqueezeModulePositions:
+                windowParameters.squeezeModules = value > 0.5f;
+                break;
+            default:
+                return;
             }
-            break;
-        case kWindowParameterInvertZoom:
-            windowParameters.invertZoom = value > 0.5f;
-            break;
-        case kWindowParameterSqueezeModulePositions:
-            windowParameters.squeezeModules = value > 0.5f;
-            break;
-        default:
+
+            WindowParametersSetValues(context->window, windowParameters);
             return;
         }
 
-        WindowParametersSetValues(context->window, windowParameters);
+       #if CARDINAL_VARIANT_MINI
+        if (index < kCardinalParameterCountAtMiniBuffers)
+        {
+            float* const buffer = *const_cast<float**>(&context->dataIns[index - kCardinalParameterStartMiniBuffers]);
+            buffer[0] = value;
+            return;
+        }
+
+        switch (index)
+        {
+        case kCardinalParameterMiniTimeFlags: {
+            const int32_t flags = static_cast<int32_t>(value + 0.5f);
+            context->playing = flags & 0x1;
+            context->bbtValid = flags & 0x2;
+            context->reset = flags & 0x4;
+            return;
+        }
+        case kCardinalParameterMiniTimeBar:
+            context->bar = static_cast<int32_t>(value + 0.5f);
+            return;
+        case kCardinalParameterMiniTimeBeat:
+            context->beat = static_cast<int32_t>(value + 0.5f);
+            return;
+        case kCardinalParameterMiniTimeBeatsPerBar:
+            context->beatsPerBar = static_cast<int32_t>(value + 0.5f);
+            return;
+        case kCardinalParameterMiniTimeBeatType:
+            context->beatType = static_cast<int32_t>(value + 0.5f);
+            context->ticksPerClock = context->ticksPerBeat / context->beatType;
+            context->tickClock = std::fmod(context->tick, context->ticksPerClock);
+            return;
+        case kCardinalParameterMiniTimeFrame:
+            context->frame = static_cast<uint64_t>(value * context->sampleRate + 0.5f);
+            return;
+        case kCardinalParameterMiniTimeBarStartTick:
+            context->barStartTick = value;
+            return;
+        case kCardinalParameterMiniTimeBeatsPerMinute:
+            context->beatsPerMinute = value;
+            context->ticksPerFrame = 1.0 / (60.0 * context->sampleRate / context->beatsPerMinute / context->ticksPerBeat);
+            return;
+        case kCardinalParameterMiniTimeTick:
+            context->tick = value;
+            context->tickClock = std::fmod(context->tick, context->ticksPerClock);
+            return;
+        case kCardinalParameterMiniTimeTicksPerBeat:
+            context->ticksPerBeat = value;
+            context->ticksPerClock = context->ticksPerBeat / context->beatType;
+            context->ticksPerFrame = 1.0 / (60.0 * context->sampleRate / context->beatsPerMinute / context->ticksPerBeat);
+            context->tickClock = std::fmod(context->tick, context->ticksPerClock);
+            return;
+        }
+       #endif
     }
 
     void stateChanged(const char* const key, const char* const value) override

@@ -28,6 +28,12 @@
 #include "CardinalRemote.hpp"
 #include "DistrhoPlugin.hpp"
 
+#if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+# include "WindowParameters.hpp"
+#else
+# define kWindowParameterCount 0
+#endif
+
 #ifndef HEADLESS
 # include "DistrhoUI.hpp"
 #else
@@ -43,7 +49,7 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
-static constexpr const uint kModuleParameters = 24;
+static constexpr const uint kModuleParameterCount = 24;
 
 enum CardinalVariant {
     kCardinalVariantMain,
@@ -53,6 +59,74 @@ enum CardinalVariant {
     kCardinalVariantSynth,
 };
 
+enum CardinalParameters {
+    kCardinalParameterCountAtModules = kModuleParameterCount,
+    kCardinalParameterBypass = kCardinalParameterCountAtModules,
+  #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+    kCardinalParameterStartWindow,
+    kCardinalParameterCountAtWindow = kCardinalParameterStartWindow + kWindowParameterCount,
+   #if CARDINAL_VARIANT_MINI
+    kCardinalParameterStartMini = kCardinalParameterCountAtWindow,
+    kCardinalParameterStartMiniBuffers = kCardinalParameterStartMini,
+    kCardinalParameterMiniAudioIn1 = kCardinalParameterStartMiniBuffers,
+    kCardinalParameterMiniAudioIn2,
+    kCardinalParameterMiniCVIn1,
+    kCardinalParameterMiniCVIn2,
+    kCardinalParameterMiniCVIn3,
+    kCardinalParameterMiniCVIn4,
+    kCardinalParameterMiniCVIn5,
+    kCardinalParameterCountAtMiniBuffers,
+    kCardinalParameterStartMiniTime = kCardinalParameterCountAtMiniBuffers,
+    kCardinalParameterMiniTimeFlags = kCardinalParameterStartMiniTime,
+    kCardinalParameterMiniTimeBar,
+    kCardinalParameterMiniTimeBeat,
+    kCardinalParameterMiniTimeBeatsPerBar,
+    kCardinalParameterMiniTimeBeatType,
+    kCardinalParameterMiniTimeFrame,
+    kCardinalParameterMiniTimeBarStartTick,
+    kCardinalParameterMiniTimeBeatsPerMinute,
+    kCardinalParameterMiniTimeTick,
+    kCardinalParameterMiniTimeTicksPerBeat,
+    kCardinalParameterCountAtMiniTime,
+    kCardinalParameterCountAtMini = kCardinalParameterCountAtMiniTime,
+    kCardinalParameterCount = kCardinalParameterCountAtMini
+   #else
+    kCardinalParameterCount = kCardinalParameterCountAtWindow
+   #endif
+  #else
+    kCardinalParameterCount
+  #endif
+};
+
+enum CardinalStates {
+    kCardinalStatePatch,
+    kCardinalStateScreenshot,
+    kCardinalStateComment,
+   #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+    kCardinalStateModuleInfos,
+    kCardinalStateWindowSize,
+   #endif
+   #if CARDINAL_VARIANT_MINI
+    kCardinalStateParamChange,
+   #endif
+    kCardinalStateCount
+};
+
+static_assert(kCardinalParameterBypass == kModuleParameterCount, "valid parameter indexes");
+#if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+static_assert(kCardinalParameterStartWindow == kModuleParameterCount + 1, "valid parameter indexes");
+static_assert(kCardinalParameterStartWindow == kCardinalParameterBypass + 1, "valid parameter indexes");
+static_assert(kCardinalParameterCountAtWindow == kModuleParameterCount + kWindowParameterCount + 1, "valid parameter indexes");
+#endif
+#if CARDINAL_VARIANT_MINI
+static_assert(0 == kCardinalParameterStartMini - kCardinalParameterMiniAudioIn1, "valid parameter indexes");
+static_assert(kCardinalParameterStartMini == kCardinalParameterCountAtWindow, "valid parameter indexes");
+static_assert(kCardinalParameterStartMini == kCardinalParameterBypass + kWindowParameterCount + 1, "valid parameter indexes");
+static_assert(kCardinalParameterStartMini == kModuleParameterCount + kWindowParameterCount + 1, "valid parameter indexes");
+static_assert(kCardinalParameterCountAtWindow == kModuleParameterCount + kWindowParameterCount + 1, "valid parameter indexes");
+static_assert(DISTRHO_PLUGIN_NUM_INPUTS == kCardinalParameterCountAtMiniBuffers - kCardinalParameterStartMiniBuffers, "valid parameter indexes");
+#endif
+
 class UI;
 
 // -----------------------------------------------------------------------------------------------------------
@@ -60,7 +134,7 @@ class UI;
 struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize, processCounter;
     double sampleRate;
-    float parameters[kModuleParameters];
+    float parameters[kModuleParameterCount];
     CardinalVariant variant;
     bool bypassed, playing, reset, bbtValid;
     int32_t bar, beat, beatsPerBar, beatType;

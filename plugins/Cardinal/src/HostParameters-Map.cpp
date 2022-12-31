@@ -63,8 +63,8 @@ struct HostParametersMap : TerminalModule {
     uint8_t learningId = UINT8_MAX;
 
     CardinalPluginContext* const pcontext;
-    bool parametersChanged[kModuleParameters] = {};
-    float parameterValues[kModuleParameters];
+    bool parametersChanged[kModuleParameterCount] = {};
+    float parameterValues[kModuleParameterCount];
     bool bypassed = false;
     bool firstRun = true;
     uint32_t lastProcessCounter = 0;
@@ -135,7 +135,7 @@ struct HostParametersMap : TerminalModule {
         if (isBypassed())
             return;
 
-        for (uint32_t i = 0; i < kModuleParameters; ++i)
+        for (uint32_t i = 0; i < kModuleParameterCount; ++i)
         {
             if (d_isEqual(pcontext->parameters[i], parameterValues[i]))
                 continue;
@@ -161,7 +161,7 @@ struct HostParametersMap : TerminalModule {
 
             // Validate hostParamId
             const uint8_t hostParamId = mappings[id].hostParamId;
-            if (hostParamId >= kModuleParameters)
+            if (hostParamId >= kModuleParameterCount)
                 continue;
 
             // Set filter from param value if filter is uninitialized
@@ -350,7 +350,7 @@ struct ParameterIndexQuantity : Quantity {
         return 0;
     }
     float getMaxValue() override {
-        return kModuleParameters - 1;
+        return kModuleParameterCount - 1;
     }
     float getDefaultValue() override {
         return 0;
@@ -360,7 +360,7 @@ struct ParameterIndexQuantity : Quantity {
     }
     void setValue(float value) override {
         v = math::clamp(value, getMinValue(), getMaxValue());
-        mapping.hostParamId = math::clamp(static_cast<int>(v + 0.5f), 0, kModuleParameters - 1);
+        mapping.hostParamId = math::clamp(static_cast<int>(v + 0.5f), 0, kModuleParameterCount - 1);
     }
     float getDisplayValue() override {
         return mapping.hostParamId + 1;
@@ -437,7 +437,7 @@ struct HostParametersMapChoice : CardinalLedDisplayChoice {
             if (ParamWidget* const touchedParam = APP->scene->rack->touchedParam)
             {
                 APP->scene->rack->touchedParam = nullptr;
-                DISTRHO_SAFE_ASSERT_RETURN(mapping.hostParamId < kModuleParameters,);
+                DISTRHO_SAFE_ASSERT_RETURN(mapping.hostParamId < kModuleParameterCount,);
 
                 const int64_t moduleId = touchedParam->module->id;
                 const int paramId = touchedParam->paramId;
@@ -453,7 +453,7 @@ struct HostParametersMapChoice : CardinalLedDisplayChoice {
         text.clear();
 
         // mapped
-        if (module->mappings[id].hostParamId < kModuleParameters)
+        if (module->mappings[id].hostParamId < kModuleParameterCount)
             text += string::f("P%02d: ", module->mappings[id].hostParamId + 1);
         if (module->mappings[id].paramHandle.moduleId >= 0)
             text += getParamName();
