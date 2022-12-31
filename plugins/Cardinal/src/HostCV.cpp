@@ -195,30 +195,30 @@ struct HostCVWidget : ModuleWidgetWith8HP {
     {
         drawBackground(args.vg);
 
-        if (pcontext->variant != kCardinalVariantMain && pcontext->variant != kCardinalVariantMini)
-            return;
-
-        drawOutputJacksArea(args.vg, pcontext->variant == kCardinalVariantMini ? 5 : HostCV::NUM_INPUTS);
-        setupTextLines(args.vg);
-
-        switch (pcontext->variant)
+        if (pcontext->variant == kCardinalVariantMain || pcontext->variant == kCardinalVariantMini)
         {
-        case kCardinalVariantMain:
-            drawTextLine(args.vg, 5, "CV 6");
-            drawTextLine(args.vg, 6, "CV 7");
-            drawTextLine(args.vg, 7, "CV 8");
-            drawTextLine(args.vg, 8, "CV 9");
-            drawTextLine(args.vg, 9, "CV 10");
-            // fall through
-        case kCardinalVariantMini:
-            drawTextLine(args.vg, 0, "CV 1");
-            drawTextLine(args.vg, 1, "CV 2");
-            drawTextLine(args.vg, 2, "CV 3");
-            drawTextLine(args.vg, 3, "CV 4");
-            drawTextLine(args.vg, 4, "CV 5");
-            break;
-        default:
-            break;
+            drawOutputJacksArea(args.vg, pcontext->variant == kCardinalVariantMini ? 5 : HostCV::NUM_INPUTS);
+            setupTextLines(args.vg);
+
+            switch (pcontext->variant)
+            {
+            case kCardinalVariantMain:
+                drawTextLine(args.vg, 5, "CV 6");
+                drawTextLine(args.vg, 6, "CV 7");
+                drawTextLine(args.vg, 7, "CV 8");
+                drawTextLine(args.vg, 8, "CV 9");
+                drawTextLine(args.vg, 9, "CV 10");
+                // fall through
+            case kCardinalVariantMini:
+                drawTextLine(args.vg, 0, "CV 1");
+                drawTextLine(args.vg, 1, "CV 2");
+                drawTextLine(args.vg, 2, "CV 3");
+                drawTextLine(args.vg, 3, "CV 4");
+                drawTextLine(args.vg, 4, "CV 5");
+                break;
+            default:
+                break;
+            }
         }
 
         ModuleWidgetWith8HP::draw(args);
