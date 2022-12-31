@@ -26,6 +26,10 @@
 // Fundamental
 #include "Fundamental/src/plugin.hpp"
 
+// Aria
+extern Model* modelSpleet;
+extern Model* modelSwerge;
+
 // AudibleInstruments
 #include "AudibleInstruments/src/plugin.hpp"
 
@@ -49,7 +53,6 @@ extern Model* modelOffset;
 extern Model* modelSampleHold;
 extern Model* modelSwitch;
 extern Model* modelSwitch18;
-extern Model* modelUMix;
 extern Model* modelUnison;
 
 // ValleyAudio
@@ -61,6 +64,7 @@ std::vector<Model*> hostTerminalModels;
 // plugin instances
 Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__Fundamental;
+Plugin* pluginInstance__Aria;
 Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__ValleyAudio;
@@ -252,6 +256,41 @@ static void initStatic__Fundamental()
     }
 }
 
+static void initStatic__Aria()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Aria = p;
+
+    const StaticPluginLoader spl(p, "AriaModules");
+    if (spl.ok())
+    {
+        p->addModel(modelSpleet);
+        p->addModel(modelSwerge);
+
+        spl.removeModule("Aleister");
+        spl.removeModule("Arcane");
+        spl.removeModule("Atout");
+        spl.removeModule("Blank");
+        spl.removeModule("Darius");
+        spl.removeModule("Grabby");
+        spl.removeModule("Pokies4");
+        spl.removeModule("Psychopump");
+        spl.removeModule("Q");
+        spl.removeModule("Qqqq");
+        spl.removeModule("Quack");
+        spl.removeModule("Quale");
+        spl.removeModule("Rotatoes4");
+        spl.removeModule("Smerge");
+        spl.removeModule("Solomon16");
+        spl.removeModule("Solomon4");
+        spl.removeModule("Solomon8");
+        spl.removeModule("Splirge");
+        spl.removeModule("Splort");
+        spl.removeModule("Undular");
+
+    }
+}
+
 static void initStatic__AudibleInstruments()
 {
     Plugin* const p = new Plugin;
@@ -305,7 +344,6 @@ static void initStatic__BogaudioModules()
         p->addModel(modelSampleHold);
         p->addModel(modelSwitch);
         p->addModel(modelSwitch18);
-        p->addModel(modelUMix);
         p->addModel(modelUnison);
 
         // cat plugins/BogaudioModules/plugin.json  | jq -r .modules[].slug - | sort
@@ -400,6 +438,7 @@ static void initStatic__BogaudioModules()
         spl.removeModule("Bogaudio-Switch44");
         spl.removeModule("Bogaudio-Switch81");
         spl.removeModule("Bogaudio-Switch88");
+        spl.removeModule("Bogaudio-UMix");
         spl.removeModule("Bogaudio-VCAmp");
         spl.removeModule("Bogaudio-VCM");
         spl.removeModule("Bogaudio-Velo");
@@ -436,6 +475,7 @@ void initStaticPlugins()
 {
     initStatic__Cardinal();
     initStatic__Fundamental();
+    initStatic__Aria();
     initStatic__AudibleInstruments();
     initStatic__BogaudioModules();
     initStatic__ValleyAudio();
