@@ -313,9 +313,12 @@ PLUGIN_FILES += Fundamental/src/dr_wav.c
 
 MINIPLUGIN_FILES += Fundamental/src/ADSR.cpp
 MINIPLUGIN_FILES += Fundamental/src/LFO.cpp
+MINIPLUGIN_FILES += Fundamental/src/Merge.cpp
 MINIPLUGIN_FILES += Fundamental/src/Noise.cpp
+MINIPLUGIN_FILES += Fundamental/src/Quantizer.cpp
 MINIPLUGIN_FILES += Fundamental/src/Random.cpp
 MINIPLUGIN_FILES += Fundamental/src/Scope.cpp
+MINIPLUGIN_FILES += Fundamental/src/Split.cpp
 MINIPLUGIN_FILES += Fundamental/src/VCA-1.cpp
 MINIPLUGIN_FILES += Fundamental/src/VCF.cpp
 MINIPLUGIN_FILES += Fundamental/src/VCMixer.cpp
@@ -592,14 +595,24 @@ PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/filters/*.cpp)
 
 MINIPLUGIN_FILES += BogaudioModules/src/LFO.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/Noise.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/Offset.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/SampleHold.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/Switch.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/Switch18.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/UMix.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/Unison.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/VCA.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/VCF.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/VCO.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/disable_output_limit.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/lfo_base.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/matrix_base.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/menu.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/module.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/param_quantities.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/poly_channels.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/rack_overrides.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/save_latch_to_patch.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/skins.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/utils.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/vco_base.cpp
@@ -1006,6 +1019,7 @@ PLUGIN_FILES += surgext-helper/surgext-helper.cpp
 SURGEXT_CUSTOM = HysteresisProcessing Patch SolverType Tunings Wavetable ghc clouds plaits stmlib
 
 SURGEXT_FLAGS  = $(filter-out -fsingle-precision-constant,$(filter-out -std=gnu++11,$(BUILD_CXX_FLAGS)))
+SURGEXT_FLAGS += $(NOFINITE_FLAGS)
 SURGEXT_FLAGS += -std=gnu++17
 SURGEXT_FLAGS += -DTIXML_USE_STL=1
 SURGEXT_FLAGS += -Isurgext/surge/src/common \
@@ -1133,6 +1147,58 @@ PLUGIN_BINARIES += ValleyAudio/src/VOICE_6.bin
 PLUGIN_BINARIES += ValleyAudio/src/VOX_MACH.bin
 PLUGIN_BINARIES += ValleyAudio/src/XFADE.bin
 
+MINIPLUGIN_FILES += ValleyAudio/src/PlainText.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/SteppedSlider.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/ValleyChoiceMenu.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/Common/FreqLUT.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/Common/Utilities.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/Common/DSP/OnePoleFilters.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/Common/DSP/OTAFilter.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/Common/SIMD/QuadOsc.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/Common/SIMD/VecLoopingADSR.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/Common/SIMD/VecOnePoleFilters.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/Common/SIMD/VecOTAFilter.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/Dexter/Dexter.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/Dexter/DexterRoutingMatrix.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/Dexter/Osc4Core_SIMD.cpp
+MINIPLUGIN_FILES += ValleyAudio/src/Interzone/Interzone.cpp
+
+MINIPLUGIN_BINARIES += ValleyAudio/src/ADD_BANK1.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/ADD_SAW.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/ADD_SINE.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/ADD_SQR.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/ALTOSAX.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/AM_HARM.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/BASIC.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/BITCRUSH1.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/BITCRUSH2.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/BI_PULSE.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/CELLO_1.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/CELLO_2.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/CHIP_1.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/CHIP_2.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/OBOE.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/OPAL.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/OVERTONE1.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/OVERTONE2.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/PIANO.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/PLUCK.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/PWM.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/SAW_GAP1.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/SAW_GAP2.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/SINE_HARM.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/SWEEPHARM.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/SYMMETRY.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/TEE_EKS.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/THEREMIN.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/VIDEOGAME.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/VIOLIN.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_1.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_2.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_3.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_4.bin
+MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_5.bin
+
 # modules/types which are present in other plugins
 VALLEYAUDIO_CUSTOM = $(DRWAV) DigitalDisplay
 VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
@@ -1245,6 +1311,10 @@ BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
 BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
 endif
 
+ifeq ($(MOD_BUILD),true)
+BASE_FLAGS += -DSIMDE_ENABLE_OPENMP -fopenmp
+endif
+
 ifneq ($(WASM),true)
 ifneq ($(HAIKU),true)
 BASE_FLAGS += -pthread
@@ -1274,8 +1344,6 @@ BASE_FLAGS += -DHAVE_SNDFILE
 endif
 
 BUILD_C_FLAGS += -std=gnu11
-BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 
 ifneq ($(MACOS),true)
 BUILD_CXX_FLAGS += -faligned-new -Wno-abi
@@ -1294,6 +1362,9 @@ BUILD_CXX_FLAGS += -Wno-format-security
 ifeq ($(MOD_BUILD),true)
 BUILD_CXX_FLAGS += -Wno-overflow
 endif
+
+# Use this for any plugins that rely on NaN presence
+NOFINITE_FLAGS = -fno-finite-math-only -fno-strict-aliasing
 
 # --------------------------------------------------------------
 # lots of warnings from VCV side
@@ -1424,13 +1495,505 @@ endif
 
 RESOURCE_FILES += Cardinal/res/Miku/Miku.png
 
-MINIPLUGIN_LIST     = AudibleInstruments BogaudioModules Cardinal Fundamental
-MINIRESOURCE_FILES  = $(wildcard AudibleInstruments/res/*.svg)
-MINIRESOURCE_FILES += $(wildcard BogaudioModules/res/*.svg)
-MINIRESOURCE_FILES += $(wildcard Cardinal/res/*.svg)
-MINIRESOURCE_FILES += $(wildcard Fundamental/res/*.svg)
-MINIRESOURCE_FILES += $(wildcard Fundamental/res/components/*.svg)
+MINIPLUGIN_LIST     = AudibleInstruments BogaudioModules Cardinal Fundamental ValleyAudio
+MINIRESOURCE_FILES  = AudibleInstruments/res/Plaits.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AD-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AD-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AD.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Additator-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Additator-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Additator.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AddrSeq-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AddrSeq-latif.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AddrSeq-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AddrSeq.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AddrSeqX-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AddrSeqX-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AddrSeqX.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/ADSR-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/ADSR-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/ADSR.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AMRM-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AMRM-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AMRM.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Analyzer-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Analyzer-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Analyzer.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AnalyzerXL.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Arp-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Arp-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Arp.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/ASR-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/ASR-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/ASR.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Assign-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Assign-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Assign.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Bool-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Bool-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Bool.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_18px_0.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_18px_1_green.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_18px_1_orange.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_18px_1.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_9px_0.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_9px_1_green.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_9px_1.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Chirp-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Chirp-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Chirp.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Clpr-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Clpr-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Clpr.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Cmp-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/CmpDist-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/CmpDist-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/CmpDist.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Cmp-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Cmp.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/CVD-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/CVD-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/CVD.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/DADSRH-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/DADSRH-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/DADSRHPlus-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/DADSRHPlus-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/DADSRHPlus.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/DADSRH.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Detune-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Detune-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Detune.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/DGate-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/DGate-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/DGate.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Edge-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Edge-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Edge.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EightFO-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EightFO-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EightFO.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EightOne-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EightOne-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EightOne.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EQ-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EQ-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EQS-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EQS-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EQS.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EQ.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FFB-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FFB-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FFB.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FlipFlop-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FlipFlop-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FlipFlop.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FMOp-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FMOp-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FMOp.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Follow-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Follow-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Follow.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FourFO-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FourFO-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FourFO.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FourMan-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FourMan-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FourMan.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Inv-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Inv-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Inv.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_16px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_16px-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_16px.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_19px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_19px-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_19px.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_26px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_26px-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_26px.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_29px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_29px-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_29px.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_38px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_38px-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_38px.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_45px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_45px-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_45px.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_68px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_68px-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_68px.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Lag-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Lag-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Lag.svg
+MINIRESOURCE_FILES += BogaudioModules/res/LFO-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/LFO-latif.svg
+MINIRESOURCE_FILES += BogaudioModules/res/LFO-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/LFO.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Lgsw-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Lgsw-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Lgsw.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LLFO-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LLFO-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LLFO.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LLPG-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LLPG-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LLPG.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Lmtr-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Lmtr-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Lmtr.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LPG-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LPG-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LPG.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LVCF-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LVCF-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LVCF.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LVCO-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LVCO-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LVCO.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Manual-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Manual-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Manual.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/MegaGate-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/MegaGate-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/MegaGate.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix1-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix1-latif.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix1-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix1.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix2-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix2-latif.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix2-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix2.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix4-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix4-latif.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix4-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix4.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix4x-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix4x-latif.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix4x-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix4x.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix8-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix8-latif.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix8-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix8.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix8x-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix8x-latif.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix8x-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix8x.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mono-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mono-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mono.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mult-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mult-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mult.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mumix-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mumix-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mumix.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mute8-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mute8-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mute8.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Noise-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Noise-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Noise.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Nsgt-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Nsgt-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Nsgt.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Offset-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Offset-latif.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Offset-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Offset.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/OneEight-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/OneEight-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/OneEight.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pan-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pan-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pan.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14XF-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14XF-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14XF.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14XR-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14XR-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14XR.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14XV-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14XV-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14XV.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ6-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ6-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ6.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ6XF-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ6XF-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ6XF.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pgmr-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pgmr-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pgmr.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PgmrX-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PgmrX-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PgmrX.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyCon16-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyCon16-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyCon16.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyCon8-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyCon8-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyCon8.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyMult-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyMult-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyMult.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyOff16-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyOff16-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyOff16.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyOff8-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyOff8-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyOff8.svg
+MINIRESOURCE_FILES += BogaudioModules/res/port-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/port-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/port.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pressor-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pressor-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pressor.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pulse-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pulse-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pulse.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Ranalyzer.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Reftone-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Reftone-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Reftone.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/RGate-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/RGate-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/RGate.svg
+MINIRESOURCE_FILES += BogaudioModules/res/SampleHold-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/SampleHold-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/SampleHold.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Shaper-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Shaper-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/ShaperPlus-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/ShaperPlus-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/ShaperPlus.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Shaper.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Sine-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Sine-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Sine.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Slew-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Slew-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Slew.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/slider_switch_2_14px_0.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/slider_switch_2_14px_1.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Stack-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Stack-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Stack.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Sums-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Sums-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Sums.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Switch-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Switch-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Switch.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch1616-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch1616-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch1616.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Switch18-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Switch18-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Switch18.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch44-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch44-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch44.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch81-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch81-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch81.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch88-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch88-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch88.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Test2-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Test2-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Test2.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Test-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestExpanderBase-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestExpanderBase-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestExpanderBase.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestExpanderExtension-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestExpanderExtension-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestExpanderExtension.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestGl-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestGl-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestGl.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Test-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Test.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestVCF-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestVCF-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestVCF.svg
+MINIRESOURCE_FILES += BogaudioModules/res/UMix-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/UMix-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/UMix.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Unison-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Unison-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Unison.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCA-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCA-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCA.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/VCAmp-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/VCAmp-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/VCAmp.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCF-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCF-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCF.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/VCM-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/VCM-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/VCM.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCO-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCO-latif.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCO-lowcontrast.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCO.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Velo-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Velo-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Velo.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Vish-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Vish-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Vish.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/VU-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/VU-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/VU.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Walk2-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Walk2-latif.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Walk2-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Walk2.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Walk-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Walk-latif.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Walk-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Walk.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/XCO-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/XCO-latif.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/XCO-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/XCO.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/XFade-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/XFade-lowcontrast.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/XFade.svg
+
+MINIRESOURCE_FILES += Cardinal/res/HostAudio.svg
+MINIRESOURCE_FILES += Cardinal/res/HostCV.svg
+MINIRESOURCE_FILES += Cardinal/res/HostMIDICC.svg
+MINIRESOURCE_FILES += Cardinal/res/HostMIDIGate.svg
+MINIRESOURCE_FILES += Cardinal/res/HostMIDIMap.svg
+MINIRESOURCE_FILES += Cardinal/res/HostMIDI.svg
+MINIRESOURCE_FILES += Cardinal/res/HostParameters.svg
+MINIRESOURCE_FILES += Cardinal/res/HostParamsMap.svg
+MINIRESOURCE_FILES += Cardinal/res/HostTime.svg
+
 MINIRESOURCE_FILES += Fundamental/presets
+MINIRESOURCE_FILES += Fundamental/res/ADSR.svg
+MINIRESOURCE_FILES += Fundamental/res/LFO.svg
+MINIRESOURCE_FILES += Fundamental/res/Merge.svg
+MINIRESOURCE_FILES += Fundamental/res/Noise.svg
+MINIRESOURCE_FILES += Fundamental/res/Quantizer.svg
+MINIRESOURCE_FILES += Fundamental/res/Random.svg
+MINIRESOURCE_FILES += Fundamental/res/Scope.svg
+MINIRESOURCE_FILES += Fundamental/res/Split.svg
+MINIRESOURCE_FILES += Fundamental/res/VCA-1.svg
+MINIRESOURCE_FILES += Fundamental/res/VCF.svg
+MINIRESOURCE_FILES += Fundamental/res/VCMixer.svg
+MINIRESOURCE_FILES += Fundamental/res/VCO.svg
+MINIRESOURCE_FILES += Fundamental/res/components/ADSR-bg.svg
+MINIRESOURCE_FILES += Fundamental/res/components/button-off.svg
+MINIRESOURCE_FILES += Fundamental/res/components/button-on.svg
+MINIRESOURCE_FILES += Fundamental/res/components/knob-marker-small.svg
+MINIRESOURCE_FILES += Fundamental/res/components/knob-marker.svg
+MINIRESOURCE_FILES += Fundamental/res/components/knob-small.svg
+MINIRESOURCE_FILES += Fundamental/res/components/knob.svg
+MINIRESOURCE_FILES += Fundamental/res/components/port.svg
+MINIRESOURCE_FILES += Fundamental/res/components/Quantizer-keyboard.svg
+MINIRESOURCE_FILES += Fundamental/res/components/Scope-bg.svg
+
+MINIRESOURCE_FILES += ValleyAudio/res/DexterPanelDark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/DexterPanelLight.svg
+MINIRESOURCE_FILES += ValleyAudio/res/InterzonePanelDark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/InterzonePanelLight.svg
+MINIRESOURCE_FILES += ValleyAudio/res/LightLEDButton80.svg
+MINIRESOURCE_FILES += ValleyAudio/res/PJ301MDarkSmallOut.svg
+MINIRESOURCE_FILES += ValleyAudio/res/PJ301MDarkSmall.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo0.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo1.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo2.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo3.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo4.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo5.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo6.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo7.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo8.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo9.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo10.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo11.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo12.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo13.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo14.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo15.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo16.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo17.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo18.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo19.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo20.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo21.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo22.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo0Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo1Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo2Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo3Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo4Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo5Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo6Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo7Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo8Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo9Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo10Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo11Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo12Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo13Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo14Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo15Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo16Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo17Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo18Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo19Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo20Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo21Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/algo22Dark.svg
+MINIRESOURCE_FILES += ValleyAudio/res/din1451alt.ttf
+MINIRESOURCE_FILES += ValleyAudio/res/sliderBlue.svg
+MINIRESOURCE_FILES += ValleyAudio/res/sliderGreen.svg
+MINIRESOURCE_FILES += ValleyAudio/res/sliderRed.svg
+MINIRESOURCE_FILES += ValleyAudio/res/sliderOrange.svg
+MINIRESOURCE_FILES += ValleyAudio/res/sliderYellow.svg
+MINIRESOURCE_FILES += ValleyAudio/res/valleySliderBackground.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSBlueMed.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSBlueMed-fg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSBlueMedSmall.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSBlueMedSmall-fg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSMed-bg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSMedSmall-bg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSGreenMed.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSGreenMed-fg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSOrangeMed.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSOrangeMed-fg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSRedMed.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSRedMed-fg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSPurpleMed.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSPurpleMed-fg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSSmall-bg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSBlueSmall.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSBlueSmall-fg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSOrangeSmall.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSOrangeSmall-fg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSGreenSmall.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSGreenSmall-fg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSRedSmall.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSRedSmall-fg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSMustardSmall.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSMustardSmall-fg.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSPurpleSmall.svg
+MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSPurpleSmall-fg.svg
 
 # MOD builds only have LV2 main and FX variant
 ifeq ($(MOD_BUILD),true)
@@ -1645,7 +2208,8 @@ endif
 PLUGIN_OBJS  = $(PLUGIN_FILES:%=$(BUILD_DIR)/%.o)
 PLUGIN_OBJS += $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.o)
 
-MINIPLUGIN_OBJS = $(MINIPLUGIN_FILES:%=$(BUILD_DIR)/%.o)
+MINIPLUGIN_OBJS  = $(MINIPLUGIN_FILES:%=$(BUILD_DIR)/%.o)
+MINIPLUGIN_OBJS += $(MINIPLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.o)
 
 NOPLUGIN_OBJS = $(NOPLUGIN_FILES:%=$(BUILD_DIR)/%.o)
 
@@ -1799,7 +2363,7 @@ $(BUILD_DIR)/AudibleInstruments/%.o: AudibleInstruments/%
 $(BUILD_DIR)/Autinn/%.cpp.o: Autinn/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(AUTINN_CUSTOM),$(call custom_module_names,$(m),Autinn)) \
 		-DpluginInstance=pluginInstance__Autinn \
 		-Dinit=init__Autinn
@@ -1877,7 +2441,7 @@ $(BUILD_DIR)/CatroModulo/src/%.cpp.o: CatroModulo/src/%.cpp
 $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
 		-DpluginInstance=pluginInstance__cf \
 		-Wno-misleading-indentation
@@ -1885,7 +2449,7 @@ $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(CHOWDSP_CUSTOM),$(call custom_module_names,$(m),ChowDSP)) \
 		-DpluginInstance=pluginInstance__ChowDSP \
 		-DUSE_EIGEN \
@@ -1935,7 +2499,7 @@ $(BUILD_DIR)/Extratone/src/%.cpp.o: Extratone/src/%.cpp
 $(BUILD_DIR)/FehlerFabrik/%.cpp.o: FehlerFabrik/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(FEHLERFABRIK_CUSTOM),$(call custom_module_names,$(m),FehlerFabrik)) \
 		-DpluginInstance=pluginInstance__FehlerFabrik
 
@@ -1957,6 +2521,13 @@ $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
+		-DpluginInstance=pluginInstance__Fundamental
+
+$(BUILD_DIR)/Fundamental/src/Scope.cpp.o: Fundamental/src/Scope.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
 		-DpluginInstance=pluginInstance__Fundamental
 
@@ -1986,7 +2557,7 @@ $(BUILD_DIR)/GoodSheperd/%.cpp.o: GoodSheperd/%.cpp
 $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(GRANDEMODULAR_CUSTOM),$(call custom_module_names,$(m),GrandeModular)) \
 		-DpluginInstance=pluginInstance__GrandeModular \
 		-Wno-missing-braces \
@@ -2010,7 +2581,7 @@ $(BUILD_DIR)/HamptonHarmonics/%.cpp.o: HamptonHarmonics/%.cpp
 $(BUILD_DIR)/HetrickCV/%.cpp.o: HetrickCV/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(HETRICKCV_CUSTOM),$(call custom_module_names,$(m),HetrickCV)) \
 		-DpluginInstance=pluginInstance__HetrickCV \
 		-DSTDIO_OVERRIDE=HetrickCV \
@@ -2020,7 +2591,7 @@ $(BUILD_DIR)/HetrickCV/%.cpp.o: HetrickCV/%.cpp
 $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
 		-DStepAttributes=StepAttributesKernel \
@@ -2028,7 +2599,7 @@ $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cp
 $(BUILD_DIR)/ImpromptuModular/src/ImpromptuModular.cpp.o: ImpromptuModular/src/ImpromptuModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
 		-Dinit=init__ImpromptuModular
@@ -2036,7 +2607,7 @@ $(BUILD_DIR)/ImpromptuModular/src/ImpromptuModular.cpp.o: ImpromptuModular/src/I
 $(BUILD_DIR)/ImpromptuModular%.cpp.o: ImpromptuModular%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ImpromptuModular_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
@@ -2100,7 +2671,7 @@ $(BUILD_DIR)/LilacLoop/%.cpp.o: LilacLoop/%.cpp
 $(BUILD_DIR)/LittleUtils/%.cpp.o: LittleUtils/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(LITTLEUTILS_CUSTOM),$(call custom_module_names,$(m),LittleUtils)) \
 		-DpluginInstance=pluginInstance__LittleUtils
 
@@ -2130,7 +2701,7 @@ $(BUILD_DIR)/Meander/src/Meander.cpp.o: Meander/src/Meander.cpp
 $(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),MindMeld)) \
 		-DpluginInstance=pluginInstance__MindMeld \
 		-Dinit=init__MindMeld
@@ -2138,7 +2709,7 @@ $(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/Mind
 $(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),MindMeld)) \
 		-DpluginInstance=pluginInstance__MindMeld
 
@@ -2166,7 +2737,7 @@ $(BUILD_DIR)/Mog/%.cpp.o: Mog/%.cpp
 $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(MSCHACK_CUSTOM),$(call custom_module_names,$(m),mscHack)) \
 		$(foreach m,$(MSCHACK_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),mscHack_$(shell basename $*))) \
 		-DthePlugin=pluginInstance__mscHack \
@@ -2219,7 +2790,7 @@ $(BUILD_DIR)/ParableInstruments/%.o: ParableInstruments/%
 $(BUILD_DIR)/PathSet/%.cpp.o: PathSet/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(PATHSET_CUSTOM),$(call custom_module_names,$(m),PathSet)) \
 		-DpluginInstance=pluginInstance__PathSet
 
@@ -2264,7 +2835,7 @@ $(BUILD_DIR)/repelzen/%.cpp.o: repelzen/%.cpp
 $(BUILD_DIR)/Sapphire/%.cpp.o: Sapphire/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(SAPPHIRE_CUSTOM),$(call custom_module_names,$(m),Sapphire)) \
 		-DpluginInstance=pluginInstance__sapphire
 

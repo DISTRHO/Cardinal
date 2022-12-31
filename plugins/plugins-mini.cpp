@@ -45,6 +45,15 @@ extern Model* modelBogaudioNoise;
 extern Model* modelBogaudioVCA;
 extern Model* modelBogaudioVCF;
 extern Model* modelBogaudioVCO;
+extern Model* modelOffset;
+extern Model* modelSampleHold;
+extern Model* modelSwitch;
+extern Model* modelSwitch18;
+extern Model* modelUMix;
+extern Model* modelUnison;
+
+// ValleyAudio
+#include "ValleyAudio/src/Valley.hpp"
 
 // known terminal modules
 std::vector<Model*> hostTerminalModels;
@@ -54,6 +63,7 @@ Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__BogaudioModules;
+Plugin* pluginInstance__ValleyAudio;
 
 namespace rack {
 
@@ -215,9 +225,12 @@ static void initStatic__Fundamental()
     {
         p->addModel(modelADSR);
         p->addModel(modelLFO);
+        p->addModel(modelMerge);
         p->addModel(modelNoise);
+        p->addModel(modelQuantizer);
         p->addModel(modelRandom);
         p->addModel(modelScope);
+        p->addModel(modelSplit);
         p->addModel(modelVCA_1);
         p->addModel(modelVCF);
         p->addModel(modelVCMixer);
@@ -225,17 +238,14 @@ static void initStatic__Fundamental()
         spl.removeModule("8vert");
         spl.removeModule("Delay");
         spl.removeModule("LFO2");
-        spl.removeModule("Merge");
         spl.removeModule("MidSide");
         spl.removeModule("Mixer");
         spl.removeModule("Mutes");
         spl.removeModule("Octave");
         spl.removeModule("Pulses");
-        spl.removeModule("Quantizer");
         spl.removeModule("SEQ3");
         spl.removeModule("SequentialSwitch1");
         spl.removeModule("SequentialSwitch2");
-        spl.removeModule("Split");
         spl.removeModule("Sum");
         spl.removeModule("VCA");
         spl.removeModule("VCO2");
@@ -291,6 +301,12 @@ static void initStatic__BogaudioModules()
         p->addModel(modelBogaudioVCA);
         p->addModel(modelBogaudioVCF);
         p->addModel(modelBogaudioVCO);
+        p->addModel(modelOffset);
+        p->addModel(modelSampleHold);
+        p->addModel(modelSwitch);
+        p->addModel(modelSwitch18);
+        p->addModel(modelUMix);
+        p->addModel(modelUnison);
 
         // cat plugins/BogaudioModules/plugin.json  | jq -r .modules[].slug - | sort
         spl.removeModule("Bogaudio-AD");
@@ -355,7 +371,6 @@ static void initStatic__BogaudioModules()
         spl.removeModule("Bogaudio-Mumix");
         spl.removeModule("Bogaudio-Mute8");
         spl.removeModule("Bogaudio-Nsgt");
-        spl.removeModule("Bogaudio-Offset");
         spl.removeModule("Bogaudio-OneEight");
         spl.removeModule("Bogaudio-Pan");
         spl.removeModule("Bogaudio-PEQ");
@@ -375,21 +390,16 @@ static void initStatic__BogaudioModules()
         spl.removeModule("Bogaudio-Ranalyzer");
         spl.removeModule("Bogaudio-Reftone");
         spl.removeModule("Bogaudio-RGate");
-        spl.removeModule("Bogaudio-SampleHold");
         spl.removeModule("Bogaudio-Shaper");
         spl.removeModule("Bogaudio-ShaperPlus");
         spl.removeModule("Bogaudio-Sine");
         spl.removeModule("Bogaudio-Slew");
         spl.removeModule("Bogaudio-Stack");
         spl.removeModule("Bogaudio-Sums");
-        spl.removeModule("Bogaudio-Switch");
         spl.removeModule("Bogaudio-Switch1616");
-        spl.removeModule("Bogaudio-Switch18");
         spl.removeModule("Bogaudio-Switch44");
         spl.removeModule("Bogaudio-Switch81");
         spl.removeModule("Bogaudio-Switch88");
-        spl.removeModule("Bogaudio-UMix");
-        spl.removeModule("Bogaudio-Unison");
         spl.removeModule("Bogaudio-VCAmp");
         spl.removeModule("Bogaudio-VCM");
         spl.removeModule("Bogaudio-Velo");
@@ -402,12 +412,33 @@ static void initStatic__BogaudioModules()
     }
 }
 
+static void initStatic__ValleyAudio()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__ValleyAudio = p;
+
+    const StaticPluginLoader spl(p, "ValleyAudio");
+    if (spl.ok())
+    {
+        p->addModel(modelDexter);
+        p->addModel(modelInterzone);
+
+        spl.removeModule("Amalgam");
+        spl.removeModule("Feline");
+        spl.removeModule("Plateau");
+        spl.removeModule("Terrorform");
+        spl.removeModule("Topograph");
+        spl.removeModule("uGraph");
+    }
+}
+
 void initStaticPlugins()
 {
     initStatic__Cardinal();
     initStatic__Fundamental();
     initStatic__AudibleInstruments();
     initStatic__BogaudioModules();
+    initStatic__ValleyAudio();
 }
 
 void destroyStaticPlugins()
