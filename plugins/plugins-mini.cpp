@@ -260,10 +260,10 @@ static void initStatic__AudibleInstruments()
     const StaticPluginLoader spl(p, "AudibleInstruments");
     if (spl.ok())
     {
+        p->addModel(modelBraids);
         p->addModel(modelPlaits);
 
         spl.removeModule("Blinds");
-        spl.removeModule("Braids");
         spl.removeModule("Branches");
         spl.removeModule("Clouds");
         spl.removeModule("Elements");

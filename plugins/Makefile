@@ -532,7 +532,13 @@ PLUGIN_FILES += AudibleInstruments/eurorack/streams/svf.cc
 PLUGIN_FILES += AudibleInstruments/eurorack/streams/vactrol.cc
 PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
 
+MINIPLUGIN_FILES += AudibleInstruments/src/Braids.cpp
 MINIPLUGIN_FILES += AudibleInstruments/src/Plaits.cpp
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/macro_oscillator.cc
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/analog_oscillator.cc
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/digital_oscillator.cc
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/quantizer.cc
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/resources.cc
 MINIPLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/*.cc)
 MINIPLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/engine/*.cc)
 MINIPLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/speech/*.cc)
@@ -1496,7 +1502,9 @@ endif
 RESOURCE_FILES += Cardinal/res/Miku/Miku.png
 
 MINIPLUGIN_LIST     = AudibleInstruments BogaudioModules Cardinal Fundamental ValleyAudio
-MINIRESOURCE_FILES  = AudibleInstruments/res/Plaits.svg
+MINIRESOURCE_FILES  = AudibleInstruments/res/Braids.svg
+MINIRESOURCE_FILES += AudibleInstruments/res/Plaits.svg
+MINIRESOURCE_FILES += AudibleInstruments/res/hdad-segment14-1.002/Segment14.ttf
 # MINIRESOURCE_FILES += BogaudioModules/res/AD-dark.svg
 # MINIRESOURCE_FILES += BogaudioModules/res/AD-lowcontrast.svg
 # MINIRESOURCE_FILES += BogaudioModules/res/AD.svg
