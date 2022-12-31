@@ -1176,10 +1176,6 @@ jobs:
           # runtime testing
           sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
           sudo apt-get clean
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-pluginval-v${{ env.CACHE_VERSION }}
       # multiple jobs for building carla, deps and plugins
       - name: Build Cardinal (carla, deps and plugins)
         env:
@@ -1188,7 +1184,6 @@ jobs:
           LDFLAGS: -static-libgcc -static-libstdc++
           WITH_LTO: false
         run: |
-          export PATH="/usr/lib/ccache:${PATH}"
           make features
           make NOOPT=true SKIP_STRIPPING=true carla deps dgl plugins resources -j $(nproc)
       # single job for final build stage, otherwise we might get killed due to OOM
@@ -1199,7 +1194,6 @@ jobs:
           LDFLAGS: -static-libgcc -static-libstdc++
           WITH_LTO: false
         run: |
-          export PATH="/usr/lib/ccache:${PATH}"
           make features
           make NOOPT=true SKIP_STRIPPING=true -j 1
       - name: Run Cardinal self-tests
