@@ -375,7 +375,11 @@ public:
         context->dataOuts = new float*[DISTRHO_PLUGIN_NUM_OUTPUTS];
 
         for (uint32_t i=0; i<DISTRHO_PLUGIN_NUM_INPUTS;++i)
-            *const_cast<float**>(&context->dataIns[i]) = new float[1];
+        {
+            float** const bufferptr = const_cast<float**>(&context->dataIns[i]);
+            *bufferptr = new float[1];
+            (*bufferptr)[0] = 0.f;
+        }
         for (uint32_t i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS;++i)
             context->dataOuts[i] = new float[1];
 
@@ -619,6 +623,8 @@ public:
        #if CARDINAL_VARIANT_MINI
         {
             const ScopedContext sc(this);
+            for (uint32_t i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS;++i)
+                context->dataOuts[i][0] = 0.f;
             ++context->processCounter;
             context->engine->stepBlock(1);
         }

@@ -313,19 +313,23 @@ struct HostAudio8 : HostAudio<8> {
 template<int numIO>
 struct HostAudioWidget : ModuleWidgetWith8HP {
     HostAudio<numIO>* const module;
+    CardinalPluginContext* const pcontext;
 
     HostAudioWidget(HostAudio<numIO>* const m)
-        : module(m)
+        : module(m),
+          pcontext(static_cast<CardinalPluginContext*>(APP))
     {
         setModule(m);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostAudio.svg")));
 
         createAndAddScrews();
 
+        const uint8_t ioCount = pcontext->variant == kCardinalVariantMain ? 8 : 2;
+
         for (uint i=0; i<numIO; ++i)
         {
-            createAndAddInput(i);
-            createAndAddOutput(i);
+            createAndAddInput(i, i, i<ioCount);
+            createAndAddOutput(i, i, i<ioCount);
         }
     }
 
@@ -395,11 +399,13 @@ struct HostAudioWidget8 : HostAudioWidget<8> {
 
     void draw(const DrawArgs& args) override
     {
+        const uint8_t ioCount = pcontext->variant == kCardinalVariantMain ? 8 : 2;
+
         drawBackground(args.vg);
-        drawOutputJacksArea(args.vg, 8);
+        drawOutputJacksArea(args.vg, ioCount);
         setupTextLines(args.vg);
 
-        for (int i=0; i<8; ++i)
+        for (int i=0; i<ioCount; ++i)
         {
             char text[] = {'A','u','d','i','o',' ',static_cast<char>('0'+i+1),'\0'};
             drawTextLine(args.vg, i, text);

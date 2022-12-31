@@ -37,16 +37,20 @@ struct ModuleWidgetWithSideScrews : ModuleWidget {
         createAndAddInput(paramId, paramId);
     }
 
-    void createAndAddInput(const uint posY, const uint paramId) {
-        addInput(createInput<PJ301MPort>(Vec(startX_In, startY + padding * posY), module, paramId));
+    void createAndAddInput(const uint posY, const uint paramId, bool visible = true) {
+        PortWidget* const widget = createInput<PJ301MPort>(Vec(startX_In, startY + padding * posY), module, paramId);
+        widget->visible = visible;
+        addInput(widget);
     }
 
     void createAndAddOutput(const uint paramId) {
         createAndAddOutput(paramId, paramId);
     }
 
-    void createAndAddOutput(const uint posY, const uint paramId) {
-        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * posY), module, paramId));
+    void createAndAddOutput(const uint posY, const uint paramId, bool visible = true) {
+        PortWidget* const widget = createOutput<PJ301MPort>(Vec(startX_Out, startY + padding * posY), module, paramId);
+        widget->visible = visible;
+        addOutput(widget);
     }
 
     void createAndAddScrews() {
