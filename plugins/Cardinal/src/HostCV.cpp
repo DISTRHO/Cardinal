@@ -146,14 +146,22 @@ struct HostCV : TerminalModule {
         inputOffset = params[BIPOLAR_INPUTS_1_5].getValue() > 0.1f ? 5.0f : 0.0f;
 
         for (int i=0; i<5; ++i)
+        {
+            if (!std::isfinite(dataOuts[i+ioOffset][k]))
+                __builtin_unreachable();
             dataOuts[i+ioOffset][k] += inputs[i].getVoltage() + inputOffset;
+        }
 
         if (pcontext->variant == kCardinalVariantMain)
         {
             inputOffset = params[BIPOLAR_INPUTS_6_10].getValue() > 0.1f ? 5.0f : 0.0f;
 
             for (int i=5; i<10; ++i)
+            {
+                if (!std::isfinite(dataOuts[i+ioOffset][k]))
+                    __builtin_unreachable();
                 dataOuts[i+ioOffset][k] += inputs[i].getVoltage() + inputOffset;
+            }
         }
     }
 };

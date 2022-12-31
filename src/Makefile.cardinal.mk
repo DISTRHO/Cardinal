@@ -323,6 +323,8 @@ BASE_FLAGS += -DDISTRHO_PLUGIN_USES_CUSTOM_MODGUI=0
 else
 BASE_FLAGS += -DDISTRHO_PLUGIN_USES_CUSTOM_MODGUI=1
 endif
+BASE_FLAGS += -DSIMDE_ENABLE_OPENMP -fopenmp
+LINK_FLAGS += -fopenmp
 endif
 
 ifneq ($(WASM),true)
@@ -346,8 +348,6 @@ BASE_FLAGS += -DNANOVG_GLES3_FORCED
 endif
 
 BUILD_C_FLAGS += -std=gnu11
-BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 
 ifneq ($(MACOS),true)
 BUILD_CXX_FLAGS += -faligned-new -Wno-abi

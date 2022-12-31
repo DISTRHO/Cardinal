@@ -20,6 +20,12 @@
 #if (defined(__i386__) || defined(__x86_64__) || defined(__EMSCRIPTEN__)) && !defined(CARDINAL_NOSIMD)
 # include_next <emmintrin.h>
 #else
+# define SIMDE_ACCURACY_PREFERENCE 0
 # define SIMDE_ENABLE_NATIVE_ALIASES
+# define SIMDE_FAST_CONVERSION_RANGE
+# define SIMDE_FAST_MATH
+# define SIMDE_FAST_NANS
+# define SIMDE_FAST_ROUND_MODE
+# define SIMDE_FAST_ROUND_TIES
 # include "../simde/simde/x86/sse.h"
 #endif

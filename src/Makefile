@@ -104,6 +104,10 @@ ifeq ($(HAIKU),true)
 BASE_FLAGS += -DCLOCK_MONOTONIC_RAW=CLOCK_MONOTONIC
 endif
 
+ifeq ($(MOD_BUILD),true)
+BASE_FLAGS += -DSIMDE_ENABLE_OPENMP -fopenmp
+endif
+
 ifneq ($(WASM),true)
 ifneq ($(HAIKU),true)
 BASE_FLAGS += -pthread

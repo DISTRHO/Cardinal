@@ -140,11 +140,9 @@ static void Cable_step(Cable* that) {
 	const int channels = output->channels;
 	// Copy all voltages from output to input
 	for (int c = 0; c < channels; c++) {
-		float v = output->voltages[c];
-		// Set 0V if infinite or NaN
-		if (!std::isfinite(v))
-			v = 0.f;
-		input->voltages[c] = v;
+		if (!std::isfinite(output->voltages[c]))
+			__builtin_unreachable();
+		input->voltages[c] = output->voltages[c];
 	}
 	// Set higher channel voltages to 0
 	for (int c = channels; c < input->channels; c++) {

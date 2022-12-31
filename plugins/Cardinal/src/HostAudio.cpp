@@ -182,6 +182,9 @@ struct HostAudio2 : HostAudio<2> {
 
         if (in1connected)
         {
+            if (!std::isfinite(dataOuts[0][k]))
+                __builtin_unreachable();
+
             valueL = inputs[0].getVoltageSum() * 0.1f;
 
             if (dcFilterEnabled)
@@ -200,6 +203,9 @@ struct HostAudio2 : HostAudio<2> {
 
         if (in2connected)
         {
+            if (!std::isfinite(dataOuts[1][k]))
+                __builtin_unreachable();
+
             valueR = inputs[1].getVoltageSum() * 0.1f;
 
             if (dcFilterEnabled)

@@ -924,7 +924,7 @@ protected:
                         json_object_set_new(moduleJ, "favorite", json_boolean(m.favorite));
                     if (m.added > 0)
                         json_object_set_new(moduleJ, "added", json_integer(m.added));
-                    if (std::isfinite(m.lastAdded))
+                    if (std::isfinite(m.lastAdded) && d_isNotZero(m.lastAdded))
                         json_object_set_new(moduleJ, "lastAdded", json_real(m.lastAdded));
 
                     if (json_object_size(moduleJ))
