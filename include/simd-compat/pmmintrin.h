@@ -67,48 +67,6 @@ __m64 _mm_set1_pi16(short w)
 */
 
 #else
-// add missing calls, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95399
-# ifdef __arm__
-//#  define SIMDE_ARM_NEON_A64V8_NO_NATIVE
-#  if 0
-#  include <arm_neon.h>
-// custom vcvtnq_s32_f32 implementation for armv7, based on _mm_cvtps_epi32 from sse2neon
-/*
- * sse2neon is freely redistributable under the MIT License.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-static __inline__ int32x4_t __attribute__((__always_inline__, __nodebug__))
-vcvtnq_s32_f32(const float32x4_t a)
-{
-    const uint32x4_t signmask = vdupq_n_u32(0x80000000);
-    const float32x4_t half = vbslq_f32(signmask, a, vdupq_n_f32(0.5f)); /* +/- 0.5 */
-    const int32x4_t r_normal = vcvtq_s32_f32(vaddq_f32(a, half)); /* round to integer: [a + 0.5]*/
-    const int32x4_t r_trunc = vcvtq_s32_f32(a); /* truncate to integer: [a] */
-    const int32x4_t plusone = vreinterpretq_s32_u32(vshrq_n_u32(vreinterpretq_u32_s32(vnegq_s32(r_trunc)), 31)); /* 1 or 0 */
-    const int32x4_t r_even = vbicq_s32(vaddq_s32(r_trunc, plusone), vdupq_n_s32(1)); /* ([a] + {0,1}) & ~1 */
-    const float32x4_t delta = vsubq_f32(a, vcvtq_f32_s32(r_trunc)); /* compute delta: delta = (a - [a]) */
-    const uint32x4_t is_delta_half = vceqq_f32(delta, half); /* delta == +/- 0.5 */
-    return vbslq_s32(is_delta_half, r_even, r_normal);
-}
-#  endif
-# endif
 # define SIMDE_ACCURACY_PREFERENCE 0
 # define SIMDE_ENABLE_NATIVE_ALIASES
 # define SIMDE_FAST_CONVERSION_RANGE
