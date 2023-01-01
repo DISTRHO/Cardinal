@@ -69,7 +69,7 @@ __m64 _mm_set1_pi16(short w)
 #else
 // add missing calls, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95399
 # ifdef __arm__
-#  define SIMDE_ARM_NEON_A64V8_NO_NATIVE
+//#  define SIMDE_ARM_NEON_A64V8_NO_NATIVE
 #  if 0
 #  include <arm_neon.h>
 // custom vcvtnq_s32_f32 implementation for armv7, based on _mm_cvtps_epi32 from sse2neon
