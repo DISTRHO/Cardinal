@@ -45,6 +45,7 @@
 #include "../CardinalCommon.hpp"
 #include "../CardinalRemote.hpp"
 
+#include <algorithm>
 
 namespace rack {
 namespace app {
@@ -215,7 +216,12 @@ void Scene::step() {
 				internal->lastSceneChangeTime = time;
 			} else if (internal->historyActionIndex != actionIndex && actionIndex > 0 && time - internal->lastSceneChangeTime >= 1.0) {
 				const std::string& name(APP->history->actions[actionIndex - 1]->name);
-				if (/*std::abs(internal->historyActionIndex = actionIndex) > 1 ||*/ name != "move knob") {
+				static const std::vector<std::string> ignoredNames = {
+					"move knob",
+					"move module",
+					"move switch",
+				};
+				if (std::find(ignoredNames.cbegin(), ignoredNames.cend(), name) == ignoredNames.cend()) {
 					printf("action '%s'\n", APP->history->actions[actionIndex - 1]->name.c_str());
 					remoteUtils::sendFullPatchToRemote(remoteDetails);
 					window::generateScreenshot();

@@ -266,6 +266,7 @@ native: $(TARGETS)
 lv2: $(TARGETS)
 	$(MAKE) lv2 -C Cardinal
 	$(MAKE) lv2 -C CardinalFX $(CARDINAL_FX_ARGS)
+	$(MAKE) lv2 -C CardinalMini
 	$(MAKE) lv2 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 
 vst2: $(TARGETS)
