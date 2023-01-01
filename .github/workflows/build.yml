@@ -1195,7 +1195,7 @@ jobs:
           WITH_LTO: false
         run: |
           make features
-          make NOOPT=true SKIP_STRIPPING=true -j 1
+          make NOOPT=true SKIP_STRIPPING=true jack lv2 vst2 vst3 clap -j 1
       - name: Run Cardinal self-tests
         run: |
           # --exit-on-first-error=yes
