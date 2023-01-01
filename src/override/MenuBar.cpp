@@ -172,7 +172,7 @@ struct FileButton : MenuButton {
 			patchUtils::revertDialog();
 		}, APP->patch->path.empty()));
 
-#if defined(HAVE_LIBLO) && ! CARDINAL_VARIANT_MINI
+#if defined(HAVE_LIBLO) || CARDINAL_VARIANT_MINI
 		menu->addChild(new ui::MenuSeparator);
 
 		remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote();
