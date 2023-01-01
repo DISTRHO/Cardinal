@@ -282,7 +282,7 @@ clap: $(TARGETS)
 	$(MAKE) clap -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 
 clean:
-	rm -f $(TARGETS)
+	rm -f *.a
 	rm -rf $(BUILD_DIR)
 	$(MAKE) clean -C Cardinal
 	$(MAKE) clean -C CardinalFX $(CARDINAL_FX_ARGS)
