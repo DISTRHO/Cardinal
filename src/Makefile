@@ -244,7 +244,7 @@ all: $(TARGETS)
 ifeq ($(MOD_BUILD),true)
 	$(MAKE) -C Cardinal lv2
 	$(MAKE) -C CardinalFX lv2
-	$(MAKE) -C CardinalMini lv2
+	$(MAKE) -C CardinalMini lv2_sep
 else ifeq ($(WASM),true)
 	$(MAKE) -C CardinalNative
 else
@@ -266,8 +266,8 @@ native: $(TARGETS)
 lv2: $(TARGETS)
 	$(MAKE) lv2 -C Cardinal
 	$(MAKE) lv2 -C CardinalFX $(CARDINAL_FX_ARGS)
-	$(MAKE) lv2 -C CardinalMini
 	$(MAKE) lv2 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
+	$(MAKE) lv2_sep -C CardinalMini
 
 vst2: $(TARGETS)
 	$(MAKE) vst2 -C CardinalFX $(CARDINAL_FX_ARGS)

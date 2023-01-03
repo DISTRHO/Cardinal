@@ -779,12 +779,9 @@ protected:
         {
         case kCardinalStatePatch:
            #if CARDINAL_VARIANT_MINI
-            state.hints = kStateIsHostWritable;
+            state.hints = kStateIsHostReadable;
            #else
-            state.hints = kStateIsBase64Blob;
-           #endif
-           #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
-            state.hints |= kStateIsOnlyForDSP;
+            state.hints = kStateIsOnlyForDSP | kStateIsBase64Blob;
            #endif
             if (FILE* const f = std::fopen(context->patch->factoryTemplatePath.c_str(), "r"))
             {
@@ -823,9 +820,10 @@ protected:
             break;
        #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         case kCardinalStateModuleInfos:
-            state.hints = 0x0;
-           #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
-            state.hints |= kStateIsOnlyForDSP;
+           #if CARDINAL_VARIANT_MINI
+            state.hints = kStateIsHostReadable;
+           #else
+            state.hints = kStateIsOnlyForDSP;
            #endif
             state.defaultValue = "{}";
             state.key = "moduleInfos";
