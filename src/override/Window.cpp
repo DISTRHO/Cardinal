@@ -623,16 +623,18 @@ void Window::step() {
 		bndSetFont(uiFont->handle);
 
 	// Set window title
-	std::string windowTitle = "Cardinal";
-	if (APP->patch->path != "") {
-		windowTitle += " - ";
-		if (!APP->history->isSaved())
-			windowTitle += "*";
-		windowTitle += system::getFilename(APP->patch->path);
-	}
-	if (windowTitle != internal->lastWindowTitle) {
-		internal->tlw->getWindow().setTitle(windowTitle.c_str());
-		internal->lastWindowTitle = windowTitle;
+	if (isStandalone()) {
+		std::string windowTitle = "Cardinal";
+		if (APP->patch->path != "") {
+			windowTitle += " - ";
+			if (!APP->history->isSaved())
+				windowTitle += "*";
+			windowTitle += system::getFilename(APP->patch->path);
+		}
+		if (windowTitle != internal->lastWindowTitle) {
+			internal->tlw->getWindow().setTitle(windowTitle.c_str());
+			internal->lastWindowTitle = windowTitle;
+		}
 	}
 
 	// Get desired pixel ratio
