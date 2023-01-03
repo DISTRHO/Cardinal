@@ -43,6 +43,7 @@ namespace window {
 void generateScreenshot();
 }
 
+bool isMini();
 bool isStandalone();
 
 #ifdef ARCH_WIN

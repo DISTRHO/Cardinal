@@ -139,7 +139,7 @@ Scene::Scene() {
 	browser->hide();
 	addChild(browser);
 
-	if (isStandalone())
+	if (isStandalone() || isMini())
 		return;
 
 	internal->resizeHandle = new ResizeHandle;

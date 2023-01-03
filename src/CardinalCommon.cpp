@@ -533,6 +533,15 @@ END_NAMESPACE_DISTRHO
 
 namespace rack {
 
+bool isMini()
+{
+#if CARDINAL_VARIANT_MINI
+    return true;
+#else
+    return false;
+#endif
+}
+
 bool isStandalone()
 {
     return std::strstr(getPluginFormatName(), "Standalone") != nullptr;
