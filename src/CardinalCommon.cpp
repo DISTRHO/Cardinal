@@ -47,7 +47,7 @@
 # error wrong build
 #endif
 
-#if defined(STATIC_BUILD) || CARDINAL_VARIANT_MINI
+#if (defined(STATIC_BUILD) && !defined(__MOD_DEVICES__)) || CARDINAL_VARIANT_MINI
 # undef CARDINAL_INIT_OSC_THREAD
 #endif
 
