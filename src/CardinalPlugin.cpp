@@ -438,10 +438,6 @@ protected:
             parameter.symbol += String(index + 1);
             parameter.unit = "v";
             parameter.hints = kParameterIsAutomatable;
-           #if CARDINAL_VARIANT_MINI
-            // TODO is hidden
-            // parameter.hints |= kParameterIsAutomatable;
-           #endif
             parameter.ranges.def = 0.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 10.0f;
@@ -463,6 +459,9 @@ protected:
                 parameter.name = "Show tooltips";
                 parameter.symbol = "tooltips";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 1.0f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 1.0f;
@@ -472,6 +471,9 @@ protected:
                 parameter.symbol = "cableOpacity";
                 parameter.unit = "%";
                 parameter.hints = kParameterIsAutomatable;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 50.0f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 100.0f;
@@ -481,6 +483,9 @@ protected:
                 parameter.symbol = "cableTension";
                 parameter.unit = "%";
                 parameter.hints = kParameterIsAutomatable;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 75.0f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 100.0f;
@@ -490,6 +495,9 @@ protected:
                 parameter.symbol = "rackBrightness";
                 parameter.unit = "%";
                 parameter.hints = kParameterIsAutomatable;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 100.0f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 100.0f;
@@ -499,6 +507,9 @@ protected:
                 parameter.symbol = "haloBrightness";
                 parameter.unit = "%";
                 parameter.hints = kParameterIsAutomatable;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 25.0f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 100.0f;
@@ -507,6 +518,9 @@ protected:
                 parameter.name = "Knob mode";
                 parameter.symbol = "knobMode";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 0.0f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 2.0f;
@@ -524,6 +538,9 @@ protected:
                 parameter.name = "Scroll wheel knob control";
                 parameter.symbol = "knobScroll";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 0.0f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 1.0f;
@@ -532,6 +549,9 @@ protected:
                 parameter.name = "Scroll wheel knob sensitivity";
                 parameter.symbol = "knobScrollSensitivity";
                 parameter.hints = kParameterIsAutomatable|kParameterIsLogarithmic;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 1.0f;
                 parameter.ranges.min = 0.1f;
                 parameter.ranges.max = 10.0f;
@@ -540,6 +560,9 @@ protected:
                 parameter.name = "Lock module positions";
                 parameter.symbol = "lockModules";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 0.0f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 1.0f;
@@ -548,6 +571,9 @@ protected:
                 parameter.name = "Update rate limit";
                 parameter.symbol = "rateLimit";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 0.0f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 2.0f;
@@ -565,6 +591,9 @@ protected:
                 parameter.name = "Browser sort";
                 parameter.symbol = "browserSort";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 3.0f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 5.0f;
@@ -588,6 +617,9 @@ protected:
                 parameter.name = "Browser zoom";
                 parameter.symbol = "browserZoom";
                 parameter.hints = kParameterIsAutomatable;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.unit = "%";
                 parameter.ranges.def = 50.0f;
                 parameter.ranges.min = 25.0f;
@@ -614,6 +646,9 @@ protected:
                 parameter.name = "Invert zoom";
                 parameter.symbol = "invertZoom";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 0.0f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 1.0f;
@@ -622,6 +657,9 @@ protected:
                 parameter.name = "Auto-squeeze module positions";
                 parameter.symbol = "squeezeModules";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+               #if CARDINAL_VARIANT_MINI
+                parameter.hints |= kParameterIsHidden;
+               #endif
                 parameter.ranges.def = 1.0f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 1.0f;
