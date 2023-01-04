@@ -660,7 +660,8 @@ jobs:
       - name: Build for modduo
         if: steps.mpb-cache.outputs.cache-hit == 'true'
         run: |
-          make modduo CIBUILD=true HEADLESS=true MODDUO=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+          make CIBUILD=true HEADLESS=true modduo-features
+          make CIBUILD=true HEADLESS=true MODDUO=true WITH_LTO=${{ env.WITH_LTO }} modduo -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
@@ -702,7 +703,8 @@ jobs:
       - name: Build for modduox
         if: steps.mpb-cache.outputs.cache-hit == 'true'
         run: |
-          make modduox CIBUILD=true HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+          make CIBUILD=true HEADLESS=true modduox-features
+          make CIBUILD=true HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} modduox -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
@@ -744,7 +746,8 @@ jobs:
       - name: Build for moddwarf
         if: steps.mpb-cache.outputs.cache-hit == 'true'
         run: |
-          make moddwarf CIBUILD=true HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+          make CIBUILD=true HEADLESS=true moddwarf-features
+          make CIBUILD=true HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} moddwarf -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV

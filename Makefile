@@ -72,16 +72,16 @@ DGL_EXTRA_ARGS = \
 
 ifeq ($(SYSDEPS),true)
 
-ifneq ($(shell pkg-config --exists jansson && echo true),true)
+ifneq ($(shell $(PKG_CONFIG) --exists jansson && echo true),true)
 $(error jansson dependency not installed/available)
 endif
-ifneq ($(shell pkg-config --exists libarchive && echo true),true)
+ifneq ($(shell $(PKG_CONFIG) --exists libarchive && echo true),true)
 $(error libarchive dependency not installed/available)
 endif
-ifneq ($(shell pkg-config --exists samplerate && echo true),true)
+ifneq ($(shell $(PKG_CONFIG) --exists samplerate && echo true),true)
 $(error samplerate dependency not installed/available)
 endif
-ifneq ($(shell pkg-config --exists speexdsp && echo true),true)
+ifneq ($(shell $(PKG_CONFIG) --exists speexdsp && echo true),true)
 $(error speexdsp dependency not installed/available)
 endif
 
@@ -89,7 +89,7 @@ endif
 
 ifeq ($(HEADLESS),true)
 
-ifneq ($(shell pkg-config --exists liblo && echo true),true)
+ifneq ($(shell $(PKG_CONFIG) --exists liblo && echo true),true)
 $(error liblo dependency not installed/available)
 endif
 
