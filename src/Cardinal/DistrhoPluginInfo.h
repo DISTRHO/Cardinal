@@ -53,7 +53,7 @@
 #define DISTRHO_PLUGIN_WANT_FULL_STATE    1
 #define DISTRHO_PLUGIN_WANT_STATE         1
 #define DISTRHO_PLUGIN_WANT_TIMEPOS       1
-#define DISTRHO_PLUGIN_LV2_CATEGORY       "lv2:UtilityPlugin"
+#define DISTRHO_PLUGIN_LV2_CATEGORY       "mod:ControlVoltagePlugin, lv2:UtilityPlugin"
 #define DISTRHO_PLUGIN_VST3_CATEGORIES    "Fx|Generator"
 
 #endif // DISTRHO_PLUGIN_INFO_H_INCLUDED
