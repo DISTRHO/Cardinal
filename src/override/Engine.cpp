@@ -61,6 +61,13 @@ namespace rack {
 namespace engine {
 
 
+static constexpr const int PORT_DIVIDER = 7;
+// Arbitrary prime number so it doesn't over- or under-estimate time of buffered processors.
+static constexpr const int METER_DIVIDER = 37;
+static constexpr const int METER_BUFFER_LEN = 32;
+static constexpr const float METER_TIME = 1.f;
+
+
 struct Engine::Internal {
 	std::vector<Module*> modules;
 	std::vector<TerminalModule*> terminalModules;
@@ -106,6 +113,17 @@ struct Engine::Internal {
 	Readers lock when using the engine's state.
 	*/
 	SharedMutex mutex;
+};
+
+
+struct Module::Internal {
+	bool bypassed = false;
+
+	int meterSamples = 0;
+	float meterDurationTotal = 0.f;
+
+	float meterBuffer[METER_BUFFER_LEN] = {};
+	int meterIndex = 0;
 };
 
 
@@ -176,7 +194,7 @@ static void Port_step(Port* that, float deltaTime) {
 #endif
 
 
-static void TerminalModule__doProcess(TerminalModule* terminalModule, const Module::ProcessArgs& args, bool input) {
+static void TerminalModule__doProcess(TerminalModule* const terminalModule, const Module::ProcessArgs& args, bool input) {
 	// Step module
 	if (input) {
 		terminalModule->processTerminalInput(args);
@@ -190,12 +208,73 @@ static void TerminalModule__doProcess(TerminalModule* terminalModule, const Modu
 
 #ifndef HEADLESS
 	// Iterate ports to step plug lights
-	if (args.frame % 7 /* PORT_DIVIDER */ == 0) {
-		float portTime = args.sampleTime * 7 /* PORT_DIVIDER */;
+	if (args.frame % PORT_DIVIDER == 0) {
+		float portTime = args.sampleTime * PORT_DIVIDER;
 		for (Input& input : terminalModule->inputs) {
 			Port_step(&input, portTime);
 		}
 		for (Output& output : terminalModule->outputs) {
+			Port_step(&output, portTime);
+		}
+	}
+#endif
+}
+
+
+static void Module__doProcess(Module* const module, const Module::ProcessArgs& args) {
+	Module::Internal* const internal = module->internal;
+
+#ifndef HEADLESS
+	// This global setting can change while the function is running, so use a local variable.
+	bool meterEnabled = settings::cpuMeter && (args.frame % METER_DIVIDER == 0);
+
+	// Start CPU timer
+	double startTime;
+	if (meterEnabled) {
+		startTime = system::getTime();
+	}
+#endif
+
+	// Step module
+	if (!internal->bypassed)
+		module->process(args);
+	else
+		module->processBypass(args);
+
+#ifndef HEADLESS
+	// Stop CPU timer
+	if (meterEnabled) {
+		double endTime = system::getTime();
+		// Subtract call time of getTime() itself, since we only want to measure process() time.
+		double endTime2 = system::getTime();
+		float duration = (endTime - startTime) - (endTime2 - endTime);
+
+		internal->meterSamples++;
+		internal->meterDurationTotal += duration;
+
+		// Seconds we've been measuring
+		float meterTime = internal->meterSamples * METER_DIVIDER * args.sampleTime;
+
+		if (meterTime >= METER_TIME) {
+			// Push time to buffer
+			if (internal->meterSamples > 0) {
+				internal->meterIndex++;
+				internal->meterIndex %= METER_BUFFER_LEN;
+				internal->meterBuffer[internal->meterIndex] = internal->meterDurationTotal / internal->meterSamples;
+			}
+			// Reset total
+			internal->meterSamples = 0;
+			internal->meterDurationTotal = 0.f;
+		}
+	}
+
+	// Iterate ports to step plug lights
+	if (args.frame % PORT_DIVIDER == 0) {
+		float portTime = args.sampleTime * PORT_DIVIDER;
+		for (Input& input : module->inputs) {
+			Port_step(&input, portTime);
+		}
+		for (Output& output : module->outputs) {
 			Port_step(&output, portTime);
 		}
 	}
@@ -260,7 +339,7 @@ static void Engine_stepFrame(Engine* that) {
 
 	// Step each module and cables
 	for (Module* module : internal->modules) {
-		module->doProcess(processArgs);
+		Module__doProcess(module, processArgs);
 		for (Output& output : module->outputs) {
 			for (Cable* cable : output.cables)
 				Cable_step(cable);
