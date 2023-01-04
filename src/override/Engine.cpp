@@ -152,6 +152,7 @@ static void Cable_step(Cable* that) {
 }
 
 
+#ifndef HEADLESS
 static void Port_step(Port* that, float deltaTime) {
 	// Set plug lights
 	if (that->channels == 0) {
@@ -172,6 +173,7 @@ static void Port_step(Port* that, float deltaTime) {
 		that->plugLights[2].setSmoothBrightness(v, deltaTime);
 	}
 }
+#endif
 
 
 static void TerminalModule__doProcess(TerminalModule* terminalModule, const Module::ProcessArgs& args, bool input) {
@@ -186,6 +188,7 @@ static void TerminalModule__doProcess(TerminalModule* terminalModule, const Modu
 		terminalModule->processTerminalOutput(args);
 	}
 
+#ifndef HEADLESS
 	// Iterate ports to step plug lights
 	if (args.frame % 7 /* PORT_DIVIDER */ == 0) {
 		float portTime = args.sampleTime * 7 /* PORT_DIVIDER */;
@@ -196,6 +199,7 @@ static void TerminalModule__doProcess(TerminalModule* terminalModule, const Modu
 			Port_step(&output, portTime);
 		}
 	}
+#endif
 }
 
 
