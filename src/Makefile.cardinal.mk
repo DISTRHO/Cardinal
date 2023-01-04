@@ -227,6 +227,11 @@ LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui
 endif
 endif
 
+ifeq ($(CARDINAL_VARIANT),mini)
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui/screenshot.png
+LV2_RESOURCES += $(TARGET_DIR)/$(NAME).lv2/modgui/thumbnail.png
+endif
+
 # Cardinal main variant is not available as VST2 due to lack of CV ports
 ifneq ($(CARDINAL_VARIANT),main)
 ifeq ($(MACOS),true)
@@ -563,6 +568,10 @@ else
 	$(SILENT)ln -sf $(abspath $<) $@
 endif
 
+$(TARGET_DIR)/$(NAME).lv2/mod%: ../MOD/$(NAME).lv2/mod%
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
 $(TARGET_DIR)/$(NAME).lv2/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
@@ -571,10 +580,6 @@ ifeq ($(MOD_BUILD),true)
 $(TARGET_DIR)/$(NAME).lv2/resources/%.svg: ../Rack/res/%.svg ../../deps/svg2stub.py
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)python3 ../../deps/svg2stub.py $< $@
-
-$(TARGET_DIR)/$(NAME).lv2/mod%: ../MOD/$(NAME).lv2/mod%
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
 
 $(TARGET_DIR)/$(NAME).lv2/%.ttl: ../MOD/$(NAME).lv2/%.ttl
 	-@mkdir -p "$(shell dirname $@)"
