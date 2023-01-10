@@ -2,6 +2,11 @@ name: build
 
 on:
   push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
 
 env:
   CACHE_VERSION: 1
