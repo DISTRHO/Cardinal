@@ -1990,6 +1990,7 @@ static void initStatic__GrandeModular()
     if (spl.ok())
     {
         p->addModel(modelClip);
+        p->addModel(modelCompare3);
         p->addModel(modelLFO3);
         p->addModel(modelLFO4);
         p->addModel(modelLogic);
@@ -2009,6 +2010,7 @@ static void initStatic__GrandeModular()
         p->addModel(modelScale);
         p->addModel(modelSplit8);
         p->addModel(modelTails);
+        p->addModel(modelTails4);
         p->addModel(modelVarSampleDelays);
         p->addModel(modelVCA3);
         p->addModel(modelVCA4);
