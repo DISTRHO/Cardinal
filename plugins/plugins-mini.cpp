@@ -55,6 +55,22 @@ extern Model* modelSwitch;
 extern Model* modelSwitch18;
 extern Model* modelUnison;
 
+// MockbaModular
+#include "MockbaModular/src/plugin.hpp"
+#include "MockbaModular/src/MockbaModular.hpp"
+#undef min
+#define saveBack ignoreMockbaModular1
+#define loadBack ignoreMockbaModular2
+#include "MockbaModular/src/MockbaModular.cpp"
+#undef saveBack
+#undef loadBack
+std::string loadBack(int) { return "res/Empty_gray.svg"; }
+
+// surgext
+#include "surgext/src/SurgeXT.h"
+void surgext_rack_initialize();
+void surgext_rack_update_theme();
+
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
 
@@ -67,6 +83,8 @@ Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__Aria;
 Plugin* pluginInstance__AudibleInstruments;
 Plugin* pluginInstance__BogaudioModules;
+Plugin* pluginInstance__MockbaModular;
+Plugin* pluginInstance__surgext;
 Plugin* pluginInstance__ValleyAudio;
 
 namespace rack {
@@ -451,6 +469,154 @@ static void initStatic__BogaudioModules()
     }
 }
 
+static void initStatic__MockbaModular()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__MockbaModular = p;
+
+    const StaticPluginLoader spl(p, "MockbaModular");
+    if (spl.ok())
+    {
+        p->addModel(modelCZOsc);
+        p->addModel(modelFiltah);
+        p->addModel(modelMaugOsc);
+        p->addModel(modelMixah);
+        p->addModel(modelPannah);
+        p->addModel(modelReVoltah);
+        p->addModel(modelShapah);
+
+        spl.removeModule("Blank");
+        spl.removeModule("Comparator");
+        spl.removeModule("Countah");
+        spl.removeModule("CZDblSine");
+        spl.removeModule("CZPulse");
+        spl.removeModule("CZReso1");
+        spl.removeModule("CZReso2");
+        spl.removeModule("CZReso3");
+        spl.removeModule("CZSaw");
+        spl.removeModule("CZSawPulse");
+        spl.removeModule("CZSquare");
+        spl.removeModule("Dividah");
+        spl.removeModule("DualBUFFER");
+        spl.removeModule("DualNOT");
+        spl.removeModule("DualOR");
+        spl.removeModule("DualNOR");
+        spl.removeModule("DualAND");
+        spl.removeModule("DualNAND");
+        spl.removeModule("DualXOR");
+        spl.removeModule("DualXNOR");
+        spl.removeModule("Feidah");
+        spl.removeModule("FeidahS");
+        spl.removeModule("Holdah");
+        spl.removeModule("MaugSaw");
+        spl.removeModule("MaugSaw2");
+        spl.removeModule("MaugShark");
+        spl.removeModule("MaugSquare");
+        spl.removeModule("MaugSquare2");
+        spl.removeModule("MaugSquare3");
+        spl.removeModule("MaugTriangle");
+        spl.removeModule("Mixah3");
+        spl.removeModule("PSelectah");
+        spl.removeModule("Selectah");
+        spl.removeModule("UDPClockMaster");
+        spl.removeModule("UDPClockSlave");
+    }
+}
+
+static void initStatic__surgext()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__surgext = p;
+
+    const StaticPluginLoader spl(p, "surgext");
+    if (spl.ok())
+    {
+        p->addModel(modelVCOClassic);
+//         p->addModel(modelVCOModern);
+//         p->addModel(modelVCOWavetable);
+//         p->addModel(modelVCOWindow);
+//         p->addModel(modelVCOSine);
+//         p->addModel(modelVCOFM2);
+//         p->addModel(modelVCOFM3);
+//         p->addModel(modelVCOSHNoise);
+//         p->addModel(modelVCOAlias);
+//         p->addModel(modelVCOString);
+//         p->addModel(modelVCOTwist);
+        spl.removeModule("SurgeXTOSCModern");
+        spl.removeModule("SurgeXTOSCWavetable");
+        spl.removeModule("SurgeXTOSCWindow");
+        spl.removeModule("SurgeXTOSCSine");
+        spl.removeModule("SurgeXTOSCFM2");
+        spl.removeModule("SurgeXTOSCFM3");
+        spl.removeModule("SurgeXTOSCSHNoise");
+        spl.removeModule("SurgeXTOSCAlias");
+        spl.removeModule("SurgeXTOSCString");
+        spl.removeModule("SurgeXTOSCTwist");
+
+        // Add the ported ones
+//         p->addModel(modelSurgeVCF);
+//         p->addModel(modelSurgeDelay);
+//         p->addModel(modelSurgeDelayLineByFreq);
+//         p->addModel(modelSurgeWaveshaper);
+//         p->addModel(modelSurgeLFO);
+//         p->addModel(modelSurgeMixer);
+//         p->addModel(modelSurgeModMatrix);
+        spl.removeModule("SurgeXTVCF");
+        spl.removeModule("SurgeXTDelay");
+        spl.removeModule("SurgeXTDelayLineByFreq");
+        spl.removeModule("SurgeXTWaveshaper");
+        spl.removeModule("SurgeXTLFO");
+        spl.removeModule("SurgeXTMixer");
+        spl.removeModule("SurgeXTModMatrix");
+
+//         p->addModel(modelFXReverb);
+//         p->addModel(modelFXPhaser);
+//         p->addModel(modelFXRotarySpeaker);
+//         p->addModel(modelFXDistortion);
+//         p->addModel(modelFXFrequencyShifter);
+//         p->addModel(modelFXChorus);
+//         p->addModel(modelFXVocoder);
+//         p->addModel(modelFXReverb2);
+//         p->addModel(modelFXFlanger);
+//         p->addModel(modelFXRingMod);
+//         p->addModel(modelFXNeuron);
+//         p->addModel(modelFXResonator);
+//         p->addModel(modelFXChow);
+//         p->addModel(modelFXExciter);
+//         p->addModel(modelFXEnsemble);
+//         p->addModel(modelFXCombulator);
+//         p->addModel(modelFXSpringReverb);
+//         p->addModel(modelFXTreeMonster);
+        spl.removeModule("SurgeXTFXChorus");
+        spl.removeModule("SurgeXTFXChow");
+        spl.removeModule("SurgeXTFXCombulator");
+        spl.removeModule("SurgeXTFXDistortion");
+        spl.removeModule("SurgeXTFXExciter");
+        spl.removeModule("SurgeXTFXEnsemble");
+        spl.removeModule("SurgeXTFXFlanger");
+        spl.removeModule("SurgeXTFXFrequencyShifter");
+        spl.removeModule("SurgeXTFXNeuron");
+        spl.removeModule("SurgeXTFXPhaser");
+        spl.removeModule("SurgeXTFXResonator");
+        spl.removeModule("SurgeXTFXReverb");
+        spl.removeModule("SurgeXTFXReverb2");
+        spl.removeModule("SurgeXTFXRingMod");
+        spl.removeModule("SurgeXTFXRotarySpeaker");
+        spl.removeModule("SurgeXTFXSpringReverb");
+        spl.removeModule("SurgeXTFXTreeMonster");
+        spl.removeModule("SurgeXTFXVocoder");
+
+        /* v2.1 modules
+        p->addModel(modelEGxVCA);
+        p->addModel(modelQuadAD);
+        p->addModel(modelQuadLFO);
+        */
+
+        surgext_rack_initialize();
+    }
+}
+
+/*
 static void initStatic__ValleyAudio()
 {
     Plugin* const p = new Plugin;
@@ -470,6 +636,7 @@ static void initStatic__ValleyAudio()
         spl.removeModule("uGraph");
     }
 }
+*/
 
 void initStaticPlugins()
 {
@@ -478,7 +645,11 @@ void initStaticPlugins()
     initStatic__Aria();
     initStatic__AudibleInstruments();
     initStatic__BogaudioModules();
+    initStatic__MockbaModular();
+    initStatic__surgext();
+    /*
     initStatic__ValleyAudio();
+    */
 }
 
 void destroyStaticPlugins()
@@ -500,6 +671,10 @@ void updateStaticPluginsDarkMode()
         for (auto listener : skins._defaultSkinListeners) {
             listener->defaultSkinChanged(skins._default);
         }
+    }
+    // surgext
+    {
+        surgext_rack_update_theme();
     }
 }
 
