@@ -531,22 +531,25 @@ static void initStatic__surgext()
     const StaticPluginLoader spl(p, "surgext");
     if (spl.ok())
     {
-        p->addModel(modelVCOClassic);
         p->addModel(modelVCOModern);
-        p->addModel(modelVCOSHNoise);
         p->addModel(modelVCOSine);
         p->addModel(modelVCOString);
-        p->addModel(modelVCOTwist);
         /*
         p->addModel(modelVCOAlias);
+        p->addModel(modelVCOClassic);
         p->addModel(modelVCOFM2);
         p->addModel(modelVCOFM3);
+        p->addModel(modelVCOSHNoise);
+        p->addModel(modelVCOTwist);
         p->addModel(modelVCOWavetable);
         p->addModel(modelVCOWindow);
         */
         spl.removeModule("SurgeXTOSCAlias");
+        spl.removeModule("SurgeXTOSCClassic");
         spl.removeModule("SurgeXTOSCFM2");
         spl.removeModule("SurgeXTOSCFM3");
+        spl.removeModule("SurgeXTOSCSHNoise");
+        spl.removeModule("SurgeXTOSCTwist");
         spl.removeModule("SurgeXTOSCWavetable");
         spl.removeModule("SurgeXTOSCWindow");
 

@@ -1728,6 +1728,8 @@ MINIRESOURCE_FILES += MockbaModular/res/screw.svg
 MINIRESOURCE_FILES += MockbaModular/res/selector.svg
 MINIRESOURCE_FILES += MockbaModular/res/Shapah.svg
 
+MINIRESOURCE_FILES += surgext/build/surge-data/configuration.xml
+MINIRESOURCE_FILES += surgext/build/surge-data/windows.wt
 MINIRESOURCE_FILES += surgext/res/xt/fonts/quicksand/Quicksand-Regular.ttf
 MINIRESOURCE_FILES += surgext/res/xt/fonts/quicksand/Quicksand-Bold.ttf
 MINIRESOURCE_FILES += surgext/res/xt/dark/components/fader_bg.svg
@@ -1747,9 +1749,14 @@ MINIRESOURCE_FILES += surgext/res/xt/dark/panels/other/EGLFO.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/panels/other/Matrix.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/panels/other/Mixer.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/panels/vco/BlankVCO.svg
-
-MINIRESOURCE_FILES += surgext/build/surge-data/configuration.xml
-MINIRESOURCE_FILES += surgext/build/surge-data/windows.wt
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_0.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_1.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_2.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_3.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_4.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_5.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_6.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_7.svg
 
 # MINIRESOURCE_FILES += ValleyAudio/res/DexterPanelDark.svg
 # MINIRESOURCE_FILES += ValleyAudio/res/InterzonePanelDark.svg
