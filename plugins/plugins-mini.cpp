@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -230,11 +230,13 @@ static void initStatic__Fundamental()
         p->addModel(modelADSR);
         p->addModel(modelLFO);
         p->addModel(modelMerge);
+        p->addModel(modelMidSide);
         p->addModel(modelNoise);
         p->addModel(modelQuantizer);
         p->addModel(modelRandom);
         p->addModel(modelScope);
         p->addModel(modelSplit);
+        p->addModel(modelSum);
         p->addModel(modelVCA_1);
         p->addModel(modelVCF);
         p->addModel(modelVCMixer);
@@ -242,7 +244,6 @@ static void initStatic__Fundamental()
         spl.removeModule("8vert");
         spl.removeModule("Delay");
         spl.removeModule("LFO2");
-        spl.removeModule("MidSide");
         spl.removeModule("Mixer");
         spl.removeModule("Mutes");
         spl.removeModule("Octave");
@@ -250,7 +251,6 @@ static void initStatic__Fundamental()
         spl.removeModule("SEQ3");
         spl.removeModule("SequentialSwitch1");
         spl.removeModule("SequentialSwitch2");
-        spl.removeModule("Sum");
         spl.removeModule("VCA");
         spl.removeModule("VCO2");
     }
@@ -299,10 +299,11 @@ static void initStatic__AudibleInstruments()
     const StaticPluginLoader spl(p, "AudibleInstruments");
     if (spl.ok())
     {
-        p->addModel(modelBraids);
         p->addModel(modelPlaits);
+        p->addModel(modelRipples);
 
         spl.removeModule("Blinds");
+        spl.removeModule("Braids");
         spl.removeModule("Branches");
         spl.removeModule("Clouds");
         spl.removeModule("Elements");
@@ -311,7 +312,6 @@ static void initStatic__AudibleInstruments()
         spl.removeModule("Links");
         spl.removeModule("Marbles");
         spl.removeModule("Rings");
-        spl.removeModule("Ripples");
         spl.removeModule("Shades");
         spl.removeModule("Shelves");
         spl.removeModule("Stages");

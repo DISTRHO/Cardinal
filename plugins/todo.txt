@@ -8,14 +8,8 @@ VultModulesFree           61804.0 (not opensource?)
 
 NYSTHI                    58494.0 (not opensource?)
 
-ML_modules                55847.0
-https://github.com/martin-lueders/ML_modules/
-
 FrozenWasteland           53690.0 (GPL-3.0-only)
 https://github.com/almostEric/FrozenWasteland/
-
-ArableInstruments         48756.0
-https://github.com/adbrant/ArableInstruments/
 
 squinkylabs-plug1         48682.0
 https://github.com/squinkylabs/SquinkyVCV
@@ -28,14 +22,12 @@ https://github.com/MarcBoule/Geodesics
 Alikins                   41798.0
 https://github.com/alikins/Alikins-rack-plugins
 
-dBiz                      40849.0
 RJModules                 39972.0
 DHE-Modules               39582.0
 AlrightDevices            38307.0
 SynthKit                  38228.0
 SubmarineFree             38146.0
 Hora-treasureFree         37847.0
-ParableInstruments        37781.0
 CountModula               37759.0
 MSM                       37337.0
 CharredDesert             36813.0
@@ -45,10 +37,8 @@ Autinn                    34990.0
 trowaSoft                 34946.0
 Hora-VCO_VCF_VCA_Free     34770.0
 moDllz                    34368.0
-21kHz                     34172.0
 Ohmer                     33950.0
 modular80                 33447.0
-Autodafe-DrumKit          33143.0
 Koralfx-Modules           33035.0
 alto777_LFSR              32872.0
 StellareModular           32526.0
