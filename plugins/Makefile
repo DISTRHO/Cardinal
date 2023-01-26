@@ -1794,11 +1794,13 @@ MINIRESOURCE_FILES += Fundamental/presets
 MINIRESOURCE_FILES += Fundamental/res/ADSR.svg
 MINIRESOURCE_FILES += Fundamental/res/LFO.svg
 MINIRESOURCE_FILES += Fundamental/res/Merge.svg
+MINIRESOURCE_FILES += Fundamental/res/MidSide.svg
 MINIRESOURCE_FILES += Fundamental/res/Noise.svg
 MINIRESOURCE_FILES += Fundamental/res/Quantizer.svg
 MINIRESOURCE_FILES += Fundamental/res/Random.svg
 MINIRESOURCE_FILES += Fundamental/res/Scope.svg
 MINIRESOURCE_FILES += Fundamental/res/Split.svg
+MINIRESOURCE_FILES += Fundamental/res/Sum.svg
 MINIRESOURCE_FILES += Fundamental/res/VCA-1.svg
 MINIRESOURCE_FILES += Fundamental/res/VCF.svg
 MINIRESOURCE_FILES += Fundamental/res/VCMixer.svg
@@ -1986,6 +1988,10 @@ ifeq ($(MOD_BUILD),true)
 	$(SILENT)python3 ../deps/svg2stub.py $< $@
 
 ../bin/CardinalFX.lv2/resources/%.svg: %.svg ../deps/svg2stub.py
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)python3 ../deps/svg2stub.py $< $@
+
+../bin/CardinalMini.lv2/resources/%.svg: %.svg ../deps/svg2stub.py
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)python3 ../deps/svg2stub.py $< $@
 endif
