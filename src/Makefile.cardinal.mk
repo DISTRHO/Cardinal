@@ -117,7 +117,7 @@ FILES_UI += distrho.rc
 endif
 
 # --------------------------------------------------------------
-# Extra libraries to link against
+# Rack and plugin libs
 
 ifeq ($(HEADLESS),true)
 TARGET_SUFFIX = -headless
@@ -137,24 +137,9 @@ else
 RACK_EXTRA_LIBS += ../rack$(TARGET_SUFFIX).a
 endif
 
-RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libquickjs.a
-
-ifneq ($(SYSDEPS),true)
-RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libjansson.a
-RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libsamplerate.a
-RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libspeexdsp.a
-ifeq ($(WINDOWS),true)
-RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libarchive_static.a
-else
-RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libarchive.a
-endif
-RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libzstd.a
-endif
-
 # --------------------------------------------------------------
 # surgext libraries
 
-ifneq ($(CARDINAL_VARIANT),mini)
 ifneq ($(NOPLUGINS),true)
 SURGE_DEP_PATH = $(abspath ../../deps/surge-build)
 RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/src/common/libsurge-common.a
@@ -174,6 +159,26 @@ endif
 RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/sst/sst-plugininfra/libs/strnatcmp/libstrnatcmp.a
 RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/sst/sst-plugininfra/libs/tinyxml/libtinyxml.a
 endif
+
+# --------------------------------------------------------------
+# Extra libraries to link against
+
+ifneq ($(CARDINAL_VARIANT),mini)
+ifneq ($(NOPLUGINS),true)
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libquickjs.a
+endif
+endif
+
+ifneq ($(SYSDEPS),true)
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libjansson.a
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libsamplerate.a
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libspeexdsp.a
+ifeq ($(WINDOWS),true)
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libarchive_static.a
+else
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libarchive.a
+endif
+RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libzstd.a
 endif
 
 # --------------------------------------------------------------
@@ -188,10 +193,12 @@ endif
 EXTRA_DSP_DEPENDENCIES = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS)
 EXTRA_DSP_LIBS = $(RACK_EXTRA_LIBS) $(CARLA_EXTRA_LIBS) $(STATIC_CARLA_PLUGIN_LIBS)
 
+ifneq ($(CARDINAL_VARIANT),mini)
 ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
 EXTRA_DSP_DEPENDENCIES += ../../deps/aubio/libaubio.a
 EXTRA_DSP_LIBS += ../../deps/aubio/libaubio.a
 EXTRA_DSP_LIBS += $(shell $(PKG_CONFIG) --libs fftw3f)
+endif
 endif
 
 ifneq ($(NOPLUGINS),true)
