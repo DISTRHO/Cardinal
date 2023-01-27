@@ -318,7 +318,6 @@ static void initStatic__AudibleInstruments()
     if (spl.ok())
     {
         p->addModel(modelPlaits);
-        p->addModel(modelRipples);
 
         spl.removeModule("Blinds");
         spl.removeModule("Braids");
@@ -330,6 +329,7 @@ static void initStatic__AudibleInstruments()
         spl.removeModule("Links");
         spl.removeModule("Marbles");
         spl.removeModule("Rings");
+        spl.removeModule("Ripples");
         spl.removeModule("Shades");
         spl.removeModule("Shelves");
         spl.removeModule("Stages");

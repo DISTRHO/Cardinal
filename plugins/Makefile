@@ -538,7 +538,6 @@ PLUGIN_FILES += AudibleInstruments/eurorack/streams/vactrol.cc
 PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
 
 MINIPLUGIN_FILES += AudibleInstruments/src/Plaits.cpp
-MINIPLUGIN_FILES += AudibleInstruments/src/Ripples.cpp
 # MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/macro_oscillator.cc
 # MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/analog_oscillator.cc
 # MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/digital_oscillator.cc
@@ -1544,7 +1543,6 @@ MINIRESOURCE_FILES += AriaModules/res/faceplates/Swerge.svg
 MINIRESOURCE_FILES += AriaModules/res/signature/signature.svg
 
 MINIRESOURCE_FILES += AudibleInstruments/res/Plaits.svg
-MINIRESOURCE_FILES += AudibleInstruments/res/Ripples.svg
 # MINIRESOURCE_FILES += AudibleInstruments/res/hdad-segment14-1.002/Segment14.ttf
 
 # MINIRESOURCE_FILES += BogaudioModules/res/AD-dark.svg
