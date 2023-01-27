@@ -533,13 +533,13 @@ static void initStatic__surgext()
     {
         p->addModel(modelVCOModern);
         p->addModel(modelVCOSine);
-        p->addModel(modelVCOString);
         /*
         p->addModel(modelVCOAlias);
         p->addModel(modelVCOClassic);
         p->addModel(modelVCOFM2);
         p->addModel(modelVCOFM3);
         p->addModel(modelVCOSHNoise);
+        p->addModel(modelVCOString);
         p->addModel(modelVCOTwist);
         p->addModel(modelVCOWavetable);
         p->addModel(modelVCOWindow);
@@ -549,6 +549,7 @@ static void initStatic__surgext()
         spl.removeModule("SurgeXTOSCFM2");
         spl.removeModule("SurgeXTOSCFM3");
         spl.removeModule("SurgeXTOSCSHNoise");
+        spl.removeModule("SurgeXTOSCString");
         spl.removeModule("SurgeXTOSCTwist");
         spl.removeModule("SurgeXTOSCWavetable");
         spl.removeModule("SurgeXTOSCWindow");
