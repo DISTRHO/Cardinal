@@ -310,6 +310,32 @@ static int osc_param_handler(const char*, const char* types, lo_arg** argv, int 
     return 0;
 }
 
+static int osc_host_param_handler(const char*, const char* types, lo_arg** argv, int argc, const lo_message m, void* const self)
+{
+    d_debug("osc_host_param_handler()");
+    DISTRHO_SAFE_ASSERT_RETURN(argc == 2, 0);
+    DISTRHO_SAFE_ASSERT_RETURN(types != nullptr, 0);
+    DISTRHO_SAFE_ASSERT_RETURN(types[0] == 'i', 0);
+    DISTRHO_SAFE_ASSERT_RETURN(types[1] == 'f', 0);
+
+    if (CardinalBasePlugin* const plugin = static_cast<Initializer*>(self)->remotePluginInstance)
+    {
+        CardinalPluginContext* const context = plugin->context;
+
+        const int paramId = argv[0]->i;
+        DISTRHO_SAFE_ASSERT_RETURN(paramId >= 0, 0);
+
+        const uint uparamId = static_cast<uint>(paramId);
+        DISTRHO_SAFE_ASSERT_UINT2_RETURN(uparamId < kModuleParameterCount, uparamId, kModuleParameterCount, 0);
+
+        const float paramValue = argv[1]->f;
+
+        context->parameters[uparamId] = paramValue;
+    }
+
+    return 0;
+}
+
 static int osc_screenshot_handler(const char*, const char* types, lo_arg** argv, int argc, const lo_message m, void* const self)
 {
     d_debug("osc_screenshot_handler()");
@@ -483,6 +509,7 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     DISTRHO_SAFE_ASSERT_RETURN(oscServerThread != nullptr,);
 
     lo_server_thread_add_method(oscServerThread, "/hello", "", osc_hello_handler, this);
+    lo_server_thread_add_method(oscServerThread, "/host-param", "if", osc_host_param_handler, this);
     lo_server_thread_add_method(oscServerThread, "/load", "b", osc_load_handler, this);
     lo_server_thread_add_method(oscServerThread, "/param", "hif", osc_param_handler, this);
     lo_server_thread_add_method(oscServerThread, "/screenshot", "b", osc_screenshot_handler, this);
