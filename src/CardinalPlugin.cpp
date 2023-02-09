@@ -45,6 +45,7 @@
 #include "DistrhoPluginUtils.hpp"
 #include "PluginContext.hpp"
 #include "extra/Base64.hpp"
+#include "extra/ScopedDenormalDisable.hpp"
 #include "extra/ScopedSafeLocale.hpp"
 
 #ifdef DISTRHO_OS_WASM
@@ -1192,23 +1193,7 @@ protected:
     void run(const float** const inputs, float** const outputs, const uint32_t frames,
              const MidiEvent* const midiEvents, const uint32_t midiEventCount) override
     {
-        // TESTING make this revert itself if proven to work
-       #if defined(__SSE2_MATH__)
-        _mm_setcsr(_mm_getcsr() | 0x8040);
-       #elif defined(__aarch64__)
-        uint64_t c;
-        __asm__ __volatile__("mrs %0, fpcr          \n"
-                             "orr %0, %0, #0x1000000\n"
-                             "msr fpcr, %0          \n"
-                             "isb                   \n"
-                             : "=r"(c) :: "memory");
-       #elif defined(__arm__) && !defined(__SOFTFP__)
-        uint32_t c;
-        __asm__ __volatile__("vmrs %0, fpscr         \n"
-                             "orr  %0, %0, #0x1000000\n"
-                             "vmsr fpscr, %0         \n"
-                             : "=r"(c) :: "memory");
-       #endif
+        const ScopedDenormalDisable sdd;
 
         rack::contextSet(context);
 
