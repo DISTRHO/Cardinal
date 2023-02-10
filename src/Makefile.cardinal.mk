@@ -203,7 +203,7 @@ endif
 
 ifneq ($(NOPLUGINS),true)
 ifeq ($(MACOS),true)
-EXTRA_DSP_LIBS += -framework Accelerate
+EXTRA_DSP_LIBS += -framework Accelerate -framework AppKit
 endif
 endif
 

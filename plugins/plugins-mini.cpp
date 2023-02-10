@@ -562,10 +562,12 @@ static void initStatic__surgext()
         /*
         p->addModel(modelSurgeDelay);
         p->addModel(modelSurgeDelayLineByFreq);
+        p->addModel(modelSurgeDelayLineByFreqExpanded);
         p->addModel(modelSurgeVCF);
         */
         spl.removeModule("SurgeXTDelay");
         spl.removeModule("SurgeXTDelayLineByFreq");
+        spl.removeModule("SurgeXTDelayLineByFreqExpanded");
         spl.removeModule("SurgeXTVCF");
 
         spl.removeModule("SurgeXTFXChorus");
@@ -587,11 +589,14 @@ static void initStatic__surgext()
         spl.removeModule("SurgeXTFXTreeMonster");
         spl.removeModule("SurgeXTFXVocoder");
 
-        /* v2.1 modules
+        /*
         p->addModel(modelEGxVCA);
         p->addModel(modelQuadAD);
         p->addModel(modelQuadLFO);
         */
+        spl.removeModule("SurgeXTEGxVCA");
+        spl.removeModule("SurgeXTQuadAD");
+        spl.removeModule("SurgeXTQuadLFO");
 
         surgext_rack_initialize();
     }

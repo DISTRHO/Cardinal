@@ -1086,10 +1086,20 @@ SURGEXT_FLAGS += -DSURGE_RACK_BASE_VERSION=XT1-0-1
 SURGEXT_FLAGS += -DSURGE_RACK_PLUG_VERSION=Cardinal
 SURGEXT_FLAGS += -DSURGE_RACK_SURGE_VERSION=Cardinal
 
+SURGEXT_FLAGS += -I$(abspath ../carla/source/modules)
+
+MINIPLUGIN_FILES += surgext/src/Delay.cpp
+MINIPLUGIN_FILES += surgext/src/DelayLineByFreq.cpp
+MINIPLUGIN_FILES += surgext/src/DelayLineByFreqExpanded.cpp
+MINIPLUGIN_FILES += surgext/src/EGxVCA.cpp
+MINIPLUGIN_FILES += surgext/src/FX.cpp
 MINIPLUGIN_FILES += surgext/src/LFO.cpp
 MINIPLUGIN_FILES += surgext/src/Mixer.cpp
 MINIPLUGIN_FILES += surgext/src/ModMatrix.cpp
+MINIPLUGIN_FILES += surgext/src/QuadAD.cpp
+MINIPLUGIN_FILES += surgext/src/QuadLFO.cpp
 MINIPLUGIN_FILES += surgext/src/VCO.cpp
+MINIPLUGIN_FILES += surgext/src/VCF.cpp
 MINIPLUGIN_FILES += surgext/src/Waveshaper.cpp
 MINIPLUGIN_FILES += surgext/src/XTModule.cpp
 MINIPLUGIN_FILES += surgext/src/XTModuleWidget.cpp

@@ -2883,6 +2883,7 @@ static void initStatic__surgext()
         p->addModel(modelSurgeVCF);
         p->addModel(modelSurgeDelay);
         p->addModel(modelSurgeDelayLineByFreq);
+        p->addModel(modelSurgeDelayLineByFreqExpanded);
         p->addModel(modelSurgeWaveshaper);
         p->addModel(modelSurgeLFO);
         p->addModel(modelSurgeMixer);
@@ -2907,11 +2908,9 @@ static void initStatic__surgext()
         p->addModel(modelFXSpringReverb);
         p->addModel(modelFXTreeMonster);
 
-        /* v2.1 modules
         p->addModel(modelEGxVCA);
         p->addModel(modelQuadAD);
         p->addModel(modelQuadLFO);
-        */
 
         surgext_rack_initialize();
     }

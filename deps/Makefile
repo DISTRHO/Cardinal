@@ -321,8 +321,8 @@ ifeq ($(CPU_I386),true)
 SURGE_CXX_FLAGS += -D__sigemptyset=sigemptyset
 endif
 
-# unwanted in this build
-SURGE_CXX_FLAGS += -DJUCE_DSP_ENABLE_SNAP_TO_ZERO=0
+# use custom JUCE from DISTRHO and Carla
+SURGE_CXX_FLAGS += -I$(abspath ../carla/source/modules)
 
 # SIMD must always be enabled, even in debug builds
 ifeq ($(NOSIMD),true)
@@ -374,6 +374,7 @@ $(SURGE_DEP_PATH)/Makefile: $(SURGE_SRC_PATH)/CMakeLists.txt
 		-DSURGE_SKIP_JUCE_FOR_RACK=TRUE \
 		-DSURGE_SKIP_LUA=TRUE \
 		-DSURGE_SKIP_ODDSOUND_MTS=TRUE \
+		-DSURGE_JUCE_PATH=$(abspath ../carla/source) \
 		$(SURGE_SRC_PATH)
 
 # --------------------------------------------------------------
