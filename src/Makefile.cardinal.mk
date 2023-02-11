@@ -204,6 +204,8 @@ endif
 ifneq ($(NOPLUGINS),true)
 ifeq ($(MACOS),true)
 EXTRA_DSP_LIBS += -framework Accelerate -framework AppKit
+else ifeq ($(WINDOWS),true)
+EXTRA_DSP_LIBS += -lole32 -lshlwapi -luuid -lversion
 endif
 endif
 
