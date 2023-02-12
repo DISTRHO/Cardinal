@@ -1064,7 +1064,11 @@ SURGEXT_FLAGS += \
 	-Isurgext/surge/libs/tuning-library/include \
 	-I../deps/surge-build/libs/sst/sst-plugininfra/libs/filesystem/include \
 	-include limits \
-	-DSURGE_COMPILE_BLOCK_SIZE=8
+	-DSURGE_COMPILE_BLOCK_SIZE=8 \
+	-DSURGE_SKIP_ODDSOUND_MTS \
+	-DHAS_LUA=0 \
+	-DHAS_JUCE=0 \
+	-DSKIP_JUCE=1
 
 ifneq ($(DEBUG),true)
 SURGEXT_FLAGS += -DRELEASE=1
