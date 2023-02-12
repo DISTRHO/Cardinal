@@ -1041,7 +1041,9 @@ SURGEXT_FLAGS  = $(filter-out -fsingle-precision-constant,$(filter-out -std=gnu+
 SURGEXT_FLAGS += $(NOFINITE_FLAGS)
 SURGEXT_FLAGS += -std=gnu++17
 SURGEXT_FLAGS += -DTIXML_USE_STL=1
-SURGEXT_FLAGS += -Isurgext/surge/src/common \
+SURGEXT_FLAGS += \
+	-Isurgext/libs/sst/sst-basic-blocks/include \
+	-Isurgext/surge/src/common \
 	-Isurgext/surge/src/common/dsp \
 	-Isurgext/surge/src/common/dsp/filters \
 	-Isurgext/surge/src/common/dsp/vembertech \

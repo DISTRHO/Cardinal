@@ -261,7 +261,7 @@ clean:
 	$(MAKE) clean -C dpf/utils/lv2-ttl-generator
 	$(MAKE) clean -C plugins
 	$(MAKE) clean -C src
-	rm -rf bin build
+	rm -rf bin build build-headless
 
 # --------------------------------------------------------------
 # Install step
