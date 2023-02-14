@@ -8,7 +8,7 @@
 # jucewrapper/CMakeLists.txt `project`
 # src/CardinalCommon.cpp `CARDINAL_VERSION`
 # src/CardinalPlugin.cpp `getVersion`
-VERSION = 22.12
+VERSION = 23.02
 
 # --------------------------------------------------------------
 # Import base definitions
