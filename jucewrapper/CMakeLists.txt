@@ -179,9 +179,9 @@ target_compile_definitions(Cardinal
         JUCE_USE_OGGVORBIS=0
         JUCE_USE_XINERAMA=0
         JUCE_VST3_CAN_REPLACE_VST2=0
-        JUCE_ALSA=1
+        JUCE_ALSA=0
         JUCE_DIRECTSOUND=0
-        JUCE_JACK=1
+        JUCE_JACK=0
         JUCE_WASAPI=0
         JUCE_WEB_BROWSER=0)
 
@@ -282,13 +282,115 @@ target_compile_definitions(CardinalFX
         JUCE_USE_OGGVORBIS=0
         JUCE_USE_XINERAMA=0
         JUCE_VST3_CAN_REPLACE_VST2=0
-        JUCE_ALSA=1
+        JUCE_ALSA=0
         JUCE_DIRECTSOUND=0
-        JUCE_JACK=1
+        JUCE_JACK=0
         JUCE_WASAPI=0
         JUCE_WEB_BROWSER=0)
 
 target_link_libraries(CardinalFX
+    PRIVATE
+        juce::juce_audio_utils
+        ${STATIC_LIBS_START}
+        sPlugins
+        sCardinalFX
+        sRack
+        carla_host_plugin
+        carla_engine_plugin
+        carla_plugin
+        native_plugins
+        audio_decoder
+        jackbridge
+        lilv
+        rtmempool
+        sfzero
+        water
+        ysfx
+        zita_resampler
+        dgl
+        surgedep01
+        surgedep02
+        surgedep03
+        surgedep04
+        surgedep05
+        surgedep06
+        surgedep07
+        surgedep08
+        surgedep09
+        surgedep10
+        libaubio
+        libarchive
+        libjansson
+        libquickjs
+        libsamplerate
+        libspeexdsp
+        libzstd
+        ${STATIC_LIBS_END}
+        ${GL_LIBRARIES}
+        ${DBUS_LIBRARIES}
+        -L${LIBLO_LIBRARY_DIRS}
+        ${FFTW3F_LIBRARIES}
+        ${LIBLO_LIBRARIES}
+        ${SNDFILE_LIBRARIES}
+        ${X11_LIBRARIES}
+        ${XCURSOR_LIBRARIES}
+        ${XEXT_LIBRARIES}
+        ${XRANDR_LIBRARIES}
+        ${EXTRA_LIBS}
+        -lmagic
+    PUBLIC
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_lto_flags
+        juce::juce_recommended_warning_flags)
+
+# MIDI variant
+
+juce_add_plugin(CardinalMIDI
+    AU_MAIN_TYPE kAudioUnitType_MIDIProcessor
+    COMPANY_COPYRIGHT "GPL-3.0-or-later"
+    COMPANY_NAME "DISTRHO"
+    COMPANY_WEBSITE "https://github.com/DISTRHO/Cardinal"
+    DESCRIPTION "Virtual modular synthesizer plugin"
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    FORMATS ${PLUGIN_FORMATS}
+    IS_MIDI_EFFECT TRUE
+    IS_SYNTH FALSE
+    NEEDS_MIDI_INPUT TRUE
+    NEEDS_MIDI_OUTPUT TRUE
+    PLUGIN_CODE DcnM
+    PLUGIN_MANUFACTURER_CODE Dstr
+    PRODUCT_NAME "CardinalMIDI")
+
+target_sources(CardinalMIDI
+    PRIVATE
+        CardinalWrapper.cpp)
+
+target_include_directories(CardinalMIDI
+    PRIVATE
+        ../dpf/distrho
+        ../src/CardinalFX)
+
+target_compile_definitions(CardinalMIDI
+    PUBLIC
+        DISTRHO_NAMESPACE=CardinalDISTRHO
+        DGL_NAMESPACE=CardinalDGL
+        JucePlugin_PreferredChannelConfigurations=2,2
+        JUCE_CHECK_MEMORY_LEAKS=0
+        JUCE_DISABLE_NATIVE_FILECHOOSERS=1
+        JUCE_DISPLAY_SPLASH_SCREEN=0
+        JUCE_MODAL_LOOPS_PERMITTED=0
+        JUCE_USE_CURL=0
+        JUCE_USE_FLAC=0
+        JUCE_USE_OGGVORBIS=0
+        JUCE_USE_XINERAMA=0
+        JUCE_VST3_CAN_REPLACE_VST2=0
+        JUCE_ALSA=0
+        JUCE_DIRECTSOUND=0
+        JUCE_JACK=0
+        JUCE_WASAPI=0
+        JUCE_WEB_BROWSER=0)
+
+target_link_libraries(CardinalMIDI
     PRIVATE
         juce::juce_audio_utils
         ${STATIC_LIBS_START}
@@ -384,9 +486,9 @@ target_compile_definitions(CardinalSynth
         JUCE_USE_OGGVORBIS=0
         JUCE_USE_XINERAMA=0
         JUCE_VST3_CAN_REPLACE_VST2=0
-        JUCE_ALSA=1
+        JUCE_ALSA=0
         JUCE_DIRECTSOUND=0
-        JUCE_JACK=1
+        JUCE_JACK=0
         JUCE_WASAPI=0
         JUCE_WEB_BROWSER=0)
 
