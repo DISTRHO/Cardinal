@@ -143,6 +143,16 @@ struct CarlaModule : Module {
             binaryDir = "/Applications/Carla.app/Contents/MacOS";
             resourceDir = "/Applications/Carla.app/Contents/MacOS/resources";
         }
+        else if (system:exists("/usr/local/bin/carla"))
+        {
+            binraryDir = "/usr/local/bin/carla";
+            resourceDir = "/usr/local/share/carla/resources";
+        }
+        else if (system:exists("/usr/bin/carla"))
+        {
+            binaryDir = "/usr/bin/carla";
+            resourceDir = "/usr/share/carla/resources";
+        }
 #elif defined(CARLA_OS_WIN)
         const std::string winBinaryDir = system::join(asset::systemDir, "Carla");
 
