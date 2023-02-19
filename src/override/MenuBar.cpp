@@ -173,16 +173,21 @@ struct FileButton : MenuButton {
 		}, APP->patch->path.empty()));
 
 #if defined(HAVE_LIBLO) || CARDINAL_VARIANT_MINI
+#ifdef __MOD_DEVICES__
+#define REMOTE_NAME "MOD"
+#else
+#define REMOTE_NAME "Remote"
+#endif
 		menu->addChild(new ui::MenuSeparator);
 
 		remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote();
 
 		if (remoteDetails != nullptr && remoteDetails->connected) {
-			menu->addChild(createMenuItem("Deploy to MOD", "F7", [remoteDetails]() {
+			menu->addChild(createMenuItem("Deploy to " REMOTE_NAME, "F7", [remoteDetails]() {
 				remoteUtils::sendFullPatchToRemote(remoteDetails);
 			}));
 
-			menu->addChild(createCheckMenuItem("Auto deploy to MOD", "",
+			menu->addChild(createCheckMenuItem("Auto deploy to " REMOTE_NAME, "",
 				[remoteDetails]() {return remoteDetails->autoDeploy;},
 				[remoteDetails]() {
 					remoteDetails->autoDeploy = !remoteDetails->autoDeploy;
@@ -190,7 +195,7 @@ struct FileButton : MenuButton {
 				}
 			));
 		} else {
-			menu->addChild(createMenuItem("Connect to MOD", "", []() {
+			menu->addChild(createMenuItem("Connect to " REMOTE_NAME, "", []() {
 				DISTRHO_SAFE_ASSERT(remoteUtils::connectToRemote());
 			}));
 		}
