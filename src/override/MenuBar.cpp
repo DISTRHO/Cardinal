@@ -101,15 +101,16 @@ struct MenuButton : ui::Button {
 
 struct FileButton : MenuButton {
 	const bool isStandalone;
-#if ! CARDINAL_VARIANT_MINI
 	std::vector<std::string> demoPatches;
-#endif
 
 	FileButton(const bool standalone)
 		: MenuButton(),  isStandalone(standalone)
 	{
-#if ! CARDINAL_VARIANT_MINI
+#if CARDINAL_VARIANT_MINI
+		const std::string patchesDir = asset::patchesPath() + DISTRHO_OS_SEP_STR "mini";
+#else
 		const std::string patchesDir = asset::patchesPath() + DISTRHO_OS_SEP_STR "examples";
+#endif
 
 		if (system::isDirectory(patchesDir))
 		{
@@ -118,7 +119,6 @@ struct FileButton : MenuButton {
 				return string::lowercase(a) < string::lowercase(b);
 			});
 		}
-#endif
 	}
 
 	void onAction(const ActionEvent& e) override {
@@ -211,7 +211,6 @@ struct FileButton : MenuButton {
 #endif
 #endif
 
-#if ! CARDINAL_VARIANT_MINI
 		if (!demoPatches.empty())
 		{
 			menu->addChild(new ui::MenuSeparator);
@@ -237,7 +236,6 @@ struct FileButton : MenuButton {
 				}));
 			}));
 		}
-#endif
 
 #ifndef DISTRHO_OS_WASM
 		if (isStandalone) {

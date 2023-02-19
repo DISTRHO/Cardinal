@@ -347,8 +347,6 @@ public:
         rack::contextSet(context);
 
        #if CARDINAL_VARIANT_MINI
-        DISTRHO_SAFE_ASSERT(remoteUtils::connectToRemote());
-
         // create unique temporary path for this instance
         try {
             char uidBuf[24];
@@ -402,6 +400,8 @@ public:
 
         context->patch->loadTemplate();
         context->scene->rackScroll->reset();
+
+        DISTRHO_SAFE_ASSERT(remoteUtils::connectToRemote());
 
         Engine_setRemoteDetails(context->engine, remoteDetails);
        #endif

@@ -218,7 +218,7 @@ void Scene::step() {
 				const std::string& name(APP->history->actions[actionIndex - 1]->name);
 				static const std::vector<std::string> ignoredNames = {
 					"move knob",
-					"move module",
+					"move modules",
 					"move switch",
 				};
 				if (std::find(ignoredNames.cbegin(), ignoredNames.cend(), name) == ignoredNames.cend()) {
