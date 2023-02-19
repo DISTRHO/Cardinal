@@ -100,7 +100,7 @@ jobs:
             *.tar.gz
 
   linux-armhf:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -125,16 +125,15 @@ jobs:
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libgd3/jammy
-          sudo apt-get purge -yqq libmono* moby* mono* msbuild* php* libgdiplus libpcre2-posix3 nuget
+          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
           sudo apt-get clean
       - name: Set up dependencies
         run: |
           sudo dpkg --add-architecture armhf
           sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
-          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-armhf.list
-          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
-          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports jammy-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
+          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-armhf.list
+          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
+          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           sudo apt-get update -qq
           sudo apt-get install -yqq g++-arm-linux-gnueabihf libasound2-dev:armhf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libglib2.0-dev:armhf libsdl2-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf gperf qemu-user-static
           sudo apt-get clean
