@@ -1121,7 +1121,7 @@ jobs:
           WITH_LTO: false
         run: |
           make features
-          make NOOPT=true SKIP_STRIPPING=true carla deps dgl plugins resources dpf/utils/lv2_ttl_generator -j $(nproc)
+          make NOOPT=true SKIP_STRIPPING=true carla deps dgl plugins resources -j $(nproc)
       # single job for final build stage, otherwise we might get killed due to OOM
       - name: Build Cardinal (final build stage)
         env:
@@ -1131,7 +1131,7 @@ jobs:
           WITH_LTO: false
         run: |
           make features
-          make NOOPT=true SKIP_STRIPPING=true -C src jack lv2 vst2 vst3 clap -j 1
+          make NOOPT=true SKIP_STRIPPING=true -j 1
           ./dpf/utils/generate-ttl.sh
       - name: Run Cardinal self-tests
         run: |
