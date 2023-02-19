@@ -374,6 +374,7 @@ $(SURGE_DEP_PATH)/Makefile: $(SURGE_SRC_PATH)/CMakeLists.txt
 		-DSURGE_SKIP_LUA=TRUE \
 		-DSURGE_SKIP_ODDSOUND_MTS=TRUE \
 		-DSURGE_JUCE_PATH=$(abspath ../carla/source) \
+		-DSURGE_SIMDE_PATH=$(abspath ../include/simde) \
 		$(SURGE_SRC_PATH)
 
 # --------------------------------------------------------------
