@@ -231,12 +231,7 @@ DRWAV += drwav_write_raw
 # --------------------------------------------------------------
 # Files to build
 
-ifeq ($(NOPLUGINS),true)
-PLUGIN_FILES = noplugins.cpp
-else
 PLUGIN_FILES = plugins.cpp
-endif
-
 MINIPLUGIN_FILES = plugins-mini.cpp
 
 # --------------------------------------------------------------
@@ -334,12 +329,6 @@ FUNDAMENTAL_CUSTOM = $(DRWAV)
 
 # PLUGIN_FILES += $(wildcard ZamAudio/src/*.cpp)
 
-# --------------------------------------------------------------
-# noplugins build
-
-NOPLUGIN_FILES = $(PLUGIN_FILES:%=%)
-
-ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------
 # 21kHz
 
@@ -1278,10 +1267,6 @@ PLUGIN_FILES += $(filter-out ZZC/src/ZZC.cpp ZZC/src/WavetablePlayer.cpp,$(wildc
 ZZC_CUSTOM = Clock LowFrequencyOscillator
 
 # --------------------------------------------------------------
-
-endif # !NOPLUGINS
-
-# --------------------------------------------------------------
 # Build setup
 
 ifeq ($(HEADLESS),true)
@@ -1374,10 +1359,6 @@ BASE_FLAGS += -I../include/mingw-compat
 BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
-ifeq ($(NOPLUGINS),true)
-BASE_FLAGS += -DNOPLUGINS
-endif
-
 ifeq ($(USE_GLES2),true)
 BASE_FLAGS += -DNANOVG_GLES2_FORCED
 else ifeq ($(USE_GLES3),true)
@@ -1454,11 +1435,7 @@ ifeq ($(HEADLESS),true)
 TARGET_SUFFIX = -headless
 endif
 
-ifeq ($(NOPLUGINS),true)
-TARGETS = noplugins$(TARGET_SUFFIX).a
-else
 TARGETS = plugins$(TARGET_SUFFIX).a plugins-mini$(TARGET_SUFFIX).a
-endif
 
 all: $(TARGETS)
 ifneq ($(HEADLESS),true)
@@ -1472,16 +1449,6 @@ clean:
 
 # --------------------------------------------------------------
 
-ifeq ($(NOPLUGINS),true)
-PLUGIN_LIST = Cardinal Fundamental ZamAudio
-
-RESOURCE_FILES = \
-		$(wildcard Cardinal/res/*.svg) \
-		$(wildcard Fundamental/res/*.svg) \
-		$(wildcard Fundamental/res/components/*.svg) \
-		Fundamental/presets
-# $(wildcard ZamAudio/res/*.svg)
-else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 
 UNWANTED_FILES  = HetrickCV/res/illustrator - deprecated/MyModule.svg
@@ -1536,7 +1503,6 @@ JACK_RESOURCES  = $(CURDIR)/surgext/build/surge-data/configuration.xml
 JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/fx_presets
 JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/wavetables
 JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/windows.wt
-endif
 
 RESOURCE_FILES += Cardinal/res/Miku/Miku.png
 
@@ -2078,8 +2044,6 @@ PLUGIN_OBJS += $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.o)
 MINIPLUGIN_OBJS  = $(MINIPLUGIN_FILES:%=$(BUILD_DIR)/%.o)
 MINIPLUGIN_OBJS += $(MINIPLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.o)
 
-NOPLUGIN_OBJS = $(NOPLUGIN_FILES:%=$(BUILD_DIR)/%.o)
-
 .PRECIOUS: $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.c)
 
 # function for custom module names macro
@@ -2093,11 +2057,6 @@ plugins$(TARGET_SUFFIX).a: $(PLUGIN_OBJS)
 
 plugins-mini$(TARGET_SUFFIX).a: $(MINIPLUGIN_OBJS)
 	@echo "Creating $@"
-	$(SILENT)rm -f $@
-	$(SILENT)$(AR) crs $@ $^
-
-noplugins$(TARGET_SUFFIX).a: $(NOPLUGIN_OBJS)
-	@echo "Creating $@" $(NOPLUGIN_OBJS)
 	$(SILENT)rm -f $@
 	$(SILENT)$(AR) crs $@ $^
 

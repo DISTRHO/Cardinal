@@ -125,8 +125,6 @@ endif
 
 ifeq ($(CARDINAL_VARIANT),mini)
 RACK_EXTRA_LIBS  = ../../plugins/plugins-mini-headless.a
-else ifeq ($(NOPLUGINS),true)
-RACK_EXTRA_LIBS  = ../../plugins/noplugins$(TARGET_SUFFIX).a
 else
 RACK_EXTRA_LIBS  = ../../plugins/plugins$(TARGET_SUFFIX).a
 endif
@@ -140,7 +138,6 @@ endif
 # --------------------------------------------------------------
 # surgext libraries
 
-ifneq ($(NOPLUGINS),true)
 SURGE_DEP_PATH = $(abspath ../../deps/surge-build)
 RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/src/common/libsurge-common.a
 RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/src/common/libjuce_dsp_rack_sub.a
@@ -158,15 +155,12 @@ RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/sst/sst-plugininfra/libs/filesystem/li
 endif
 RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/sst/sst-plugininfra/libs/strnatcmp/libstrnatcmp.a
 RACK_EXTRA_LIBS += $(SURGE_DEP_PATH)/libs/sst/sst-plugininfra/libs/tinyxml/libtinyxml.a
-endif
 
 # --------------------------------------------------------------
 # Extra libraries to link against
 
 ifneq ($(CARDINAL_VARIANT),mini)
-ifneq ($(NOPLUGINS),true)
 RACK_EXTRA_LIBS += $(DEP_LIB_PATH)/libquickjs.a
-endif
 endif
 
 ifneq ($(SYSDEPS),true)
@@ -201,12 +195,10 @@ EXTRA_DSP_LIBS += $(shell $(PKG_CONFIG) --libs fftw3f)
 endif
 endif
 
-ifneq ($(NOPLUGINS),true)
 ifeq ($(MACOS),true)
 EXTRA_DSP_LIBS += -framework Accelerate -framework AppKit
 else ifeq ($(WINDOWS),true)
 EXTRA_DSP_LIBS += -lole32 -lshlwapi -luuid -lversion
-endif
 endif
 
 # --------------------------------------------------------------
@@ -413,7 +405,6 @@ endif
 # find . -type l | grep -v svg | grep -v ttf | grep -v art | grep -v json | grep -v png | grep -v otf | sort
 SYMLINKED_DIRS_RESOURCES  = Fundamental/presets
 ifneq ($(CARDINAL_VARIANT),mini)
-ifneq ($(NOPLUGINS),true)
 SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/chopin
 SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/debussy
 SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/goldberg
@@ -435,7 +426,6 @@ SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/fx_presets
 SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/wavetables
 SYMLINKED_DIRS_RESOURCES += surgext/patches
 SYMLINKED_DIRS_RESOURCES += surgext/presets
-endif
 endif
 LINK_FLAGS += $(foreach d,$(SYMLINKED_DIRS_RESOURCES),--preload-file=../../bin/CardinalNative.lv2/resources/$(d)@/resources/$(d))
 

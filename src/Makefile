@@ -249,9 +249,7 @@ else ifeq ($(WASM),true)
 	$(MAKE) -C CardinalNative
 else
 	$(MAKE) -C Cardinal
-ifneq ($(NOPLUGINS),true)
 	$(MAKE) -C CardinalMini
-endif
 	$(MAKE) -C CardinalNative
 	$(MAKE) -C CardinalFX $(CARDINAL_FX_ARGS)
 	$(MAKE) -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
