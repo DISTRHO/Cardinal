@@ -135,7 +135,7 @@ struct FileButton : MenuButton {
 			patchUtils::loadTemplateDialog();
 		}));
 
-#if ! CARDINAL_VARIANT_MINI
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 #ifndef DISTRHO_OS_WASM
 		menu->addChild(createMenuItem("Open / Import...", RACK_MOD_CTRL_NAME "+O", []() {
 			patchUtils::loadDialog();
@@ -172,7 +172,7 @@ struct FileButton : MenuButton {
 			patchUtils::revertDialog();
 		}, APP->patch->path.empty()));
 
-#if defined(HAVE_LIBLO) || CARDINAL_VARIANT_MINI
+#if defined(HAVE_LIBLO) || ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 #ifdef __MOD_DEVICES__
 #define REMOTE_NAME "MOD"
 #else
@@ -201,7 +201,7 @@ struct FileButton : MenuButton {
 		}
 #endif
 
-#if ! CARDINAL_VARIANT_MINI
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 #ifndef DISTRHO_OS_WASM
 		menu->addChild(new ui::MenuSeparator);
 
@@ -768,7 +768,7 @@ struct MeterLabel : ui::Label {
 		// 	uiLastTime = time;
 		// }
 
-#if CARDINAL_VARIANT_MINI
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		text = string::f("%.1f fps", 1.0 / frameDurationAvg);
 #else
 		double meterAverage = APP->engine->getMeterAverage();
@@ -807,7 +807,7 @@ struct MenuBar : widget::OpaqueWidget {
 		viewButton->text = "View";
 		layout->addChild(viewButton);
 
-#if ! CARDINAL_VARIANT_MINI
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		EngineButton* engineButton = new EngineButton;
 		engineButton->text = "Engine";
 		layout->addChild(engineButton);

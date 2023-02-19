@@ -205,7 +205,9 @@ struct CardinalPluginContext : rack::Context {
 
 // -----------------------------------------------------------------------------------------------------------
 
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 CardinalPluginContext* getRackContextFromPlugin(void* ptr);
+#endif
 
 class CardinalBasePlugin : public Plugin {
 public:

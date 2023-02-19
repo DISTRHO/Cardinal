@@ -346,7 +346,7 @@ public:
     {
         rack::contextSet(context);
 
-       #if CARDINAL_VARIANT_MINI
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         // create unique temporary path for this instance
         try {
             char uidBuf[24];
@@ -490,7 +490,7 @@ public:
         context->tlw = nullptr;
         context->ui = nullptr;
 
-       #if CARDINAL_VARIANT_MINI
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         {
             const ScopedContext sc(this);
             context->patch->clear();
@@ -620,7 +620,7 @@ public:
             filebrowserhandle = nullptr;
         }
 
-       #if CARDINAL_VARIANT_MINI
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         {
             const ScopedContext sc(this);
             for (uint32_t i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS;++i)
@@ -726,7 +726,7 @@ protected:
         // host mapped parameters
         if (index < kCardinalParameterCountAtModules)
         {
-           #if CARDINAL_VARIANT_MINI
+           #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
             context->parameters[index] = value;
            #endif
             return;
@@ -735,7 +735,7 @@ protected:
         // bypass
         if (index == kCardinalParameterBypass)
         {
-           #if CARDINAL_VARIANT_MINI
+           #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
             context->bypassed = value > 0.5f;
            #endif
             return;
@@ -829,7 +829,7 @@ protected:
             return;
         }
 
-       #if CARDINAL_VARIANT_MINI
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         if (index < kCardinalParameterCountAtMiniBuffers)
         {
             float* const buffer = *const_cast<float**>(&context->dataIns[index - kCardinalParameterStartMiniBuffers]);
@@ -886,7 +886,7 @@ protected:
 
     void stateChanged(const char* const key, const char* const value) override
     {
-       #if CARDINAL_VARIANT_MINI
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         if (std::strcmp(key, "patch") == 0)
         {
             if (fAutosavePath.empty())

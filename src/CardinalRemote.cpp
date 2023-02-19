@@ -28,11 +28,11 @@
 #include "extra/Base64.hpp"
 #include "extra/ScopedSafeLocale.hpp"
 
-#if defined(STATIC_BUILD) || CARDINAL_VARIANT_MINI
+#if defined(STATIC_BUILD) || ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 # undef HAVE_LIBLO
 #endif
 
-#if (CARDINAL_VARIANT_MINI || defined(HAVE_LIBLO)) && !defined(HEADLESS)
+#if (defined(HAVE_LIBLO) || ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS) && !defined(HEADLESS)
 # define CARDINAL_REMOTE_ENABLED
 #endif
 
@@ -88,7 +88,7 @@ bool connectToRemote()
 
     RemoteDetails* remoteDetails = ui->remoteDetails;
 
-   #if CARDINAL_VARIANT_MINI
+   #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
     if (remoteDetails == nullptr)
     {
         ui->remoteDetails = remoteDetails = new RemoteDetails;
@@ -148,7 +148,7 @@ void idleRemote(RemoteDetails* const remote)
 void sendParamChangeToRemote(RemoteDetails* const remote, int64_t moduleId, int paramId, float value)
 {
 #ifdef CARDINAL_REMOTE_ENABLED
-#if CARDINAL_VARIANT_MINI
+#if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
     char paramBuf[512] = {};
     {
         const ScopedSafeLocale cssl;
@@ -179,7 +179,7 @@ void sendFullPatchToRemote(RemoteDetails* const remote)
     std::vector<uint8_t> data;
     using namespace rack::system;
 
-   #if CARDINAL_VARIANT_MINI
+   #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
     FILE* const f = std::fopen(join(context->patch->autosavePath, "patch.json").c_str(), "r");
     DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
 
@@ -221,7 +221,7 @@ void sendFullPatchToRemote(RemoteDetails* const remote)
 
 void sendScreenshotToRemote(RemoteDetails*, const char* const screenshot)
 {
-#if defined(HAVE_LIBLO) && ! CARDINAL_VARIANT_MINI
+#if defined(HAVE_LIBLO) && DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
     const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, CARDINAL_DEFAULT_REMOTE_HOST_PORT);
     DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
 

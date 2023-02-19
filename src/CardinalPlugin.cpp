@@ -61,7 +61,7 @@
 extern const std::string CARDINAL_VERSION;
 
 namespace rack {
-#if CARDINAL_VARIANT_MINI || defined(HEADLESS)
+#if (CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS) || defined(HEADLESS)
 namespace app {
 rack::widget::Widget* createMenuBar() { return new rack::widget::Widget; }
 }
@@ -179,7 +179,7 @@ class CardinalPlugin : public CardinalBasePlugin
     // real values, not VCV interpreted ones
     float fWindowParameters[kWindowParameterCount];
    #endif
-   #if CARDINAL_VARIANT_MINI
+   #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
     float fMiniReportValues[kCardinalParameterCountAtMini - kCardinalParameterStartMini];
    #endif
 
@@ -213,7 +213,7 @@ public:
         fWindowParameters[kWindowParameterInvertZoom] = 0.0f;
         fWindowParameters[kWindowParameterSqueezeModulePositions] = 1.0f;
        #endif
-       #if CARDINAL_VARIANT_MINI
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         std::memset(fMiniReportValues, 0, sizeof(fMiniReportValues));
         fMiniReportValues[kCardinalParameterMiniTimeBar - kCardinalParameterStartMini] = 1;
         fMiniReportValues[kCardinalParameterMiniTimeBeat - kCardinalParameterStartMini] = 1;
@@ -460,7 +460,7 @@ protected:
                 parameter.name = "Show tooltips";
                 parameter.symbol = "tooltips";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 1.0f;
@@ -472,7 +472,7 @@ protected:
                 parameter.symbol = "cableOpacity";
                 parameter.unit = "%";
                 parameter.hints = kParameterIsAutomatable;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 50.0f;
@@ -484,7 +484,7 @@ protected:
                 parameter.symbol = "cableTension";
                 parameter.unit = "%";
                 parameter.hints = kParameterIsAutomatable;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 75.0f;
@@ -496,7 +496,7 @@ protected:
                 parameter.symbol = "rackBrightness";
                 parameter.unit = "%";
                 parameter.hints = kParameterIsAutomatable;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 100.0f;
@@ -508,7 +508,7 @@ protected:
                 parameter.symbol = "haloBrightness";
                 parameter.unit = "%";
                 parameter.hints = kParameterIsAutomatable;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 25.0f;
@@ -519,7 +519,7 @@ protected:
                 parameter.name = "Knob mode";
                 parameter.symbol = "knobMode";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 0.0f;
@@ -539,7 +539,7 @@ protected:
                 parameter.name = "Scroll wheel knob control";
                 parameter.symbol = "knobScroll";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 0.0f;
@@ -550,7 +550,7 @@ protected:
                 parameter.name = "Scroll wheel knob sensitivity";
                 parameter.symbol = "knobScrollSensitivity";
                 parameter.hints = kParameterIsAutomatable|kParameterIsLogarithmic;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 1.0f;
@@ -561,7 +561,7 @@ protected:
                 parameter.name = "Lock module positions";
                 parameter.symbol = "lockModules";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 0.0f;
@@ -572,7 +572,7 @@ protected:
                 parameter.name = "Update rate limit";
                 parameter.symbol = "rateLimit";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 0.0f;
@@ -592,7 +592,7 @@ protected:
                 parameter.name = "Browser sort";
                 parameter.symbol = "browserSort";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 3.0f;
@@ -618,7 +618,7 @@ protected:
                 parameter.name = "Browser zoom";
                 parameter.symbol = "browserZoom";
                 parameter.hints = kParameterIsAutomatable;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.unit = "%";
@@ -647,7 +647,7 @@ protected:
                 parameter.name = "Invert zoom";
                 parameter.symbol = "invertZoom";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 0.0f;
@@ -658,7 +658,7 @@ protected:
                 parameter.name = "Auto-squeeze module positions";
                 parameter.symbol = "squeezeModules";
                 parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.ranges.def = 1.0f;
@@ -669,7 +669,7 @@ protected:
         }
        #endif
 
-       #if CARDINAL_VARIANT_MINI
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         switch (index)
         {
         case kCardinalParameterMiniAudioIn1:
@@ -817,7 +817,7 @@ protected:
         switch (index)
         {
         case kCardinalStatePatch:
-           #if CARDINAL_VARIANT_MINI
+           #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
             state.hints = kStateIsHostReadable;
            #else
             state.hints = kStateIsOnlyForDSP | kStateIsBase64Blob;
@@ -833,7 +833,7 @@ protected:
                     if (std::fread(fileContent, fileSize, 1, f) == 1)
                     {
                         fileContent[fileSize] = '\0';
-                       #if CARDINAL_VARIANT_MINI
+                       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                         state.defaultValue = fileContent;
                        #else
                         state.defaultValue = String::asBase64(fileContent, fileSize);
@@ -859,7 +859,7 @@ protected:
             break;
        #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         case kCardinalStateModuleInfos:
-           #if CARDINAL_VARIANT_MINI
+           #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
             state.hints = kStateIsHostReadable;
            #else
             state.hints = kStateIsOnlyForDSP;
@@ -875,7 +875,7 @@ protected:
             state.label = "Window size";
             break;
        #endif
-       #if CARDINAL_VARIANT_MINI
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         case kCardinalStateParamChange:
             state.hints = kStateIsHostReadable | kStateIsOnlyForDSP;
             state.key = "param";
@@ -903,7 +903,7 @@ protected:
             return fWindowParameters[index - kCardinalParameterStartWindow];
        #endif
 
-       #if CARDINAL_VARIANT_MINI
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         if (index < kCardinalParameterCountAtMini)
             return fMiniReportValues[index - kCardinalParameterStartMini];
        #endif
@@ -1006,7 +1006,7 @@ protected:
             context->patch->cleanAutosave();
             // context->history->setSaved();
 
-           #if CARDINAL_VARIANT_MINI
+           #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
             FILE* const f = std::fopen(rack::system::join(context->patch->autosavePath, "patch.json").c_str(), "r");
             DISTRHO_SAFE_ASSERT_RETURN(f != nullptr, String());
 
@@ -1037,7 +1037,7 @@ protected:
 
     void setState(const char* const key, const char* const value) override
     {
-       #if CARDINAL_VARIANT_MINI
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         if (std::strcmp(key, "param") == 0)
         {
             long long moduleId = 0;
@@ -1115,7 +1115,7 @@ protected:
         if (fAutosavePath.empty())
             return;
 
-       #if CARDINAL_VARIANT_MINI
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         rack::system::removeRecursively(fAutosavePath);
         rack::system::createDirectories(fAutosavePath);
 
@@ -1228,7 +1228,7 @@ protected:
                 context->ticksPerClock = timePos.bbt.ticksPerBeat / timePos.bbt.beatType;
                 context->ticksPerFrame = 1.0 / samplesPerTick;
                 context->tickClock = std::fmod(timePos.bbt.tick, context->ticksPerClock);
-               #if CARDINAL_VARIANT_MINI
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 fMiniReportValues[kCardinalParameterMiniTimeBar - kCardinalParameterStartMini] = timePos.bbt.bar;
                 fMiniReportValues[kCardinalParameterMiniTimeBeat - kCardinalParameterStartMini] = timePos.bbt.beat;
                 fMiniReportValues[kCardinalParameterMiniTimeBeatsPerBar - kCardinalParameterStartMini] = timePos.bbt.beatsPerBar;
@@ -1243,7 +1243,7 @@ protected:
             context->reset = reset;
             fNextExpectedFrame = timePos.playing ? timePos.frame + frames : 0;
 
-           #if CARDINAL_VARIANT_MINI
+           #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
             const int flags = (timePos.playing ? 0x1 : 0x0)
                             | (timePos.bbt.valid ? 0x2 : 0x0)
                             | (reset ? 0x4 : 0x0);
@@ -1286,10 +1286,10 @@ protected:
                 std::memset(outputs[i], 0, sizeof(float)*frames);
         }
 
-        #if CARDINAL_VARIANT_MINI
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
             fMiniReportValues[i] = context->dataIns[i][0];
-        #endif
+       #endif
 
         if (bypassed)
         {

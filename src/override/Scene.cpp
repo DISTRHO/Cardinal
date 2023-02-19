@@ -330,8 +330,10 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 		}
 		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
 			if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
+			{
 				remoteUtils::sendFullPatchToRemote(remoteDetails);
-			window::generateScreenshot();
+				window::generateScreenshot();
+			}
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F9 && (e.mods & RACK_MOD_MASK) == 0) {

@@ -67,7 +67,7 @@ WASM_EXCEPTIONS = true
 ifeq ($(CARDINAL_VARIANT),main)
 # main variant should not use rtaudio/sdl2 fallback (it has CV ports)
 SKIP_NATIVE_AUDIO_FALLBACK = true
-else
+else ifneq ($(CARDINAL_VARIANT),mini)
 # other variants should only use rtaudio/sdl2 fallbacks
 FORCE_NATIVE_AUDIO_FALLBACK = true
 endif
@@ -99,7 +99,7 @@ FILES_DSP += CardinalCommon.cpp
 FILES_DSP += CardinalRemote.cpp
 FILES_DSP += common.cpp
 
-ifeq ($(CARDINAL_VARIANT),mini)
+ifeq ($(DSP_UI_SPLIT),true)
 FILES_DSP += RemoteNanoVG.cpp
 FILES_DSP += RemoteWindow.cpp
 else ifeq ($(HEADLESS),true)
@@ -119,18 +119,20 @@ endif
 # --------------------------------------------------------------
 # Rack and plugin libs
 
-ifeq ($(HEADLESS),true)
+ifeq ($(DSP_UI_SPLIT),true)
+TARGET_SUFFIX = -headless
+else ifeq ($(HEADLESS),true)
 TARGET_SUFFIX = -headless
 endif
 
 ifeq ($(CARDINAL_VARIANT),mini)
-RACK_EXTRA_LIBS  = ../../plugins/plugins-mini-headless.a
+RACK_EXTRA_LIBS  = ../../plugins/plugins-mini$(TARGET_SUFFIX).a
 else
 RACK_EXTRA_LIBS  = ../../plugins/plugins$(TARGET_SUFFIX).a
 endif
 
 ifeq ($(CARDINAL_VARIANT),mini)
-RACK_EXTRA_LIBS += ../rack-headless.a
+RACK_EXTRA_LIBS += ../rack$(TARGET_SUFFIX).a
 else
 RACK_EXTRA_LIBS += ../rack$(TARGET_SUFFIX).a
 endif
@@ -255,7 +257,7 @@ endif
 # --------------------------------------------------------------
 # mini variant UI
 
-ifeq ($(CARDINAL_VARIANT),mini)
+ifeq ($(DSP_UI_SPLIT),true)
 ifneq ($(HEADLESS),true)
 FILES_UI  = CardinalUI.cpp
 FILES_UI += CardinalCommon-UI.cpp
@@ -324,13 +326,10 @@ endif
 ifeq ($(MOD_BUILD),true)
 BASE_FLAGS += -DDISTRHO_PLUGIN_MINIMUM_BUFFER_SIZE=0xffff
 BASE_FLAGS += -DDISTRHO_PLUGIN_USES_MODGUI=1
-ifeq ($(CARDINAL_VARIANT),mini)
-BASE_FLAGS += -DDISTRHO_PLUGIN_USES_CUSTOM_MODGUI=0
-else
-BASE_FLAGS += -DDISTRHO_PLUGIN_USES_CUSTOM_MODGUI=1
-endif
 BASE_FLAGS += -DSIMDE_ENABLE_OPENMP -fopenmp
 LINK_FLAGS += -fopenmp
+else ifeq ($(CARDINAL_VARIANT),mini)
+BUILD_CXX_FLAGS += -DDISTRHO_PLUGIN_MINIMUM_BUFFER_SIZE=0xffff
 endif
 
 ifneq ($(WASM),true)
@@ -360,10 +359,6 @@ BUILD_CXX_FLAGS += -faligned-new -Wno-abi
 ifeq ($(MOD_BUILD),true)
 BUILD_CXX_FLAGS += -std=gnu++17
 endif
-endif
-
-ifeq ($(CARDINAL_VARIANT),mini)
-BUILD_CXX_FLAGS += -DDISTRHO_PLUGIN_MINIMUM_BUFFER_SIZE=0xffff
 endif
 
 # Rack code is not tested for this flag, unset it
@@ -504,8 +499,10 @@ BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 
 ifeq ($(CARDINAL_VARIANT),main)
 TARGETS = jack lv2 vst3 clap
-else ifeq ($(CARDINAL_VARIANT),mini)
+else ifeq ($(DSP_UI_SPLIT),true)
 TARGETS = lv2_sep
+else ifeq ($(CARDINAL_VARIANT),mini)
+TARGETS = jack
 else ifeq ($(CARDINAL_VARIANT),native)
 TARGETS = jack
 else

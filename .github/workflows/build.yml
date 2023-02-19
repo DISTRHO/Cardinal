@@ -814,7 +814,11 @@ jobs:
         run: |
           VERSION=$(cat Makefile | awk 'sub("VERSION = ","")')
           cd bin
+          sed -i "s/CardinalMini\./CardinalMini-v${VERSION}\./g" *.html *.js
           sed -i "s/CardinalNative\./CardinalNative-v${VERSION}\./g" *.html *.js
+          mv CardinalMini.data CardinalMini-v${VERSION}.data
+          mv CardinalMini.js   CardinalMini-v${VERSION}.js
+          mv CardinalMini.wasm CardinalMini-v${VERSION}.wasm
           mv CardinalNative.data CardinalNative-v${VERSION}.data
           mv CardinalNative.js   CardinalNative-v${VERSION}.js
           mv CardinalNative.wasm CardinalNative-v${VERSION}.wasm
@@ -832,82 +836,6 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || env.SHA8 }}
-          path: |
-            *.zip
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.zip
-
-  wasm-mini:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/emsdk
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: wasm-mini-v${{ env.CACHE_VERSION }}
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq brotli
-          sudo apt-get clean
-          [ -e ~/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/emsdk
-          cd ~/emsdk && ./emsdk install ${{ env.EMSCRIPTEN_VERSION }} && ./emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
-      - name: Build wasm-mini cross-compiled
-        env:
-          AR: emar
-          CC: emcc
-          CXX: em++
-          NM: emnm
-          RANLIB: emranlib
-          STRIP: emstrip
-          WITH_LTO: false
-        run: |
-          source ~/emsdk/emsdk_env.sh
-          make features
-          make CIBUILD=true NOPLUGINS=true NOOPT=true NOSIMD=true STATIC_BUILD=true USE_GLES2=true -j $(nproc)
-      - name: Make wasm versioned and compress
-        run: |
-          VERSION=$(cat Makefile | awk 'sub("VERSION = ","")')
-          cd bin
-          rm -r *.lv2
-          sed -i "s/CardinalNative\./CardinalNative-v${VERSION}\./g" *.html *.js
-          mv CardinalNative.data CardinalNative-v${VERSION}.data
-          mv CardinalNative.js   CardinalNative-v${VERSION}.js
-          mv CardinalNative.wasm CardinalNative-v${VERSION}.wasm
-          brotli -k -q 11 *.data *.html *.js *.wasm
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
-      - name: Pack binaries
-        run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm)
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.zip
       - uses: softprops/action-gh-release@v1
