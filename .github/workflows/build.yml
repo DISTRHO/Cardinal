@@ -808,7 +808,7 @@ jobs:
           pushd deps/PawPaw; source local.env wasm; popd
           make features
           make CIBUILD=true HAVE_LIBLO=false NOOPT=true USE_GLES2=true -j $(nproc)
-          make CIBUILD=true HAVE_LIBLO=false NOOPT=true USE_GLES2=true -j $(nproc) -C src/CardinalMini modgui
+          make CIBUILD=true HAVE_LIBLO=false NOOPT=true USE_GLES2=true -j $(nproc) -C src/CardinalMiniSep modgui
       - name: Make wasm versioned and compress
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
