@@ -9,7 +9,7 @@ on:
       - '*'
 
 env:
-  CACHE_VERSION: 1
+  CACHE_VERSION: 2
   CARDINAL_UNDER_WINE: 1
   EMSCRIPTEN_VERSION: 3.1.27
   DEBIAN_FRONTEND: noninteractive
