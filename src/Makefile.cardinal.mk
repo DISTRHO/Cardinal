@@ -247,7 +247,7 @@ endif
 ifeq ($(WASM),true)
 WASM_RESOURCES  = $(LV2_RESOURCES)
 
-ifneq ($(STATIC_BUILD),true)
+ifneq ($(CARDINAL_VARIANT),mini)
 WASM_RESOURCES += $(CURDIR)/lv2/fomp.lv2/manifest.ttl
 endif
 
@@ -384,17 +384,15 @@ LINK_FLAGS += -sINITIAL_MEMORY=64Mb
 LINK_FLAGS += -sLZ4=1
 
 ifeq ($(CARDINAL_VARIANT),mini)
+LINK_FLAGS += --shell-file=../emscripten/CardinalMini.html
 LINK_FLAGS += --preload-file=../../bin/CardinalMini.lv2/resources@/resources
-# LINK_FLAGS += -sEXPORTED_RUNTIME_METHODS=FS,cwrap
 else
-LINK_FLAGS += --shell-file=../emscripten/shell.html
-ifneq ($(STATIC_BUILD),true)
-LINK_FLAGS += --use-preload-cache
-LINK_FLAGS += --use-preload-plugins
+LINK_FLAGS += --shell-file=../emscripten/CardinalNative.html
+LINK_FLAGS += --preload-file=../../bin/CardinalNative.lv2/resources@/resources
 LINK_FLAGS += --preload-file=./jsfx
 LINK_FLAGS += --preload-file=./lv2
-endif
-LINK_FLAGS += --preload-file=../../bin/CardinalNative.lv2/resources@/resources
+LINK_FLAGS += --use-preload-cache
+LINK_FLAGS += --use-preload-plugins
 endif
 
 # find . -type l | grep -v svg | grep -v ttf | grep -v art | grep -v json | grep -v png | grep -v otf | sort
