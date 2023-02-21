@@ -1215,7 +1215,8 @@ jobs:
           WITH_LTO: false
         run: |
           make features
-          make NOOPT=true SKIP_STRIPPING=true -j 1
+          make NOOPT=true SKIP_STRIPPING=true -j 1 -C src jack
+          make NOOPT=true -j 1
           ./dpf/utils/generate-ttl.sh
       - name: Run Cardinal self-tests
         run: |
