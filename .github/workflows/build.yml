@@ -885,6 +885,7 @@ jobs:
       - name: Build wasm-noopt cross-compiled
         if: steps.cache.outputs.cache-hit == 'true'
         env:
+          PAWPAW_NOSIMD: 1
           NOSIMD: true
           WITH_LTO: false
         run: |
