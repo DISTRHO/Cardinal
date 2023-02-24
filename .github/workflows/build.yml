@@ -891,6 +891,8 @@ jobs:
         run: |
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
           pushd deps/PawPaw; source local.env wasm; popd
+          # FIXME send patch upstream, assuming this works..
+          sed -i -e 's/defined(__riscv)/defined(__riscv) || defined(__EMSCRIPTEN__)/' plugins/surgext/surge/src/common/globals.h
           make features
           make CIBUILD=true HAVE_LIBLO=false NOOPT=true USE_GLES2=true -j $(nproc)
           make CIBUILD=true HAVE_LIBLO=false NOOPT=true USE_GLES2=true -j $(nproc) -C src/CardinalMiniSep modgui
