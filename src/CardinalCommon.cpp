@@ -87,6 +87,14 @@
 # define CARDINAL_TEMPLATE_NAME "init/main.vcv"
 #endif
 
+#ifdef DISTRHO_OS_WASM
+# if CARDINAL_VARIANT_MINI
+#  define CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME "welcome-wasm-mini.vcv"
+# else
+#  define CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME "welcome-wasm.vcv"
+# endif
+#endif
+
 namespace rack {
 namespace asset {
 std::string patchesPath();
