@@ -148,21 +148,26 @@ struct HostMIDI : TerminalModule {
             channels = 1;
             polyMode = ROTATE_MODE;
             pwRange = 0;
-            panic();
+            panic(true);
         }
 
         /** Resets performance state */
-        void panic()
+        void panic(const bool resetPitch)
         {
             for (int c = 0; c < 16; c++) {
                 notes[c] = 60;
                 gates[c] = false;
                 velocities[c] = 0;
                 aftertouches[c] = 0;
-                pws[c] = 8192;
-                mods[c] = 0;
                 pwFilters[c].reset();
                 modFilters[c].reset();
+            }
+            if (resetPitch) {
+                for (int c = 0; c < 16; c++) {
+                    notes[c] = 60;
+                    pws[c] = 8192;
+                    mods[c] = 0;
+                }
             }
             pedal = false;
             rotateIndex = -1;
@@ -374,7 +379,7 @@ struct HostMIDI : TerminalModule {
                 // all notes off (panic)
                 case 0x7b: {
                     if (msg.getValue() == 0) {
-                        panic();
+                        panic(false);
                     }
                 } break;
                 default: break;
@@ -529,7 +534,7 @@ struct HostMIDI : TerminalModule {
             if (channels == this->channels)
                 return;
             this->channels = channels;
-            panic();
+            panic(true);
         }
 
         void setPolyMode(const PolyMode polyMode)
@@ -537,7 +542,7 @@ struct HostMIDI : TerminalModule {
             if (polyMode == this->polyMode)
                 return;
             this->polyMode = polyMode;
-            panic();
+            panic(true);
         }
     } midiInput;
 
@@ -886,7 +891,7 @@ struct HostMIDIWidget : ModuleWidgetWith9HP {
         menu->addChild(createMenuLabel("MIDI Input & Output"));
 
         menu->addChild(createMenuItem("Panic", "",
-            [=]() { module->midiInput.panic(); module->midiOutput.panic(); }
+            [=]() { module->midiInput.panic(true); module->midiOutput.panic(); }
         ));
     }
 };
