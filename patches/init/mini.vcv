@@ -13,7 +13,7 @@
         "filepath": "",
         "lang": "None",
         "etext": "Welcome to Cardinal!\n\nThis is the mini variant\nIt has 2 audio ports, 5 CV ports, plus MIDI\n\nThe most relevant modules for host\nintegration are in this default patch\n\nA basic VCO + ADSR + VCA is\nthe default patch\n\nHave fun!\n\n",
-        "width": 19
+        "width": 23
       },
       "pos": [
         58,
