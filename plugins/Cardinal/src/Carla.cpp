@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -132,7 +132,17 @@ struct CarlaModule : Module {
         const char* binaryDir = nullptr;
         const char* resourceDir = nullptr;
 
-#if defined(CARLA_OS_MAC)
+      #if defined(CARLA_OS_WIN)
+        const std::string winBinaryDir = system::join(asset::systemDir, "Carla");
+
+        if (system::exists(winBinaryDir))
+        {
+            winResourceDir = system::join(winBinaryDir, "resources");
+            binaryDir = winBinaryDir.c_str();
+            resourceDir = winResourceDir.c_str();
+        }
+      #else // CARLA_OS_WIN
+       #if defined(CARLA_OS_MAC)
         if (system::exists("~/Applications/Carla.app"))
         {
             binaryDir = "~/Applications/Carla.app/Contents/MacOS";
@@ -143,17 +153,10 @@ struct CarlaModule : Module {
             binaryDir = "/Applications/Carla.app/Contents/MacOS";
             resourceDir = "/Applications/Carla.app/Contents/MacOS/resources";
         }
-#elif defined(CARLA_OS_WIN)
-        const std::string winBinaryDir = system::join(asset::systemDir, "Carla");
-
-        if (system::exists(winBinaryDir))
-        {
-            winResourceDir = system::join(winBinaryDir, "resources");
-            binaryDir = winBinaryDir.c_str();
-            resourceDir = winResourceDir.c_str();
-        }
-#else
-        if (system::exists("/usr/local/lib/carla"))
+       #else // CARLA_OS_MAC
+        if (false) {}
+       #endif // CARLA_OS_MAC
+        else if (system::exists("/usr/local/lib/carla"))
         {
             binaryDir = "/usr/local/lib/carla";
             resourceDir = "/usr/local/share/carla/resources";
@@ -163,7 +166,7 @@ struct CarlaModule : Module {
             binaryDir = "/usr/lib/carla";
             resourceDir = "/usr/share/carla/resources";
         }
-#endif
+      #endif // CARLA_OS_WIN
 
         if (binaryDir == nullptr)
         {

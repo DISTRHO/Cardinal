@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -244,7 +244,17 @@ struct IldaeilModule : Module {
         fCarlaHostHandle = carla_create_native_plugin_host_handle(fCarlaPluginDescriptor, fCarlaPluginHandle);
         DISTRHO_SAFE_ASSERT_RETURN(fCarlaHostHandle != nullptr,);
 
-#if defined(CARLA_OS_MAC)
+      #if defined(CARLA_OS_WIN)
+        const std::string winBinaryDir = system::join(asset::systemDir, "Carla");
+
+        if (system::exists(winBinaryDir))
+        {
+            const std::string winResourceDir = system::join(winBinaryDir, "resources");
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, winBinaryDir.c_str());
+            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, winResourceDir.c_str());
+        }
+      #else // CARLA_OS_WIN
+       #if defined(CARLA_OS_MAC)
         if (system::exists("~/Applications/Carla.app"))
         {
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "~/Applications/Carla.app/Contents/MacOS");
@@ -255,20 +265,12 @@ struct IldaeilModule : Module {
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/Applications/Carla.app/Contents/MacOS");
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/Applications/Carla.app/Contents/MacOS/resources");
         }
-#elif defined(CARLA_OS_WASM)
-        if (true)
-        {}
-#elif defined(CARLA_OS_WIN)
-        const std::string winBinaryDir = system::join(asset::systemDir, "Carla");
-
-        if (system::exists(winBinaryDir))
-        {
-            const std::string winResourceDir = system::join(winBinaryDir, "resources");
-            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, winBinaryDir.c_str());
-            carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, winResourceDir.c_str());
-        }
-#else
-        if (system::exists("/usr/local/lib/carla"))
+       #elif defined(CARLA_OS_WASM)
+        if (true) {}
+       #else
+        if (false) {}
+       #endif
+        else if (system::exists("/usr/local/lib/carla"))
         {
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/usr/local/lib/carla");
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/usr/local/share/carla/resources");
@@ -278,7 +280,7 @@ struct IldaeilModule : Module {
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_BINARIES, 0, "/usr/lib/carla");
             carla_set_engine_option(fCarlaHostHandle, ENGINE_OPTION_PATH_RESOURCES, 0, "/usr/share/carla/resources");
         }
-#endif
+      #endif // CARLA_OS_WIN
         else
         {
             canUseBridges = false;
