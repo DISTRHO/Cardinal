@@ -1,6 +1,6 @@
 name: irc
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   notification:
