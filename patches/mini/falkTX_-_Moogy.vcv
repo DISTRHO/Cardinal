@@ -378,20 +378,6 @@
       "data": {
         "maps": [
           {
-            "hostParamId": 255,
-            "inverted": false,
-            "smooth": true,
-            "moduleId": -1,
-            "paramId": 0
-          },
-          {
-            "hostParamId": 255,
-            "inverted": false,
-            "smooth": true,
-            "moduleId": -1,
-            "paramId": 0
-          },
-          {
             "hostParamId": 0,
             "inverted": false,
             "smooth": true,
@@ -446,13 +432,6 @@
             "smooth": true,
             "moduleId": 5726895899473528,
             "paramId": 2
-          },
-          {
-            "hostParamId": 255,
-            "inverted": false,
-            "smooth": true,
-            "moduleId": -1,
-            "paramId": 0
           }
         ]
       },

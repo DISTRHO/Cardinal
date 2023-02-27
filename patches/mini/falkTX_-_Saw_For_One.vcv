@@ -1,0 +1,971 @@
+{
+  "version": "2.1.2",
+  "zoom": 1.0,
+  "gridOffset": [
+    -3.8666665554046631,
+    -0.33421051502227783
+  ],
+  "modules": [
+    {
+      "id": 3530479703931215,
+      "plugin": "Fundamental",
+      "model": "LFO",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        },
+        {
+          "value": 0.0,
+          "id": 1
+        },
+        {
+          "value": -0.99517768621444702,
+          "id": 2
+        },
+        {
+          "value": 0.0,
+          "id": 3
+        },
+        {
+          "value": 0.0,
+          "id": 4
+        },
+        {
+          "value": 0.5,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        }
+      ],
+      "pos": [
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 2617521628379532,
+      "plugin": "Fundamental",
+      "model": "ADSR",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.2975899875164032,
+          "id": 0
+        },
+        {
+          "value": 0.53734946250915527,
+          "id": 1
+        },
+        {
+          "value": 0.31204831600189209,
+          "id": 2
+        },
+        {
+          "value": 0.5,
+          "id": 3
+        },
+        {
+          "value": 0.0,
+          "id": 4
+        },
+        {
+          "value": 0.0,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        },
+        {
+          "value": 0.0,
+          "id": 7
+        },
+        {
+          "value": 0.0,
+          "id": 8
+        }
+      ],
+      "rightModuleId": 6351707277679558,
+      "pos": [
+        44,
+        0
+      ]
+    },
+    {
+      "id": 8914754292241465,
+      "plugin": "SurgeXTRack",
+      "model": "SurgeXTOSCSine",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        },
+        {
+          "value": 0.44499999284744263,
+          "id": 1
+        },
+        {
+          "value": 0.60414284467697144,
+          "id": 2
+        },
+        {
+          "value": 0.99500000476837158,
+          "id": 3
+        },
+        {
+          "value": 0.0,
+          "id": 4
+        },
+        {
+          "value": 1.0,
+          "id": 5
+        },
+        {
+          "value": 0.11999999731779099,
+          "id": 6
+        },
+        {
+          "value": 0.1276666522026062,
+          "id": 7
+        },
+        {
+          "value": 0.0,
+          "id": 8
+        },
+        {
+          "value": 0.0,
+          "id": 9
+        },
+        {
+          "value": 0.0,
+          "id": 10
+        },
+        {
+          "value": 0.0,
+          "id": 11
+        },
+        {
+          "value": 0.0,
+          "id": 12
+        },
+        {
+          "value": 0.0,
+          "id": 13
+        },
+        {
+          "value": 0.0,
+          "id": 14
+        },
+        {
+          "value": 0.0,
+          "id": 15
+        },
+        {
+          "value": -0.14399991929531097,
+          "id": 16
+        },
+        {
+          "value": 0.0,
+          "id": 17
+        },
+        {
+          "value": 0.0,
+          "id": 18
+        },
+        {
+          "value": 0.0,
+          "id": 19
+        },
+        {
+          "value": 0.0,
+          "id": 20
+        },
+        {
+          "value": 0.0,
+          "id": 21
+        },
+        {
+          "value": 0.0,
+          "id": 22
+        },
+        {
+          "value": 0.0,
+          "id": 23
+        },
+        {
+          "value": 0.0,
+          "id": 24
+        },
+        {
+          "value": 0.0,
+          "id": 25
+        },
+        {
+          "value": 0.0,
+          "id": 26
+        },
+        {
+          "value": 0.0,
+          "id": 27
+        },
+        {
+          "value": 0.0,
+          "id": 28
+        },
+        {
+          "value": 0.0,
+          "id": 29
+        },
+        {
+          "value": 0.0,
+          "id": 30
+        },
+        {
+          "value": 0.0,
+          "id": 31
+        },
+        {
+          "value": 0.0,
+          "id": 32
+        },
+        {
+          "value": 0.061999920755624771,
+          "id": 33
+        },
+        {
+          "value": 0.0,
+          "id": 34
+        },
+        {
+          "value": 0.0,
+          "id": 35
+        },
+        {
+          "value": 0.0,
+          "id": 36
+        },
+        {
+          "value": 0.0,
+          "id": 37
+        },
+        {
+          "value": 0.0,
+          "id": 38
+        },
+        {
+          "value": 0.0,
+          "id": 39
+        },
+        {
+          "value": 0.0,
+          "id": 40
+        },
+        {
+          "value": 0.0,
+          "id": 41
+        },
+        {
+          "value": 0.0,
+          "id": 42
+        },
+        {
+          "value": 0.0,
+          "id": 43
+        },
+        {
+          "value": 0.0,
+          "id": 44
+        },
+        {
+          "value": 0.0,
+          "id": 45
+        },
+        {
+          "value": 0.0,
+          "id": 46
+        },
+        {
+          "value": 0.0,
+          "id": 47
+        },
+        {
+          "value": 1.0,
+          "id": 48
+        },
+        {
+          "value": 0.078000001609325409,
+          "id": 49
+        },
+        {
+          "value": 1.0,
+          "id": 50
+        }
+      ],
+      "leftModuleId": 287325898511014,
+      "rightModuleId": 6895418575305544,
+      "data": {
+        "xtshared": {
+          "streamingVersion": 1,
+          "buildInfo": "os:linux pluggit:Cardinal surgegit:Cardinal buildtime=Feb 19 2023 23:43:29",
+          "isCoupledToGlobalStyle": true,
+          "localStyle": 10001,
+          "localDisplayRegionColor": 900001,
+          "localModulationColor": 900005,
+          "localControlValueColor": 900001,
+          "localPowerButtonColor": 900003
+        },
+        "modulespecific": {
+          "halfbandM": 6,
+          "halfbandSteep": true,
+          "doDCBlock": true
+        }
+      },
+      "pos": [
+        22,
+        0
+      ]
+    },
+    {
+      "id": 287325898511014,
+      "plugin": "SurgeXTRack",
+      "model": "SurgeXTOSCModern",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        },
+        {
+          "value": 1.0,
+          "id": 1
+        },
+        {
+          "value": 0.32114300131797791,
+          "id": 2
+        },
+        {
+          "value": 0.8151429295539856,
+          "id": 3
+        },
+        {
+          "value": 0.5,
+          "id": 4
+        },
+        {
+          "value": 0.0,
+          "id": 5
+        },
+        {
+          "value": 0.11999999731779099,
+          "id": 6
+        },
+        {
+          "value": 0.13699999451637268,
+          "id": 7
+        },
+        {
+          "value": 0.0,
+          "id": 8
+        },
+        {
+          "value": 0.0,
+          "id": 9
+        },
+        {
+          "value": 0.0,
+          "id": 10
+        },
+        {
+          "value": 0.0,
+          "id": 11
+        },
+        {
+          "value": 0.0,
+          "id": 12
+        },
+        {
+          "value": -1.0,
+          "id": 13
+        },
+        {
+          "value": 0.0,
+          "id": 14
+        },
+        {
+          "value": 0.0,
+          "id": 15
+        },
+        {
+          "value": 0.16599999368190765,
+          "id": 16
+        },
+        {
+          "value": 0.0,
+          "id": 17
+        },
+        {
+          "value": 0.0,
+          "id": 18
+        },
+        {
+          "value": 0.0,
+          "id": 19
+        },
+        {
+          "value": -0.28200000524520874,
+          "id": 20
+        },
+        {
+          "value": 0.0,
+          "id": 21
+        },
+        {
+          "value": 0.0,
+          "id": 22
+        },
+        {
+          "value": 0.0,
+          "id": 23
+        },
+        {
+          "value": 0.0,
+          "id": 24
+        },
+        {
+          "value": 0.0,
+          "id": 25
+        },
+        {
+          "value": 0.0,
+          "id": 26
+        },
+        {
+          "value": 0.0,
+          "id": 27
+        },
+        {
+          "value": 0.0,
+          "id": 28
+        },
+        {
+          "value": 0.0,
+          "id": 29
+        },
+        {
+          "value": 0.0,
+          "id": 30
+        },
+        {
+          "value": 0.0,
+          "id": 31
+        },
+        {
+          "value": 0.0,
+          "id": 32
+        },
+        {
+          "value": 0.0,
+          "id": 33
+        },
+        {
+          "value": 0.0,
+          "id": 34
+        },
+        {
+          "value": 0.0,
+          "id": 35
+        },
+        {
+          "value": 0.0,
+          "id": 36
+        },
+        {
+          "value": 0.0,
+          "id": 37
+        },
+        {
+          "value": 0.0,
+          "id": 38
+        },
+        {
+          "value": 0.0,
+          "id": 39
+        },
+        {
+          "value": 0.0,
+          "id": 40
+        },
+        {
+          "value": 0.0,
+          "id": 41
+        },
+        {
+          "value": 0.0,
+          "id": 42
+        },
+        {
+          "value": 0.0,
+          "id": 43
+        },
+        {
+          "value": 0.0,
+          "id": 44
+        },
+        {
+          "value": 0.0,
+          "id": 45
+        },
+        {
+          "value": 0.0,
+          "id": 46
+        },
+        {
+          "value": 0.0,
+          "id": 47
+        },
+        {
+          "value": 1.0,
+          "id": 48
+        },
+        {
+          "value": 0.066999994218349457,
+          "id": 49
+        },
+        {
+          "value": 1.0,
+          "id": 50
+        }
+      ],
+      "rightModuleId": 8914754292241465,
+      "data": {
+        "xtshared": {
+          "streamingVersion": 1,
+          "buildInfo": "os:linux pluggit:Cardinal surgegit:Cardinal buildtime=Feb 19 2023 23:43:29",
+          "isCoupledToGlobalStyle": true,
+          "localStyle": 10001,
+          "localDisplayRegionColor": 900001,
+          "localModulationColor": 900005,
+          "localControlValueColor": 900001,
+          "localPowerButtonColor": 900003
+        },
+        "modulespecific": {
+          "halfbandM": 6,
+          "halfbandSteep": true,
+          "doDCBlock": true
+        }
+      },
+      "pos": [
+        10,
+        0
+      ]
+    },
+    {
+      "id": 6895418575305544,
+      "plugin": "AriaSalvatrice",
+      "model": "Swerge",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        }
+      ],
+      "leftModuleId": 8914754292241465,
+      "rightModuleId": 6420065476624550,
+      "pos": [
+        34,
+        0
+      ]
+    },
+    {
+      "id": 702164998788601,
+      "plugin": "Fundamental",
+      "model": "Sum",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        }
+      ],
+      "leftModuleId": 6420065476624550,
+      "pos": [
+        40,
+        0
+      ]
+    },
+    {
+      "id": 6420065476624550,
+      "plugin": "Fundamental",
+      "model": "Sum",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        }
+      ],
+      "leftModuleId": 6895418575305544,
+      "rightModuleId": 702164998788601,
+      "pos": [
+        37,
+        0
+      ]
+    },
+    {
+      "id": 6351707277679558,
+      "plugin": "SurgeXTRack",
+      "model": "SurgeXTWaveshaper",
+      "version": "2.0",
+      "params": [
+        {
+          "value": -8.6468648910522461,
+          "id": 0
+        },
+        {
+          "value": 0.0,
+          "id": 1
+        },
+        {
+          "value": 0.0,
+          "id": 2
+        },
+        {
+          "value": -60.0,
+          "id": 3
+        },
+        {
+          "value": 70.0,
+          "id": 4
+        },
+        {
+          "value": 0.12800015509128571,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        },
+        {
+          "value": 0.0,
+          "id": 7
+        },
+        {
+          "value": 0.0,
+          "id": 8
+        },
+        {
+          "value": 0.0,
+          "id": 9
+        },
+        {
+          "value": 0.21600000560283661,
+          "id": 10
+        },
+        {
+          "value": 0.0,
+          "id": 11
+        },
+        {
+          "value": 0.0,
+          "id": 12
+        },
+        {
+          "value": 0.50200003385543823,
+          "id": 13
+        },
+        {
+          "value": 0.0,
+          "id": 14
+        },
+        {
+          "value": 0.0,
+          "id": 15
+        },
+        {
+          "value": 0.0,
+          "id": 16
+        },
+        {
+          "value": 0.0,
+          "id": 17
+        },
+        {
+          "value": 0.0,
+          "id": 18
+        },
+        {
+          "value": 0.0,
+          "id": 19
+        },
+        {
+          "value": 0.0,
+          "id": 20
+        },
+        {
+          "value": 0.0,
+          "id": 21
+        },
+        {
+          "value": 0.0,
+          "id": 22
+        },
+        {
+          "value": 0.0,
+          "id": 23
+        },
+        {
+          "value": 0.0,
+          "id": 24
+        },
+        {
+          "value": 15.0,
+          "id": 25
+        },
+        {
+          "value": 0.0,
+          "id": 26
+        },
+        {
+          "value": 0.0,
+          "id": 27
+        }
+      ],
+      "leftModuleId": 2617521628379532,
+      "data": {
+        "xtshared": {
+          "streamingVersion": 1,
+          "buildInfo": "os:linux pluggit:Cardinal surgegit:Cardinal buildtime=Feb 19 2023 23:43:29",
+          "isCoupledToGlobalStyle": true,
+          "localStyle": 10001,
+          "localDisplayRegionColor": 900001,
+          "localModulationColor": 900005,
+          "localControlValueColor": 900001,
+          "localPowerButtonColor": 900003
+        },
+        "modulespecific": {
+          "doDCBlock": false
+        }
+      },
+      "pos": [
+        53,
+        0
+      ]
+    },
+    {
+      "id": 1,
+      "plugin": "Cardinal",
+      "model": "HostAudio2",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.45032820105552673,
+          "id": 0
+        }
+      ],
+      "data": {
+        "dcFilter": true
+      },
+      "pos": [
+        66,
+        0
+      ]
+    },
+    {
+      "id": 2,
+      "plugin": "Cardinal",
+      "model": "HostMIDI",
+      "version": "2.0",
+      "params": [],
+      "data": {
+        "pwRange": 0.0,
+        "smooth": false,
+        "channels": 1,
+        "polyMode": 0,
+        "lastPitch": 8192,
+        "lastMod": 0,
+        "inputChannel": 0,
+        "outputChannel": 0
+      },
+      "pos": [
+        0,
+        0
+      ]
+    }
+  ],
+  "cables": [
+    {
+      "id": 7078442804356951,
+      "outputModuleId": 2,
+      "outputId": 0,
+      "inputModuleId": 287325898511014,
+      "inputId": 0,
+      "color": "#52beff"
+    },
+    {
+      "id": 2637993111379757,
+      "outputModuleId": 2,
+      "outputId": 0,
+      "inputModuleId": 8914754292241465,
+      "inputId": 0,
+      "color": "#52beff"
+    },
+    {
+      "id": 7645122439500280,
+      "outputModuleId": 2,
+      "outputId": 6,
+      "inputModuleId": 287325898511014,
+      "inputId": 1,
+      "color": "#527dff"
+    },
+    {
+      "id": 456636951896817,
+      "outputModuleId": 2,
+      "outputId": 6,
+      "inputModuleId": 8914754292241465,
+      "inputId": 1,
+      "color": "#527dff"
+    },
+    {
+      "id": 4908672560602015,
+      "outputModuleId": 2,
+      "outputId": 1,
+      "inputModuleId": 2617521628379532,
+      "inputId": 4,
+      "color": "#a852ff"
+    },
+    {
+      "id": 3911345250761309,
+      "outputModuleId": 2,
+      "outputId": 6,
+      "inputModuleId": 2617521628379532,
+      "inputId": 5,
+      "color": "#527dff"
+    },
+    {
+      "id": 1721551606636812,
+      "outputModuleId": 6351707277679558,
+      "outputId": 0,
+      "inputModuleId": 1,
+      "inputId": 0,
+      "color": "#ff5252"
+    },
+    {
+      "id": 8567652559342014,
+      "outputModuleId": 6351707277679558,
+      "outputId": 1,
+      "inputModuleId": 1,
+      "inputId": 1,
+      "color": "#ff5252"
+    },
+    {
+      "id": 7051140988441255,
+      "outputModuleId": 287325898511014,
+      "outputId": 1,
+      "inputModuleId": 6895418575305544,
+      "inputId": 4,
+      "color": "#ff5252"
+    },
+    {
+      "id": 780441311761289,
+      "outputModuleId": 8914754292241465,
+      "outputId": 0,
+      "inputModuleId": 6895418575305544,
+      "inputId": 1,
+      "color": "#ff5252"
+    },
+    {
+      "id": 2400958554319452,
+      "outputModuleId": 8914754292241465,
+      "outputId": 1,
+      "inputModuleId": 6895418575305544,
+      "inputId": 5,
+      "color": "#ff5252"
+    },
+    {
+      "id": 5935487313164681,
+      "outputModuleId": 287325898511014,
+      "outputId": 0,
+      "inputModuleId": 6895418575305544,
+      "inputId": 0,
+      "color": "#ff5252"
+    },
+    {
+      "id": 7922595614504923,
+      "outputModuleId": 6895418575305544,
+      "outputId": 0,
+      "inputModuleId": 6420065476624550,
+      "inputId": 0,
+      "color": "#ff5252"
+    },
+    {
+      "id": 5223439046078660,
+      "outputModuleId": 6420065476624550,
+      "outputId": 0,
+      "inputModuleId": 6351707277679558,
+      "inputId": 0,
+      "color": "#ff5252"
+    },
+    {
+      "id": 1550005732923321,
+      "outputModuleId": 6895418575305544,
+      "outputId": 1,
+      "inputModuleId": 702164998788601,
+      "inputId": 0,
+      "color": "#ff5252"
+    },
+    {
+      "id": 3466384847513146,
+      "outputModuleId": 702164998788601,
+      "outputId": 0,
+      "inputModuleId": 6351707277679558,
+      "inputId": 1,
+      "color": "#ff5252"
+    },
+    {
+      "id": 6350073656502047,
+      "outputModuleId": 2617521628379532,
+      "outputId": 0,
+      "inputModuleId": 287325898511014,
+      "inputId": 2,
+      "color": "#a852ff"
+    },
+    {
+      "id": 4319366098337873,
+      "outputModuleId": 2617521628379532,
+      "outputId": 0,
+      "inputModuleId": 8914754292241465,
+      "inputId": 2,
+      "color": "#a852ff"
+    },
+    {
+      "id": 960118561480436,
+      "outputModuleId": 2617521628379532,
+      "outputId": 0,
+      "inputModuleId": 6351707277679558,
+      "inputId": 2,
+      "color": "#a852ff"
+    },
+    {
+      "id": 6295963384449957,
+      "outputModuleId": 3530479703931215,
+      "outputId": 0,
+      "inputModuleId": 287325898511014,
+      "inputId": 3,
+      "color": "#ff5293"
+    },
+    {
+      "id": 5112615215271363,
+      "outputModuleId": 3530479703931215,
+      "outputId": 1,
+      "inputModuleId": 6351707277679558,
+      "inputId": 3,
+      "color": "#ff5293"
+    }
+  ]
+}
