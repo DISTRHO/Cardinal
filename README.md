@@ -79,6 +79,22 @@ Plugin type is set as "instrument".
 This variant provides 2 audio inputs and outputs, but no CV ports.  
 Plugin type is set as regular "effect".
 
+### Mini
+
+This is a special variant with a very small, hand-picked module selection and limited IO (2 audio ports plus 5 CV).
+
+There are 2 main reasons for this variant to exist:
+1. make it easier for users new to the modular world to get a working setup, by only having some of the best possible modules available to choose from
+2. hand-pick modules that are simple enough to work reliably in a remote setup
+
+For now the list of selected modules is quite small, intentionally. We will add a few more as the need appears.  
+All included modules support polyphony, reducing confusion for new users not yet used to mono vs poly approach in Rack/Cardinal.
+
+The 2nd reason (only having simple modules) is needed in order to support DSP/UI separation.  
+Having this in place means we can run the DSP on a different machine than the UI.  
+This is particularly interesting for running Cardinal on embed systems, being controlled remotely via a web browser or a native desktop application.
+Already doable with LV2 from 23.02 onwards, later on this will be made possible on standalone too.
+
 
 ## Screenshots
 
