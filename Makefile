@@ -356,7 +356,6 @@ TAR_ARGS = \
 	--exclude=plugins/surgext/surge/resources/data/patches_3rdparty \
 	--exclude=plugins/surgext/surge/resources/data/patches_factory \
 	--exclude=plugins/surgext/surge/resources/data/wavetables_3rdparty \
-	--exclude=src/MOD \
 	--exclude=src/Rack/adapters \
 	--exclude=src/Rack/dep/filesystem/cmake \
 	--exclude=src/Rack/dep/filesystem/examples \
