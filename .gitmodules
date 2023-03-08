@@ -230,3 +230,6 @@
 [submodule "plugins/Sapphire"]
 	path = plugins/Sapphire
 	url = https://github.com/cosinekitty/sapphire.git
+[submodule "plugins/Sculpt-O-Sound"]
+	path = plugins/Sculpt-O-Sound
+	url = https://github.com/josbouten/Sculpt-O-Sound.git
