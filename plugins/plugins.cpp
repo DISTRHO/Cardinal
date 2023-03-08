@@ -2762,6 +2762,19 @@ static void initStatic__Sculpt_O_Sound()
     }
 }
 
+static void initStatic__Sculpt_O_Sound()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Sculpt_O_Sound = p;
+
+    const StaticPluginLoader spl(p, "Sculpt-O-Sound");
+    if (spl.ok())
+    {
+        p->addModel(modelVocode_O_Matic_XL);
+        p->addModel(modelVocode_O_Matic);
+    }
+}
+
 static void initStatic__sonusmodular()
 {
     Plugin* const p = new Plugin;
