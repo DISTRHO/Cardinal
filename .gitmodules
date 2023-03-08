@@ -240,3 +240,6 @@
 [submodule "plugins/CVfunk"]
 	path = plugins/CVfunk
 	url = https://github.com/codygeary/CVfunk-Modules.git
+[submodule "plugins/Sculpt-O-Sound"]
+	path = plugins/Sculpt-O-Sound
+	url = https://github.com/josbouten/Sculpt-O-Sound.git
