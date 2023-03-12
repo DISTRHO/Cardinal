@@ -2739,6 +2739,7 @@ static void initStatic__Sapphire()
     {
         p->addModel(modelElastika);
         p->addModel(modelMoots);
+        p->addModel(modelTubeUnit);
     }
 }
 
