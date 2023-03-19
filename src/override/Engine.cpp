@@ -758,6 +758,8 @@ void Engine::addModule(Module* module) {
 	DISTRHO_SAFE_ASSERT_RETURN(it == internal->modules.end(),);
 	auto tit = std::find(internal->terminalModules.begin(), internal->terminalModules.end(), module);
 	DISTRHO_SAFE_ASSERT_RETURN(tit == internal->terminalModules.end(),);
+	// Reinitialize random module since it uses thread-local RNG state
+	random::init();
 	// Set ID if unset or collides with an existing ID
 	while (module->id < 0 || internal->modulesCache.find(module->id) != internal->modulesCache.end()) {
 		// Randomly generate ID
@@ -1003,6 +1005,8 @@ void Engine::addCable(Cable* cable) {
 		if (cable2->outputModule == cable->outputModule && cable2->outputId == cable->outputId)
 			outputWasConnected = true;
 	}
+	// Reinitialize random module since it uses thread-local RNG state
+	random::init();
 	// Set ID if unset or collides with an existing ID
 	while (cable->id < 0 || internal->cablesCache.find(cable->id) != internal->cablesCache.end()) {
 		// Randomly generate ID
