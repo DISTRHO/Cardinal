@@ -769,11 +769,11 @@ struct MeterLabel : ui::Label {
 		// }
 
 #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
-		text = string::f("%.1f fps", 1.0 / frameDurationAvg);
-#else
 		double meterAverage = APP->engine->getMeterAverage();
 		double meterMax = APP->engine->getMeterMax();
 		text = string::f("%.1f fps  %.1f%% avg  %.1f%% max", 1.0 / frameDurationAvg, meterAverage * 100, meterMax * 100);
+#else
+		text = string::f("%.1f fps", 1.0 / frameDurationAvg);
 #endif
 
 		Label::step();
