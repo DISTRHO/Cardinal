@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -974,9 +974,9 @@ protected:
 
         switch (ev.button)
         {
-        case 1: button = GLFW_MOUSE_BUTTON_LEFT;   break;
-        case 2: button = GLFW_MOUSE_BUTTON_RIGHT;  break;
-        case 3: button = GLFW_MOUSE_BUTTON_MIDDLE; break;
+        case kMouseButtonLeft: button = GLFW_MOUSE_BUTTON_LEFT;   break;
+        case kMouseButtonRight: button = GLFW_MOUSE_BUTTON_RIGHT;  break;
+        case kMouseButtonMiddle: button = GLFW_MOUSE_BUTTON_MIDDLE; break;
         default:
             button = ev.button;
             break;
@@ -1020,7 +1020,7 @@ protected:
         if (inSelfTest) return false;
        #endif
 
-        rack::math::Vec scrollDelta = rack::math::Vec(ev.delta.getX(), ev.delta.getY());
+        rack::math::Vec scrollDelta = rack::math::Vec(-ev.delta.getX(), ev.delta.getY());
        #ifndef DISTRHO_OS_MAC
         scrollDelta = scrollDelta.mult(50.0);
        #endif
