@@ -25,8 +25,31 @@ ifneq ($(CARDINAL_VARIANT),mini)
 ifneq ($(STATIC_BUILD),true)
 
 STATIC_PLUGIN_TARGET = true
-CARLA_EXTRA_LIBS = ../../carla/bin/libcarla_host-plugin.a
 include ../../carla/source/Makefile.deps.mk
+
+ifneq ($(WINDOWS),true)
+CARLA_EXTRA_LIBS = ../../carla/bin/libcarla_host-plugin.a
+else
+# workaround mingw linker bug
+CARLA_BUILD_DIR = ../../carla/build
+ifeq ($(DEBUG),true)
+CARLA_BUILD_TYPE = Debug
+else
+CARLA_BUILD_TYPE = Release
+endif
+CARLA_EXTRA_LIBS  = $(CARLA_BUILD_DIR)/plugin/$(CARLA_BUILD_TYPE)/carla-host-plugin.cpp.o
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/carla_engine_plugin.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/carla_plugin.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/native-plugins.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/audio_decoder.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/jackbridge.min.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/lilv.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/rtmempool.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/sfzero.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/water.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/ysfx.a
+CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/zita-resampler.a
+endif
 
 endif # STATIC_BUILD
 endif # CARDINAL_VARIANT mini
