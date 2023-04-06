@@ -801,7 +801,7 @@ jobs:
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
           pushd deps/PawPaw; source local.env wasm; popd
           make features
-          make CIBUILD=true HAVE_LIBLO=false NOOPT=true USE_GLES2=true -j $(nproc)
+          make CIBUILD=true HAVE_LIBLO=false NOOPT=true -j $(nproc)
       - name: Make wasm versioned and compress
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
@@ -888,8 +888,8 @@ jobs:
           # FIXME send patch upstream, assuming this works..
           sed -i -e 's/defined(__riscv)/defined(__riscv) || defined(__EMSCRIPTEN__)/' plugins/surgext/surge/src/common/globals.h
           make features
-          make CIBUILD=true HAVE_LIBLO=false NOOPT=true USE_GLES2=true -j $(nproc)
-          make CIBUILD=true HAVE_LIBLO=false NOOPT=true USE_GLES2=true -j $(nproc) -C src/CardinalMiniSep modgui
+          make CIBUILD=true HAVE_LIBLO=false NOOPT=true -j $(nproc)
+          make CIBUILD=true HAVE_LIBLO=false NOOPT=true -j $(nproc) -C src/CardinalMiniSep modgui
       - name: Make wasm-noopt versioned and compress
         if: steps.cache.outputs.cache-hit == 'true'
         run: |

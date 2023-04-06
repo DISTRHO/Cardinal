@@ -157,7 +157,7 @@ endif
 # --------------------------------------------------------------
 
 # FIXME
-ifeq ($(CARDINAL_VARIANT)$(CIBUILD)$(WASM),nativetruetrue)
+ifeq ($(CARDINAL_VARIANT)$(WASM),nativetrue)
 ifneq ($(OLD_PATH),)
 STATIC_CARLA_PLUGIN_LIBS = -lsndfile -lopus -lFLAC -lvorbisenc -lvorbis -logg -lm
 endif
@@ -170,7 +170,7 @@ ifneq ($(CARDINAL_VARIANT),mini)
 ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
 EXTRA_DSP_DEPENDENCIES += ../../deps/aubio/libaubio.a
 EXTRA_DSP_LIBS += ../../deps/aubio/libaubio.a
-EXTRA_DSP_LIBS += $(shell $(PKG_CONFIG) --libs fftw3f)
+EXTRA_DSP_LIBS += $(filter-out -lpthread,$(shell $(PKG_CONFIG) --libs fftw3f))
 endif
 endif
 
@@ -520,8 +520,6 @@ endif
 
 ifeq ($(WINDOWS),true)
 WINDRES ?= $(subst gcc,windres,$(CC))
-
-JACK_LIBS += -Wl,-subsystem,windows
 
 $(BUILD_DIR)/distrho.rc.o: ../../utils/distrho.rc ../../utils/distrho.ico
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
