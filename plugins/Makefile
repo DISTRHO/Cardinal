@@ -991,6 +991,13 @@ REPELZEN_CUSTOM = Blank Mixer Werner tanh_pade
 PLUGIN_FILES += $(filter-out Sapphire/src/plugin.cpp,$(wildcard Sapphire/src/*.cpp))
 
 # --------------------------------------------------------------
+# Sculpt-O-Sound
+
+PLUGIN_FILES += $(filter-out Sculpt-O-Sound/src/Sculpt-O-Sound.cpp,$(wildcard Sculpt-O-Sound/src/*.cpp))
+
+SCULPT_O_SOUND_CUSTOM = LButton MySlider_01 Slider02_10x15 LedLight MsDisplayWidget
+
+# --------------------------------------------------------------
 # sonusmodular
 
 PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular.cpp,$(wildcard sonusmodular/src/*.cpp))
@@ -2664,6 +2671,13 @@ $(BUILD_DIR)/Sapphire/%.cpp.o: Sapphire/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(SAPPHIRE_CUSTOM),$(call custom_module_names,$(m),Sapphire)) \
 		-DpluginInstance=pluginInstance__sapphire
+
+$(BUILD_DIR)/Sculpt-O-Sound/%.cpp.o: Sculpt-O-Sound/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+		$(foreach m,$(SCULPT_O_SOUND_CUSTOM),$(call custom_module_names,$(m),Sculpt_O_Sound)) \
+		-DthePlugin=pluginInstance__Sculpt_O_Sound
 
 $(BUILD_DIR)/sonusmodular/%.cpp.o: sonusmodular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
