@@ -27,10 +27,6 @@ ifneq ($(STATIC_BUILD),true)
 STATIC_PLUGIN_TARGET = true
 include ../../carla/source/Makefile.deps.mk
 
-ifneq ($(WINDOWS),true)
-CARLA_EXTRA_LIBS = ../../carla/bin/libcarla_host-plugin.a
-else
-# workaround mingw linker bug
 CARLA_BUILD_DIR = ../../carla/build
 ifeq ($(DEBUG),true)
 CARLA_BUILD_TYPE = Debug
@@ -49,7 +45,6 @@ CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/sfzero.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/water.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/ysfx.a
 CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/zita-resampler.a
-endif
 
 endif # STATIC_BUILD
 endif # CARDINAL_VARIANT mini
