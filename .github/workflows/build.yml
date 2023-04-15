@@ -987,8 +987,8 @@ jobs:
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win32; popd
           make carla-win32 -j $(nproc)
-          make -C carla DGL_NAMESPACE=CardinalDGL EMBED_TARGET=true TESTING=true dist
-          make -C carla DGL_NAMESPACE=CardinalDGL EMBED_TARGET=true TESTING=true dist
+          make -C carla EMBED_TARGET=true TESTING=true dist
+          make -C carla EMBED_TARGET=true TESTING=true dist
       - name: Build win32 cross-compiled (packaging)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
@@ -1083,8 +1083,8 @@ jobs:
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win64; popd
           make carla-win32 -j $(nproc)
-          make -C carla DGL_NAMESPACE=CardinalDGL EMBED_TARGET=true TESTING=true dist
-          make -C carla DGL_NAMESPACE=CardinalDGL EMBED_TARGET=true TESTING=true dist
+          make -C carla EMBED_TARGET=true TESTING=true dist
+          make -C carla EMBED_TARGET=true TESTING=true dist
       - name: Build win64 cross-compiled (packaging)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
