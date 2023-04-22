@@ -264,7 +264,7 @@ jobs:
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           pushd deps/PawPaw; source local.env macos-${{ matrix.target }}; popd
-          git clone --depth=1 -b 6.1.6 https://github.com/DISTRHO/JUCE.git jucewrapper/JUCE
+          git clone --depth=1 -b v6.1.6 https://github.com/DISTRHO/JUCE.git jucewrapper/JUCE
           # sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
           mkdir -p jucewrapper/build
           pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
