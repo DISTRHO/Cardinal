@@ -8,43 +8,6 @@ ROOT = ..
 include $(ROOT)/Makefile.base.mk
 
 # --------------------------------------------------------------
-# custom build flags
-
-BASE_FLAGS += -I$(abspath ../include)
-BASE_FLAGS += -I$(abspath ../include/simd-compat)
-
-ifeq ($(NOSIMD),true)
-BASE_FLAGS += -DCARDINAL_NOSIMD
-endif
-
-ifeq ($(HAIKU)$(WASM),true)
-BASE_FLAGS += -I$(abspath ../include/linux-compat)
-endif
-
-ifneq ($(SYSDEPS),true)
-BASE_FLAGS += -DZSTDLIB_VISIBILITY=
-endif
-
-ifneq ($(HAIKU),true)
-ifneq ($(WASM),true)
-BASE_FLAGS += -pthread
-endif
-endif
-
-ifeq ($(WINDOWS),true)
-BASE_FLAGS += -D_USE_MATH_DEFINES
-BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
-BASE_FLAGS += -D_WIN32_WINNT=0x0600
-BASE_FLAGS += -I$(abspath ../include/mingw-compat)
-endif
-
-BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-
-# Rack code is not tested for this flag, unset it
-BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
-
-# --------------------------------------------------------------
 # override VCV arch.mk stuff so we can build more architectures
 
 ifeq ($(CPU_ARM32),true)

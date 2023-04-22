@@ -4,6 +4,7 @@
 # Created by falkTX
 #
 
+BUILDING_RACK = true
 ROOT = ..
 include $(ROOT)/Makefile.base.mk
 
@@ -16,127 +17,16 @@ else
 BUILD_DIR = ../build/rack
 endif
 
-ifeq ($(MACOS),true)
-BASE_FLAGS += -DARCH_MAC
-else ifeq ($(WINDOWS),true)
-BASE_FLAGS += -DARCH_WIN
-else
-BASE_FLAGS += -DARCH_LIN
-endif
-
-ifeq ($(HAIKU),true)
-BASE_FLAGS += -I../include/linux-compat
-else ifeq ($(WASM),true)
-BASE_FLAGS += -I../include/linux-compat
-endif
-
 BASE_FLAGS += -DPRIVATE=
-BASE_FLAGS += -I../dpf/dgl/src/nanovg
-BASE_FLAGS += -I../dpf/distrho
-BASE_FLAGS += -I../include
-BASE_FLAGS += -I../include/simd-compat
-BASE_FLAGS += -IRack/include
-ifeq ($(SYSDEPS),true)
-BASE_FLAGS += -DCARDINAL_SYSDEPS
-BASE_FLAGS += $(shell pkg-config --cflags jansson libarchive samplerate speexdsp)
-else
-BASE_FLAGS += -DZSTDLIB_VISIBILITY=
-BASE_FLAGS += -IRack/dep/include
-endif
-BASE_FLAGS += -IRack/dep/filesystem/include
-BASE_FLAGS += -IRack/dep/fuzzysearchdatabase/src
-BASE_FLAGS += -IRack/dep/glfw/include
-BASE_FLAGS += -IRack/dep/nanosvg/src
-BASE_FLAGS += -IRack/dep/osdialog
-BASE_FLAGS += -IRack/dep/oui-blendish
-BASE_FLAGS += -IRack/dep/pffft
-
-ifeq ($(CPU_I386),true)
-# needed for enabling SSE in pffft
-BASE_FLAGS += -Di386
-endif
-
-ifeq ($(DEBUG),true)
-BASE_FLAGS += -UDEBUG
-endif
+BASE_FLAGS += -I$(abspath $(ROOT)/src/Rack/dep/osdialog)
 
 ifeq ($(HAVE_LIBLO),true)
 BASE_FLAGS += -DHAVE_LIBLO $(LIBLO_FLAGS)
 endif
 
-ifeq ($(HEADLESS),true)
-BASE_FLAGS += -DHEADLESS
-endif
-
-# SIMD must always be enabled, even in debug builds
-ifeq ($(NOSIMD),true)
-BASE_FLAGS += -DCARDINAL_NOSIMD
-else ifeq ($(DEBUG),true)
-ifeq ($(WASM),true)
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-else ifeq ($(CPU_ARM32),true)
-BASE_FLAGS += -mfpu=neon-vfpv4 -mfloat-abi=hard
-else ifeq ($(CPU_I386_OR_X86_64),true)
-BASE_FLAGS += -msse -msse2 -mfpmath=sse
-endif
-endif
-
-ifeq ($(BSD),true)
-BASE_FLAGS += -DCLOCK_MONOTONIC_RAW=CLOCK_MONOTONIC_PRECISE
-endif
-
-ifeq ($(HAIKU),true)
-BASE_FLAGS += -DCLOCK_MONOTONIC_RAW=CLOCK_MONOTONIC
-endif
-
-ifeq ($(MOD_BUILD),true)
-BASE_FLAGS += -DSIMDE_ENABLE_OPENMP -fopenmp
-endif
-
-ifneq ($(WASM),true)
-ifneq ($(HAIKU),true)
-BASE_FLAGS += -pthread
-endif
-endif
-
-ifeq ($(WINDOWS),true)
-BASE_FLAGS += -D_USE_MATH_DEFINES
-BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
-BASE_FLAGS += -D_WIN32_WINNT=0x0600
-BASE_FLAGS += -I../include/mingw-compat
-endif
-
-ifeq ($(USE_GLES2),true)
-BASE_FLAGS += -DNANOVG_GLES2_FORCED
-else ifeq ($(USE_GLES3),true)
-BASE_FLAGS += -DNANOVG_GLES3_FORCED
-endif
-
-BUILD_C_FLAGS += -std=gnu11
-BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-
-ifneq ($(MACOS),true)
-BUILD_CXX_FLAGS += -faligned-new -Wno-abi
-ifeq ($(MOD_BUILD),true)
-BUILD_CXX_FLAGS += -std=gnu++17
-endif
-endif
-
 # use our custom function to invert some colors
 BUILD_CXX_FLAGS += -DnsvgDelete=nsvgDeleteCardinal
 BUILD_CXX_FLAGS += -DnsvgParseFromFile=nsvgParseFromFileCardinal
-
-# Rack code is not tested for this flag, unset it
-BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
-
-# Ignore bad behaviour from Rack API
-BUILD_CXX_FLAGS += -Wno-format-security
-
-# Ignore warnings from simde
-ifeq ($(MOD_BUILD),true)
-BUILD_CXX_FLAGS += -Wno-overflow
-endif
 
 # --------------------------------------------------------------
 # Rack files to build

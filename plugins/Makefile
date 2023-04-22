@@ -4,6 +4,7 @@
 # Created by falkTX
 #
 
+BUILDING_RACK = true
 ROOT = ..
 include $(ROOT)/Makefile.base.mk
 
@@ -1260,134 +1261,22 @@ else
 BUILD_DIR = ../build/plugins
 endif
 
-ifeq ($(MACOS),true)
-BASE_FLAGS += -DARCH_MAC
-else ifeq ($(WINDOWS),true)
-BASE_FLAGS += -DARCH_WIN
-else
-BASE_FLAGS += -DARCH_LIN
-endif
-
 BASE_FLAGS += -DBUILDING_PLUGIN_MODULES
-BASE_FLAGS += -I../dpf/dgl/src/nanovg
-BASE_FLAGS += -I../dpf/distrho
-
-BASE_FLAGS += -I../include
-BASE_FLAGS += -I../include/osdialog-stub
-BASE_FLAGS += -I../include/simd-compat
-BASE_FLAGS += -I../include/simde
-
-ifeq ($(HAVE_X11),true)
-BASE_FLAGS += -DHAVE_X11
-endif
-
-ifeq ($(SYSDEPS),true)
-BASE_FLAGS += -DCARDINAL_SYSDEPS
-BASE_FLAGS += $(shell $(PKG_CONFIG) --cflags jansson libarchive samplerate speexdsp)
-BASE_FLAGS += -I../deps/sysroot/include
-else
-BASE_FLAGS += -DZSTDLIB_VISIBILITY=
-BASE_FLAGS += -I../src/Rack/dep/include
-endif
-
-BASE_FLAGS += -I../src
-BASE_FLAGS += -I../src/Rack/include
-BASE_FLAGS += -I../src/Rack/include/dsp
-BASE_FLAGS += -I../src/Rack/dep/filesystem/include
-# # BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
-BASE_FLAGS += -I../src/Rack/dep/glfw/include
-BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
-BASE_FLAGS += -I../src/Rack/dep/oui-blendish
-BASE_FLAGS += -I../src/Rack/dep/pffft
-
-ifeq ($(DEBUG),true)
-BASE_FLAGS += -UDEBUG
-endif
-
-ifeq ($(HEADLESS),true)
-BASE_FLAGS += -DHEADLESS
-endif
-
-# SIMD must always be enabled, even in debug builds
-ifeq ($(NOSIMD),true)
-BASE_FLAGS += -DCARDINAL_NOSIMD
-else ifeq ($(DEBUG),true)
-ifeq ($(WASM),true)
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-else ifeq ($(CPU_ARM32),true)
-BASE_FLAGS += -mfpu=neon-vfpv4 -mfloat-abi=hard
-else ifeq ($(CPU_I386_OR_X86_64),true)
-BASE_FLAGS += -msse -msse2 -mfpmath=sse
-endif
-endif
-
-ifeq ($(BSD)$(WASM),true)
-BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
-BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
-endif
-
-ifeq ($(MOD_BUILD),true)
-BASE_FLAGS += -DSIMDE_ENABLE_OPENMP -fopenmp
-endif
-
-ifneq ($(WASM),true)
-ifneq ($(HAIKU),true)
-BASE_FLAGS += -pthread
-endif
-endif
-
-ifeq ($(WINDOWS),true)
-BASE_FLAGS += -D_USE_MATH_DEFINES
-BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
-BASE_FLAGS += -D_WIN32_WINNT=0x0600
-BASE_FLAGS += -I../include/mingw-compat
-endif
-
-ifeq ($(USE_GLES2),true)
-BASE_FLAGS += -DNANOVG_GLES2_FORCED
-else ifeq ($(USE_GLES3),true)
-BASE_FLAGS += -DNANOVG_GLES3_FORCED
-endif
+BASE_FLAGS += -I$(abspath $(ROOT)/include/osdialog-stub)
 
 ifeq ($(shell $(PKG_CONFIG) --exists sndfile && echo true),true)
 BASE_FLAGS += -DHAVE_SNDFILE
 endif
 
-BUILD_C_FLAGS += -std=gnu11
-
-ifneq ($(MACOS),true)
-BUILD_CXX_FLAGS += -faligned-new -Wno-abi
-ifeq ($(MOD_BUILD),true)
-BUILD_CXX_FLAGS += -std=gnu++17
-endif
-endif
-
-# Rack code is not tested for this flag, unset it
-BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
-
-# Ignore bad behaviour from Rack API
-BUILD_CXX_FLAGS += -Wno-format-security
-
-# Ignore warnings from simde
-ifeq ($(MOD_BUILD),true)
-BUILD_CXX_FLAGS += -Wno-overflow
+ifeq ($(HAVE_X11),true)
+BASE_FLAGS += -DHAVE_X11
 endif
 
 # Use this for any plugins that rely on NaN presence
 NOFINITE_FLAGS = -fno-finite-math-only -fno-strict-aliasing
 
 # --------------------------------------------------------------
-# lots of warnings from VCV side
-
-BASE_FLAGS += -Wno-unused-parameter
-BASE_FLAGS += -Wno-unused-variable
-
-ifeq ($(CPU_ARM_OR_ARM64)$(CPU_RISCV64),true)
-BASE_FLAGS += -Wno-attributes
-endif
-
-# --------------------------------------------------------------
-# also from plugins
+# lots of warnings from plugins
 
 BASE_FLAGS += -Wno-deprecated-declarations
 

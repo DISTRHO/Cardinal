@@ -4,6 +4,7 @@
 # Created by falkTX
 #
 
+BUILDING_RACK = true
 ROOT = ../..
 include $(ROOT)/Makefile.base.mk
 
@@ -62,11 +63,7 @@ endif # CARDINAL_VARIANT mini
 
 PREFIX  ?= /usr/local
 
-ifeq ($(SYSDEPS),true)
-DEP_LIB_PATH = $(abspath ../../deps/sysroot/lib)
-else
-DEP_LIB_PATH = $(abspath ../Rack/dep/lib)
-endif
+DEP_LIB_PATH = $(RACK_DEP_PATH)/lib
 
 # --------------------------------------------------------------
 # Files to build (DPF stuff)
@@ -266,96 +263,14 @@ include ../../dpf/Makefile.plugins.mk
 # --------------------------------------------------------------
 # Extra flags for VCV stuff
 
-ifeq ($(MACOS),true)
-BASE_FLAGS += -DARCH_MAC
-else ifeq ($(WINDOWS),true)
-BASE_FLAGS += -DARCH_WIN
-else
-BASE_FLAGS += -DARCH_LIN
-endif
-
 BASE_FLAGS += -DPRIVATE=
-BASE_FLAGS += -I..
-BASE_FLAGS += -I../../dpf/dgl/src/nanovg
-BASE_FLAGS += -I../../include
-BASE_FLAGS += -I../../include/simd-compat
-BASE_FLAGS += -I../Rack/include
-ifeq ($(SYSDEPS),true)
-BASE_FLAGS += -DCARDINAL_SYSDEPS
-BASE_FLAGS += $(shell $(PKG_CONFIG) --cflags jansson libarchive samplerate speexdsp)
-else
-BASE_FLAGS += -DZSTDLIB_VISIBILITY=
-BASE_FLAGS += -I../Rack/dep/include
-endif
-BASE_FLAGS += -I../Rack/dep/glfw/include
-BASE_FLAGS += -I../Rack/dep/nanosvg/src
-BASE_FLAGS += -I../Rack/dep/oui-blendish
-
-ifeq ($(HEADLESS),true)
-BASE_FLAGS += -DHEADLESS
-endif
-
-# SIMD must always be enabled, even in debug builds
-ifeq ($(NOSIMD),true)
-BASE_FLAGS += -DCARDINAL_NOSIMD
-else ifeq ($(DEBUG),true)
-ifeq ($(WASM),true)
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-else ifeq ($(CPU_ARM32),true)
-BASE_FLAGS += -mfpu=neon-vfpv4 -mfloat-abi=hard
-else ifeq ($(CPU_I386_OR_X86_64),true)
-BASE_FLAGS += -msse -msse2 -mfpmath=sse
-endif
-endif
 
 ifeq ($(MOD_BUILD),true)
 BASE_FLAGS += -DDISTRHO_PLUGIN_MINIMUM_BUFFER_SIZE=0xffff
 BASE_FLAGS += -DDISTRHO_PLUGIN_USES_MODGUI=1
-BASE_FLAGS += -DSIMDE_ENABLE_OPENMP -fopenmp
-LINK_FLAGS += -fopenmp
 else ifeq ($(CARDINAL_VARIANT),mini)
-BUILD_CXX_FLAGS += -DDISTRHO_PLUGIN_MINIMUM_BUFFER_SIZE=0xffff
+BASE_FLAGS += -DDISTRHO_PLUGIN_MINIMUM_BUFFER_SIZE=0xffff
 endif
-
-ifneq ($(WASM),true)
-ifneq ($(HAIKU),true)
-BASE_FLAGS += -pthread
-endif
-endif
-
-ifeq ($(WINDOWS),true)
-BASE_FLAGS += -D_USE_MATH_DEFINES
-BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
-BASE_FLAGS += -D_WIN32_WINNT=0x0600
-BASE_FLAGS += -I../../include/mingw-compat
-endif
-
-ifeq ($(USE_GLES2),true)
-BASE_FLAGS += -DNANOVG_GLES2_FORCED
-else ifeq ($(USE_GLES3),true)
-BASE_FLAGS += -DNANOVG_GLES3_FORCED
-endif
-
-BUILD_C_FLAGS += -std=gnu11
-
-ifneq ($(MACOS),true)
-BUILD_CXX_FLAGS += -faligned-new -Wno-abi
-ifeq ($(MOD_BUILD),true)
-BUILD_CXX_FLAGS += -std=gnu++17
-endif
-endif
-
-# Rack code is not tested for this flag, unset it
-BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
-
-# Ignore bad behaviour from Rack API
-BUILD_CXX_FLAGS += -Wno-format-security
-
-# --------------------------------------------------------------
-# FIXME lots of warnings from VCV side
-
-BASE_FLAGS += -Wno-unused-parameter
-BASE_FLAGS += -Wno-unused-variable
 
 # --------------------------------------------------------------
 # extra linker flags
@@ -407,9 +322,13 @@ endif
 LINK_FLAGS += $(foreach d,$(SYMLINKED_DIRS_RESOURCES),--preload-file=../../bin/CardinalNative.lv2/resources/$(d)@/resources/$(d))
 
 else ifeq ($(HAIKU),true)
+
 LINK_FLAGS += -lpthread
+
 else
+
 LINK_FLAGS += -pthread
+
 endif
 
 ifneq ($(HAIKU_OR_MACOS_OR_WINDOWS),true)
@@ -418,10 +337,8 @@ LINK_FLAGS += -ldl
 endif
 endif
 
-ifeq ($(BSD),true)
-ifeq ($(DEBUG),true)
+ifeq ($(BSD)$(DEBUG),true)
 LINK_FLAGS += -lexecinfo
-endif
 endif
 
 ifeq ($(MACOS),true)
