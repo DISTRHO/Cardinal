@@ -5,11 +5,12 @@ on: [push, pull_request]
 env:
   CACHE_VERSION: 2
   CARDINAL_UNDER_WINE: 1
+  CIBUILD: true
   EMSCRIPTEN_VERSION: 3.1.27
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: true
-  WITH_LTO: false
+  PAWPAW_SKIP_LTO: 1
 
 jobs:
   linux-arm64:
@@ -33,7 +34,7 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: linux-arm64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: linux-arm64-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
@@ -53,21 +54,19 @@ jobs:
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-linux-arm64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: ccache-linux-arm64-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         env:
           PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64 && ./deps/PawPaw/.cleanup.sh linux-aarch64
       - name: Build linux arm64 cross-compiled
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           pushd deps/PawPaw; source local.env linux-aarch64; popd
           export PATH="/usr/lib/ccache:${PATH}"
           export PKG_CONFIG_PATH+=:/usr/lib/aarch64-linux-gnu/pkgconfig
           make features
-          make CIBUILD=true HAVE_PULSEAUDIO=false NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+          make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -114,7 +113,7 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: linux-armhf-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: linux-armhf-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
@@ -134,21 +133,19 @@ jobs:
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-linux-armhf-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: ccache-linux-armhf-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         env:
           PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           ./deps/PawPaw/bootstrap-cardinal.sh linux-armhf && ./deps/PawPaw/.cleanup.sh linux-armhf
       - name: Build linux armhf cross-compiled
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           pushd deps/PawPaw; source local.env linux-armhf; popd
           export PATH="/usr/lib/ccache:${PATH}"
           export PKG_CONFIG_PATH+=:/usr/lib/arm-linux-gnueabihf/pkgconfig
           make features
-          make CIBUILD=true HAVE_PULSEAUDIO=false NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+          make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -195,7 +192,7 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: linux-i686-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: linux-i686-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
@@ -211,21 +208,19 @@ jobs:
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-linux-i686-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: ccache-linux-i686-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         env:
           PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           ./deps/PawPaw/bootstrap-cardinal.sh linux-i686 && ./deps/PawPaw/.cleanup.sh linux-i686
       - name: Build linux i686
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           pushd deps/PawPaw; source local.env linux-i686; popd
           export PATH="/usr/lib/ccache:${PATH}"
           export PKG_CONFIG_PATH+=:/usr/lib/i386-linux-gnu/pkgconfig
           make features
-          make CIBUILD=true HAVE_PULSEAUDIO=false NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+          make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -272,7 +267,7 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: linux-riscv64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: linux-riscv64-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
@@ -293,21 +288,19 @@ jobs:
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-linux-riscv64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: ccache-linux-riscv64-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         env:
           PKG_CONFIG_PATH: /usr/lib/riscv64-linux-gnu/pkgconfig
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           ./deps/PawPaw/bootstrap-cardinal.sh linux-riscv64 && ./deps/PawPaw/.cleanup.sh linux-riscv64
       - name: Build linux riscv64 cross-compiled
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           pushd deps/PawPaw; source local.env linux-riscv64; popd
           export PATH="/usr/lib/ccache:${PATH}"
           export PKG_CONFIG_PATH+=:/usr/lib/riscv64-linux-gnu/pkgconfig
           make features
-          make CIBUILD=true HAVE_PULSEAUDIO=false NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+          make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -354,7 +347,7 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: linux-x86_64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: linux-x86_64-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
@@ -363,19 +356,17 @@ jobs:
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-linux-x86_64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: ccache-linux-x86_64-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           ./deps/PawPaw/bootstrap-cardinal.sh linux && ./deps/PawPaw/.cleanup.sh linux
       - name: Build linux x86_64
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           pushd deps/PawPaw; source local.env linux; popd
           export PATH="/usr/lib/ccache:${PATH}"
           export PKG_CONFIG_PATH+=:/usr/lib/x86_64-linux-gnu/pkgconfig
           make features
-          make CIBUILD=true HAVE_PULSEAUDIO=false NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+          make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -487,29 +478,26 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: macos-intel-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: macos-intel-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh macos && ./deps/PawPaw/.cleanup.sh macos
       - name: Set up ccache
         if: steps.cache.outputs.cache-hit == 'true'
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-macos-intel-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: ccache-macos-intel-v${{ env.CACHE_VERSION }}
       - name: Build macOS intel (base)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           pushd deps/PawPaw; source local.env macos; popd
           make features
-          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(sysctl -n hw.logicalcpu)
+          make NOOPT=true -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS intel (AU using juce)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           pushd deps/PawPaw; source local.env macos; popd
           git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
           sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
@@ -572,7 +560,6 @@ jobs:
           key: macos-universal-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         run: |
-          export PAWPAW_SKIP_LTO=1
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           ./deps/PawPaw/bootstrap-cardinal.sh macos-universal && ./deps/PawPaw/.cleanup.sh macos-universal
       - name: Set up ccache
@@ -582,18 +569,14 @@ jobs:
           key: ccache-macos-universal-v${{ env.CACHE_VERSION }}
       - name: Build macOS universal (base)
         if: steps.cache.outputs.cache-hit == 'true'
-        env:
-          WITH_LTO: false
         run: |
-          export PAWPAW_SKIP_LTO=1
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           pushd deps/PawPaw; source local.env macos-universal; popd
           make features
-          make CIBUILD=true NOOPT=true -j $(sysctl -n hw.logicalcpu)
+          make NOOPT=true -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS universal (AU using juce)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          export PAWPAW_SKIP_LTO=1
           pushd deps/PawPaw; source local.env macos-universal; popd
           git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
           mkdir -p jucewrapper/build
@@ -643,7 +626,7 @@ jobs:
         with:
           path: |
             ~/mod-workdir
-          key: modduo-static-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: modduo-static-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
@@ -659,8 +642,8 @@ jobs:
       - name: Build for modduo
         if: steps.mpb-cache.outputs.cache-hit == 'true'
         run: |
-          make CIBUILD=true HEADLESS=true modduo-features
-          make CIBUILD=true HEADLESS=true MODDUO=true WITH_LTO=${{ env.WITH_LTO }} modduo -j $(nproc)
+          make HEADLESS=true modduo-features
+          make HEADLESS=true MODDUO=true modduo -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
@@ -686,7 +669,7 @@ jobs:
         with:
           path: |
             ~/mod-workdir
-          key: modduox-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: modduox-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
@@ -702,8 +685,8 @@ jobs:
       - name: Build for modduox
         if: steps.mpb-cache.outputs.cache-hit == 'true'
         run: |
-          make CIBUILD=true HEADLESS=true modduox-features
-          make CIBUILD=true HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} modduox -j $(nproc)
+          make HEADLESS=true modduox-features
+          make HEADLESS=true modduox -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
@@ -729,7 +712,7 @@ jobs:
         with:
           path: |
             ~/mod-workdir
-          key: moddwarf-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: moddwarf-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
@@ -745,8 +728,8 @@ jobs:
       - name: Build for moddwarf
         if: steps.mpb-cache.outputs.cache-hit == 'true'
         run: |
-          make CIBUILD=true HEADLESS=true moddwarf-features
-          make CIBUILD=true HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} moddwarf -j $(nproc)
+          make HEADLESS=true moddwarf-features
+          make HEADLESS=true moddwarf -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
@@ -795,13 +778,11 @@ jobs:
           ./deps/PawPaw/bootstrap-cardinal.sh wasm && ./deps/PawPaw/.cleanup.sh wasm
       - name: Build wasm cross-compiled
         if: steps.cache.outputs.cache-hit == 'true'
-        env:
-          WITH_LTO: false
         run: |
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
           pushd deps/PawPaw; source local.env wasm; popd
           make features
-          make CIBUILD=true HAVE_LIBLO=false NOOPT=true -j $(nproc)
+          make HAVE_LIBLO=false NOOPT=true -j $(nproc)
       - name: Make wasm versioned and compress
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
@@ -881,15 +862,14 @@ jobs:
         env:
           PAWPAW_NOSIMD: 1
           NOSIMD: true
-          WITH_LTO: false
         run: |
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
           pushd deps/PawPaw; source local.env wasm; popd
           # FIXME send patch upstream, assuming this works..
           sed -i -e 's/defined(__riscv)/defined(__riscv) || defined(__EMSCRIPTEN__)/' plugins/surgext/surge/src/common/globals.h
           make features
-          make CIBUILD=true HAVE_LIBLO=false NOOPT=true -j $(nproc)
-          make CIBUILD=true HAVE_LIBLO=false NOOPT=true -j $(nproc) -C src/CardinalMiniSep modgui
+          make HAVE_LIBLO=false NOOPT=true -j $(nproc)
+          make HAVE_LIBLO=false NOOPT=true -j $(nproc) -C src/CardinalMiniSep modgui
       - name: Make wasm-noopt versioned and compress
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
@@ -950,7 +930,7 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: win32-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: win32-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
@@ -967,23 +947,20 @@ jobs:
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-win32-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: ccache-win32-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           ./deps/PawPaw/bootstrap-cardinal.sh win32 && ./deps/PawPaw/.cleanup.sh win32
       - name: Build win32 cross-compiled (base)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win32; popd
           make features
-          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+          make NOOPT=true -j $(nproc)
       - name: Build win32 cross-compiled (carla)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win32; popd
           make carla-win32 -j $(nproc)
@@ -1046,7 +1023,7 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: win64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: win64-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
@@ -1063,23 +1040,20 @@ jobs:
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-win64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: ccache-win64-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           ./deps/PawPaw/bootstrap-cardinal.sh win64 && ./deps/PawPaw/.cleanup.sh win64
       - name: Build win64 cross-compiled (base)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win64; popd
           make features
-          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+          make NOOPT=true -j $(nproc)
       - name: Build win64 cross-compiled (carla)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/lib/ccache:${PATH}"
           pushd deps/PawPaw; source local.env win64; popd
           make carla-win32 -j $(nproc)
@@ -1199,7 +1173,6 @@ jobs:
           CFLAGS: -g
           CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING -Wno-pmf-conversions
           LDFLAGS: -static-libgcc -static-libstdc++
-          WITH_LTO: false
         run: |
           make features
           make NOOPT=true SKIP_STRIPPING=true carla deps dgl plugins resources -j $(nproc)
@@ -1209,7 +1182,6 @@ jobs:
           CFLAGS: -g
           CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING -Wno-pmf-conversions
           LDFLAGS: -static-libgcc -static-libstdc++
-          WITH_LTO: false
         run: |
           make features
           make NOOPT=true SKIP_STRIPPING=true -j 1 -C src jack
