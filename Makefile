@@ -4,16 +4,17 @@
 # Created by falkTX
 #
 
+ROOT = .
+include $(ROOT)/Makefile.base.mk
+
+# -----------------------------------------------------------------------------
+# Set version
+
 # also set in:
 # jucewrapper/CMakeLists.txt `project`
 # src/CardinalCommon.cpp `CARDINAL_VERSION`
 # src/CardinalPlugin.cpp `getVersion`
 VERSION = 23.04
-
-# --------------------------------------------------------------
-# Import base definitions
-
-include dpf/Makefile.base.mk
 
 # --------------------------------------------------------------
 # Build targets
@@ -25,20 +26,6 @@ all: cardinal carla deps dgl plugins gen resources
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
-
-ifeq ($(BSD),true)
-SYSDEPS ?= true
-else
-SYSDEPS ?= false
-endif
-
-ifeq ($(LINUX),true)
-VST3_SUPPORTED = true
-else ifeq ($(MACOS),true)
-VST3_SUPPORTED = true
-else ifeq ($(WINDOWS),true)
-VST3_SUPPORTED = true
-endif
 
 # --------------------------------------------------------------
 # Carla config
@@ -55,17 +42,6 @@ CARLA_EXTRA_ARGS = \
 ifneq ($(DEBUG),true)
 CARLA_EXTRA_ARGS += EXTERNAL_PLUGINS=true
 endif
-
-# --------------------------------------------------------------
-# DGL config
-
-DGL_EXTRA_ARGS = \
-	DISTRHO_NAMESPACE=CardinalDISTRHO \
-	DGL_NAMESPACE=CardinalDGL \
-	NVG_DISABLE_SKIPPING_WHITESPACE=true \
-	NVG_FONT_TEXTURE_FLAGS=NVG_IMAGE_NEAREST \
-	USE_NANOVG_FBO=true \
-	WINDOWS_ICON_ID=401
 
 # --------------------------------------------------------------
 # Check for required system-wide dependencies
@@ -278,10 +254,10 @@ install:
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/CardinalSynth.lv2
 	install -d $(DESTDIR)$(PREFIX)/lib/clap/Cardinal.clap
 	install -d $(DESTDIR)$(PREFIX)/lib/vst/Cardinal.vst
-ifeq ($(VST3_SUPPORTED),true)
-	install -d $(DESTDIR)$(PREFIX)/lib/vst3/Cardinal.vst3/Contents
-	install -d $(DESTDIR)$(PREFIX)/lib/vst3/CardinalFX.vst3/Contents
-	install -d $(DESTDIR)$(PREFIX)/lib/vst3/CardinalSynth.vst3/Contents
+ifneq ($(VST3_BINARY_DIR),)
+	install -d $(DESTDIR)$(PREFIX)/lib/vst3/Cardinal.vst3/$(VST3_BINARY_DIR)
+	install -d $(DESTDIR)$(PREFIX)/lib/vst3/CardinalFX.vst3/$(VST3_BINARY_DIR)
+	install -d $(DESTDIR)$(PREFIX)/lib/vst3/CardinalSynth.vst3/$(VST3_BINARY_DIR)
 endif
 	install -d $(DESTDIR)$(PREFIX)/share/cardinal
 	install -d $(DESTDIR)$(PREFIX)/share/doc/cardinal/docs
@@ -293,10 +269,10 @@ endif
 	install -m 644 bin/Cardinal.clap/*.*     $(DESTDIR)$(PREFIX)/lib/clap/Cardinal.clap/
 	install -m 644 bin/Cardinal.vst/*.*      $(DESTDIR)$(PREFIX)/lib/vst/Cardinal.vst/
 
-ifeq ($(VST3_SUPPORTED),true)
-	cp -rL bin/Cardinal.vst3/Contents/*-*      $(DESTDIR)$(PREFIX)/lib/vst3/Cardinal.vst3/Contents/
-	cp -rL bin/CardinalFX.vst3/Contents/*-*    $(DESTDIR)$(PREFIX)/lib/vst3/CardinalFX.vst3/Contents/
-	cp -rL bin/CardinalSynth.vst3/Contents/*-* $(DESTDIR)$(PREFIX)/lib/vst3/CardinalSynth.vst3/Contents/
+ifneq ($(VST3_BINARY_DIR),)
+	install -m 644 bin/Cardinal.vst3/$(VST3_BINARY_DIR)/*      $(DESTDIR)$(PREFIX)/lib/vst3/Cardinal.vst3/$(VST3_BINARY_DIR)/
+	install -m 644 bin/CardinalFX.vst3/$(VST3_BINARY_DIR)/*    $(DESTDIR)$(PREFIX)/lib/vst3/CardinalFX.vst3/$(VST3_BINARY_DIR)/
+	install -m 644 bin/CardinalSynth.vst3/$(VST3_BINARY_DIR)/* $(DESTDIR)$(PREFIX)/lib/vst3/CardinalSynth.vst3/$(VST3_BINARY_DIR)/
 endif
 
 	install -m 755 bin/Cardinal$(APP_EXT)       $(DESTDIR)$(PREFIX)/bin/

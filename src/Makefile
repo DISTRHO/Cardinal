@@ -4,23 +4,8 @@
 # Created by falkTX
 #
 
-# --------------------------------------------------------------
-# Import base definitions
-
-DISTRHO_NAMESPACE = CardinalDISTRHO
-DGL_NAMESPACE = CardinalDGL
-USE_NANOVG_FBO = true
-WASM_EXCEPTIONS = true
-include ../dpf/Makefile.base.mk
-
-# --------------------------------------------------------------
-# Build config
-
-ifeq ($(BSD),true)
-SYSDEPS ?= true
-else
-SYSDEPS ?= false
-endif
+ROOT = ..
+include $(ROOT)/Makefile.base.mk
 
 # --------------------------------------------------------------
 # Build setup

@@ -4,7 +4,15 @@
 # Created by falkTX
 #
 
-# Must have NAME defined
+ROOT = ../..
+include $(ROOT)/Makefile.base.mk
+
+# -----------------------------------------------------------------------------
+# Set variant to build
+
+ifeq ($(NAME),)
+$(error invalid usage)
+endif
 
 ifeq ($(NAME),Cardinal)
 CARDINAL_VARIANT = main
@@ -50,35 +58,9 @@ endif # STATIC_BUILD
 endif # CARDINAL_VARIANT mini
 
 # --------------------------------------------------------------
-# Import base definitions
-
-DISTRHO_NAMESPACE = CardinalDISTRHO
-DGL_NAMESPACE = CardinalDGL
-NVG_DISABLE_SKIPPING_WHITESPACE = true
-NVG_FONT_TEXTURE_FLAGS = NVG_IMAGE_NEAREST
-USE_NANOVG_FBO = true
-WASM_EXCEPTIONS = true
-
-ifeq ($(CARDINAL_VARIANT),main)
-# main variant should not use rtaudio/sdl2 fallback (it has CV ports)
-SKIP_NATIVE_AUDIO_FALLBACK = true
-else ifneq ($(CARDINAL_VARIANT),mini)
-# other variants should only use rtaudio/sdl2 fallbacks
-FORCE_NATIVE_AUDIO_FALLBACK = true
-endif
-
-include ../../dpf/Makefile.base.mk
-
-# --------------------------------------------------------------
 # Build config
 
 PREFIX  ?= /usr/local
-
-ifeq ($(BSD),true)
-SYSDEPS ?= true
-else
-SYSDEPS ?= false
-endif
 
 ifeq ($(SYSDEPS),true)
 DEP_LIB_PATH = $(abspath ../../deps/sysroot/lib)
@@ -268,6 +250,14 @@ endif
 
 # --------------------------------------------------------------
 # Do some magic
+
+ifeq ($(CARDINAL_VARIANT),main)
+# main variant should not use rtaudio/sdl2 fallback (it has CV ports)
+SKIP_NATIVE_AUDIO_FALLBACK = true
+else ifneq ($(CARDINAL_VARIANT),mini)
+# other variants should only use rtaudio/sdl2 fallbacks
+FORCE_NATIVE_AUDIO_FALLBACK = true
+endif
 
 USE_VST2_BUNDLE = true
 USE_CLAP_BUNDLE = true
