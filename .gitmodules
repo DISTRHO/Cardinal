@@ -4,9 +4,6 @@
 [submodule "dpf"]
 	path = dpf
 	url = https://github.com/DISTRHO/DPF.git
-[submodule "plugins/Cardinal/mingw-std-threads"]
-	path = include/mingw-std-threads
-	url = https://github.com/meganz/mingw-std-threads.git
 [submodule "plugins/Befaco"]
 	path = plugins/Befaco
 	url = https://github.com/VCVRack/Befaco.git

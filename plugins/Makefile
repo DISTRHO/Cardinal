@@ -1356,7 +1356,6 @@ BASE_FLAGS += -D_USE_MATH_DEFINES
 BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
 BASE_FLAGS += -D_WIN32_WINNT=0x0600
 BASE_FLAGS += -I../include/mingw-compat
-BASE_FLAGS += -I../include/mingw-std-threads
 endif
 
 ifeq ($(USE_GLES2),true)
