@@ -1264,6 +1264,11 @@ endif
 BASE_FLAGS += -DBUILDING_PLUGIN_MODULES
 BASE_FLAGS += -I$(abspath $(ROOT)/include/osdialog-stub)
 
+ifeq ($(BSD)$(WASM),true)
+BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
+BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
+endif
+
 ifeq ($(shell $(PKG_CONFIG) --exists sndfile && echo true),true)
 BASE_FLAGS += -DHAVE_SNDFILE
 endif

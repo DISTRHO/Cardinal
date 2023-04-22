@@ -71,11 +71,6 @@ ifeq ($(BSD)$(HAIKU),true)
 BASE_FLAGS += -DCLOCK_MONOTONIC_RAW=CLOCK_MONOTONIC
 endif
 
-ifeq ($(BSD)$(WASM),true)
-BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
-BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
-endif
-
 ifeq ($(HAIKU)$(WASM),true)
 BASE_FLAGS += -I$(abspath $(ROOT)/include/linux-compat)
 else
