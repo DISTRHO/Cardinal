@@ -199,8 +199,8 @@ jobs:
           sudo apt-get clean
       - name: Build linux (LTO)
         run: |
-          make SYSDEPS=true features
-          make SYSDEPS=true WITH_LTO=true -j $(nproc)
+          make features
+          make WITH_LTO=true -j $(nproc)
 
   linux-sysdeps:
     runs-on: ubuntu-20.04
