@@ -13,13 +13,16 @@ env:
   PAWPAW_SKIP_LTO: 1
 
 jobs:
-  linux-arm64:
+  linux:
+    strategy:
+      matrix:
+        target: [aarch64, armhf, i386, riscv64, x86_64]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - name: Set up cache
+      - name: Set up build cache
         id: cache
         uses: actions/cache@v3
         with:
@@ -34,14 +37,17 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: linux-arm64-v${{ env.CACHE_VERSION }}
+          key: linux-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+          sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+          sudo apt-get purge -yqq libclang* libgbm* libllvm* libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
           sudo apt-get clean
-      - name: Set up dependencies
+      - name: Setup dependencies (aarch64)
+        if: ${{ matrix.target == 'aarch64' }}
+        shell: bash
         run: |
           sudo dpkg --add-architecture arm64
           sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
@@ -51,20 +57,59 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -yqq g++-aarch64-linux-gnu libasound2-dev:arm64 libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libglib2.0-dev:arm64 libsdl2-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 gperf qemu-user-static
           sudo apt-get clean
+      - name: Setup dependencies (armhf)
+        if: ${{ matrix.target == 'armhf' }}
+        shell: bash
+        run: |
+          sudo dpkg --add-architecture armhf
+          sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
+          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-armhf.list
+          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
+          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
+          sudo apt-get update -qq
+          sudo apt-get install -yqq g++-arm-linux-gnueabihf libasound2-dev:armhf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libglib2.0-dev:armhf libsdl2-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf gperf qemu-user-static
+          sudo apt-get clean
+      - name: Setup dependencies (i386)
+        if: ${{ matrix.target == 'i386' }}
+        shell: bash
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
+          sudo apt-get install -yqq g++-i686-linux-gnu libasound2-dev:i386 libdbus-1-dev:i386 libgl1-mesa-dev:i386 libglib2.0-dev:i386 libsdl2-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386 gperf
+          sudo apt-get clean
+      - name: Setup dependencies (riscv64)
+        if: ${{ matrix.target == 'riscv64' }}
+        shell: bash
+        run: |
+          sudo dpkg --add-architecture riscv64
+          sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-riscv64.list
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
+          sudo apt-get update -qq
+          sudo apt-get install -yqq g++-riscv64-linux-gnu libasound2-dev:riscv64 libdbus-1-dev:riscv64 libgl1-mesa-dev:riscv64 libglapi-mesa:riscv64 libglvnd0:riscv64 libglib2.0-dev:riscv64 libsdl2-dev:riscv64 libx11-dev:riscv64 libxcursor-dev:riscv64 libxext-dev:riscv64 libxrandr-dev:riscv64 gperf qemu-user-static
+          sudo apt-get clean
+      - name: Setup dependencies (x86_64)
+        if: ${{ matrix.target == 'x86_64' }}
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
+          sudo apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-linux-arm64-v${{ env.CACHE_VERSION }}
+          key: ccache-linux-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         env:
-          PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
+          PKG_CONFIG_PATH: /usr/lib/${{ matrix.target }}-linux-gnu/pkgconfig
         run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64 && ./deps/PawPaw/.cleanup.sh linux-aarch64
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-${{ matrix.target }} && ./deps/PawPaw/.cleanup.sh linux-${{ matrix.target }}
       - name: Build linux arm64 cross-compiled
         run: |
-          pushd deps/PawPaw; source local.env linux-aarch64; popd
+          pushd deps/PawPaw; source local.env linux-${{ matrix.target }}; popd
           export PATH="/usr/lib/ccache:${PATH}"
-          export PKG_CONFIG_PATH+=:/usr/lib/aarch64-linux-gnu/pkgconfig
+          export PKG_CONFIG_PATH+=:/usr/lib/${{ matrix.target }}-linux-gnu/pkgconfig
           make features
           make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
           make unzipfx
@@ -80,306 +125,6 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || env.SHA8 }}
-          path: |
-            *.tar.gz
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.tar.gz
-
-  linux-armhf:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: linux-armhf-v${{ env.CACHE_VERSION }}
-      - name: Fix GitHub's mess
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-          sudo apt-get clean
-      - name: Set up dependencies
-        run: |
-          sudo dpkg --add-architecture armhf
-          sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
-          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-armhf.list
-          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
-          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq g++-arm-linux-gnueabihf libasound2-dev:armhf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libglib2.0-dev:armhf libsdl2-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf gperf qemu-user-static
-          sudo apt-get clean
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-linux-armhf-v${{ env.CACHE_VERSION }}
-      - name: Build extra dependencies
-        env:
-          PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
-        run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh linux-armhf && ./deps/PawPaw/.cleanup.sh linux-armhf
-      - name: Build linux armhf cross-compiled
-        run: |
-          pushd deps/PawPaw; source local.env linux-armhf; popd
-          export PATH="/usr/lib/ccache:${PATH}"
-          export PKG_CONFIG_PATH+=:/usr/lib/arm-linux-gnueabihf/pkgconfig
-          make features
-          make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
-          make unzipfx
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || env.SHA8 }}
-          path: |
-            *.tar.gz
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.tar.gz
-
-  linux-i686:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: linux-i686-v${{ env.CACHE_VERSION }}
-      - name: Fix GitHub's mess
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-          sudo apt-get clean
-      - name: Set up dependencies
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update -qq
-          sudo apt-get install -yqq g++-i686-linux-gnu libasound2-dev:i386 libdbus-1-dev:i386 libgl1-mesa-dev:i386 libglib2.0-dev:i386 libsdl2-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386 gperf
-          sudo apt-get clean
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-linux-i686-v${{ env.CACHE_VERSION }}
-      - name: Build extra dependencies
-        env:
-          PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
-        run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh linux-i686 && ./deps/PawPaw/.cleanup.sh linux-i686
-      - name: Build linux i686
-        run: |
-          pushd deps/PawPaw; source local.env linux-i686; popd
-          export PATH="/usr/lib/ccache:${PATH}"
-          export PKG_CONFIG_PATH+=:/usr/lib/i386-linux-gnu/pkgconfig
-          make features
-          make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
-          make unzipfx
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || env.SHA8 }}
-          path: |
-            *.tar.gz
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.tar.gz
-
-  linux-riscv64:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: linux-riscv64-v${{ env.CACHE_VERSION }}
-      - name: Fix GitHub's mess
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-          sudo apt-get purge -yqq libclang* libgbm* libllvm* libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
-          sudo apt-get clean
-      - name: Set up dependencies
-        run: |
-          sudo dpkg --add-architecture riscv64
-          sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
-          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-riscv64.list
-          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
-          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq g++-riscv64-linux-gnu libasound2-dev:riscv64 libdbus-1-dev:riscv64 libgl1-mesa-dev:riscv64 libglapi-mesa:riscv64 libglvnd0:riscv64 libglib2.0-dev:riscv64 libsdl2-dev:riscv64 libx11-dev:riscv64 libxcursor-dev:riscv64 libxext-dev:riscv64 libxrandr-dev:riscv64 gperf qemu-user-static
-          sudo apt-get clean
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-linux-riscv64-v${{ env.CACHE_VERSION }}
-      - name: Build extra dependencies
-        env:
-          PKG_CONFIG_PATH: /usr/lib/riscv64-linux-gnu/pkgconfig
-        run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh linux-riscv64 && ./deps/PawPaw/.cleanup.sh linux-riscv64
-      - name: Build linux riscv64 cross-compiled
-        run: |
-          pushd deps/PawPaw; source local.env linux-riscv64; popd
-          export PATH="/usr/lib/ccache:${PATH}"
-          export PKG_CONFIG_PATH+=:/usr/lib/riscv64-linux-gnu/pkgconfig
-          make features
-          make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
-          make unzipfx
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || env.SHA8 }}
-          path: |
-            *.tar.gz
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.tar.gz
-
-  linux-x86_64:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: linux-x86_64-v${{ env.CACHE_VERSION }}
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
-          sudo apt-get clean
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-linux-x86_64-v${{ env.CACHE_VERSION }}
-      - name: Build extra dependencies
-        run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh linux && ./deps/PawPaw/.cleanup.sh linux
-      - name: Build linux x86_64
-        run: |
-          pushd deps/PawPaw; source local.env linux; popd
-          export PATH="/usr/lib/ccache:${PATH}"
-          export PKG_CONFIG_PATH+=:/usr/lib/x86_64-linux-gnu/pkgconfig
-          make features
-          make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
-          make unzipfx
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
       - uses: softprops/action-gh-release@v1
@@ -424,7 +169,7 @@ jobs:
           path: |
             *.tar.gz
 
-  linux-x86_64-headless:
+  linux-headless:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -436,12 +181,28 @@ jobs:
           sudo apt-get remove -yqq libcairo2-dev libx11-dev libx11-dev libxext-dev
           sudo apt-get install -yqq liblo-dev
           sudo apt-get clean
-      - name: Build linux x86_64 (headless)
+      - name: Build linux (headless)
         run: |
           make HEADLESS=true features
           make HEADLESS=true -j $(nproc)
 
-  linux-x86_64-sysdeps:
+  linux-lto:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev liblo-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
+          sudo apt-get clean
+      - name: Build linux (LTO)
+        run: |
+          make SYSDEPS=true features
+          make SYSDEPS=true WITH_LTO=true -j $(nproc)
+
+  linux-sysdeps:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -452,12 +213,15 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libfftw3-dev libjansson-dev libsamplerate0-dev libsndfile1-dev libspeexdsp-dev
           sudo apt-get clean
-      - name: Build linux x86_64 (sysdeps)
+      - name: Build linux (sysdeps)
         run: |
           make features
           make SYSDEPS=true -j $(nproc)
 
-  macos-intel:
+  macos:
+    strategy:
+      matrix:
+        target: [intel, universal]
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v3
@@ -478,116 +242,46 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: macos-intel-v${{ env.CACHE_VERSION }}
+          key: macos-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          ./deps/PawPaw/bootstrap-cardinal.sh macos && ./deps/PawPaw/.cleanup.sh macos
+          ./deps/PawPaw/bootstrap-cardinal.sh macos-${{ matrix.target }} && ./deps/PawPaw/.cleanup.sh macos-${{ matrix.target }}
       - name: Set up ccache
         if: steps.cache.outputs.cache-hit == 'true'
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-macos-intel-v${{ env.CACHE_VERSION }}
-      - name: Build macOS intel (base)
+          key: ccache-macos-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+      - name: Build macOS (base)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          pushd deps/PawPaw; source local.env macos; popd
+          pushd deps/PawPaw; source local.env macos-${{ matrix.target }}; popd
           make features
           make NOOPT=true -j $(sysctl -n hw.logicalcpu)
-      - name: Build macOS intel (AU using juce)
+      - name: Build macOS (AU using juce)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          pushd deps/PawPaw; source local.env macos; popd
-          git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
-          sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
+          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
+          pushd deps/PawPaw; source local.env macos-${{ matrix.target }}; popd
+          git clone --depth=1 -b 6.1.6 https://github.com/DISTRHO/JUCE.git jucewrapper/JUCE
+          # sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
           mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_OSX_SYSROOT="macosx" -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
+          pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
-      - name: Build macOS intel (packaging)
-        if: steps.cache.outputs.cache-hit == 'true'
+      - name: Build macOS (intel packaging)
+        if: ${{ steps.cache.outputs.cache-hit == 'true' && matrix.target == 'intel' }}
         env:
           MACOS_ARCHS: 'x86_64'
         run: |
-          pushd deps/PawPaw; source local.env macos; popd
+          pushd deps/PawPaw; source local.env macos-${{ matrix.target }}; popd
           ./utils/create-macos-installer.sh
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
-      - name: Rename macOS bundle
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || env.SHA8 }}.pkg
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || env.SHA8 }}
-          path: |
-            ${{ github.event.repository.name }}-*.pkg
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            ${{ github.event.repository.name }}-*.pkg
-
-  macos-universal:
-    runs-on: macos-11
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: macos-universal-v${{ env.CACHE_VERSION }}
-      - name: Build extra dependencies
-        run: |
-          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          ./deps/PawPaw/bootstrap-cardinal.sh macos-universal && ./deps/PawPaw/.cleanup.sh macos-universal
-      - name: Set up ccache
-        if: steps.cache.outputs.cache-hit == 'true'
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-macos-universal-v${{ env.CACHE_VERSION }}
-      - name: Build macOS universal (base)
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          pushd deps/PawPaw; source local.env macos-universal; popd
-          make features
-          make NOOPT=true -j $(sysctl -n hw.logicalcpu)
-      - name: Build macOS universal (AU using juce)
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          pushd deps/PawPaw; source local.env macos-universal; popd
-          git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
-          mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_OSX_SYSROOT="macosx" -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
-          mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
-      - name: Build macOS universal (packaging)
-        if: steps.cache.outputs.cache-hit == 'true'
+      - name: Build macOS (universal packaging)
+        if: ${{ steps.cache.outputs.cache-hit == 'true' && matrix.target == 'universal' }}
         env:
           MACOS_ARCHS: 'arm64,x86_64'
         run: |
-          pushd deps/PawPaw; source local.env macos-universal; popd
+          pushd deps/PawPaw; source local.env macos-${{ matrix.target }}; popd
           ./utils/create-macos-installer.sh
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -598,10 +292,10 @@ jobs:
       - name: Rename macOS bundle
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || env.SHA8 }}.pkg
+          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.pkg
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || env.SHA8 }}
+          name: ${{ github.event.repository.name }}-macOS-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             ${{ github.event.repository.name }}-*.pkg
       - uses: softprops/action-gh-release@v1
@@ -909,7 +603,10 @@ jobs:
           files: |
             *.zip
 
-  win32:
+  windows:
+    strategy:
+      matrix:
+        target: [win32, win64]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -930,108 +627,23 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: win32-v${{ env.CACHE_VERSION }}
+          key: ${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
           sudo apt-get install -yqq --allow-downgrades libgd3/jammy
-          sudo apt-get purge -yqq libmono* moby* mono* msbuild* php* libgdiplus libpcre2-posix3 nuget
+          sudo apt-get purge -yqq libclang* libgbm* libllvm* libmono* moby* mono* msbuild* php* libgdiplus libpcre2-posix3 libzip4
           sudo apt-get clean
       - name: Set up dependencies
+        if: ${{ matrix.target == 'win32' }}
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
           sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 gperf qttools5-dev qttools5-dev-tools xvfb
           sudo apt-get clean
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-win32-v${{ env.CACHE_VERSION }}
-      - name: Build extra dependencies
-        run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh win32 && ./deps/PawPaw/.cleanup.sh win32
-      - name: Build win32 cross-compiled (base)
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env win32; popd
-          make features
-          make NOOPT=true -j $(nproc)
-      - name: Build win32 cross-compiled (carla)
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env win32; popd
-          make carla-win32 -j $(nproc)
-          make -C carla EMBED_TARGET=true TESTING=true dist
-          make -C carla EMBED_TARGET=true TESTING=true dist
-      - name: Build win32 cross-compiled (packaging)
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          pushd deps/PawPaw; source local.env win32; popd
-          xvfb-run ./utils/create-windows-installer.sh 32
-          make unzipfx
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
-      - name: Pack binaries
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          pushd bin
-          zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
-          popd
-          zip -u -9 ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || env.SHA8 }}.zip LICENSE README.md docs/*.* CardinalJACK.exe CardinalNative.exe
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || env.SHA8 }}
-          path: |
-            Cardinal-*.exe
-            Cardinal-*.zip
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            Cardinal-*.exe
-            Cardinal-*.zip
-
-  win64:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: win64-v${{ env.CACHE_VERSION }}
-      - name: Fix GitHub's mess
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libgd3/jammy
-          sudo apt-get purge -yqq libmono* moby* mono* msbuild* php* libgdiplus libpcre2-posix3 nuget
-          sudo apt-get clean
       - name: Set up dependencies
+        if: ${{ matrix.target == 'win64' }}
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
@@ -1040,30 +652,30 @@ jobs:
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-win64-v${{ env.CACHE_VERSION }}
+          key: ccache-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
         run: |
-          ./deps/PawPaw/bootstrap-cardinal.sh win64 && ./deps/PawPaw/.cleanup.sh win64
-      - name: Build win64 cross-compiled (base)
+          ./deps/PawPaw/bootstrap-cardinal.sh ${{ matrix.target }} && ./deps/PawPaw/.cleanup.sh ${{ matrix.target }}
+      - name: Build cross-compiled (base)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env win64; popd
+          pushd deps/PawPaw; source local.env ${{ matrix.target }}; popd
           make features
           make NOOPT=true -j $(nproc)
-      - name: Build win64 cross-compiled (carla)
+      - name: Build cross-compiled (carla)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env win64; popd
+          pushd deps/PawPaw; source local.env ${{ matrix.target }}; popd
           make carla-win32 -j $(nproc)
           make -C carla EMBED_TARGET=true TESTING=true dist
           make -C carla EMBED_TARGET=true TESTING=true dist
-      - name: Build win64 cross-compiled (packaging)
+      - name: Build cross-compiled (packaging)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          pushd deps/PawPaw; source local.env win64; popd
-          xvfb-run ./utils/create-windows-installer.sh 64
+          pushd deps/PawPaw; source local.env ${{ matrix.target }}; popd
+          xvfb-run ./utils/create-windows-installer.sh ${{ matrix.target }}
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -1075,12 +687,12 @@ jobs:
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           pushd bin
-          zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
+          zip -r -9 ../${{ github.event.repository.name }}-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
           popd
-          zip -u -9 ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || env.SHA8 }}.zip LICENSE README.md docs/*.* CardinalJACK.exe CardinalNative.exe
+          zip -u -9 ${{ github.event.repository.name }}-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip LICENSE README.md docs/*.* CardinalJACK.exe CardinalNative.exe
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || env.SHA8 }}
+          name: ${{ github.event.repository.name }}-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             Cardinal-*.exe
             Cardinal-*.zip
