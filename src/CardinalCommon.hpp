@@ -75,8 +75,7 @@ void openBrowser(const std::string& url);
 
 // -----------------------------------------------------------------------------------------------------------
 
-// && defined(HEADLESS)
-#if defined(HAVE_LIBLO)
+#if defined(HAVE_LIBLO) && defined(HEADLESS)
 # define CARDINAL_INIT_OSC_THREAD
 #endif
 

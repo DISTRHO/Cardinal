@@ -169,55 +169,6 @@ jobs:
           path: |
             *.tar.gz
 
-  headless:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get remove -yqq libcairo2-dev libx11-dev libx11-dev libxext-dev
-          sudo apt-get install -yqq liblo-dev
-          sudo apt-get clean
-      - name: Build linux (headless)
-        run: |
-          make HEADLESS=true features
-          make HEADLESS=true -j $(nproc)
-
-  lto:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev liblo-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
-          sudo apt-get clean
-      - name: Build linux (LTO)
-        run: |
-          make features
-          make WITH_LTO=true -j $(nproc)
-
-  sysdeps:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libfftw3-dev libjansson-dev libsamplerate0-dev libsndfile1-dev libspeexdsp-dev
-          sudo apt-get clean
-      - name: Build linux (sysdeps)
-        run: |
-          make features
-          make SYSDEPS=true -j $(nproc)
-
   macos:
     strategy:
       matrix:
@@ -558,6 +509,55 @@ jobs:
           files: |
             Cardinal-*.exe
             Cardinal-*.zip
+
+  headless:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get remove -yqq libcairo2-dev libx11-dev libx11-dev libxext-dev
+          sudo apt-get install -yqq liblo-dev
+          sudo apt-get clean
+      - name: Build linux (headless)
+        run: |
+          make HEADLESS=true features
+          make HEADLESS=true -j $(nproc)
+
+  lto:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev liblo-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
+          sudo apt-get clean
+      - name: Build linux (LTO)
+        run: |
+          make features
+          make WITH_LTO=true -j $(nproc)
+
+  sysdeps:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libfftw3-dev libjansson-dev libsamplerate0-dev libsndfile1-dev libspeexdsp-dev
+          sudo apt-get clean
+      - name: Build linux (sysdeps)
+        run: |
+          make features
+          make SYSDEPS=true -j $(nproc)
 
   source-tarball:
     runs-on: ubuntu-20.04

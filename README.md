@@ -248,7 +248,6 @@ Other relevant reasons include:
 
  - LV2 plugin version from the start
  - Proper dark mode support
- - Proper optimized build (because all code is compiled to a single file, we can use LTO over the whole thing)
  - Real CV ports to and from the plugin
  - Removing online access from the plugin and included modules (no phone-home here!)
  - Works as a test case for [DPF](https://github.com/DISTRHO/DPF/) and [Carla](https://github.com/falkTX/Carla/)
