@@ -372,8 +372,10 @@ jobs:
           ${{ matrix.target == 'nosimd' }} && export SUFFIX="-nosimd"
           VERSION=$(cat Makefile | awk 'sub("VERSION = ","")')
           cd bin
-          sed -i "s/CardinalMini${SUFFIX}\./CardinalMini${SUFFIX}-v${VERSION}\./g" *.html *.js
-          sed -i "s/CardinalNative${SUFFIX}\./CardinalNative${SUFFIX}-v${VERSION}\./g" *.html *.js
+          sed -i "s/CardinalMini\./CardinalMini-v${VERSION}\./g" *.html *.js
+          sed -i "s/CardinalNative\./CardinalNative-v${VERSION}\./g" *.html *.js
+          sed -i "s/CardinalMini-nosimd\./CardinalMini-nosimd-v${VERSION}\./g" *.html *.js
+          sed -i "s/CardinalNative-nosimd\./CardinalNative-nosimd-v${VERSION}\./g" *.html *.js
           mv CardinalMini.data   CardinalMini${SUFFIX}-v${VERSION}.data
           mv CardinalMini.js     CardinalMini${SUFFIX}-v${VERSION}.js
           mv CardinalMini.wasm   CardinalMini${SUFFIX}-v${VERSION}.wasm

@@ -128,6 +128,7 @@
         spinnerElement.style.display = 'none';
       } else {
         var canvasWrapper = document.getElementById('canvas_wrapper');
+        var simdSupported = WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,5,1,96,0,1,123,3,2,1,0,10,10,1,8,0,65,0,253,15,253,98,11]));
 
         var Module = {
           preRun: [],
@@ -137,6 +138,9 @@
             spinnerElement.style.display = 'none';
             canvasWrapper.style.display = 'block';
             window.dispatchEvent(new Event('resize'));
+          },
+          locateFile: function(p,_) {
+            return p.replace("CardinalMini"+".", simdSupported ? "CardinalMini." : "CardinalMini-nosimd.");
           },
           canvas: (function() {
             var canvas = document.getElementById('canvas');
@@ -187,10 +191,10 @@
         };
 
         var jsModuleName;
-        if (!WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,5,1,96,0,1,123,3,2,1,0,10,10,1,8,0,65,0,253,15,253,98,11]))) {
-          jsModuleName = "CardinalMini-nosimd.js";
-        } else {
+        if (simdSupported) {
           jsModuleName = "CardinalMini.js";
+        } else {
+          jsModuleName = "CardinalMini-nosimd.js";
         }
         var jsModuleScript = document.createElement('script');
         jsModuleScript.setAttribute('async', true);
