@@ -251,6 +251,7 @@ install:
 	install -d $(DESTDIR)$(PREFIX)/bin
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/Cardinal.lv2
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/CardinalFX.lv2
+	install -d $(DESTDIR)$(PREFIX)/lib/lv2/CardinalMini.lv2
 	install -d $(DESTDIR)$(PREFIX)/lib/lv2/CardinalSynth.lv2
 	install -d $(DESTDIR)$(PREFIX)/lib/clap/Cardinal.clap
 	install -d $(DESTDIR)$(PREFIX)/lib/vst/Cardinal.vst
@@ -264,6 +265,7 @@ endif
 
 	install -m 644 bin/Cardinal.lv2/*.*      $(DESTDIR)$(PREFIX)/lib/lv2/Cardinal.lv2/
 	install -m 644 bin/CardinalFX.lv2/*.*    $(DESTDIR)$(PREFIX)/lib/lv2/CardinalFX.lv2/
+	install -m 644 bin/CardinalMini.lv2/*.*  $(DESTDIR)$(PREFIX)/lib/lv2/CardinalMini.lv2/
 	install -m 644 bin/CardinalSynth.lv2/*.* $(DESTDIR)$(PREFIX)/lib/lv2/CardinalSynth.lv2/
 
 	install -m 644 bin/Cardinal.clap/*.*     $(DESTDIR)$(PREFIX)/lib/clap/Cardinal.clap/
@@ -276,6 +278,7 @@ ifneq ($(VST3_BINARY_DIR),)
 endif
 
 	install -m 755 bin/Cardinal$(APP_EXT)       $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 bin/CardinalMini$(APP_EXT)   $(DESTDIR)$(PREFIX)/bin/
 	install -m 755 bin/CardinalNative$(APP_EXT) $(DESTDIR)$(PREFIX)/bin/
 
 	cp -rL bin/Cardinal.lv2/resources/* $(DESTDIR)$(PREFIX)/share/cardinal/
