@@ -105,7 +105,7 @@ jobs:
           PKG_CONFIG_PATH: /usr/lib/${{ matrix.target }}-linux-gnu/pkgconfig
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh linux-${{ matrix.target }} && ./deps/PawPaw/.cleanup.sh linux-${{ matrix.target }}
-      - name: Build linux arm64 cross-compiled
+      - name: Build linux
         run: |
           pushd deps/PawPaw; source local.env linux-${{ matrix.target }}; popd
           export PATH="/usr/lib/ccache:${PATH}"
@@ -121,10 +121,10 @@ jobs:
         run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || env.SHA8 }}
+          name: ${{ github.event.repository.name }}-linux-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
       - uses: softprops/action-gh-release@v1
@@ -265,7 +265,7 @@ jobs:
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           pushd deps/PawPaw; source local.env macos-${{ matrix.target }}; popd
           git clone --depth=1 -b v6.1.6 https://github.com/DISTRHO/JUCE.git jucewrapper/JUCE
-          # sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
+          ${{ matrix.target == 'intel' }} && sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
           mkdir -p jucewrapper/build
           pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/

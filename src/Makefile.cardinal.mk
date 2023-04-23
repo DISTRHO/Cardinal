@@ -337,7 +337,7 @@ LINK_FLAGS += -ldl
 endif
 endif
 
-ifeq ($(BSD)$(DEBUG),true)
+ifeq ($(BSD)$(DEBUG),truetrue)
 LINK_FLAGS += -lexecinfo
 endif
 
