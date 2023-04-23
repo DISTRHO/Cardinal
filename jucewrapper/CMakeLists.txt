@@ -237,7 +237,6 @@ target_link_libraries(Cardinal
         -lmagic
     PUBLIC
         juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
 #]]
 
@@ -340,7 +339,6 @@ target_link_libraries(CardinalFX
         -lmagic
     PUBLIC
         juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
 
 # MIDI variant
@@ -442,7 +440,6 @@ target_link_libraries(CardinalMIDI
         -lmagic
     PUBLIC
         juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
 
 # Synth variant
@@ -544,5 +541,4 @@ target_link_libraries(CardinalSynth
         -lmagic
     PUBLIC
         juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)

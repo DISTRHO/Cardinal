@@ -8,16 +8,22 @@ ifeq ($(ROOT),)
 $(error invalid usage)
 endif
 
+ifeq ($(NOSIMD),true)
+ifneq (,$(findstring -msse,$(CXXFLAGS)))
+$(error NOSIMD build requested but -msse compiler flag is present in CXXFLAGS)
+endif
+endif
+
 # -----------------------------------------------------------------------------
 # Import base definitions
 
-DISTRHO_NAMESPACE = CardinalDISTRHO
-DGL_NAMESPACE = CardinalDGL
-NVG_DISABLE_SKIPPING_WHITESPACE = true
-NVG_FONT_TEXTURE_FLAGS = NVG_IMAGE_NEAREST
-USE_NANOVG_FBO = true
-WASM_EXCEPTIONS = true
-WINDOWS_ICON_ID = 401
+export DISTRHO_NAMESPACE = CardinalDISTRHO
+export DGL_NAMESPACE = CardinalDGL
+export NVG_DISABLE_SKIPPING_WHITESPACE = true
+export NVG_FONT_TEXTURE_FLAGS = NVG_IMAGE_NEAREST
+export USE_NANOVG_FBO = true
+export WASM_EXCEPTIONS = true
+export WINDOWS_ICON_ID = 401
 include $(ROOT)/dpf/Makefile.base.mk
 
 DGL_EXTRA_ARGS = \

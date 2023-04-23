@@ -219,7 +219,7 @@ endif
 endif
 
 ifeq ($(WASM),true)
-WASM_RESOURCES  = $(LV2_RESOURCES)
+WASM_RESOURCES  = $(TARGET_DIR)/$(NAME).html $(LV2_RESOURCES)
 
 ifneq ($(CARDINAL_VARIANT),mini)
 WASM_RESOURCES += $(CURDIR)/lv2/fomp.lv2/manifest.ttl
@@ -256,6 +256,10 @@ else ifneq ($(CARDINAL_VARIANT),mini)
 FORCE_NATIVE_AUDIO_FALLBACK = true
 endif
 
+ifeq ($(WASM),true)
+APP_EXT = .js
+endif
+
 USE_VST2_BUNDLE = true
 USE_CLAP_BUNDLE = true
 include ../../dpf/Makefile.plugins.mk
@@ -283,10 +287,8 @@ LINK_FLAGS += -sINITIAL_MEMORY=64Mb
 LINK_FLAGS += -sLZ4=1
 
 ifeq ($(CARDINAL_VARIANT),mini)
-LINK_FLAGS += --shell-file=../emscripten/CardinalMini.html
 LINK_FLAGS += --preload-file=../../bin/CardinalMini.lv2/resources@/resources
 else
-LINK_FLAGS += --shell-file=../emscripten/CardinalNative.html
 LINK_FLAGS += --preload-file=../../bin/CardinalNative.lv2/resources@/resources
 LINK_FLAGS += --preload-file=./jsfx
 LINK_FLAGS += --preload-file=./lv2
@@ -434,6 +436,10 @@ $(TARGET_DIR)/%.app/Contents/Resources/distrho.icns: ../../utils/distrho.icns
 # Extra rules for wasm resources
 
 ifeq ($(WASM),true)
+$(TARGET_DIR)/$(NAME).html: ../emscripten/$(NAME).html
+	-@mkdir -p $(shell dirname $@)
+	cp $< $@
+
 $(CURDIR)/lv2/fomp.lv2/manifest.ttl: $(TARGET_DIR)/$(NAME).lv2/resources/PluginManifests/Cardinal.json
 	wget -O - https://falktx.com/data/wasm-things-2022-08-15.tar.gz | tar xz -C $(CURDIR)
 	touch $@

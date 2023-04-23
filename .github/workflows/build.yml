@@ -107,8 +107,8 @@ jobs:
           ./deps/PawPaw/bootstrap-cardinal.sh linux-${{ matrix.target }} && ./deps/PawPaw/.cleanup.sh linux-${{ matrix.target }}
       - name: Build linux
         run: |
-          pushd deps/PawPaw; source local.env linux-${{ matrix.target }}; popd
           export PATH="/usr/lib/ccache:${PATH}"
+          source deps/PawPaw/local.env linux-${{ matrix.target }}
           export PKG_CONFIG_PATH+=:/usr/lib/${{ matrix.target }}-linux-gnu/pkgconfig
           make features
           make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
@@ -169,7 +169,7 @@ jobs:
           path: |
             *.tar.gz
 
-  linux-headless:
+  headless:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -186,7 +186,7 @@ jobs:
           make HEADLESS=true features
           make HEADLESS=true -j $(nproc)
 
-  linux-lto:
+  lto:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -202,7 +202,7 @@ jobs:
           make features
           make WITH_LTO=true -j $(nproc)
 
-  linux-sysdeps:
+  sysdeps:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -256,32 +256,32 @@ jobs:
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          pushd deps/PawPaw; source local.env macos-${{ matrix.target }}; popd
+          source deps/PawPaw/local.env macos-${{ matrix.target }}
           make features
           make NOOPT=true -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS (AU using juce)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          pushd deps/PawPaw; source local.env macos-${{ matrix.target }}; popd
+          source deps/PawPaw/local.env macos-${{ matrix.target }}
           git clone --depth=1 -b v6.1.6 https://github.com/DISTRHO/JUCE.git jucewrapper/JUCE
           ${{ matrix.target == 'intel' }} && sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
           mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
+          pushd jucewrapper/build; cmake -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS (intel packaging)
         if: ${{ steps.cache.outputs.cache-hit == 'true' && matrix.target == 'intel' }}
         env:
           MACOS_ARCHS: 'x86_64'
         run: |
-          pushd deps/PawPaw; source local.env macos-${{ matrix.target }}; popd
+          source deps/PawPaw/local.env macos-${{ matrix.target }}
           ./utils/create-macos-installer.sh
       - name: Build macOS (universal packaging)
         if: ${{ steps.cache.outputs.cache-hit == 'true' && matrix.target == 'universal' }}
         env:
           MACOS_ARCHS: 'arm64,x86_64'
         run: |
-          pushd deps/PawPaw; source local.env macos-${{ matrix.target }}; popd
+          source deps/PawPaw/local.env macos-${{ matrix.target }}
           ./utils/create-macos-installer.sh
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -308,7 +308,17 @@ jobs:
           files: |
             ${{ github.event.repository.name }}-*.pkg
 
-  modduo:
+  modaudio:
+    strategy:
+      matrix:
+        include:
+          - name: modduo
+            target: modduo-static
+            extraflags: MODDUO=true
+          - name: modduox
+            target: modduox-static
+          - name: moddwarf
+            target: moddwarf
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -320,7 +330,7 @@ jobs:
         with:
           path: |
             ~/mod-workdir
-          key: modduo-static-v${{ env.CACHE_VERSION }}
+          key: ${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
@@ -332,112 +342,29 @@ jobs:
         run: |
           git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
           sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
-          $(pwd)/deps/mod-plugin-builder/bootstrap.sh modduo-static minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduo-static
-      - name: Build for modduo
+          $(pwd)/deps/mod-plugin-builder/bootstrap.sh ${{ matrix.target }} minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh ${{ matrix.target }}
+      - name: Build for modaudio
         if: steps.mpb-cache.outputs.cache-hit == 'true'
         run: |
-          make HEADLESS=true modduo-features
-          make HEADLESS=true MODDUO=true modduo -j $(nproc)
+          make HEADLESS=true ${{ matrix.name }}-features
+          make HEADLESS=true ${{ matrix.extraflags }} ${{ matrix.name }} -j $(nproc)
       - name: Set sha8
         id: slug
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Pack binaries
         if: steps.mpb-cache.outputs.cache-hit == 'true'
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep lv2)
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-${{ matrix.name }}-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep lv2)
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || env.SHA8 }}
-          path: |
-            *.tar.gz
-
-  modduox:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up cache
-        uses: actions/cache@v3
-        id: mpb-cache
-        with:
-          path: |
-            ~/mod-workdir
-          key: modduox-v${{ env.CACHE_VERSION }}
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
-          sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
-          sudo apt-get clean
-      - name: Bootstrap toolchain
-        if: steps.mpb-cache.outputs.cache-hit != 'true'
-        run: |
-          git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
-          sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
-          $(pwd)/deps/mod-plugin-builder/bootstrap.sh modduox-static minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduox-static
-      - name: Build for modduox
-        if: steps.mpb-cache.outputs.cache-hit == 'true'
-        run: |
-          make HEADLESS=true modduox-features
-          make HEADLESS=true modduox -j $(nproc)
-      - name: Set sha8
-        id: slug
-        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
-      - name: Pack binaries
-        if: steps.mpb-cache.outputs.cache-hit == 'true'
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || env.SHA8 }}
-          path: |
-            *.tar.gz
-
-  moddwarf:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up cache
-        uses: actions/cache@v3
-        id: mpb-cache
-        with:
-          path: |
-            ~/mod-workdir
-          key: moddwarf-v${{ env.CACHE_VERSION }}
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
-          sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
-          sudo apt-get clean
-      - name: Bootstrap toolchain
-        if: steps.mpb-cache.outputs.cache-hit != 'true'
-        run: |
-          git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
-          sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
-          $(pwd)/deps/mod-plugin-builder/bootstrap.sh moddwarf minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh moddwarf
-      - name: Build for moddwarf
-        if: steps.mpb-cache.outputs.cache-hit == 'true'
-        run: |
-          make HEADLESS=true moddwarf-features
-          make HEADLESS=true moddwarf -j $(nproc)
-      - name: Set sha8
-        id: slug
-        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
-      - name: Pack binaries
-        if: steps.mpb-cache.outputs.cache-hit == 'true'
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || env.SHA8 }}
+          name: ${{ github.event.repository.name }}-${{ matrix.name }}-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
 
   wasm:
+    strategy:
+      matrix:
+        target: [simd, nosimd]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -458,7 +385,7 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: wasm-v${{ env.CACHE_VERSION }}
+          key: wasm-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
@@ -468,115 +395,40 @@ jobs:
           cd ~/PawPawBuilds/emsdk && ./emsdk install ${{ env.EMSCRIPTEN_VERSION }} && ./emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
       - name: Build extra dependencies
         run: |
+          ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
           ./deps/PawPaw/bootstrap-cardinal.sh wasm && ./deps/PawPaw/.cleanup.sh wasm
       - name: Build wasm cross-compiled
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
+          ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
-          pushd deps/PawPaw; source local.env wasm; popd
-          make features
-          make HAVE_LIBLO=false NOOPT=true -j $(nproc)
-      - name: Make wasm versioned and compress
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          VERSION=$(cat Makefile | awk 'sub("VERSION = ","")')
-          cd bin
-          sed -i "s/CardinalMini\./CardinalMini-v${VERSION}\./g" *.html *.js
-          sed -i "s/CardinalNative\./CardinalNative-v${VERSION}\./g" *.html *.js
-          mv CardinalMini.data CardinalMini-v${VERSION}.data
-          mv CardinalMini.js   CardinalMini-v${VERSION}.js
-          mv CardinalMini.wasm CardinalMini-v${VERSION}.wasm
-          mv CardinalNative.data CardinalNative-v${VERSION}.data
-          mv CardinalNative.js   CardinalNative-v${VERSION}.js
-          mv CardinalNative.wasm CardinalNative-v${VERSION}.wasm
-          brotli -k -q 11 *.data *.html *.js *.wasm
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
-      - name: Pack binaries
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm)
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || env.SHA8 }}
-          path: |
-            *.zip
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.zip
-
-  wasm-noopt:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: wasm-noopt-v${{ env.CACHE_VERSION }}
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq brotli gperf
-          sudo apt-get clean
-          [ -e ~/PawPawBuilds/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/PawPawBuilds/emsdk
-          cd ~/PawPawBuilds/emsdk && ./emsdk install ${{ env.EMSCRIPTEN_VERSION }} && ./emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
-      - name: Build extra dependencies
-        env:
-          PAWPAW_NOSIMD: 1
-        run: |
-          source ~/PawPawBuilds/emsdk/emsdk_env.sh
-          ./deps/PawPaw/bootstrap-cardinal.sh wasm && ./deps/PawPaw/.cleanup.sh wasm
-      - name: Build wasm-noopt cross-compiled
-        if: steps.cache.outputs.cache-hit == 'true'
-        env:
-          PAWPAW_NOSIMD: 1
-          NOSIMD: true
-        run: |
-          source ~/PawPawBuilds/emsdk/emsdk_env.sh
-          pushd deps/PawPaw; source local.env wasm; popd
+          source deps/PawPaw/local.env wasm
           # FIXME send patch upstream, assuming this works..
           sed -i -e 's/defined(__riscv)/defined(__riscv) || defined(__EMSCRIPTEN__)/' plugins/surgext/surge/src/common/globals.h
           make features
-          make HAVE_LIBLO=false NOOPT=true -j $(nproc)
-          make HAVE_LIBLO=false NOOPT=true -j $(nproc) -C src/CardinalMiniSep modgui
-      - name: Make wasm-noopt versioned and compress
+          make HAVE_LIBLO=false NOOPT=true NOSIMD=${{ matrix.target == 'nosimd' }} -j $(nproc)
+      - name: Build modgui
+        if: ${{ steps.cache.outputs.cache-hit == 'true' && matrix.target == 'nosimd' }}
+        run: |
+          ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
+          source ~/PawPawBuilds/emsdk/emsdk_env.sh
+          source deps/PawPaw/local.env wasm
+          make HAVE_LIBLO=false NOOPT=true NOSIMD=true -j $(nproc) -C src/CardinalMiniSep modgui
+      - name: Make wasm versioned and compress
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
+          ${{ matrix.target == 'nosimd' }} && export SUFFIX="-nosimd"
           VERSION=$(cat Makefile | awk 'sub("VERSION = ","")')
           cd bin
-          sed -i "s/CardinalMini\./CardinalMini-noopt-v${VERSION}\./g" *.html *.js
-          sed -i "s/CardinalNative\./CardinalNative-noopt-v${VERSION}\./g" *.html *.js
-          mv CardinalMini.data CardinalMini-noopt-v${VERSION}.data
-          mv CardinalMini.js   CardinalMini-noopt-v${VERSION}.js
-          mv CardinalMini.wasm CardinalMini-noopt-v${VERSION}.wasm
-          mv CardinalNative.data CardinalNative-noopt-v${VERSION}.data
-          mv CardinalNative.js   CardinalNative-noopt-v${VERSION}.js
-          mv CardinalNative.wasm CardinalNative-noopt-v${VERSION}.wasm
+          sed -i "s/CardinalMini${SUFFIX}\./CardinalMini${SUFFIX}-v${VERSION}\./g" *.html *.js
+          sed -i "s/CardinalNative${SUFFIX}\./CardinalNative${SUFFIX}-v${VERSION}\./g" *.html *.js
+          mv CardinalMini.data   CardinalMini${SUFFIX}-v${VERSION}.data
+          mv CardinalMini.js     CardinalMini${SUFFIX}-v${VERSION}.js
+          mv CardinalMini.wasm   CardinalMini${SUFFIX}-v${VERSION}.wasm
+          mv CardinalNative.data CardinalNative${SUFFIX}-v${VERSION}.data
+          mv CardinalNative.js   CardinalNative${SUFFIX}-v${VERSION}.js
+          mv CardinalNative.wasm CardinalNative${SUFFIX}-v${VERSION}.wasm
           brotli -k -q 11 *.data *.html *.js *.wasm
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -587,10 +439,10 @@ jobs:
       - name: Pack binaries
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-noopt-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm-noopt) CardinalMini.lv2/modgui
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm)
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-wasm-noopt-${{ github.event.pull_request.number || env.SHA8 }}
+          name: ${{ github.event.repository.name }}-wasm-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.zip
       - uses: softprops/action-gh-release@v1
@@ -660,21 +512,21 @@ jobs:
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env ${{ matrix.target }}; popd
+          source deps/PawPaw/local.env ${{ matrix.target }}
           make features
           make NOOPT=true -j $(nproc)
       - name: Build cross-compiled (carla)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env ${{ matrix.target }}; popd
+          source deps/PawPaw/local.env ${{ matrix.target }}
           make carla-win32 -j $(nproc)
           make -C carla EMBED_TARGET=true TESTING=true dist
           make -C carla EMBED_TARGET=true TESTING=true dist
       - name: Build cross-compiled (packaging)
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          pushd deps/PawPaw; source local.env ${{ matrix.target }}; popd
+          source deps/PawPaw/local.env ${{ matrix.target }}
           xvfb-run ./utils/create-windows-installer.sh ${{ matrix.target }}
           make unzipfx
       - name: Set sha8 (non-release)
