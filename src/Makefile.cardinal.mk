@@ -4,10 +4,6 @@
 # Created by falkTX
 #
 
-BUILDING_RACK = true
-ROOT = ../..
-include $(ROOT)/Makefile.base.mk
-
 # -----------------------------------------------------------------------------
 # Set variant to build
 
@@ -57,6 +53,21 @@ CARLA_EXTRA_LIBS += $(CARLA_BUILD_DIR)/modules/$(CARLA_BUILD_TYPE)/zita-resample
 
 endif # STATIC_BUILD
 endif # CARDINAL_VARIANT mini
+
+# --------------------------------------------------------------
+# Import base definitions
+
+ifeq ($(CARDINAL_VARIANT),main)
+# main variant should not use rtaudio/sdl2 fallback (it has CV ports)
+SKIP_NATIVE_AUDIO_FALLBACK = true
+else ifneq ($(CARDINAL_VARIANT),mini)
+# other variants should only use rtaudio/sdl2 fallbacks
+FORCE_NATIVE_AUDIO_FALLBACK = true
+endif
+
+BUILDING_RACK = true
+ROOT = ../..
+include $(ROOT)/Makefile.base.mk
 
 # --------------------------------------------------------------
 # Build config
@@ -247,14 +258,6 @@ endif
 
 # --------------------------------------------------------------
 # Do some magic
-
-ifeq ($(CARDINAL_VARIANT),main)
-# main variant should not use rtaudio/sdl2 fallback (it has CV ports)
-SKIP_NATIVE_AUDIO_FALLBACK = true
-else ifneq ($(CARDINAL_VARIANT),mini)
-# other variants should only use rtaudio/sdl2 fallbacks
-FORCE_NATIVE_AUDIO_FALLBACK = true
-endif
 
 ifeq ($(WASM),true)
 APP_EXT = .js
