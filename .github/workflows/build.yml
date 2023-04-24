@@ -172,7 +172,7 @@ jobs:
   macos:
     strategy:
       matrix:
-        target: [intel, universal]
+        target: [universal-10.15]
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v3

@@ -18,6 +18,9 @@
 # include "ghc/filesystem.hpp"
 #endif
 
+template class RTNeural::Model<float>;
+template class RTNeural::Layer<float>;
+
 // --------------------------------------------------------------------------------------------------------------------
 
 /* Define a constexpr for converting a gain in dB to a coefficient */
@@ -169,6 +172,7 @@ struct AidaPluginModule : Module {
         configParam(PARAM_INPUT_LEVEL, -12.f, 12.f, 0.f, "Input level", " dB");
         configParam(PARAM_OUTPUT_LEVEL, -12.f, 12.f, 0.f, "Output level", " dB");
 
+        in_lpf.setFc(MAP(66.216f, 0.0f, 100.0f, INLPF_MAX_CO, INLPF_MIN_CO));
         inlevel.setTau(1 / 30.f);
         outlevel.setTau(1 / 30.f);
     }
@@ -335,8 +339,6 @@ struct AidaPluginModule : Module {
     void onSampleRateChange(const SampleRateChangeEvent& e) override
     {
         dc_blocker.setFc(35.0f / e.sampleRate);
-
-        in_lpf.setFc(MAP(66.216f, 0.0f, 100.0f, INLPF_MAX_CO, INLPF_MIN_CO));
     }
 
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AidaPluginModule)
