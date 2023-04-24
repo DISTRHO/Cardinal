@@ -90,8 +90,9 @@ BASE_FLAGS += -D_WIN32_WINNT=0x0600
 BASE_FLAGS += -I$(abspath $(ROOT)/include/mingw-compat)
 endif
 
-BASE_OPTS += -fno-finite-math-only
-BASE_OPTS += -fno-strict-aliasing
+# make sure these flags always end up last
+BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
+BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 
 # -----------------------------------------------------------------------------
 # Rack build flags
