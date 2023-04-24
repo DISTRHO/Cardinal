@@ -140,7 +140,7 @@
             window.dispatchEvent(new Event('resize'));
           },
           locateFile: function(p,_) {
-            return p.replace("CardinalNative"+".", simdSupported ? "CardinalNative." : "CardinalNative-nosimd.");
+            return simdSupported ? p : p.replace("CardinalNative",  "CardinalNative-nosimd");
           },
           canvas: (function() {
             var canvas = document.getElementById('canvas');

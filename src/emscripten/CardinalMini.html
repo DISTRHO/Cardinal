@@ -140,7 +140,7 @@
             window.dispatchEvent(new Event('resize'));
           },
           locateFile: function(p,_) {
-            return p.replace("CardinalMini"+".", simdSupported ? "CardinalMini." : "CardinalMini-nosimd.");
+            return simdSupported ? p : p.replace("CardinalMini",  "CardinalMini-nosimd");
           },
           canvas: (function() {
             var canvas = document.getElementById('canvas');
