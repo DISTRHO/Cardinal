@@ -227,3 +227,6 @@
 [submodule "plugins/Sapphire"]
 	path = plugins/Sapphire
 	url = https://github.com/cosinekitty/sapphire.git
+[submodule "plugins/Cardinal/src/AIDA-X/RTNeural"]
+	path = plugins/Cardinal/src/AIDA-X/RTNeural
+	url = https://github.com/jatinchowdhury18/RTNeural.git

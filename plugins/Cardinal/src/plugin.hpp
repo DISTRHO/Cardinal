@@ -28,6 +28,7 @@ using namespace rack;
 
 extern Plugin* pluginInstance;
 
+extern Model* modelAidaX;
 extern Model* modelAudioFile;
 extern Model* modelAudioToCVPitch;
 extern Model* modelCarla;

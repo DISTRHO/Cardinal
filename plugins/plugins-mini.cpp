@@ -212,6 +212,7 @@ static void initStatic__Cardinal()
         /*
        #endif
         */
+        spl.removeModule("AIDA-X");
         spl.removeModule("AudioFile");
         spl.removeModule("Blank");
         spl.removeModule("Carla");

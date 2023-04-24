@@ -223,6 +223,7 @@ MINIPLUGIN_FILES = plugins-mini.cpp
 # --------------------------------------------------------------
 # Cardinal (built-in)
 
+PLUGIN_FILES += Cardinal/src/AIDA-X.cpp
 PLUGIN_FILES += Cardinal/src/Blank.cpp
 PLUGIN_FILES += Cardinal/src/ExpanderInputMIDI.cpp
 PLUGIN_FILES += Cardinal/src/ExpanderOutputMIDI.cpp
@@ -1307,6 +1308,20 @@ CARLA_FLAGS += -DDISTRHO_RUNNER_INDIRECT_WASM_CALLS
 endif
 
 # --------------------------------------------------------------
+# RTNeural flags, used in AIDA-X
+
+RTNEURAL_FLAGS  = -std=gnu++17
+RTNEURAL_FLAGS += -DRTNEURAL_DEFAULT_ALIGNMENT=16
+RTNEURAL_FLAGS += -DRTNEURAL_USE_EIGEN=1
+
+ifeq ($(WASM),true)
+RTNEURAL_FLAGS += -DEIGEN_DONT_VECTORIZE=1
+endif
+
+RTNEURAL_FLAGS += -ICardinal/src/AIDA-X/RTNeural
+RTNEURAL_FLAGS += -ICardinal/src/AIDA-X/RTNeural/modules/Eigen
+
+# --------------------------------------------------------------
 # Build targets
 
 ifeq ($(HEADLESS),true)
@@ -1973,6 +1988,19 @@ $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 		-Dstbtt_fontinfo=stbtt_fontinfo_cardinal \
 		-Dstbrp_node=stbrp_node_cardinal \
 		-Dstbrp_rect=stbrp_rect_cardinal \
+		$(CARLA_FLAGS)
+
+$(BUILD_DIR)/Cardinal/src/AIDA-X.cpp.o: Cardinal/src/AIDA-X.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		-DpluginInstance=pluginInstance__Cardinal \
+		-Dstbrp_context=stbrp_context_cardinal \
+		-Dstbrp_coord=stbrp_coord_cardinal \
+		-Dstbtt_fontinfo=stbtt_fontinfo_cardinal \
+		-Dstbrp_node=stbrp_node_cardinal \
+		-Dstbrp_rect=stbrp_rect_cardinal \
+		$(RTNEURAL_FLAGS) \
 		$(CARLA_FLAGS)
 
 $(BUILD_DIR)/21kHz/%.cpp.o: 21kHz/%.cpp
