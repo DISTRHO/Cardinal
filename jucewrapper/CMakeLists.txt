@@ -98,7 +98,7 @@ add_library(surgedep04 STATIC IMPORTED)
 add_library(surgedep05 STATIC IMPORTED)
 add_library(surgedep06 STATIC IMPORTED)
 add_library(surgedep07 STATIC IMPORTED)
-add_library(surgedep08 STATIC IMPORTED)
+#add_library(surgedep08 STATIC IMPORTED)
 add_library(surgedep09 STATIC IMPORTED)
 add_library(surgedep10 STATIC IMPORTED)
 
@@ -109,7 +109,7 @@ set_property(TARGET surgedep04 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/lib
 set_property(TARGET surgedep05 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/fmt/libfmt.a")
 set_property(TARGET surgedep06 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sqlite-3.23.3/libsqlite.a")
 set_property(TARGET surgedep07 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libsst-plugininfra.a")
-set_property(TARGET surgedep08 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libs/filesystem/libfilesystem.a")
+#set_property(TARGET surgedep08 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libs/filesystem/libfilesystem.a")
 set_property(TARGET surgedep09 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libs/strnatcmp/libstrnatcmp.a")
 set_property(TARGET surgedep10 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libs/tinyxml/libtinyxml.a")
 
@@ -212,7 +212,7 @@ target_link_libraries(Cardinal
         surgedep05
         surgedep06
         surgedep07
-        surgedep08
+        #surgedep08
         surgedep09
         surgedep10
         libaubio
@@ -314,7 +314,7 @@ target_link_libraries(CardinalFX
         surgedep05
         surgedep06
         surgedep07
-        surgedep08
+        #surgedep08
         surgedep09
         surgedep10
         libaubio
@@ -415,7 +415,7 @@ target_link_libraries(CardinalMIDI
         surgedep05
         surgedep06
         surgedep07
-        surgedep08
+        #surgedep08
         surgedep09
         surgedep10
         libaubio
@@ -516,7 +516,7 @@ target_link_libraries(CardinalSynth
         surgedep05
         surgedep06
         surgedep07
-        surgedep08
+        #surgedep08
         surgedep09
         surgedep10
         libaubio
