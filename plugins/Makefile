@@ -1311,6 +1311,9 @@ endif
 # RTNeural flags, used in AIDA-X
 
 RTNEURAL_FLAGS  = -std=gnu++17
+RTNEURAL_FLAGS += -DBiquad=AidaBiquad
+RTNEURAL_FLAGS += -Dconst_blas_data_mapper=Aida_const_blas_data_mapper
+RTNEURAL_FLAGS += -Devaluator=Aida_evaluator
 RTNEURAL_FLAGS += -DSKIP_MINGW_FORMAT
 RTNEURAL_FLAGS += -DRTNEURAL_DEFAULT_ALIGNMENT=16
 RTNEURAL_FLAGS += -DRTNEURAL_USE_EIGEN=1
