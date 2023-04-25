@@ -220,15 +220,8 @@ jobs:
           mkdir -p jucewrapper/build
           pushd jucewrapper/build; cmake -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
-      - name: Build macOS (intel packaging)
-        if: ${{ steps.cache.outputs.cache-hit == 'true' && matrix.target == 'intel' }}
-        env:
-          MACOS_ARCHS: 'x86_64'
-        run: |
-          source deps/PawPaw/local.env macos-${{ matrix.target }}
-          ./utils/create-macos-installer.sh
-      - name: Build macOS (universal packaging)
-        if: ${{ steps.cache.outputs.cache-hit == 'true' && matrix.target == 'universal' }}
+      - name: Build macOS (packaging)
+        if: steps.cache.outputs.cache-hit == 'true'
         env:
           MACOS_ARCHS: 'arm64,x86_64'
         run: |
