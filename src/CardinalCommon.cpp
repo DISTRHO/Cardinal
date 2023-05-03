@@ -378,11 +378,7 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
 {
     using namespace rack;
 
-#ifdef DISTRHO_OS_WASM
-    settings::allowCursorLock = true;
-#else
     settings::allowCursorLock = false;
-#endif
     settings::autoCheckUpdates = false;
     settings::autosaveInterval = 0;
     settings::devMode = true;
