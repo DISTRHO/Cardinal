@@ -14,7 +14,7 @@ include $(ROOT)/Makefile.base.mk
 # jucewrapper/CMakeLists.txt `project`
 # src/CardinalCommon.cpp `CARDINAL_VERSION`
 # src/CardinalPlugin.cpp `getVersion`
-VERSION = 23.04
+VERSION = 23.05
 
 # --------------------------------------------------------------
 # Build targets
