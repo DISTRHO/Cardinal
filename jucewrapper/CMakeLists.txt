@@ -43,9 +43,6 @@ set_property(TARGET lilv PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../ca
 add_library(rtmempool STATIC IMPORTED)
 set_property(TARGET rtmempool PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/rtmempool.a")
 
-add_library(sfzero STATIC IMPORTED)
-set_property(TARGET sfzero PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/sfzero.a")
-
 add_library(water STATIC IMPORTED)
 set_property(TARGET water PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/water.a")
 
@@ -206,7 +203,6 @@ target_link_libraries(Cardinal
         jackbridge
         lilv
         rtmempool
-        sfzero
         water
         ysfx
         zita_resampler
@@ -308,7 +304,6 @@ target_link_libraries(CardinalFX
         jackbridge
         lilv
         rtmempool
-        sfzero
         water
         ysfx
         zita_resampler
@@ -409,7 +404,6 @@ target_link_libraries(CardinalMIDI
         jackbridge
         lilv
         rtmempool
-        sfzero
         water
         ysfx
         zita_resampler
@@ -510,7 +504,6 @@ target_link_libraries(CardinalSynth
         jackbridge
         lilv
         rtmempool
-        sfzero
         water
         ysfx
         zita_resampler
