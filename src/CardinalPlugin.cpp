@@ -128,6 +128,26 @@ static char* getPatchStorageSlug() {
 };
 #endif
 
+#if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+float RackKnobModeToFloat(const rack::settings::KnobMode knobMode) noexcept
+{
+    switch (knobMode)
+    {
+    case rack::settings::KNOB_MODE_LINEAR:
+        return 0.f;
+    case rack::settings::KNOB_MODE_ROTARY_ABSOLUTE:
+        return 1.f;
+    case rack::settings::KNOB_MODE_ROTARY_RELATIVE:
+        return 2.f;
+    // unused in Rack
+    case rack::settings::KNOB_MODE_SCALED_LINEAR:
+        break;
+    }
+
+    return 0.f;
+}
+#endif
+
 // -----------------------------------------------------------------------------------------------------------
 
 struct ScopedContext {
@@ -203,15 +223,18 @@ public:
         fWindowParameters[kWindowParameterCableTension] = std::min(100.f, std::max(0.f, rack::settings::cableTension * 100));
         fWindowParameters[kWindowParameterRackBrightness] = std::min(100.f, std::max(0.f, rack::settings::rackBrightness * 100));
         fWindowParameters[kWindowParameterHaloBrightness] = std::min(100.f, std::max(0.f, rack::settings::haloBrightness * 100));
-        fWindowParameters[kWindowParameterKnobMode] = 0.0f;
+        fWindowParameters[kWindowParameterKnobMode] = RackKnobModeToFloat(rack::settings::knobMode);
         fWindowParameters[kWindowParameterWheelKnobControl] = rack::settings::knobScroll ? 1.f : 0.f;
         fWindowParameters[kWindowParameterWheelSensitivity] = std::min(10.f, std::max(0.1f, rack::settings::knobScrollSensitivity * 1000));
         fWindowParameters[kWindowParameterLockModulePositions] = rack::settings::lockModules ? 1.f : 0.f;
-        fWindowParameters[kWindowParameterUpdateRateLimit] = 0.0f;
-        fWindowParameters[kWindowParameterBrowserSort] = 3.0f;
-        fWindowParameters[kWindowParameterBrowserZoom] = 50.0f;
+        fWindowParameters[kWindowParameterBrowserSort] = std::min(rack::settings::BROWSER_SORT_RANDOM,
+                                                                  std::max(rack::settings::BROWSER_SORT_UPDATED,
+                                                                           rack::settings::browserSort));
+        fWindowParameters[kWindowParameterBrowserZoom] = std::min(200.f, std::max(25.f, std::pow(2.f, rack::settings::browserZoom) * 100.0f));
         fWindowParameters[kWindowParameterInvertZoom] = rack::settings::invertZoom ? 1.f : 0.f;
         fWindowParameters[kWindowParameterSqueezeModulePositions] = rack::settings::squeezeModules ? 1.f : 0.f;
+        // not saved
+        fWindowParameters[kWindowParameterUpdateRateLimit] = 0.0f;
        #endif
        #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         std::memset(fMiniReportValues, 0, sizeof(fMiniReportValues));
@@ -520,7 +543,7 @@ protected:
                #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
-                parameter.ranges.def = 0.0f;
+                parameter.ranges.def = RackKnobModeToFloat(rack::settings::knobMode);
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 2.0f;
                 parameter.enumValues.count = 3;
@@ -593,24 +616,26 @@ protected:
                #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
-                parameter.ranges.def = 3.0f;
-                parameter.ranges.min = 0.0f;
-                parameter.ranges.max = 5.0f;
+                parameter.ranges.def = std::min(rack::settings::BROWSER_SORT_RANDOM,
+                                                std::max(rack::settings::BROWSER_SORT_UPDATED,
+                                                         rack::settings::browserSort));
+                parameter.ranges.min = rack::settings::BROWSER_SORT_UPDATED;
+                parameter.ranges.max = rack::settings::BROWSER_SORT_RANDOM;
                 parameter.enumValues.count = 6;
                 parameter.enumValues.restrictedMode = true;
                 parameter.enumValues.values = new ParameterEnumerationValue[6];
                 parameter.enumValues.values[0].label = "Updated";
-                parameter.enumValues.values[0].value = 0.0f;
+                parameter.enumValues.values[0].value = rack::settings::BROWSER_SORT_UPDATED;
                 parameter.enumValues.values[1].label = "Last used";
-                parameter.enumValues.values[1].value = 1.0f;
+                parameter.enumValues.values[1].value = rack::settings::BROWSER_SORT_LAST_USED;
                 parameter.enumValues.values[2].label = "Most used";
-                parameter.enumValues.values[2].value = 2.0f;
+                parameter.enumValues.values[2].value = rack::settings::BROWSER_SORT_MOST_USED;
                 parameter.enumValues.values[3].label = "Brand";
-                parameter.enumValues.values[3].value = 3.0f;
+                parameter.enumValues.values[3].value = rack::settings::BROWSER_SORT_BRAND;
                 parameter.enumValues.values[4].label = "Name";
-                parameter.enumValues.values[4].value = 4.0f;
+                parameter.enumValues.values[4].value = rack::settings::BROWSER_SORT_NAME;
                 parameter.enumValues.values[5].label = "Random";
-                parameter.enumValues.values[5].value = 5.0f;
+                parameter.enumValues.values[5].value = rack::settings::BROWSER_SORT_RANDOM;
                 break;
             case kWindowParameterBrowserZoom:
                 parameter.name = "Browser zoom";
@@ -620,7 +645,7 @@ protected:
                 parameter.hints |= kParameterIsHidden;
                #endif
                 parameter.unit = "%";
-                parameter.ranges.def = 50.0f;
+                parameter.ranges.def = std::min(200.f, std::max(25.f, std::pow(2.f, rack::settings::browserZoom) * 100.0f));
                 parameter.ranges.min = 25.0f;
                 parameter.ranges.max = 200.0f;
                 parameter.enumValues.count = 7;

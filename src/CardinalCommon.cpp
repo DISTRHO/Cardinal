@@ -378,13 +378,28 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
 {
     using namespace rack;
 
+    // Cardinal default settings, potentially overriding VCV Rack ones
     settings::allowCursorLock = false;
+    settings::tooltips = true;
+    settings::cableOpacity = 0.5f;
+    settings::cableTension = 0.75f;
+    settings::rackBrightness = 1.0f;
+    settings::haloBrightness = 0.25f;
+    settings::knobMode = settings::KNOB_MODE_LINEAR;
+    settings::knobScroll = false;
+    settings::knobScrollSensitivity = 0.001f;
+    settings::lockModules = false;
+    settings::browserSort = settings::BROWSER_SORT_UPDATED;
+    settings::browserZoom = -1.f;
+    settings::invertZoom = false;
+    settings::squeezeModules = true;
+
+    // runtime behaviour
     settings::devMode = true;
     settings::isPlugin = true;
-    settings::windowPos = math::Vec(0, 0);
-#ifdef HEADLESS_BEHAVIOUR
+   #ifdef HEADLESS_BEHAVIOUR
     settings::headless = true;
-#endif
+   #endif
 
     // copied from https://community.vcvrack.com/t/16-colour-cable-palette/15951
     settings::cableColors = {
