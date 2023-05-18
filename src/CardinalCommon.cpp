@@ -529,7 +529,9 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     INFO("Initializing plugin browser DB");
     app::browserInit();
 
+   #ifndef CARDINAL_COMMON_UI_ONLY
     if (! plugin->isDummyInstance())
+   #endif
     {
         INFO("Loading settings");
         settings::load();
