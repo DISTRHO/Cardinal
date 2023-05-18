@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -44,6 +44,7 @@ enum SpecialPath {
     kSpecialPathCommonProgramFiles,
     kSpecialPathProgramFiles,
     kSpecialPathAppData,
+    kSpecialPathMyDocuments,
 };
 std::string getSpecialPath(SpecialPath type);
 #endif
@@ -54,6 +55,8 @@ extern char* patchRemoteURL;
 extern char* patchStorageSlug;
 #endif
 
+std::string homeDir();
+
 } // namespace rack
 
 // -----------------------------------------------------------------------------------------------------------
@@ -63,11 +66,13 @@ namespace patchUtils {
 void loadDialog();
 void loadPathDialog(const std::string& path, bool asTemplate = false);
 void loadSelectionDialog();
-void loadTemplateDialog();
+void loadTemplate(bool factory);
+void loadTemplateDialog(bool factory);
 void revertDialog();
 void saveDialog(const std::string& path);
 void saveAsDialog();
 void saveAsDialogUncompressed();
+void saveTemplateDialog();
 void appendSelectionContextMenu(rack::ui::Menu* menu);
 void openBrowser(const std::string& url);
 

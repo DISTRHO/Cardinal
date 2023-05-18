@@ -277,8 +277,8 @@ static void downloadRemotePatchSucceeded(const char* const filename)
         return;
     }
 
+    context->patch->path.clear();
     context->scene->rackScroll->reset();
-    context->patch->path = "";
     context->history->setSaved();
 }
 #endif
@@ -415,8 +415,16 @@ public:
 
         setGeometryConstraints(648 * scaleFactor, 538 * scaleFactor);
 
-        if (scaleFactor != 1.0)
+        if (rack::isStandalone() && rack::system::exists(rack::settings::settingsPath))
+        {
+            const double width = std::max(648.f, rack::settings::windowSize.x) * scaleFactor;
+            const double height = std::max(538.f, rack::settings::windowSize.y) * scaleFactor;
+            setSize(width, height);
+        }
+        else if (scaleFactor != 1.0)
+        {
             setSize(DISTRHO_UI_DEFAULT_WIDTH * scaleFactor, DISTRHO_UI_DEFAULT_HEIGHT * scaleFactor);
+        }
 
         rack::window::WindowSetPluginUI(context->window, this);
 
@@ -1137,10 +1145,15 @@ protected:
             WindowSetInternalSize(context->window, rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
 
         const double scaleFactor = getScaleFactor();
-        char sizeString[64];
-        std::snprintf(sizeString, sizeof(sizeString), "%d:%d",
-                      (int)(ev.size.getWidth() / scaleFactor), (int)(ev.size.getHeight() / scaleFactor));
+        const int width = static_cast<int>(ev.size.getWidth() / scaleFactor + 0.5);
+        const int height = static_cast<int>(ev.size.getHeight() / scaleFactor + 0.5);
+
+        char sizeString[64] = {};
+        std::snprintf(sizeString, sizeof(sizeString), "%d:%d", width, height);
         setState("windowSize", sizeString);
+
+        if (rack::isStandalone())
+            rack::settings::windowSize = rack::math::Vec(width, height);
     }
 
     void uiFocus(const bool focus, CrossingMode) override
@@ -1212,7 +1225,10 @@ protected:
         }
 
         context->patch->path = sfilename;
+        context->patch->pushRecentPath(sfilename);
         context->history->setSaved();
+
+        rack::settings::save();
     }
 
 #if 0

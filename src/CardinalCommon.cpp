@@ -76,15 +76,15 @@
 #endif
 
 #if CARDINAL_VARIANT_FX
-# define CARDINAL_TEMPLATE_NAME "init/fx.vcv"
+# define CARDINAL_VARIANT_NAME "fx"
 #elif CARDINAL_VARIANT_MINI
-# define CARDINAL_TEMPLATE_NAME "init/mini.vcv"
+# define CARDINAL_VARIANT_NAME "mini"
 #elif CARDINAL_VARIANT_NATIVE
-# define CARDINAL_TEMPLATE_NAME "init/native.vcv"
+# define CARDINAL_VARIANT_NAME "native"
 #elif CARDINAL_VARIANT_SYNTH
-# define CARDINAL_TEMPLATE_NAME "init/synth.vcv"
+# define CARDINAL_VARIANT_NAME "synth"
 #else
-# define CARDINAL_TEMPLATE_NAME "init/main.vcv"
+# define CARDINAL_VARIANT_NAME "main"
 #endif
 
 #ifdef DISTRHO_OS_WASM
@@ -379,12 +379,8 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     using namespace rack;
 
     settings::allowCursorLock = false;
-    settings::autoCheckUpdates = false;
-    settings::autosaveInterval = 0;
     settings::devMode = true;
     settings::isPlugin = true;
-    settings::skipLoadOnLaunch = true;
-    settings::showTipsOnLaunch = false;
     settings::windowPos = math::Vec(0, 0);
 #ifdef HEADLESS_BEHAVIOUR
     settings::headless = true;
@@ -446,27 +442,58 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
                #elif defined(ARCH_MAC)
                 asset::systemDir = "/Library/Application Support/Cardinal";
                #elif defined(ARCH_WIN)
-                const std::string commonprogfiles = getSpecialPath(kSpecialPathCommonProgramFiles);
-                if (! commonprogfiles.empty())
-                    asset::systemDir = system::join(commonprogfiles, "Cardinal");
+                asset::systemDir = system::join(getSpecialPath(kSpecialPathCommonProgramFiles), "Cardinal");
                #else
                 asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/cardinal";
                #endif
-
                 asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
             }
         }
-
-        asset::userDir = asset::systemDir;
     }
+
+    if (asset::userDir.empty())
+    {
+       #if defined(DISTRHO_OS_WASM)
+        asset::userDir = "/userfiles";
+       #elif defined(ARCH_MAC)
+        asset::userDir = system::join(homeDir(), "Documents", "Cardinal");
+       #elif defined(ARCH_WIN)
+        asset::userDir = system::join(getSpecialPath(kSpecialPathMyDocuments), "Cardinal");
+       #else
+        if (const char* const xdgEnv = getenv("XDG_DOCUMENTS_DIR"))
+            asset::userDir = system::join(xdgEnv, "Cardinal");
+        else
+            asset::userDir = system::join(homeDir(), "Documents", "Cardinal");
+       #endif
+        system::createDirectory(asset::userDir);
+    }
+
+   #ifndef CARDINAL_COMMON_DSP_ONLY
+    if (asset::configDir.empty())
+    {
+       #if defined(ARCH_MAC) || defined(ARCH_WIN) || defined(DISTRHO_OS_WASM)
+        asset::configDir = asset::userDir;
+       #else
+        if (const char* const xdgEnv = getenv("XDG_CONFIG_HOME"))
+            asset::configDir = system::join(xdgEnv, "Cardinal");
+        else
+            asset::configDir = system::join(homeDir(), ".config", "Cardinal");
+        system::createDirectory(asset::configDir);
+       #endif
+    }
+   #endif
+   
+    if (settings::settingsPath.empty())
+        settings::settingsPath = asset::config(CARDINAL_VARIANT_NAME ".json");
 
     const std::string patchesPath = asset::patchesPath();
    #ifdef DISTRHO_OS_WASM
-    templatePath = system::join(patchesPath, CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME);
+    templatePath = system::join(patchesPath, CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME ".vcv");
+    factoryTemplatePath = system::join(patchesPath, "templates/" CARDINAL_VARIANT_NAME ".vcv");
    #else
-    templatePath = system::join(patchesPath, CARDINAL_TEMPLATE_NAME);
+    templatePath = asset::user("templates/" CARDINAL_VARIANT_NAME ".vcv");
+    factoryTemplatePath = system::join(patchesPath, "templates/" CARDINAL_VARIANT_NAME ".vcv");
    #endif
-    factoryTemplatePath = system::join(patchesPath, CARDINAL_TEMPLATE_NAME);
 
     // Log environment
     INFO("%s %s %s, compatible with Rack version %s", APP_NAME.c_str(), APP_EDITION.c_str(), CARDINAL_VERSION.c_str(), APP_VERSION.c_str());
@@ -501,6 +528,27 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
 
     INFO("Initializing plugin browser DB");
     app::browserInit();
+
+    if (! plugin->isDummyInstance())
+    {
+        INFO("Loading settings");
+        settings::load();
+    }
+    
+    // enforce settings that do not make sense as anything else
+    settings::safeMode = false;
+    settings::token.clear();
+    settings::windowMaximized = false;
+    settings::windowPos = math::Vec(0, 0);
+    settings::pixelRatio = 0.0;
+    settings::sampleRate = 0;
+    settings::threadCount = 1;
+    settings::frameSwapInterval = 1;
+    settings::autosaveInterval = 0;
+    settings::skipLoadOnLaunch = true;
+    settings::autoCheckUpdates = false;
+    settings::showTipsOnLaunch = false;
+    settings::tipIndex = -1;
 
 #ifdef CARDINAL_INIT_OSC_THREAD
     INFO("Initializing OSC Remote control");
@@ -537,6 +585,9 @@ Initializer::~Initializer()
         oscServerThread = nullptr;
     }
 #endif
+
+    INFO("Save settings");
+    settings::save();
 
     INFO("Clearing asset paths");
     asset::bundlePath.clear();
@@ -596,6 +647,8 @@ std::string getSpecialPath(const SpecialPath type)
     case kSpecialPathAppData:
         csidl = CSIDL_APPDATA;
         break;
+    case kSpecialPathMyDocuments:
+        csidl = CSIDL_MYDOCUMENTS;
     default:
         return {};
     }
@@ -617,14 +670,14 @@ char* patchStorageSlug = nullptr;
 
 std::string homeDir()
 {
-# ifdef ARCH_WIN
+   #ifdef ARCH_WIN
     return getSpecialPath(kSpecialPathUserProfile);
-# else
+   #else
     if (const char* const home = getenv("HOME"))
         return home;
     if (struct passwd* const pwd = getpwuid(getuid()))
         return pwd->pw_dir;
-# endif
+   #endif
     return {};
 }
 
@@ -719,15 +772,38 @@ void loadSelectionDialog()
     });
 }
 
-void loadTemplateDialog()
+void loadTemplate(const bool factory)
+{
+    try {
+        APP->patch->load(factory ? APP->patch->factoryTemplatePath : APP->patch->templatePath);
+    }
+    catch (Exception& e) {
+        // if user template failed, try the factory one
+        if (!factory)
+            return loadTemplate(true);
+
+        const std::string message = string::f("Could not load template patch, clearing rack: %s", e.what());
+        asyncDialog::create(message.c_str());
+
+        APP->patch->clear();
+        APP->patch->clearAutosave();
+    }
+
+    // load() sets the patch's original patch, but we don't want to use that.
+    APP->patch->path.clear();
+    APP->history->setSaved();
+
+    if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
+        if (remoteDetails->autoDeploy)
+            remoteUtils::sendFullPatchToRemote(remoteDetails);
+}
+
+
+void loadTemplateDialog(const bool factory)
 {
 #ifndef HEADLESS_BEHAVIOUR
-    promptClear("The current patch is unsaved. Clear it and start a new patch?", []() {
-        APP->patch->loadTemplate();
-
-        if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
-            if (remoteDetails->autoDeploy)
-                remoteUtils::sendFullPatchToRemote(remoteDetails);
+    promptClear("The current patch is unsaved. Clear it and start a new patch?", [factory]() {
+        loadTemplate(factory);
     });
 #endif
 }
@@ -772,9 +848,14 @@ static void saveAsDialog(const bool uncompressed)
 {
     std::string dir;
     if (! APP->patch->path.empty())
+    {
         dir = system::getDirectory(APP->patch->path);
+    }
     else
-        dir = homeDir();
+    {
+        dir = asset::user("patches");
+        system::createDirectories(dir);
+    }
 
     CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(pcontext != nullptr,);
@@ -804,6 +885,21 @@ void saveAsDialogUncompressed()
 #ifndef HEADLESS_BEHAVIOUR
     saveAsDialog(true);
 #endif
+}
+
+void saveTemplateDialog()
+{
+    asyncDialog::create("Overwrite template patch?", []{
+        rack::system::createDirectories(system::getDirectory(APP->patch->templatePath));
+
+        try {
+            APP->patch->save(APP->patch->templatePath);
+        }
+        catch (Exception& e) {
+            asyncDialog::create(string::f("Could not save template patch: %s", e.what()).c_str());
+            return;
+        } 
+    });
 }
 
 void openBrowser(const std::string& url)

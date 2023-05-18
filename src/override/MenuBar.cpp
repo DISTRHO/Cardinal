@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -127,19 +127,32 @@ struct FileButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 #ifndef DISTRHO_OS_WASM
-		const char* const NewShortcut = RACK_MOD_CTRL_NAME "+N";
+		constexpr const char* const NewShortcut = RACK_MOD_CTRL_NAME "+N";
 #else
-		const char* const NewShortcut = "";
+		constexpr const char* const NewShortcut = "";
 #endif
 		menu->addChild(createMenuItem("New", NewShortcut, []() {
-			patchUtils::loadTemplateDialog();
+			patchUtils::loadTemplateDialog(false);
 		}));
 
 #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 #ifndef DISTRHO_OS_WASM
+		menu->addChild(createMenuItem("New (factory template)", "", []() {
+			patchUtils::loadTemplateDialog(true);
+		}));
+
 		menu->addChild(createMenuItem("Open / Import...", RACK_MOD_CTRL_NAME "+O", []() {
 			patchUtils::loadDialog();
 		}));
+
+		menu->addChild(createSubmenuItem("Open recent", "", [](ui::Menu* menu) {
+			for (const std::string& path : settings::recentPatchPaths) {
+				std::string name = system::getStem(path);
+				menu->addChild(createMenuItem(name, "", [=]() {
+					patchUtils::loadPathDialog(path, false);
+				}));
+			}
+		}, settings::recentPatchPaths.empty()));
 
 		menu->addChild(createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
 			// NOTE: will do nothing if path is empty, intentionally
@@ -171,6 +184,10 @@ struct FileButton : MenuButton {
 		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
 			patchUtils::revertDialog();
 		}, APP->patch->path.empty()));
+
+		menu->addChild(createMenuItem("Overwrite template", "", []() {
+			patchUtils::saveTemplateDialog();
+		}));
 
 #if defined(HAVE_LIBLO) || ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 #ifdef __MOD_DEVICES__
@@ -724,6 +741,12 @@ struct HelpButton : MenuButton {
 
 		menu->addChild(createMenuItem("Cardinal Project page", "", [=]() {
 			patchUtils::openBrowser("https://github.com/DISTRHO/Cardinal/");
+		}));
+
+		menu->addChild(new ui::MenuSeparator);
+
+		menu->addChild(createMenuItem("Open user folder", "", [=]() {
+			system::openDirectory(asset::user(""));
 		}));
 
 		menu->addChild(new ui::MenuSeparator);

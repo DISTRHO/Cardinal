@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -36,9 +36,18 @@ extern bool forceBlackScrew;
 extern bool forceSilverScrew;
 #endif
 
-std::string userDir; // ignored
+std::string configDir; // points to writable config dir (might be equal to userDir)
+std::string userDir; // points to common writable dir
 std::string systemDir; // points to plugin resources dir (or installed/local Rack dir)
 std::string bundlePath; // points to plugin manifests dir (or empty)
+
+std::string config(std::string filename) {
+    return system::join(configDir, filename);
+}
+
+std::string user(std::string filename) {
+    return system::join(userDir, filename);
+}
 
 // get rid of "res/" prefix
 static inline std::string& trim(std::string& s)
@@ -46,11 +55,6 @@ static inline std::string& trim(std::string& s)
     if (std::strncmp(s.c_str(), "res/", 4) == 0)
         s = s.substr(4, s.size()-4);
     return s;
-}
-
-// ignored, returns the same as `system`
-std::string user(std::string filename) {
-    return system(filename);
 }
 
 // get system resource, trimming "res/" prefix if we are loaded as a plugin bundle

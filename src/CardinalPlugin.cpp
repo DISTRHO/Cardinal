@@ -198,20 +198,20 @@ public:
           fWasBypassed(false)
     {
        #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
-        fWindowParameters[kWindowParameterShowTooltips] = 1.0f;
-        fWindowParameters[kWindowParameterCableOpacity] = 50.0f;
-        fWindowParameters[kWindowParameterCableTension] = 75.0f;
-        fWindowParameters[kWindowParameterRackBrightness] = 100.0f;
-        fWindowParameters[kWindowParameterHaloBrightness] = 25.0f;
+        fWindowParameters[kWindowParameterShowTooltips] = rack::settings::tooltips ? 1.f : 0.f;
+        fWindowParameters[kWindowParameterCableOpacity] = std::min(100.f, std::max(0.f, rack::settings::cableOpacity * 100));
+        fWindowParameters[kWindowParameterCableTension] = std::min(100.f, std::max(0.f, rack::settings::cableTension * 100));
+        fWindowParameters[kWindowParameterRackBrightness] = std::min(100.f, std::max(0.f, rack::settings::rackBrightness * 100));
+        fWindowParameters[kWindowParameterHaloBrightness] = std::min(100.f, std::max(0.f, rack::settings::haloBrightness * 100));
         fWindowParameters[kWindowParameterKnobMode] = 0.0f;
-        fWindowParameters[kWindowParameterWheelKnobControl] = 0.0f;
-        fWindowParameters[kWindowParameterWheelSensitivity] = 1.0f;
-        fWindowParameters[kWindowParameterLockModulePositions] = 0.0f;
+        fWindowParameters[kWindowParameterWheelKnobControl] = rack::settings::knobScroll ? 1.f : 0.f;
+        fWindowParameters[kWindowParameterWheelSensitivity] = std::min(10.f, std::max(0.1f, rack::settings::knobScrollSensitivity * 1000));
+        fWindowParameters[kWindowParameterLockModulePositions] = rack::settings::lockModules ? 1.f : 0.f;
         fWindowParameters[kWindowParameterUpdateRateLimit] = 0.0f;
         fWindowParameters[kWindowParameterBrowserSort] = 3.0f;
         fWindowParameters[kWindowParameterBrowserZoom] = 50.0f;
-        fWindowParameters[kWindowParameterInvertZoom] = 0.0f;
-        fWindowParameters[kWindowParameterSqueezeModulePositions] = 1.0f;
+        fWindowParameters[kWindowParameterInvertZoom] = rack::settings::invertZoom ? 1.f : 0.f;
+        fWindowParameters[kWindowParameterSqueezeModulePositions] = rack::settings::squeezeModules ? 1.f : 0.f;
        #endif
        #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         std::memset(fMiniReportValues, 0, sizeof(fMiniReportValues));
@@ -283,8 +283,6 @@ public:
         {
             context->patch->loadTemplate();
             context->scene->rackScroll->reset();
-            // swap to factory template after first load
-            context->patch->templatePath = context->patch->factoryTemplatePath;
         }
 
        #ifdef CARDINAL_INIT_OSC_THREAD
@@ -463,7 +461,7 @@ protected:
                #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
-                parameter.ranges.def = 1.0f;
+                parameter.ranges.def = rack::settings::tooltips ? 1.f : 0.f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 1.0f;
                 break;
@@ -475,7 +473,7 @@ protected:
                #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
-                parameter.ranges.def = 50.0f;
+                parameter.ranges.def = std::min(100.f, std::max(0.f, rack::settings::cableOpacity * 100));
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 100.0f;
                 break;
@@ -487,7 +485,7 @@ protected:
                #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
-                parameter.ranges.def = 75.0f;
+                parameter.ranges.def = std::min(100.f, std::max(0.f, rack::settings::cableTension * 100));
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 100.0f;
                 break;
@@ -499,7 +497,7 @@ protected:
                #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
-                parameter.ranges.def = 100.0f;
+                parameter.ranges.def = std::min(100.f, std::max(0.f, rack::settings::rackBrightness * 100));
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 100.0f;
                 break;
@@ -511,7 +509,7 @@ protected:
                #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
-                parameter.ranges.def = 25.0f;
+                parameter.ranges.def = std::min(100.f, std::max(0.f, rack::settings::haloBrightness * 100));
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 100.0f;
                 break;
@@ -542,7 +540,7 @@ protected:
                #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
-                parameter.ranges.def = 0.0f;
+                parameter.ranges.def = rack::settings::knobScroll ? 1.f : 0.f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 1.0f;
                 break;
@@ -553,7 +551,7 @@ protected:
                #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
-                parameter.ranges.def = 1.0f;
+                parameter.ranges.def = std::min(10.f, std::max(0.1f, rack::settings::knobScrollSensitivity * 1000));
                 parameter.ranges.min = 0.1f;
                 parameter.ranges.max = 10.0f;
                 break;
@@ -564,7 +562,7 @@ protected:
                #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
-                parameter.ranges.def = 0.0f;
+                parameter.ranges.def = rack::settings::lockModules ? 1.f : 0.f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 1.0f;
                 break;
@@ -650,7 +648,7 @@ protected:
                #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
-                parameter.ranges.def = 0.0f;
+                parameter.ranges.def = rack::settings::invertZoom ? 1.f : 0.f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 1.0f;
                 break;
@@ -661,7 +659,7 @@ protected:
                #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
                 parameter.hints |= kParameterIsHidden;
                #endif
-                parameter.ranges.def = 1.0f;
+                parameter.ranges.def = rack::settings::squeezeModules ? 1.f : 0.f;
                 parameter.ranges.min = 0.0f;
                 parameter.ranges.max = 1.0f;
                 break;
