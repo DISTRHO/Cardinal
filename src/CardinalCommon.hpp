@@ -100,6 +100,7 @@ struct Initializer
 #endif
     std::string templatePath;
     std::string factoryTemplatePath;
+    bool shouldSaveSettings = false;
 
     Initializer(const CardinalBasePlugin* plugin, const CardinalBaseUI* ui);
     ~Initializer();

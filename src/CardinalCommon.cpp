@@ -426,6 +426,12 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     random::init();
     ui::init();
 
+   #ifdef CARDINAL_COMMON_UI_ONLY
+    constexpr const bool isRealInstance = true;
+   #else
+    const bool isRealInstance = !plugin->isDummyInstance();
+   #endif
+
     if (asset::systemDir.empty())
     {
         if (const char* const bundlePath = (plugin != nullptr ? plugin->getBundlePath() :
@@ -480,7 +486,9 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
         else
             asset::userDir = system::join(homeDir(), "Documents", "Cardinal");
        #endif
-        system::createDirectory(asset::userDir);
+
+        if (isRealInstance)
+            system::createDirectory(asset::userDir);
     }
 
    #ifndef CARDINAL_COMMON_DSP_ONLY
@@ -493,7 +501,9 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
             asset::configDir = system::join(xdgEnv, "Cardinal");
         else
             asset::configDir = system::join(homeDir(), ".config", "Cardinal");
-        system::createDirectory(asset::configDir);
+
+        if (isRealInstance)
+            system::createDirectory(asset::configDir);
        #endif
     }
    #endif
@@ -544,14 +554,13 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     INFO("Initializing plugin browser DB");
     app::browserInit();
 
-   #ifndef CARDINAL_COMMON_UI_ONLY
-    if (! plugin->isDummyInstance())
-   #endif
+    if (isRealInstance)
     {
         INFO("Loading settings");
         settings::load();
+        shouldSaveSettings = true;
     }
-    
+
     // enforce settings that do not make sense as anything else
     settings::safeMode = false;
     settings::token.clear();
@@ -603,8 +612,11 @@ Initializer::~Initializer()
     }
 #endif
 
-    INFO("Save settings");
-    settings::save();
+    if (shouldSaveSettings)
+    {
+        INFO("Save settings");
+        settings::save();
+    }
 
     INFO("Clearing asset paths");
     asset::bundlePath.clear();
