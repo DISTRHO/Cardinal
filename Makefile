@@ -201,6 +201,15 @@ gen:
 endif
 
 # --------------------------------------------------------------
+# extra rules, for quick testing
+
+jack: carla deps dgl plugins resources
+	$(MAKE) jack -C src $(CARLA_EXTRA_ARGS)
+
+native: carla deps dgl plugins resources
+	$(MAKE) native -C src $(CARLA_EXTRA_ARGS)
+
+# --------------------------------------------------------------
 # Packaging standalone for CI
 
 unzipfx: deps/unzipfx/unzipfx2cat$(APP_EXT) CardinalJACK.zip CardinalNative.zip

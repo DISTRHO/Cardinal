@@ -34,6 +34,8 @@ static constexpr float MAP(const float x, const float in_min, const float in_max
 
 /* Defines for tone controls */
 static constexpr const float COMMON_Q = 0.707f;
+static constexpr const float DEPTH_FREQ = 75.f;
+static constexpr const float PRESENCE_FREQ = 900.f;
 
 /* Defines for antialiasing filter */
 static constexpr const float INLPF_MAX_CO = 0.99f * 0.5f; /* coeff * ((samplerate / 2) / samplerate) */
@@ -52,7 +54,7 @@ struct DynamicModel {
 // This function carries model calculations
 
 static inline
-void applyModel(DynamicModel* model, float* const out, uint32_t numSamples)
+void applyModelOffline(DynamicModel* model, float* const out, uint32_t numSamples)
 {
     const bool input_skip = model->input_skip;
     const float input_gain = model->input_gain;
@@ -82,6 +84,54 @@ void applyModel(DynamicModel* model, float* const out, uint32_t numSamples)
                         out[i] = custom_model.forward(out + i) * output_gain;
                 }
             }
+            else if constexpr (ModelType::input_size == 2)
+            {
+                float inArray1 alignas(RTNEURAL_DEFAULT_ALIGNMENT)[2];
+
+                if (input_skip)
+                {
+                    for (uint32_t i=0; i<numSamples; ++i)
+                    {
+                        inArray1[0] = out[i];
+                        inArray1[1] = 0.f;
+                        out[i] += custom_model.forward(inArray1);
+                    }
+                }
+                else
+                {
+                    for (uint32_t i=0; i<numSamples; ++i)
+                    {
+                        inArray1[0] = out[i];
+                        inArray1[1] = 0.f;
+                        out[i] = custom_model.forward(inArray1) * output_gain;
+                    }
+                }
+            }
+            else if constexpr (ModelType::input_size == 3)
+            {
+                float inArray2 alignas(RTNEURAL_DEFAULT_ALIGNMENT)[3];
+
+                if (input_skip)
+                {
+                    for (uint32_t i=0; i<numSamples; ++i)
+                    {
+                        inArray2[0] = out[i];
+                        inArray2[1] = 0.f;
+                        inArray2[2] = 0.f;
+                        out[i] += custom_model.forward(inArray2);
+                    }
+                }
+                else
+                {
+                    for (uint32_t i=0; i<numSamples; ++i)
+                    {
+                        inArray2[0] = out[i];
+                        inArray2[1] = 0.f;
+                        inArray2[2] = 0.f;
+                        out[i] = custom_model.forward(inArray2) * output_gain;
+                    }
+                }
+            }
 
             if (input_skip && d_isNotEqual(output_gain, 1.f))
             {
@@ -94,7 +144,7 @@ void applyModel(DynamicModel* model, float* const out, uint32_t numSamples)
 }
 
 static inline
-float applyModel(DynamicModel* model, float sample)
+float applyModel(DynamicModel* model, float sample, const float param1, const float param2)
 {
     const bool input_skip = model->input_skip;
     const float input_gain = model->input_gain;
@@ -103,13 +153,13 @@ float applyModel(DynamicModel* model, float sample)
     sample *= input_gain;
 
     std::visit(
-        [&sample, input_skip, output_gain] (auto&& custom_model)
+        [&sample, input_skip, output_gain, param1, param2] (auto&& custom_model)
         {
             using ModelType = std::decay_t<decltype (custom_model)>;
-            float* out = &sample;
 
             if constexpr (ModelType::input_size == 1)
             {
+                float* out = &sample;
                 if (input_skip)
                 {
                     sample += custom_model.forward(out);
@@ -118,6 +168,32 @@ float applyModel(DynamicModel* model, float sample)
                 else
                 {
                     sample = custom_model.forward(out) * output_gain;
+                }
+            }
+            else if constexpr (ModelType::input_size == 2)
+            {
+                float inArray1 alignas(RTNEURAL_DEFAULT_ALIGNMENT)[2] = {sample, param1};
+                if (input_skip)
+                {
+                    sample += custom_model.forward(inArray1);
+                    sample *= output_gain;
+                }
+                else
+                {
+                    sample = custom_model.forward(inArray1) * output_gain;
+                }
+            }
+            else if constexpr (ModelType::input_size == 3)
+            {
+                float inArray2 alignas(RTNEURAL_DEFAULT_ALIGNMENT)[3] = {sample, param1, param2};
+                if (input_skip)
+                {
+                    sample += custom_model.forward(inArray2);
+                    sample *= output_gain;
+                }
+                else
+                {
+                    sample = custom_model.forward(inArray2) * output_gain;
                 }
             }
         },
@@ -130,10 +206,34 @@ float applyModel(DynamicModel* model, float sample)
 // --------------------------------------------------------------------------------------------------------------------
 
 struct AidaPluginModule : Module {
-    enum ParamIds {
-        PARAM_INPUT_LEVEL,
-        PARAM_OUTPUT_LEVEL,
+    enum Parameters {
+        kParameterINLPF,
+        kParameterINLEVEL,
+        kParameterNETBYPASS,
+        kParameterEQBYPASS,
+        kParameterEQPOS,
+        kParameterBASSGAIN,
+        kParameterBASSFREQ,
+        kParameterMIDGAIN,
+        kParameterMIDFREQ,
+        kParameterMIDQ,
+        kParameterMTYPE,
+        kParameterTREBLEGAIN,
+        kParameterTREBLEFREQ,
+        kParameterDEPTH,
+        kParameterPRESENCE,
+        kParameterOUTLEVEL,
+        kParameterPARAM1,
+        kParameterPARAM2,
         NUM_PARAMS
+    };
+    enum EqPos {
+        kEqPost,
+        kEqPre
+    };
+    enum MidEqType {
+        kMidEqPeak,
+        kMidEqBandpass
     };
     enum InputIds {
         AUDIO_INPUT,
@@ -147,16 +247,20 @@ struct AidaPluginModule : Module {
         NUM_LIGHTS
     };
 
-    enum Parameters {
-        kParameterCount
-    };
-
     CardinalPluginContext* const pcontext;
     bool fileChanged = false;
     std::string currentFile;
 
     Biquad dc_blocker { bq_type_highpass, 0.5f, COMMON_Q, 0.0f };
     Biquad in_lpf { bq_type_lowpass, 0.5f, COMMON_Q, 0.0f };
+    Biquad bass { bq_type_lowshelf, 0.5f, COMMON_Q, 0.0f };
+    Biquad mid { bq_type_peak, 0.5f, COMMON_Q, 0.0f };
+    Biquad treble { bq_type_highshelf, 0.5f, COMMON_Q, 0.0f };
+    Biquad depth { bq_type_peak, 0.5f, COMMON_Q, 0.0f };
+    Biquad presence { bq_type_highshelf, 0.5f, COMMON_Q, 0.0f };
+
+    float cachedParams[NUM_PARAMS] = {};
+
     dsp::ExponentialFilter inlevel;
     dsp::ExponentialFilter outlevel;
     DynamicModel* model = nullptr;
@@ -169,8 +273,35 @@ struct AidaPluginModule : Module {
 
         configInput(AUDIO_INPUT, "Audio");
         configOutput(AUDIO_OUTPUT, "Audio");
-        configParam(PARAM_INPUT_LEVEL, -12.f, 12.f, 0.f, "Input level", " dB");
-        configParam(PARAM_OUTPUT_LEVEL, -12.f, 12.f, 0.f, "Output level", " dB");
+        configParam(kParameterINLPF, -0.f, 100.f, 66.216f, "ANTIALIASING", " %");
+        configParam(kParameterINLEVEL, -12.f, 12.f, 0.f, "INPUT", " dB");
+        configSwitch(kParameterNETBYPASS, 0.f, 1.f, 0.f, "NETBYPASS");
+        configSwitch(kParameterEQBYPASS, 0.f, 1.f, 0.f, "EQBYPASS");
+        configSwitch(kParameterEQPOS, 0.f, 1.f, 0.f, "NETBYPASS");
+        configParam(kParameterBASSGAIN, -8.f, 8.f, 0.f, "BASS", " dB");
+        configParam(kParameterBASSFREQ, 60.f, 305.f, 75.f, "BFREQ", " Hz");
+        configParam(kParameterMIDGAIN, -8.f, 8.f, 0.f, "MID", " dB");
+        configParam(kParameterMIDFREQ, 150.f, 5000.f, 750.f, "MFREQ", " Hz");
+        configParam(kParameterMIDQ, 0.2f, 5.f, 0.707f, "MIDQ");
+        configSwitch(kParameterMTYPE, 0.f, 1.f, 0.f, "MTYPE");
+        configParam(kParameterTREBLEGAIN, -8.f, 8.f, 0.f, "TREBLE", " dB");
+        configParam(kParameterTREBLEFREQ, 1000.f, 4000.f, 2000.f, "TFREQ", " Hz");
+        configParam(kParameterDEPTH, -8.f, 8.f, 0.f, "DEPTH", " dB");
+        configParam(kParameterPRESENCE, -8.f, 8.f, 0.f, "PRESENCE", " dB");
+        configParam(kParameterOUTLEVEL, -15.f, 15.f, 0.f, "OUTPUT", " dB");
+        configParam(kParameterPARAM1, 0.f, 1.f, 0.f, "PARAM1");
+        configParam(kParameterPARAM2, 0.f, 1.f, 0.f, "PARAM2");
+
+        cachedParams[kParameterINLPF] = 66.216f;
+        cachedParams[kParameterBASSGAIN] = 0.f;
+        cachedParams[kParameterBASSFREQ] = 75.f;
+        cachedParams[kParameterMIDGAIN] = 0.f;
+        cachedParams[kParameterMIDFREQ] = 750.f;
+        cachedParams[kParameterMIDQ] = 0.707f;
+        cachedParams[kParameterTREBLEGAIN] = 0.f;
+        cachedParams[kParameterTREBLEFREQ] = 2000.f;
+        cachedParams[kParameterDEPTH] = 0.f;
+        cachedParams[kParameterPRESENCE] = 0.f;
 
         in_lpf.setFc(MAP(66.216f, 0.0f, 100.0f, INLPF_MAX_CO, INLPF_MIN_CO));
         inlevel.setTau(1 / 30.f);
@@ -240,7 +371,7 @@ struct AidaPluginModule : Module {
 
             /* Understand which model type to load */
             input_size = model_json["in_shape"].back().get<int>();
-            if (input_size > 1) { // MAX_INPUT_SIZE
+            if (input_size > MAX_INPUT_SIZE) {
                 throw std::invalid_argument("Value for input_size not supported");
             }
 
@@ -302,7 +433,7 @@ struct AidaPluginModule : Module {
 
         // Pre-buffer to avoid "clicks" during initialization
         float out[2048] = {};
-        applyModel(newmodel.get(), out, ARRAY_SIZE(out));
+        applyModelOffline(newmodel.get(), out, ARRAY_SIZE(out));
 
         // swap active model
         DynamicModel* const oldmodel = model;
@@ -315,30 +446,207 @@ struct AidaPluginModule : Module {
         delete oldmodel;
     }
 
+    MidEqType getMidType() const
+    {
+        return cachedParams[kParameterMTYPE] > 0.5f ? kMidEqBandpass : kMidEqPeak;
+    }
+
+    float applyToneControls(float sample)
+    {
+        return getMidType() == kMidEqBandpass
+            ? mid.process(sample)
+            : presence.process(
+                treble.process(
+                    mid.process(
+                        bass.process(
+                            depth.process(sample)))));
+    }
+
     void process(const ProcessArgs& args) override
     {
         const float stime = args.sampleTime;
-        const float inlevelv = DB_CO(params[PARAM_INPUT_LEVEL].getValue());
-        const float outlevelv = DB_CO(params[PARAM_OUTPUT_LEVEL].getValue());
+        const float inlevelv = DB_CO(params[kParameterINLEVEL].getValue());
+        const float outlevelv = DB_CO(params[kParameterOUTLEVEL].getValue());
+
+        const bool net_bypass = params[kParameterNETBYPASS].getValue() > 0.5f;
+        const bool eq_bypass = params[kParameterEQBYPASS].getValue() > 0.5f;
+        const EqPos eq_pos = params[kParameterEQPOS].getValue() > 0.5f ? kEqPre : kEqPost;
+
+        // update tone controls
+        bool changed = false;
+        float value;
+
+        value = params[kParameterINLPF].getValue();
+        if (d_isNotEqual(cachedParams[kParameterINLPF], value))
+        {
+            cachedParams[kParameterINLPF] = value;
+            in_lpf.setFc(MAP(value, 0.0f, 100.0f, INLPF_MAX_CO, INLPF_MIN_CO));
+        }
+
+        value = params[kParameterBASSGAIN].getValue();
+        if (d_isNotEqual(cachedParams[kParameterBASSGAIN], value))
+        {
+            cachedParams[kParameterBASSGAIN] = value;
+            changed = true;
+        }
+
+        value = params[kParameterBASSFREQ].getValue();
+        if (d_isNotEqual(cachedParams[kParameterBASSFREQ], value))
+        {
+            cachedParams[kParameterBASSFREQ] = value;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            changed = false;
+            bass.setBiquad(bq_type_lowshelf,
+                           cachedParams[kParameterBASSFREQ] / args.sampleRate,
+                           COMMON_Q,
+                           cachedParams[kParameterBASSGAIN]);
+        }
+
+        value = params[kParameterMIDGAIN].getValue();
+        if (d_isNotEqual(cachedParams[kParameterMIDGAIN], value))
+        {
+            cachedParams[kParameterMIDGAIN] = value;
+            changed = true;
+        }
+
+        value = params[kParameterMIDFREQ].getValue();
+        if (d_isNotEqual(cachedParams[kParameterMIDFREQ], value))
+        {
+            cachedParams[kParameterMIDFREQ] = value;
+            changed = true;
+        }
+
+        value = params[kParameterMIDQ].getValue();
+        if (d_isNotEqual(cachedParams[kParameterMIDQ], value))
+        {
+            cachedParams[kParameterMIDQ] = value;
+            changed = true;
+        }
+
+        value = params[kParameterMTYPE].getValue();
+        if (d_isNotEqual(cachedParams[kParameterMTYPE], value))
+        {
+            cachedParams[kParameterMTYPE] = value;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            changed = false;
+            mid.setBiquad(getMidType() == kMidEqBandpass ? bq_type_bandpass : bq_type_peak,
+                          cachedParams[kParameterMIDFREQ] / args.sampleRate,
+                          cachedParams[kParameterMIDQ],
+                          cachedParams[kParameterMIDGAIN]);
+        }
+
+        value = params[kParameterTREBLEGAIN].getValue();
+        if (d_isNotEqual(cachedParams[kParameterTREBLEGAIN], value))
+        {
+            cachedParams[kParameterTREBLEGAIN] = value;
+            changed = true;
+        }
+
+        value = params[kParameterTREBLEFREQ].getValue();
+        if (d_isNotEqual(cachedParams[kParameterTREBLEFREQ], value))
+        {
+            cachedParams[kParameterTREBLEFREQ] = value;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            changed = false;
+            treble.setBiquad(bq_type_highshelf,
+                             cachedParams[kParameterTREBLEFREQ] / args.sampleRate,
+                             COMMON_Q,
+                             cachedParams[kParameterTREBLEGAIN]);
+        }
+
+        value = params[kParameterDEPTH].getValue();
+        if (d_isNotEqual(cachedParams[kParameterDEPTH], value))
+        {
+            cachedParams[kParameterDEPTH] = value;
+            depth.setPeakGain(value);
+        }
+
+        value = params[kParameterPRESENCE].getValue();
+        if (d_isNotEqual(cachedParams[kParameterPRESENCE], value))
+        {
+            cachedParams[kParameterPRESENCE] = value;
+            presence.setPeakGain(value);
+        }
 
         // High frequencies roll-off (lowpass)
         float sample = in_lpf.process(inputs[AUDIO_INPUT].getVoltage() * 0.1f) * inlevel.process(stime, inlevelv);
 
+        // Equalizer section
+        if (!eq_bypass && eq_pos == kEqPre)
+            sample = applyToneControls(sample);
+
         // run model
-        if (model != nullptr)
+        if (!net_bypass && model != nullptr)
         {
             activeModel.store(true);
-            sample = applyModel(model, sample);
+            sample = applyModel(model, sample,
+                                params[kParameterPARAM1].getValue(),
+                                params[kParameterPARAM2].getValue());
             activeModel.store(false);
         }
 
         // DC blocker filter (highpass)
-        outputs[AUDIO_OUTPUT].setVoltage(dc_blocker.process(sample) * outlevel.process(stime, outlevelv) * 10.f);
+        sample = dc_blocker.process(sample);
+
+        // Equalizer section
+        if (!eq_bypass && eq_pos == kEqPost)
+            sample = applyToneControls(sample);
+
+        // Output volume
+        outputs[AUDIO_OUTPUT].setVoltage(sample * outlevel.process(stime, outlevelv) * 10.f);
     }
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override
     {
+        cachedParams[kParameterBASSGAIN] = params[kParameterBASSGAIN].getValue();
+        cachedParams[kParameterBASSFREQ] = params[kParameterBASSFREQ].getValue();
+        cachedParams[kParameterMIDGAIN] = params[kParameterMIDGAIN].getValue();
+        cachedParams[kParameterMIDFREQ] = params[kParameterMIDFREQ].getValue();
+        cachedParams[kParameterMIDQ] = params[kParameterMIDQ].getValue();
+        cachedParams[kParameterMTYPE] = params[kParameterMTYPE].getValue();
+        cachedParams[kParameterTREBLEGAIN] = params[kParameterTREBLEGAIN].getValue();
+        cachedParams[kParameterTREBLEFREQ] = params[kParameterTREBLEFREQ].getValue();
+        cachedParams[kParameterDEPTH] = params[kParameterDEPTH].getValue();
+        cachedParams[kParameterPRESENCE] = params[kParameterPRESENCE].getValue();
+
         dc_blocker.setFc(35.0f / e.sampleRate);
+
+        bass.setBiquad(bq_type_lowshelf,
+                       cachedParams[kParameterBASSFREQ] / e.sampleRate,
+                       COMMON_Q,
+                       cachedParams[kParameterBASSGAIN]);
+
+        mid.setBiquad(getMidType() == kMidEqBandpass ? bq_type_bandpass : bq_type_peak,
+                      cachedParams[kParameterMIDFREQ] / e.sampleRate,
+                      cachedParams[kParameterMIDQ],
+                      cachedParams[kParameterMIDGAIN]);
+
+        treble.setBiquad(bq_type_highshelf,
+                         cachedParams[kParameterTREBLEFREQ] / e.sampleRate,
+                         COMMON_Q,
+                         cachedParams[kParameterTREBLEGAIN]);
+
+        depth.setBiquad(bq_type_peak,
+                        DEPTH_FREQ / e.sampleRate,
+                        COMMON_Q,
+                        cachedParams[kParameterDEPTH]);
+
+        presence.setBiquad(bq_type_highshelf,
+                           PRESENCE_FREQ / e.sampleRate,
+                           COMMON_Q,
+                           cachedParams[kParameterPRESENCE]);
     }
 
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AidaPluginModule)
@@ -501,15 +809,11 @@ struct AidaKnob : app::SvgKnob {
 };
 
 struct AidaWidget : ModuleWidgetWithSideScrews<23> {
-    static constexpr const float previewBoxHeight = 80.0f;
-    static constexpr const float previewBoxBottom = 20.0f;
-    static constexpr const float previewBoxRect[] = {8.0f,
-                                                     380.0f - previewBoxHeight - previewBoxBottom,
-                                                     15.0f * 23 - 16.0f,
-                                                     previewBoxHeight};
+    static constexpr const uint kPedalMargin = 10;
+    static constexpr const uint kPedalMarginTop = 50;
+
     static constexpr const float startY_list = startY - 2.0f;
-    static constexpr const float fileListHeight = 380.0f - startY_list - previewBoxHeight - previewBoxBottom * 1.5f;
-    static constexpr const float startY_preview = startY_list + fileListHeight;
+    static constexpr const float fileListHeight = 380.0f - startY_list - 110.0f;
 
     AidaPluginModule* const module;
 
@@ -524,24 +828,97 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
         addInput(createInput<PJ301MPort>(Vec(startX_In, 25), module, 0));
         addOutput(createOutput<PJ301MPort>(Vec(startX_Out, 25), module, 0));
 
-        addChild(createParamCentered<AidaKnob>(Vec(box.size.x * 0.5f - 50, box.size.y - 60),
-                                               module, AidaPluginModule::PARAM_INPUT_LEVEL));
+        addChild(createParamCentered<AidaKnob>(Vec(50, box.size.y - 60),
+                                               module, AidaPluginModule::kParameterINLEVEL));
 
-        addChild(createParamCentered<AidaKnob>(Vec(box.size.x * 0.5f + 50, box.size.y - 60),
-                                               module, AidaPluginModule::PARAM_OUTPUT_LEVEL));
+        addChild(createParamCentered<AidaKnob>(Vec(100, box.size.y - 60),
+                                               module, AidaPluginModule::kParameterBASSGAIN));
+
+        addChild(createParamCentered<AidaKnob>(Vec(150, box.size.y - 60),
+                                               module, AidaPluginModule::kParameterMIDGAIN));
+
+        addChild(createParamCentered<AidaKnob>(Vec(200, box.size.y - 60),
+                                               module, AidaPluginModule::kParameterTREBLEGAIN));
+
+        addChild(createParamCentered<AidaKnob>(Vec(250, box.size.y - 60),
+                                               module, AidaPluginModule::kParameterDEPTH));
+
+        addChild(createParamCentered<AidaKnob>(Vec(300, box.size.y - 60),
+                                               module, AidaPluginModule::kParameterPRESENCE));
+
+        addChild(createParamCentered<AidaKnob>(Vec(350, box.size.y - 60),
+                                               module, AidaPluginModule::kParameterOUTLEVEL));
 
         if (m != nullptr)
         {
             AidaModelListWidget* const listw = new AidaModelListWidget(m);
-            listw->box.pos = Vec(0, startY_list);
-            listw->box.size = Vec(box.size.x, fileListHeight);
+            listw->box.pos = Vec(kPedalMargin, startY_list);
+            listw->box.size = Vec(box.size.x - kPedalMargin * 2, fileListHeight);
             addChild(listw);
         }
     }
 
     void draw(const DrawArgs& args) override
     {
-        drawBackground(args.vg);
+        const double widthPedal = box.size.x - kPedalMargin * 2;
+        const double heightPedal = box.size.y - kPedalMargin - kPedalMarginTop;
+        const int cornerRadius = 12;
+
+        // outer bounds gradient
+        nvgBeginPath(args.vg);
+        nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+        nvgFillPaint(args.vg,
+                     nvgLinearGradient(args.vg,
+                                       0, 0, 0, box.size.y,
+                                       nvgRGB(0xff - 0xcd + 50, 0xff - 0xff + 50, 0xff),
+                                       nvgRGB(0xff - 0x8b + 50, 0xff - 0xf7 + 50, 0xff)));
+        nvgFill(args.vg);
+
+        // outer bounds pattern
+        // TODO
+
+        // box shadow
+        nvgBeginPath(args.vg);
+        nvgRect(args.vg,
+                kPedalMargin / 2,
+                kPedalMarginTop / 2,
+                kPedalMargin + widthPedal,
+                kPedalMarginTop + heightPedal);
+        nvgFillPaint(args.vg,
+                     nvgBoxGradient(args.vg,
+                                    kPedalMargin,
+                                    kPedalMarginTop,
+                                    widthPedal,
+                                    heightPedal,
+                                    cornerRadius,
+                                    cornerRadius,
+                                    nvgRGBA(0,0,0,1.f),
+                                    nvgRGBA(0,0,0,0.f)));
+        nvgFill(args.vg);
+
+        // .rt-neural .grid
+        nvgBeginPath(args.vg);
+        nvgRoundedRect(args.vg, kPedalMargin, kPedalMarginTop, widthPedal, heightPedal, cornerRadius);
+        nvgFillPaint(args.vg,
+                     nvgLinearGradient(args.vg,
+                                       kPedalMargin, kPedalMarginTop,
+                                       kPedalMargin + box.size.x * 0.52f, 0,
+                                       nvgRGB(28, 23, 12),
+                                       nvgRGB(42, 34, 15)));
+        nvgFill(args.vg);
+
+        nvgFillPaint(args.vg,
+                     nvgLinearGradient(args.vg,
+                                       kPedalMargin + box.size.x * 0.5f, 0,
+                                       kPedalMargin + box.size.x, 0,
+                                       nvgRGB(42, 34, 15),
+                                       nvgRGB(19, 19, 19)));
+        nvgFill(args.vg);
+
+        // extra
+        nvgStrokeColor(args.vg, nvgRGBA(150, 150, 150, 0.25f));
+        nvgStroke(args.vg);
+
         drawOutputJacksArea(args.vg);
 
         ModuleWidget::draw(args);
