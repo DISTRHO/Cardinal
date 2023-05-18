@@ -554,27 +554,7 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     INFO("Initializing plugin browser DB");
     app::browserInit();
 
-    if (isRealInstance)
-    {
-        INFO("Loading settings");
-        settings::load();
-        shouldSaveSettings = true;
-    }
-
-    // enforce settings that do not make sense as anything else
-    settings::safeMode = false;
-    settings::token.clear();
-    settings::windowMaximized = false;
-    settings::windowPos = math::Vec(0, 0);
-    settings::pixelRatio = 0.0;
-    settings::sampleRate = 0;
-    settings::threadCount = 1;
-    settings::frameSwapInterval = 1;
-    settings::autosaveInterval = 0;
-    settings::skipLoadOnLaunch = true;
-    settings::autoCheckUpdates = false;
-    settings::showTipsOnLaunch = false;
-    settings::tipIndex = -1;
+    loadSettings(isRealInstance);
 
 #ifdef CARDINAL_INIT_OSC_THREAD
     INFO("Initializing OSC Remote control");
@@ -634,6 +614,33 @@ Initializer::~Initializer()
 
     INFO("Destroying logger");
     logger::destroy();
+}
+
+void Initializer::loadSettings(const bool isRealInstance)
+{
+    using namespace rack;
+
+    if (isRealInstance)
+    {
+        INFO("Loading settings");
+        settings::load();
+        shouldSaveSettings = true;
+    }
+
+    // enforce settings that do not make sense as anything else
+    settings::safeMode = false;
+    settings::token.clear();
+    settings::windowMaximized = false;
+    settings::windowPos = math::Vec(0, 0);
+    settings::pixelRatio = 0.0;
+    settings::sampleRate = 0;
+    settings::threadCount = 1;
+    settings::frameSwapInterval = 1;
+    settings::autosaveInterval = 0;
+    settings::skipLoadOnLaunch = true;
+    settings::autoCheckUpdates = false;
+    settings::showTipsOnLaunch = false;
+    settings::tipIndex = -1;
 }
 
 // --------------------------------------------------------------------------------------------------------------------

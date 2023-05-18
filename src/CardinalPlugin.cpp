@@ -217,6 +217,10 @@ public:
           fNextExpectedFrame(0),
           fWasBypassed(false)
     {
+        // check if first time loading a real instance
+        if (!fInitializer->shouldSaveSettings && !isDummyInstance())
+            fInitializer->loadSettings(true);
+
        #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         fWindowParameters[kWindowParameterShowTooltips] = rack::settings::tooltips ? 1.f : 0.f;
         fWindowParameters[kWindowParameterCableOpacity] = std::min(100.f, std::max(0.f, rack::settings::cableOpacity * 100));

@@ -104,6 +104,7 @@ struct Initializer
 
     Initializer(const CardinalBasePlugin* plugin, const CardinalBaseUI* ui);
     ~Initializer();
+    void loadSettings(bool isRealInstance);
 };
 
 #ifndef HEADLESS
