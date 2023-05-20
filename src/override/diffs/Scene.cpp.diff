@@ -1,12 +1,12 @@
---- ../Rack/src/app/Scene.cpp	2022-09-21 19:49:12.199540706 +0100
-+++ Scene.cpp	2022-12-30 14:50:06.801891005 +0000
+--- ../Rack/src/app/Scene.cpp	2022-09-21 20:49:12.199540706 +0200
++++ Scene.cpp	2023-05-20 18:44:57.551491858 +0200
 @@ -1,12 +1,36 @@
 -#include <thread>
 -
 -#include <osdialog.h>
 +/*
 + * DISTRHO Cardinal Plugin
-+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
 + *
 + * This program is free software; you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@
 +
 +/**
 + * This file is an edited version of VCVRack's app/Scene.cpp
-+ * Copyright (C) 2016-2021 VCV.
++ * Copyright (C) 2016-2023 VCV.
 + *
 + * This program is free software: you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -40,7 +40,7 @@
  #include <system.hpp>
  #include <network.hpp>
  #include <history.hpp>
-@@ -14,6 +38,13 @@
+@@ -14,6 +38,14 @@
  #include <patch.hpp>
  #include <asset.hpp>
  
@@ -51,10 +51,11 @@
 +#include "../CardinalCommon.hpp"
 +#include "../CardinalRemote.hpp"
 +
++#include <algorithm>
  
  namespace rack {
  namespace app {
-@@ -23,32 +54,72 @@
+@@ -23,32 +55,72 @@
  	math::Vec size;
  
  	void draw(const DrawArgs& args) override {
@@ -101,17 +102,17 @@
 +
 +	void onHover(const HoverEvent& e) override {
 +		e.consume(this);
-+	}
-+
+ 	}
+ 
+-	void onDragStart(const DragStartEvent& e) override {
 +	void onEnter(const EnterEvent& e) override {
 +		glfwSetCursor(APP->window->win, glfwCreateStandardCursor(GLFW_RESIZE_NWSE_CURSOR));
 +	}
 +
 +	void onLeave(const LeaveEvent& e) override {
 +		glfwSetCursor(APP->window->win, nullptr);
- 	}
- 
--	void onDragStart(const DragStartEvent& e) override {
++	}
++
 +	void onDragStart(const DragStartEvent&) override {
  		size = APP->window->getSize();
  	}
@@ -137,14 +138,14 @@
  };
  
  
-@@ -67,13 +138,11 @@
+@@ -67,13 +139,11 @@
  	browser->hide();
  	addChild(browser);
  
 -	if (settings::showTipsOnLaunch) {
 -		addChild(tipWindowCreate());
 -	}
-+	if (isStandalone())
++	if (isStandalone() || isMini())
 +		return;
  
  	internal->resizeHandle = new ResizeHandle;
@@ -154,7 +155,7 @@
  	addChild(internal->resizeHandle);
  }
  
-@@ -99,22 +168,13 @@
+@@ -99,22 +169,13 @@
  		rackScroll->box.pos.y = menuBar->box.size.y;
  	}
  
@@ -179,7 +180,7 @@
  	// Scroll RackScrollWidget with arrow keys
  	math::Vec arrowDelta;
  	if (internal->heldArrowKeys[0]) {
-@@ -143,6 +203,29 @@
+@@ -143,6 +204,34 @@
  		rackScroll->offset += arrowDelta * arrowSpeed;
  	}
  
@@ -195,7 +196,12 @@
 +				internal->lastSceneChangeTime = time;
 +			} else if (internal->historyActionIndex != actionIndex && actionIndex > 0 && time - internal->lastSceneChangeTime >= 1.0) {
 +				const std::string& name(APP->history->actions[actionIndex - 1]->name);
-+				if (/*std::abs(internal->historyActionIndex = actionIndex) > 1 ||*/ name != "move knob") {
++				static const std::vector<std::string> ignoredNames = {
++					"move knob",
++					"move modules",
++					"move switch",
++				};
++				if (std::find(ignoredNames.cbegin(), ignoredNames.cend(), name) == ignoredNames.cend()) {
 +					printf("action '%s'\n", APP->history->actions[actionIndex - 1]->name.c_str());
 +					remoteUtils::sendFullPatchToRemote(remoteDetails);
 +					window::generateScreenshot();
@@ -209,16 +215,16 @@
  	Widget::step();
  }
  
-@@ -172,7 +255,7 @@
+@@ -172,7 +261,7 @@
  	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
  		// DEBUG("key '%d '%c' scancode %d '%c' keyName '%s'", e.key, e.key, e.scancode, e.scancode, e.keyName.c_str());
  		if (e.keyName == "n" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 -			APP->patch->loadTemplateDialog();
-+			patchUtils::loadTemplateDialog();
++			patchUtils::loadTemplateDialog(false);
  			e.consume(this);
  		}
  		if (e.keyName == "q" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -180,19 +263,22 @@
+@@ -180,19 +269,22 @@
  			e.consume(this);
  		}
  		if (e.keyName == "o" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -245,7 +251,7 @@
  			e.consume(this);
  		}
  		if (e.keyName == "z" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -220,24 +306,38 @@
+@@ -220,24 +312,42 @@
  			APP->scene->rackScroll->setZoom(std::pow(2.f, zoom));
  			e.consume(this);
  		}
@@ -269,8 +275,10 @@
  		}
 +		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
 +			if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
++			{
 +				remoteUtils::sendFullPatchToRemote(remoteDetails);
-+			window::generateScreenshot();
++				window::generateScreenshot();
++			}
 +			e.consume(this);
 +		}
 +		if (e.key == GLFW_KEY_F9 && (e.mods & RACK_MOD_MASK) == 0) {
@@ -280,15 +288,15 @@
 +#ifdef DISTRHO_OS_WASM
  		if (e.key == GLFW_KEY_F11 && (e.mods & RACK_MOD_MASK) == 0) {
  			APP->window->setFullScreen(!APP->window->isFullScreen());
--			// The MenuBar will be hidden when the mouse moves over the RackScrollWidget.
--			// menuBar->hide();
+ 			// The MenuBar will be hidden when the mouse moves over the RackScrollWidget.
+ 			// menuBar->hide();
  			e.consume(this);
  		}
 +#endif
  
  		// Module selections
  		if (e.keyName == "a" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -326,13 +426,6 @@
+@@ -326,13 +436,6 @@
  
  	// Key commands that can be overridden by children
  	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -302,7 +310,7 @@
  		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
  			rack->pasteClipboardAction();
  			e.consume(this);
-@@ -351,7 +444,7 @@
+@@ -351,7 +454,7 @@
  		std::string extension = system::getExtension(path);
  
  		if (extension == ".vcv") {

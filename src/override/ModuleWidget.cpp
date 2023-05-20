@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 
 /**
  * This file is an edited version of VCVRack's ModuleWidget.cpp
- * Copyright (C) 2016-2021 VCV.
+ * Copyright (C) 2016-2023 VCV.
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -29,8 +29,6 @@
 
 #include <thread>
 #include <regex>
-
-#include <osdialog.h>
 
 #include <app/ModuleWidget.hpp>
 #include <app/Scene.hpp>
@@ -420,6 +418,7 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 
 				// If module positions are locked, don't consume left-click
 				if (settings::lockModules) {
+					e.consume(NULL);
 					return;
 				}
 
@@ -449,6 +448,7 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 
 			// If module positions are locked, don't consume left-click
 			if (settings::lockModules) {
+				e.consume(NULL);
 				return;
 			}
 
@@ -700,7 +700,7 @@ void ModuleWidget::save(std::string filename) {
 	FILE* file = std::fopen(filename.c_str(), "w");
 	if (!file) {
 		std::string message = string::f("Could not save preset to file %s", filename.c_str());
-		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
+		async_dialog_message(message.c_str());
 		return;
 	}
 	DEFER({std::fclose(file);});
@@ -718,10 +718,12 @@ void ModuleWidget::saveTemplate() {
 void ModuleWidget::saveTemplateDialog() {
 	if (hasTemplate()) {
 		std::string message = string::f("Overwrite default preset for %s?", model->getFullName().c_str());
-		if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, message.c_str()))
-			return;
+		WeakPtr<ModuleWidget> weakThis = this;
+		async_dialog_message(message.c_str(), [=]{
+			if (weakThis)
+				weakThis->saveTemplate();
+		});
 	}
-	saveTemplate();
 }
 
 bool ModuleWidget::hasTemplate() {
@@ -738,9 +740,11 @@ void ModuleWidget::clearTemplate() {
 
 void ModuleWidget::clearTemplateDialog() {
 	std::string message = string::f("Delete default preset for %s?", model->getFullName().c_str());
-	if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, message.c_str()))
-		return;
-	clearTemplate();
+	WeakPtr<ModuleWidget> weakThis = this;
+	async_dialog_message(message.c_str(), [=]{
+		if (weakThis)
+			weakThis->clearTemplate();
+	});
 }
 
 void ModuleWidget::saveDialog() {
@@ -978,12 +982,16 @@ static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget
 			std::regex r("^\\d+_");
 			name = std::regex_replace(name, r, "");
 
-			if (false) {
+			if (system::isDirectory(path)) {
+				hasPresets = true;
+
+				menu->addChild(createSubmenuItem(name, "", [=](ui::Menu* menu) {
+					if (!moduleWidget)
+						return;
+					appendPresetItems(menu, moduleWidget, path);
+				}));
 			}
 			else if (system::getExtension(path) == ".vcvm" && name != "template") {
-				if (!hasPresets)
-					menu->addChild(new ui::MenuSeparator);
-
 				hasPresets = true;
 
 				menu->addChild(createMenuItem(name, "", [=]() {
@@ -998,6 +1006,9 @@ static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget
 				}));
 			}
 		}
+	}
+	if (!hasPresets) {
+		menu->addChild(createMenuLabel("(None)"));
 	}
 };
 
@@ -1037,7 +1048,6 @@ void ModuleWidget::createContextMenu() {
 			weakThis->loadDialog();
 		}));
 
-		/* TODO requires setting up user dir
 		menu->addChild(createMenuItem("Save as", "", [=]() {
 			if (!weakThis)
 				return;
@@ -1060,13 +1070,10 @@ void ModuleWidget::createContextMenu() {
 		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("User presets"));
 		appendPresetItems(menu, weakThis, weakThis->model->getUserPresetDirectory());
-		*/
 
 		// Scan `<plugin dir>/presets/<module slug>` for presets.
-		/* TODO enable only after setting up user dir
 		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("Factory presets"));
-		*/
 		appendPresetItems(menu, weakThis, weakThis->model->getFactoryPresetDirectory());
 	}));
 

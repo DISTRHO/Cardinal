@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -20,13 +20,8 @@
 #if (defined(__i386__) || defined(__x86_64__) || defined(__EMSCRIPTEN__)) && !defined(CARDINAL_NOSIMD)
 # include_next <immintrin.h>
 #else
-# define SIMDE_ACCURACY_PREFERENCE 0
 # define SIMDE_ENABLE_NATIVE_ALIASES
-# define SIMDE_FAST_CONVERSION_RANGE
-# define SIMDE_FAST_MATH
-# define SIMDE_FAST_NANS
-# define SIMDE_FAST_ROUND_MODE
-# define SIMDE_FAST_ROUND_TIES
 # include "../simde/simde/x86/sse.h"
 # include "../simde/simde/x86/sse2.h"
+# undef SIMDE_ENABLE_NATIVE_ALIASES
 #endif

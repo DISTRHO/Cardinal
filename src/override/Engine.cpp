@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 
 /**
  * This file is an edited version of VCVRack's engine/Engine.cpp
- * Copyright (C) 2016-2021 VCV.
+ * Copyright (C) 2016-2023 VCV.
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -83,8 +83,8 @@ struct Engine::Internal {
 
 	float sampleRate = 0.f;
 	float sampleTime = 0.f;
-	int64_t block = 0;
 	int64_t frame = 0;
+	int64_t block = 0;
 	int64_t blockFrame = 0;
 	double blockTime = 0.0;
 	int blockFrames = 0;
@@ -653,18 +653,13 @@ void Engine::yieldWorkers() {
 }
 
 
-int64_t Engine::getBlock() {
-	return internal->block;
-}
-
-
 int64_t Engine::getFrame() {
 	return internal->frame;
 }
 
 
-void Engine::setFrame(int64_t frame) {
-	internal->frame = frame;
+int64_t Engine::getBlock() {
+	return internal->block;
 }
 
 
@@ -758,8 +753,6 @@ void Engine::addModule(Module* module) {
 	DISTRHO_SAFE_ASSERT_RETURN(it == internal->modules.end(),);
 	auto tit = std::find(internal->terminalModules.begin(), internal->terminalModules.end(), module);
 	DISTRHO_SAFE_ASSERT_RETURN(tit == internal->terminalModules.end(),);
-	// Reinitialize random module since it uses thread-local RNG state
-	random::init();
 	// Set ID if unset or collides with an existing ID
 	while (module->id < 0 || internal->modulesCache.find(module->id) != internal->modulesCache.end()) {
 		// Randomly generate ID
@@ -1005,8 +998,6 @@ void Engine::addCable(Cable* cable) {
 		if (cable2->outputModule == cable->outputModule && cable2->outputId == cable->outputId)
 			outputWasConnected = true;
 	}
-	// Reinitialize random module since it uses thread-local RNG state
-	random::init();
 	// Set ID if unset or collides with an existing ID
 	while (cable->id < 0 || internal->cablesCache.find(cable->id) != internal->cablesCache.end()) {
 		// Randomly generate ID
@@ -1106,19 +1097,19 @@ void Engine::setParamValue(Module* module, int paramId, float value) {
 	if (internal->remoteDetails != nullptr) {
 		sendParamChangeToRemote(internal->remoteDetails, module->id, paramId, value);
 	}
-	module->params[paramId].value = value;
+	module->params[paramId].setValue(value);
 }
 
 
 float Engine::getParamValue(Module* module, int paramId) {
-	return module->params[paramId].value;
+	return module->params[paramId].getValue();
 }
 
 
 void Engine::setParamSmoothValue(Module* module, int paramId, float value) {
 	// If another param is being smoothed, jump value
 	if (internal->smoothModule && !(internal->smoothModule == module && internal->smoothParamId == paramId)) {
-		internal->smoothModule->params[internal->smoothParamId].value = internal->smoothValue;
+		internal->smoothModule->params[internal->smoothParamId].setValue(internal->smoothValue);
 	}
 	internal->smoothParamId = paramId;
 	internal->smoothValue = value;
@@ -1130,7 +1121,7 @@ void Engine::setParamSmoothValue(Module* module, int paramId, float value) {
 float Engine::getParamSmoothValue(Module* module, int paramId) {
 	if (internal->smoothModule == module && internal->smoothParamId == paramId)
 		return internal->smoothValue;
-	return module->params[paramId].value;
+	return module->params[paramId].getValue();
 }
 
 

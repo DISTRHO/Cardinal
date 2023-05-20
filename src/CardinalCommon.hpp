@@ -57,6 +57,8 @@ extern char* patchStorageSlug;
 
 std::string homeDir();
 
+void switchDarkMode(bool darkMode);
+
 } // namespace rack
 
 // -----------------------------------------------------------------------------------------------------------

@@ -95,6 +95,21 @@ BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing
 
 # -----------------------------------------------------------------------------
+# simde flags
+
+BASE_FLAGS += -I$(abspath $(ROOT)/src/Rack/dep/simde)
+BASE_FLAGS += -DSIMDE_ACCURACY_PREFERENCE=0
+BASE_FLAGS += -DSIMDE_FAST_CONVERSION_RANGE
+BASE_FLAGS += -DSIMDE_FAST_MATH
+BASE_FLAGS += -DSIMDE_FAST_NANS
+BASE_FLAGS += -DSIMDE_FAST_ROUND_MODE
+BASE_FLAGS += -DSIMDE_FAST_ROUND_TIES
+
+# unwanted
+BASE_FLAGS += -DSIMDE_X86_SSE4_1_H
+BASE_FLAGS += -DSIMDE_X86_SSE4_2_H
+
+# -----------------------------------------------------------------------------
 # Rack build flags
 
 ifeq ($(BUILDING_RACK),true)
@@ -163,8 +178,6 @@ endif
 BASE_FLAGS += -I$(abspath $(ROOT)/dpf/dgl/src/nanovg)
 BASE_FLAGS += -I$(abspath $(ROOT)/dpf/distrho)
 
-BASE_FLAGS += -I$(abspath $(ROOT)/include/simde)
-
 BASE_FLAGS += -I$(abspath $(ROOT)/src)
 BASE_FLAGS += -I$(abspath $(ROOT)/src/Rack/include)
 BASE_FLAGS += -I$(abspath $(ROOT)/src/Rack/include/dsp)
@@ -174,6 +187,7 @@ BASE_FLAGS += -I$(abspath $(ROOT)/src/Rack/dep/glfw/include)
 BASE_FLAGS += -I$(abspath $(ROOT)/src/Rack/dep/nanosvg/src)
 BASE_FLAGS += -I$(abspath $(ROOT)/src/Rack/dep/oui-blendish)
 BASE_FLAGS += -I$(abspath $(ROOT)/src/Rack/dep/pffft)
+BASE_FLAGS += -I$(abspath $(ROOT)/src/Rack/dep/tinyexpr)
 
 BUILD_C_FLAGS += -std=gnu11
 

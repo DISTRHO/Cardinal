@@ -1,9 +1,9 @@
---- ../Rack/src/app/ModuleWidget.cpp	2022-09-21 19:49:12.198540676 +0100
-+++ ModuleWidget.cpp	2022-12-02 19:11:45.780215974 +0000
-@@ -1,3 +1,32 @@
+--- ../Rack/src/app/ModuleWidget.cpp	2023-05-20 17:03:33.005081737 +0200
++++ ModuleWidget.cpp	2023-05-20 18:40:08.948302802 +0200
+@@ -1,8 +1,35 @@
 +/*
 + * DISTRHO Cardinal Plugin
-+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
 + *
 + * This program is free software; you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 +
 +/**
 + * This file is an edited version of VCVRack's ModuleWidget.cpp
-+ * Copyright (C) 2016-2021 VCV.
++ * Copyright (C) 2016-2023 VCV.
 + *
 + * This program is free software: you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -33,7 +33,12 @@
  #include <thread>
  #include <regex>
  
-@@ -375,7 +404,7 @@
+-#include <osdialog.h>
+-
+ #include <app/ModuleWidget.hpp>
+ #include <app/Scene.hpp>
+ #include <engine/Engine.hpp>
+@@ -375,7 +402,7 @@
  			if (e.action == GLFW_PRESS) {
  				// Open selection context menu on right-click
  				ui::Menu* menu = createMenu();
@@ -42,7 +47,7 @@
  			}
  			e.consume(this);
  		}
-@@ -627,6 +656,9 @@
+@@ -629,6 +656,9 @@
  	std::string presetDir = model->getUserPresetDirectory();
  	system::createDirectories(presetDir);
  
@@ -52,7 +57,7 @@
  	// Delete directories if empty
  	DEFER({
  		try {
-@@ -638,10 +670,8 @@
+@@ -640,10 +670,8 @@
  		}
  	});
  
@@ -65,7 +70,7 @@
  	if (!pathC) {
  		// No path selected
  		return;
-@@ -649,11 +679,13 @@
+@@ -651,11 +679,13 @@
  	DEFER({std::free(pathC);});
  
  	try {
@@ -81,7 +86,46 @@
  }
  
  void ModuleWidget::save(std::string filename) {
-@@ -715,6 +747,9 @@
+@@ -670,7 +700,7 @@
+ 	FILE* file = std::fopen(filename.c_str(), "w");
+ 	if (!file) {
+ 		std::string message = string::f("Could not save preset to file %s", filename.c_str());
+-		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
++		async_dialog_message(message.c_str());
+ 		return;
+ 	}
+ 	DEFER({std::fclose(file);});
+@@ -688,10 +718,12 @@
+ void ModuleWidget::saveTemplateDialog() {
+ 	if (hasTemplate()) {
+ 		std::string message = string::f("Overwrite default preset for %s?", model->getFullName().c_str());
+-		if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, message.c_str()))
+-			return;
++		WeakPtr<ModuleWidget> weakThis = this;
++		async_dialog_message(message.c_str(), [=]{
++			if (weakThis)
++				weakThis->saveTemplate();
++		});
+ 	}
+-	saveTemplate();
+ }
+ 
+ bool ModuleWidget::hasTemplate() {
+@@ -708,15 +740,20 @@
+ 
+ void ModuleWidget::clearTemplateDialog() {
+ 	std::string message = string::f("Delete default preset for %s?", model->getFullName().c_str());
+-	if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, message.c_str()))
+-		return;
+-	clearTemplate();
++	WeakPtr<ModuleWidget> weakThis = this;
++	async_dialog_message(message.c_str(), [=]{
++		if (weakThis)
++			weakThis->clearTemplate();
++	});
+ }
+ 
+ void ModuleWidget::saveDialog() {
  	std::string presetDir = model->getUserPresetDirectory();
  	system::createDirectories(presetDir);
  
@@ -91,7 +135,7 @@
  	// Delete directories if empty
  	DEFER({
  		try {
-@@ -726,10 +761,8 @@
+@@ -728,10 +765,8 @@
  		}
  	});
  
@@ -104,7 +148,7 @@
  	if (!pathC) {
  		// No path selected
  		return;
-@@ -741,7 +774,8 @@
+@@ -743,7 +778,8 @@
  	if (system::getExtension(path) != ".vcvm")
  		path += ".vcvm";
  
@@ -114,28 +158,7 @@
  }
  
  void ModuleWidget::disconnect() {
-@@ -944,16 +978,12 @@
- 			std::regex r("^\\d+_");
- 			name = std::regex_replace(name, r, "");
- 
--			if (system::isDirectory(path)) {
--				hasPresets = true;
--
--				menu->addChild(createSubmenuItem(name, "", [=](ui::Menu* menu) {
--					if (!moduleWidget)
--						return;
--					appendPresetItems(menu, moduleWidget, path);
--				}));
-+			if (false) {
- 			}
- 			else if (system::getExtension(path) == ".vcvm" && name != "template") {
-+				if (!hasPresets)
-+					menu->addChild(new ui::MenuSeparator);
-+
- 				hasPresets = true;
- 
- 				menu->addChild(createMenuItem(name, "", [=]() {
-@@ -963,15 +993,12 @@
+@@ -965,7 +1001,7 @@
  						moduleWidget->loadAction(path);
  					}
  					catch (Exception& e) {
@@ -144,37 +167,7 @@
  					}
  				}));
  			}
- 		}
- 	}
--	if (!hasPresets) {
--		menu->addChild(createMenuLabel("(None)"));
--	}
- };
- 
- 
-@@ -1010,6 +1037,7 @@
- 			weakThis->loadDialog();
- 		}));
- 
-+		/* TODO requires setting up user dir
- 		menu->addChild(createMenuItem("Save as", "", [=]() {
- 			if (!weakThis)
- 				return;
-@@ -1032,10 +1060,13 @@
- 		menu->addChild(new ui::MenuSeparator);
- 		menu->addChild(createMenuLabel("User presets"));
- 		appendPresetItems(menu, weakThis, weakThis->model->getUserPresetDirectory());
-+		*/
- 
- 		// Scan `<plugin dir>/presets/<module slug>` for presets.
-+		/* TODO enable only after setting up user dir
- 		menu->addChild(new ui::MenuSeparator);
- 		menu->addChild(createMenuLabel("Factory presets"));
-+		*/
- 		appendPresetItems(menu, weakThis, weakThis->model->getFactoryPresetDirectory());
- 	}));
- 
-@@ -1127,4 +1158,4 @@
+@@ -1129,4 +1165,4 @@
  
  
  } // namespace app

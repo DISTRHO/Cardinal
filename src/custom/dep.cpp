@@ -64,6 +64,10 @@ void updateForcingBlackSilverScrewMode(std::string slug) {
 namespace settings {
 bool darkMode = true;
 int rateLimit = 0;
+extern std::string uiTheme;
+}
+namespace ui {
+void refreshTheme();
 }
 }
 
@@ -1468,13 +1472,17 @@ void nsvgDeleteCardinal(NSVGimage* const handle)
     nsvgDelete(handle);
 }
 
+namespace rack {
+
 void switchDarkMode(const bool darkMode)
 {
    #ifndef HEADLESS
-    if (rack::settings::darkMode == darkMode)
+    if (settings::darkMode == darkMode)
         return;
 
-    rack::settings::darkMode = darkMode;
+    settings::darkMode = darkMode;
+    settings::uiTheme = darkMode ? "dark" : "light";
+    ui::refreshTheme();
 
     for (ExtendedNSVGimage& ext : loadedDarkSVGs)
     {
@@ -1494,7 +1502,6 @@ void switchDarkMode(const bool darkMode)
    #endif
 }
 
-namespace rack {
 namespace asset {
 
 void destroy() {

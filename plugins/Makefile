@@ -643,7 +643,7 @@ CATROMODULO_CUSTOM = LowFrequencyOscillator NumDisplayWidget
 PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 
 # modules/types which are present in other plugins
-CF_CUSTOM = $(DRWAV)
+CF_CUSTOM = $(DRWAV) ledTrigger
 
 # --------------------------------------------------------------
 # dBiz

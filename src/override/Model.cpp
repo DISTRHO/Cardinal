@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 
 /**
  * This file is an edited version of VCVRack's plugin/Model.cpp
- * Copyright (C) 2016-2021 VCV.
+ * Copyright (C) 2016-2023 VCV.
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -85,9 +85,12 @@ void Model::fromJson(json_t* rootJ) {
 
 	// hidden
 	json_t* hiddenJ = json_object_get(rootJ, "hidden");
-	// Use `disabled` as an alias which was deprecated in Rack 2.0
+	// "disabled" was a deprecated alias in Rack <2
 	if (!hiddenJ)
 		hiddenJ = json_object_get(rootJ, "disabled");
+	// "deprecated" was a deprecated alias in Rack <2.2.4
+	if (!hiddenJ)
+		hiddenJ = json_object_get(rootJ, "deprecated");
 	if (hiddenJ) {
 		// Don't un-hide Model if already hidden by C++
 		if (json_boolean_value(hiddenJ))
@@ -182,6 +185,13 @@ void Model::appendContextMenu(ui::Menu* menu, bool inBrowser) {
 	if (plugin->changelogUrl != "") {
 		menu->addChild(createMenuItem("Changelog", "", [=]() {
 			patchUtils::openBrowser(plugin->changelogUrl);
+		}));
+	}
+
+	// author email
+	if (plugin->authorEmail != "") {
+		menu->addChild(createMenuItem("Author email", "Copy to clipboard", [=]() {
+			glfwSetClipboardString(APP->window->win, plugin->authorEmail.c_str());
 		}));
 	}
 

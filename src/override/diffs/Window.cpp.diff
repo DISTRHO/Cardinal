@@ -1,9 +1,9 @@
---- ../Rack/src/window/Window.cpp	2022-09-21 19:49:12.202540796 +0100
-+++ Window.cpp	2022-12-29 17:16:45.012337253 +0000
-@@ -1,33 +1,88 @@
+--- ../Rack/src/window/Window.cpp	2023-05-20 17:03:33.007081806 +0200
++++ Window.cpp	2023-05-20 19:01:25.266135825 +0200
+@@ -1,33 +1,94 @@
 +/*
 + * DISTRHO Cardinal Plugin
-+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
 + *
 + * This program is free software; you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 +
 +/**
 + * This file is an edited version of VCVRack's window/Window.cpp
-+ * Copyright (C) 2016-2021 VCV.
++ * Copyright (C) 2016-2023 VCV.
 + *
 + * This program is free software: you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -57,16 +57,6 @@
 +# undef DEBUG
 +#endif
 +
-+// comment out if wanting to generate a local screenshot.png
-+#define STBI_WRITE_NO_STDIO
-+
-+// uncomment to generate screenshots without the rack rail background (ie, transparent)
-+// #define CARDINAL_TRANSPARENT_SCREENSHOTS
- 
-+// used in Window::screenshot
-+#define STB_IMAGE_WRITE_IMPLEMENTATION
-+#include "stb_image_write.h"
-+
 +#include "DistrhoUI.hpp"
 +#include "Application.hpp"
 +#include "extra/String.hpp"
@@ -77,6 +67,22 @@
 +#ifndef DGL_NO_SHARED_RESOURCES
 +# include "src/Resources.hpp"
 +#endif
+ 
++#if !(defined(DGL_USE_GLES) || CARDINAL_VARIANT_MINI)
++
++#define CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
++
++// comment out if wanting to generate a local screenshot.png
++#define STBI_WRITE_NO_STDIO
++
++// uncomment to generate screenshots without the rack rail background (ie, transparent)
++// #define CARDINAL_TRANSPARENT_SCREENSHOTS
++
++// used in Window::screenshot
++#define STB_IMAGE_WRITE_IMPLEMENTATION
++#include "stb_image_write.h"
++
++#endif
 +
 +#ifdef DISTRHO_OS_WASM
 +# include <emscripten/html5.h>
@@ -86,7 +92,7 @@
  namespace window {
  
  
--static const math::Vec WINDOW_SIZE_MIN = math::Vec(480, 320);
+-static const math::Vec WINDOW_SIZE_MIN = math::Vec(640, 480);
 +static const math::Vec WINDOW_SIZE_MIN = math::Vec(648, 538);
 +
 +
@@ -102,7 +108,7 @@
  
  
  Font::~Font() {
-@@ -42,9 +97,8 @@
+@@ -42,9 +103,8 @@
  	// Transfer ownership of font data to font object
  	uint8_t* data = system::readFile(filename, &size);
  	// Don't use nvgCreateFont because it doesn't properly handle UTF-8 filenames on Windows.
@@ -113,10 +119,11 @@
  		throw Exception("Failed to load font %s", filename.c_str());
  	}
  	INFO("Loaded font %s", filename.c_str());
-@@ -79,375 +133,489 @@
+@@ -79,338 +139,475 @@
  }
  
  
++#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 +enum ScreenshotStep {
 +	kScreenshotStepNone,
 +	kScreenshotStepStarted,
@@ -124,6 +131,7 @@
 +	kScreenshotStepSecondPass,
 +	kScreenshotStepSaving
 +};
++#endif
 +
 +
  struct Window::Internal {
@@ -153,15 +161,13 @@
  
  	int frame = 0;
 -	bool ignoreNextMouseDelta = false;
--	int frameSwapInterval = -1;
 -	double monitorRefreshRate = 0.0;
-+	int frameSwapInterval = 1;
-+#ifndef DGL_USE_GLES
++#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 +	int generateScreenshotStep = kScreenshotStepNone;
 +#endif
 +	double monitorRefreshRate = 60.0;
- 	double frameTime = 0.0;
- 	double lastFrameDuration = 0.0;
+ 	double frameTime = NAN;
+ 	double lastFrameDuration = NAN;
  
 -	math::Vec lastMousePos;
 -
@@ -173,8 +179,8 @@
  	bool fbDirtyOnSubpixelChange = true;
  	int fbCount = 0;
 -};
--
  
+-
 -static void windowPosCallback(GLFWwindow* win, int x, int y) {
 -	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED))
 -		return;
@@ -484,15 +490,11 @@
 -	APP->event->handleDrop(APP->window->internal->lastMousePos, pathsVec);
 -}
 -
- 
+-
 -static void errorCallback(int error, const char* description) {
 -	WARN("GLFW error %d: %s", error, description);
 -}
--
--
--Window::Window() {
--	internal = new Internal;
--	int err;
+ 
 +	if (ui != nullptr)
 +	{
 +		const GLubyte* vendor = glGetString(GL_VENDOR);
@@ -514,6 +516,10 @@
 +		window->internal->r_fbVg = nvgCreateSharedGL2(window->internal->r_vg, NVG_ANTIALIAS);
 +#endif
  
+-Window::Window() {
+-	internal = new Internal;
+-	int err;
+-
 -	// Set window hints
 -#if defined NANOVG_GL2
 -	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
@@ -558,7 +564,7 @@
 -	glfwSetInputMode(win, GLFW_LOCK_KEY_MODS, 1);
 -
 -	glfwMakeContextCurrent(win);
--	glfwSwapInterval(1);
+-	glfwSwapInterval(0);
 -	const GLFWvidmode* monitorMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 -	if (monitorMode->refreshRate > 0) {
 -		internal->monitorRefreshRate = monitorMode->refreshRate;
@@ -731,14 +737,14 @@
 +#else
 +			nvgDeleteGL2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
 +			nvgDeleteGL2(internal->o_vg != nullptr ? internal->o_vg : vg);
-+#endif
+ #endif
 +#else
 +#if defined NANOVG_GLES2
 +			nvgDeleteGLES2(fbVg);
 +#else
 +			nvgDeleteGL2(fbVg);
 +#endif
- #endif
++#endif
 +		}
 +	}
  
@@ -777,7 +783,7 @@
 +}
 +
 +
-+#ifndef DGL_USE_GLES
++#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 +static void Window__flipBitmap(uint8_t* pixels, const int width, const int height, const int depth) {
 +	for (int y = 0; y < height / 2; y++) {
 +		const int flipY = height - y - 1;
@@ -785,10 +791,10 @@
 +		std::memcpy(tmp, &pixels[y * width * depth], width * depth);
 +		std::memmove(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
 +		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
- 	}
- }
- 
- 
++	}
++}
++
++
 +#ifdef STBI_WRITE_NO_STDIO
 +static void Window__downscaleBitmap(uint8_t* pixels, int& width, int& height) {
 +	int targetWidth = width;
@@ -828,12 +834,12 @@
 +		ui->setState("screenshot", screenshot);
 +		remoteUtils::sendScreenshotToRemote(ui->remoteDetails, screenshot);
 +		std::free(screenshot);
-+	}
-+}
+ 	}
+ }
 +#endif
 +#endif
-+
-+
+ 
+ 
  void Window::step() {
 +	DISTRHO_SAFE_ASSERT_RETURN(internal->tlw != nullptr,);
 +
@@ -841,13 +847,9 @@
 +		return;
 +
  	double frameTime = system::getTime();
- 	double lastFrameTime = internal->frameTime;
- 	internal->frameTime = frameTime;
- 	internal->lastFrameDuration = frameTime - lastFrameTime;
- 	internal->fbCount = 0;
- 	// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
--	// double t1 = 0.0, t2 = 0.0, t3 = 0.0, t4 = 0.0, t5 = 0.0;
- 
+ 	if (std::isfinite(internal->frameTime)) {
+ 		internal->lastFrameDuration = frameTime - internal->frameTime;
+@@ -422,57 +619,48 @@
  	// Make event handlers and step() have a clean NanoVG context
  	nvgReset(vg);
  
@@ -861,10 +863,6 @@
 -
 -	// In case glfwPollEvents() sets another OpenGL context
 -	glfwMakeContextCurrent(win);
--	if (settings::frameSwapInterval != internal->frameSwapInterval) {
--		glfwSwapInterval(settings::frameSwapInterval);
--		internal->frameSwapInterval = settings::frameSwapInterval;
--	}
 -
 -	// Call cursorPosCallback every frame, not just when the mouse moves
 -	{
@@ -878,17 +876,27 @@
  
  	// Set window title
 -	std::string windowTitle = APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION;
-+	std::string windowTitle = "Cardinal";
- 	if (APP->patch->path != "") {
- 		windowTitle += " - ";
- 		if (!APP->history->isSaved())
-@@ -455,246 +623,189 @@
- 		windowTitle += system::getFilename(APP->patch->path);
- 	}
- 	if (windowTitle != internal->lastWindowTitle) {
+-	if (APP->patch->path != "") {
+-		windowTitle += " - ";
+-		if (!APP->history->isSaved())
+-			windowTitle += "*";
+-		windowTitle += system::getFilename(APP->patch->path);
+-	}
+-	if (windowTitle != internal->lastWindowTitle) {
 -		glfwSetWindowTitle(win, windowTitle.c_str());
-+		internal->tlw->getWindow().setTitle(windowTitle.c_str());
- 		internal->lastWindowTitle = windowTitle;
+-		internal->lastWindowTitle = windowTitle;
++	if (isStandalone()) {
++		std::string windowTitle = "Cardinal";
++		if (APP->patch->path != "") {
++			windowTitle += " - ";
++			if (!APP->history->isSaved())
++				windowTitle += "*";
++			windowTitle += system::getFilename(APP->patch->path);
++		}
++		if (windowTitle != internal->lastWindowTitle) {
++			internal->tlw->getWindow().setTitle(windowTitle.c_str());
++			internal->lastWindowTitle = windowTitle;
++		}
  	}
  
  	// Get desired pixel ratio
@@ -906,7 +914,7 @@
  		APP->event->handleDirty();
  	}
  
-+#ifndef DGL_USE_GLES
++#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 +	// Hide menu and background if generating screenshot
 +	if (internal->generateScreenshotStep == kScreenshotStepStarted) {
 +#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
@@ -925,20 +933,13 @@
 -	glfwGetWindowSize(win, &winWidth, &winHeight);
 +	int winWidth = internal->tlw->getWidth();
 +	int winHeight = internal->tlw->getHeight();
-+	int fbWidth = winWidth;// * newPixelRatio;
-+	int fbHeight = winHeight;// * newPixelRatio;
++	int fbWidth = winWidth;
++	int fbHeight = winHeight;
  	windowRatio = (float)fbWidth / winWidth;
--	// t1 = system::getTime();
+ 	// t1 = system::getTime();
  
- 	if (APP->scene) {
- 		// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
- 		// Resize scene
--		APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
-+		APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(newPixelRatio);
- 
- 		// Step scene
- 		APP->scene->step();
--		// t2 = system::getTime();
+@@ -486,10 +674,8 @@
+ 		// t2 = system::getTime();
  
  		// Render scene
 -		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
@@ -946,15 +947,11 @@
 +		{
  			// Update and render
 -			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
--			nvgScale(vg, pixelRatio, pixelRatio);
-+			nvgScale(vg, newPixelRatio, newPixelRatio);
+ 			nvgScale(vg, pixelRatio, pixelRatio);
  
  			// Draw scene
- 			widget::Widget::DrawArgs args;
- 			args.vg = vg;
- 			args.clipBox = APP->scene->box.zeroPos();
- 			APP->scene->draw(args);
--			// t3 = system::getTime();
+@@ -500,23 +686,16 @@
+ 			// t3 = system::getTime();
  
  			glViewport(0, 0, fbWidth, fbHeight);
 +#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
@@ -964,19 +961,32 @@
 +#endif
  			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 -			nvgEndFrame(vg);
--			// t4 = system::getTime();
  		}
+ 		// t4 = system::getTime();
  	}
  
 -	glfwSwapBuffers(win);
+-
+-	// Limit frame rate
+-	if (settings::frameRateLimit > 0) {
+-		double remaining = getFrameDurationRemaining();
+-		if (remaining > 0.0) {
+-			system::sleep(remaining);
+-		}
+-	}
+-
+ 	// t5 = system::getTime();
+ 	// DEBUG("pre-step %6.1f step %6.1f draw %6.1f nvgEndFrame %6.1f glfwSwapBuffers %6.1f total %6.1f",
+ 	// 	(t1 - frameTime) * 1e3f,
+@@ -526,163 +705,124 @@
+ 	// 	(t5 - t4) * 1e3f,
+ 	// 	(t5 - frameTime) * 1e3f
+ 	// );
+-	internal->frame++;
+-}
 +	++internal->frame;
  
--	// On some platforms, glfwSwapBuffers() doesn't wait on monitor refresh, so we have to sleep as a fallback.
--	double frameDurationRemaining = getFrameDurationRemaining();
--	if (frameDurationRemaining > 0.0) {
--		std::this_thread::sleep_for(std::chrono::duration<double>(frameDurationRemaining));
--	}
-+#ifndef DGL_USE_GLES
++#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 +	if (internal->generateScreenshotStep != kScreenshotStepNone) {
 +		++internal->generateScreenshotStep;
 +
@@ -988,24 +998,20 @@
 +		constexpr const int depth = 3;
 +#endif
  
--	// t5 = system::getTime();
+-static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
+-	for (int y = 0; y < height / 2; y++) {
+-		int flipY = height - y - 1;
+-		uint8_t tmp[width * depth];
+-		std::memcpy(tmp, &pixels[y * width * depth], width * depth);
+-		std::memcpy(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
+-		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
 +		// Allocate pixel color buffer
 +		uint8_t* const pixels = new uint8_t[winHeight * winWidth * 4];
- 
--	// DEBUG("pre-step %6.1f step %6.1f draw %6.1f nvgEndFrame %6.1f glfwSwapBuffers %6.1f total %6.1f",
--	// 	(t1 - frameTime) * 1e3f,
--	// 	(t2 - t1) * 1e3f,
--	// 	(t3 - t2) * 1e3f,
--	// 	(t4 - t2) * 1e3f,
--	// 	(t5 - t4) * 1e3f,
--	// 	(t5 - frameTime) * 1e3f
--	// );
--	internal->frame++;
--}
++
 +		// glReadPixels defaults to GL_BACK, but the back-buffer is unstable, so use the front buffer (what the user sees)
 +		glReadBuffer(GL_FRONT);
 +		glReadPixels(0, 0, winWidth, winHeight, depth == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, pixels);
- 
++
 +		if (internal->generateScreenshotStep == kScreenshotStepSaving)
 +		{
 +			// Write pixels to PNG
@@ -1020,33 +1026,19 @@
 +#else
 +			stbi_write_png("screenshot.png", winWidth, winHeight, depth, pixelsWithOffset, stride);
 +#endif
- 
--void Window::activateContext() {
--	glfwMakeContextCurrent(win);
++
 +			internal->generateScreenshotStep = kScreenshotStepNone;
 +			APP->scene->menuBar->show();
 +			APP->scene->rack->children.front()->show();
 +		}
 +
 +		delete[] pixels;
-+	}
+ 	}
 +#endif
  }
  
  
--static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
--	for (int y = 0; y < height / 2; y++) {
--		int flipY = height - y - 1;
--		uint8_t tmp[width * depth];
--		std::memcpy(tmp, &pixels[y * width * depth], width * depth);
--		std::memcpy(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
--		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
--	}
-+void Window::activateContext() {
- }
- 
- 
--void Window::screenshot(const std::string& screenshotPath) {
+ void Window::screenshot(const std::string& screenshotPath) {
 -	// Get window framebuffer size
 -	int width, height;
 -	glfwGetFramebufferSize(APP->window->win, &width, &height);
@@ -1063,10 +1055,10 @@
 -	stbi_write_png(screenshotPath.c_str(), width, height, 4, pixels, width * 4);
 -
 -	delete[] pixels;
--}
--
--
--void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
+ }
+ 
+ 
+ void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 -	// Iterate plugins and create directories
 -	system::createDirectories(screenshotsDir);
 -	for (plugin::Plugin* p : plugin::plugins) {
@@ -1111,20 +1103,17 @@
 -			nvgImageSize(vg, fbw->getImageHandle(), &width, &height);
 -			uint8_t* pixels = new uint8_t[height * width * 4];
 -			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-+void Window::screenshot(const std::string&) {
-+}
- 
+-
 -			// Write pixels to PNG
 -			flipBitmap(pixels, width, height, 4);
 -			stbi_write_png(filename.c_str(), width, height, 4, pixels, width * 4);
- 
+-
 -			// Cleanup
 -			delete[] pixels;
 -			nvgluBindFramebuffer(NULL);
 -			delete fbw;
 -		}
 -	}
-+void Window::screenshotModules(const std::string&, float) {
  }
  
  
@@ -1189,7 +1178,7 @@
  }
  
  
--void Window::setFullScreen(bool fullScreen) {
+ void Window::setFullScreen(bool fullScreen) {
 -	if (!fullScreen) {
 -		glfwSetWindowMonitor(win, NULL, internal->lastWindowX, internal->lastWindowY, internal->lastWindowWidth, internal->lastWindowHeight, GLFW_DONT_CARE);
 -	}
@@ -1200,9 +1189,8 @@
 -		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 -		glfwSetWindowMonitor(win, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 -	}
-+void Window::setFullScreen(const bool fullscreen) {
 +#ifdef DISTRHO_OS_WASM
-+	if (fullscreen)
++	if (fullScreen)
 +		emscripten_request_fullscreen(internal->tlw->getWindow().getApp().getClassName(), false);
 +	else
 +		emscripten_exit_fullscreen();
@@ -1218,18 +1206,24 @@
 +	if (emscripten_get_fullscreen_status(&status) == EMSCRIPTEN_RESULT_SUCCESS)
 +		return status.isFullscreen;
 +	return false;
-+#elif defined(CARDINAL_TRANSPARENT_SCREENSHOTS) && !defined(DGL_USE_GLES)
++#elif defined(CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS) && defined(CARDINAL_TRANSPARENT_SCREENSHOTS)
 +	return internal->generateScreenshotStep != kScreenshotStepNone;
 +#else
 +	return false;
 +#endif
  }
  
--
- double Window::getMonitorRefreshRate() {
- 	return internal->monitorRefreshRate;
+ 
+@@ -702,7 +842,7 @@
+ 
+ 
+ double Window::getFrameDurationRemaining() {
+-	double frameDuration = 1.f / settings::frameRateLimit;
++	double frameDuration = 1.f / internal->monitorRefreshRate;
+ 	return frameDuration - (system::getTime() - internal->frameTime);
  }
-@@ -722,14 +833,15 @@
+ 
+@@ -713,14 +853,15 @@
  		return pair->second;
  
  	// Load font
@@ -1248,7 +1242,7 @@
  	}
  	internal->fontCache[filename] = font;
  	return font;
-@@ -742,14 +854,15 @@
+@@ -733,14 +874,15 @@
  		return pair->second;
  
  	// Load image
@@ -1267,7 +1261,7 @@
  	}
  	internal->imageCache[filename] = image;
  	return image;
-@@ -766,28 +879,156 @@
+@@ -757,28 +899,156 @@
  }
  
  
@@ -1279,7 +1273,7 @@
 -	glfwInitHint(GLFW_COCOA_CHDIR_RESOURCES, GLFW_TRUE);
 -	glfwInitHint(GLFW_COCOA_MENUBAR, GLFW_FALSE);
 +void generateScreenshot() {
-+#ifndef DGL_USE_GLES
++#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 +	APP->window->internal->generateScreenshotStep = kScreenshotStepStarted;
  #endif
 +}

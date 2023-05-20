@@ -1,9 +1,9 @@
---- ../Rack/src/plugin/Model.cpp	2022-09-21 19:49:12.200540736 +0100
-+++ Model.cpp	2022-09-21 19:41:45.883648777 +0100
+--- ../Rack/src/plugin/Model.cpp	2023-05-20 17:03:33.007081806 +0200
++++ Model.cpp	2023-05-20 18:29:51.484669742 +0200
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin
-+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
 + *
 + * This program is free software; you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 +
 +/**
 + * This file is an edited version of VCVRack's plugin/Model.cpp
-+ * Copyright (C) 2016-2021 VCV.
++ * Copyright (C) 2016-2023 VCV.
 + *
 + * This program is free software: you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -61,8 +61,8 @@
 -
  	// hidden
  	json_t* hiddenJ = json_object_get(rootJ, "hidden");
- 	// Use `disabled` as an alias which was deprecated in Rack 2.0
-@@ -74,7 +97,7 @@
+ 	// "disabled" was a deprecated alias in Rack <2
+@@ -77,7 +100,7 @@
  
  
  std::string Model::getFullName() {
@@ -71,7 +71,7 @@
  	return plugin->getBrand() + " " + name;
  }
  
-@@ -99,7 +122,7 @@
+@@ -102,7 +125,7 @@
  void Model::appendContextMenu(ui::Menu* menu, bool inBrowser) {
  	// plugin
  	menu->addChild(createMenuItem("Plugin: " + plugin->name, "", [=]() {
@@ -80,7 +80,7 @@
  	}, plugin->pluginUrl == ""));
  
  	// version
-@@ -108,7 +131,7 @@
+@@ -111,7 +134,7 @@
  	// author
  	if (plugin->author != "") {
  		menu->addChild(createMenuItem("Author: " + plugin->author, "", [=]() {
@@ -89,7 +89,7 @@
  		}, plugin->authorUrl.empty()));
  	}
  
-@@ -116,7 +139,7 @@
+@@ -119,7 +142,7 @@
  	std::string license = plugin->license;
  	if (string::startsWith(license, "https://") || string::startsWith(license, "http://")) {
  		menu->addChild(createMenuItem("License: Open in browser", "", [=]() {
@@ -98,7 +98,7 @@
  		}));
  	}
  	else if (license != "") {
-@@ -133,58 +156,32 @@
+@@ -136,44 +159,32 @@
  
  	menu->addChild(new ui::MenuSeparator);
  
@@ -143,21 +143,21 @@
  	if (plugin->changelogUrl != "") {
  		menu->addChild(createMenuItem("Changelog", "", [=]() {
 -			system::openBrowser(plugin->changelogUrl);
--		}));
--	}
--
--	// author email
--	if (plugin->authorEmail != "") {
--		menu->addChild(createMenuItem("Author email", "Copy to clipboard", [=]() {
--			glfwSetClipboardString(APP->window->win, plugin->authorEmail.c_str());
--		}));
--	}
--
--	// plugin folder
--	if (plugin->path != "") {
--		menu->addChild(createMenuItem("Open plugin folder", "", [=]() {
--			system::openDirectory(plugin->path);
 +			patchUtils::openBrowser(plugin->changelogUrl);
  		}));
  	}
  
+@@ -184,13 +195,6 @@
+ 		}));
+ 	}
+ 
+-	// plugin folder
+-	if (plugin->path != "") {
+-		menu->addChild(createMenuItem("Open plugin folder", "", [=]() {
+-			system::openDirectory(plugin->path);
+-		}));
+-	}
+-
+ 	// Favorite
+ 	std::string favoriteRightText = inBrowser ? (RACK_MOD_CTRL_NAME "+click") : "";
+ 	if (isFavorite())

@@ -393,6 +393,8 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     settings::browserZoom = -1.f;
     settings::invertZoom = false;
     settings::squeezeModules = true;
+    settings::darkMode = true;
+    settings::uiTheme = "dark";
 
     // runtime behaviour
     settings::devMode = true;
@@ -635,12 +637,20 @@ void Initializer::loadSettings(const bool isRealInstance)
     settings::pixelRatio = 0.0;
     settings::sampleRate = 0;
     settings::threadCount = 1;
-    settings::frameSwapInterval = 1;
     settings::autosaveInterval = 0;
     settings::skipLoadOnLaunch = true;
     settings::autoCheckUpdates = false;
     settings::showTipsOnLaunch = false;
     settings::tipIndex = -1;
+
+    if (settings::uiTheme != "dark" && settings::uiTheme != "light")
+    {
+        settings::uiTheme = "dark";
+        rack::ui::refreshTheme();
+    }
+
+    // reload dark/light mode as necessary
+    switchDarkMode(settings::uiTheme == "dark");
 }
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -197,14 +197,10 @@ $(RACK_DEP_PATH)/libsamplerate-0.1.9/.stamp-patched:
 	touch $@
 
 # libspeexdsp: hide symbols
-$(RACK_DEP_PATH)/lib/libspeexdsp.a: $(RACK_DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched
+$(RACK_DEP_PATH)/lib/libspeexdsp.a: $(RACK_DEP_PATH)/speexdsp/.stamp-patched
 
-$(RACK_DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched:
-	$(DEP_MAKE2) -C $(RACK_DEP_PATH) speexdsp-SpeexDSP-1.2rc3 \
-		WGET="wget -c http://downloads.xiph.org/releases/speex/speexdsp-1.2rc3.tar.gz && mv speexdsp-1.2rc3.tar.gz speexdsp-SpeexDSP-1.2rc3.tgz #" \
-		SHA256SUM="true" \
-		UNTAR="mkdir -p speexdsp-SpeexDSP-1.2rc3 && tar -x --strip-components=1 --directory=$(RACK_DEP_PATH)/speexdsp-SpeexDSP-1.2rc3 -f"
-	sed -i -e "s/#pragma GCC visibility push/#error we dont want this/" $(RACK_DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/configure
+$(RACK_DEP_PATH)/speexdsp/.stamp-patched:
+	sed -i -e 's/__attribute__((visibility("default")))//' $(RACK_DEP_PATH)/speexdsp/configure.ac
 	touch $@
 
 # custom zstd build for only building static libs
@@ -279,12 +275,7 @@ endif
 endif
 
 # same flags as applied to main build
-SURGE_CXX_FLAGS += -DSIMDE_ACCURACY_PREFERENCE=0
-SURGE_CXX_FLAGS += -DSIMDE_FAST_CONVERSION_RANGE
-SURGE_CXX_FLAGS += -DSIMDE_FAST_MATH
-SURGE_CXX_FLAGS += -DSIMDE_FAST_NANS
-SURGE_CXX_FLAGS += -DSIMDE_FAST_ROUND_MODE
-SURGE_CXX_FLAGS += -DSIMDE_FAST_ROUND_TIES
+SURGE_CXX_FLAGS += -I$(abspath ../src/Rack/dep/simde)
 
 # possibly use fftw?
 # ifeq ($(shell $(PKG_CONFIG) --exists fftw3 fftw3f && echo true),true)
@@ -315,7 +306,7 @@ $(SURGE_DEP_PATH)/Makefile: $(SURGE_SRC_PATH)/CMakeLists.txt
 		-DSURGE_SKIP_LUA=TRUE \
 		-DSURGE_SKIP_ODDSOUND_MTS=TRUE \
 		-DSURGE_JUCE_PATH=$(abspath ../carla/source) \
-		-DSURGE_SIMDE_PATH=$(abspath ../include/simde) \
+		-DSURGE_SIMDE_PATH=$(abspath ../src/Rack/dep/simde) \
 		$(SURGE_SRC_PATH)
 
 # --------------------------------------------------------------
@@ -352,7 +343,6 @@ clean:
 	rm -rf $(RACK_DEP_PATH)/jansson-2.12
 	rm -rf $(RACK_DEP_PATH)/libarchive-3.4.3
 	rm -rf $(RACK_DEP_PATH)/libsamplerate-0.1.9
-	rm -rf $(RACK_DEP_PATH)/speexdsp-SpeexDSP-1.2rc3
 	rm -rf $(RACK_DEP_PATH)/zstd-1.4.5
 	rm -rf $(SURGE_DEP_PATH)
 
@@ -360,7 +350,6 @@ download: \
 	$(RACK_DEP_PATH)/jansson-2.12 \
 	$(RACK_DEP_PATH)/libarchive-3.4.3/.stamp-patched \
 	$(RACK_DEP_PATH)/libsamplerate-0.1.9/.stamp-patched \
-	$(RACK_DEP_PATH)/speexdsp-SpeexDSP-1.2rc3/.stamp-patched \
 	$(RACK_DEP_PATH)/zstd-1.4.5/.stamp-patched
 
 quickjs: $(RACK_DEP_PATH)/lib/libquickjs.a

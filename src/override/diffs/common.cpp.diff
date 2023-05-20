@@ -1,9 +1,9 @@
---- ../Rack/src/common.cpp	2022-09-21 19:49:12.199540706 +0100
-+++ common.cpp	2022-12-02 19:11:45.780215974 +0000
+--- ../Rack/src/common.cpp	2023-05-20 17:03:33.006081772 +0200
++++ common.cpp	2023-05-20 17:51:04.675045244 +0200
 @@ -1,12 +1,57 @@
 +/*
 + * DISTRHO Cardinal Plugin
-+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
 + *
 + * This program is free software; you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 +
 +/**
 + * This file is an edited version of VCVRack's common.cpp
-+ * Copyright (C) 2016-2021 VCV.
++ * Copyright (C) 2016-2023 VCV.
 + *
 + * This program is free software: you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -60,7 +60,7 @@
  }
  
  #endif
-@@ -14,20 +59,21 @@
+@@ -14,12 +59,11 @@
  
  namespace rack {
  
@@ -73,17 +73,24 @@
 +const std::string APP_EDITION_NAME = "Audio Plugin";
  const std::string APP_VERSION_MAJOR = "2";
 -const std::string APP_VERSION = TOSTRING(_APP_VERSION);
-+const std::string APP_VERSION = "2.1.2";
++const std::string APP_VERSION = "2.3.0";
  #if defined ARCH_WIN
  	const std::string APP_OS = "win";
--#elif ARCH_MAC
-+#elif defined ARCH_MAC
- 	const std::string APP_OS = "mac";
+ 	const std::string APP_OS_NAME = "Windows";
+@@ -29,15 +73,10 @@
  #elif defined ARCH_LIN
  	const std::string APP_OS = "lin";
+ 	const std::string APP_OS_NAME = "Linux";
 +#else
 +	#error ARCH_LIN undefined
  #endif
+-#if defined ARCH_X64
+-	const std::string APP_CPU = "x64";
+-	const std::string APP_CPU_NAME = "x64";
+-#elif defined ARCH_ARM64
+-	const std::string APP_CPU = "arm64";
+-	const std::string APP_CPU_NAME = "ARM64";
+-#endif
 -const std::string API_URL = "https://api.vcvrack.com";
 +const std::string API_URL = "";
  

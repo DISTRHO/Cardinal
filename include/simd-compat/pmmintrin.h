@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -32,13 +32,16 @@
 
 // assume SSE3 only on macOS
 # ifndef ARCH_MAC
-#  include "../simde/simde/x86/sse3.h"
+#  include "simde/x86/sse3.h"
 # endif
 
 # ifdef _WIN32_WAS_DEFINED
 #  define _WIN32
 #  undef _WIN32_WAS_DEFINED
 # endif
+
+# undef SIMDE_X86_SSE2_NATIVE
+# undef SIMDE_X86_SSE3_ENABLE_NATIVE_ALIASES
 
 #elif defined(__EMSCRIPTEN__) && !defined(CARDINAL_NOSIMD)
 # include_next <pmmintrin.h>
@@ -67,14 +70,9 @@ __m64 _mm_set1_pi16(short w)
 */
 
 #else
-# define SIMDE_ACCURACY_PREFERENCE 0
 # define SIMDE_ENABLE_NATIVE_ALIASES
-# define SIMDE_FAST_CONVERSION_RANGE
-# define SIMDE_FAST_MATH
-# define SIMDE_FAST_NANS
-# define SIMDE_FAST_ROUND_MODE
-# define SIMDE_FAST_ROUND_TIES
-# include "../simde/simde/x86/sse.h"
-# include "../simde/simde/x86/sse2.h"
-# include "../simde/simde/x86/sse3.h"
+# include "simde/x86/sse.h"
+# include "simde/x86/sse2.h"
+# include "simde/x86/sse3.h"
+# undef SIMDE_ENABLE_NATIVE_ALIASES
 #endif

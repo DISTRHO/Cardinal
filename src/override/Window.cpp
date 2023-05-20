@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 
 /**
  * This file is an edited version of VCVRack's window/Window.cpp
- * Copyright (C) 2016-2021 VCV.
+ * Copyright (C) 2016-2023 VCV.
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -172,13 +172,12 @@ struct Window::Internal {
 	int currentRateLimit = 0;
 
 	int frame = 0;
-	int frameSwapInterval = 1;
 #ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 	int generateScreenshotStep = kScreenshotStepNone;
 #endif
 	double monitorRefreshRate = 60.0;
-	double frameTime = 0.0;
-	double lastFrameDuration = 0.0;
+	double frameTime = NAN;
+	double lastFrameDuration = NAN;
 
 	std::map<std::string, std::shared_ptr<FontWithOriginalContext>> fontCache;
 	std::map<std::string, std::shared_ptr<ImageWithOriginalContext>> imageCache;
@@ -610,11 +609,12 @@ void Window::step() {
 		return;
 
 	double frameTime = system::getTime();
-	double lastFrameTime = internal->frameTime;
+	if (std::isfinite(internal->frameTime)) {
+		internal->lastFrameDuration = frameTime - internal->frameTime;
+	}
 	internal->frameTime = frameTime;
-	internal->lastFrameDuration = frameTime - lastFrameTime;
 	internal->fbCount = 0;
-	// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
+	// double t1 = 0.0, t2 = 0.0, t3 = 0.0, t4 = 0.0, t5 = 0.0;
 
 	// Make event handlers and step() have a clean NanoVG context
 	nvgReset(vg);
@@ -659,28 +659,31 @@ void Window::step() {
 	// Get framebuffer/window ratio
 	int winWidth = internal->tlw->getWidth();
 	int winHeight = internal->tlw->getHeight();
-	int fbWidth = winWidth;// * newPixelRatio;
-	int fbHeight = winHeight;// * newPixelRatio;
+	int fbWidth = winWidth;
+	int fbHeight = winHeight;
 	windowRatio = (float)fbWidth / winWidth;
+	// t1 = system::getTime();
 
 	if (APP->scene) {
 		// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
 		// Resize scene
-		APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(newPixelRatio);
+		APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
 
 		// Step scene
 		APP->scene->step();
+		// t2 = system::getTime();
 
 		// Render scene
 		{
 			// Update and render
-			nvgScale(vg, newPixelRatio, newPixelRatio);
+			nvgScale(vg, pixelRatio, pixelRatio);
 
 			// Draw scene
 			widget::Widget::DrawArgs args;
 			args.vg = vg;
 			args.clipBox = APP->scene->box.zeroPos();
 			APP->scene->draw(args);
+			// t3 = system::getTime();
 
 			glViewport(0, 0, fbWidth, fbHeight);
 #ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
@@ -690,8 +693,18 @@ void Window::step() {
 #endif
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		}
+		// t4 = system::getTime();
 	}
 
+	// t5 = system::getTime();
+	// DEBUG("pre-step %6.1f step %6.1f draw %6.1f nvgEndFrame %6.1f glfwSwapBuffers %6.1f total %6.1f",
+	// 	(t1 - frameTime) * 1e3f,
+	// 	(t2 - t1) * 1e3f,
+	// 	(t3 - t2) * 1e3f,
+	// 	(t4 - t3) * 1e3f,
+	// 	(t5 - t4) * 1e3f,
+	// 	(t5 - frameTime) * 1e3f
+	// );
 	++internal->frame;
 
 #ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
@@ -739,15 +752,11 @@ void Window::step() {
 }
 
 
-void Window::activateContext() {
+void Window::screenshot(const std::string& screenshotPath) {
 }
 
 
-void Window::screenshot(const std::string&) {
-}
-
-
-void Window::screenshotModules(const std::string&, float) {
+void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 }
 
 
@@ -793,9 +802,9 @@ int Window::getMods() {
 }
 
 
-void Window::setFullScreen(const bool fullscreen) {
+void Window::setFullScreen(bool fullScreen) {
 #ifdef DISTRHO_OS_WASM
-	if (fullscreen)
+	if (fullScreen)
 		emscripten_request_fullscreen(internal->tlw->getWindow().getApp().getClassName(), false);
 	else
 		emscripten_exit_fullscreen();
@@ -816,6 +825,7 @@ bool Window::isFullScreen() {
 #endif
 }
 
+
 double Window::getMonitorRefreshRate() {
 	return internal->monitorRefreshRate;
 }
@@ -832,8 +842,8 @@ double Window::getLastFrameDuration() {
 
 
 double Window::getFrameDurationRemaining() {
-	double frameDurationDesired = internal->frameSwapInterval / internal->monitorRefreshRate;
-	return frameDurationDesired - (system::getTime() - internal->frameTime);
+	double frameDuration = 1.f / internal->monitorRefreshRate;
+	return frameDuration - (system::getTime() - internal->frameTime);
 }
 
 

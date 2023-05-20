@@ -62,6 +62,7 @@ IGNORED_FILES += Rack/src/gamepad.cpp
 IGNORED_FILES += Rack/src/keyboard.cpp
 IGNORED_FILES += Rack/src/library.cpp
 IGNORED_FILES += Rack/src/midi.cpp
+IGNORED_FILES += Rack/src/midiloopback.cpp
 IGNORED_FILES += Rack/src/network.cpp
 IGNORED_FILES += Rack/src/plugin.cpp
 IGNORED_FILES += Rack/src/rtaudio.cpp
@@ -79,6 +80,7 @@ IGNORED_FILES += Rack/src/widget/OpenGlWidget.cpp
 IGNORED_FILES += Rack/src/window/Window.cpp
 IGNORED_FILES += $(wildcard Rack/src/core/*.cpp)
 
+RACK_FILES += Rack/dep/tinyexpr/tinyexpr.c
 RACK_FILES += $(wildcard Rack/src/*.c)
 RACK_FILES += $(wildcard Rack/src/*/*.c)
 RACK_FILES += $(filter-out $(IGNORED_FILES),$(wildcard Rack/src/*.cpp))
@@ -189,6 +191,8 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
 
 $(BUILD_DIR)/emscripten/WasmUtils.cpp.o: BUILD_CXX_FLAGS += -fno-exceptions
+
+$(BUILD_DIR)/Rack/dep/tinyexpr/tinyexpr.c.o: BUILD_C_FLAGS += -DTE_POW_FROM_RIGHT -DTE_NAT_LOG
 
 # --------------------------------------------------------------
 
