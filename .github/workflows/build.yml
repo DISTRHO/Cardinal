@@ -194,7 +194,7 @@ jobs:
           key: macos-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Setup dependencies
         run: |
-          brew install autoconf
+          brew install autoconf automake
       - name: Build extra dependencies
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
