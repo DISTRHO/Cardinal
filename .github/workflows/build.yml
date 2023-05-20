@@ -35,7 +35,6 @@ jobs:
             src/Rack/dep/jansson-2.12
             src/Rack/dep/libarchive-3.4.3
             src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: linux-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
@@ -191,9 +190,11 @@ jobs:
             src/Rack/dep/jansson-2.12
             src/Rack/dep/libarchive-3.4.3
             src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: macos-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+      - name: Setup dependencies
+        run: |
+          brew install autoconf
       - name: Build extra dependencies
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
@@ -325,7 +326,6 @@ jobs:
             src/Rack/dep/jansson-2.12
             src/Rack/dep/libarchive-3.4.3
             src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: wasm-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
@@ -421,7 +421,6 @@ jobs:
             src/Rack/dep/jansson-2.12
             src/Rack/dep/libarchive-3.4.3
             src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: ${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
@@ -606,7 +605,6 @@ jobs:
             src/Rack/dep/jansson-2.12
             src/Rack/dep/libarchive-3.4.3
             src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: pluginval-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies

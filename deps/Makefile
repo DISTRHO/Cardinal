@@ -12,15 +12,16 @@ include $(ROOT)/Makefile.base.mk
 
 ifeq ($(CPU_ARM32),true)
 ARCH_NAME = arm
-MACHINE = i686-the-rack
+MACHINE = arm64
 else ifeq ($(CPU_ARM64),true)
 ARCH_NAME = arm64
-MACHINE = x86_64-the-rack
+MACHINE = arm64
 else ifeq ($(CPU_RISCV64),true)
 ARCH_NAME = riscv64
-MACHINE = x86_64-the-rack
+MACHINE = arm64
 else ifeq ($(WASM),true)
-MACHINE = i686-wasm
+ARCH_NAME = wasm
+MACHINE = x86_64
 else
 MACHINE = $(TARGET_MACHINE)
 endif
