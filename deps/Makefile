@@ -16,6 +16,9 @@ MACHINE = arm64
 else ifeq ($(CPU_ARM64),true)
 ARCH_NAME = arm64
 MACHINE = arm64
+else ifeq ($(CPU_I386),true)
+ARCH_NAME = i686
+MACHINE = x86_64
 else ifeq ($(CPU_RISCV64),true)
 ARCH_NAME = riscv64
 MACHINE = arm64
