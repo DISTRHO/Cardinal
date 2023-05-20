@@ -61,6 +61,9 @@ void updateForcingBlackSilverScrewMode(std::string slug) {
 }
 }
 #endif
+namespace plugin {
+void updateStaticPluginsDarkMode();
+}
 namespace settings {
 bool darkMode = true;
 int rateLimit = 0;
@@ -1483,6 +1486,7 @@ void switchDarkMode(const bool darkMode)
     settings::darkMode = darkMode;
     settings::uiTheme = darkMode ? "dark" : "light";
     ui::refreshTheme();
+    plugin::updateStaticPluginsDarkMode();
 
     for (ExtendedNSVGimage& ext : loadedDarkSVGs)
     {

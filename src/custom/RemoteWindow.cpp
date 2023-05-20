@@ -108,10 +108,6 @@ void Window::step() {
 }
 
 
-// void Window::activateContext() {
-// }
-
-
 void Window::screenshot(const std::string&) {
 }
 

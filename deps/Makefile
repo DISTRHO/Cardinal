@@ -274,9 +274,6 @@ SURGE_CXX_FLAGS += -msse -msse2 -mfpmath=sse
 endif
 endif
 
-# same flags as applied to main build
-SURGE_CXX_FLAGS += -I$(abspath ../src/Rack/dep/simde)
-
 # possibly use fftw?
 # ifeq ($(shell $(PKG_CONFIG) --exists fftw3 fftw3f && echo true),true)
 # SURGE_CXX_FLAGS += -DJUCE_DSP_USE_STATIC_FFTW=1

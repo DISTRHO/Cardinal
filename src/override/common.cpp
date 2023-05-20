@@ -66,13 +66,10 @@ const std::string APP_VERSION_MAJOR = "2";
 const std::string APP_VERSION = "2.3.0";
 #if defined ARCH_WIN
 	const std::string APP_OS = "win";
-	const std::string APP_OS_NAME = "Windows";
 #elif defined ARCH_MAC
 	const std::string APP_OS = "mac";
-	const std::string APP_OS_NAME = "macOS";
 #elif defined ARCH_LIN
 	const std::string APP_OS = "lin";
-	const std::string APP_OS_NAME = "Linux";
 #else
 	#error ARCH_LIN undefined
 #endif
