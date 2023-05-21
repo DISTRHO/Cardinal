@@ -221,8 +221,6 @@ jobs:
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS (packaging)
         if: steps.cache.outputs.cache-hit == 'true'
-        env:
-          MACOS_ARCHS: 'arm64,x86_64'
         run: |
           source deps/PawPaw/local.env macos-${{ matrix.target }}
           ./utils/create-macos-installer.sh

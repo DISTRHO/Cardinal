@@ -34,12 +34,14 @@ pkgbuild \
 
 pkgbuild \
   --identifier "studio.kx.distrho.plugins.cardinal.jack" \
+  --component-plist "../utils/macOS/Build_JACK.plist" \
   --install-location "/Applications/" \
   --root "${PWD}/jack/" \
   ../dpf-cardinal-jack.pkg
 
 pkgbuild \
   --identifier "studio.kx.distrho.plugins.cardinal.native" \
+  --component-plist "../utils/macOS/Build_Native.plist" \
   --install-location "/Applications/" \
   --root "${PWD}/native/" \
   ../dpf-cardinal-native.pkg
@@ -77,7 +79,6 @@ pkgbuild \
 cd ..
 
 sed -e "s|@builddir@|${PWD}/build|" \
-    -e "s|@buildarchs@|${MACOS_ARCHS}|" \
     utils/macOS/package.xml.in > build/package.xml
 
 productbuild \
