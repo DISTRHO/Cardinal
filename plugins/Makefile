@@ -843,7 +843,7 @@ PLUGIN_FILES += $(wildcard MindMeldModular/src/ShapeMaster/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/Utilities/*.cpp)
 
 # modules/types which are present in other plugins
-MINDMELD_CUSTOM = printNote
+MINDMELD_CUSTOM = Trigger printNote
 
 # --------------------------------------------------------------
 # ML_modules
