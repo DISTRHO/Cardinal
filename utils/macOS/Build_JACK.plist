@@ -12,7 +12,7 @@
 		<key>BundleOverwriteAction</key>
 		<string>upgrade</string>
 		<key>RootRelativeBundlePath</key>
-		<string>Cardinal.app</string>
+		<string>CardinalJACK.app</string>
 	</dict>
 </array>
 </plist>
