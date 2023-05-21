@@ -283,6 +283,7 @@ LINK_FLAGS += -O3
 LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
 LINK_FLAGS += -sLZ4=1
+LINK_FLAGS += -lidbfs.js
 
 ifeq ($(CARDINAL_VARIANT),mini)
 LINK_FLAGS += --preload-file=../../bin/CardinalMini.lv2/resources@/resources

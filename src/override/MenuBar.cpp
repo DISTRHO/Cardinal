@@ -56,6 +56,11 @@
 #include "DistrhoPlugin.hpp"
 #include "DistrhoStandaloneUtils.hpp"
 
+#ifdef DISTRHO_OS_WASM
+# include <emscripten/emscripten.h>
+# undef HAVE_LIBLO
+#endif
+
 #ifdef HAVE_LIBLO
 # include <lo/lo.h>
 #endif
@@ -98,6 +103,28 @@ struct FileButton : MenuButton {
 	const bool isStandalone;
 	std::vector<std::string> demoPatches;
 
+#ifdef DISTRHO_OS_WASM
+	static void WebBrowserDataSaved(const int err)
+	{
+		err ? async_dialog_message("Error, could not save web browser data!")
+		    : async_dialog_message("Web browser data saved!");
+	}
+
+	static void wasmSaveAs()
+	{
+		async_dialog_text_input("Filename", nullptr, [](char* const filename) {
+			if (filename == nullptr)
+				return;
+			APP->patch->path  = "/userfiles/";
+			APP->patch->path += filename;
+			if (rack::system::getExtension(filename) != ".vcv")
+				APP->patch->path += ".vcv";
+			patchUtils::saveDialog(APP->patch->path);
+			std::free(filename);
+		});
+	}
+#endif
+
 	FileButton(const bool standalone)
 		: MenuButton(),  isStandalone(standalone)
 	{
@@ -131,7 +158,6 @@ struct FileButton : MenuButton {
 		}));
 
 #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
-#ifndef DISTRHO_OS_WASM
 		menu->addChild(createMenuItem("New (factory template)", "", []() {
 			patchUtils::loadTemplateDialog(true);
 		}));
@@ -149,6 +175,11 @@ struct FileButton : MenuButton {
 			}
 		}, settings::recentPatchPaths.empty()));
 
+		menu->addChild(createMenuItem("Import selection...", "", [=]() {
+			patchUtils::loadSelectionDialog();
+		}, false, true));
+
+#ifndef DISTRHO_OS_WASM
 		menu->addChild(createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
 			// NOTE: will do nothing if path is empty, intentionally
 			patchUtils::saveDialog(APP->patch->path);
@@ -158,13 +189,16 @@ struct FileButton : MenuButton {
 			patchUtils::saveAsDialog();
 		}));
 #else
-		menu->addChild(createMenuItem("Import patch...", RACK_MOD_CTRL_NAME "+O", []() {
-			patchUtils::loadDialog();
+		menu->addChild(createMenuItem("Save", "", []() {
+			if (APP->patch->path.empty())
+				wasmSaveAs();
+			else
+				patchUtils::saveDialog(APP->patch->path);
 		}));
 
-		menu->addChild(createMenuItem("Import selection...", "", [=]() {
-			patchUtils::loadSelectionDialog();
-		}, false, true));
+		menu->addChild(createMenuItem("Save as", "", []() {
+			wasmSaveAs();
+		}));
 
 		menu->addChild(createMenuItem("Save and download compressed", RACK_MOD_CTRL_NAME "+Shift+S", []() {
 			patchUtils::saveAsDialog();
@@ -183,6 +217,17 @@ struct FileButton : MenuButton {
 		menu->addChild(createMenuItem("Overwrite template", "", []() {
 			patchUtils::saveTemplateDialog();
 		}));
+
+#ifdef DISTRHO_OS_WASM
+		menu->addChild(new ui::MenuSeparator);
+
+		menu->addChild(createMenuItem("Save persistent browser data", "", []() {
+			settings::save();
+			EM_ASM({
+				Module.FS.syncfs(false, function(err){ dynCall('vi', $0, [!!err]) });
+			}, WebBrowserDataSaved);
+		}));
+#endif
 
 #if defined(HAVE_LIBLO) || ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 #ifdef __MOD_DEVICES__
@@ -211,21 +256,6 @@ struct FileButton : MenuButton {
 				DISTRHO_SAFE_ASSERT(remoteUtils::connectToRemote());
 			}));
 		}
-#endif
-
-#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
-#ifndef DISTRHO_OS_WASM
-		menu->addChild(new ui::MenuSeparator);
-
-		// Load selection
-		menu->addChild(createMenuItem("Import selection...", "", [=]() {
-			patchUtils::loadSelectionDialog();
-		}, false, true));
-
-		menu->addChild(createMenuItem("Export uncompressed json...", "", []() {
-			patchUtils::saveAsDialogUncompressed();
-		}));
-#endif
 #endif
 
 		if (!demoPatches.empty())

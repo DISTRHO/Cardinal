@@ -62,6 +62,11 @@
 #endif
 
 namespace rack {
+#ifdef DISTRHO_OS_WASM
+namespace asset {
+std::string patchesPath();
+}
+#endif
 namespace engine {
 void Engine_setAboutToClose(Engine*);
 void Engine_setRemoteDetails(Engine*, remoteUtils::RemoteDetails*);
@@ -246,7 +251,7 @@ static void downloadRemotePatchFailed(const char* const filename)
     }
 
     using namespace rack;
-    context->patch->templatePath = system::join(asset::systemDir, "init/wasm.vcv"); // FIXME
+    context->patch->templatePath = rack::system::join(asset::patchesPath(), "templates/main.vcv");
     context->patch->loadTemplate();
     context->scene->rackScroll->reset();
 }
@@ -1228,7 +1233,11 @@ protected:
         context->patch->pushRecentPath(sfilename);
         context->history->setSaved();
 
+       #ifdef DISTRHO_OS_WASM
+        rack::syncfs();
+       #else
         rack::settings::save();
+       #endif
     }
 
 #if 0

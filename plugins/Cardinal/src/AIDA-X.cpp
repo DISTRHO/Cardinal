@@ -892,8 +892,8 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
                                     heightPedal,
                                     cornerRadius,
                                     cornerRadius,
-                                    nvgRGBA(0,0,0,1.f),
-                                    nvgRGBA(0,0,0,0.f)));
+                                    nvgRGBAf(0,0,0,1.f),
+                                    nvgRGBAf(0,0,0,0.f)));
         nvgFill(args.vg);
 
         // .rt-neural .grid
@@ -916,7 +916,7 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
         nvgFill(args.vg);
 
         // extra
-        nvgStrokeColor(args.vg, nvgRGBA(150, 150, 150, 0.25f));
+        nvgStrokeColor(args.vg, nvgRGBA(150, 150, 150, 60));
         nvgStroke(args.vg);
 
         drawOutputJacksArea(args.vg);

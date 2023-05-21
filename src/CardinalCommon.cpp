@@ -89,9 +89,9 @@
 
 #ifdef DISTRHO_OS_WASM
 # if CARDINAL_VARIANT_MINI
-#  define CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME "welcome-wasm-mini.vcv"
+#  define CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME "welcome-wasm-mini"
 # else
-#  define CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME "welcome-wasm.vcv"
+#  define CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME "welcome-wasm"
 # endif
 #endif
 
@@ -374,6 +374,17 @@ static int osc_screenshot_handler(const char*, const char* types, lo_arg** argv,
 }
 #endif
 
+// -----------------------------------------------------------------------------------------------------------
+
+#ifdef DISTRHO_OS_WASM
+static void WebBrowserDataLoaded(void* const data)
+{
+    static_cast<Initializer*>(data)->loadSettings(true);
+}
+#endif
+
+// -----------------------------------------------------------------------------------------------------------
+
 Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalBaseUI* const ui)
 {
     using namespace rack;
@@ -490,7 +501,17 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
        #endif
 
         if (isRealInstance)
+        {
+           #ifdef DISTRHO_OS_WASM
+            EM_ASM({
+                Module.FS.mkdir('/userfiles');
+                Module.FS.mount(Module.IDBFS, {}, '/userfiles');
+                Module.FS.syncfs(true, function(err) { if (!err) { dynCall('vi', $0, [$1]) } });
+            }, WebBrowserDataLoaded, this);
+           #else
             system::createDirectory(asset::userDir);
+           #endif
+        }
     }
 
    #ifndef CARDINAL_COMMON_DSP_ONLY
@@ -513,13 +534,11 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     if (settings::settingsPath.empty())
         settings::settingsPath = asset::config(CARDINAL_VARIANT_NAME ".json");
 
-    const std::string patchesPath = asset::patchesPath();
-   #ifdef DISTRHO_OS_WASM
-    templatePath = system::join(patchesPath, CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME ".vcv");
-    factoryTemplatePath = system::join(patchesPath, "templates/" CARDINAL_VARIANT_NAME ".vcv");
-   #else
     templatePath = asset::user("templates/" CARDINAL_VARIANT_NAME ".vcv");
-    factoryTemplatePath = system::join(patchesPath, "templates/" CARDINAL_VARIANT_NAME ".vcv");
+   #ifdef DISTRHO_OS_WASM
+    factoryTemplatePath = system::join(asset::patchesPath(), CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME ".vcv");
+   #else
+    factoryTemplatePath = system::join(asset::patchesPath(), "templates/" CARDINAL_VARIANT_NAME ".vcv");
    #endif
 
     // Log environment
@@ -672,7 +691,8 @@ bool isMini()
 
 bool isStandalone()
 {
-    return std::strstr(getPluginFormatName(), "Standalone") != nullptr;
+    static const bool standalone = std::strstr(getPluginFormatName(), "Standalone") != nullptr;
+    return standalone;
 }
 
 #ifdef ARCH_WIN
@@ -712,6 +732,15 @@ std::string getSpecialPath(const SpecialPath type)
 char* patchFromURL = nullptr;
 char* patchRemoteURL = nullptr;
 char* patchStorageSlug = nullptr;
+
+void syncfs()
+{
+    settings::save();
+
+    EM_ASM({
+        Module.FS.syncfs(false, function(){} );
+    });
+}
 #endif
 
 std::string homeDir()
@@ -783,6 +812,10 @@ void loadPathDialog(const std::string& path, const bool asTemplate)
             APP->history->setSaved();
         }
 
+       #ifdef DISTRHO_OS_WASM
+        syncfs();
+       #endif
+
         if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
             if (remoteDetails->autoDeploy)
                 remoteUtils::sendFullPatchToRemote(remoteDetails);
@@ -812,6 +845,10 @@ void loadSelectionDialog()
 
         std::free(pathC);
 
+       #ifdef DISTRHO_OS_WASM
+        syncfs();
+       #endif
+
         if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
             if (remoteDetails->autoDeploy)
                 remoteUtils::sendFullPatchToRemote(remoteDetails);
@@ -839,6 +876,10 @@ void loadTemplate(const bool factory)
     APP->patch->path.clear();
     APP->history->setSaved();
 
+   #ifdef DISTRHO_OS_WASM
+    syncfs();
+   #endif
+
     if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
         if (remoteDetails->autoDeploy)
             remoteUtils::sendFullPatchToRemote(remoteDetails);
@@ -861,6 +902,10 @@ void revertDialog()
         return;
     promptClear("Revert patch to the last saved state?", []{
         APP->patch->loadAction(APP->patch->path);
+
+       #ifdef DISTRHO_OS_WASM
+        syncfs();
+       #endif
 
         if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
             if (remoteDetails->autoDeploy)
@@ -886,6 +931,14 @@ void saveDialog(const std::string& path)
         asyncDialog::create(string::f("Could not save patch: %s", e.what()).c_str());
         return;
     }
+
+    APP->patch->pushRecentPath(path);
+
+   #ifdef DISTRHO_OS_WASM
+    syncfs();
+   #else
+    rack::settings::save();
+   #endif
 #endif
 }
 
@@ -944,7 +997,11 @@ void saveTemplateDialog()
         catch (Exception& e) {
             asyncDialog::create(string::f("Could not save template patch: %s", e.what()).c_str());
             return;
-        } 
+        }
+
+       #ifdef DISTRHO_OS_WASM
+        syncfs();
+       #endif
     });
 }
 

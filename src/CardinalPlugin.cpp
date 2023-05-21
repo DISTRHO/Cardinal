@@ -66,6 +66,11 @@ namespace app {
 rack::widget::Widget* createMenuBar() { return new rack::widget::Widget; }
 }
 #endif
+#ifdef DISTRHO_OS_WASM
+namespace asset {
+std::string patchesPath();
+}
+#endif
 namespace engine {
 void Engine_setAboutToClose(Engine*);
 }
@@ -311,6 +316,15 @@ public:
             context->patch->loadTemplate();
             context->scene->rackScroll->reset();
         }
+
+      #ifdef DISTRHO_OS_WASM
+        // switch factory template to regular one after first load
+       #if CARDINAL_VARIANT_MINI
+        context->patch->factoryTemplatePath = rack::system::join(rack::asset::patchesPath(), "templates/mini.vcv");
+       #else
+        context->patch->factoryTemplatePath = rack::system::join(rack::asset::patchesPath(), "templates/main.vcv");
+       #endif
+      #endif
 
        #ifdef CARDINAL_INIT_OSC_THREAD
         fInitializer->remotePluginInstance = this;

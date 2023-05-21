@@ -276,13 +276,11 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			patchUtils::revertDialog();
 			e.consume(this);
 		}
-#ifndef DISTRHO_OS_WASM
 		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			// NOTE: will do nothing if path is empty, intentionally
 			patchUtils::saveDialog(APP->patch->path);
 			e.consume(this);
 		}
-#endif
 		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
 			patchUtils::saveAsDialog();
 			e.consume(this);

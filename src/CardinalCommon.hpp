@@ -53,6 +53,7 @@ std::string getSpecialPath(SpecialPath type);
 extern char* patchFromURL;
 extern char* patchRemoteURL;
 extern char* patchStorageSlug;
+void syncfs();
 #endif
 
 std::string homeDir();
