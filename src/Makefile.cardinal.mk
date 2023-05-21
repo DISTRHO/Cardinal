@@ -231,10 +231,6 @@ endif
 ifeq ($(WASM),true)
 WASM_RESOURCES  = $(TARGET_DIR)/$(NAME).html $(LV2_RESOURCES)
 
-ifneq ($(CARDINAL_VARIANT),mini)
-WASM_RESOURCES += $(CURDIR)/lv2/fomp.lv2/manifest.ttl
-endif
-
 EXTRA_DSP_DEPENDENCIES += $(WASM_RESOURCES)
 endif
 
@@ -292,8 +288,6 @@ ifeq ($(CARDINAL_VARIANT),mini)
 LINK_FLAGS += --preload-file=../../bin/CardinalMini.lv2/resources@/resources
 else
 LINK_FLAGS += --preload-file=../../bin/CardinalNative.lv2/resources@/resources
-LINK_FLAGS += --preload-file=./jsfx
-LINK_FLAGS += --preload-file=./lv2
 LINK_FLAGS += --use-preload-cache
 LINK_FLAGS += --use-preload-plugins
 endif
@@ -441,10 +435,6 @@ ifeq ($(WASM),true)
 $(TARGET_DIR)/$(NAME).html: ../emscripten/$(NAME).html
 	-@mkdir -p $(shell dirname $@)
 	cp $< $@
-
-$(CURDIR)/lv2/fomp.lv2/manifest.ttl: $(TARGET_DIR)/$(NAME).lv2/resources/PluginManifests/Cardinal.json
-	wget -O - https://falktx.com/data/wasm-things-2022-08-15.tar.gz | tar xz -C $(CURDIR)
-	touch $@
 endif
 
 # --------------------------------------------------------------

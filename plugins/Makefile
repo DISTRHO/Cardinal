@@ -259,8 +259,8 @@ ifneq ($(STATIC_BUILD),true)
 PLUGIN_FILES += Cardinal/src/AudioFile.cpp
 ifneq ($(WASM),true)
 PLUGIN_FILES += Cardinal/src/Carla.cpp
-endif
 PLUGIN_FILES += Cardinal/src/Ildaeil.cpp
+endif
 ifneq ($(HEADLESS),true)
 ifeq ($(HAVE_X11),true)
 PLUGIN_FILES += Cardinal/src/EmbedWidget.cpp
