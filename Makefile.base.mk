@@ -157,7 +157,9 @@ endif
 
 # needed for enabling SSE in pffft
 ifeq ($(CPU_I386),true)
+ifneq ($(NOSIMD),true)
 BASE_FLAGS += -Di386
+endif
 endif
 
 # SIMD must always be enabled, even in debug builds
