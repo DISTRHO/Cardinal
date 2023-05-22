@@ -277,8 +277,13 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			// NOTE: will do nothing if path is empty, intentionally
-			patchUtils::saveDialog(APP->patch->path);
+			// NOTE: for plugin versions it will do nothing if path is empty, intentionally
+			if (APP->patch->path.empty()) {
+				if (isStandalone())
+					patchUtils::saveAsDialog();
+			} else {
+				patchUtils::saveDialog(APP->patch->path);
+			}
 			e.consume(this);
 		}
 		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {

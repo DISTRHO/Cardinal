@@ -115,10 +115,15 @@ struct FileButton : MenuButton {
 		async_dialog_text_input("Filename", nullptr, [](char* const filename) {
 			if (filename == nullptr)
 				return;
-			APP->patch->path  = "/userfiles/";
+
+			APP->patch->path = asset::user("patches");
+			system::createDirectories(APP->patch->path);
+
+			APP->patch->path += DISTRHO_OS_SEP_STR;
 			APP->patch->path += filename;
 			if (rack::system::getExtension(filename) != ".vcv")
 				APP->patch->path += ".vcv";
+
 			patchUtils::saveDialog(APP->patch->path);
 			std::free(filename);
 		});
@@ -161,10 +166,27 @@ struct FileButton : MenuButton {
 		menu->addChild(createMenuItem("New (factory template)", "", []() {
 			patchUtils::loadTemplateDialog(true);
 		}));
+#endif
 
-		menu->addChild(createMenuItem("Open / Import...", RACK_MOD_CTRL_NAME "+O", []() {
+#ifndef DISTRHO_OS_WASM
+		constexpr const char* const OpenName = "Open...";
+#else
+		constexpr const char* const OpenName = "Import patch...";
+#endif
+		menu->addChild(createMenuItem(OpenName, RACK_MOD_CTRL_NAME "+O", []() {
 			patchUtils::loadDialog();
 		}));
+
+		const std::string patchesDir = asset::user("patches");
+		const std::vector<std::string> patches = system::isDirectory(patchesDir) ? system::getEntries(patchesDir) : std::vector<std::string>();
+		menu->addChild(createSubmenuItem("Open local patch", "", [patches](ui::Menu* menu) {
+			for (const std::string& path : patches) {
+				std::string name = system::getStem(path);
+				menu->addChild(createMenuItem(name, "", [=]() {
+					patchUtils::loadPathDialog(path, false);
+				}));
+			}
+		}, patches.empty()));
 
 		menu->addChild(createSubmenuItem("Open recent", "", [](ui::Menu* menu) {
 			for (const std::string& path : settings::recentPatchPaths) {
@@ -175,15 +197,42 @@ struct FileButton : MenuButton {
 			}
 		}, settings::recentPatchPaths.empty()));
 
+		if (!demoPatches.empty())
+		{
+			menu->addChild(createSubmenuItem("Open demo / example project", "", [=](ui::Menu* const menu) {
+				for (std::string path : demoPatches) {
+					std::string label = system::getStem(path);
+
+					for (size_t i=0, len=label.size(); i<len; ++i) {
+						if (label[i] == '_')
+							label[i] = ' ';
+					}
+
+					menu->addChild(createMenuItem(label, "", [path]() {
+						patchUtils::loadPathDialog(path, true);
+					}));
+				}
+
+				menu->addChild(new ui::MenuSeparator);
+
+				menu->addChild(createMenuItem("Open patchstorage.com for more patches", "", []() {
+					patchUtils::openBrowser("https://patchstorage.com/platform/cardinal/");
+				}));
+			}));
+		}
+
 		menu->addChild(createMenuItem("Import selection...", "", [=]() {
 			patchUtils::loadSelectionDialog();
 		}, false, true));
 
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+		menu->addChild(new ui::MenuSeparator);
+
 #ifndef DISTRHO_OS_WASM
 		menu->addChild(createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
-			// NOTE: will do nothing if path is empty, intentionally
+			// NOTE: for plugin versions it will do nothing if path is empty, intentionally
 			patchUtils::saveDialog(APP->patch->path);
-		}, APP->patch->path.empty()));
+		}, APP->patch->path.empty() && !isStandalone));
 
 		menu->addChild(createMenuItem("Save as / Export...", RACK_MOD_CTRL_NAME "+Shift+S", []() {
 			patchUtils::saveAsDialog();
@@ -196,11 +245,11 @@ struct FileButton : MenuButton {
 				patchUtils::saveDialog(APP->patch->path);
 		}));
 
-		menu->addChild(createMenuItem("Save as", "", []() {
+		menu->addChild(createMenuItem("Save as...", "", []() {
 			wasmSaveAs();
 		}));
 
-		menu->addChild(createMenuItem("Save and download compressed", RACK_MOD_CTRL_NAME "+Shift+S", []() {
+		menu->addChild(createMenuItem("Save and download compressed", "", []() {
 			patchUtils::saveAsDialog();
 		}));
 
@@ -251,38 +300,21 @@ struct FileButton : MenuButton {
 					Engine_setRemoteDetails(APP->engine, remoteDetails->autoDeploy ? remoteDetails : nullptr);
 				}
 			));
+#ifndef __MOD_DEVICES__
 		} else {
-			menu->addChild(createMenuItem("Connect to " REMOTE_NAME, "", []() {
-				DISTRHO_SAFE_ASSERT(remoteUtils::connectToRemote());
+			menu->addChild(createMenuItem("Connect to " REMOTE_NAME "...", "", [remoteDetails]() {
+				const std::string url = remoteDetails != nullptr ? remoteDetails->url : CARDINAL_DEFAULT_REMOTE_URL;
+				async_dialog_text_input("Remote:", url.c_str(), [](char* const url) {
+					if (url == nullptr)
+						return;
+
+					DISTRHO_SAFE_ASSERT(remoteUtils::connectToRemote(url));
+					std::free(url);
+				});
 			}));
+#endif
 		}
 #endif
-
-		if (!demoPatches.empty())
-		{
-			menu->addChild(new ui::MenuSeparator);
-
-			menu->addChild(createSubmenuItem("Open Demo / Example project", "", [=](ui::Menu* const menu) {
-				for (std::string path : demoPatches) {
-					std::string label = system::getStem(path);
-
-					for (size_t i=0, len=label.size(); i<len; ++i) {
-						if (label[i] == '_')
-							label[i] = ' ';
-					}
-
-					menu->addChild(createMenuItem(label, "", [path]() {
-						patchUtils::loadPathDialog(path, true);
-					}));
-				}
-
-				menu->addChild(new ui::MenuSeparator);
-
-				menu->addChild(createMenuItem("Open PatchStorage.com for more patches", "", []() {
-					patchUtils::openBrowser("https://patchstorage.com/platform/cardinal/");
-				}));
-			}));
-		}
 
 #ifndef DISTRHO_OS_WASM
 		if (isStandalone) {

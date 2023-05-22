@@ -406,7 +406,7 @@ public:
         context->patch->loadTemplate();
         context->scene->rackScroll->reset();
 
-        DISTRHO_SAFE_ASSERT(remoteUtils::connectToRemote());
+        DISTRHO_SAFE_ASSERT(remoteUtils::connectToRemote(CARDINAL_DEFAULT_REMOTE_URL));
 
         Engine_setRemoteDetails(context->engine, remoteDetails);
        #endif

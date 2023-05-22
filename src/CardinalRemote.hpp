@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,7 +17,8 @@
 
 #pragma once
 
-#define CARDINAL_DEFAULT_REMOTE_HOST_PORT "2228"
+// #define CARDINAL_DEFAULT_REMOTE_URL "osc.udp://localhost:2228"
+#define CARDINAL_DEFAULT_REMOTE_URL "osc.udp://192.168.51.1:2228"
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -25,12 +26,13 @@ namespace remoteUtils {
 
 struct RemoteDetails {
     void* handle;
+    const char* url;
     bool connected;
     bool autoDeploy;
 };
 
 RemoteDetails* getRemote();
-bool connectToRemote();
+bool connectToRemote(const char* url);
 void disconnectFromRemote(RemoteDetails* remote);
 void idleRemote(RemoteDetails* remote);
 void sendParamChangeToRemote(RemoteDetails* remote, int64_t moduleId, int paramId, float value);
