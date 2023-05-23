@@ -583,7 +583,7 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     if (const char* const portEnv = std::getenv("CARDINAL_REMOTE_HOST_PORT"))
         port = portEnv;
     else
-        port = CARDINAL_DEFAULT_REMOTE_HOST_PORT;
+        port = CARDINAL_DEFAULT_REMOTE_PORT;
     oscServerThread = lo_server_thread_new_with_proto(port, LO_UDP, osc_error_handler);
     DISTRHO_SAFE_ASSERT_RETURN(oscServerThread != nullptr,);
 

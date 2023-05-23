@@ -17,7 +17,7 @@
 
 #pragma once
 
-// #define CARDINAL_DEFAULT_REMOTE_URL "osc.udp://localhost:2228"
+#define CARDINAL_DEFAULT_REMOTE_PORT "2228"
 #define CARDINAL_DEFAULT_REMOTE_URL "osc.udp://192.168.51.1:2228"
 
 // -----------------------------------------------------------------------------------------------------------

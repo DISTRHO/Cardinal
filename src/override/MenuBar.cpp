@@ -263,9 +263,11 @@ struct FileButton : MenuButton {
 			patchUtils::revertDialog();
 		}, APP->patch->path.empty()));
 
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		menu->addChild(createMenuItem("Overwrite template", "", []() {
 			patchUtils::saveTemplateDialog();
 		}));
+#endif
 
 #ifdef DISTRHO_OS_WASM
 		menu->addChild(new ui::MenuSeparator);
