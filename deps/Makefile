@@ -139,6 +139,7 @@ CONFIGURE += --disable-alsa
 # NOTE speex fails to build when neon is enabled, so we disable that
 CONFIGURE += --disable-neon
 # NOTE libsamplerate fails with invalid host, so we force ac_cv_host
+CONFIGURE += ac_cv_build=$(TARGET_MACHINE)
 CONFIGURE += ac_cv_host=$(TARGET_MACHINE)
 
 # --------------------------------------------------------------
