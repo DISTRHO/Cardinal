@@ -258,6 +258,9 @@ SURGE_NAMES = HysteresisProcessing Patch SolverType Tunings Wavetable clouds ghc
 SURGE_CXX_FLAGS  = $(filter-out -fsingle-precision-constant,$(filter-out -std=gnu++11,$(BUILD_CXX_FLAGS)))
 SURGE_CXX_FLAGS += $(foreach n,$(SURGE_NAMES),-D$(n)=surgext$(n))
 
+# fix build with gcc13
+SURGE_CXX_FLAGS += -include cstdint
+
 # fix JUCE build https://github.com/juce-framework/JUCE/issues/374
 ifeq ($(CPU_I386),true)
 SURGE_CXX_FLAGS += -D__sigemptyset=sigemptyset
