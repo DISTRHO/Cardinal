@@ -1040,6 +1040,7 @@ SURGEXT_FLAGS += \
 	-Isurgext/surge/libs/tuning-library/include \
 	-I../deps/surge-build/libs/sst/sst-plugininfra/libs/filesystem/include \
 	-include limits \
+	-include cstdint \
 	-DSURGE_COMPILE_BLOCK_SIZE=8 \
 	-DSURGE_SKIP_ODDSOUND_MTS \
 	-DHAS_LUA=0 \
