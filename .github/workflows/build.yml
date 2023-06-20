@@ -3,12 +3,10 @@ name: build
 on: [push, pull_request]
 
 env:
-  CACHE_VERSION: 3
+  CACHE_VERSION: 4
   CARDINAL_UNDER_WINE: 1
   CIBUILD: true
   EMSCRIPTEN_VERSION: 3.1.27
-  DEBIAN_FRONTEND: noninteractive
-  HOMEBREW_NO_AUTO_UPDATE: 1
   LIBGL_ALWAYS_SOFTWARE: true
   PAWPAW_SKIP_LTO: 1
 
