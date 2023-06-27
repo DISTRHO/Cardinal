@@ -283,7 +283,10 @@ LINK_FLAGS += -O3
 LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
 LINK_FLAGS += -sLZ4=1
+LINK_FLAGS += -sSTACK_SIZE=5MB
 LINK_FLAGS += -lidbfs.js
+
+JACK_LIBS += -sEXPORTED_RUNTIME_METHODS=IDBFS,FS,cwrap
 
 ifeq ($(CARDINAL_VARIANT),mini)
 LINK_FLAGS += --preload-file=../../bin/CardinalMini.lv2/resources@/resources
@@ -344,7 +347,8 @@ ifeq ($(MACOS),true)
 LINK_FLAGS += -framework IOKit
 else ifeq ($(WINDOWS),true)
 # needed by VCVRack
-EXTRA_DSP_LIBS += -ldbghelp -lshlwapi -Wl,--stack,0x100000
+LINK_FLAGS += -Wl,--stack,0x100000
+EXTRA_DSP_LIBS += -ldbghelp -lshlwapi
 # needed by JW-Modules
 EXTRA_DSP_LIBS += -lws2_32 -lwinmm
 endif

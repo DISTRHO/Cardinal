@@ -502,14 +502,12 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
 
         if (isRealInstance)
         {
+            system::createDirectory(asset::userDir);
            #ifdef DISTRHO_OS_WASM
             EM_ASM({
-                Module.FS.mkdir('/userfiles');
                 Module.FS.mount(Module.IDBFS, {}, '/userfiles');
                 Module.FS.syncfs(true, function(err) { if (!err) { dynCall('vi', $0, [$1]) } });
             }, WebBrowserDataLoaded, this);
-           #else
-            system::createDirectory(asset::userDir);
            #endif
         }
     }
