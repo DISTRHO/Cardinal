@@ -139,6 +139,9 @@ jack: $(TARGETS)
 native: $(TARGETS)
 	$(MAKE) jack -C CardinalNative
 
+mini: $(TARGETS)
+	$(MAKE) jack -C CardinalMini
+
 lv2: $(TARGETS)
 	$(MAKE) lv2 -C Cardinal
 	$(MAKE) lv2 -C CardinalFX $(CARDINAL_FX_ARGS)
