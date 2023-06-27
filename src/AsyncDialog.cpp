@@ -220,6 +220,10 @@ struct AsyncTextInput : OpaqueWidget
 				}
 				TextField::onSelectKey(e);
 			}
+			void step() override {
+				APP->event->setSelectedWidget(this);
+				TextField::step();
+			}
 		};
 		AsyncTextField* const textField = new AsyncTextField;
 		textField->box.size.x = contentLayout->box.size.x - (label != nullptr ? label->box.size.x + margin : 0);
