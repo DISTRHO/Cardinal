@@ -44,6 +44,7 @@ extern Model* modelSwerge;
 #undef private
 
 // BogaudioModules
+extern Model* modelAD;
 extern Model* modelBogaudioLFO;
 extern Model* modelBogaudioNoise;
 extern Model* modelBogaudioVCA;
@@ -354,6 +355,7 @@ static void initStatic__BogaudioModules()
         Skins& skins(Skins::skins());
         skins._default = settings::darkMode ? "dark" : "light";
 
+        p->addModel(modelAD);
         p->addModel(modelBogaudioLFO);
         p->addModel(modelBogaudioNoise);
         p->addModel(modelBogaudioVCA);
@@ -366,7 +368,6 @@ static void initStatic__BogaudioModules()
         p->addModel(modelUnison);
 
         // cat plugins/BogaudioModules/plugin.json  | jq -r .modules[].slug - | sort
-        spl.removeModule("Bogaudio-AD");
         spl.removeModule("Bogaudio-Additator");
         spl.removeModule("Bogaudio-AddrSeq");
         spl.removeModule("Bogaudio-AddrSeqX");

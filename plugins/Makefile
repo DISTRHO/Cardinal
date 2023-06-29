@@ -581,6 +581,7 @@ PLUGIN_FILES += $(filter-out BogaudioModules/src/bogaudio.cpp,$(wildcard Bogaudi
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/*.cpp)
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/filters/*.cpp)
 
+MINIPLUGIN_FILES += BogaudioModules/src/AD.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/LFO.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/Noise.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/Offset.cpp
@@ -605,6 +606,7 @@ MINIPLUGIN_FILES += BogaudioModules/src/utils.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/vco_base.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/widgets.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/analyzer.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/envelope.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/math.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/noise.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/oscillator.cpp
