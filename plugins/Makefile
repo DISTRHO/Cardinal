@@ -1427,7 +1427,7 @@ MINIRESOURCE_FILES += AriaModules/res/signature/signature.svg
 MINIRESOURCE_FILES += AudibleInstruments/res/Plaits.svg
 # MINIRESOURCE_FILES += AudibleInstruments/res/hdad-segment14-1.002/Segment14.ttf
 
-# MINIRESOURCE_FILES += BogaudioModules/res/AD-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/AD-dark.svg
 # MINIRESOURCE_FILES += BogaudioModules/res/Additator-dark.svg
 # MINIRESOURCE_FILES += BogaudioModules/res/AddrSeq-dark.svg
 # MINIRESOURCE_FILES += BogaudioModules/res/AddrSeqX-dark.svg
