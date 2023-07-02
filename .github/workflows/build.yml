@@ -382,7 +382,7 @@ jobs:
       - name: Pack binaries
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm)
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm CardinalMini.lv2/modgui)
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-wasm-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
