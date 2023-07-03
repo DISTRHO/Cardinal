@@ -350,12 +350,12 @@ jobs:
           make features
           make HAVE_LIBLO=false NOOPT=true NOSIMD=${{ matrix.target == 'nosimd' }} -j $(nproc)
       - name: Build modgui
-        if: ${{ steps.cache.outputs.cache-hit == 'true' && matrix.target == 'nosimd' }}
+        if: steps.cache.outputs.cache-hit == 'true'
         run: |
           ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
           source ~/PawPawBuilds/emsdk/emsdk_env.sh
           source deps/PawPaw/local.env wasm
-          make HAVE_LIBLO=false NOOPT=true NOSIMD=true -j $(nproc) -C src/CardinalMiniSep modgui
+          make HAVE_LIBLO=false NOOPT=true NOSIMD=${{ matrix.target == 'nosimd' }} -j $(nproc) -C src/CardinalMiniSep modgui
       - name: Make wasm versioned and compress
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
@@ -382,7 +382,7 @@ jobs:
       - name: Pack binaries
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm CardinalMini.lv2/modgui)
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm) CardinalMini.lv2/modgui
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-wasm-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
