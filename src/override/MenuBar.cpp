@@ -119,7 +119,6 @@ struct FileButton : MenuButton {
 			APP->patch->path = asset::user("patches");
 			system::createDirectories(APP->patch->path);
 
-			APP->patch->path += DISTRHO_OS_SEP_STR;
 			APP->patch->path += filename;
 			if (rack::system::getExtension(filename) != ".vcv")
 				APP->patch->path += ".vcv";
@@ -803,11 +802,13 @@ struct HelpButton : MenuButton {
 
 		menu->addChild(new ui::MenuSeparator);
 
+#ifndef DISTRHO_OS_WASM
 		menu->addChild(createMenuItem("Open user folder", "", [=]() {
 			system::openDirectory(asset::user(""));
 		}));
 
 		menu->addChild(new ui::MenuSeparator);
+#endif
 
 		menu->addChild(createMenuLabel("Rack " + APP_VERSION + " Compatible"));
 	}
