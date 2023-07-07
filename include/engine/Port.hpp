@@ -78,40 +78,40 @@ struct Port {
 	};
 
 	/** Sets the voltage of the given channel. */
-	void setVoltage(float voltage, int channel = 0) {
+	void setVoltage(float voltage, int channel = 0) noexcept {
 		voltages[channel] = voltage;
 	}
 
 	/** Returns the voltage of the given channel.
 	Because of proper bookkeeping, all channels higher than the input port's number of channels should be 0V.
 	*/
-	float getVoltage(int channel = 0) {
+	float getVoltage(int channel = 0) const noexcept {
 		return voltages[channel];
 	}
 
 	/** Returns the given channel's voltage if the port is polyphonic, otherwise returns the first voltage (channel 0). */
-	float getPolyVoltage(int channel) {
+	float getPolyVoltage(int channel) const noexcept {
 		return isMonophonic() ? getVoltage(0) : getVoltage(channel);
 	}
 
 	/** Returns the voltage if a cable is connected, otherwise returns the given normal voltage. */
-	float getNormalVoltage(float normalVoltage, int channel = 0) {
+	float getNormalVoltage(float normalVoltage, int channel = 0) const noexcept {
 		return isConnected() ? getVoltage(channel) : normalVoltage;
 	}
 
-	float getNormalPolyVoltage(float normalVoltage, int channel) {
+	float getNormalPolyVoltage(float normalVoltage, int channel) const noexcept {
 		return isConnected() ? getPolyVoltage(channel) : normalVoltage;
 	}
 
 	/** Returns a pointer to the array of voltages beginning with firstChannel.
 	The pointer can be used for reading and writing.
 	*/
-	float* getVoltages(int firstChannel = 0) {
+	float* getVoltages(int firstChannel = 0) noexcept {
 		return &voltages[firstChannel];
 	}
 
 	/** Copies the port's voltages to an array of size at least `channels`. */
-	void readVoltages(float* v) {
+	void readVoltages(float* v) const noexcept {
 		for (int c = 0; c < channels; c++) {
 			v[c] = voltages[c];
 		}
@@ -127,14 +127,14 @@ struct Port {
 	}
 
 	/** Sets all voltages to 0. */
-	void clearVoltages() {
+	void clearVoltages() noexcept {
 		for (int c = 0; c < channels; c++) {
 			voltages[c] = 0.f;
 		}
 	}
 
 	/** Returns the sum of all voltages. */
-	float getVoltageSum() {
+	float getVoltageSum() const noexcept {
 		float sum = 0.f;
 		for (int c = 0; c < channels; c++) {
 			sum += voltages[c];
@@ -145,7 +145,7 @@ struct Port {
 	/** Returns the root-mean-square of all voltages.
 	Uses sqrt() which is slow, so use a custom approximation if calling frequently.
 	*/
-	float getVoltageRMS() {
+	float getVoltageRMS() const {
 		if (channels == 0) {
 			return 0.f;
 		}
@@ -162,22 +162,22 @@ struct Port {
 	}
 
 	template <typename T>
-	T getVoltageSimd(int firstChannel) {
+	T getVoltageSimd(int firstChannel) const noexcept {
 		return T::load(&voltages[firstChannel]);
 	}
 
 	template <typename T>
-	T getPolyVoltageSimd(int firstChannel) {
+	T getPolyVoltageSimd(int firstChannel) const noexcept {
 		return isMonophonic() ? getVoltage(0) : getVoltageSimd<T>(firstChannel);
 	}
 
 	template <typename T>
-	T getNormalVoltageSimd(T normalVoltage, int firstChannel) {
+	T getNormalVoltageSimd(T normalVoltage, int firstChannel) const noexcept {
 		return isConnected() ? getVoltageSimd<T>(firstChannel) : normalVoltage;
 	}
 
 	template <typename T>
-	T getNormalPolyVoltageSimd(T normalVoltage, int firstChannel) {
+	T getNormalPolyVoltageSimd(T normalVoltage, int firstChannel) const noexcept {
 		return isConnected() ? getPolyVoltageSimd<T>(firstChannel) : normalVoltage;
 	}
 
@@ -191,7 +191,7 @@ struct Port {
 	If disconnected, this does nothing (`channels` remains 0).
 	If 0 is given, `channels` is set to 1 but all voltages are cleared.
 	*/
-	void setChannels(int channels) {
+	void setChannels(int channels) noexcept {
 		// If disconnected, keep the number of channels at 0.
 		if (this->channels == 0) {
 			return;
@@ -212,29 +212,29 @@ struct Port {
 	/** Returns the number of channels.
 	If the port is disconnected, it has 0 channels.
 	*/
-	int getChannels() {
+	int getChannels() const noexcept {
 		return channels;
 	}
 
 	/** Returns whether a cable is connected to the Port.
 	You can use this for skipping code that generates output voltages.
 	*/
-	bool isConnected() {
+	bool isConnected() const noexcept {
 		return channels > 0;
 	}
 
 	/** Returns whether the cable exists and has 1 channel. */
-	bool isMonophonic() {
+	bool isMonophonic() const noexcept {
 		return channels == 1;
 	}
 
 	/** Returns whether the cable exists and has more than 1 channel. */
-	bool isPolyphonic() {
+	bool isPolyphonic() const noexcept {
 		return channels > 1;
 	}
 
 	/** Use getNormalVoltage() instead. */
-	DEPRECATED float normalize(float normalVoltage) {
+	DEPRECATED float normalize(float normalVoltage) const noexcept {
 		return getNormalVoltage(normalVoltage);
 	}
 };
