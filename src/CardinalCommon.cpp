@@ -376,7 +376,7 @@ static int osc_screenshot_handler(const char*, const char* types, lo_arg** argv,
 
 // -----------------------------------------------------------------------------------------------------------
 
-#ifdef DISTRHO_OS_WASM
+#if defined(DISTRHO_OS_WASM) && !defined(CARDINAL_COMMON_UI_ONLY)
 static void WebBrowserDataLoaded(void* const data)
 {
     static_cast<Initializer*>(data)->loadSettings(true);
@@ -503,7 +503,7 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
         if (isRealInstance)
         {
             system::createDirectory(asset::userDir);
-           #ifdef DISTRHO_OS_WASM
+           #if defined(DISTRHO_OS_WASM) && !defined(CARDINAL_COMMON_UI_ONLY)
             EM_ASM({
                 Module.FS.mount(Module.IDBFS, {}, '/userfiles');
                 Module.FS.syncfs(true, function(err) { if (!err) { dynCall('vi', $0, [$1]) } });
@@ -735,9 +735,11 @@ void syncfs()
 {
     settings::save();
 
+   #ifndef CARDINAL_COMMON_UI_ONLY
     EM_ASM({
         Module.FS.syncfs(false, function(){} );
     });
+   #endif
 }
 #endif
 

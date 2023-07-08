@@ -165,7 +165,6 @@ struct FileButton : MenuButton {
 		menu->addChild(createMenuItem("New (factory template)", "", []() {
 			patchUtils::loadTemplateDialog(true);
 		}));
-#endif
 
 #ifndef DISTRHO_OS_WASM
 		constexpr const char* const OpenName = "Open...";
@@ -195,6 +194,7 @@ struct FileButton : MenuButton {
 				}));
 			}
 		}, settings::recentPatchPaths.empty()));
+#endif
 
 		if (!demoPatches.empty())
 		{
@@ -220,11 +220,11 @@ struct FileButton : MenuButton {
 			}));
 		}
 
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		menu->addChild(createMenuItem("Import selection...", "", [=]() {
 			patchUtils::loadSelectionDialog();
 		}, false, true));
 
-#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		menu->addChild(new ui::MenuSeparator);
 
 #ifndef DISTRHO_OS_WASM
@@ -266,7 +266,6 @@ struct FileButton : MenuButton {
 		menu->addChild(createMenuItem("Overwrite template", "", []() {
 			patchUtils::saveTemplateDialog();
 		}));
-#endif
 
 #ifdef DISTRHO_OS_WASM
 		menu->addChild(new ui::MenuSeparator);
@@ -277,6 +276,7 @@ struct FileButton : MenuButton {
 				Module.FS.syncfs(false, function(err){ dynCall('vi', $0, [!!err]) });
 			}, WebBrowserDataSaved);
 		}));
+#endif
 #endif
 
 #if defined(HAVE_LIBLO) || ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
@@ -598,6 +598,7 @@ struct KnobScrollSensitivitySlider : ui::Slider {
 };
 
 
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 static void setAllFramebufferWidgetsDirty(widget::Widget* const widget)
 {
 	for (widget::Widget* child : widget->children)
@@ -610,6 +611,7 @@ static void setAllFramebufferWidgetsDirty(widget::Widget* const widget)
 		setAllFramebufferWidgetsDirty(child);
 	}
 }
+#endif
 
 
 struct ViewButton : MenuButton {
@@ -620,6 +622,7 @@ struct ViewButton : MenuButton {
 
 		menu->addChild(createMenuLabel("Appearance"));
 
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		std::string darkModeText;
 		if (settings::darkMode)
 			darkModeText = CHECKMARK_STRING;
@@ -627,6 +630,7 @@ struct ViewButton : MenuButton {
 			switchDarkMode(!settings::darkMode);
 			setAllFramebufferWidgetsDirty(APP->scene);
 		}));
+#endif
 
 		menu->addChild(createBoolPtrMenuItem("Show tooltips", "", &settings::tooltips));
 

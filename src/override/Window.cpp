@@ -805,9 +805,15 @@ int Window::getMods() {
 void Window::setFullScreen(bool fullScreen) {
 #ifdef DISTRHO_OS_WASM
 	if (fullScreen)
-		emscripten_request_fullscreen(internal->tlw->getWindow().getApp().getClassName(), false);
+	{
+		try {
+			emscripten_request_fullscreen(internal->tlw->getWindow().getApp().getClassName(), false);
+		} DISTRHO_SAFE_EXCEPTION("fullscreen");
+	}
 	else
+	{
 		emscripten_exit_fullscreen();
+	}
 #endif
 }
 

@@ -267,6 +267,9 @@ include ../../dpf/Makefile.plugins.mk
 
 BASE_FLAGS += -DPRIVATE=
 
+# --------------------------------------------------------------
+# Extra flags for MOD and Mini stuff
+
 ifeq ($(MOD_BUILD),true)
 BASE_FLAGS += -DDISTRHO_PLUGIN_MINIMUM_BUFFER_SIZE=0xffff
 BASE_FLAGS += -DDISTRHO_PLUGIN_USES_MODGUI=1
@@ -284,9 +287,6 @@ LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
 LINK_FLAGS += -sLZ4=1
 LINK_FLAGS += -sSTACK_SIZE=5MB
-LINK_FLAGS += -lidbfs.js
-
-JACK_LIBS += -sEXPORTED_RUNTIME_METHODS=IDBFS,FS,cwrap
 
 ifeq ($(CARDINAL_VARIANT),mini)
 LINK_FLAGS += --preload-file=../../bin/CardinalMini.lv2/resources@/resources
@@ -294,6 +294,11 @@ else
 LINK_FLAGS += --preload-file=../../bin/CardinalNative.lv2/resources@/resources
 LINK_FLAGS += --use-preload-cache
 LINK_FLAGS += --use-preload-plugins
+endif
+
+ifneq ($(DSP_UI_SPLIT),true)
+LINK_FLAGS += -lidbfs.js
+JACK_LIBS += -sEXPORTED_RUNTIME_METHODS=IDBFS,FS,cwrap
 endif
 
 # find . -type l | grep -v svg | grep -v ttf | grep -v art | grep -v json | grep -v png | grep -v otf | sort
