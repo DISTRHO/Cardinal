@@ -35,13 +35,13 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 | Synth plugin variant           | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
 | FX plugin variant              | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
 | Raw-CV plugin variant          | Unsupported               | 8 audio IO + 10 CV IO           | Available in JACK, LV2 and VST3 formats, not possible in AU and VST2 |
-| Arbitrary parameter automation | Yes                       | No                              | |
+| Arbitrary parameter automation | Yes                       | No (*)                          | Static 24 automatable params, use Host Params/Map modules to map them to module parameters |
 | Integrated plugin host         | No, Host payed separately | Yes, using Carla or Ildaeil     | |
 | Host sync/timing               | Using MIDI signals        | Using dedicated module          | |
 | Linux/X11 event handling       | Runs on 2nd thread        | Runs on main/GUI thread         | |
 | v1 module compatibility        | No                        | No, but with less restrictions  | Module widgets can load resources at any point |
 | Online phone-home              | Yes                       | No                              | Online access is strictly forbidden in Cardinal |
-| Proper dark theme              | No, only room brightness  | Yes                             | All dark panel variants have explicit permission when required |
+| Proper dark theme              | WIP                       | Yes                             | All dark panel variants have explicit permission when required |
 | Proper Linux headless mode     | No, always requires X11   | Yes                             | |
 
 Additionally, Cardinal contains the following built-in modules not present in the official plugin or standalone:
@@ -50,6 +50,7 @@ Additionally, Cardinal contains the following built-in modules not present in th
  * Mog (never updated to v2)
  * mscHack (never updated to v2)
  * rackwindows
+ * AIDA-X
  * Audio File
  * Audio to CV Pitch converter
  * Carla Plugin Host
