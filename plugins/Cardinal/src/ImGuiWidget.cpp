@@ -492,6 +492,9 @@ void ImGuiWidget::drawFramebufferCommon(const Vec& fbSize, const float scaleFact
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
+
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 #endif
 
     io.DisplaySize = ImVec2(box.size.x * scaleFactor, box.size.y * scaleFactor);

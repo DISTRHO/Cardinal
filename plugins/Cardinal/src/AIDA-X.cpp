@@ -277,7 +277,7 @@ struct AidaPluginModule : Module {
         configParam(kParameterINLEVEL, -12.f, 12.f, 0.f, "INPUT", " dB");
         configSwitch(kParameterNETBYPASS, 0.f, 1.f, 0.f, "NETBYPASS");
         configSwitch(kParameterEQBYPASS, 0.f, 1.f, 0.f, "EQBYPASS");
-        configSwitch(kParameterEQPOS, 0.f, 1.f, 0.f, "NETBYPASS");
+        configSwitch(kParameterEQPOS, 0.f, 1.f, 0.f, "EQPOS");
         configParam(kParameterBASSGAIN, -8.f, 8.f, 0.f, "BASS", " dB");
         configParam(kParameterBASSFREQ, 60.f, 305.f, 75.f, "BFREQ", " Hz");
         configParam(kParameterMIDGAIN, -8.f, 8.f, 0.f, "MID", " dB");
@@ -675,7 +675,7 @@ struct AidaModelListWidget : ImGuiWidget {
         : ImGuiWidget(),
           module(m)
     {
-        if (module->fileChanged)
+        if (module != nullptr && module->fileChanged)
             reloadDir();
     }
 
@@ -683,7 +683,26 @@ struct AidaModelListWidget : ImGuiWidget {
     {
         const float scaleFactor = getScaleFactor();
 
-        const int flags = ImGuiWindowFlags_NoSavedSettings
+        // transparent background
+        {
+            ImGuiStyle& style(ImGui::GetStyle());
+            style.WindowRounding = 12 * scaleFactor;
+            style.WindowBorderSize = style.FrameBorderSize = 0.f;
+            style.ScrollbarSize = 12 * scaleFactor;
+
+            ImVec4* const colors = style.Colors;
+            colors[ImGuiCol_Text]             = ImVec4(1.f, 1.f, 1.f, 1.f);
+            colors[ImGuiCol_WindowBg]         = ImVec4(0.f, 0.f, 0.f, 0.f);
+            colors[ImGuiCol_FrameBg]          = ImVec4(0.f, 0.f, 0.f, 0.f);
+            colors[ImGuiCol_FrameBgHovered]   = ImVec4(0.f, 0.f, 0.f, 0.f);
+            colors[ImGuiCol_FrameBgActive]    = ImVec4(0.f, 0.f, 0.f, 0.f);
+            colors[ImGuiCol_Header]           = ImVec4(0.f, 0.f, 0.f, 0.8f);
+            colors[ImGuiCol_HeaderHovered]    = ImVec4(0.f, 0.f, 0.f, 0.6f);
+            colors[ImGuiCol_HeaderActive]     = ImVec4(0.f, 0.f, 0.f, 0.4f);
+        }
+
+        const int flags = ImGuiWindowFlags_NoBackground
+                        | ImGuiWindowFlags_NoSavedSettings
                         | ImGuiWindowFlags_NoTitleBar
                         | ImGuiWindowFlags_NoResize
                         | ImGuiWindowFlags_NoCollapse
@@ -808,12 +827,53 @@ struct AidaKnob : app::SvgKnob {
     }
 };
 
+struct AidaSwitch : app::Switch {
+    static constexpr const float kSwitchWidth = 15.f;
+    static constexpr const float kSwitchHeight = 34.f;
+
+    bool inverted = false;
+
+    AidaSwitch()
+    {
+        box.size.x = kSwitchWidth;
+        box.size.y = kSwitchHeight;
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        engine::ParamQuantity* pq = getParamQuantity();
+
+        if (pq == nullptr)
+            return;
+
+        const bool checked = inverted ? pq->getValue() <= pq->getMinValue() : pq->getValue() > pq->getMinValue();
+
+        nvgBeginPath(args.vg);
+        nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, kSwitchWidth/2);
+        nvgFillColor(args.vg, checked ? nvgRGB(84, 84, 84) : nvgRGB(129, 247, 0));
+        nvgFill(args.vg);
+
+        nvgBeginPath(args.vg);
+        nvgCircle(args.vg,
+                  box.size.x / 2,
+                  checked ? box.size.y/2 + kSwitchHeight/2 - kSwitchWidth/2
+                          : box.size.y/2 - kSwitchHeight/2 + kSwitchWidth/2,
+                  6.f);
+        nvgFillColor(args.vg, checked ? nvgRGB(218, 214, 203) : nvgRGB(24, 112, 4));
+        nvgFill(args.vg);
+    }
+};
+
 struct AidaWidget : ModuleWidgetWithSideScrews<23> {
     static constexpr const uint kPedalMargin = 10;
-    static constexpr const uint kPedalMarginTop = 50;
+    static constexpr const uint kPedalMarginVertical = 20;
+    static constexpr const uint kFileListHeight = 200;
 
-    static constexpr const float startY_list = startY - 2.0f;
-    static constexpr const float fileListHeight = 380.0f - startY_list - 110.0f;
+    struct {
+        std::shared_ptr<Image> background;
+        std::shared_ptr<Image> header;
+        std::shared_ptr<Image> logo;
+    } images;
 
     AidaPluginModule* const module;
 
@@ -825,35 +885,41 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
 
         createAndAddScrews();
 
-        addInput(createInput<PJ301MPort>(Vec(startX_In, 25), module, 0));
-        addOutput(createOutput<PJ301MPort>(Vec(startX_Out, 25), module, 0));
+        addInput(createInputCentered<PJ301MPort>(Vec(box.size.x / 2 - 120, box.size.y - 120), module, 0));
+        addOutput(createOutputCentered<PJ301MPort>(Vec(box.size.x / 2 + 120, box.size.y - 120), module, 0));
 
-        addChild(createParamCentered<AidaKnob>(Vec(50, box.size.y - 60),
+        addChild(createParamCentered<AidaKnob>(Vec(box.size.x / 2 - 80, box.size.y - 120),
                                                module, AidaPluginModule::kParameterINLEVEL));
 
-        addChild(createParamCentered<AidaKnob>(Vec(100, box.size.y - 60),
+        addChild(createParamCentered<AidaKnob>(Vec(box.size.x / 2 + 80, box.size.y - 120),
+                                               module, AidaPluginModule::kParameterOUTLEVEL));
+
+        addChild(createParamCentered<AidaKnob>(Vec(104, box.size.y - 60),
                                                module, AidaPluginModule::kParameterBASSGAIN));
 
-        addChild(createParamCentered<AidaKnob>(Vec(150, box.size.y - 60),
+        addChild(createParamCentered<AidaKnob>(Vec(152, box.size.y - 60),
                                                module, AidaPluginModule::kParameterMIDGAIN));
 
         addChild(createParamCentered<AidaKnob>(Vec(200, box.size.y - 60),
                                                module, AidaPluginModule::kParameterTREBLEGAIN));
 
-        addChild(createParamCentered<AidaKnob>(Vec(250, box.size.y - 60),
+        addChild(createParamCentered<AidaKnob>(Vec(252, box.size.y - 60),
                                                module, AidaPluginModule::kParameterDEPTH));
 
         addChild(createParamCentered<AidaKnob>(Vec(300, box.size.y - 60),
                                                module, AidaPluginModule::kParameterPRESENCE));
 
-        addChild(createParamCentered<AidaKnob>(Vec(350, box.size.y - 60),
-                                               module, AidaPluginModule::kParameterOUTLEVEL));
+        addChild(createParamCentered<AidaSwitch>(Vec(34, box.size.y - 58),
+                                                 module, AidaPluginModule::kParameterEQPOS));
+
+        addChild(createParamCentered<AidaSwitch>(Vec(64, box.size.y - 58),
+                                                 module, AidaPluginModule::kParameterMTYPE));
 
         if (m != nullptr)
         {
             AidaModelListWidget* const listw = new AidaModelListWidget(m);
-            listw->box.pos = Vec(kPedalMargin, startY_list);
-            listw->box.size = Vec(box.size.x - kPedalMargin * 2, fileListHeight);
+            listw->box.pos = Vec(kPedalMargin * 2, kPedalMargin * 3);
+            listw->box.size = Vec(box.size.x - kPedalMargin * 4, kFileListHeight);
             addChild(listw);
         }
     }
@@ -861,8 +927,16 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
     void draw(const DrawArgs& args) override
     {
         const double widthPedal = box.size.x - kPedalMargin * 2;
-        const double heightPedal = box.size.y - kPedalMargin - kPedalMarginTop;
+        const double heightPedal = box.size.y - kPedalMarginVertical * 2;
         const int cornerRadius = 12;
+
+        // load images as needed
+        if (images.background.get() == nullptr)
+        {
+            images.background = APP->window->loadImage(asset::plugin(pluginInstance, "res/aida-x-background-p2.png"));
+            images.header = APP->window->loadImage(asset::plugin(pluginInstance, "res/aida-x-header.png"));
+            images.logo = APP->window->loadImage(asset::plugin(pluginInstance, "res/aida-x-logo.png"));
+        }
 
         // outer bounds gradient
         nvgBeginPath(args.vg);
@@ -875,19 +949,23 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
         nvgFill(args.vg);
 
         // outer bounds pattern
-        // TODO
+        if (Image* const img = images.background.get())
+        {
+            nvgFillPaint(args.vg, nvgImagePattern(args.vg, 0, 0, 256.f, 128.f, 0.f, img->handle, 1.f));
+            nvgFill(args.vg);
+        }
 
         // box shadow
         nvgBeginPath(args.vg);
         nvgRect(args.vg,
                 kPedalMargin / 2,
-                kPedalMarginTop / 2,
+                kPedalMarginVertical / 2,
                 kPedalMargin + widthPedal,
-                kPedalMarginTop + heightPedal);
+                kPedalMarginVertical + heightPedal);
         nvgFillPaint(args.vg,
                      nvgBoxGradient(args.vg,
                                     kPedalMargin,
-                                    kPedalMarginTop,
+                                    kPedalMarginVertical,
                                     widthPedal,
                                     heightPedal,
                                     cornerRadius,
@@ -898,10 +976,10 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
 
         // .rt-neural .grid
         nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg, kPedalMargin, kPedalMarginTop, widthPedal, heightPedal, cornerRadius);
+        nvgRoundedRect(args.vg, kPedalMargin, kPedalMarginVertical, widthPedal, heightPedal, cornerRadius);
         nvgFillPaint(args.vg,
                      nvgLinearGradient(args.vg,
-                                       kPedalMargin, kPedalMarginTop,
+                                       kPedalMargin, kPedalMarginVertical,
                                        kPedalMargin + box.size.x * 0.52f, 0,
                                        nvgRGB(28, 23, 12),
                                        nvgRGB(42, 34, 15)));
@@ -919,17 +997,113 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
         nvgStrokeColor(args.vg, nvgRGBA(150, 150, 150, 60));
         nvgStroke(args.vg);
 
-        drawOutputJacksArea(args.vg);
+        // splitter
+        nvgBeginPath(args.vg);
+        nvgMoveTo(args.vg, 226, box.size.y - 80);
+        nvgLineTo(args.vg, 226, box.size.y - 32);
+        nvgLineCap(args.vg, NVG_ROUND);
+        nvgStrokeColor(args.vg, nvgRGBA(97, 97, 97, 123));
+        nvgStrokeWidth(args.vg, 2);
+        nvgStroke(args.vg);
+
+        // .rt-neural .background_head
+        nvgBeginPath(args.vg);
+        nvgRoundedRect(args.vg,
+                       kPedalMargin * 2,
+                       kPedalMargin + kPedalMarginVertical,
+                       box.size.x - kPedalMargin * 4,
+                       kFileListHeight,
+                       cornerRadius);
+        nvgFillPaint(args.vg,
+                     nvgLinearGradient(args.vg,
+                                       kPedalMargin * 2,
+                                       kPedalMargin + kPedalMarginVertical,
+                                       kPedalMargin * 2,
+                                       kPedalMargin + kPedalMarginVertical + kFileListHeight,
+                                       nvgRGB(0x8b, 0xf7, 0x00),
+                                       nvgRGB(0xcd, 0xff, 0x05)));
+        nvgFill(args.vg);
+
+        if (Image* const img = images.background.get())
+        {
+            nvgFillPaint(args.vg, nvgImagePattern(args.vg,
+                                                  kPedalMargin * 2,
+                                                  kPedalMargin + kPedalMarginVertical,
+                                                  256.f, 128.f, 0.f, img->handle, 1.f));
+            nvgFill(args.vg);
+        }
+
+        nvgFillPaint(args.vg,
+                     nvgBoxGradient(args.vg,
+                                    kPedalMargin * 2,
+                                    kPedalMargin + kPedalMarginVertical,
+                                    box.size.x - kPedalMargin * 4,
+                                    kFileListHeight,
+                                    cornerRadius,
+                                    cornerRadius,
+                                    nvgRGBAf(0,0,0,0.f),
+                                    nvgRGBAf(0,0,0,1.f)));
+        nvgFill(args.vg);
+
+        // a bit darker so the text is readable
+        nvgFillColor(args.vg, nvgRGBAf(0.f,0.f,0.f,0.5f));
+        nvgFill(args.vg);
+
+        // .rt-neural .plate
+        if (Image* const img = images.header.get())
+        {
+            const float imgw = 100 * 1548 / 727;
+            const float imgh = 100;
+
+            nvgSave(args.vg);
+            nvgTranslate(args.vg, box.size.x / 2 - imgw/2, kPedalMarginVertical + kFileListHeight / 4);
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, 0, 0, imgw, imgh);
+            nvgFillPaint(args.vg, nvgImagePattern(args.vg, 0, 0, imgw, imgh, 0.f, img->handle, 1.f));
+            nvgFill(args.vg);
+            nvgRestore(args.vg);
+
+            nvgFillColor(args.vg, nvgRGBA(0x0c, 0x2f, 0x03, 175));
+            nvgFontSize(args.vg, 20);
+            nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
+            nvgText(args.vg, box.size.x / 2, kPedalMarginVertical + kFileListHeight - 25, "AI CRAFTED TONE", nullptr);
+        }
+
+        // .rt-neural .brand
+        if (Image* const img = images.logo.get())
+        {
+            nvgSave(args.vg);
+            nvgAlpha(args.vg, 0.25f);
+            // nvgTranslate(args.vg, kPedalMargin * 3, kPedalMarginVertical + kFileListHeight - 25);
+            nvgTranslate(args.vg, box.size.x / 2 - 55.5f, box.size.y - 120 - 11);
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, 0, 0, 111, 25);
+            nvgFillPaint(args.vg, nvgImagePattern(args.vg, 0, 0, 111, 25, 0.f, img->handle, 1.f));
+            nvgFill(args.vg);
+            nvgRestore(args.vg);
+        }
+
+        // text stuff
+        nvgFontSize(args.vg, 11);
+        nvgFillColor(args.vg, nvgRGB(0xff,0xff,0xff));
+        nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+
+        nvgText(args.vg, 34, box.size.y - 80, "POST", nullptr);
+        nvgText(args.vg, 34, box.size.y - 30, "PRE", nullptr);
+
+        nvgText(args.vg, 64, box.size.y - 80, "PEAK", nullptr);
+        nvgText(args.vg, 64, box.size.y - 30, "BPASS", nullptr);
+
+        nvgText(args.vg, 104, box.size.y - 30, "BASS", nullptr);
+        nvgText(args.vg, 152, box.size.y - 30, "MID", nullptr);
+        nvgText(args.vg, 200, box.size.y - 30, "TREBLE", nullptr);
+        nvgText(args.vg, 252, box.size.y - 30, "DEPTH", nullptr);
+        nvgText(args.vg, 300, box.size.y - 30, "PRESENCE", nullptr);
+
+        nvgText(args.vg, box.size.x / 2 - 80, box.size.y - 90, "INPUT", nullptr);
+        nvgText(args.vg, box.size.x / 2 + 80, box.size.y - 90, "OUTPUT", nullptr);
 
         ModuleWidget::draw(args);
-    }
-
-    void drawOutputJacksArea(NVGcontext* const vg)
-    {
-        nvgBeginPath(vg);
-        nvgRoundedRect(vg, startX_Out - 2.5f, startY_list * 0.5f - padding * 0.5f, padding, padding, 4);
-        nvgFillColor(vg, nvgRGB(0xd0, 0xd0, 0xd0));
-        nvgFill(vg);
     }
 
     void appendContextMenu(ui::Menu* const menu) override
