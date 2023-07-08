@@ -106,7 +106,7 @@ void destroyStaticPlugins();
 }
 }
 
-const std::string CARDINAL_VERSION = "23.05";
+const std::string CARDINAL_VERSION = "23.07";
 
 START_NAMESPACE_DISTRHO
 
