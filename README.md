@@ -27,6 +27,7 @@ Cardinal should be considered stable, if you spot any bugs please report them.
 Currently the following should be noted:
 
 - CLAP support is a work-in-progress [DPF#383](https://github.com/DISTRHO/DPF/issues/383)
+- VST3 plugin hosting (inside Carla or Ildaeil modules) mostly works but is considered experimental
 - Windows 32bit builds still have a few problematic modules [#80](https://github.com/DISTRHO/Cardinal/issues/80)
 
 ### Stable release
