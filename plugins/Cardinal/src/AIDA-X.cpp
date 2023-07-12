@@ -843,10 +843,11 @@ struct AidaSwitch : app::Switch {
     {
         engine::ParamQuantity* pq = getParamQuantity();
 
+        bool checked;
         if (pq == nullptr)
-            return;
-
-        const bool checked = inverted ? pq->getValue() <= pq->getMinValue() : pq->getValue() > pq->getMinValue();
+            checked = inverted ? pq->getValue() <= pq->getMinValue() : pq->getValue() > pq->getMinValue();
+        else
+            checked = true;
 
         nvgBeginPath(args.vg);
         nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, kSwitchWidth/2);
