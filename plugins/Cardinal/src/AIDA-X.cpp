@@ -364,7 +364,9 @@ struct AidaPluginModule : Module {
         }
         catch (const std::exception& e) {
             d_stderr2("Unable to load aida-x file: %s\nError: %s", filename, e.what());
-            async_dialog_message((std::string("Unable to load aida-x file: ") + e.what()).c_str());
+
+            if (showError)
+                async_dialog_message((std::string("Unable to load aida-x file: ") + e.what()).c_str());
         };
     }
 
@@ -975,10 +977,6 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
                                        nvgRGB(19, 19, 19)));
         nvgFill(args.vg);
 
-        // extra
-        // nvgStrokeColor(args.vg, nvgRGBA(150, 150, 150, 60));
-        // nvgStroke(args.vg);
-
         // splitter
         nvgBeginPath(args.vg);
         nvgMoveTo(args.vg, 226, box.size.y - 80);
@@ -1028,7 +1026,7 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
         nvgFill(args.vg);
 
         // a bit darker so the text is readable
-        nvgFillColor(args.vg, nvgRGBAf(0.f,0.f,0.f,0.25f));
+        nvgFillColor(args.vg, nvgRGBAf(0.f,0.f,0.f,0.1f));
         nvgFill(args.vg);
 
         // plugin label
