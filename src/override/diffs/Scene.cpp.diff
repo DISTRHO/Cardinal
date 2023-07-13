@@ -1,5 +1,5 @@
---- ../Rack/src/app/Scene.cpp	2022-09-21 20:49:12.199540706 +0200
-+++ Scene.cpp	2023-05-20 18:44:57.551491858 +0200
+--- ../Rack/src/app/Scene.cpp	2023-06-11 21:02:02.640002965 +0200
++++ Scene.cpp	2023-06-11 20:56:09.476002797 +0200
 @@ -1,12 +1,36 @@
 -#include <thread>
 -
@@ -224,7 +224,7 @@
  			e.consume(this);
  		}
  		if (e.keyName == "q" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -180,19 +269,22 @@
+@@ -180,19 +269,25 @@
  			e.consume(this);
  		}
  		if (e.keyName == "o" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -237,21 +237,24 @@
 +			patchUtils::revertDialog();
  			e.consume(this);
  		}
-+#ifndef DISTRHO_OS_WASM
  		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 -			APP->patch->saveDialog();
-+			// NOTE: will do nothing if path is empty, intentionally
-+			patchUtils::saveDialog(APP->patch->path);
++			// NOTE: for plugin versions it will do nothing if path is empty, intentionally
++			if (APP->patch->path.empty()) {
++				if (isStandalone())
++					patchUtils::saveAsDialog();
++			} else {
++				patchUtils::saveDialog(APP->patch->path);
++			}
  			e.consume(this);
  		}
-+#endif
  		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
 -			APP->patch->saveAsDialog();
 +			patchUtils::saveAsDialog();
  			e.consume(this);
  		}
  		if (e.keyName == "z" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -220,24 +312,42 @@
+@@ -220,24 +315,42 @@
  			APP->scene->rackScroll->setZoom(std::pow(2.f, zoom));
  			e.consume(this);
  		}
@@ -296,7 +299,7 @@
  
  		// Module selections
  		if (e.keyName == "a" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-@@ -326,13 +436,6 @@
+@@ -326,13 +439,6 @@
  
  	// Key commands that can be overridden by children
  	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -310,7 +313,7 @@
  		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
  			rack->pasteClipboardAction();
  			e.consume(this);
-@@ -351,7 +454,7 @@
+@@ -351,7 +457,7 @@
  		std::string extension = system::getExtension(path);
  
  		if (extension == ".vcv") {

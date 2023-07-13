@@ -1,5 +1,5 @@
---- ../Rack/src/window/Window.cpp	2023-05-20 17:03:33.007081806 +0200
-+++ Window.cpp	2023-05-20 19:01:25.266135825 +0200
+--- ../Rack/src/window/Window.cpp	2023-06-11 21:02:02.648002965 +0200
++++ Window.cpp	2023-07-13 17:01:53.848000425 +0200
 @@ -1,33 +1,94 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -978,7 +978,7 @@
  	// t5 = system::getTime();
  	// DEBUG("pre-step %6.1f step %6.1f draw %6.1f nvgEndFrame %6.1f glfwSwapBuffers %6.1f total %6.1f",
  	// 	(t1 - frameTime) * 1e3f,
-@@ -526,163 +705,124 @@
+@@ -526,163 +705,130 @@
  	// 	(t5 - t4) * 1e3f,
  	// 	(t5 - frameTime) * 1e3f
  	// );
@@ -1181,19 +1181,23 @@
  void Window::setFullScreen(bool fullScreen) {
 -	if (!fullScreen) {
 -		glfwSetWindowMonitor(win, NULL, internal->lastWindowX, internal->lastWindowY, internal->lastWindowWidth, internal->lastWindowHeight, GLFW_DONT_CARE);
--	}
++#ifdef DISTRHO_OS_WASM
++	if (fullScreen)
++	{
++		try {
++			emscripten_request_fullscreen(internal->tlw->getWindow().getApp().getClassName(), false);
++		} DISTRHO_SAFE_EXCEPTION("fullscreen");
+ 	}
 -	else {
 -		glfwGetWindowPos(win, &internal->lastWindowX, &internal->lastWindowY);
 -		glfwGetWindowSize(win, &internal->lastWindowWidth, &internal->lastWindowHeight);
 -		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 -		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 -		glfwSetWindowMonitor(win, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
--	}
-+#ifdef DISTRHO_OS_WASM
-+	if (fullScreen)
-+		emscripten_request_fullscreen(internal->tlw->getWindow().getApp().getClassName(), false);
 +	else
++	{
 +		emscripten_exit_fullscreen();
+ 	}
 +#endif
  }
  
@@ -1214,7 +1218,7 @@
  }
  
  
-@@ -702,7 +842,7 @@
+@@ -702,7 +848,7 @@
  
  
  double Window::getFrameDurationRemaining() {
@@ -1223,7 +1227,7 @@
  	return frameDuration - (system::getTime() - internal->frameTime);
  }
  
-@@ -713,14 +853,15 @@
+@@ -713,14 +859,15 @@
  		return pair->second;
  
  	// Load font
@@ -1242,7 +1246,7 @@
  	}
  	internal->fontCache[filename] = font;
  	return font;
-@@ -733,14 +874,15 @@
+@@ -733,14 +880,15 @@
  		return pair->second;
  
  	// Load image
@@ -1261,7 +1265,7 @@
  	}
  	internal->imageCache[filename] = image;
  	return image;
-@@ -757,28 +899,156 @@
+@@ -757,28 +905,156 @@
  }
  
  

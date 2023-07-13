@@ -1,5 +1,5 @@
---- ../Rack/src/common.cpp	2023-05-20 17:03:33.006081772 +0200
-+++ common.cpp	2023-05-20 17:51:04.675045244 +0200
+--- ../Rack/src/common.cpp	2023-06-11 21:02:02.640002965 +0200
++++ common.cpp	2023-06-11 20:56:09.476002797 +0200
 @@ -1,12 +1,57 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -60,7 +60,7 @@
  }
  
  #endif
-@@ -14,12 +59,11 @@
+@@ -14,30 +59,21 @@
  
  namespace rack {
  
@@ -76,21 +76,23 @@
 +const std::string APP_VERSION = "2.3.0";
  #if defined ARCH_WIN
  	const std::string APP_OS = "win";
- 	const std::string APP_OS_NAME = "Windows";
-@@ -29,15 +73,10 @@
+-	const std::string APP_OS_NAME = "Windows";
+ #elif defined ARCH_MAC
+ 	const std::string APP_OS = "mac";
+-	const std::string APP_OS_NAME = "macOS";
  #elif defined ARCH_LIN
  	const std::string APP_OS = "lin";
- 	const std::string APP_OS_NAME = "Linux";
-+#else
-+	#error ARCH_LIN undefined
- #endif
+-	const std::string APP_OS_NAME = "Linux";
+-#endif
 -#if defined ARCH_X64
 -	const std::string APP_CPU = "x64";
 -	const std::string APP_CPU_NAME = "x64";
 -#elif defined ARCH_ARM64
 -	const std::string APP_CPU = "arm64";
 -	const std::string APP_CPU_NAME = "ARM64";
--#endif
++#else
++	#error ARCH_LIN undefined
+ #endif
 -const std::string API_URL = "https://api.vcvrack.com";
 +const std::string API_URL = "";
  
