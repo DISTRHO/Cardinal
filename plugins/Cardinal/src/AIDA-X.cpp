@@ -8,15 +8,17 @@
 #include "plugincontext.hpp"
 #include "ModuleWidgets.hpp"
 
-#include "extra/Sleep.hpp"
-
-#include "AIDA-X/Biquad.cpp"
-#include "AIDA-X/model_variant.hpp"
-
 #ifndef HEADLESS
 # include "ImGuiWidget.hpp"
 # include "ghc/filesystem.hpp"
 #endif
+
+// #define QUICK_BUILD_TESTING
+
+#ifndef QUICK_BUILD_TESTING
+# include "extra/Sleep.hpp"
+# include "AIDA-X/Biquad.cpp"
+# include "AIDA-X/model_variant.hpp"
 
 template class RTNeural::Model<float>;
 template class RTNeural::Layer<float>;
@@ -202,6 +204,7 @@ float applyModel(DynamicModel* model, float sample, const float param1, const fl
     
     return sample;
 }
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -251,6 +254,7 @@ struct AidaPluginModule : Module {
     bool fileChanged = false;
     std::string currentFile;
 
+#ifndef QUICK_BUILD_TESTING
     Biquad dc_blocker { bq_type_highpass, 0.5f, COMMON_Q, 0.0f };
     Biquad in_lpf { bq_type_lowpass, 0.5f, COMMON_Q, 0.0f };
     Biquad bass { bq_type_lowshelf, 0.5f, COMMON_Q, 0.0f };
@@ -265,6 +269,7 @@ struct AidaPluginModule : Module {
     dsp::ExponentialFilter outlevel;
     DynamicModel* model = nullptr;
     std::atomic<bool> activeModel { false };
+#endif
 
     AidaPluginModule()
         : pcontext(static_cast<CardinalPluginContext*>(APP))
@@ -292,6 +297,7 @@ struct AidaPluginModule : Module {
         configParam(kParameterPARAM1, 0.f, 1.f, 0.f, "PARAM1");
         configParam(kParameterPARAM2, 0.f, 1.f, 0.f, "PARAM2");
 
+#ifndef QUICK_BUILD_TESTING
         cachedParams[kParameterINLPF] = 66.216f;
         cachedParams[kParameterBASSGAIN] = 0.f;
         cachedParams[kParameterBASSFREQ] = 75.f;
@@ -306,11 +312,14 @@ struct AidaPluginModule : Module {
         in_lpf.setFc(MAP(66.216f, 0.0f, 100.0f, INLPF_MAX_CO, INLPF_MIN_CO));
         inlevel.setTau(1 / 30.f);
         outlevel.setTau(1 / 30.f);
+#endif
     }
 
     ~AidaPluginModule() override
     {
+#ifndef QUICK_BUILD_TESTING
         delete model;
+#endif
     }
 
     json_t* dataToJson() override
@@ -336,7 +345,7 @@ struct AidaPluginModule : Module {
                 currentFile = filepath;
                 fileChanged = true;
 
-                loadModelFromFile(filepath);
+                loadModelFromFile(filepath, false);
             }
         }
 
@@ -347,84 +356,74 @@ struct AidaPluginModule : Module {
         }
     }
 
-    void loadModelFromFile(const char* const filename)
+    void loadModelFromFile(const char* const filename, const bool showError)
     {
         try {
             std::ifstream jsonStream(filename, std::ifstream::binary);
             loadModelFromStream(jsonStream);
         }
         catch (const std::exception& e) {
-            d_stderr2("Unable to load json file: %s\nError: %s", filename, e.what());
+            d_stderr2("Unable to load aida-x file: %s\nError: %s", filename, e.what());
+            async_dialog_message((std::string("Unable to load aida-x file: ") + e.what()).c_str());
         };
     }
 
     void loadModelFromStream(std::istream& jsonStream)
     {
+#ifndef QUICK_BUILD_TESTING
         int input_size;
         int input_skip;
         float input_gain;
         float output_gain;
         nlohmann::json model_json;
 
-        try {
-            jsonStream >> model_json;
+        jsonStream >> model_json;
 
-            /* Understand which model type to load */
-            input_size = model_json["in_shape"].back().get<int>();
-            if (input_size > MAX_INPUT_SIZE) {
-                throw std::invalid_argument("Value for input_size not supported");
-            }
-
-            if (model_json["in_skip"].is_number()) {
-                input_skip = model_json["in_skip"].get<int>();
-                if (input_skip > 1)
-                    throw std::invalid_argument("Values for in_skip > 1 are not supported");
-            }
-            else {
-                input_skip = 0;
-            }
-
-            if (model_json["in_gain"].is_number()) {
-                input_gain = DB_CO(model_json["in_gain"].get<float>());
-            }
-            else {
-                input_gain = 1.0f;
-            }
-
-            if (model_json["out_gain"].is_number()) {
-                output_gain = DB_CO(model_json["out_gain"].get<float>());
-            }
-            else {
-                output_gain = 1.0f;
-            }
+        /* Understand which model type to load */
+        input_size = model_json["in_shape"].back().get<int>();
+        if (input_size > MAX_INPUT_SIZE) {
+            throw std::invalid_argument("Value for input_size not supported");
         }
-        catch (const std::exception& e) {
-            d_stderr2("Unable to load json, error: %s", e.what());
-            return;
+
+        if (model_json["in_skip"].is_number()) {
+            input_skip = model_json["in_skip"].get<int>();
+            if (input_skip > 1)
+                throw std::invalid_argument("Values for in_skip > 1 are not supported");
+        }
+        else {
+            input_skip = 0;
+        }
+
+        if (model_json["in_gain"].is_number()) {
+            input_gain = DB_CO(model_json["in_gain"].get<float>());
+        }
+        else {
+            input_gain = 1.0f;
+        }
+
+        if (model_json["out_gain"].is_number()) {
+            output_gain = DB_CO(model_json["out_gain"].get<float>());
+        }
+        else {
+            output_gain = 1.0f;
         }
 
         std::unique_ptr<DynamicModel> newmodel = std::make_unique<DynamicModel>();
 
-        try {
-            if (! custom_model_creator (model_json, newmodel->variant))
-                throw std::runtime_error ("Unable to identify a known model architecture!");
+        if (! custom_model_creator(model_json, newmodel->variant))
+            throw std::runtime_error("Unable to identify a known model architecture!");
 
-            std::visit (
-                [&model_json] (auto&& custom_model)
+        std::visit (
+            [&model_json] (auto&& custom_model)
+            {
+                using ModelType = std::decay_t<decltype (custom_model)>;
+                if constexpr (! std::is_same_v<ModelType, NullModel>)
                 {
-                    using ModelType = std::decay_t<decltype (custom_model)>;
-                    if constexpr (! std::is_same_v<ModelType, NullModel>)
-                    {
-                        custom_model.parseJson (model_json, true);
-                        custom_model.reset();
-                    }
-                },
-                newmodel->variant);
-        }
-        catch (const std::exception& e) {
-            d_stderr2("Error loading model: %s", e.what());
-            return;
-        }
+                    custom_model.parseJson (model_json, true);
+                    custom_model.reset();
+                }
+            },
+            newmodel->variant);
 
         // save extra info
         newmodel->input_skip = input_skip != 0;
@@ -444,8 +443,10 @@ struct AidaPluginModule : Module {
             d_msleep(1);
 
         delete oldmodel;
+#endif
     }
 
+#ifndef QUICK_BUILD_TESTING
     MidEqType getMidType() const
     {
         return cachedParams[kParameterMTYPE] > 0.5f ? kMidEqBandpass : kMidEqPeak;
@@ -461,9 +462,11 @@ struct AidaPluginModule : Module {
                         bass.process(
                             depth.process(sample)))));
     }
+#endif
 
     void process(const ProcessArgs& args) override
     {
+#ifndef QUICK_BUILD_TESTING
         const float stime = args.sampleTime;
         const float inlevelv = DB_CO(params[kParameterINLEVEL].getValue());
         const float outlevelv = DB_CO(params[kParameterOUTLEVEL].getValue());
@@ -606,8 +609,10 @@ struct AidaPluginModule : Module {
 
         // Output volume
         outputs[AUDIO_OUTPUT].setVoltage(sample * outlevel.process(stime, outlevelv) * 10.f);
+#endif
     }
 
+#ifndef QUICK_BUILD_TESTING
     void onSampleRateChange(const SampleRateChangeEvent& e) override
     {
         cachedParams[kParameterBASSGAIN] = params[kParameterBASSGAIN].getValue();
@@ -648,6 +653,7 @@ struct AidaPluginModule : Module {
                            COMMON_Q,
                            cachedParams[kParameterPRESENCE]);
     }
+#endif
 
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AidaPluginModule)
 };
@@ -657,11 +663,6 @@ struct AidaPluginModule : Module {
 #ifndef HEADLESS
 struct AidaModelListWidget : ImGuiWidget {
     AidaPluginModule* const module;
-
-    /*
-    bool showError = false;
-    String errorMessage;
-    */
 
     struct ghcFile {
         std::string full, base;
@@ -691,14 +692,14 @@ struct AidaModelListWidget : ImGuiWidget {
             style.ScrollbarSize = 12 * scaleFactor;
 
             ImVec4* const colors = style.Colors;
-            colors[ImGuiCol_Text]             = ImVec4(1.f, 1.f, 1.f, 1.f);
+            colors[ImGuiCol_Text]             = ImVec4(0.f, 0.f, 0.f, 1.f);
             colors[ImGuiCol_WindowBg]         = ImVec4(0.f, 0.f, 0.f, 0.f);
             colors[ImGuiCol_FrameBg]          = ImVec4(0.f, 0.f, 0.f, 0.f);
             colors[ImGuiCol_FrameBgHovered]   = ImVec4(0.f, 0.f, 0.f, 0.f);
             colors[ImGuiCol_FrameBgActive]    = ImVec4(0.f, 0.f, 0.f, 0.f);
-            colors[ImGuiCol_Header]           = ImVec4(0.f, 0.f, 0.f, 0.8f);
-            colors[ImGuiCol_HeaderHovered]    = ImVec4(0.f, 0.f, 0.f, 0.6f);
-            colors[ImGuiCol_HeaderActive]     = ImVec4(0.f, 0.f, 0.f, 0.4f);
+            colors[ImGuiCol_Header]           = ImVec4(0.f, 0.f, 0.f, 0.4f);
+            colors[ImGuiCol_HeaderHovered]    = ImVec4(0.f, 0.f, 0.f, 0.35f);
+            colors[ImGuiCol_HeaderActive]     = ImVec4(0.f, 0.f, 0.f, 0.5f);
         }
 
         const int flags = ImGuiWindowFlags_NoBackground
@@ -714,26 +715,6 @@ struct AidaModelListWidget : ImGuiWidget {
 
         if (ImGui::Begin("Model File List", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize))
         {
-            /*
-            if (showError)
-            {
-                showError = false;
-                ImGui::OpenPopup("Audio File Error");
-            }
-
-            if (ImGui::BeginPopupModal("Model File Error", nullptr, flags))
-            {
-                ImGui::TextWrapped("Failed to load model file, error was:\n%s", errorMessage.buffer());
-
-                ImGui::Separator();
-
-                if (ImGui::Button("Ok"))
-                    ImGui::CloseCurrentPopup();
-
-                ImGui::EndPopup();
-            }
-            else
-            */
             if (ImGui::BeginTable("modellist", 1, ImGuiTableFlags_NoSavedSettings))
             {
                 for (size_t i=0, count=currentFiles.size(); i < count; ++i)
@@ -748,7 +729,7 @@ struct AidaModelListWidget : ImGuiWidget {
                     {
                         selectedFile = i;
                         module->currentFile = currentFiles[i].full;
-                        module->loadModelFromFile(currentFiles[i].full.c_str());
+                        module->loadModelFromFile(currentFiles[i].full.c_str(), true);
                     }
                 }
 
@@ -817,6 +798,37 @@ struct AidaModelListWidget : ImGuiWidget {
     }
 };
 
+struct AidaLogo : Widget {
+    std::shared_ptr<Image> image;
+    bool hasModule;
+
+    AidaLogo(const bool hasModule) {
+        box.size = Vec(74, 16.666f);
+        this->hasModule = hasModule;
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        if (image.get() == nullptr)
+            image = APP->window->loadImage(asset::plugin(pluginInstance, "res/aida-x-logo.png"));
+
+        if (Image* const img = image.get())
+        {
+            const float pixelRatio = hasModule ? APP->window->pixelRatio : 1.0f;
+            const float boxscale = std::min(box.size.x / 111, box.size.y / 25);
+            const float imgHeight = (25 / pixelRatio) * boxscale;
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+            nvgFillPaint(args.vg, nvgImagePattern(args.vg,
+                                                  0,
+                                                  (box.size.y / pixelRatio) * 0.5f - imgHeight * 0.5f,
+                                                  box.size.x / pixelRatio,
+                                                  imgHeight, 0, img->handle, 1.0f));
+            nvgFill(args.vg);
+        }
+    }
+};
+
 struct AidaKnob : app::SvgKnob {
     AidaKnob()
     {
@@ -844,7 +856,7 @@ struct AidaSwitch : app::Switch {
         engine::ParamQuantity* pq = getParamQuantity();
 
         bool checked;
-        if (pq == nullptr)
+        if (pq != nullptr)
             checked = inverted ? pq->getValue() <= pq->getMinValue() : pq->getValue() > pq->getMinValue();
         else
             checked = true;
@@ -867,7 +879,7 @@ struct AidaSwitch : app::Switch {
 
 struct AidaWidget : ModuleWidgetWithSideScrews<23> {
     static constexpr const uint kPedalMargin = 10;
-    static constexpr const uint kPedalMarginVertical = 20;
+    static constexpr const uint kPedalMarginVertical = 25;
     static constexpr const uint kFileListHeight = 200;
 
     struct {
@@ -886,35 +898,45 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
 
         createAndAddScrews();
 
-        addInput(createInputCentered<PJ301MPort>(Vec(box.size.x / 2 - 120, box.size.y - 120), module, 0));
-        addOutput(createOutputCentered<PJ301MPort>(Vec(box.size.x / 2 + 120, box.size.y - 120), module, 0));
+        addInput(createInputCentered<PJ301MPort>(Vec(box.size.x / 2 - 120, box.size.y - 115), module, 0));
+        addOutput(createOutputCentered<PJ301MPort>(Vec(box.size.x / 2 + 120, box.size.y - 115), module, 0));
 
-        addChild(createParamCentered<AidaKnob>(Vec(box.size.x / 2 - 80, box.size.y - 120),
+        addChild(createParamCentered<AidaKnob>(Vec(box.size.x / 2 - 80, box.size.y - 115),
                                                module, AidaPluginModule::kParameterINLEVEL));
 
-        addChild(createParamCentered<AidaKnob>(Vec(box.size.x / 2 + 80, box.size.y - 120),
+        addChild(createParamCentered<AidaKnob>(Vec(box.size.x / 2 + 80, box.size.y - 115),
                                                module, AidaPluginModule::kParameterOUTLEVEL));
 
-        addChild(createParamCentered<AidaKnob>(Vec(104, box.size.y - 60),
+        addChild(createParamCentered<AidaKnob>(Vec(104, box.size.y - 55),
                                                module, AidaPluginModule::kParameterBASSGAIN));
 
-        addChild(createParamCentered<AidaKnob>(Vec(152, box.size.y - 60),
+        addChild(createParamCentered<AidaKnob>(Vec(152, box.size.y - 55),
                                                module, AidaPluginModule::kParameterMIDGAIN));
 
-        addChild(createParamCentered<AidaKnob>(Vec(200, box.size.y - 60),
+        addChild(createParamCentered<AidaKnob>(Vec(200, box.size.y - 55),
                                                module, AidaPluginModule::kParameterTREBLEGAIN));
 
-        addChild(createParamCentered<AidaKnob>(Vec(252, box.size.y - 60),
+        addChild(createParamCentered<AidaKnob>(Vec(252, box.size.y - 55),
                                                module, AidaPluginModule::kParameterDEPTH));
 
-        addChild(createParamCentered<AidaKnob>(Vec(300, box.size.y - 60),
+        addChild(createParamCentered<AidaKnob>(Vec(300, box.size.y - 55),
                                                module, AidaPluginModule::kParameterPRESENCE));
 
-        addChild(createParamCentered<AidaSwitch>(Vec(34, box.size.y - 58),
+        addChild(createParamCentered<AidaSwitch>(Vec(34, box.size.y - 53),
                                                  module, AidaPluginModule::kParameterEQPOS));
 
-        addChild(createParamCentered<AidaSwitch>(Vec(64, box.size.y - 58),
+        addChild(createParamCentered<AidaSwitch>(Vec(64, box.size.y - 53),
                                                  module, AidaPluginModule::kParameterMTYPE));
+
+        AidaLogo* const logow = new AidaLogo(module != nullptr);
+
+        FramebufferWidget* const fbw = new FramebufferWidget;
+        fbw->oversample = 2.0;
+        fbw->addChild(logow);
+        fbw->box.size = logow->box.size;
+        fbw->box.pos.x = box.size.x / 2 - fbw->box.size.x / 2;
+        fbw->box.pos.y = 8;
+        addChild(fbw);
 
         if (m != nullptr)
         {
@@ -927,76 +949,35 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
 
     void draw(const DrawArgs& args) override
     {
-        const double widthPedal = box.size.x - kPedalMargin * 2;
-        const double heightPedal = box.size.y - kPedalMarginVertical * 2;
         const int cornerRadius = 12;
 
         // load images as needed
         if (images.background.get() == nullptr)
-        {
             images.background = APP->window->loadImage(asset::plugin(pluginInstance, "res/aida-x-background-p2.png"));
-            images.header = APP->window->loadImage(asset::plugin(pluginInstance, "res/aida-x-header.png"));
-            images.logo = APP->window->loadImage(asset::plugin(pluginInstance, "res/aida-x-logo.png"));
-        }
 
-        // outer bounds gradient
+        // background gradient
         nvgBeginPath(args.vg);
         nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+
         nvgFillPaint(args.vg,
                      nvgLinearGradient(args.vg,
-                                       0, 0, 0, box.size.y,
-                                       nvgRGB(0xff - 0xcd + 50, 0xff - 0xff + 50, 0xff),
-                                       nvgRGB(0xff - 0x8b + 50, 0xff - 0xf7 + 50, 0xff)));
-        nvgFill(args.vg);
-
-        // outer bounds pattern
-        if (Image* const img = images.background.get())
-        {
-            nvgFillPaint(args.vg, nvgImagePattern(args.vg, 0, 0, 256.f, 128.f, 0.f, img->handle, 1.f));
-            nvgFill(args.vg);
-        }
-
-        // box shadow
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg,
-                kPedalMargin / 2,
-                kPedalMarginVertical / 2,
-                kPedalMargin + widthPedal,
-                kPedalMarginVertical + heightPedal);
-        nvgFillPaint(args.vg,
-                     nvgBoxGradient(args.vg,
-                                    kPedalMargin,
-                                    kPedalMarginVertical,
-                                    widthPedal,
-                                    heightPedal,
-                                    cornerRadius,
-                                    cornerRadius,
-                                    nvgRGBAf(0,0,0,1.f),
-                                    nvgRGBAf(0,0,0,0.f)));
-        nvgFill(args.vg);
-
-        // .rt-neural .grid
-        nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg, kPedalMargin, kPedalMarginVertical, widthPedal, heightPedal, cornerRadius);
-        nvgFillPaint(args.vg,
-                     nvgLinearGradient(args.vg,
-                                       kPedalMargin, kPedalMarginVertical,
-                                       kPedalMargin + box.size.x * 0.52f, 0,
+                                       0, 0,
+                                       box.size.x * 0.52f, 0,
                                        nvgRGB(28, 23, 12),
                                        nvgRGB(42, 34, 15)));
         nvgFill(args.vg);
 
         nvgFillPaint(args.vg,
                      nvgLinearGradient(args.vg,
-                                       kPedalMargin + box.size.x * 0.5f, 0,
-                                       kPedalMargin + box.size.x, 0,
+                                       box.size.x * 0.5f, 0,
+                                       box.size.x, 0,
                                        nvgRGB(42, 34, 15),
                                        nvgRGB(19, 19, 19)));
         nvgFill(args.vg);
 
         // extra
-        nvgStrokeColor(args.vg, nvgRGBA(150, 150, 150, 60));
-        nvgStroke(args.vg);
+        // nvgStrokeColor(args.vg, nvgRGBA(150, 150, 150, 60));
+        // nvgStroke(args.vg);
 
         // splitter
         nvgBeginPath(args.vg);
@@ -1047,62 +1028,38 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
         nvgFill(args.vg);
 
         // a bit darker so the text is readable
-        nvgFillColor(args.vg, nvgRGBAf(0.f,0.f,0.f,0.5f));
+        nvgFillColor(args.vg, nvgRGBAf(0.f,0.f,0.f,0.25f));
         nvgFill(args.vg);
 
-        // .rt-neural .plate
-        if (Image* const img = images.header.get())
-        {
-            const float imgw = 100 * 1548 / 727;
-            const float imgh = 100;
+        // plugin label
+        nvgFillColor(args.vg, nvgRGBA(0x8b, 0xf7, 0x00, 255));
+        nvgFontSize(args.vg, 24);
+        nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
+        nvgText(args.vg, box.size.x / 2, box.size.y - 110, "AIDA-X", nullptr);
 
-            nvgSave(args.vg);
-            nvgTranslate(args.vg, box.size.x / 2 - imgw/2, kPedalMarginVertical + kFileListHeight / 4);
-            nvgBeginPath(args.vg);
-            nvgRect(args.vg, 0, 0, imgw, imgh);
-            nvgFillPaint(args.vg, nvgImagePattern(args.vg, 0, 0, imgw, imgh, 0.f, img->handle, 1.f));
-            nvgFill(args.vg);
-            nvgRestore(args.vg);
-
-            nvgFillColor(args.vg, nvgRGBA(0x0c, 0x2f, 0x03, 175));
-            nvgFontSize(args.vg, 20);
-            nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
-            nvgText(args.vg, box.size.x / 2, kPedalMarginVertical + kFileListHeight - 25, "AI CRAFTED TONE", nullptr);
-        }
-
-        // .rt-neural .brand
-        if (Image* const img = images.logo.get())
-        {
-            nvgSave(args.vg);
-            nvgAlpha(args.vg, 0.25f);
-            // nvgTranslate(args.vg, kPedalMargin * 3, kPedalMarginVertical + kFileListHeight - 25);
-            nvgTranslate(args.vg, box.size.x / 2 - 55.5f, box.size.y - 120 - 11);
-            nvgBeginPath(args.vg);
-            nvgRect(args.vg, 0, 0, 111, 25);
-            nvgFillPaint(args.vg, nvgImagePattern(args.vg, 0, 0, 111, 25, 0.f, img->handle, 1.f));
-            nvgFill(args.vg);
-            nvgRestore(args.vg);
-        }
+        nvgFontSize(args.vg, 14);
+        nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
+        nvgText(args.vg, box.size.x / 2, box.size.y - 105, "AI CRAFTED TONE", nullptr);
 
         // text stuff
         nvgFontSize(args.vg, 11);
         nvgFillColor(args.vg, nvgRGB(0xff,0xff,0xff));
         nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
 
-        nvgText(args.vg, 34, box.size.y - 80, "POST", nullptr);
-        nvgText(args.vg, 34, box.size.y - 30, "PRE", nullptr);
+        nvgText(args.vg, 34, box.size.y - 75, "POST", nullptr);
+        nvgText(args.vg, 34, box.size.y - 25, "PRE", nullptr);
 
-        nvgText(args.vg, 64, box.size.y - 80, "PEAK", nullptr);
-        nvgText(args.vg, 64, box.size.y - 30, "BPASS", nullptr);
+        nvgText(args.vg, 64, box.size.y - 75, "PEAK", nullptr);
+        nvgText(args.vg, 64, box.size.y - 25, "BPASS", nullptr);
 
-        nvgText(args.vg, 104, box.size.y - 30, "BASS", nullptr);
-        nvgText(args.vg, 152, box.size.y - 30, "MID", nullptr);
-        nvgText(args.vg, 200, box.size.y - 30, "TREBLE", nullptr);
-        nvgText(args.vg, 252, box.size.y - 30, "DEPTH", nullptr);
-        nvgText(args.vg, 300, box.size.y - 30, "PRESENCE", nullptr);
+        nvgText(args.vg, 104, box.size.y - 25, "BASS", nullptr);
+        nvgText(args.vg, 152, box.size.y - 25, "MID", nullptr);
+        nvgText(args.vg, 200, box.size.y - 25, "TREBLE", nullptr);
+        nvgText(args.vg, 252, box.size.y - 25, "DEPTH", nullptr);
+        nvgText(args.vg, 300, box.size.y - 25, "PRESENCE", nullptr);
 
-        nvgText(args.vg, box.size.x / 2 - 80, box.size.y - 90, "INPUT", nullptr);
-        nvgText(args.vg, box.size.x / 2 + 80, box.size.y - 90, "OUTPUT", nullptr);
+        nvgText(args.vg, box.size.x / 2 - 80, box.size.y - 85, "INPUT", nullptr);
+        nvgText(args.vg, box.size.x / 2 + 80, box.size.y - 85, "OUTPUT", nullptr);
 
         ModuleWidget::draw(args);
     }
@@ -1130,7 +1087,7 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
 
                     module->currentFile = path;
                     module->fileChanged = true;
-                    module->loadModelFromFile(path);
+                    module->loadModelFromFile(path, true);
                     std::free(path);
                 });
             }
