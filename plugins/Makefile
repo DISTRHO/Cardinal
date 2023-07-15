@@ -1405,7 +1405,7 @@ JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/fx_presets
 JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/wavetables
 JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/windows.wt
 
-RESOURCE_FILES += Cardinal/res/*.png
+RESOURCE_FILES += $(wildcard Cardinal/res/*.png)
 RESOURCE_FILES += Cardinal/res/Miku/Miku.png
 
 MINIPLUGIN_LIST     = Cardinal
