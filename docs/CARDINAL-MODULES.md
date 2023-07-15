@@ -8,9 +8,10 @@ This file contains documentation for the DISTRHO Cardinal modules.
 
 ![screenshot](Module_AIDA-X.png)
 
-[AIDA-X](https://github.com/AidaDSP/AIDA-X) is an Amp Model Player, for providing high fidelity simulations of guitar amplifiers.  
+[AIDA-X](https://github.com/AidaDSP/AIDA-X) is an Amp Model Player leveraging AI and machine learning, with a target of providing high fidelity simulations of guitar amplifiers.  
 It is also possible to run entire signal chains consisting of any combination of amp, cab, dist, drive, fuzz, boost and eq.
 
+The module loads AIDA-X files that have been trained to match a desired sound output.  
 Right-click on the module and select "Load model file..." to load an AIDA-X model file from disk.
 
 A quick model pack can be downloaded from [AIDA DSP's Google Drive folder](https://drive.google.com/drive/folders/18MwNhuo9fjK8hlne6SAdhpGtL4bWsVz-).
