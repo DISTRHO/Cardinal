@@ -603,9 +603,7 @@ static void Window__writeImagePNG(void* context, void* data, int size) {
 
 
 void Window::step() {
-	DISTRHO_SAFE_ASSERT_RETURN(internal->tlw != nullptr,);
-
-	if (vg == nullptr)
+	if (internal->tlw == nullptr || vg == nullptr)
 		return;
 
 	double frameTime = system::getTime();
