@@ -87,6 +87,7 @@ void openBrowser(const std::string& url);
 # define CARDINAL_INIT_OSC_THREAD
 #endif
 
+typedef void* lo_server;
 typedef void* lo_server_thread;
 
 START_NAMESPACE_DISTRHO
@@ -97,10 +98,6 @@ struct CardinalPluginContext;
 
 struct Initializer
 {
-#ifdef CARDINAL_INIT_OSC_THREAD
-    lo_server_thread oscServerThread = nullptr;
-    CardinalBasePlugin* remotePluginInstance = nullptr;
-#endif
     std::string templatePath;
     std::string factoryTemplatePath;
     bool shouldSaveSettings = false;
@@ -108,6 +105,18 @@ struct Initializer
     Initializer(const CardinalBasePlugin* plugin, const CardinalBaseUI* ui);
     ~Initializer();
     void loadSettings(bool isRealInstance);
+
+  #ifdef HAVE_LIBLO
+    lo_server oscServer = nullptr;
+   #ifdef CARDINAL_INIT_OSC_THREAD
+    lo_server_thread oscServerThread = nullptr;
+   #endif
+    CardinalBasePlugin* remotePluginInstance = nullptr;
+
+    bool startRemoteServer(const char* port);
+    void stopRemoteServer();
+    void stepRemoteServer();
+  #endif
 };
 
 #ifndef HEADLESS

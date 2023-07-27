@@ -218,6 +218,12 @@ public:
           context(new CardinalPluginContext(this)) {}
     ~CardinalBasePlugin() override {}
 
+   #ifdef HAVE_LIBLO
+    virtual bool startRemoteServer(const char* port) = 0;
+    virtual void stopRemoteServer() = 0;
+    virtual void stepRemoteServer() = 0;
+   #endif
+
    #ifndef HEADLESS
     friend class CardinalUI;
    #endif

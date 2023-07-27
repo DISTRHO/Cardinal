@@ -53,6 +53,7 @@
 
 #include "../CardinalCommon.hpp"
 #include "../CardinalRemote.hpp"
+#include "../PluginContext.hpp"
 #include "DistrhoPlugin.hpp"
 #include "DistrhoStandaloneUtils.hpp"
 
@@ -729,6 +730,10 @@ struct ViewButton : MenuButton {
 
 
 struct EngineButton : MenuButton {
+#ifdef HAVE_LIBLO
+	bool remoteServerStarted = false;
+#endif
+
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->cornerFlags = BND_CORNER_TOP;
@@ -740,6 +745,34 @@ struct EngineButton : MenuButton {
 		menu->addChild(createMenuItem("Performance meters", cpuMeterText, [=]() {
 			settings::cpuMeter ^= true;
 		}));
+
+#ifdef HAVE_LIBLO
+		if (isStandalone()) {
+			CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+			CardinalBasePlugin* const plugin = static_cast<CardinalBasePlugin*>(context->plugin);
+
+			// const bool remoteServerStarted = this->remoteServerStarted;
+			const std::string remoteControlText = remoteServerStarted ? " " CHECKMARK_STRING : "";
+
+			menu->addChild(createMenuItem("Enable OSC remote control", remoteControlText, [=]() {
+				if (remoteServerStarted) {
+					remoteServerStarted = false;
+					plugin->stopRemoteServer();
+					return;
+				}
+
+				async_dialog_text_input("OSC network port", CARDINAL_DEFAULT_REMOTE_PORT, [=](char* const port) {
+					if (port == nullptr)
+						return;
+
+					if (plugin->startRemoteServer(port))
+						remoteServerStarted = true;
+
+					std::free(port);
+				});
+			}));
+		}
+#endif
 
 		if (isUsingNativeAudio()) {
 			if (supportsAudioInput()) {
@@ -782,6 +815,18 @@ struct EngineButton : MenuButton {
 			}
 		}
 	}
+
+#ifdef HAVE_LIBLO
+	void step() override {
+		MenuButton::step();
+
+		if (remoteServerStarted) {
+			CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+			CardinalBasePlugin* const plugin = static_cast<CardinalBasePlugin*>(context->plugin);
+			plugin->stepRemoteServer();
+		}
+	}
+#endif
 };
 
 

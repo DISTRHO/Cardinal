@@ -167,7 +167,6 @@ struct ScopedContext {
     }
 };
 
-
 // -----------------------------------------------------------------------------------------------------------
 
 class CardinalPlugin : public CardinalBasePlugin
@@ -333,7 +332,7 @@ public:
 
     ~CardinalPlugin() override
     {
-       #ifdef CARDINAL_INIT_OSC_THREAD
+       #ifdef HAVE_LIBLO
         if (fInitializer->remotePluginInstance == this)
             fInitializer->remotePluginInstance = nullptr;
        #endif
@@ -358,6 +357,37 @@ public:
     {
         return context;
     }
+
+   #ifdef HAVE_LIBLO
+    bool startRemoteServer(const char* const port) override
+    {
+        if (fInitializer->remotePluginInstance != nullptr)
+            return false;
+        
+        if (fInitializer->startRemoteServer(port))
+        {
+            fInitializer->remotePluginInstance = this;
+            return true;
+        }
+
+        return false;
+    }
+
+    void stopRemoteServer() override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(fInitializer->remotePluginInstance == this,);
+
+        fInitializer->remotePluginInstance = nullptr;
+        fInitializer->stopRemoteServer();
+    }
+    
+    void stepRemoteServer() override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(fInitializer->remotePluginInstance == this,);
+
+        fInitializer->stepRemoteServer();
+    }
+   #endif
 
 protected:
    /* --------------------------------------------------------------------------------------------------------
