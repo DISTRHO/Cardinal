@@ -79,6 +79,7 @@ struct CarlaInternalPluginModule : Module, Runner {
         kParameterHostSync,
         kParameterVolume,
         kParameterEnabled,
+        kParameterQuadChannels,
         kParameterInfoChannels,
         kParameterInfoBitRate,
         kParameterInfoBitDepth,
@@ -96,7 +97,7 @@ struct CarlaInternalPluginModule : Module, Runner {
     NativeHostDescriptor fCarlaHostDescriptor = {};
     NativeTimeInfo fCarlaTimeInfo;
 
-    float dataOut[NUM_OUTPUTS][BUFFER_SIZE];
+    float dataOut[NUM_OUTPUTS+1][BUFFER_SIZE];
     float* dataOutPtr[NUM_OUTPUTS];
     unsigned audioDataFill = 0;
     uint32_t lastProcessCounter = 0;
@@ -105,11 +106,11 @@ struct CarlaInternalPluginModule : Module, Runner {
 
     struct {
         float preview[108];
-        uint channels; // 4
-        uint bitDepth; // 6
-        uint sampleRate; // 7
-        uint length; // 8
-        float position; // 9
+        uint channels;
+        uint bitDepth;
+        uint sampleRate;
+        uint length;
+        float position;
     } audioInfo;
 
     CarlaInternalPluginModule()
@@ -315,11 +316,11 @@ struct CarlaInternalPluginModule : Module, Runner {
             audioDataFill = 0;
             fCarlaPluginDescriptor->process(fCarlaPluginHandle, nullptr, dataOutPtr, BUFFER_SIZE, nullptr, 0);
 
-            audioInfo.channels = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, 4);
-            audioInfo.bitDepth = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, 6);
-            audioInfo.sampleRate = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, 7);
-            audioInfo.length = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle,  8);
-            audioInfo.position = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, 9);
+            audioInfo.channels = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, kParameterInfoChannels);
+            audioInfo.bitDepth = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, kParameterInfoBitDepth);
+            audioInfo.sampleRate = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, kParameterInfoSampleRate);
+            audioInfo.length = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle,  kParameterInfoLength);
+            audioInfo.position = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, kParameterInfoPosition);
         }
     }
 
