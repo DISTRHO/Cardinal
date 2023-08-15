@@ -98,7 +98,7 @@ struct CarlaInternalPluginModule : Module, Runner {
     NativeTimeInfo fCarlaTimeInfo;
 
     float dataOut[NUM_OUTPUTS+1][BUFFER_SIZE];
-    float* dataOutPtr[NUM_OUTPUTS];
+    float* dataOutPtr[NUM_OUTPUTS+1];
     unsigned audioDataFill = 0;
     uint32_t lastProcessCounter = 0;
     bool fileChanged = false;
@@ -123,6 +123,7 @@ struct CarlaInternalPluginModule : Module, Runner {
 
         dataOutPtr[0] = dataOut[0];
         dataOutPtr[1] = dataOut[1];
+        dataOutPtr[2] = dataOut[2];
 
         std::memset(dataOut, 0, sizeof(dataOut));
         std::memset(&audioInfo, 0, sizeof(audioInfo));
