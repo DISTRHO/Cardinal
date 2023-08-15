@@ -325,11 +325,13 @@ void WindowSetPluginRemote(Window* const window, NanoTopLevelWidget* const tlw)
 		WindowParametersRestore(window);
 
 		widget::Widget::ContextCreateEvent e;
+		e.vg = window->vg;
 		APP->scene->onContextCreate(e);
 	}
 	else
 	{
 		widget::Widget::ContextDestroyEvent e;
+		e.vg = window->vg;
 		APP->scene->onContextDestroy(e);
 
 #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
@@ -436,11 +438,13 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 		WindowParametersRestore(window);
 
 		widget::Widget::ContextCreateEvent e;
+		e.vg = window->vg;
 		APP->scene->onContextCreate(e);
 	}
 	else
 	{
 		widget::Widget::ContextDestroyEvent e;
+		e.vg = window->vg;
 		APP->scene->onContextDestroy(e);
 
 #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
