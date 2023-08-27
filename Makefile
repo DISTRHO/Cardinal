@@ -214,6 +214,18 @@ native: carla deps dgl plugins resources
 mini: carla deps dgl plugins resources
 	$(MAKE) mini -C src $(CARLA_EXTRA_ARGS)
 
+clap: carla deps dgl plugins resources
+	$(MAKE) clap -C src $(CARLA_EXTRA_ARGS)
+
+lv2: carla deps dgl plugins resources
+	$(MAKE) lv2 -C src $(CARLA_EXTRA_ARGS)
+
+vst2: carla deps dgl plugins resources
+	$(MAKE) vst2 -C src $(CARLA_EXTRA_ARGS)
+
+vst3: carla deps dgl plugins resources
+	$(MAKE) vst3 -C src $(CARLA_EXTRA_ARGS)
+
 # --------------------------------------------------------------
 # Packaging standalone for CI
 

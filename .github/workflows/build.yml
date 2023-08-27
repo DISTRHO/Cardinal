@@ -156,7 +156,7 @@ jobs:
           # multiple jobs for building carla, deps and plugins
           make DEBUG=true carla deps dgl plugins resources -j $(nproc)
           # single job for final build stage, otherwise we might get killed due to OOM
-          make DEBUG=true HAVE_PULSEAUDIO=false -j 1
+          make DEBUG=true HAVE_PULSEAUDIO=false clap lv2 vst2 vst3 -j 1
       - name: Set sha8
         id: slug
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
