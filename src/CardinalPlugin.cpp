@@ -929,16 +929,6 @@ protected:
             state.label = "Comment";
             break;
        #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
-        case kCardinalStateModuleInfos:
-           #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
-            state.hints = kStateIsHostReadable;
-           #else
-            state.hints = kStateIsOnlyForDSP;
-           #endif
-            state.defaultValue = "{}";
-            state.key = "moduleInfos";
-            state.label = "moduleInfos";
-            break;
         case kCardinalStateWindowSize:
             state.hints = kStateIsOnlyForUI;
             // state.defaultValue = String("%d:%d", DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT);
@@ -1010,49 +1000,6 @@ protected:
     String getState(const char* const key) const override
     {
        #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
-        if (std::strcmp(key, "moduleInfos") == 0)
-        {
-            json_t* const rootJ = json_object();
-            DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr, String());
-
-            for (const auto& pluginPair : rack::settings::moduleInfos)
-            {
-                json_t* const pluginJ = json_object();
-                DISTRHO_SAFE_ASSERT_CONTINUE(pluginJ != nullptr);
-
-                for (const auto& modulePair : pluginPair.second)
-                {
-                    json_t* const moduleJ = json_object();
-                    DISTRHO_SAFE_ASSERT_CONTINUE(moduleJ != nullptr);
-
-                    const rack::settings::ModuleInfo& m(modulePair.second);
-
-                    // To make setting.json smaller, only set properties if not default values.
-                    if (m.favorite)
-                        json_object_set_new(moduleJ, "favorite", json_boolean(m.favorite));
-                    if (m.added > 0)
-                        json_object_set_new(moduleJ, "added", json_integer(m.added));
-                    if (std::isfinite(m.lastAdded) && d_isNotZero(m.lastAdded))
-                        json_object_set_new(moduleJ, "lastAdded", json_real(m.lastAdded));
-
-                    if (json_object_size(moduleJ))
-                        json_object_set_new(pluginJ, modulePair.first.c_str(), moduleJ);
-                    else
-                        json_decref(moduleJ);
-                }
-
-                if (json_object_size(pluginJ))
-                    json_object_set_new(rootJ, pluginPair.first.c_str(), pluginJ);
-                else
-                    json_decref(pluginJ);
-            }
-
-            const String info(json_dumps(rootJ, JSON_COMPACT), false);
-            json_decref(rootJ);
-
-            return info;
-        }
-
         if (std::strcmp(key, "windowSize") == 0)
             return fState.windowSize;
        #endif
@@ -1128,40 +1075,6 @@ protected:
        #endif
 
        #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
-        if (std::strcmp(key, "moduleInfos") == 0)
-        {
-            json_error_t error;
-            json_t* const rootJ = json_loads(value, 0, &error);
-            DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr,);
-
-            const char* pluginSlug;
-            json_t* pluginJ;
-
-            json_object_foreach(rootJ, pluginSlug, pluginJ)
-            {
-                const char* moduleSlug;
-                json_t* moduleJ;
-
-                json_object_foreach(pluginJ, moduleSlug, moduleJ)
-                {
-                    rack::settings::ModuleInfo m;
-
-                    if (json_t* const favoriteJ = json_object_get(moduleJ, "favorite"))
-                        m.favorite = json_boolean_value(favoriteJ);
-
-                    if (json_t* const addedJ = json_object_get(moduleJ, "added"))
-                        m.added = json_integer_value(addedJ);
-
-                    if (json_t* const lastAddedJ = json_object_get(moduleJ, "lastAdded"))
-                        m.lastAdded = json_number_value(lastAddedJ);
-
-                    rack::settings::moduleInfos[pluginSlug][moduleSlug] = m;
-                }
-            }
-
-            json_decref(rootJ);
-            return;
-        }
         if (std::strcmp(key, "windowSize") == 0)
         {
             fState.windowSize = value;

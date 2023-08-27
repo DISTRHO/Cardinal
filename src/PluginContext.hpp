@@ -103,7 +103,6 @@ enum CardinalStates {
     kCardinalStateScreenshot,
     kCardinalStateComment,
    #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
-    kCardinalStateModuleInfos,
     kCardinalStateWindowSize,
    #endif
    #if CARDINAL_VARIANT_MINI
