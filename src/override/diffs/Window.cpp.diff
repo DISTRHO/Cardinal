@@ -1,5 +1,5 @@
---- ../Rack/src/window/Window.cpp	2023-06-11 21:02:02.648002965 +0200
-+++ Window.cpp	2023-07-13 17:01:53.848000425 +0200
+--- ../Rack/src/window/Window.cpp	2023-05-20 17:03:33.007081806 +0200
++++ Window.cpp	2023-08-28 09:55:57.292032175 +0200
 @@ -1,33 +1,94 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -119,7 +119,7 @@
  		throw Exception("Failed to load font %s", filename.c_str());
  	}
  	INFO("Loaded font %s", filename.c_str());
-@@ -79,338 +139,475 @@
+@@ -79,338 +139,478 @@
  }
  
  
@@ -141,7 +141,7 @@
 -	int lastWindowY = 0;
 -	int lastWindowWidth = 0;
 -	int lastWindowHeight = 0;
-+	DISTRHO_NAMESPACE::UI* ui = nullptr;
++	CardinalBaseUI* ui = nullptr;
 +	DGL_NAMESPACE::NanoTopLevelWidget* tlw = nullptr;
 +	DISTRHO_NAMESPACE::WindowParameters params;
 +	DISTRHO_NAMESPACE::WindowParametersCallback* callback = nullptr;
@@ -410,12 +410,14 @@
 -	if (APP->event->handleText(APP->window->internal->lastMousePos, codepoint))
 -		return;
 -}
-+		widget::Widget::ContextCreateEvent e;
++		widget::Widget::ContextCreateEvent e = {};
++		e.vg = window->vg;
 +		APP->scene->onContextCreate(e);
 +	}
 +	else
 +	{
-+		widget::Widget::ContextDestroyEvent e;
++		widget::Widget::ContextDestroyEvent e = {};
++		e.vg = window->vg;
 +		APP->scene->onContextDestroy(e);
  
 +#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
@@ -470,7 +472,7 @@
 -	std::vector<std::string> pathsVec;
 -	for (int i = 0; i < count; i++) {
 -		pathsVec.push_back(paths[i]);
-+void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
++void WindowSetPluginUI(Window* const window, CardinalBaseUI* const ui)
 +{
 +	// if nanovg context failed, init only bare minimum
 +	if (window->vg == nullptr)
@@ -643,12 +645,14 @@
 -	if (!vg) {
 -		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize NanoVG. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 -		throw Exception("Could not initialize NanoVG");
-+		widget::Widget::ContextCreateEvent e;
++		widget::Widget::ContextCreateEvent e = {};
++		e.vg = window->vg;
 +		APP->scene->onContextCreate(e);
  	}
 +	else
 +	{
-+		widget::Widget::ContextDestroyEvent e;
++		widget::Widget::ContextDestroyEvent e = {};
++		e.vg = window->vg;
 +		APP->scene->onContextDestroy(e);
  
 -	// Load default Blendish font
@@ -832,7 +836,8 @@
 +	CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(context);
 +	if (char* const screenshot = String::asBase64(data, size).getAndReleaseBuffer()) {
 +		ui->setState("screenshot", screenshot);
-+		remoteUtils::sendScreenshotToRemote(ui->remoteDetails, screenshot);
++		if (ui->remoteDetails != nullptr)
++			remoteUtils::sendScreenshotToRemote(ui->remoteDetails, screenshot);
 +		std::free(screenshot);
  	}
  }
@@ -841,15 +846,13 @@
  
  
  void Window::step() {
-+	DISTRHO_SAFE_ASSERT_RETURN(internal->tlw != nullptr,);
-+
-+	if (vg == nullptr)
++	if (internal->tlw == nullptr || vg == nullptr)
 +		return;
 +
  	double frameTime = system::getTime();
  	if (std::isfinite(internal->frameTime)) {
  		internal->lastFrameDuration = frameTime - internal->frameTime;
-@@ -422,57 +619,48 @@
+@@ -422,57 +622,52 @@
  	// Make event handlers and step() have a clean NanoVG context
  	nvgReset(vg);
  
@@ -886,7 +889,11 @@
 -		glfwSetWindowTitle(win, windowTitle.c_str());
 -		internal->lastWindowTitle = windowTitle;
 +	if (isStandalone()) {
++#if CARDINAL_VARIANT_MINI
++		std::string windowTitle = "Cardinal Mini";
++#else
 +		std::string windowTitle = "Cardinal";
++#endif
 +		if (APP->patch->path != "") {
 +			windowTitle += " - ";
 +			if (!APP->history->isSaved())
@@ -938,7 +945,7 @@
  	windowRatio = (float)fbWidth / winWidth;
  	// t1 = system::getTime();
  
-@@ -486,10 +674,8 @@
+@@ -486,10 +681,8 @@
  		// t2 = system::getTime();
  
  		// Render scene
@@ -950,7 +957,7 @@
  			nvgScale(vg, pixelRatio, pixelRatio);
  
  			// Draw scene
-@@ -500,23 +686,16 @@
+@@ -500,23 +693,16 @@
  			// t3 = system::getTime();
  
  			glViewport(0, 0, fbWidth, fbHeight);
@@ -978,14 +985,14 @@
  	// t5 = system::getTime();
  	// DEBUG("pre-step %6.1f step %6.1f draw %6.1f nvgEndFrame %6.1f glfwSwapBuffers %6.1f total %6.1f",
  	// 	(t1 - frameTime) * 1e3f,
-@@ -526,163 +705,130 @@
+@@ -526,163 +712,132 @@
  	// 	(t5 - t4) * 1e3f,
  	// 	(t5 - frameTime) * 1e3f
  	// );
 -	internal->frame++;
 -}
 +	++internal->frame;
- 
++
 +#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 +	if (internal->generateScreenshotStep != kScreenshotStepNone) {
 +		++internal->generateScreenshotStep;
@@ -998,6 +1005,9 @@
 +		constexpr const int depth = 3;
 +#endif
  
++		// Allocate pixel color buffer
++		uint8_t* const pixels = new uint8_t[winHeight * winWidth * 4];
+ 
 -static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
 -	for (int y = 0; y < height / 2; y++) {
 -		int flipY = height - y - 1;
@@ -1005,9 +1015,6 @@
 -		std::memcpy(tmp, &pixels[y * width * depth], width * depth);
 -		std::memcpy(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
 -		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
-+		// Allocate pixel color buffer
-+		uint8_t* const pixels = new uint8_t[winHeight * winWidth * 4];
-+
 +		// glReadPixels defaults to GL_BACK, but the back-buffer is unstable, so use the front buffer (what the user sees)
 +		glReadBuffer(GL_FRONT);
 +		glReadPixels(0, 0, winWidth, winHeight, depth == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, pixels);
@@ -1015,10 +1022,10 @@
 +		if (internal->generateScreenshotStep == kScreenshotStepSaving)
 +		{
 +			// Write pixels to PNG
-+			const int stride = winWidth * depth;
-+			uint8_t* const pixelsWithOffset = pixels + (stride * y);
 +			Window__flipBitmap(pixels, winWidth, winHeight, depth);
 +			winHeight -= y;
++			const int stride = winWidth * depth;
++			uint8_t* const pixelsWithOffset = pixels + (stride * y);
 +#ifdef STBI_WRITE_NO_STDIO
 +			Window__downscaleBitmap(pixelsWithOffset, winWidth, winHeight);
 +			stbi_write_png_to_func(Window__writeImagePNG, internal->ui,
@@ -1028,8 +1035,10 @@
 +#endif
 +
 +			internal->generateScreenshotStep = kScreenshotStepNone;
++#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
 +			APP->scene->menuBar->show();
 +			APP->scene->rack->children.front()->show();
++#endif
 +		}
 +
 +		delete[] pixels;
@@ -1218,7 +1227,7 @@
  }
  
  
-@@ -702,7 +848,7 @@
+@@ -702,7 +857,7 @@
  
  
  double Window::getFrameDurationRemaining() {
@@ -1227,7 +1236,7 @@
  	return frameDuration - (system::getTime() - internal->frameTime);
  }
  
-@@ -713,14 +859,15 @@
+@@ -713,14 +868,15 @@
  		return pair->second;
  
  	// Load font
@@ -1246,7 +1255,7 @@
  	}
  	internal->fontCache[filename] = font;
  	return font;
-@@ -733,14 +880,15 @@
+@@ -733,14 +889,15 @@
  		return pair->second;
  
  	// Load image
@@ -1265,7 +1274,7 @@
  	}
  	internal->imageCache[filename] = image;
  	return image;
-@@ -757,28 +905,156 @@
+@@ -757,28 +914,156 @@
  }
  
  

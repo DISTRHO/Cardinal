@@ -1,5 +1,5 @@
---- ../Rack/src/app/MenuBar.cpp	2023-06-11 21:02:02.640002965 +0200
-+++ MenuBar.cpp	2023-07-11 19:18:16.204016531 +0200
+--- ../Rack/src/app/MenuBar.cpp	2023-05-20 17:03:33.005081737 +0200
++++ MenuBar.cpp	2023-08-15 17:56:23.782915145 +0200
 @@ -1,8 +1,33 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -44,12 +44,13 @@
  #include <window/Window.hpp>
  #include <asset.hpp>
  #include <context.hpp>
-@@ -25,8 +51,28 @@
+@@ -25,8 +51,29 @@
  #include <patch.hpp>
  #include <library.hpp>
  
 +#include "../CardinalCommon.hpp"
 +#include "../CardinalRemote.hpp"
++#include "../PluginContext.hpp"
 +#include "DistrhoPlugin.hpp"
 +#include "DistrhoStandaloneUtils.hpp"
 +
@@ -73,7 +74,7 @@
  namespace app {
  namespace menuBar {
  
-@@ -48,79 +94,238 @@
+@@ -48,79 +95,238 @@
  };
  
  
@@ -349,7 +350,7 @@
  	}
  };
  
-@@ -166,7 +371,7 @@
+@@ -166,7 +372,7 @@
  
  		menu->addChild(new ui::MenuSeparator);
  
@@ -358,7 +359,7 @@
  	}
  };
  
-@@ -256,7 +461,7 @@
+@@ -256,7 +462,7 @@
  		return settings::cableTension;
  	}
  	float getDefaultValue() override {
@@ -367,7 +368,7 @@
  	}
  	float getDisplayValue() override {
  		return getValue() * 100;
-@@ -393,49 +598,39 @@
+@@ -393,49 +599,39 @@
  };
  
  
@@ -442,7 +443,7 @@
  
  		menu->addChild(createBoolPtrMenuItem("Show tooltips", "", &settings::tooltips));
  
-@@ -460,9 +655,18 @@
+@@ -460,9 +656,18 @@
  		menu->addChild(haloBrightnessSlider);
  
  		menu->addChild(new ui::MenuSeparator);
@@ -461,7 +462,7 @@
  
  		static const std::vector<std::string> knobModeLabels = {
  			"Linear",
-@@ -487,11 +691,34 @@
+@@ -487,11 +692,34 @@
  		menu->addChild(knobScrollSensitivitySlider);
  
  		menu->addChild(new ui::MenuSeparator);
@@ -499,7 +500,7 @@
  	}
  };
  
-@@ -501,47 +728,6 @@
+@@ -501,48 +729,11 @@
  ////////////////////
  
  
@@ -545,9 +546,14 @@
 -
 -
  struct EngineButton : MenuButton {
++#ifdef HAVE_LIBLO
++	bool remoteServerStarted = false;
++#endif
++
  	void onAction(const ActionEvent& e) override {
  		ui::Menu* menu = createMenu();
-@@ -555,268 +741,46 @@
+ 		menu->cornerFlags = BND_CORNER_TOP;
+@@ -555,269 +746,87 @@
  			settings::cpuMeter ^= true;
  		}));
  
@@ -558,10 +564,7 @@
 -			int cores = system::getLogicalCoreCount() / 2;
 -
 -			for (int i = 1; i <= 2 * cores; i++) {
-+		if (isUsingNativeAudio()) {
-+			if (supportsAudioInput()) {
-+				const bool enabled = isAudioInputEnabled();
- 				std::string rightText;
+-				std::string rightText;
 -				if (i == cores)
 -					rightText += "(most modules)";
 -				else if (i == 1)
@@ -693,17 +696,24 @@
 -				plugin::Plugin* p = plugin::getPlugin(slug);
 -				if (p) {
 -					rightText += p->version + " → ";
--				}
++#ifdef HAVE_LIBLO
++		if (isStandalone()) {
++			CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
++			CardinalBasePlugin* const plugin = static_cast<CardinalBasePlugin*>(context->plugin);
++
++			// const bool remoteServerStarted = this->remoteServerStarted;
++			const std::string remoteControlText = remoteServerStarted ? " " CHECKMARK_STRING : "";
++
++			menu->addChild(createMenuItem("Enable OSC remote control", remoteControlText, [=]() {
++				if (remoteServerStarted) {
++					remoteServerStarted = false;
++					plugin->stopRemoteServer();
++					return;
+ 				}
 -				rightText += update.version;
-+				if (enabled)
-+					rightText = CHECKMARK_STRING;
-+				menu->addChild(createMenuItem("Enable Audio Input", rightText, [enabled]() {
-+					if (!enabled)
-+						requestAudioInput();
-+				}));
- 			}
+-			}
 -		}
--
+ 
 -		MenuItem::step();
 -	}
 -
@@ -715,8 +725,13 @@
 -		e.unconsume();
 -	}
 -};
--
--
++				async_dialog_text_input("OSC network port", CARDINAL_DEFAULT_REMOTE_PORT, [=](char* const port) {
++					if (port == nullptr)
++						return;
+ 
++					if (plugin->startRemoteServer(port))
++						remoteServerStarted = true;
+ 
 -struct LibraryMenu : ui::Menu {
 -	LibraryMenu() {
 -		refresh();
@@ -741,8 +756,12 @@
 -		else if (!library::isLoggedIn()) {
 -			addChild(createMenuItem("Register VCV account", "", [=]() {
 -				system::openBrowser("https://vcvrack.com/login");
--			}));
--
++					std::free(port);
++				});
+ 			}));
++		}
++#endif
+ 
 -			ui::TextField* emailField = new ui::TextField;
 -			emailField->placeholder = "Email";
 -			emailField->box.size.x = 240.0;
@@ -765,10 +784,29 @@
 -			addChild(createMenuItem("Log out", "", [=]() {
 -				library::logOut();
 -			}));
--
++		if (isUsingNativeAudio()) {
++			if (supportsAudioInput()) {
++				const bool enabled = isAudioInputEnabled();
++				std::string rightText;
++				if (enabled)
++					rightText = CHECKMARK_STRING;
++				menu->addChild(createMenuItem("Enable Audio Input", rightText, [enabled]() {
++					if (!enabled)
++						requestAudioInput();
++				}));
++			}
+ 
 -			addChild(createMenuItem("Browse VCV Library", "", [=]() {
 -				system::openBrowser("https://library.vcvrack.com/");
 -			}));
++			if (supportsMIDI()) {
++				std::string rightText;
++				if (isMIDIEnabled())
++					rightText = CHECKMARK_STRING;
++				menu->addChild(createMenuItem("Enable/Reconnect MIDI", rightText, []() {
++					requestMIDI();
++				}));
++			}
  
 -			SyncUpdatesItem* syncItem = new SyncUpdatesItem;
 -			syncItem->text = "Update all";
@@ -783,48 +821,6 @@
 -					updateItem->setUpdate(pair.first);
 -					addChild(updateItem);
 -				}
-+			if (supportsMIDI()) {
-+				std::string rightText;
-+				if (isMIDIEnabled())
-+					rightText = CHECKMARK_STRING;
-+				menu->addChild(createMenuItem("Enable/Reconnect MIDI", rightText, []() {
-+					requestMIDI();
-+				}));
- 			}
--		}
--	}
--};
--
--
--struct LibraryButton : MenuButton {
--	NotificationIcon* notification;
- 
--	LibraryButton() {
--		notification = new NotificationIcon;
--		addChild(notification);
--	}
--
--	void onAction(const ActionEvent& e) override {
--		ui::Menu* menu = createMenu<LibraryMenu>();
--		menu->cornerFlags = BND_CORNER_TOP;
--		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
--		// Check for updates when menu is opened
--		std::thread t([&]() {
--			system::setThreadName("Library");
--			library::checkUpdates();
--		});
--		t.detach();
--	}
--
--	void step() override {
--		notification->box.pos = math::Vec(0, 0);
--		notification->visible = library::hasUpdates();
--
--		// Popup when updates finish downloading
--		if (library::restartRequested) {
--			library::restartRequested = false;
--			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been downloaded. Close and re-launch Rack to load new updates.")) {
--				APP->window->close();
 +			if (supportsBufferSizeChanges()) {
 +				static const std::vector<uint32_t> bufferSizes = {
 +					#ifdef DISTRHO_OS_WASM
@@ -844,12 +840,55 @@
 +				}));
  			}
  		}
+ 	}
+-};
+-
+-
+-struct LibraryButton : MenuButton {
+-	NotificationIcon* notification;
+-
+-	LibraryButton() {
+-		notification = new NotificationIcon;
+-		addChild(notification);
+-	}
+-
+-	void onAction(const ActionEvent& e) override {
+-		ui::Menu* menu = createMenu<LibraryMenu>();
+-		menu->cornerFlags = BND_CORNER_TOP;
+-		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+-		// Check for updates when menu is opened
+-		std::thread t([&]() {
+-			system::setThreadName("Library");
+-			library::checkUpdates();
+-		});
+-		t.detach();
+-	}
+ 
++#ifdef HAVE_LIBLO
+ 	void step() override {
+-		notification->box.pos = math::Vec(0, 0);
+-		notification->visible = library::hasUpdates();
++		MenuButton::step();
+ 
+-		// Popup when updates finish downloading
+-		if (library::restartRequested) {
+-			library::restartRequested = false;
+-			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been downloaded. Close and re-launch Rack to load new updates.")) {
+-				APP->window->close();
+-			}
++		if (remoteServerStarted) {
++			CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
++			CardinalBasePlugin* const plugin = static_cast<CardinalBasePlugin*>(context->plugin);
++			plugin->stepRemoteServer();
+ 		}
 -
 -		MenuButton::step();
  	}
++#endif
  };
  
-@@ -827,63 +791,30 @@
+ 
+@@ -827,63 +836,30 @@
  
  
  struct HelpButton : MenuButton {
@@ -867,14 +906,14 @@
  
 -		menu->addChild(createMenuItem("Tips", "", [=]() {
 -			APP->scene->addChild(tipWindowCreate());
+-		}));
+-
+-		menu->addChild(createMenuItem("User manual", "F1", [=]() {
+-			system::openBrowser("https://vcvrack.com/manual");
 +		menu->addChild(createMenuItem("Rack User manual", "F1", [=]() {
 +			patchUtils::openBrowser("https://vcvrack.com/manual");
  		}));
  
--		menu->addChild(createMenuItem("User manual", "F1", [=]() {
--			system::openBrowser("https://vcvrack.com/manual");
--		}));
--
 -		menu->addChild(createMenuItem("Support", "", [=]() {
 -			system::openBrowser("https://vcvrack.com/support");
 -		}));
@@ -921,7 +960,7 @@
  	}
  };
  
-@@ -926,15 +857,19 @@
+@@ -926,15 +902,19 @@
  
  		text = "";
  
@@ -944,7 +983,7 @@
  
  		Label::step();
  	}
-@@ -944,7 +879,9 @@
+@@ -944,7 +924,9 @@
  struct MenuBar : widget::OpaqueWidget {
  	InfoLabel* infoLabel;
  
@@ -955,7 +994,7 @@
  		const float margin = 5;
  		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
  
-@@ -953,7 +890,7 @@
+@@ -953,7 +935,7 @@
  		layout->spacing = math::Vec(0, 0);
  		addChild(layout);
  
@@ -964,7 +1003,7 @@
  		fileButton->text = "File";
  		layout->addChild(fileButton);
  
-@@ -965,13 +902,11 @@
+@@ -965,13 +947,11 @@
  		viewButton->text = "View";
  		layout->addChild(viewButton);
  
@@ -980,7 +1019,7 @@
  
  		HelpButton* helpButton = new HelpButton;
  		helpButton->text = "Help";
-@@ -1003,7 +938,7 @@
+@@ -1003,7 +983,7 @@
  
  
  widget::Widget* createMenuBar() {

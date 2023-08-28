@@ -324,13 +324,13 @@ void WindowSetPluginRemote(Window* const window, NanoTopLevelWidget* const tlw)
 		// Init settings
 		WindowParametersRestore(window);
 
-		widget::Widget::ContextCreateEvent e;
+		widget::Widget::ContextCreateEvent e = {};
 		e.vg = window->vg;
 		APP->scene->onContextCreate(e);
 	}
 	else
 	{
-		widget::Widget::ContextDestroyEvent e;
+		widget::Widget::ContextDestroyEvent e = {};
 		e.vg = window->vg;
 		APP->scene->onContextDestroy(e);
 
@@ -437,13 +437,13 @@ void WindowSetPluginUI(Window* const window, CardinalBaseUI* const ui)
 		// Init settings
 		WindowParametersRestore(window);
 
-		widget::Widget::ContextCreateEvent e;
+		widget::Widget::ContextCreateEvent e = {};
 		e.vg = window->vg;
 		APP->scene->onContextCreate(e);
 	}
 	else
 	{
-		widget::Widget::ContextDestroyEvent e;
+		widget::Widget::ContextDestroyEvent e = {};
 		e.vg = window->vg;
 		APP->scene->onContextDestroy(e);
 
