@@ -72,7 +72,7 @@ void Engine_setAboutToClose(Engine*);
 void Engine_setRemoteDetails(Engine*, remoteUtils::RemoteDetails*);
 }
 namespace window {
-    void WindowSetPluginUI(Window* window, DISTRHO_NAMESPACE::UI* ui);
+    void WindowSetPluginUI(Window* window, CardinalBaseUI* ui);
     void WindowSetMods(Window* window, int mods);
     void WindowSetInternalSize(rack::window::Window* window, math::Vec size);
 }

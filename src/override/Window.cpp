@@ -153,7 +153,7 @@ enum ScreenshotStep {
 struct Window::Internal {
 	std::string lastWindowTitle;
 
-	DISTRHO_NAMESPACE::UI* ui = nullptr;
+	CardinalBaseUI* ui = nullptr;
 	DGL_NAMESPACE::NanoTopLevelWidget* tlw = nullptr;
 	DISTRHO_NAMESPACE::WindowParameters params;
 	DISTRHO_NAMESPACE::WindowParametersCallback* callback = nullptr;
@@ -370,7 +370,7 @@ void WindowSetPluginRemote(Window* const window, NanoTopLevelWidget* const tlw)
 	}
 }
 
-void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
+void WindowSetPluginUI(Window* const window, CardinalBaseUI* const ui)
 {
 	// if nanovg context failed, init only bare minimum
 	if (window->vg == nullptr)
@@ -598,7 +598,8 @@ static void Window__writeImagePNG(void* context, void* data, int size) {
 	CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(context);
 	if (char* const screenshot = String::asBase64(data, size).getAndReleaseBuffer()) {
 		ui->setState("screenshot", screenshot);
-		remoteUtils::sendScreenshotToRemote(ui->remoteDetails, screenshot);
+		if (ui->remoteDetails != nullptr)
+			remoteUtils::sendScreenshotToRemote(ui->remoteDetails, screenshot);
 		std::free(screenshot);
 	}
 }
@@ -731,10 +732,10 @@ void Window::step() {
 		if (internal->generateScreenshotStep == kScreenshotStepSaving)
 		{
 			// Write pixels to PNG
-			const int stride = winWidth * depth;
-			uint8_t* const pixelsWithOffset = pixels + (stride * y);
 			Window__flipBitmap(pixels, winWidth, winHeight, depth);
 			winHeight -= y;
+			const int stride = winWidth * depth;
+			uint8_t* const pixelsWithOffset = pixels + (stride * y);
 #ifdef STBI_WRITE_NO_STDIO
 			Window__downscaleBitmap(pixelsWithOffset, winWidth, winHeight);
 			stbi_write_png_to_func(Window__writeImagePNG, internal->ui,
@@ -744,8 +745,10 @@ void Window::step() {
 #endif
 
 			internal->generateScreenshotStep = kScreenshotStepNone;
+#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
 			APP->scene->menuBar->show();
 			APP->scene->rack->children.front()->show();
+#endif
 		}
 
 		delete[] pixels;
