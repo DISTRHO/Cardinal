@@ -670,6 +670,13 @@ PLUGIN_FILES += $(wildcard DrumKit/deps/SynthDevKit/src/*.cpp)
 DRUMKIT_CUSTOM = ADSR Envelope LowFrequencyOscillator
 
 # --------------------------------------------------------------
+# EnigmaCurry
+
+PLUGIN_FILES += $(filter-out EnigmaCurry/src/plugin.cpp,$(wildcard EnigmaCurry/src/*.cpp))
+# modules/types which are present in other plugins
+ENIGMACURRY_CUSTOM = Pulse
+
+# --------------------------------------------------------------
 # ESeries
 
 PLUGIN_FILES += ESeries/src/E340.cpp
@@ -2215,6 +2222,14 @@ $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 		-DpluginInstance=pluginInstance__DrumKit \
 		-Dinit=init__DrumKit \
 		-Wno-sign-compare
+
+$(BUILD_DIR)/EnigmaCurry/src/%.cpp.o: EnigmaCurry/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+		$(foreach m,$(ENIGMACURRY_CUSTOM),$(call custom_module_names,$(m),EnigmaCurry)) \
+		-DpluginInstance=pluginInstance__EnigmaCurry \
+		-Wno-misleading-indentation
 
 $(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
