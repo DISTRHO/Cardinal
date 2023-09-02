@@ -173,7 +173,6 @@ extern Model* modelChord;
 #define modelVCA modelBogaudioVCA
 #define modelVCF modelBogaudioVCF
 #define modelVCO modelBogaudioVCO
-#define modelPulse modelBogaudioPulse
 extern Model* modelVCO;
 extern Model* modelLVCO;
 extern Model* modelSine;
@@ -304,7 +303,6 @@ extern Model* modelTestVCF;
 #undef modelVCA
 #undef modelVCF
 #undef modelVCO
-#undef modelPulse
 
 // CatroModulo
 #include "CatroModulo/src/CatroModulo.hpp"
@@ -1566,7 +1564,6 @@ static void initStatic__BogaudioModules()
 #define modelVCA modelBogaudioVCA
 #define modelVCF modelBogaudioVCF
 #define modelVCO modelBogaudioVCO
-#define modelPulse modelBogaudioPulse
         p->addModel(modelVCO);
         p->addModel(modelLVCO);
         p->addModel(modelSine);
@@ -1697,7 +1694,6 @@ static void initStatic__BogaudioModules()
 #undef modelVCA
 #undef modelVCF
 #undef modelVCO
-#undef modelPulse
     }
 }
 
