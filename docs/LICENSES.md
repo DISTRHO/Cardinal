@@ -35,6 +35,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | ChowDSP                 | GPL-3.0-or-later         | |
 | dBiz                    | GPL-3.0-or-later         | |
 | DrumKit                 | CC0-1.0                  | |
+| EnigmaCurry             | GPL-3.0-or-later         | |
 | E-Series                | GPL-3.0-or-later         | |
 | ExpertSleepers Encoders | MIT                      | |
 | Extratone               | GPL-3.0-or-later         | |
