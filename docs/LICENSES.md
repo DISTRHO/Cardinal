@@ -35,6 +35,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | ChowDSP                 | GPL-3.0-or-later         | |
 | dBiz                    | GPL-3.0-or-later         | |
 | DrumKit                 | CC0-1.0                  | |
+| EnigmaCurry             | GPL-3.0-or-later         | |
 | E-Series                | GPL-3.0-or-later         | |
 | ExpertSleepers Encoders | MIT                      | |
 | Extratone               | GPL-3.0-or-later         | |
@@ -160,6 +161,10 @@ Below is a list of artwork licenses from plugins
 | dBiz/ShareTechMono-Regular.ttf          | OFL-1.1          | |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
+| EnigmaCurry/res/fonts/dseg/*            | OFL-1.1-RFN      | |
+| EnigmaCurry/res/fonts/Fantasque/*       | OFL-1.1          | |
+| EnigmaCurry/res/fonts/manrope/*         | OFL-1.1          | |
+| EnigmaCurry/res/*.svg                   | CC0-1.0          | |
 | E-Series/*                              | Custom           | Copyright © Synthesis Technology, [used and distributed with permission](LICENSE-PERMISSIONS.md#eseries-paul-schreiber--synthtech) |
 | ExpertSleepers-Encoders/*               | MIT              | [Same license as source code](https://github.com/expertsleepersltd/vcvrack-encoders/issues/3) |
 | Extratone/*                             | GPL-3.0-or-later | [Same license as source code](https://github.com/EaterOfSheep/Extratone/issues/7) |

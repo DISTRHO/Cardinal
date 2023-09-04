@@ -230,3 +230,6 @@
 [submodule "plugins/Cardinal/src/AIDA-X/RTNeural"]
 	path = plugins/Cardinal/src/AIDA-X/RTNeural
 	url = https://github.com/jatinchowdhury18/RTNeural.git
+[submodule "plugins/EnigmaCurry"]
+	path = plugins/EnigmaCurry
+	url = https://github.com/EnigmaCurry/EnigmaCurry-vcv-pack.git

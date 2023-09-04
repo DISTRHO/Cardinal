@@ -339,6 +339,11 @@ extern Model* modelTestVCF;
 #include "DrumKit/src/DrumKit.hpp"
 void setupSamples();
 
+// EnigmaCurry
+#define modelPulse modelEnigmaCurryPulse
+#include "EnigmaCurry/src/plugin.hpp"
+#undef modelPulse
+
 // ESeries
 #include "ESeries/src/plugin.hpp"
 
@@ -816,6 +821,7 @@ Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
 Plugin* pluginInstance__dBiz;
 extern Plugin* pluginInstance__DrumKit;
+Plugin* pluginInstance__EnigmaCurry;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
 Plugin* pluginInstance__Extratone;
@@ -1851,6 +1857,24 @@ static void initStatic__DrumKit()
         p->addModel(modelMarionette);
     }
 }
+
+static void initStatic__EnigmaCurry()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__EnigmaCurry = p;
+
+    const StaticPluginLoader spl(p, "EnigmaCurry");
+    if (spl.ok())
+    {
+#define modelPulse modelEnigmaCurryPulse
+      p->addModel(modelTransport);
+      p->addModel(modelLatch);
+      p->addModel(modelPulse);
+      p->addModel(modelRange);
+#undef modelPulse
+    }
+}
+
 
 static void initStatic__ESeries()
 {
@@ -3077,6 +3101,7 @@ void initStaticPlugins()
     initStatic__ChowDSP();
     initStatic__dBiz();
     initStatic__DrumKit();
+    initStatic__EnigmaCurry();
     initStatic__ESeries();
     initStatic__ExpertSleepersEncoders();
     initStatic__Extratone();

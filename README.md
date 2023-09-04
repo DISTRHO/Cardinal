@@ -145,6 +145,7 @@ At the moment the following 3rd-party modules are provided:
 - [ChowDSP](https://github.com/jatinchowdhury18/ChowDSP-VCV)
 - [dBiz](https://github.com/dBiz/dBiz)
 - [DrumKit](https://svmodular.com/plugin/vcv/drumkit.html)
+- [EnigmaCurry](https://github.com/EnigmaCurry/EnigmaCurry-vcv-pack)
 - [E-Series](https://github.com/VCVRack/ESeries)
 - [ExpertSleepers Encoders](https://expert-sleepers.co.uk/vcvrack_encoders.html)
 - [Extratone](http://extratone.xyz/modules)
