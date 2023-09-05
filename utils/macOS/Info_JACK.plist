@@ -10,7 +10,7 @@
 	<string>distrho.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>studio.kx.distrho.cardinal.jack</string>
-	<key>CFBundleVersion</key>
+	<key>CFBundleShortVersionString</key>
 	<string>23.09</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.15</string>
