@@ -14,7 +14,8 @@ include $(ROOT)/Makefile.base.mk
 # jucewrapper/CMakeLists.txt `project`
 # src/CardinalCommon.cpp `CARDINAL_VERSION`
 # src/CardinalPlugin.cpp `getVersion`
-VERSION = 23.08
+# utils/macOS/Info_{JACK,Native}.plist
+VERSION = 23.09
 
 # --------------------------------------------------------------
 # Build targets
