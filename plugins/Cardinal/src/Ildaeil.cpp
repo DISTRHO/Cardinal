@@ -39,6 +39,7 @@
 # include "../../src/extra/SharedResourcePointer.hpp"
 #else
 # include "extra/Mutex.hpp"
+# include "extra/String.hpp"
 #endif
 
 #include "CarlaNativePlugin.h"
