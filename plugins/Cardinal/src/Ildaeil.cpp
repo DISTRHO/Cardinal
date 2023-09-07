@@ -572,7 +572,7 @@ struct IldaeilModule : Module {
     {
         switch (opcode)
         {
-        // cannnot be supported
+        // cannnot be supported?
         case NATIVE_HOST_OPCODE_HOST_IDLE:
             break;
         // other stuff
@@ -955,6 +955,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
     bool fPluginHasCustomUI = false;
     bool fPluginHasFileOpen = false;
     bool fPluginHasOutputParameters = false;
+    bool fPluginIsBridge = false;
     bool fPluginRunning = false;
     bool fPluginWillRunInBridgeMode = false;
     Mutex fPluginsMutex;
@@ -1045,6 +1046,8 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
             fPluginHasCustomUI = hints & PLUGIN_HAS_CUSTOM_UI;
             fPluginHasFileOpen = false;
         }
+
+        fPluginIsBridge = hints & PLUGIN_IS_BRIDGE;
     }
 
     void projectLoadedFromDSP()
@@ -1968,6 +1971,23 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
         if (ImGui::Begin(ui->title, nullptr, pflags))
         {
             const CarlaHostHandle handle = module->fCarlaHostHandle;
+
+            if (fPluginIsBridge)
+            {
+                const bool active = carla_get_internal_parameter_value(handle, 0, PARAMETER_ACTIVE) > 0.5f;
+
+                if (active)
+                {
+                    ImGui::BeginDisabled();
+                    ImGui::Button("Reload bridge");
+                    ImGui::EndDisabled();
+                }
+                else
+                {
+                    if (ImGui::Button("Reload bridge"))
+                        carla_set_active(handle, 0, true);
+                }
+            }
 
             if (ui->presetCount != 0)
             {
