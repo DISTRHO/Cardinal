@@ -531,7 +531,7 @@ jobs:
       - name: Build linux (LTO)
         run: |
           make features
-          make WITH_LTO=true -j $(nproc)
+          make WITH_LTO=true -j $(nproc) native
 
   sysdeps:
     runs-on: ubuntu-20.04
