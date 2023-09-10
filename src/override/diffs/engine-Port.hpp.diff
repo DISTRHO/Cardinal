@@ -1,0 +1,226 @@
+--- ../Rack/include/engine/Port.hpp	2023-09-10 12:59:02.629898529 +0200
++++ ../../include/engine/Port.hpp	2023-07-07 18:20:12.030329564 +0200
+@@ -1,19 +1,57 @@
++/*
++ * DISTRHO Cardinal Plugin
++ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * For a full copy of the GNU General Public License see the LICENSE file.
++ */
++
++/**
++ * This file is an edited version of VCVRack's engine/Port.hpp
++ * Copyright (C) 2016-2021 VCV.
++ *
++ * This program is free software: you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or (at your option) any later version.
++ */
++
+ #pragma once
++
+ #include <common.hpp>
+ #include <engine/Light.hpp>
+ 
++#include <list>
++
++/** NOTE alignas is required in some systems in order to allow SSE usage. */
++#define SIMD_ALIGN alignas(16)
++
+ 
+ namespace rack {
+ namespace engine {
+ 
+ 
+ /** This is inspired by the number of MIDI channels. */
+-static const int PORT_MAX_CHANNELS = 16;
++static constexpr const int PORT_MAX_CHANNELS = 16;
++
++
++struct Cable;
+ 
+ 
+ struct Port {
+ 	/** Voltage of the port. */
+-	union {
++	/** NOTE alignas is required in order to allow SSE usage.
++	Consecutive data (like in a vector) would otherwise pack Ports in a way that breaks SSE. */
++	union SIMD_ALIGN {
+ 		/** Unstable API. Use getVoltage() and setVoltage() instead. */
+ 		float voltages[PORT_MAX_CHANNELS] = {};
+ 		/** DEPRECATED. Unstable API. Use getVoltage() and setVoltage() instead. */
+@@ -40,40 +78,40 @@
+ 	};
+ 
+ 	/** Sets the voltage of the given channel. */
+-	void setVoltage(float voltage, int channel = 0) {
++	void setVoltage(float voltage, int channel = 0) noexcept {
+ 		voltages[channel] = voltage;
+ 	}
+ 
+ 	/** Returns the voltage of the given channel.
+ 	Because of proper bookkeeping, all channels higher than the input port's number of channels should be 0V.
+ 	*/
+-	float getVoltage(int channel = 0) {
++	float getVoltage(int channel = 0) const noexcept {
+ 		return voltages[channel];
+ 	}
+ 
+ 	/** Returns the given channel's voltage if the port is polyphonic, otherwise returns the first voltage (channel 0). */
+-	float getPolyVoltage(int channel) {
++	float getPolyVoltage(int channel) const noexcept {
+ 		return isMonophonic() ? getVoltage(0) : getVoltage(channel);
+ 	}
+ 
+ 	/** Returns the voltage if a cable is connected, otherwise returns the given normal voltage. */
+-	float getNormalVoltage(float normalVoltage, int channel = 0) {
++	float getNormalVoltage(float normalVoltage, int channel = 0) const noexcept {
+ 		return isConnected() ? getVoltage(channel) : normalVoltage;
+ 	}
+ 
+-	float getNormalPolyVoltage(float normalVoltage, int channel) {
++	float getNormalPolyVoltage(float normalVoltage, int channel) const noexcept {
+ 		return isConnected() ? getPolyVoltage(channel) : normalVoltage;
+ 	}
+ 
+ 	/** Returns a pointer to the array of voltages beginning with firstChannel.
+ 	The pointer can be used for reading and writing.
+ 	*/
+-	float* getVoltages(int firstChannel = 0) {
++	float* getVoltages(int firstChannel = 0) noexcept {
+ 		return &voltages[firstChannel];
+ 	}
+ 
+ 	/** Copies the port's voltages to an array of size at least `channels`. */
+-	void readVoltages(float* v) {
++	void readVoltages(float* v) const noexcept {
+ 		for (int c = 0; c < channels; c++) {
+ 			v[c] = voltages[c];
+ 		}
+@@ -89,14 +127,14 @@
+ 	}
+ 
+ 	/** Sets all voltages to 0. */
+-	void clearVoltages() {
++	void clearVoltages() noexcept {
+ 		for (int c = 0; c < channels; c++) {
+ 			voltages[c] = 0.f;
+ 		}
+ 	}
+ 
+ 	/** Returns the sum of all voltages. */
+-	float getVoltageSum() {
++	float getVoltageSum() const noexcept {
+ 		float sum = 0.f;
+ 		for (int c = 0; c < channels; c++) {
+ 			sum += voltages[c];
+@@ -107,7 +145,7 @@
+ 	/** Returns the root-mean-square of all voltages.
+ 	Uses sqrt() which is slow, so use a custom approximation if calling frequently.
+ 	*/
+-	float getVoltageRMS() {
++	float getVoltageRMS() const {
+ 		if (channels == 0) {
+ 			return 0.f;
+ 		}
+@@ -124,22 +162,22 @@
+ 	}
+ 
+ 	template <typename T>
+-	T getVoltageSimd(int firstChannel) {
++	T getVoltageSimd(int firstChannel) const noexcept {
+ 		return T::load(&voltages[firstChannel]);
+ 	}
+ 
+ 	template <typename T>
+-	T getPolyVoltageSimd(int firstChannel) {
++	T getPolyVoltageSimd(int firstChannel) const noexcept {
+ 		return isMonophonic() ? getVoltage(0) : getVoltageSimd<T>(firstChannel);
+ 	}
+ 
+ 	template <typename T>
+-	T getNormalVoltageSimd(T normalVoltage, int firstChannel) {
++	T getNormalVoltageSimd(T normalVoltage, int firstChannel) const noexcept {
+ 		return isConnected() ? getVoltageSimd<T>(firstChannel) : normalVoltage;
+ 	}
+ 
+ 	template <typename T>
+-	T getNormalPolyVoltageSimd(T normalVoltage, int firstChannel) {
++	T getNormalPolyVoltageSimd(T normalVoltage, int firstChannel) const noexcept {
+ 		return isConnected() ? getPolyVoltageSimd<T>(firstChannel) : normalVoltage;
+ 	}
+ 
+@@ -153,13 +191,15 @@
+ 	If disconnected, this does nothing (`channels` remains 0).
+ 	If 0 is given, `channels` is set to 1 but all voltages are cleared.
+ 	*/
+-	void setChannels(int channels) {
++	void setChannels(int channels) noexcept {
+ 		// If disconnected, keep the number of channels at 0.
+ 		if (this->channels == 0) {
+ 			return;
+ 		}
+ 		// Set higher channel voltages to 0
+ 		for (int c = channels; c < this->channels; c++) {
++			if (c >= PORT_MAX_CHANNELS)
++				__builtin_unreachable();
+ 			voltages[c] = 0.f;
+ 		}
+ 		// Don't allow caller to set port as disconnected
+@@ -172,35 +212,39 @@
+ 	/** Returns the number of channels.
+ 	If the port is disconnected, it has 0 channels.
+ 	*/
+-	int getChannels() {
++	int getChannels() const noexcept {
+ 		return channels;
+ 	}
+ 
+ 	/** Returns whether a cable is connected to the Port.
+ 	You can use this for skipping code that generates output voltages.
+ 	*/
+-	bool isConnected() {
++	bool isConnected() const noexcept {
+ 		return channels > 0;
+ 	}
+ 
+ 	/** Returns whether the cable exists and has 1 channel. */
+-	bool isMonophonic() {
++	bool isMonophonic() const noexcept {
+ 		return channels == 1;
+ 	}
+ 
+ 	/** Returns whether the cable exists and has more than 1 channel. */
+-	bool isPolyphonic() {
++	bool isPolyphonic() const noexcept {
+ 		return channels > 1;
+ 	}
+ 
+ 	/** Use getNormalVoltage() instead. */
+-	DEPRECATED float normalize(float normalVoltage) {
++	DEPRECATED float normalize(float normalVoltage) const noexcept {
+ 		return getNormalVoltage(normalVoltage);
+ 	}
+ };
+ 
+ 
+-struct Output : Port {};
++struct Output : Port {
++	/** List of cables connected to this port. */
++	std::list<Cable*> cables;
++};
++
+ 
+ struct Input : Port {};
+ 

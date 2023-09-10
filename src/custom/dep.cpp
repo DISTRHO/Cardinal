@@ -1184,11 +1184,11 @@ static std::list<ExtendedNSVGimage> loadedLightSVGs;
 static inline
 void nsvg__duplicatePaint(NSVGpaint& dst, NSVGpaint& src)
 {
-	if (dst.type == NSVG_PAINT_LINEAR_GRADIENT || dst.type == NSVG_PAINT_RADIAL_GRADIENT)
+    if (dst.type == NSVG_PAINT_LINEAR_GRADIENT || dst.type == NSVG_PAINT_RADIAL_GRADIENT)
     {
         const size_t size = sizeof(NSVGgradient) + sizeof(NSVGgradientStop)*(src.gradient->nstops-1);
-		dst.gradient = static_cast<NSVGgradient*>(malloc(size));
-		std::memcpy(dst.gradient, src.gradient, size);
+        dst.gradient = static_cast<NSVGgradient*>(malloc(size));
+        std::memcpy(dst.gradient, src.gradient, size);
     }
 }
 
@@ -1260,6 +1260,31 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
 {
     if (NSVGimage* const handle = nsvgParseFromFile(filename, units, dpi))
     {
+        /*
+        if (NSVGshape* const shapes = handle->shapes)
+        {
+            for (NSVGshape *next, *shape = shapes;;)
+            {
+                next = shape->next;
+
+                nsvg__deletePaint(&shape->fill);
+                nsvg__deletePaint(&shape->stroke);
+                std::free(shape);
+
+                if (next == nullptr)
+                    break;
+
+                shape = next;
+            }
+        }
+        handle->shapes = static_cast<NSVGshape*>(std::calloc(1, sizeof(NSVGshape)));
+        handle->shapes->stroke.color = 0xff00ff00;
+        handle->shapes->stroke.type = NSVG_PAINT_COLOR;
+        handle->shapes->fill.color = 0xff000000;
+        handle->shapes->fill.type = NSVG_PAINT_COLOR;
+        return handle;
+        */
+
        #ifndef HEADLESS
         const size_t filenamelen = std::strlen(filename);
 
