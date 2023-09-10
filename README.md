@@ -150,7 +150,7 @@ At the moment the following 3rd-party modules are provided:
 - [ExpertSleepers Encoders](https://expert-sleepers.co.uk/vcvrack_encoders.html)
 - [Extratone](http://extratone.xyz/modules)
 - [Fehler Fabrik](https://github.com/RCameron93/FehlerFabrik)
-- [forsitan modulare](tps://github.com/gosub/forsitan-modulare)
+- [forsitan modulare](https://github.com/gosub/forsitan-modulare)
 - [Fundamental](https://github.com/VCVRack/Fundamental)
 - [Glue the Giant](https://github.com/gluethegiant/gtg-rack)
 - [GoodSheperd](https://github.com/jensschulze/GoodSheperd)
