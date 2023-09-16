@@ -7,7 +7,7 @@ Please note **OSC Remote Control is not available when using Cardinal as a plugi
 
 ## Activating remote control
 
-Make sure you are using version 23.08 or later of Cardinal, start up the standalone (both Native and JACK variants will work) and under "Engine" menu click on "Enable OSC remote control".
+Make sure you are using version 23.09 or later of Cardinal, start up the standalone (both Native and JACK variants will work) and under "Engine" menu click on "Enable OSC remote control".
 
 ![screenshot](Docs_Remote-Control-1.png "Screenshot")
 
