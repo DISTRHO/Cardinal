@@ -63,6 +63,10 @@
 # include <unistd.h>
 #endif
 
+#ifdef ARCH_LIN
+# include <fstream>
+#endif
+
 #ifdef HAVE_LIBLO
 # include <lo/lo.h>
 #endif
@@ -496,9 +500,38 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
        #elif defined(ARCH_WIN)
         asset::userDir = system::join(getSpecialPath(kSpecialPathMyDocuments), "Cardinal");
        #else
-        if (const char* const xdgEnv = getenv("XDG_DOCUMENTS_DIR"))
-            asset::userDir = system::join(xdgEnv, "Cardinal");
-        else
+        std::string xdgConfigDir;
+        if (const char* const xdgEnv = getenv("XDG_CONFIG_HOME"))
+            xdgConfigDir = xdgEnv;
+        if (xdgConfigDir.empty())
+            xdgConfigDir = system::join(homeDir(), ".config");
+
+        const std::string xdgDirsConfigPath(system::join(xdgConfigDir, "user-dirs.dirs"));
+
+        if (system::exists(xdgDirsConfigPath))
+        {
+            std::ifstream xdgDirsConfigFile(xdgDirsConfigPath, std::ios::in|std::ios::ate);
+            std::string xdgDirsConfig(xdgDirsConfigFile.tellg(), 0);
+
+            xdgDirsConfigFile.seekg(0);
+            xdgDirsConfigFile.read(&xdgDirsConfig[0], xdgDirsConfig.size());
+
+            if (const char* const xdgDocsDir = std::strstr(xdgDirsConfig.c_str(), "XDG_DOCUMENTS_DIR=\""))
+            {
+                if (const char* const xdgDocsDirNL = std::strstr(xdgDocsDir, "\"\n"))
+                {
+                    asset::userDir = std::string(xdgDocsDir + 19, xdgDocsDirNL - xdgDocsDir - 19);
+
+                    if (string::startsWith(asset::userDir, "$HOME"))
+                        asset::userDir.replace(asset::userDir.begin(), asset::userDir.begin() + 5, homeDir());
+
+                    if (! system::exists(asset::userDir))
+                        asset::userDir.clear();
+                }
+            }
+        }
+
+        if (asset::userDir.empty())
             asset::userDir = system::join(homeDir(), "Documents", "Cardinal");
        #endif
 
