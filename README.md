@@ -82,19 +82,16 @@ Plugin type is set as regular "effect".
 
 ### Mini
 
-This is a special variant with a very small, hand-picked module selection and limited IO (2 audio ports plus 5 CV).
-
-There are 2 main reasons for this variant to exist:
-1. make it easier for users new to the modular world to get a working setup, by only having some of the best possible modules available to choose from
-2. hand-pick modules that are simple enough to work reliably in a remote setup
+This is a special variant with a very small, hand-picked module selection and limited IO (2 audio ports plus 5 CV).  
+It only exists as LV2 and Standalone plugin.
 
 For now the list of selected modules is quite small, intentionally. We will add a few more as the need appears.  
 All included modules support polyphony, reducing confusion for new users not yet used to mono vs poly approach in Rack/Cardinal.
 
-The 2nd reason (only having simple modules) is needed in order to support DSP/UI separation.  
-Having this in place means we can run the DSP on a different machine than the UI.  
-This is particularly interesting for running Cardinal on embed systems, being controlled remotely via a web browser or a native desktop application.
-Already doable with LV2 from 23.02 onwards, later on this will be made possible on standalone too.
+The main reason for this variant to exist is being able to support DSP/UI separation, which is only possible with more simple modules.  
+The DSP/UI separation means we can run the DSP on a different machine than the UI.  
+This is particularly interesting for running Cardinal on embed systems, being controlled remotely via a web browser or a native desktop application.  
+Such setup is already in use in [Cardinal Mini for MOD Audio](https://forum.mod.audio/t/distrho-cardinal-mini/9262/).
 
 
 ## Screenshots
@@ -200,7 +197,7 @@ Additionally Cardinal provides its own modules for DAW/Host automation, time pos
 
 ### Adding modules
 
-Install new modules on a Cardinal build is not possible, but we can add new modules to the build.  
+Installing new modules on a Cardinal build is not possible, but we can integrate existing open-source modules to be part of Cardinal.
 Details on this are available [here](https://github.com/DISTRHO/Cardinal/discussions/28).  
 Also check [this wiki page](https://github.com/DISTRHO/Cardinal/wiki/Possible-modules-to-include)
 where we discuss possible modules to include.  
@@ -276,4 +273,4 @@ An overview of the included code and linked submodules can be seen [here](docs/L
 ## Community chat
 
 Currently we are all on #cardinal IRC room in irc.libera.chat server.  
-Come join us in your favorite IRC client or through a Matrix bridge.
+Come join us in your favorite IRC client.
