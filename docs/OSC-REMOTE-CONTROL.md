@@ -1,13 +1,13 @@
 # OSC Remote Control
 
 OSC (Open Sound Control) is a protocol commonly used for remote control over the network.  
-Starting with version 23.08, Cardinal allows remote control of the entire patch/project and individual parameters through OSC.
+Starting with version 23.09, Cardinal allows remote control of the entire patch/project and individual parameters through OSC.
 
 ## Activating remote control
 
 Make sure you are using version 23.08 or later of Cardinal, start up the standalone (both Native and JACK variants will work) and under "Engine" menu click on "Enable OSC remote control".
 
-NOTE: This option is not available when using Cardinal as a plugin, only for standalones.
+NOTE: This option is not available when using Cardinal as a plugin, only in standalone.
 
 ![screenshot](Docs_Remote-Control-1.png "Screenshot")
 
