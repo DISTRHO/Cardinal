@@ -51,7 +51,7 @@ Dependencies for using system libraries:
 
 ```
 # common
-sudo pkg install -A dbus libglvnd liblo libsndfile libX11 libXcursor libXext libXrandr python3
+sudo pkg install -A cmake dbus fftw libglvnd liblo libsndfile libX11 libXcursor libXext libXrandr python3
 # system libraries
 sudo pkg install -A libarchive libsamplerate jansson speexdsp
 ```
@@ -67,7 +67,7 @@ Dependencies for using system libraries, that is, with `SYSDEPS=true`:
 
 ```
 # common
-sudo pacman -S dbus file libgl liblo libsndfile libx11 libxcursor libxext libxrandr python3
+sudo pacman -S cmake dbus file fftw libgl liblo libsndfile libx11 libxcursor libxext libxrandr python3
 # system libraries
 sudo pacman -S libarchive libsamplerate jansson speexdsp
 ```
@@ -76,9 +76,9 @@ Dependencies for vendored libraries:
 
 ```
 # common
-sudo pacman -S dbus file libgl liblo libsndfile libx11 libxcursor libxext libxrandr python3
+sudo pacman -S cmake dbus file fftw libgl liblo libsndfile libx11 libxcursor libxext libxrandr python3
 # nedeed by vendored libraries
-sudo pacman -S cmake wget
+sudo pacman -S wget
 ```
 
 ### Debian
@@ -87,7 +87,7 @@ Dependencies for using system libraries, that is, with `SYSDEPS=true`:
 
 ```
 # common
-sudo apt install libdbus-1-dev libgl1-mesa-dev liblo-dev libmagic-dev libsndfile1-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev python3
+sudo apt install cmake libdbus-1-dev libgl1-mesa-dev liblo-dev libfftw3-dev libmagic-dev libsndfile1-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev python3
 # system libraries
 sudo apt install libarchive-dev libjansson-dev libsamplerate0-dev libspeexdsp-dev
 ```
@@ -96,9 +96,9 @@ Dependencies for vendored libraries:
 
 ```
 # common
-sudo apt install libdbus-1-dev libgl1-mesa-dev liblo-dev libmagic-dev libsndfile1-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev python3
+sudo apt install cmake libdbus-1-dev libgl1-mesa-dev liblo-dev libfftw3-dev libmagic-dev libsndfile1-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev python3
 # nedeed by vendored libraries
-sudo apt install cmake wget
+sudo apt install wget
 ```
 
 ## macOS
