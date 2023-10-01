@@ -588,6 +588,7 @@ extern Model* modelArpeggiator;
 #undef modelSH8
 
 // MockbaModular
+#define max max
 #define modelBlank modelMockbaModularBlank
 #define modelComparator modelMockbaModularComparator
 #include "MockbaModular/src/plugin.hpp"
@@ -2606,9 +2607,14 @@ static void initStatic__nonlinearcircuits()
         p->addModel(modelLetsSplosh);
         p->addModel(modelNeuron);
         p->addModel(modelNumberwang);
+        p->addModel(modelRouter);
         p->addModel(modelSegue);
+        p->addModel(modelSlothApathy);
+        p->addModel(modelSlothInertia);
+        p->addModel(modelSlothTorpor);
         p->addModel(modelSquidAxon);
         p->addModel(modelStatues);
+        p->addModel(modelTripleSloth);
     }
 }
 
