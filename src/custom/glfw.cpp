@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -50,16 +50,16 @@ GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char* const text)
 GLFWAPI GLFWcursor* glfwCreateStandardCursor(const int shape)
 {
     static GLFWcursor cursors[] = {
-        { kMouseCursorArrow        }, // GLFW_ARROW_CURSOR
-        { kMouseCursorCaret        }, // GLFW_IBEAM_CURSOR
-        { kMouseCursorCrosshair    }, // GLFW_CROSSHAIR_CURSOR
-        { kMouseCursorHand         }, // GLFW_POINTING_HAND_CURSOR
-        { kMouseCursorNotAllowed   }, // GLFW_NOT_ALLOWED_CURSOR
-        { kMouseCursorLeftRight    }, // GLFW_RESIZE_EW_CURSOR
-        { kMouseCursorUpDown       }, // GLFW_RESIZE_NS_CURSOR
-        { kMouseCursorDiagonal     }, // GLFW_RESIZE_NWSE_CURSOR
-        { kMouseCursorAntiDiagonal }, // GLFW_RESIZE_NESW_CURSOR
-        // NOTE GLFW_RESIZE_ALL_CURSOR is unsupported in pugl
+        { kMouseCursorArrow           }, // GLFW_ARROW_CURSOR
+        { kMouseCursorCaret           }, // GLFW_IBEAM_CURSOR
+        { kMouseCursorCrosshair       }, // GLFW_CROSSHAIR_CURSOR
+        { kMouseCursorHand            }, // GLFW_POINTING_HAND_CURSOR
+        { kMouseCursorNotAllowed      }, // GLFW_NOT_ALLOWED_CURSOR
+        { kMouseCursorLeftRight       }, // GLFW_RESIZE_EW_CURSOR
+        { kMouseCursorUpDown          }, // GLFW_RESIZE_NS_CURSOR
+        { kMouseCursorUpLeftDownRight }, // GLFW_RESIZE_NWSE_CURSOR
+        { kMouseCursorUpRightDownLeft }, // GLFW_RESIZE_NESW_CURSOR
+        { kMouseCursorAllScroll       }, // GLFW_RESIZE_ALL_CURSOR
     };
 
     switch (shape)
@@ -79,9 +79,11 @@ GLFWAPI GLFWcursor* glfwCreateStandardCursor(const int shape)
     case GLFW_RESIZE_NS_CURSOR:
         return &cursors[kMouseCursorUpDown];
     case GLFW_RESIZE_NWSE_CURSOR:
-        return &cursors[kMouseCursorDiagonal];
+        return &cursors[kMouseCursorUpLeftDownRight];
     case GLFW_RESIZE_NESW_CURSOR:
-        return &cursors[kMouseCursorAntiDiagonal];
+        return &cursors[kMouseCursorUpRightDownLeft];
+    case GLFW_RESIZE_ALL_CURSOR:
+        return &cursors[kMouseCursorAllScroll];
     default:
         return nullptr;
     }
