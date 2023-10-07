@@ -166,6 +166,7 @@ target_sources(Cardinal
 target_include_directories(Cardinal
     PRIVATE
         ../dpf/distrho
+        ../dpf/dgl/src/pugl-upstream/include
         ../src/Cardinal)
 
 target_compile_definitions(Cardinal
@@ -267,6 +268,7 @@ target_sources(CardinalFX
 target_include_directories(CardinalFX
     PRIVATE
         ../dpf/distrho
+        ../dpf/dgl/src/pugl-upstream/include
         ../src/CardinalFX)
 
 target_compile_definitions(CardinalFX
@@ -367,6 +369,7 @@ target_sources(CardinalMIDI
 target_include_directories(CardinalMIDI
     PRIVATE
         ../dpf/distrho
+        ../dpf/dgl/src/pugl-upstream/include
         ../src/CardinalFX)
 
 target_compile_definitions(CardinalMIDI
@@ -467,6 +470,7 @@ target_sources(CardinalSynth
 target_include_directories(CardinalSynth
     PRIVATE
         ../dpf/distrho
+        ../dpf/dgl/src/pugl-upstream/include
         ../src/CardinalSynth)
 
 target_compile_definitions(CardinalSynth
