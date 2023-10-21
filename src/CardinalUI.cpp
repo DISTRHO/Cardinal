@@ -518,6 +518,14 @@ public:
             rack::system::removeRecursively(fAutosavePath);
        #endif
 
+       #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        if (fInitializer->shouldSaveSettings)
+        {
+            INFO("Save settings");
+            rack::settings::save();
+        }
+       #endif
+
         rack::contextSet(nullptr);
     }
 

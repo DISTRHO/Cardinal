@@ -818,9 +818,9 @@ std::string getSpecialPath(const SpecialPath type)
         return {};
     }
 
-    WCHAR path[MAX_PATH + 256];
+    WCHAR path[MAX_PATH] = {};
 
-    if (SHGetSpecialFolderPathW(nullptr, path, csidl, FALSE))
+    if (SHGetFolderPathW(nullptr, csidl, nullptr, SHGFP_TYPE_CURRENT, path) == S_OK)
         return string::UTF16toUTF8(path);
 
     return {};
