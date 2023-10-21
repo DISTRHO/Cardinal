@@ -27,6 +27,11 @@ float max(const float a, const double b) {
 }
 
 static inline
+float min(const float a, const double b) {
+    return std::min<float>(a, static_cast<float>(b));
+}
+
+static inline
 std::complex<float> operator*(const std::complex<double>& a, const float b) {
     return static_cast<std::complex<float>>(a) * b;
 }
