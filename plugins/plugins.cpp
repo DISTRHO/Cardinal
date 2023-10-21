@@ -588,7 +588,6 @@ extern Model* modelArpeggiator;
 #undef modelSH8
 
 // MockbaModular
-#define max max
 #define modelBlank modelMockbaModularBlank
 #define modelComparator modelMockbaModularComparator
 #include "MockbaModular/src/plugin.hpp"
@@ -596,6 +595,7 @@ extern Model* modelArpeggiator;
 #undef modelComparator
 #include "MockbaModular/src/MockbaModular.hpp"
 #undef min
+#undef max
 #define saveBack ignoreMockbaModular1
 #define loadBack ignoreMockbaModular2
 #include "MockbaModular/src/MockbaModular.cpp"
