@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -45,7 +45,7 @@
 #define DISTRHO_UI_DEFAULT_WIDTH          1228
 #define DISTRHO_UI_DEFAULT_HEIGHT         666
 #endif
-#define DISTRHO_PLUGIN_IS_SYNTH           0
+#define DISTRHO_PLUGIN_IS_SYNTH           1
 #define DISTRHO_PLUGIN_NUM_INPUTS         CARDINAL_NUM_AUDIO_INPUTS + 10
 #define DISTRHO_PLUGIN_NUM_OUTPUTS        CARDINAL_NUM_AUDIO_OUTPUTS + 10
 #define DISTRHO_PLUGIN_WANT_MIDI_INPUT    1
@@ -55,6 +55,5 @@
 #define DISTRHO_PLUGIN_WANT_TIMEPOS       1
 #define DISTRHO_PLUGIN_USES_CUSTOM_MODGUI 1
 #define DISTRHO_PLUGIN_LV2_CATEGORY       "mod:ControlVoltagePlugin, lv2:UtilityPlugin"
-#define DISTRHO_PLUGIN_VST3_CATEGORIES    "Fx|Generator"
 
 #endif // DISTRHO_PLUGIN_INFO_H_INCLUDED
