@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(Cardinal VERSION 23.09)
+project(Cardinal VERSION 23.10)
 
 include(FetchContent)
 FetchContent_Declare(JUCE
