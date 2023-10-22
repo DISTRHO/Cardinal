@@ -431,6 +431,10 @@ public:
             setSize(DISTRHO_UI_DEFAULT_WIDTH * scaleFactor, DISTRHO_UI_DEFAULT_HEIGHT * scaleFactor);
         }
 
+       #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        const DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(window);
+       #endif
+
         rack::window::WindowSetPluginUI(context->window, this);
 
         // hide "Browse VCV Library" button

@@ -188,7 +188,7 @@ struct Window::Internal {
 	Internal()
 #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		: hiddenApp(false),
-		  hiddenWindow(hiddenApp)
+		  hiddenWindow(hiddenApp, 0, DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT, 0.0, true)
 	{
 		hiddenWindow.setIgnoringKeyRepeat(true);
 		hiddenApp.idle();
@@ -221,7 +221,7 @@ Window::Window() {
 	const int nvgFlags = NVG_ANTIALIAS;
 
 #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
-	DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
+	const DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
 	vg = nvgCreateGL(nvgFlags);
 #else
 	vg = static_cast<CardinalPluginContext*>(APP)->tlw->getContext();
