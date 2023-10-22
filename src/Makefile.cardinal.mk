@@ -100,6 +100,10 @@ ifeq ($(WINDOWS),true)
 FILES_UI += distrho.rc
 endif
 
+ifneq ($(HAIKU_OR_MACOS_OR_WASM_OR_WINDOWS),true)
+FILES_UI += CardinalX11WindowIcon.cpp
+endif
+
 # --------------------------------------------------------------
 # Rack and plugin libs
 
