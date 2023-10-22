@@ -246,6 +246,7 @@ ifneq ($(HEADLESS),true)
 FILES_UI  = CardinalUI.cpp
 FILES_UI += CardinalCommon-UI.cpp
 FILES_UI += CardinalRemote.cpp
+FILES_UI += CardinalX11WindowIcon.cpp
 FILES_UI += common.cpp
 FILES_UI += glfw.cpp
 FILES_UI += MenuBar.cpp
