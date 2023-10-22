@@ -246,11 +246,13 @@ ifneq ($(HEADLESS),true)
 FILES_UI  = CardinalUI.cpp
 FILES_UI += CardinalCommon-UI.cpp
 FILES_UI += CardinalRemote.cpp
-FILES_UI += CardinalX11WindowIcon.cpp
 FILES_UI += common.cpp
 FILES_UI += glfw.cpp
 FILES_UI += MenuBar.cpp
 FILES_UI += Window.cpp
+ifneq ($(HAIKU_OR_MACOS_OR_WASM_OR_WINDOWS),true)
+FILES_UI += CardinalX11WindowIcon.cpp
+endif
 EXTRA_UI_DEPENDENCIES = $(subst -headless,,$(EXTRA_DSP_DEPENDENCIES))
 EXTRA_UI_LIBS += $(subst -headless,,$(EXTRA_DSP_LIBS))
 endif
