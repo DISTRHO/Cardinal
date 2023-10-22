@@ -814,6 +814,7 @@ std::string getSpecialPath(const SpecialPath type)
         break;
     case kSpecialPathMyDocuments:
         csidl = CSIDL_MYDOCUMENTS;
+        break;
     default:
         return {};
     }
