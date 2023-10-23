@@ -2624,7 +2624,8 @@ $(BUILD_DIR)/StarlingVia/%.cpp.o: StarlingVia/%.cpp
 		-IStarlingVia/Via/synthesis/inc \
 		-IStarlingVia/Via/io/inc \
 		-IStarlingVia/Via/ui/inc \
-		-I./dep/starling-dsp
+		-IStarlingVia/src/dep/starling-dsp \
+		-IStarlingVia/src/dep/starling-rack-ui
 
 $(BUILD_DIR)/stoermelder-packone/%.cpp.o: stoermelder-packone/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
