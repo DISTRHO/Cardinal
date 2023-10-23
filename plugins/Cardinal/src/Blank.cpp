@@ -41,7 +41,7 @@ struct CardinalBlankModule : Module {
 };
 
 struct CardinalBlankImage : Widget {
-    int imageId = -2;
+    std::shared_ptr<Image> image;
     int imageWidth = 0;
     int imageHeight = 0;
     bool hasModule;
@@ -53,26 +53,28 @@ struct CardinalBlankImage : Widget {
 
     void draw(const DrawArgs& args) override
     {
-        if (imageId == -2)
-        {
-            imageId = nvgCreateImage(args.vg, asset::plugin(pluginInstance, "res/Miku/Miku.png").c_str(), 0);
+        Image* img = image.get();
 
-            if (imageId != -1)
-                nvgImageSize(args.vg, imageId, &imageWidth, &imageHeight);
+        if (img == nullptr)
+        {
+            image = APP->window->loadImage(asset::plugin(pluginInstance, "res/Miku/Miku.png"));
+
+            if ((img = image.get()) != nullptr)
+                nvgImageSize(args.vg, img->handle, &imageWidth, &imageHeight);
         }
 
-        if (imageId != -1 && imageWidth != 0 && imageHeight != 0)
+        if (img != nullptr && imageWidth != 0 && imageHeight != 0)
         {
             const float pixelRatio = hasModule ? APP->window->pixelRatio : 1.0f;
             const float boxscale = std::min(box.size.x / imageWidth, box.size.y / imageHeight);
             const float imgHeight = (imageHeight / pixelRatio) * boxscale;
             nvgBeginPath(args.vg);
-            nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+            nvgRect(args.vg, 0, box.size.y * 0.5f - imgHeight * 0.5f, box.size.x, imgHeight);
             nvgFillPaint(args.vg, nvgImagePattern(args.vg,
                                                   0,
                                                   (box.size.y / pixelRatio) * 0.5f - imgHeight * 0.5f,
                                                   box.size.x / pixelRatio,
-                                                  imgHeight, 0, imageId, 1.0f));
+                                                  imgHeight, 0, img->handle, 1.0f));
             nvgFill(args.vg);
         }
     }

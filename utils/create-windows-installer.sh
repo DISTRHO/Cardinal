@@ -7,9 +7,19 @@ if [ ! -d bin ]; then
   exit
 fi
 
-# args
-bit=${1}
-bit=${bit:=64}
+if [ -z "${1}" ]; then
+  echo "usage: ${0} win32|win64"
+  exit
+fi
+
+if [ "${1}" = "win32" ]; then
+  bit=32
+elif [ "${1}" = "win64" ]; then
+  bit=64
+else
+  echo "usage: ${0} win32|win64"
+  exit
+fi
 
 # setup innosetup
 dlfile="${PWD}/bin/innosetup-6.0.5.exe"

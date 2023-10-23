@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 
 /**
  * This file is an edited version of VCVRack's window/Window.cpp
- * Copyright (C) 2016-2021 VCV.
+ * Copyright (C) 2016-2023 VCV.
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -42,6 +42,21 @@
 # undef DEBUG
 #endif
 
+#include "DistrhoUI.hpp"
+#include "Application.hpp"
+#include "extra/String.hpp"
+#include "../CardinalCommon.hpp"
+#include "../PluginContext.hpp"
+#include "../WindowParameters.hpp"
+
+#ifndef DGL_NO_SHARED_RESOURCES
+# include "src/Resources.hpp"
+#endif
+
+#if !(defined(DGL_USE_GLES) || CARDINAL_VARIANT_MINI)
+
+#define CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
+
 // comment out if wanting to generate a local screenshot.png
 #define STBI_WRITE_NO_STDIO
 
@@ -52,14 +67,6 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#include "DistrhoUI.hpp"
-#include "Application.hpp"
-#include "extra/String.hpp"
-#include "../CardinalCommon.hpp"
-#include "../WindowParameters.hpp"
-
-#ifndef DGL_NO_SHARED_RESOURCES
-# include "src/Resources.hpp"
 #endif
 
 #ifdef DISTRHO_OS_WASM
@@ -132,6 +139,7 @@ std::shared_ptr<Image> Image::load(const std::string& filename) {
 }
 
 
+#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 enum ScreenshotStep {
 	kScreenshotStepNone,
 	kScreenshotStepStarted,
@@ -139,20 +147,24 @@ enum ScreenshotStep {
 	kScreenshotStepSecondPass,
 	kScreenshotStepSaving
 };
+#endif
 
 
 struct Window::Internal {
 	std::string lastWindowTitle;
 
-	DISTRHO_NAMESPACE::UI* ui = nullptr;
+	CardinalBaseUI* ui = nullptr;
+	DGL_NAMESPACE::NanoTopLevelWidget* tlw = nullptr;
 	DISTRHO_NAMESPACE::WindowParameters params;
 	DISTRHO_NAMESPACE::WindowParametersCallback* callback = nullptr;
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 	DGL_NAMESPACE::Application hiddenApp;
 	DGL_NAMESPACE::Window hiddenWindow;
 	NVGcontext* r_vg = nullptr;
 	NVGcontext* r_fbVg = nullptr;
 	NVGcontext* o_vg = nullptr;
 	NVGcontext* o_fbVg = nullptr;
+#endif
 
 	math::Vec size = WINDOW_SIZE_MIN;
 
@@ -160,13 +172,12 @@ struct Window::Internal {
 	int currentRateLimit = 0;
 
 	int frame = 0;
-	int frameSwapInterval = 1;
-#ifndef DGL_USE_GLES
+#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 	int generateScreenshotStep = kScreenshotStepNone;
 #endif
 	double monitorRefreshRate = 60.0;
-	double frameTime = 0.0;
-	double lastFrameDuration = 0.0;
+	double frameTime = NAN;
+	double lastFrameDuration = NAN;
 
 	std::map<std::string, std::shared_ptr<FontWithOriginalContext>> fontCache;
 	std::map<std::string, std::shared_ptr<ImageWithOriginalContext>> imageCache;
@@ -175,12 +186,16 @@ struct Window::Internal {
 	int fbCount = 0;
 
 	Internal()
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		: hiddenApp(false),
-		  hiddenWindow(hiddenApp)
+		  hiddenWindow(hiddenApp, 0, DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT, 0.0, true)
 	{
 		hiddenWindow.setIgnoringKeyRepeat(true);
 		hiddenApp.idle();
 	}
+#else
+	{}
+#endif
 };
 
 
@@ -202,12 +217,17 @@ static int loadFallbackFont(NVGcontext* const vg)
 Window::Window() {
 	internal = new Internal;
 
-	DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
-
 	// Set up NanoVG
 	const int nvgFlags = NVG_ANTIALIAS;
+
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+	const DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
 	vg = nvgCreateGL(nvgFlags);
+#else
+	vg = static_cast<CardinalPluginContext*>(APP)->tlw->getContext();
+#endif
 	DISTRHO_SAFE_ASSERT_RETURN(vg != nullptr,);
+
 #ifdef NANOVG_GLES2
 	fbVg = nvgCreateSharedGLES2(vg, nvgFlags);
 #else
@@ -238,7 +258,119 @@ Window::Window() {
 #endif
 }
 
-void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
+void WindowSetPluginRemote(Window* const window, NanoTopLevelWidget* const tlw)
+{
+	// if nanovg context failed, init only bare minimum
+	if (window->vg == nullptr)
+	{
+		if (tlw != nullptr)
+		{
+			window->internal->tlw = tlw;
+			window->internal->size = rack::math::Vec(tlw->getWidth(), tlw->getHeight());
+		}
+		else
+		{
+			window->internal->tlw = nullptr;
+			window->internal->callback = nullptr;
+		}
+		return;
+	}
+
+	if (tlw != nullptr)
+	{
+		const GLubyte* vendor = glGetString(GL_VENDOR);
+		const GLubyte* renderer = glGetString(GL_RENDERER);
+		const GLubyte* version = glGetString(GL_VERSION);
+		INFO("Renderer: %s %s", vendor, renderer);
+		INFO("OpenGL: %s", version);
+
+		window->internal->tlw = tlw;
+		window->internal->size = rack::math::Vec(tlw->getWidth(), tlw->getHeight());
+
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+		// Set up NanoVG
+		window->internal->r_vg = tlw->getContext();
+#ifdef NANOVG_GLES2
+		window->internal->r_fbVg = nvgCreateSharedGLES2(window->internal->r_vg, NVG_ANTIALIAS);
+#else
+		window->internal->r_fbVg = nvgCreateSharedGL2(window->internal->r_vg, NVG_ANTIALIAS);
+#endif
+
+		// swap contexts
+		window->internal->o_vg = window->vg;
+		window->internal->o_fbVg = window->fbVg;
+		window->vg = window->internal->r_vg;
+		window->fbVg = window->internal->r_fbVg;
+
+		// also for fonts and images
+		window->uiFont->vg = window->vg;
+		window->uiFont->handle = loadFallbackFont(window->vg);
+		for (auto& font : window->internal->fontCache)
+		{
+			font.second->vg = window->vg;
+			font.second->ohandle = font.second->handle;
+			font.second->handle = nvgCreateFont(window->vg,
+			                                    font.second->ofilename.c_str(), font.second->ofilename.c_str());
+		}
+		for (auto& image : window->internal->imageCache)
+		{
+			image.second->vg = window->vg;
+			image.second->ohandle = image.second->handle;
+			image.second->handle = nvgCreateImage(window->vg, image.second->ofilename.c_str(),
+			                                      NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+		}
+#endif
+
+		// Init settings
+		WindowParametersRestore(window);
+
+		widget::Widget::ContextCreateEvent e = {};
+		e.vg = window->vg;
+		APP->scene->onContextCreate(e);
+	}
+	else
+	{
+		widget::Widget::ContextDestroyEvent e = {};
+		e.vg = window->vg;
+		APP->scene->onContextDestroy(e);
+
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+		// swap contexts
+		window->uiFont->vg = window->internal->o_vg;
+		window->vg = window->internal->o_vg;
+		window->fbVg = window->internal->o_fbVg;
+		window->internal->o_vg = nullptr;
+		window->internal->o_fbVg = nullptr;
+
+		// also for fonts and images
+		window->uiFont->vg = window->vg;
+		window->uiFont->handle = loadFallbackFont(window->vg);
+		for (auto& font : window->internal->fontCache)
+		{
+			font.second->vg = window->vg;
+			font.second->handle = font.second->ohandle;
+			font.second->ohandle = -1;
+		}
+		for (auto& image : window->internal->imageCache)
+		{
+			image.second->vg = window->vg;
+			image.second->handle = image.second->ohandle;
+			image.second->ohandle = -1;
+		}
+
+#if defined NANOVG_GLES2
+		nvgDeleteGLES2(window->internal->r_fbVg);
+#else
+		nvgDeleteGL2(window->internal->r_fbVg);
+#endif
+#endif
+
+		window->internal->tlw = nullptr;
+		window->internal->callback = nullptr;
+	}
+}
+
+void WindowSetPluginUI(Window* const window, CardinalBaseUI* const ui)
 {
 	// if nanovg context failed, init only bare minimum
 	if (window->vg == nullptr)
@@ -264,9 +396,11 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 		INFO("Renderer: %s %s", vendor, renderer);
 		INFO("OpenGL: %s", version);
 
+		window->internal->tlw = ui;
 		window->internal->ui = ui;
 		window->internal->size = rack::math::Vec(ui->getWidth(), ui->getHeight());
 
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		// Set up NanoVG
 		window->internal->r_vg = ui->getContext();
 #ifdef NANOVG_GLES2
@@ -298,18 +432,22 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 			image.second->handle = nvgCreateImage(window->vg, image.second->ofilename.c_str(),
 			                                      NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 		}
+#endif
 
 		// Init settings
 		WindowParametersRestore(window);
 
-		widget::Widget::ContextCreateEvent e;
+		widget::Widget::ContextCreateEvent e = {};
+		e.vg = window->vg;
 		APP->scene->onContextCreate(e);
 	}
 	else
 	{
-		widget::Widget::ContextDestroyEvent e;
+		widget::Widget::ContextDestroyEvent e = {};
+		e.vg = window->vg;
 		APP->scene->onContextDestroy(e);
 
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		// swap contexts
 		window->uiFont->vg = window->internal->o_vg;
 		window->vg = window->internal->o_vg;
@@ -338,7 +476,9 @@ void WindowSetPluginUI(Window* const window, DISTRHO_NAMESPACE::UI* const ui)
 #else
 		nvgDeleteGL2(window->internal->r_fbVg);
 #endif
+#endif
 
+		window->internal->tlw = nullptr;
 		window->internal->ui = nullptr;
 		window->internal->callback = nullptr;
 	}
@@ -351,9 +491,11 @@ void WindowSetMods(Window* const window, const int mods)
 
 Window::~Window() {
 	{
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
 		internal->hiddenWindow.close();
 		internal->hiddenApp.idle();
+#endif
 
 		// Fonts and Images in the cache must be deleted before the NanoVG context is deleted
 		internal->fontCache.clear();
@@ -361,12 +503,20 @@ Window::~Window() {
 
 		if (vg != nullptr)
 		{
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 #if defined NANOVG_GLES2
 			nvgDeleteGLES2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
 			nvgDeleteGLES2(internal->o_vg != nullptr ? internal->o_vg : vg);
 #else
 			nvgDeleteGL2(internal->o_fbVg != nullptr ? internal->o_fbVg : fbVg);
 			nvgDeleteGL2(internal->o_vg != nullptr ? internal->o_vg : vg);
+#endif
+#else
+#if defined NANOVG_GLES2
+			nvgDeleteGLES2(fbVg);
+#else
+			nvgDeleteGL2(fbVg);
+#endif
 #endif
 		}
 	}
@@ -384,8 +534,8 @@ void Window::setSize(math::Vec size) {
 	size = size.max(WINDOW_SIZE_MIN);
 	internal->size = size;
 
-	if (DISTRHO_NAMESPACE::UI* const ui = internal->ui)
-		ui->setSize(internal->size.x, internal->size.y);
+	if (DGL_NAMESPACE::NanoTopLevelWidget* const tlw = internal->ui)
+		tlw->setSize(internal->size.x, internal->size.y);
 }
 
 void WindowSetInternalSize(rack::window::Window* const window, math::Vec size) {
@@ -399,7 +549,7 @@ void Window::run() {
 }
 
 
-#ifndef DGL_USE_GLES
+#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 static void Window__flipBitmap(uint8_t* pixels, const int width, const int height, const int depth) {
 	for (int y = 0; y < height / 2; y++) {
 		const int flipY = height - y - 1;
@@ -445,25 +595,29 @@ static void Window__downscaleBitmap(uint8_t* pixels, int& width, int& height) {
 
 static void Window__writeImagePNG(void* context, void* data, int size) {
 	USE_NAMESPACE_DISTRHO
-	UI* const ui = static_cast<UI*>(context);
-	ui->setState("screenshot", String::asBase64(data, size).buffer());
+	CardinalBaseUI* const ui = static_cast<CardinalBaseUI*>(context);
+	if (char* const screenshot = String::asBase64(data, size).getAndReleaseBuffer()) {
+		ui->setState("screenshot", screenshot);
+		if (ui->remoteDetails != nullptr)
+			remoteUtils::sendScreenshotToRemote(ui->remoteDetails, screenshot);
+		std::free(screenshot);
+	}
 }
 #endif
 #endif
 
 
 void Window::step() {
-	DISTRHO_SAFE_ASSERT_RETURN(internal->ui != nullptr,);
-
-	if (vg == nullptr)
+	if (internal->tlw == nullptr || vg == nullptr)
 		return;
 
 	double frameTime = system::getTime();
-	double lastFrameTime = internal->frameTime;
+	if (std::isfinite(internal->frameTime)) {
+		internal->lastFrameDuration = frameTime - internal->frameTime;
+	}
 	internal->frameTime = frameTime;
-	internal->lastFrameDuration = frameTime - lastFrameTime;
 	internal->fbCount = 0;
-	// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
+	// double t1 = 0.0, t2 = 0.0, t3 = 0.0, t4 = 0.0, t5 = 0.0;
 
 	// Make event handlers and step() have a clean NanoVG context
 	nvgReset(vg);
@@ -472,26 +626,32 @@ void Window::step() {
 		bndSetFont(uiFont->handle);
 
 	// Set window title
-	std::string windowTitle = "Cardinal";
-	if (APP->patch->path != "") {
-		windowTitle += " - ";
-		if (!APP->history->isSaved())
-			windowTitle += "*";
-		windowTitle += system::getFilename(APP->patch->path);
-	}
-	if (windowTitle != internal->lastWindowTitle) {
-		internal->ui->getWindow().setTitle(windowTitle.c_str());
-		internal->lastWindowTitle = windowTitle;
+	if (isStandalone()) {
+#if CARDINAL_VARIANT_MINI
+		std::string windowTitle = "Cardinal Mini";
+#else
+		std::string windowTitle = "Cardinal";
+#endif
+		if (APP->patch->path != "") {
+			windowTitle += " - ";
+			if (!APP->history->isSaved())
+				windowTitle += "*";
+			windowTitle += system::getFilename(APP->patch->path);
+		}
+		if (windowTitle != internal->lastWindowTitle) {
+			internal->tlw->getWindow().setTitle(windowTitle.c_str());
+			internal->lastWindowTitle = windowTitle;
+		}
 	}
 
 	// Get desired pixel ratio
-	float newPixelRatio = internal->ui->getScaleFactor();
+	float newPixelRatio = internal->tlw->getScaleFactor();
 	if (newPixelRatio != pixelRatio) {
 		pixelRatio = newPixelRatio;
 		APP->event->handleDirty();
 	}
 
-#ifndef DGL_USE_GLES
+#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 	// Hide menu and background if generating screenshot
 	if (internal->generateScreenshotStep == kScreenshotStepStarted) {
 #ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
@@ -504,30 +664,33 @@ void Window::step() {
 #endif
 
 	// Get framebuffer/window ratio
-	int winWidth = internal->ui->getWidth();
-	int winHeight = internal->ui->getHeight();
-	int fbWidth = winWidth;// * newPixelRatio;
-	int fbHeight = winHeight;// * newPixelRatio;
+	int winWidth = internal->tlw->getWidth();
+	int winHeight = internal->tlw->getHeight();
+	int fbWidth = winWidth;
+	int fbHeight = winHeight;
 	windowRatio = (float)fbWidth / winWidth;
+	// t1 = system::getTime();
 
 	if (APP->scene) {
 		// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
 		// Resize scene
-		APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(newPixelRatio);
+		APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
 
 		// Step scene
 		APP->scene->step();
+		// t2 = system::getTime();
 
 		// Render scene
 		{
 			// Update and render
-			nvgScale(vg, newPixelRatio, newPixelRatio);
+			nvgScale(vg, pixelRatio, pixelRatio);
 
 			// Draw scene
 			widget::Widget::DrawArgs args;
 			args.vg = vg;
 			args.clipBox = APP->scene->box.zeroPos();
 			APP->scene->draw(args);
+			// t3 = system::getTime();
 
 			glViewport(0, 0, fbWidth, fbHeight);
 #ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
@@ -537,11 +700,21 @@ void Window::step() {
 #endif
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		}
+		// t4 = system::getTime();
 	}
 
+	// t5 = system::getTime();
+	// DEBUG("pre-step %6.1f step %6.1f draw %6.1f nvgEndFrame %6.1f glfwSwapBuffers %6.1f total %6.1f",
+	// 	(t1 - frameTime) * 1e3f,
+	// 	(t2 - t1) * 1e3f,
+	// 	(t3 - t2) * 1e3f,
+	// 	(t4 - t3) * 1e3f,
+	// 	(t5 - t4) * 1e3f,
+	// 	(t5 - frameTime) * 1e3f
+	// );
 	++internal->frame;
 
-#ifndef DGL_USE_GLES
+#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 	if (internal->generateScreenshotStep != kScreenshotStepNone) {
 		++internal->generateScreenshotStep;
 
@@ -563,10 +736,10 @@ void Window::step() {
 		if (internal->generateScreenshotStep == kScreenshotStepSaving)
 		{
 			// Write pixels to PNG
-			const int stride = winWidth * depth;
-			uint8_t* const pixelsWithOffset = pixels + (stride * y);
 			Window__flipBitmap(pixels, winWidth, winHeight, depth);
 			winHeight -= y;
+			const int stride = winWidth * depth;
+			uint8_t* const pixelsWithOffset = pixels + (stride * y);
 #ifdef STBI_WRITE_NO_STDIO
 			Window__downscaleBitmap(pixelsWithOffset, winWidth, winHeight);
 			stbi_write_png_to_func(Window__writeImagePNG, internal->ui,
@@ -576,8 +749,10 @@ void Window::step() {
 #endif
 
 			internal->generateScreenshotStep = kScreenshotStepNone;
+#ifdef CARDINAL_TRANSPARENT_SCREENSHOTS
 			APP->scene->menuBar->show();
 			APP->scene->rack->children.front()->show();
+#endif
 		}
 
 		delete[] pixels;
@@ -586,22 +761,18 @@ void Window::step() {
 }
 
 
-void Window::activateContext() {
+void Window::screenshot(const std::string& screenshotPath) {
 }
 
 
-void Window::screenshot(const std::string&) {
-}
-
-
-void Window::screenshotModules(const std::string&, float) {
+void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 }
 
 
 void Window::close() {
-	DISTRHO_SAFE_ASSERT_RETURN(internal->ui != nullptr,);
+	DISTRHO_SAFE_ASSERT_RETURN(internal->tlw != nullptr,);
 
-	internal->ui->getWindow().close();
+	internal->tlw->getWindow().close();
 }
 
 
@@ -610,7 +781,7 @@ void Window::cursorLock() {
 	if (!settings::allowCursorLock)
 		return;
 
-	emscripten_request_pointerlock(internal->ui->getWindow().getApp().getClassName(), false);
+	emscripten_request_pointerlock(internal->tlw->getWindow().getApp().getClassName(), false);
 #endif
 }
 
@@ -640,12 +811,18 @@ int Window::getMods() {
 }
 
 
-void Window::setFullScreen(const bool fullscreen) {
+void Window::setFullScreen(bool fullScreen) {
 #ifdef DISTRHO_OS_WASM
-	if (fullscreen)
-		emscripten_request_fullscreen(internal->ui->getWindow().getApp().getClassName(), false);
+	if (fullScreen)
+	{
+		try {
+			emscripten_request_fullscreen(internal->tlw->getWindow().getApp().getClassName(), false);
+		} DISTRHO_SAFE_EXCEPTION("fullscreen");
+	}
 	else
+	{
 		emscripten_exit_fullscreen();
+	}
 #endif
 }
 
@@ -656,12 +833,13 @@ bool Window::isFullScreen() {
 	if (emscripten_get_fullscreen_status(&status) == EMSCRIPTEN_RESULT_SUCCESS)
 		return status.isFullscreen;
 	return false;
-#elif defined(CARDINAL_TRANSPARENT_SCREENSHOTS) && !defined(DGL_USE_GLES)
+#elif defined(CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS) && defined(CARDINAL_TRANSPARENT_SCREENSHOTS)
 	return internal->generateScreenshotStep != kScreenshotStepNone;
 #else
 	return false;
 #endif
 }
+
 
 double Window::getMonitorRefreshRate() {
 	return internal->monitorRefreshRate;
@@ -679,8 +857,8 @@ double Window::getLastFrameDuration() {
 
 
 double Window::getFrameDurationRemaining() {
-	double frameDurationDesired = internal->frameSwapInterval / internal->monitorRefreshRate;
-	return frameDurationDesired - (system::getTime() - internal->frameTime);
+	double frameDuration = 1.f / internal->monitorRefreshRate;
+	return frameDuration - (system::getTime() - internal->frameTime);
 }
 
 
@@ -737,7 +915,7 @@ int& Window::fbCount() {
 
 
 void generateScreenshot() {
-#ifndef DGL_USE_GLES
+#ifdef CARDINAL_WINDOW_CAN_GENERATE_SCREENSHOTS
 	APP->window->internal->generateScreenshotStep = kScreenshotStepStarted;
 #endif
 }

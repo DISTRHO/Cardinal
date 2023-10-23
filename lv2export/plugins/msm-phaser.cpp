@@ -20,8 +20,8 @@
 #define PLUGIN_BRAND "MSM"
 #define PLUGIN_LABEL "Phaser"
 #define PLUGIN_MODEL modelPhaserModule
-#define PLUGIN_CV_INPUTS {1,1,1,0}
-#define PLUGIN_CV_OUTPUTS {0}
+#define PLUGIN_CV_INPUTS {Bi,Bi,Bi,Audio}
+#define PLUGIN_CV_OUTPUTS {Audio}
 #define PLUGIN_LV2_CATEGORY "lv2:DistortionPlugin"
 
 #include "lv2plugin.cpp"

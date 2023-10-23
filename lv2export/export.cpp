@@ -15,25 +15,7 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#ifndef PLUGIN_BRAND
-# error PLUGIN_BRAND undefined
-#endif
-
-#ifndef PLUGIN_LABEL
-# error PLUGIN_LABEL undefined
-#endif
-
-#ifndef PLUGIN_MODEL
-# error PLUGIN_MODEL undefined
-#endif
-
-#ifndef PLUGIN_CV_INPUTS
-# error PLUGIN_CV_INPUTS undefined
-#endif
-
-#ifndef PLUGIN_CV_OUTPUTS
-# error PLUGIN_CV_OUTPUTS undefined
-#endif
+#include "lv2plugin.hpp"
 
 #include <cstdio>
 

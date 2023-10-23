@@ -1,6 +1,5 @@
 {
-  "version": "2.0",
-  "zoom": 1.0,
+  "version": "2.1.2",
   "modules": [
     {
       "id": 1184757612963547,
@@ -463,27 +462,6 @@
       ]
     },
     {
-      "id": 8996849652715896,
-      "plugin": "Cardinal",
-      "model": "Carla",
-      "version": "2.0",
-      "params": [
-        {
-          "value": 1.0,
-          "id": 0
-        },
-        {
-          "value": 1.0,
-          "id": 1
-        }
-      ],
-      "data": "<?xml version='1.0' encoding='UTF-8'?>\n<!DOCTYPE CARLA-PROJECT>\n<CARLA-PROJECT VERSION='2.4'>\n <EngineSettings>\n  <ForceStereo>false</ForceStereo>\n  <PreferPluginBridges>false</PreferPluginBridges>\n  <PreferUiBridges>false</PreferUiBridges>\n  <UIsAlwaysOnTop>true</UIsAlwaysOnTop>\n  <MaxParameters>200</MaxParameters>\n  <UIBridgesTimeout>4000</UIBridgesTimeout>\n  <LADSPA_PATH></LADSPA_PATH>\n  <DSSI_PATH></DSSI_PATH>\n  <LV2_PATH></LV2_PATH>\n  <VST2_PATH></VST2_PATH>\n  <VST3_PATH></VST3_PATH>\n  <SF2_PATH></SF2_PATH>\n  <SFZ_PATH></SFZ_PATH>\n  <JSFX_PATH></JSFX_PATH>\n </EngineSettings>\n\n <Patchbay>\n </Patchbay>\n</CARLA-PROJECT>\n",
-      "pos": [
-        123,
-        1
-      ]
-    },
-    {
       "id": 644714212872810,
       "plugin": "Cardinal",
       "model": "TextEditor",
@@ -492,7 +470,7 @@
       "data": {
         "filepath": "",
         "lang": "None",
-        "etext": "                                                   \n        ^ ^        ,_,                             \n       (O,O)      (.,.)                            \n       (   )      (   )                            \n--------\"-\"---dwb--\"-\"---dwb-                      \n\nversatile 4 voice polyphonic synth with a bit\nof reverb\n\nParam1: pulse width modulation\nParam2: filter frequency\nParam3: filter resonance\n\n\n      /^--^\\     /^--^\\     /^--^\\                 \n      \\____/     \\____/     \\____/                 \n     /      \\   /      \\   /      \\                \n    |        | |        | |        |               \n     \\__  __/   \\__  __/   \\__  __/                \n|^|^|^|^\\ \\^|^|^|^/ /^|^|^|^|^\\ \\^|^|^|^|^|^|^|^|^|\n| | | | |\\ \\| | |/ /| | | | | |\\ \\| | | | | | | | |\n#########/ /#####\\ \\###########/ /#################\n| | | | |\\/ | | | \\/| | | | | |\\/ | | | | | | | | |\n|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|\n\n\n\n\n\n\n",
+        "etext": "                                                   \n        ^ ^        ,_,                             \n       (O,O)      (.,.)                            \n       (   )      (   )                            \n--------\"-\"---dwb--\"-\"---dwb-                      \n\nversatile 4 voice polyphonic synth with a bit\nof reverb\n\nParam1: pulse width modulation\nParam2: filter frequency\nParam3: filter resonance\n\n\n      /^--^\\     /^--^\\     /^--^\\                 \n      \\____/     \\____/     \\____/                 \n     /      \\   /      \\   /      \\                \n    |        | |        | |        |               \n     \\__  __/   \\__  __/   \\__  __/                \n|^|^|^|^\\ \\^|^|^|^/ /^|^|^|^|^\\ \\^|^|^|^|^|^|^|^|^|\n| | | | |\\ \\| | |/ /| | | | | |\\ \\| | | | | | | | |\n#########/ /#####\\ \\###########/ /#################\n| | | | |\\/ | | | \\/| | | | | |\\/ | | | | | | | | |\n|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|\n\n\n\n\n\n\n\n",
         "width": 27
       },
       "pos": [
@@ -527,6 +505,7 @@
       "version": "2.0",
       "params": [],
       "data": {
+        "pwRange": 0.0,
         "smooth": true,
         "channels": 4,
         "polyMode": 0,
@@ -546,6 +525,9 @@
       "model": "HostParameters",
       "version": "2.0",
       "params": [],
+      "data": {
+        "smooth": true
+      },
       "pos": [
         32,
         2

@@ -19,6 +19,7 @@
 #define DISTRHO_PLUGIN_INFO_H_INCLUDED
 
 #define CARDINAL_VARIANT_MAIN   0
+#define CARDINAL_VARIANT_MINI   0
 #define CARDINAL_VARIANT_FX     1
 #define CARDINAL_VARIANT_NATIVE 0
 #define CARDINAL_VARIANT_SYNTH  0
@@ -26,19 +27,16 @@
 #define CARDINAL_NUM_AUDIO_INPUTS  2
 #define CARDINAL_NUM_AUDIO_OUTPUTS 2
 
-#define DISTRHO_PLUGIN_BRAND "DISTRHO"
-#define DISTRHO_PLUGIN_URI   "https://distrho.kx.studio/plugins/cardinal#fx"
+#define DISTRHO_PLUGIN_BRAND   "DISTRHO"
+#define DISTRHO_PLUGIN_URI     "https://distrho.kx.studio/plugins/cardinal#fx"
+#define DISTRHO_PLUGIN_CLAP_ID "studio.kx.distrho.cardinal#fx"
 
-#if defined(__MOD_DEVICES__)
-# define DISTRHO_PLUGIN_NAME  "Cardinal Mini"
-# define DISTRHO_PLUGIN_LABEL "CardinalMini"
-#else
-# define DISTRHO_PLUGIN_NAME  "Cardinal FX"
-# define DISTRHO_PLUGIN_LABEL "CardinalFX"
-#endif
+#define DISTRHO_PLUGIN_NAME  "Cardinal FX"
+#define DISTRHO_PLUGIN_LABEL "CardinalFX"
 
 #ifdef HEADLESS
 #define DISTRHO_PLUGIN_HAS_UI             0
+#define DISTRHO_PLUGIN_WANT_DIRECT_ACCESS 0
 #else
 #define DISTRHO_PLUGIN_HAS_UI             1
 #define DISTRHO_PLUGIN_WANT_DIRECT_ACCESS 1
@@ -56,6 +54,7 @@
 #define DISTRHO_PLUGIN_WANT_FULL_STATE    1
 #define DISTRHO_PLUGIN_WANT_STATE         1
 #define DISTRHO_PLUGIN_WANT_TIMEPOS       1
+#define DISTRHO_PLUGIN_USES_CUSTOM_MODGUI 1
 #define DISTRHO_PLUGIN_LV2_CATEGORY       "lv2:UtilityPlugin"
 #define DISTRHO_PLUGIN_VST3_CATEGORIES    "Fx|Generator"
 

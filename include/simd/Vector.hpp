@@ -31,11 +31,7 @@
 #include <pmmintrin.h>
 
 /** NOTE alignas is required in some systems in order to allow SSE usage. */
-#ifndef ARCH_MAC
-#define SIMD_ALIGN alignas(32)
-#else
-#define SIMD_ALIGN
-#endif
+#define SIMD_ALIGN alignas(16)
 
 
 namespace rack {
@@ -359,12 +355,12 @@ inline Vector<int32_t, 4> operator~(const Vector<int32_t, 4>& a) {
 
 /** `a << b` */
 inline Vector<int32_t, 4> operator<<(const Vector<int32_t, 4>& a, const int& b) {
-	return Vector<int32_t, 4>(_mm_slli_epi32(a.v, b));
+	return Vector<int32_t, 4>(_mm_sll_epi32(a.v, _mm_cvtsi32_si128(b)));
 }
 
 /** `a >> b` */
 inline Vector<int32_t, 4> operator>>(const Vector<int32_t, 4>& a, const int& b) {
-	return Vector<int32_t, 4>(_mm_srli_epi32(a.v, b));
+	return Vector<int32_t, 4>(_mm_srl_epi32(a.v, _mm_cvtsi32_si128(b)));
 }
 
 

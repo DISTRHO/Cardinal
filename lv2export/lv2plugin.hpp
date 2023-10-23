@@ -16,10 +16,32 @@
  */
 
 #pragma once
-#include_next <future>
-#include "mingw.future.h"
 
-#undef IN
-#undef OUT
-#undef far
-#undef near
+#ifndef PLUGIN_BRAND
+# error PLUGIN_BRAND undefined
+#endif
+
+#ifndef PLUGIN_LABEL
+# error PLUGIN_LABEL undefined
+#endif
+
+#ifndef PLUGIN_MODEL
+# error PLUGIN_MODEL undefined
+#endif
+
+#ifndef PLUGIN_CV_INPUTS
+# error PLUGIN_CV_INPUTS undefined
+#endif
+
+#ifndef PLUGIN_CV_OUTPUTS
+# error PLUGIN_CV_OUTPUTS undefined
+#endif
+
+enum PortType {
+    Audio = 0,
+    Bi = 1,
+    Uni = 2,
+};
+
+static constexpr const PortType kCvInputs[] = PLUGIN_CV_INPUTS;
+static constexpr const PortType kCvOutputs[] = PLUGIN_CV_OUTPUTS;

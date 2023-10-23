@@ -6,7 +6,7 @@ They are all equivalent in performance and behaviour.
 FX and Synth variants both have 2 audio outputs, while "main" has 8.
 All variants have MIDI input and output support.
 
-This package provides the AU, LV2, VST2 and VST3 audio plugins, plus standalones for both JACK and native audio/MIDI.
+This package provides the AU, LV2, VST2, VST3 and CLAP audio plugins, plus standalones for both JACK and native audio/MIDI.
 
 Notes:
  - Due to AU and VST2 not supporting CV ports, the main variant is not available for these formats

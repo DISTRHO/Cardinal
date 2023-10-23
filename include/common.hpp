@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -97,3 +97,11 @@ void async_dialog_message(const char* message, std::function<void()> action);
 // opens a text input dialog, message and text can be null
 // action is always triggered on close (newText can be null), must be freed if not null
 void async_dialog_text_input(const char* message, const char* text, std::function<void(char* newText)> action);
+
+// Cardinal specific config dir (might be equal to userDir)
+namespace rack {
+namespace asset {
+extern std::string configDir;
+std::string config(std::string filename = "");
+}
+}

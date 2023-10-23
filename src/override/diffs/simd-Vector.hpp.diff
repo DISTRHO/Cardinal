@@ -1,0 +1,59 @@
+--- ../Rack/include/simd/Vector.hpp	2023-05-20 17:03:33.004081703 +0200
++++ ../../include/simd/Vector.hpp	2022-12-02 20:11:45.779215949 +0100
+@@ -1,6 +1,37 @@
++/*
++ * DISTRHO Cardinal Plugin
++ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * For a full copy of the GNU General Public License see the LICENSE file.
++ */
++
++/**
++ * This file is an edited version of VCVRack's simd/Vector.hpp
++ * Copyright (C) 2016-2021 VCV.
++ *
++ * This program is free software: you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or (at your option) any later version.
++ */
++
+ #pragma once
++
+ #include <cstring>
+-#include "common.hpp"
++#include <pmmintrin.h>
++
++/** NOTE alignas is required in some systems in order to allow SSE usage. */
++#define SIMD_ALIGN alignas(16)
+ 
+ 
+ namespace rack {
+@@ -34,7 +65,7 @@
+ 	using type = float;
+ 	constexpr static int size = 4;
+ 
+-	union {
++	union SIMD_ALIGN {
+ 		__m128 v;
+ 		/** Accessing this array of scalars is slow and defeats the purpose of vectorizing.
+ 		*/
+@@ -108,7 +139,7 @@
+ 	using type = int32_t;
+ 	constexpr static int size = 4;
+ 
+-	union {
++	union SIMD_ALIGN {
+ 		__m128i v;
+ 		int32_t s[4];
+ 	};

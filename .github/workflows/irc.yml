@@ -1,6 +1,6 @@
 name: irc
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   notification:
@@ -8,13 +8,14 @@ jobs:
     name: IRC notification
     steps:
       - name: Format message
-        id: message
         run: |
-          message="${{ github.actor }} pushed $(echo '${{ github.event.commits[0].message }}' | head -n 1) ${{ github.event.commits[0].url }}"
-          echo ::set-output name=message::"${message}"
+          echo commitmessage=$(echo "${{ github.event.commits[0].message }}" | head -n 1) >> $GITHUB_ENV
+      - name: Format message
+        run: |
+          echo message="${{ github.actor }} pushed ${{ env.commitmessage }} ${{ github.event.commits[0].url }}" >> $GITHUB_ENV
       - name: IRC notification
         uses: Gottox/irc-message-action@v2
         with:
           channel: '#cardinal'
           nickname: github-event-bot
-          message: ${{ steps.message.outputs.message }}
+          message: ${{ env.message }}

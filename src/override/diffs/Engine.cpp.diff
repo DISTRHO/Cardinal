@@ -1,9 +1,9 @@
---- ../Rack/src/engine/Engine.cpp	2022-04-11 20:05:02.011283836 +0100
-+++ Engine.cpp	2022-06-29 01:30:02.024102120 +0100
+--- ../Rack/src/engine/Engine.cpp	2023-09-10 12:59:02.631898592 +0200
++++ Engine.cpp	2023-05-22 04:26:39.902464764 +0200
 @@ -1,3 +1,30 @@
 +/*
 + * DISTRHO Cardinal Plugin
-+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
 + *
 + * This program is free software; you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 +
 +/**
 + * This file is an edited version of VCVRack's engine/Engine.cpp
-+ * Copyright (C) 2016-2021 VCV.
++ * Copyright (C) 2016-2023 VCV.
 + *
 + * This program is free software: you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -31,8 +31,15 @@
  #include <algorithm>
  #include <set>
  #include <thread>
-@@ -8,181 +35,35 @@
- #include <pmmintrin.h>
+@@ -5,192 +32,47 @@
+ #include <mutex>
+ #include <atomic>
+ #include <tuple>
+-#if defined ARCH_X64
+-	#include <pmmintrin.h>
+-#endif
++#include <pmmintrin.h>
++#include <unordered_map>
  
  #include <engine/Engine.hpp>
 +#include <engine/TerminalModule.hpp>
@@ -45,14 +52,12 @@
  #include <mutex.hpp>
 +#include <helpers.hpp>
  
-+#ifdef NDEBUG
-+# undef DEBUG
-+#endif
- 
+-
 -namespace rack {
 -namespace engine {
 -
 -
+-#if defined ARCH_X64
 -static void initMXCSR() {
 -	// Set CPU to flush-to-zero (FTZ) and denormals-are-zero (DAZ) mode
 -	// https://software.intel.com/en-us/node/682949
@@ -61,8 +66,13 @@
 -	// Reset other flags
 -	_MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
 -}
--
--
++#ifdef NDEBUG
++# undef DEBUG
+ #endif
+ 
++#include "../CardinalRemote.hpp"
++#include "DistrhoUtils.hpp"
+ 
 -/** Barrier based on mutexes.
 -Not finished or tested, do not use.
 -*/
@@ -109,8 +119,7 @@
 -	void setThreads(int threads) {
 -		this->threads = threads;
 -	}
-+#include "DistrhoUtils.hpp"
- 
+-
 -	void wait() {
 -		uint8_t s = step;
 -		if (count.fetch_add(1, std::memory_order_acquire) + 1 >= threads) {
@@ -125,7 +134,9 @@
 -		while (true) {
 -			if (step.load(std::memory_order_relaxed) != s)
 -				return;
+-#if defined ARCH_X64
 -			__builtin_ia32_pause();
+-#endif
 -		}
 -	}
 -};
@@ -174,7 +185,9 @@
 -		while (!yielded.load(std::memory_order_relaxed)) {
 -			if (step.load(std::memory_order_relaxed) != s)
 -				return;
+-#if defined ARCH_X64
 -			__builtin_ia32_pause();
+-#endif
 -		}
 -
 -		// Wait on mutex CV
@@ -191,7 +204,9 @@
 -	int id;
 -	std::thread thread;
 -	bool running = false;
--
++namespace rack {
++namespace engine {
+ 
 -	void start() {
 -		assert(!running);
 -		running = true;
@@ -199,7 +214,7 @@
 -			run();
 -		});
 -	}
--
+ 
 -	void requestStop() {
 -		running = false;
 -	}
@@ -211,8 +226,11 @@
 -
 -	void run();
 -};
-+namespace rack {
-+namespace engine {
++static constexpr const int PORT_DIVIDER = 7;
++// Arbitrary prime number so it doesn't over- or under-estimate time of buffered processors.
++static constexpr const int METER_DIVIDER = 37;
++static constexpr const int METER_BUFFER_LEN = 32;
++static constexpr const float METER_TIME = 1.f;
  
  
  struct Engine::Internal {
@@ -224,7 +242,7 @@
  
  	// moduleId
  	std::map<int64_t, Module*> modulesCache;
-@@ -198,7 +79,9 @@
+@@ -206,7 +88,9 @@
  	int64_t blockFrame = 0;
  	double blockTime = 0.0;
  	int blockFrames = 0;
@@ -234,7 +252,7 @@
  	// Meter
  	int meterCount = 0;
  	double meterTotal = 0.0;
-@@ -206,6 +89,7 @@
+@@ -214,33 +98,32 @@
  	double meterLastTime = -INFINITY;
  	double meterLastAverage = 0.0;
  	double meterLastMax = 0.0;
@@ -242,14 +260,23 @@
  
  	// Parameter smoothing
  	Module* smoothModule = NULL;
-@@ -217,22 +101,6 @@
+ 	int smoothParamId = 0;
+ 	float smoothValue = 0.f;
+ 
++	// Remote control
++	remoteUtils::RemoteDetails* remoteDetails = nullptr;
++
+ 	/** Mutex that guards the Engine state, such as settings, Modules, and Cables.
+ 	Writers lock when mutating the engine's state or stepping the block.
  	Readers lock when using the engine's state.
  	*/
  	SharedMutex mutex;
 -	/** Mutex that guards stepBlock() so it's not called simultaneously.
 -	*/
 -	std::mutex blockMutex;
--
++};
++
+ 
 -	int threadCount = 0;
 -	std::vector<EngineWorker> workers;
 -	HybridBarrier engineBarrier;
@@ -262,10 +289,18 @@
 -	std::thread fallbackThread;
 -	std::mutex fallbackMutex;
 -	std::condition_variable fallbackCv;
++struct Module::Internal {
++	bool bypassed = false;
++
++	int meterSamples = 0;
++	float meterDurationTotal = 0.f;
++
++	float meterBuffer[METER_BUFFER_LEN] = {};
++	int meterIndex = 0;
  };
  
  
-@@ -260,76 +128,11 @@
+@@ -268,89 +151,134 @@
  }
  
  
@@ -273,28 +308,66 @@
 -	Engine::Internal* internal = that->internal;
 -	if (threadCount == internal->threadCount)
 -		return;
--
++static void Cable_step(Cable* that) {
++	Output* output = &that->outputModule->outputs[that->outputId];
++	Input* input = &that->inputModule->inputs[that->inputId];
++	// Match number of polyphonic channels to output port
++	const int channels = output->channels;
++	// Copy all voltages from output to input
++	for (int c = 0; c < channels; c++) {
++		if (!std::isfinite(output->voltages[c]))
++			__builtin_unreachable();
++		input->voltages[c] = output->voltages[c];
++	}
++	// Set higher channel voltages to 0
++	for (int c = channels; c < input->channels; c++) {
++		input->voltages[c] = 0.f;
++	}
++	input->channels = channels;
++}
+ 
 -	if (internal->threadCount > 0) {
 -		// Stop engine workers
 -		for (EngineWorker& worker : internal->workers) {
 -			worker.requestStop();
 -		}
 -		internal->engineBarrier.wait();
--
+ 
 -		// Join and destroy engine workers
 -		for (EngineWorker& worker : internal->workers) {
 -			worker.join();
 -		}
 -		internal->workers.resize(0);
--	}
--
++#ifndef HEADLESS
++static void Port_step(Port* that, float deltaTime) {
++	// Set plug lights
++	if (that->channels == 0) {
++		that->plugLights[0].setBrightness(0.f);
++		that->plugLights[1].setBrightness(0.f);
++		that->plugLights[2].setBrightness(0.f);
++	}
++	else if (that->channels == 1) {
++		float v = that->getVoltage() / 10.f;
++		that->plugLights[0].setSmoothBrightness(-v, deltaTime);
++		that->plugLights[1].setSmoothBrightness(v, deltaTime);
++		that->plugLights[2].setBrightness(0.f);
+ 	}
++	else {
++		float v = that->getVoltageRMS() / 10.f;
++		that->plugLights[0].setBrightness(0.f);
++		that->plugLights[1].setBrightness(0.f);
++		that->plugLights[2].setSmoothBrightness(v, deltaTime);
++	}
++}
++#endif
+ 
 -	// Configure engine
 -	internal->threadCount = threadCount;
 -
 -	// Set barrier counts
 -	internal->engineBarrier.setThreads(threadCount);
 -	internal->workerBarrier.setThreads(threadCount);
--
+ 
 -	if (threadCount > 0) {
 -		// Create and start engine workers
 -		internal->workers.resize(threadCount - 1);
@@ -303,17 +376,41 @@
 -			worker.id = id;
 -			worker.engine = that;
 -			worker.start();
--		}
--	}
--}
--
--
++static void TerminalModule__doProcess(TerminalModule* const terminalModule, const Module::ProcessArgs& args, bool input) {
++	// Step module
++	if (input) {
++		terminalModule->processTerminalInput(args);
++		for (Output& output : terminalModule->outputs) {
++			for (Cable* cable : output.cables)
++				Cable_step(cable);
++		}
++	} else {
++		terminalModule->processTerminalOutput(args);
++	}
++
++#ifndef HEADLESS
++	// Iterate ports to step plug lights
++	if (args.frame % PORT_DIVIDER == 0) {
++		float portTime = args.sampleTime * PORT_DIVIDER;
++		for (Input& input : terminalModule->inputs) {
++			Port_step(&input, portTime);
++		}
++		for (Output& output : terminalModule->outputs) {
++			Port_step(&output, portTime);
+ 		}
+ 	}
++#endif
+ }
+ 
+ 
 -static void Engine_stepWorker(Engine* that, int threadId) {
 -	Engine::Internal* internal = that->internal;
 -
 -	// int threadCount = internal->threadCount;
 -	int modulesLen = internal->modules.size();
--
++static void Module__doProcess(Module* const module, const Module::ProcessArgs& args) {
++	Module::Internal* const internal = module->internal;
+ 
 -	// Build ProcessArgs
 -	Module::ProcessArgs processArgs;
 -	processArgs.sampleRate = internal->sampleRate;
@@ -330,74 +427,104 @@
 -
 -		Module* module = internal->modules[i];
 -		module->doProcess(processArgs);
--	}
++#ifndef HEADLESS
++	// This global setting can change while the function is running, so use a local variable.
++	bool meterEnabled = settings::cpuMeter && (args.frame % METER_DIVIDER == 0);
++
++	// Start CPU timer
++	double startTime;
++	if (meterEnabled) {
++		startTime = system::getTime();
+ 	}
 -}
 -
--
- static void Cable_step(Cable* that) {
- 	Output* output = &that->outputModule->outputs[that->outputId];
- 	Input* input = &that->inputModule->inputs[that->inputId];
- 	// Match number of polyphonic channels to output port
++#endif
+ 
+-static void Cable_step(Cable* that) {
+-	Output* output = &that->outputModule->outputs[that->outputId];
+-	Input* input = &that->inputModule->inputs[that->inputId];
+-	// Match number of polyphonic channels to output port
 -	int channels = output->channels;
-+	const int channels = output->channels;
- 	// Copy all voltages from output to input
- 	for (int c = 0; c < channels; c++) {
- 		float v = output->voltages[c];
-@@ -346,6 +149,53 @@
+-	// Copy all voltages from output to input
+-	for (int c = 0; c < channels; c++) {
+-		float v = output->voltages[c];
+-		// Set 0V if infinite or NaN
+-		if (!std::isfinite(v))
+-			v = 0.f;
+-		input->voltages[c] = v;
++	// Step module
++	if (!internal->bypassed)
++		module->process(args);
++	else
++		module->processBypass(args);
++
++#ifndef HEADLESS
++	// Stop CPU timer
++	if (meterEnabled) {
++		double endTime = system::getTime();
++		// Subtract call time of getTime() itself, since we only want to measure process() time.
++		double endTime2 = system::getTime();
++		float duration = (endTime - startTime) - (endTime2 - endTime);
++
++		internal->meterSamples++;
++		internal->meterDurationTotal += duration;
++
++		// Seconds we've been measuring
++		float meterTime = internal->meterSamples * METER_DIVIDER * args.sampleTime;
++
++		if (meterTime >= METER_TIME) {
++			// Push time to buffer
++			if (internal->meterSamples > 0) {
++				internal->meterIndex++;
++				internal->meterIndex %= METER_BUFFER_LEN;
++				internal->meterBuffer[internal->meterIndex] = internal->meterDurationTotal / internal->meterSamples;
++			}
++			// Reset total
++			internal->meterSamples = 0;
++			internal->meterDurationTotal = 0.f;
++		}
+ 	}
+-	// Set higher channel voltages to 0
+-	for (int c = channels; c < input->channels; c++) {
+-		input->voltages[c] = 0.f;
++
++	// Iterate ports to step plug lights
++	if (args.frame % PORT_DIVIDER == 0) {
++		float portTime = args.sampleTime * PORT_DIVIDER;
++		for (Input& input : module->inputs) {
++			Port_step(&input, portTime);
++		}
++		for (Output& output : module->outputs) {
++			Port_step(&output, portTime);
++		}
+ 	}
+-	input->channels = channels;
++#endif
  }
  
  
-+static void Port_step(Port* that, float deltaTime) {
-+	// Set plug lights
-+	if (that->channels == 0) {
-+		that->plugLights[0].setBrightness(0.f);
-+		that->plugLights[1].setBrightness(0.f);
-+		that->plugLights[2].setBrightness(0.f);
-+	}
-+	else if (that->channels == 1) {
-+		float v = that->getVoltage() / 10.f;
-+		that->plugLights[0].setSmoothBrightness(-v, deltaTime);
-+		that->plugLights[1].setSmoothBrightness(v, deltaTime);
-+		that->plugLights[2].setBrightness(0.f);
-+	}
-+	else {
-+		float v = that->getVoltageRMS() / 10.f;
-+		that->plugLights[0].setBrightness(0.f);
-+		that->plugLights[1].setBrightness(0.f);
-+		that->plugLights[2].setSmoothBrightness(v, deltaTime);
-+	}
-+}
-+
-+
-+static void TerminalModule__doProcess(TerminalModule* terminalModule, const Module::ProcessArgs& args, bool input) {
-+	// Step module
-+	if (input) {
-+		terminalModule->processTerminalInput(args);
-+		for (Output& output : terminalModule->outputs) {
-+			for (Cable* cable : output.cables)
-+				Cable_step(cable);
+@@ -366,10 +294,16 @@
+ 		float smoothValue = internal->smoothValue;
+ 		Param* smoothParam = &smoothModule->params[smoothParamId];
+ 		float value = smoothParam->value;
+-		// Use decay rate of roughly 1 graphics frame
+-		const float smoothLambda = 60.f;
+-		float newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
+-		if (value == newValue) {
++		float newValue;
++		if (internal->remoteDetails != nullptr) {
++			newValue = value;
++			sendParamChangeToRemote(internal->remoteDetails, smoothModule->id, smoothParamId, value);
++		} else {
++			// Use decay rate of roughly 1 graphics frame
++			const float smoothLambda = 60.f;
++			newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
 +		}
-+	} else {
-+		terminalModule->processTerminalOutput(args);
-+	}
-+
-+	// Iterate ports to step plug lights
-+	if (args.frame % 7 /* PORT_DIVIDER */ == 0) {
-+		float portTime = args.sampleTime * 7 /* PORT_DIVIDER */;
-+		for (Input& input : terminalModule->inputs) {
-+			Port_step(&input, portTime);
-+		}
-+		for (Output& output : terminalModule->outputs) {
-+			Port_step(&output, portTime);
-+		}
-+	}
-+}
-+
-+
- /** Steps a single frame
- */
- static void Engine_stepFrame(Engine* that) {
-@@ -372,13 +222,8 @@
++		if (d_isEqual(value, newValue)) {
+ 			// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats)
+ 			smoothParam->setValue(smoothValue);
+ 			internal->smoothModule = NULL;
+@@ -380,13 +314,8 @@
  		}
  	}
  
@@ -412,7 +539,7 @@
  		if (module->leftExpander.messageFlipRequested) {
  			std::swap(module->leftExpander.producerMessage, module->leftExpander.consumerMessage);
  			module->leftExpander.messageFlipRequested = false;
-@@ -389,13 +234,32 @@
+@@ -397,13 +326,32 @@
  		}
  	}
  
@@ -431,17 +558,17 @@
 +	for (TerminalModule* terminalModule : internal->terminalModules) {
 +		TerminalModule__doProcess(terminalModule, processArgs, true);
 +	}
-+
+ 
+-	internal->frame++;
 +	// Step each module and cables
 +	for (Module* module : internal->modules) {
-+		module->doProcess(processArgs);
++		Module__doProcess(module, processArgs);
 +		for (Output& output : module->outputs) {
 +			for (Cable* cable : output.cables)
 +				Cable_step(cable);
 +		}
 +	}
- 
--	internal->frame++;
++
 +	// Process terminal outputs last
 +	for (TerminalModule* terminalModule : internal->terminalModules) {
 +		TerminalModule__doProcess(terminalModule, processArgs, false);
@@ -451,8 +578,79 @@
  }
  
  
-@@ -416,32 +280,45 @@
+@@ -422,35 +370,119 @@
+ }
  
+ 
++template<typename T>
++using IdentityDictionary = std::unordered_map<T, T>;
++
++template<typename T>
++inline bool dictContains(IdentityDictionary<T>& dict, T key) {
++	return dict.find(key) != dict.end();
++}
++
++template<typename T>
++inline void dictAdd(IdentityDictionary<T>& dict, T key) {
++	dict[key] = key;
++}
++
++static void Engine_storeTerminalModulesIDs(std::vector<TerminalModule*> terminalModules, IdentityDictionary<int64_t>& terminalModulesIDs) {
++	for (TerminalModule* terminalModule : terminalModules)
++		dictAdd(terminalModulesIDs, terminalModule->id);
++}
++
++static void Engine_orderModule(Module* module, IdentityDictionary<Module*>& touchedModules, std::vector<Module*>& orderedModules, IdentityDictionary<int64_t>& terminalModulesIDs) {
++	if (!dictContains(touchedModules, module) && !dictContains(terminalModulesIDs, module->id)) { // Ignore feedback loops and terminal modules
++		dictAdd(touchedModules, module);
++		for (Output& output : module->outputs) {
++			for (Cable* cable : output.cables) {
++				Module* receiver = cable->inputModule; // The input to the cable is the receiving module
++				Engine_orderModule(receiver, touchedModules, orderedModules, terminalModulesIDs);
++			}
++		}
++		orderedModules.push_back(module);
++	}
++}
++
++static void Engine_assignOrderedModules(std::vector<Module*>& modules, std::vector<Module*>& orderedModules) {
++	std::reverse(orderedModules.begin(), orderedModules.end()); // These are stored bottom up
++	if (orderedModules.size() == modules.size()) {
++		for (unsigned int i = 0; i < orderedModules.size(); i++)
++			modules[i] = orderedModules[i];
++	}
++}
++
++#if DEBUG_ORDERED_MODULES
++static void Engine_debugOrderedModules(std::vector<Module*>& modules) {
++	printf("\n--- Ordered modules ---\n");
++	for (unsigned int i = 0; i < modules.size(); i++)
++		printf("%d) %s - %ld\n", i, modules[i]->model->getFullName().c_str(), modules[i]->id);
++}
++#endif
++
++/** Order the modules so that they always read the most recent sample from their inputs
++*/
++static void Engine_orderModules(Engine* that) {
++	Engine::Internal* internal = that->internal;
++
++	IdentityDictionary<int64_t> terminalModulesIDs;
++	Engine_storeTerminalModulesIDs(internal->terminalModules, terminalModulesIDs);
++
++	IdentityDictionary<Module*> touchedModules;
++	std::vector<Module*> orderedModules; 
++	orderedModules.reserve(internal->modules.size());
++	for (Module* module : internal->modules)
++		Engine_orderModule(module, touchedModules, orderedModules, terminalModulesIDs);
++
++	Engine_assignOrderedModules(internal->modules, orderedModules);
++
++#if DEBUG_ORDERED_MODULES
++	Engine_debugOrderedModules(internal->modules);
++#endif
++}
++
++
  static void Engine_updateConnected(Engine* that) {
  	// Find disconnected ports
 -	std::set<Port*> disconnectedPorts;
@@ -501,14 +699,17 @@
 -		Port_setDisconnected(port);
 +	for (Input* input : disconnectedInputs) {
 +		Port_setDisconnected(input);
-+	}
+ 	}
 +	for (Output* output : disconnectedOutputs) {
 +		Port_setDisconnected(output);
 +		DISTRHO_SAFE_ASSERT(output->cables.empty());
- 	}
++	}
++	// Order the modules according to their connections
++	Engine_orderModules(that);
  }
  
-@@ -460,37 +337,23 @@
+ 
+@@ -468,37 +500,23 @@
  
  Engine::Engine() {
  	internal = new Internal;
@@ -554,7 +755,7 @@
  
  	delete internal;
  }
-@@ -519,18 +382,22 @@
+@@ -527,20 +545,22 @@
  		removeModule_NoLock(module);
  		delete module;
  	}
@@ -575,12 +776,14 @@
 -	std::lock_guard<std::mutex> stepLock(internal->blockMutex);
  	SharedLock<SharedMutex> lock(internal->mutex);
  	// Configure thread
+-#if defined ARCH_X64
 -	uint32_t csr = _mm_getcsr();
 -	initMXCSR();
+-#endif
  	random::init();
  
  	internal->blockFrame = internal->frame;
-@@ -543,18 +410,14 @@
+@@ -553,18 +573,14 @@
  		Engine_updateExpander_NoLock(this, module, true);
  	}
  
@@ -600,14 +803,15 @@
  	// Stop timer
  	double endTime = system::getTime();
  	double meter = (endTime - startTime) / (frames * internal->sampleTime);
-@@ -572,47 +435,20 @@
+@@ -582,49 +598,20 @@
  		internal->meterTotal = 0.0;
  		internal->meterMax = 0.0;
  	}
 -
+-#if defined ARCH_X64
 -	// Reset MXCSR back to original value
 -	_mm_setcsr(csr);
-+#endif
+ #endif
  }
  
  
@@ -650,7 +854,7 @@
  }
  
  
-@@ -635,20 +471,13 @@
+@@ -647,20 +634,13 @@
  	for (Module* module : internal->modules) {
  		module->onSampleRateChange(e);
  	}
@@ -674,7 +878,7 @@
  }
  
  
-@@ -658,7 +487,6 @@
+@@ -670,7 +650,6 @@
  
  
  void Engine::yieldWorkers() {
@@ -682,7 +886,7 @@
  }
  
  
-@@ -698,17 +526,25 @@
+@@ -705,17 +684,25 @@
  
  
  double Engine::getMeterAverage() {
@@ -709,7 +913,7 @@
  }
  
  
-@@ -718,8 +554,12 @@
+@@ -725,8 +712,12 @@
  	for (Module* m : internal->modules) {
  		if (i >= len)
  			break;
@@ -724,7 +928,7 @@
  	}
  	return i;
  }
-@@ -728,27 +568,43 @@
+@@ -735,27 +726,43 @@
  std::vector<int64_t> Engine::getModuleIds() {
  	SharedLock<SharedMutex> lock(internal->mutex);
  	std::vector<int64_t> moduleIds;
@@ -772,7 +976,17 @@
  	internal->modulesCache[module->id] = module;
  	// Dispatch AddEvent
  	Module::AddEvent eAdd;
-@@ -772,11 +628,11 @@
+@@ -770,6 +777,9 @@
+ 		if (paramHandle->moduleId == module->id)
+ 			paramHandle->module = module;
+ 	}
++#if DEBUG_ORDERED_MODULES
++	printf("New module: %s - %ld\n", module->model->getFullName().c_str(), module->id);
++#endif
+ }
+ 
+ 
+@@ -779,11 +789,11 @@
  }
  
  
@@ -789,7 +1003,7 @@
  	// Dispatch RemoveEvent
  	Module::RemoveEvent eRemove;
  	module->onRemove(eRemove);
-@@ -785,18 +641,14 @@
+@@ -792,18 +802,14 @@
  		if (paramHandle->moduleId == module->id)
  			paramHandle->module = NULL;
  	}
@@ -810,7 +1024,7 @@
  	}
  	// Update expanders of other modules
  	for (Module* m : internal->modules) {
-@@ -809,14 +661,31 @@
+@@ -816,14 +822,31 @@
  			m->rightExpander.module = NULL;
  		}
  	}
@@ -845,7 +1059,7 @@
  }
  
  
-@@ -824,7 +693,8 @@
+@@ -831,7 +854,8 @@
  	SharedLock<SharedMutex> lock(internal->mutex);
  	// TODO Performance could be improved by searching modulesCache, but more testing would be needed to make sure it's always valid.
  	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
@@ -855,7 +1069,7 @@
  }
  
  
-@@ -844,7 +714,7 @@
+@@ -851,7 +875,7 @@
  
  void Engine::resetModule(Module* module) {
  	std::lock_guard<SharedMutex> lock(internal->mutex);
@@ -864,7 +1078,7 @@
  
  	Module::ResetEvent eReset;
  	module->onReset(eReset);
-@@ -853,7 +723,7 @@
+@@ -860,7 +884,7 @@
  
  void Engine::randomizeModule(Module* module) {
  	std::lock_guard<SharedMutex> lock(internal->mutex);
@@ -873,7 +1087,7 @@
  
  	Module::RandomizeEvent eRandomize;
  	module->onRandomize(eRandomize);
-@@ -861,7 +731,7 @@
+@@ -868,7 +892,7 @@
  
  
  void Engine::bypassModule(Module* module, bool bypassed) {
@@ -882,7 +1096,7 @@
  	if (module->isBypassed() == bypassed)
  		return;
  
-@@ -907,11 +777,17 @@
+@@ -914,11 +938,17 @@
  
  
  void Engine::prepareSave() {
@@ -900,7 +1114,7 @@
  }
  
  
-@@ -946,16 +822,16 @@
+@@ -953,16 +983,16 @@
  
  void Engine::addCable(Cable* cable) {
  	std::lock_guard<SharedMutex> lock(internal->mutex);
@@ -922,7 +1136,7 @@
  		// Get connected status of output, to decide whether we need to call a PortChangeEvent.
  		// It's best to not trust `cable->outputModule->outputs[cable->outputId]->isConnected()`
  		if (cable2->outputModule == cable->outputModule && cable2->outputId == cable->outputId)
-@@ -969,6 +845,8 @@
+@@ -976,6 +1006,8 @@
  	// Add the cable
  	internal->cables.push_back(cable);
  	internal->cablesCache[cable->id] = cable;
@@ -931,7 +1145,7 @@
  	Engine_updateConnected(this);
  	// Dispatch input port event
  	{
-@@ -996,10 +874,12 @@
+@@ -1003,10 +1035,12 @@
  
  
  void Engine::removeCable_NoLock(Cable* cable) {
@@ -946,7 +1160,17 @@
  	// Remove the cable
  	internal->cablesCache.erase(cable->id);
  	internal->cables.erase(it);
-@@ -1085,11 +965,11 @@
+@@ -1060,6 +1094,9 @@
+ 		internal->smoothModule = NULL;
+ 		internal->smoothParamId = 0;
+ 	}
++	if (internal->remoteDetails != nullptr) {
++		sendParamChangeToRemote(internal->remoteDetails, module->id, paramId, value);
++	}
+ 	module->params[paramId].setValue(value);
+ }
+ 
+@@ -1092,11 +1129,11 @@
  	std::lock_guard<SharedMutex> lock(internal->mutex);
  	// New ParamHandles must be blank.
  	// This means we don't have to refresh the cache.
@@ -960,7 +1184,7 @@
  
  	// Add it
  	internal->paramHandles.insert(paramHandle);
-@@ -1106,7 +986,7 @@
+@@ -1113,7 +1150,7 @@
  void Engine::removeParamHandle_NoLock(ParamHandle* paramHandle) {
  	// Check that the ParamHandle is already added
  	auto it = internal->paramHandles.find(paramHandle);
@@ -969,7 +1193,7 @@
  
  	// Remove it
  	paramHandle->module = NULL;
-@@ -1143,7 +1023,7 @@
+@@ -1150,7 +1187,7 @@
  void Engine::updateParamHandle_NoLock(ParamHandle* paramHandle, int64_t moduleId, int paramId, bool overwrite) {
  	// Check that it exists
  	auto it = internal->paramHandles.find(paramHandle);
@@ -978,7 +1202,7 @@
  
  	// Set IDs
  	paramHandle->moduleId = moduleId;
-@@ -1187,6 +1067,10 @@
+@@ -1194,6 +1231,10 @@
  		json_t* moduleJ = module->toJson();
  		json_array_append_new(modulesJ, moduleJ);
  	}
@@ -989,7 +1213,7 @@
  	json_object_set_new(rootJ, "modules", modulesJ);
  
  	// cables
-@@ -1197,11 +1081,6 @@
+@@ -1204,11 +1245,6 @@
  	}
  	json_object_set_new(rootJ, "cables", cablesJ);
  
@@ -1001,7 +1225,7 @@
  	return rootJ;
  }
  
-@@ -1225,14 +1104,20 @@
+@@ -1232,14 +1268,20 @@
  		}
  		catch (Exception& e) {
  			WARN("Cannot load model: %s", e.what());
@@ -1026,7 +1250,7 @@
  
  		try {
  			// This doesn't need a lock because the Module is not added to the Engine yet.
-@@ -1248,7 +1133,8 @@
+@@ -1255,7 +1297,8 @@
  		}
  		catch (Exception& e) {
  			WARN("Cannot load module: %s", e.what());
@@ -1036,7 +1260,7 @@
  			delete module;
  			continue;
  		}
-@@ -1285,67 +1171,15 @@
+@@ -1292,69 +1335,20 @@
  			continue;
  		}
  	}
@@ -1054,7 +1278,9 @@
 -	// Configure thread
 -	contextSet(engine->internal->context);
 -	system::setThreadName(string::f("Worker %d", id));
+-#if defined ARCH_X64
 -	initMXCSR();
+-#endif
 -	random::init();
 -
 -	while (true) {
@@ -1064,9 +1290,10 @@
 -		Engine_stepWorker(engine, id);
 -		engine->internal->workerBarrier.wait();
 -	}
--}
--
--
++void Engine::startFallbackThread() {
+ }
+ 
+ 
 -static void Engine_fallbackRun(Engine* that) {
 -	system::setThreadName("Engine fallback");
 -	contextSet(that->internal->context);
@@ -1092,7 +1319,8 @@
 -			});
 -		}
 -	}
-+void Engine::startFallbackThread() {
++void Engine_setAboutToClose(Engine* const engine) {
++	engine->internal->aboutToClose = true;
  }
  
  
@@ -1102,8 +1330,8 @@
 -
 -	internal->fallbackRunning = true;
 -	internal->fallbackThread = std::thread(Engine_fallbackRun, this);
-+void Engine_setAboutToClose(Engine* const engine) {
-+	engine->internal->aboutToClose = true;
++void Engine_setRemoteDetails(Engine* const engine, remoteUtils::RemoteDetails* const remoteDetails) {
++	engine->internal->remoteDetails = remoteDetails;
  }
  
  

@@ -118,6 +118,16 @@
       ]
     },
     {
+      "slug": "AIDA-X",
+      "name": "AIDA-X",
+      "description": "Amp Model Player leveraging AI",
+      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#aidax",
+      "tags": [
+        "Distortion",
+        "Effect"
+      ]
+    },
+    {
       "slug": "Blank",
       "name": "Blank",
       "description": "Cardinal's own blank panel, featuring Hatsune Miku",

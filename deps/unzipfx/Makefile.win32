@@ -21,7 +21,7 @@ all: unzipfx2cat.exe
 unzipfx2cat.exe: $(OBJ)
 	$(CC) $^ $(LINK_FLAGS) -o $@
 
-icon.o: ../../../resources/ico/carla.rc
+icon.o: ../../utils/distrho.rc
 	$(WINDRES) -i $< -o $@ -O coff
 
 clean:

@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,10 +17,12 @@
 
 #pragma once
 
-#if defined(__i386__) || defined(__x86_64__)
+#if (defined(__i386__) || defined(__x86_64__)) && !defined(CARDINAL_NOSIMD)
 # include_next <mmintrin.h>
-#elif defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__) && !defined(CARDINAL_NOSIMD)
 # include <wasm_simd128.h>
 #else
-# include "../sse2neon/sse2neon.h"
+# define SIMDE_ENABLE_NATIVE_ALIASES
+# include "../simde/simde/x86/mmx.h"
+# undef SIMDE_ENABLE_NATIVE_ALIASES
 #endif

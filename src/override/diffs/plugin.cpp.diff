@@ -1,6 +1,6 @@
---- ../Rack/src/plugin.cpp	2022-07-12 09:46:20.716165650 +0100
-+++ plugin.cpp	2022-05-27 23:15:35.681273727 +0100
-@@ -1,342 +1,41 @@
+--- ../Rack/src/plugin.cpp	2023-09-10 12:59:02.631898592 +0200
++++ plugin.cpp	2023-05-20 18:43:27.496323540 +0200
+@@ -1,356 +1,46 @@
 -#include <thread>
 -#include <map>
 -#include <stdexcept>
@@ -20,7 +20,7 @@
 -#include <dirent.h>
 +/*
 + * DISTRHO Cardinal Plugin
-+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
 + *
 + * This program is free software; you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -37,7 +37,7 @@
 +
 +/**
 + * This file is an edited version of VCVRack's plugin.cpp
-+ * Copyright (C) 2016-2021 VCV.
++ * Copyright (C) 2016-2023 VCV.
 + *
 + * This program is free software: you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -133,7 +133,16 @@
 -#elif ARCH_MAC
 -	libraryExt = "dylib";
 -#endif
--	std::string libraryPath = system::join(plugin->path, "plugin." + libraryExt);
+-
+-#if defined ARCH_X64
+-	// Use `plugin.EXT` on x64 for backward compatibility.
+-	// Change to `plugin-OS-CPU.EXT` in Rack 3.
+-	std::string libraryFilename = "plugin." + libraryExt;
+-#else
+-	// Use `plugin-CPU.EXT` on other CPUs like ARM64
+-	std::string libraryFilename = "plugin-" + APP_CPU + "." + libraryExt;
+-#endif
+-	std::string libraryPath = system::join(plugin->path, libraryFilename);
 -
 -	// Check file existence
 -	if (!system::isFile(libraryPath))
@@ -227,7 +236,7 @@
 -		return NULL;
 -	}
 -
--	INFO("Loaded %s v%s", plugin->slug.c_str(), plugin->version.c_str());
+-	INFO("Loaded %s %s", plugin->slug.c_str(), plugin->version.c_str());
 -	plugins.push_back(plugin);
 -	return plugin;
 -}
@@ -372,7 +381,13 @@
  
  
  /** Given slug => fallback slug.
-@@ -389,8 +88,19 @@
+ Supports bidirectional fallbacks.
+-To request fallback slugs to be added to this list, contact VCV support.
++To request fallback slugs to be added to this list, open a GitHub issue.
+ */
+ static const std::map<std::string, std::string> pluginSlugFallbacks = {
+ 	{"VultModulesFree", "VultModules"},
+@@ -399,8 +89,19 @@
  */
  using PluginModuleSlug = std::tuple<std::string, std::string>;
  static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = {
@@ -393,7 +408,7 @@
  	// {{"", ""}, {"", ""}},
  };
  
-@@ -478,7 +188,6 @@
+@@ -488,7 +189,6 @@
  }
  
  

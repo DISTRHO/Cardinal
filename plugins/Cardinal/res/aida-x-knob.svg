@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="36"
+   height="36"
+   version="1.1"
+   xml:space="preserve"
+   style="clip-rule:evenodd;fill-rule:evenodd"
+   id="svg6"
+   sodipodi:docname="aida-x-knob.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs10" /><sodipodi:namedview
+   id="namedview8"
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1.0"
+   inkscape:pageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   showgrid="false"
+   width="36px"
+   inkscape:zoom="13.702128"
+   inkscape:cx="19.267081"
+   inkscape:cy="23.463509"
+   inkscape:window-width="2560"
+   inkscape:window-height="1367"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="svg6" />
+    <g
+   id="knobLDark"
+   transform="matrix(0.7652677,0,0,0.76595949,6.0168332e-5,0)">
+        <path
+   id="path3832"
+   d="m 23.521,45.109 c -7.674,0 -3.302,3.9 -10.224,0.498 C 6.375,42.204 12.095,43.266 7.3,37.106 2.505,30.947 2.241,36.905 0.537,29.279 -1.167,21.654 1.58,26.859 3.297,19.233 5.015,11.607 0.299,15.131 5.094,9.012 9.889,2.892 7.604,8.339 14.526,4.977 21.447,1.614 15.847,0 23.521,0 c 7.675,0 2.087,1.574 8.996,4.977 6.909,3.402 4.636,-2.045 9.432,4.035 4.795,6.078 0.079,2.689 1.796,10.26 1.717,7.572 4.465,2.422 2.761,10.048 -1.704,7.625 -1.982,1.708 -6.763,7.827 -4.782,6.119 0.924,5.057 -5.998,8.46 -6.921,3.402 -2.549,-0.498 -10.224,-0.498 z"
+   style="fill:#e6e5e5;fill-rule:nonzero" />
+        <path
+   d="M 23.521,23.5 V 0"
+   style="fill:none;fill-rule:nonzero;stroke:#333333;stroke-width:2.29px"
+   id="path3" />
+    </g>
+</svg>

@@ -73,6 +73,7 @@
     align-items: center;
     justify-content: space-evenly;
     justify-content: space-between;
+    white-space: nowrap;
 }
 
 .cardinal-main.mod-pedal .visibility-buttons span {

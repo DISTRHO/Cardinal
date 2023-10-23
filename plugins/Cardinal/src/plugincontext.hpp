@@ -20,21 +20,24 @@
 #include "plugin.hpp"
 #include "DistrhoUtils.hpp"
 
-#ifndef HEADLESS
-# include "../dgl/Base.hpp"
-#else
-# include "extra/LeakDetector.hpp"
-#endif
+#include "../dgl/Base.hpp"
 
 // -----------------------------------------------------------------------------------------------------------
 // from PluginContext.hpp
 
+START_NAMESPACE_DGL
+class TopLevelWidget;
+template <class BaseWidget> class NanoBaseWidget;
+typedef NanoBaseWidget<TopLevelWidget> NanoTopLevelWidget;
+END_NAMESPACE_DGL
+
 START_NAMESPACE_DISTRHO
 
-static constexpr const uint32_t kModuleParameters = 24;
+static constexpr const uint32_t kModuleParameterCount = 24;
 
 enum CardinalVariant {
     kCardinalVariantMain,
+    kCardinalVariantMini,
     kCardinalVariantFX,
     kCardinalVariantNative,
     kCardinalVariantSynth,
@@ -54,7 +57,7 @@ struct MidiEvent {
 struct CardinalPluginContext : rack::Context {
     uint32_t bufferSize, processCounter;
     double sampleRate;
-    float parameters[kModuleParameters];
+    float parameters[kModuleParameterCount];
     CardinalVariant variant;
     bool bypassed, playing, reset, bbtValid;
     int32_t bar, beat, beatsPerBar, beatType;
@@ -67,9 +70,8 @@ struct CardinalPluginContext : rack::Context {
     const MidiEvent* midiEvents;
     uint32_t midiEventCount;
     Plugin* const plugin;
-#ifndef HEADLESS
+    DGL_NAMESPACE::NanoTopLevelWidget* tlw;
     UI* ui;
-#endif
     CardinalPluginContext(Plugin* const p);
     void writeMidiMessage(const rack::midi::Message& message, uint8_t channel);
 #ifndef HEADLESS

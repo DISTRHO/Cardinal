@@ -79,6 +79,7 @@ struct CarlaInternalPluginModule : Module, Runner {
         kParameterHostSync,
         kParameterVolume,
         kParameterEnabled,
+        kParameterQuadChannels,
         kParameterInfoChannels,
         kParameterInfoBitRate,
         kParameterInfoBitDepth,
@@ -96,8 +97,8 @@ struct CarlaInternalPluginModule : Module, Runner {
     NativeHostDescriptor fCarlaHostDescriptor = {};
     NativeTimeInfo fCarlaTimeInfo;
 
-    float dataOut[NUM_OUTPUTS][BUFFER_SIZE];
-    float* dataOutPtr[NUM_OUTPUTS];
+    float dataOut[NUM_OUTPUTS+1][BUFFER_SIZE];
+    float* dataOutPtr[NUM_OUTPUTS+1];
     unsigned audioDataFill = 0;
     uint32_t lastProcessCounter = 0;
     bool fileChanged = false;
@@ -105,11 +106,11 @@ struct CarlaInternalPluginModule : Module, Runner {
 
     struct {
         float preview[108];
-        uint channels; // 4
-        uint bitDepth; // 6
-        uint sampleRate; // 7
-        uint length; // 8
-        float position; // 9
+        uint channels;
+        uint bitDepth;
+        uint sampleRate;
+        uint length;
+        float position;
     } audioInfo;
 
     CarlaInternalPluginModule()
@@ -122,6 +123,7 @@ struct CarlaInternalPluginModule : Module, Runner {
 
         dataOutPtr[0] = dataOut[0];
         dataOutPtr[1] = dataOut[1];
+        dataOutPtr[2] = dataOut[2];
 
         std::memset(dataOut, 0, sizeof(dataOut));
         std::memset(&audioInfo, 0, sizeof(audioInfo));
@@ -315,11 +317,11 @@ struct CarlaInternalPluginModule : Module, Runner {
             audioDataFill = 0;
             fCarlaPluginDescriptor->process(fCarlaPluginHandle, nullptr, dataOutPtr, BUFFER_SIZE, nullptr, 0);
 
-            audioInfo.channels = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, 4);
-            audioInfo.bitDepth = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, 6);
-            audioInfo.sampleRate = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, 7);
-            audioInfo.length = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle,  8);
-            audioInfo.position = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, 9);
+            audioInfo.channels = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, kParameterInfoChannels);
+            audioInfo.bitDepth = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, kParameterInfoBitDepth);
+            audioInfo.sampleRate = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, kParameterInfoSampleRate);
+            audioInfo.length = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle,  kParameterInfoLength);
+            audioInfo.position = fCarlaPluginDescriptor->get_parameter_value(fCarlaPluginHandle, kParameterInfoPosition);
         }
     }
 
@@ -471,10 +473,10 @@ struct AudioFileListWidget : ImGuiWidget {
         selectedFile = (size_t)-1;
 
         static constexpr const char* const supportedExtensions[] = {
-       #ifdef HAVE_SNDFILE
+           #ifdef HAVE_SNDFILE
             ".aif",".aifc",".aiff",".au",".bwf",".flac",".htk",".iff",".mat4",".mat5",".oga",".ogg",".opus",
             ".paf",".pvf",".pvf5",".sd2",".sf",".snd",".svx",".vcc",".w64",".wav",".xi",
-       #endif
+           #endif
             ".mp3"
         };
 

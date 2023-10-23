@@ -1,5 +1,4 @@
 #include "../Bidoo/src/plugin.hpp"
-#undef ModuleWidget
 
 void InstantiateExpanderItem::onAction(const event::Action &e) {
 	engine::Module* module = model->createModule();
@@ -16,7 +15,7 @@ void InstantiateExpanderItem::onAction(const event::Action &e) {
 }
 
 json_t* BidooModule::dataToJson() {
-	return nullptr;
+	return json_object();
 }
 
 void BidooModule::dataFromJson(json_t*) {
@@ -36,5 +35,5 @@ void BidooWidget::prepareThemes(const std::string& filename) {
 }
 
 void BidooWidget::step() {
-	CardinalModuleWidget::step();
+	ModuleWidget::step();
 }

@@ -23,9 +23,54 @@
 #include <string>
 
 namespace rack {
+#ifndef HEADLESS
+namespace asset {
+bool forceBlackScrew = false;
+bool forceSilverScrew = false;
+void updateForcingBlackSilverScrewMode(std::string slug) {
+    forceBlackScrew = (
+        // arable instruments
+        slug == "Joni"
+        // axioma
+        || slug == "TheBifurcator"
+        || slug == "Tesseract"
+        || slug == "Ikeda"
+        || slug == "Rhodonea"
+        // parable instruments
+        || slug == "Neil"
+        // rackwindows
+        || slug == "bitshiftgain"
+        || slug == "capacitor"
+        || slug == "capacitor_stereo"
+        || slug == "chorus"
+        || slug == "console"
+        || slug == "console_mm"
+        || slug == "distance"
+        || slug == "golem"
+        || slug == "holt"
+        || slug == "hombre"
+        || slug == "interstage"
+        || slug == "monitoring"
+        || slug == "mv"
+        || slug == "rasp"
+        || slug == "reseq"
+        || slug == "tape"
+        || slug == "tremolo"
+        || slug == "vibrato"
+    );
+}
+}
+#endif
+namespace plugin {
+void updateStaticPluginsDarkMode();
+}
 namespace settings {
 bool darkMode = true;
 int rateLimit = 0;
+extern std::string uiTheme;
+}
+namespace ui {
+void refreshTheme();
 }
 }
 
@@ -56,419 +101,551 @@ NVGcolor nvgRGBblank(const unsigned char r, const unsigned char g, const unsigne
 #undef nsvgParseFromFile
 #include <nanosvg.h>
 
+#ifndef HEADLESS
+enum DarkMode {
+    kMode21kHz,
+    kModeAaronStatic,
+    kModeAlefsbits,
+    kModeAlgoritmarte,
+    kModeArableInstruments,
+    kModeAudibleInstruments,
+    kModeBidoo,
+    kModeCf,
+    kModeDrumKit,
+    kModeESeries,
+    kModeHetrickCV,
+    kModeJW,
+    kModeLilacLoop,
+    kModeLittleUtils,
+    kModeKocmoc,
+    kModeMyth,
+    kModeNonlinearcircuits,
+    kModeParableInstruments,
+    kModePathSet,
+    kModeVoxglitch,
+    kModeWhatTheRack,
+};
+
 // Custom Cardinal filtering
 static const struct {
+    const DarkMode mode;
     const char* const filename;
     const char* shapeIdsToIgnore[5];
     const int shapeNumberToIgnore;
 } svgFilesToInvertForDarkMode[] = {
     // MIT
-    { "/21kHz/res/Panels/D_Inf.svg", {}, -1 },
-    { "/21kHz/res/Panels/PalmLoop.svg", {}, -1 },
-    { "/21kHz/res/Panels/TachyonEntangler.svg", {}, -1 },
+    { kMode21kHz, "/21kHz/res/Panels/D_Inf.svg", {}, -1 },
+    { kMode21kHz, "/21kHz/res/Panels/PalmLoop.svg", {}, -1 },
+    { kMode21kHz, "/21kHz/res/Panels/TachyonEntangler.svg", {}, -1 },
     // MIT
-    {"/AaronStatic/res/ChordCV.svg", {}, -1 },
-    {"/AaronStatic/res/DiatonicCV.svg", {}, -1 },
-    {"/AaronStatic/res/RandomNoteCV.svg", {}, -1 },
-    {"/AaronStatic/res/ScaleCV.svg", {}, -1 },
+    { kModeAaronStatic, "/AaronStatic/res/ChordCV.svg", {}, -1 },
+    { kModeAaronStatic, "/AaronStatic/res/DiatonicCV.svg", {}, -1 },
+    { kModeAaronStatic, "/AaronStatic/res/RandomNoteCV.svg", {}, -1 },
+    { kModeAaronStatic, "/AaronStatic/res/ScaleCV.svg", {}, -1 },
     // GPL3.0-or-later
-    { "/Algoritmarte/res/Clockkky.svg", {}, -1 },
-    { "/Algoritmarte/res/CyclicCA.svg", {}, -1 },
-    { "/Algoritmarte/res/HoldMeTight.svg", {}, -1 },
-    { "/Algoritmarte/res/MusiFrog.svg", {}, -1 },
-    { "/Algoritmarte/res/MusiMath.svg", {}, -1 },
-    { "/Algoritmarte/res/Planetz.svg", {}, -1 },
-    { "/Algoritmarte/res/Zefiro.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/blank6hp.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/fibb.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/logic.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/math.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/mlt.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/noize.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/octsclr.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/polyrand.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/shift.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/simplexandhold.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/simplexvco.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/steps.svg", {}, -1 },
+    { kModeAlefsbits, "/alefsbits/res/switch.svg", {}, -1 },
+    // GPL3.0-or-later
+    { kModeAlgoritmarte, "/Algoritmarte/res/Clockkky.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/CyclicCA.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/HoldMeTight.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/MusiFrog.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/MusiMath.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/Planetz.svg", {}, -1 },
+    { kModeAlgoritmarte, "/Algoritmarte/res/Zefiro.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
-    { "/ArableInstruments/res/Joni.svg", {}, -1 },
-    // Custom, runtime dark mode used with permission
-    { "/AudibleInstruments/res/Blinds.svg", {}, -1 },
-    { "/AudibleInstruments/res/Braids.svg", {}, -1 },
-    { "/AudibleInstruments/res/Branches.svg", {}, -1 },
-    { "/AudibleInstruments/res/Clouds.svg", {}, -1 },
-    { "/AudibleInstruments/res/Elements.svg", {}, -1 },
-    { "/AudibleInstruments/res/Frames.svg", {}, -1 },
-    { "/AudibleInstruments/res/Kinks.svg", {}, -1 },
-    { "/AudibleInstruments/res/Links.svg", {}, -1 },
-    { "/AudibleInstruments/res/Marbles.svg", {}, -1 },
-    { "/AudibleInstruments/res/Peaks.svg", {}, -1 },
-    { "/AudibleInstruments/res/Plaits.svg", {}, -1 },
-    { "/AudibleInstruments/res/Rings.svg", {}, -1 },
-    { "/AudibleInstruments/res/Ripples.svg", {}, -1 },
-    { "/AudibleInstruments/res/Shades.svg", {}, -1 },
-    { "/AudibleInstruments/res/Sheep.svg", {}, -1 },
-    { "/AudibleInstruments/res/Shelves.svg", {}, -1 },
-    { "/AudibleInstruments/res/Stages.svg", {}, -1 },
-    { "/AudibleInstruments/res/Streams.svg", {}, -1 },
-    { "/AudibleInstruments/res/Tides.svg", {}, -1 },
-    { "/AudibleInstruments/res/Tides2.svg", {}, -1 },
-    { "/AudibleInstruments/res/Veils.svg", {}, -1 },
-    { "/AudibleInstruments/res/Warps.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Blinds.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Braids.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Branches.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Clouds.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Elements.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Frames.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Kinks.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Links.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Marbles.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Peaks.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Plaits.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Rings.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Ripples.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Shades.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Sheep.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Shelves.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Stages.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Streams.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Tides.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Tides2.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Veils.svg", {}, -1 },
+    { kModeAudibleInstruments, "/AudibleInstruments/res/Warps.svg", {}, -1 },
     // CC-BY-NC-ND-4.0, runtime dark mode used with permission
-    { "/Bidoo/res/ACNE.svg", {}, -1 },
-    { "/Bidoo/res/ANTN.svg", {}, -1 },
-    { "/Bidoo/res/BAFIS.svg", {}, -1 },
-    { "/Bidoo/res/BANCAU.svg", {}, -1 },
-    { "/Bidoo/res/BAR.svg", {"rect833"}, -1 },
-    { "/Bidoo/res/BISTROT.svg", {}, -1 },
-    { "/Bidoo/res/BORDL.svg", {"rect959-3-0-7-5","rect959-3-0-7","rect959-3-0","rect959-3"}, -1 },
-    { "/Bidoo/res/CANARD.svg", {"rect959-3-7"}, -1 },
-    { "/Bidoo/res/CHUTE.svg", {}, -1 },
-    { "/Bidoo/res/DFUZE.svg", {}, -1 },
-    { "/Bidoo/res/DIKTAT.svg", {"rect843","rect843-0","rect843-0-8"}, -1 },
-    { "/Bidoo/res/DILEMO.svg", {}, -1 },
-    { "/Bidoo/res/DTROY.svg", {"rect959-3"}, -1 },
-    { "/Bidoo/res/DUKE.svg", {}, -1 },
-    { "/Bidoo/res/EDSAROS.svg", {"rect959-3-7","rect959-3-7-8","rect959-3-7-8-1","rect959-3-7-8-1-4"}, -1 },
-    { "/Bidoo/res/EMILE.svg", {}, -1 },
-    { "/Bidoo/res/FLAME.svg", {}, -1 },
-    { "/Bidoo/res/FORK.svg", {}, -1 },
-    { "/Bidoo/res/FREIN.svg", {}, -1 },
-    { "/Bidoo/res/HCTIP.svg", {}, -1 },
-    { "/Bidoo/res/HUITRE.svg", {}, -1 },
-    { "/Bidoo/res/LAMBDA.svg", {}, -1 },
-    { "/Bidoo/res/LATE.svg", {}, -1 },
-    { "/Bidoo/res/LIMBO.svg", {}, -1 },
-    { "/Bidoo/res/LIMONADE.svg", {"rect839","rect839-6"}, -1 },
-    { "/Bidoo/res/LOURDE.svg", {"rect847","rect847-7","rect847-5","rect847-3"}, -1 },
-    { "/Bidoo/res/MAGMA.svg", {}, -1 },
-    { "/Bidoo/res/MINIBAR.svg", {"rect833"}, -1 },
-    { "/Bidoo/res/MOIRE.svg", {"rect843","rect843-7"}, -1 },
-    { "/Bidoo/res/MS.svg", {}, -1 },
-    { "/Bidoo/res/MU.svg", {"rect864"}, -1 },
-    { "/Bidoo/res/OAI.svg", {}, -1 },
-    { "/Bidoo/res/OUAIVE.svg", {"rect959-3-7"}, -1 },
-    { "/Bidoo/res/PERCO.svg", {}, -1 },
-    { "/Bidoo/res/PILOT.svg", {"rect843-6-4-5","rect843","rect843-4","rect843-6-4","rect843-6-7"}, -1 },
-    { "/Bidoo/res/POUPRE.svg", {}, -1 },
-    { "/Bidoo/res/RABBIT.svg", {}, -1 },
-    { "/Bidoo/res/REI.svg", {}, -1 },
-    { "/Bidoo/res/SIGMA.svg", {}, -1 },
-    { "/Bidoo/res/SPORE.svg", {}, -1 },
-    { "/Bidoo/res/TIARE.svg", {}, -1 },
-    { "/Bidoo/res/TOCANTE.svg", {"rect843"}, -1 },
-    { "/Bidoo/res/VOID.svg", {}, -1 },
-    { "/Bidoo/res/ZINC.svg", {}, -1 },
-    { "/Bidoo/res/ZOUMAI.svg", {}, -1 },
-    { "/Bidoo/res/ZOUMAIExpander.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ACNE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ANTN.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/BAFIS.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/BANCAU.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/BAR.svg", {"rect833"}, -1 },
+    { kModeBidoo, "/Bidoo/res/BISTROT.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/BORDL.svg", {"rect959-3-0-7-5","rect959-3-0-7","rect959-3-0","rect959-3"}, -1 },
+    { kModeBidoo, "/Bidoo/res/CANARD.svg", {"rect959-3-7"}, -1 },
+    { kModeBidoo, "/Bidoo/res/CHUTE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/DFUZE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/DIKTAT.svg", {"rect843","rect843-0","rect843-0-8"}, -1 },
+    { kModeBidoo, "/Bidoo/res/DILEMO.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/DTROY.svg", {"rect959-3"}, -1 },
+    { kModeBidoo, "/Bidoo/res/DUKE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/EDSAROS.svg", {"rect959-3-7","rect959-3-7-8","rect959-3-7-8-1","rect959-3-7-8-1-4"}, -1 },
+    { kModeBidoo, "/Bidoo/res/EMILE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ENCORE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ENCOREExpander.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/FLAME.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/FORK.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/FREIN.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/HCTIP.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/HUITRE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/LAMBDA.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/LATE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/LIMBO.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/LIMONADE.svg", {"rect839","rect839-6"}, -1 },
+    { kModeBidoo, "/Bidoo/res/LOURDE.svg", {"rect847","rect847-7","rect847-5","rect847-3"}, -1 },
+    { kModeBidoo, "/Bidoo/res/MAGMA.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/MINIBAR.svg", {"rect833"}, -1 },
+    { kModeBidoo, "/Bidoo/res/MOIRE.svg", {"rect843","rect843-7"}, -1 },
+    { kModeBidoo, "/Bidoo/res/MS.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/MU.svg", {"rect864"}, -1 },
+    { kModeBidoo, "/Bidoo/res/OAI.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/OUAIVE.svg", {"rect959-3-7"}, -1 },
+    { kModeBidoo, "/Bidoo/res/PERCO.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/PILOT.svg", {"rect843-6-4-5","rect843","rect843-4","rect843-6-4","rect843-6-7"}, -1 },
+    { kModeBidoo, "/Bidoo/res/POUPRE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/RABBIT.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/REI.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/SIGMA.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/SPORE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/TIARE.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/TOCANTE.svg", {"rect843"}, -1 },
+    { kModeBidoo, "/Bidoo/res/VOID.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ZINC.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ZOUMAI.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/ZOUMAIExpander.svg", {}, -1 },
     // BSD-3-Clause
-    { "/cf/res/ALGEBRA.svg", {}, -1 },
-    { "/cf/res/BUFFER.svg", {}, -1 },
-    { "/cf/res/CHOKE.svg", {}, -1 },
-    { "/cf/res/CUBE.svg", {}, -1 },
-    { "/cf/res/CUTS.svg", {}, -1 },
-    { "/cf/res/DISTO.svg", {}, -1 },
-    { "/cf/res/EACH.svg", {}, -1 },
-    { "/cf/res/FOUR.svg", {}, -1 },
-    { "/cf/res/FUNKTION.svg", {}, -1 },
-    { "/cf/res/L3DS3Q.svg", {}, 3 },
-    { "/cf/res/LABEL.svg", {}, -1 },
-    { "/cf/res/LEDS.svg", {}, -1 },
-    { "/cf/res/LEDSEQ.svg", {}, 3 },
-    { "/cf/res/MASTER.svg", {}, -1 },
-    { "/cf/res/METRO.svg", {}, -1 },
-    { "/cf/res/MONO.svg", {}, -1 },
-    { "/cf/res/PATCH.svg", {}, -1 },
-    { "/cf/res/PEAK.svg", {}, -1 },
-    { "/cf/res/PLAY.svg", {}, -1 },
-    { "/cf/res/PLAYER.svg", {}, -1 },
-    { "/cf/res/SLIDERSEQ.svg", {}, -1 },
-    { "/cf/res/STEPS.svg", {}, -1 },
-    { "/cf/res/STEREO.svg", {}, -1 },
-    { "/cf/res/SUB.svg", {}, -1 },
-    { "/cf/res/trSEQ.svg", {}, -1 },
-    { "/cf/res/VARIABLE.svg", {}, -1 },
+    { kModeCf, "/cf/res/ALGEBRA.svg", {}, -1 },
+    { kModeCf, "/cf/res/BUFFER.svg", {}, -1 },
+    { kModeCf, "/cf/res/CHOKE.svg", {}, -1 },
+    { kModeCf, "/cf/res/CUBE.svg", {}, -1 },
+    { kModeCf, "/cf/res/CUTS.svg", {}, -1 },
+    { kModeCf, "/cf/res/DISTO.svg", {}, -1 },
+    { kModeCf, "/cf/res/EACH.svg", {}, -1 },
+    { kModeCf, "/cf/res/FOUR.svg", {}, -1 },
+    { kModeCf, "/cf/res/FUNKTION.svg", {}, -1 },
+    { kModeCf, "/cf/res/L3DS3Q.svg", {}, 3 },
+    { kModeCf, "/cf/res/LABEL.svg", {}, -1 },
+    { kModeCf, "/cf/res/LEDS.svg", {}, -1 },
+    { kModeCf, "/cf/res/LEDSEQ.svg", {}, 3 },
+    { kModeCf, "/cf/res/MASTER.svg", {}, -1 },
+    { kModeCf, "/cf/res/METRO.svg", {}, -1 },
+    { kModeCf, "/cf/res/MONO.svg", {}, -1 },
+    { kModeCf, "/cf/res/PATCH.svg", {}, -1 },
+    { kModeCf, "/cf/res/PEAK.svg", {}, -1 },
+    { kModeCf, "/cf/res/PLAY.svg", {}, -1 },
+    { kModeCf, "/cf/res/PLAYER.svg", {}, -1 },
+    { kModeCf, "/cf/res/SLIDERSEQ.svg", {}, -1 },
+    { kModeCf, "/cf/res/STEPS.svg", {}, -1 },
+    { kModeCf, "/cf/res/STEREO.svg", {}, -1 },
+    { kModeCf, "/cf/res/SUB.svg", {}, -1 },
+    { kModeCf, "/cf/res/trSEQ.svg", {}, -1 },
+    { kModeCf, "/cf/res/VARIABLE.svg", {}, -1 },
     // CC0-1.0
-    { "/DrumKit/res/Baronial.svg", {}, -1 },
-    { "/DrumKit/res/BD9.svg", {}, -1 },
-    { "/DrumKit/res/ClosedHH.svg", {}, -1 },
-    { "/DrumKit/res/CR78.svg", {}, -1 },
-    { "/DrumKit/res/DMX.svg", {}, -1 },
-    { "/DrumKit/res/Gnome.svg", {}, -1 },
-    { "/DrumKit/res/Marionette.svg", {}, -1 },
-    { "/DrumKit/res/OpenHH.svg", {}, -1 },
-    { "/DrumKit/res/SBD.svg", {}, -1 },
-    { "/DrumKit/res/Sequencer.svg", {}, -1 },
-    { "/DrumKit/res/Snare.svg", {}, -1 },
-    { "/DrumKit/res/Tomi.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/Baronial.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/BD9.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/ClosedHH.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/CR78.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/DMX.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/Gnome.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/Marionette.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/OpenHH.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/SBD.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/Sequencer.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/Snare.svg", {}, -1 },
+    { kModeDrumKit, "/DrumKit/res/Tomi.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
-    { "/ESeries/res/E340.svg", {}, -1 },
+    { kModeESeries,"/ESeries/res/E340.svg", {}, -1 },
     // CC0-1.0
-    { "/HetrickCV/res/1OpChaos.svg", {}, -1},
-    { "/HetrickCV/res/2OpChaos.svg", {}, -1},
-    { "/HetrickCV/res/2To4.svg", {}, -1},
-    { "/HetrickCV/res/3OpChaos.svg", {}, -1},
-    { "/HetrickCV/res/ASR.svg", {}, -1},
-    { "/HetrickCV/res/AToD.svg", {}, -1},
-    { "/HetrickCV/res/BinaryGate.svg", {}, -1},
-    { "/HetrickCV/res/BinaryNoise.svg", {}, -1},
-    { "/HetrickCV/res/Bitshift.svg", {}, -1},
-    { "/HetrickCV/res/Boolean3.svg", {}, -1},
-    { "/HetrickCV/res/ChaoticAttractors.svg", {}, -1},
-    { "/HetrickCV/res/ClockedNoise.svg", {}, -1},
-    { "/HetrickCV/res/Comparator.svg", {}, -1},
-    { "/HetrickCV/res/Contrast.svg", {}, -1},
-    { "/HetrickCV/res/Crackle.svg", {}, -1},
-    { "/HetrickCV/res/DataCompander.svg", {}, -1},
-    { "/HetrickCV/res/Delta.svg", {}, -1},
-    { "/HetrickCV/res/DToA.svg", {}, -1},
-    { "/HetrickCV/res/Dust.svg", {}, -1},
-    { "/HetrickCV/res/Exponent.svg", {}, -1},
-    { "/HetrickCV/res/FBSineChaos.svg", {}, -1},
-    { "/HetrickCV/res/FlipFlop.svg", {}, -1},
-    { "/HetrickCV/res/FlipPan.svg", {}, -1},
-    { "/HetrickCV/res/GateJunction.svg", {}, -1},
-    { "/HetrickCV/res/Gingerbread.svg", {}, -1},
-    { "/HetrickCV/res/LogicCombiner.svg", {}, -1},
-    { "/HetrickCV/res/LogicInverter.svg", {}, -1},
-    { "/HetrickCV/res/MidSide.svg", {}, -1},
-    { "/HetrickCV/res/MinMax.svg", {}, -1},
-    { "/HetrickCV/res/RandomGates.svg", {}, -1},
-    { "/HetrickCV/res/Rotator.svg", {}, -1},
-    { "/HetrickCV/res/Rungler.svg", {}, -1},
-    { "/HetrickCV/res/Scanner.svg", {}, -1},
-    { "/HetrickCV/res/TrigShaper.svg", {}, -1},
-    { "/HetrickCV/res/Waveshape.svg", {}, -1},
-    { "/HetrickCV/res/XYToPolar.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel1.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel2.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel3.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel5.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel6.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel7.svg", {}, -1},
-    { "/HetrickCV/res/Blanks/BlankPanel8.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/1OpChaos.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/2OpChaos.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/2To4.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/3OpChaos.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/ASR.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/AToD.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/BinaryGate.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/BinaryNoise.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Bitshift.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Boolean3.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/ChaoticAttractors.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/ClockedNoise.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Comparator.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Contrast.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Crackle.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/DataCompander.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Delta.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/DToA.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Dust.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Exponent.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/FBSineChaos.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/FlipFlop.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/FlipPan.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/GateJunction.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Gingerbread.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/LogicCombiner.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/LogicInverter.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/MidSide.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/MinMax.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/RandomGates.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Rotator.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Rungler.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Scanner.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/TrigShaper.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Waveshape.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/XYToPolar.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel1.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel2.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel3.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel5.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel6.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel7.svg", {}, -1},
+    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel8.svg", {}, -1},
     // BSD-3-Clause
-    { "/JW-Modules/res/Add5.svg", {}, -1 },
-    { "/JW-Modules/res/BlankPanel1hp.svg", {}, -1 },
-    { "/JW-Modules/res/BlankPanelLarge.svg", {}, -1 },
-    { "/JW-Modules/res/BlankPanelMedium.svg", {}, -1 },
-    { "/JW-Modules/res/BlankPanelSmall.svg", {}, -1 },
-    { "/JW-Modules/res/BouncyBalls.svg", {}, -1 },
-    { "/JW-Modules/res/D1v1de.svg", {}, -1 },
-    { "/JW-Modules/res/DivSeq.svg", {}, -1 },
-    { "/JW-Modules/res/EightSeq.svg", {}, -1 },
-    { "/JW-Modules/res/GridSeq.svg", {}, -1 },
-    { "/JW-Modules/res/MinMax.svg", {"path38411"}, -1 },
-    { "/JW-Modules/res/NoteSeq.svg", {}, -1 },
-    { "/JW-Modules/res/NoteSeq16.svg", {}, -1 },
-    { "/JW-Modules/res/NoteSeqFu.svg", {}, -1 },
-    { "/JW-Modules/res/OnePattern.svg", {}, -1 },
-    { "/JW-Modules/res/Patterns.svg", {}, -1 },
-    { "/JW-Modules/res/Pres1t.svg", {}, -1 },
-    { "/JW-Modules/res/PT.svg", {}, -1 },
-    { "/JW-Modules/res/Str1ker.svg", {"rect2094","rect995","rect169"}, -1 },
-    { "/JW-Modules/res/Trigs.svg", {}, -1 },
-    { "/JW-Modules/res/WavHeadPanel.svg", {}, -1 },
-    { "/JW-Modules/res/XYPad.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/Add5.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/BlankPanel1hp.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/BlankPanelLarge.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/BlankPanelMedium.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/BlankPanelSmall.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/BouncyBalls.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/D1v1de.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/DivSeq.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/EightSeq.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/GridSeq.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/MinMax.svg", {"path38411"}, -1 },
+    { kModeJW, "/JW-Modules/res/NoteSeq.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/NoteSeq16.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/NoteSeqFu.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/OnePattern.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/Patterns.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/Pres1t.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/PT.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/Str1ker.svg", {"rect2094","rect995","rect169"}, -1 },
+    { kModeJW, "/JW-Modules/res/Trigs.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/WavHeadPanel.svg", {}, -1 },
+    { kModeJW, "/JW-Modules/res/XYPad.svg", {}, -1 },
     // GPL3.0-or-later
-    { "/LilacLoop/res/Looper.svg", {}, -1 },
+    { kModeLilacLoop, "/LilacLoop/res/Looper.svg", {}, -1 },
     // EUPL-1.2
-    { "/LittleUtils/res/Bias_Semitone.svg", {}, -1 },
-    { "/LittleUtils/res/ButtonModule.svg", {}, -1 },
-    { "/LittleUtils/res/MulDiv.svg", {}, -1 },
-    { "/LittleUtils/res/PulseGenerator.svg", {}, -1 },
-    { "/LittleUtils/res/TeleportIn.svg", {}, -1 },
-    { "/LittleUtils/res/TeleportOut.svg", {}, -1 },
+    { kModeLittleUtils, "/LittleUtils/res/Bias_Semitone.svg", {}, -1 },
+    { kModeLittleUtils, "/LittleUtils/res/ButtonModule.svg", {}, -1 },
+    { kModeLittleUtils, "/LittleUtils/res/MulDiv.svg", {}, -1 },
+    { kModeLittleUtils, "/LittleUtils/res/PulseGenerator.svg", {}, -1 },
+    { kModeLittleUtils, "/LittleUtils/res/TeleportIn.svg", {}, -1 },
+    { kModeLittleUtils, "/LittleUtils/res/TeleportOut.svg", {}, -1 },
     // GPL-3.0-or-later
-    { "/kocmoc/res/DDLY.svg", {}, -1 },
-    { "/kocmoc/res/LADR.svg", {}, -1 },
-    { "/kocmoc/res/MUL.svg", {}, -1 },
-    { "/kocmoc/res/OP.svg", {}, -1 },
-    { "/kocmoc/res/PHASR.svg", {}, -1 },
-    { "/kocmoc/res/SKF.svg", {}, -1 },
-    { "/kocmoc/res/SVF.svg", {}, -1 },
-    { "/kocmoc/res/TRG.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/DDLY.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/LADR.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/MUL.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/OP.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/PHASR.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/SKF.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/SVF.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/TRG.svg", {}, -1 },
     // GPL-3.0-or-later
-    { "/myth-modules/res/Mavka.svg", {}, -1 },
-    { "/myth-modules/res/Molphar.svg", {}, -1 },
+    { kModeMyth, "/myth-modules/res/Mavka.svg", {}, -1 },
+    { kModeMyth, "/myth-modules/res/Molphar.svg", {}, -1 },
     // CC0-1.0
-    { "/nonlinearcircuits/res/BOOLs2.svg", {}, -1 },
-    { "/nonlinearcircuits/res/DoubleNeuronRef.svg", {}, -1 },
-    { "/nonlinearcircuits/res/LetsSplosh.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - 4seq.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - 8 BIT CIPHER.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - DIVIDE & CONQUER.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - DIVINE CMOS.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - GENiE.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - NEURON.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - NUMBERWANG.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - SEGUE.svg", {}, -1 },
-    { "/nonlinearcircuits/res/NLC - STATUES.svg", {}, -1 },
-    { "/nonlinearcircuits/res/squid-axon-papernoise-panel2.svg", {}, -1 },
-    // Custom, runtime dark mode used with permission
-    { "/ParableInstruments/res/Neil.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/BOOLs2.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/DoubleNeuronRef.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/LetsSplosh.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - 4seq.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - 8 BIT CIPHER.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - DIVIDE & CONQUER.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - DIVINE CMOS.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - GENiE.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - NEURON.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - NUMBERWANG.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - ROUTER.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - SEGUE.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/NLC - STATUES.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/squid-axon-papernoise-panel2.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/SlothApathy.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/SlothInertia.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/SlothTorpor.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/TripleSloth.svg", {}, -1 },
     // GPL-3.0-or-later
-    { "/PathSet/res/AstroVibe.svg", {}, -1 },
-    { "/PathSet/res/GlassPane.svg", {}, -1 },
-    { "/PathSet/res/IceTray.svg", {}, -1 },
-    { "/PathSet/res/Nudge.svg", {}, -1 },
-    { "/PathSet/res/ShiftyExpander.svg", {}, -1 },
-    { "/PathSet/res/ShiftyMod.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/AstroVibe.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/GlassPane.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/IceTray.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/Nudge.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/OneShot.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/PlusPane.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/ShiftyExpander.svg", {}, -1 },
+    { kModePathSet, "/PathSet/res/ShiftyMod.svg", {}, -1 },
     // BSD-3-Clause
-    { "/voxglitch/res/autobreak_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/bytebeat_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/digital_programmer_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/digital_sequencer_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/digital_sequencer_xp_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/ghosts_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/glitch_sequencer_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/goblins_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/grain_engine_mk2_expander_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/grain_engine_mk2_front_panel_r3.svg", {}, -1 },
-    { "/voxglitch/res/grain_fx_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/hazumi_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/looper_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/repeater_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/samplerx8_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/satanonaut_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/wav_bank_front_panel.svg", {}, -1 },
-    { "/voxglitch/res/wav_bank_mc_front_panel_v2.svg", {}, -1 },
-    { "/voxglitch/res/xy_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/autobreak_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/bytebeat_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/digital_programmer_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/digital_sequencer_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/digital_sequencer_xp_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/ghosts_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/glitch_sequencer_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/goblins_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/grain_engine_mk2_expander_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/grain_engine_mk2_front_panel_r3.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/grain_fx_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/hazumi_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/looper_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/repeater_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/samplerx8_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/satanonaut_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/wav_bank_front_panel.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/wav_bank_mc_front_panel_v2.svg", {}, -1 },
+    { kModeVoxglitch, "/voxglitch/res/xy_front_panel.svg", {}, -1 },
     // WTFPL
-    { "/WhatTheRack/res/WhatTheJack.svg", {}, -1 },
-    { "/WhatTheRack/res/WhatTheMod.svg", {}, -1 },
-    { "/WhatTheRack/res/WhatTheRack.svg", {}, -1 },
+    { kModeWhatTheRack, "/WhatTheRack/res/WhatTheJack.svg", {}, -1 },
+    { kModeWhatTheRack, "/WhatTheRack/res/WhatTheMod.svg", {}, -1 },
+    { kModeWhatTheRack, "/WhatTheRack/res/WhatTheRack.svg", {}, -1 },
+};
+
+enum LightMode {
+    kMode8Mode,
+    kModeAutinn,
+    kModeBefaco,
+    kModeCardinal,
+    kModeExtratone,
+    kModeFehlerFabrik,
+    kModeForsitan,
+    kModeFundamental,
+    kModeGoodSheperd,
+    kModeH4n4,
+    kModeHamptonHarmonics,
+    kModeLomas,
+    kModeMockba,
+    kModeMog,
+    kModePrism,
+    kModeRepelzen,
+    kModeSonusmodular,
 };
 
 static const struct {
+    const LightMode mode;
     const char* const filename;
-    const char* shapeIdsToIgnore[5];
-    const int shapeNumberToIgnore;
 } svgFilesToInvertForLightMode[] = {
+    // BSD
+    { kMode8Mode, "/8Mode/res/SNsoft_Panel.svg" },
     // GPLv3+
-    /* FIXME does not work very well
-    { "/Autinn/res/AmpModule.svg", {}, -1 },
-    { "/Autinn/res/BassModule.svg", {}, -1 },
-    { "/Autinn/res/CVConverterModule.svg", {}, -1 },
-    { "/Autinn/res/ComponentLibrary", {}, -1 },
-    { "/Autinn/res/DeadbandModule.svg", {}, -1 },
-    { "/Autinn/res/DigiModule.svg", {}, -1 },
-    { "/Autinn/res/DiseeModule.svg", {}, -1 },
-    { "/Autinn/res/FilModule.svg", {}, -1 },
-    { "/Autinn/res/FlopperModule.svg", {}, -1 },
-    { "/Autinn/res/ImpModule.svg", {}, -1 },
-    { "/Autinn/res/JetteModule.svg", {}, -1 },
-    { "/Autinn/res/MelodyModule.svg", {}, -1 },
-    { "/Autinn/res/MeraModule.svg", {}, -1 },
-    { "/Autinn/res/Mixer6Module.svg", {}, -1 },
-    { "/Autinn/res/NapModule.svg", {}, -1 },
-    { "/Autinn/res/NonModule.svg", {}, -1 },
-    { "/Autinn/res/OxcartModule.svg", {}, -1 },
-    { "/Autinn/res/RebelModule.svg", {}, -1 },
-    { "/Autinn/res/RetriModule.svg", {}, -1 },
-    { "/Autinn/res/SawModule.svg", {}, -1 },
-    { "/Autinn/res/SjipModule.svg", {}, -1 },
-    { "/Autinn/res/SquareModule.svg", {}, -1 },
-    { "/Autinn/res/VibratoModule.svg", {}, -1 },
-    { "/Autinn/res/VxyModule.svg", {}, -1 },
-    { "/Autinn/res/ZodModule.svg", {}, -1 },
-    */
-    // ??? used for testing, might get turned off
-    { "/Befaco/res/components/Knurlie.svg", {}, -1 },
-    { "/Befaco/res/panels/ABC.svg", {}, -1 },
-    { "/Befaco/res/panels/ADSR.svg", {}, -1 },
-    { "/Befaco/res/panels/ChoppingKinky.svg", {}, -1 },
-    { "/Befaco/res/panels/DualAtenuverter.svg", {}, -1 },
-    { "/Befaco/res/panels/EvenVCO.svg", {}, -1 },
-    { "/Befaco/res/panels/HexmixVCA.svg", {}, -1 },
-    { "/Befaco/res/panels/Kickall.svg", {}, -1 },
-    { "/Befaco/res/panels/Mex.svg", {}, -1 },
-    { "/Befaco/res/panels/Mixer.svg", {}, -1 },
-    { "/Befaco/res/panels/Morphader.svg", {}, -1 },
-    { "/Befaco/res/panels/Muxlicer.svg", {}, -1 },
-    { "/Befaco/res/panels/NoisePlethora.svg", {}, -1 },
-    { "/Befaco/res/panels/Percall.svg", {}, -1 },
-    { "/Befaco/res/panels/Rampage.svg", {}, -1 },
-    { "/Befaco/res/panels/STMix.svg", {}, -1 },
-    { "/Befaco/res/panels/SamplingModulator.svg", {}, -1 },
-    { "/Befaco/res/panels/SlewLimiter.svg", {}, -1 },
-    { "/Befaco/res/panels/SpringReverb.svg", {}, -1 },
-    { "/Befaco/res/panels/StereoStrip.svg", {}, -1 },
+    { kModeAutinn, "/Autinn/res/AmpModule.svg" },
+    { kModeAutinn, "/Autinn/res/BassModule.svg" },
+    { kModeAutinn, "/Autinn/res/CVConverterModule.svg" },
+    { kModeAutinn, "/Autinn/res/ComponentLibrary" },
+    { kModeAutinn, "/Autinn/res/DeadbandModule.svg" },
+    { kModeAutinn, "/Autinn/res/DigiModule.svg" },
+    { kModeAutinn, "/Autinn/res/DiseeModule.svg" },
+    { kModeAutinn, "/Autinn/res/FilModule.svg" },
+    { kModeAutinn, "/Autinn/res/FlopperModule.svg" },
+    { kModeAutinn, "/Autinn/res/ImpModule.svg" },
+    { kModeAutinn, "/Autinn/res/JetteModule.svg" },
+    { kModeAutinn, "/Autinn/res/MelodyModule.svg" },
+    { kModeAutinn, "/Autinn/res/MeraModule.svg" },
+    { kModeAutinn, "/Autinn/res/Mixer6Module.svg" },
+    { kModeAutinn, "/Autinn/res/NapModule.svg" },
+    { kModeAutinn, "/Autinn/res/NonModule.svg" },
+    { kModeAutinn, "/Autinn/res/OxcartModule.svg" },
+    { kModeAutinn, "/Autinn/res/RebelModule.svg" },
+    { kModeAutinn, "/Autinn/res/RetriModule.svg" },
+    { kModeAutinn, "/Autinn/res/SawModule.svg" },
+    { kModeAutinn, "/Autinn/res/SjipModule.svg" },
+    { kModeAutinn, "/Autinn/res/SquareModule.svg" },
+    { kModeAutinn, "/Autinn/res/VibratoModule.svg" },
+    { kModeAutinn, "/Autinn/res/VxyModule.svg" },
+    { kModeAutinn, "/Autinn/res/ZodModule.svg" },
+    // Custom, runtime light mode used with permission
+    { kModeBefaco, "/Befaco/res/components/Knurlie.svg" },
+    { kModeBefaco, "/Befaco/res/panels/ABC.svg" },
+    { kModeBefaco, "/Befaco/res/panels/ADSR.svg" },
+    { kModeBefaco, "/Befaco/res/panels/ChoppingKinky.svg" },
+    { kModeBefaco, "/Befaco/res/panels/DualAtenuverter.svg" },
+    { kModeBefaco, "/Befaco/res/panels/EvenVCO.svg" },
+    { kModeBefaco, "/Befaco/res/panels/HexmixVCA.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Kickall.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Mex.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Mixer.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Morphader.svg" },
+    { kModeBefaco, "/Befaco/res/panels/MotionMTR.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Muxlicer.svg" },
+    { kModeBefaco, "/Befaco/res/panels/NoisePlethora.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Percall.svg" },
+    { kModeBefaco, "/Befaco/res/panels/PonyVCO.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Rampage.svg" },
+    { kModeBefaco, "/Befaco/res/panels/STMix.svg" },
+    { kModeBefaco, "/Befaco/res/panels/SamplingModulator.svg" },
+    { kModeBefaco, "/Befaco/res/panels/SlewLimiter.svg" },
+    { kModeBefaco, "/Befaco/res/panels/SpringReverb.svg" },
+    { kModeBefaco, "/Befaco/res/panels/StereoStrip.svg" },
     // GPLv3+
-    { "/Cardinal/res/AudioFile.svg", {}, -1 },
-    { "/Cardinal/res/AudioToCVPitch.svg", {}, -1 },
-    { "/Cardinal/res/Carla.svg", {}, -1 },
-    { "/Cardinal/res/ExpanderMIDI.svg", {}, -1 },
-    { "/Cardinal/res/glBars.svg", {}, -1 },
-    { "/Cardinal/res/HostAudio.svg", {}, -1 },
-    { "/Cardinal/res/HostCV.svg", {}, -1 },
-    { "/Cardinal/res/HostMIDI.svg", {}, -1 },
-    { "/Cardinal/res/HostMIDICC.svg", {}, -1 },
-    { "/Cardinal/res/HostMIDIGate.svg", {}, -1 },
-    { "/Cardinal/res/HostMIDIMap.svg", {}, -1 },
-    { "/Cardinal/res/HostParameters.svg", {}, -1 },
-    { "/Cardinal/res/HostParamsMap.svg", {}, -1 },
-    { "/Cardinal/res/HostTime.svg", {}, -1 },
-    { "/Cardinal/res/Ildaeil.svg", {}, -1 },
+    { kModeCardinal, "/Cardinal/res/AudioFile.svg" },
+    { kModeCardinal, "/Cardinal/res/AudioToCVPitch.svg" },
+    { kModeCardinal, "/Cardinal/res/Carla.svg" },
+    { kModeCardinal, "/Cardinal/res/ExpanderMIDI.svg" },
+    { kModeCardinal, "/Cardinal/res/glBars.svg" },
+    { kModeCardinal, "/Cardinal/res/HostAudio.svg" },
+    { kModeCardinal, "/Cardinal/res/HostCV.svg" },
+    { kModeCardinal, "/Cardinal/res/HostMIDI.svg" },
+    { kModeCardinal, "/Cardinal/res/HostMIDICC.svg" },
+    { kModeCardinal, "/Cardinal/res/HostMIDIGate.svg" },
+    { kModeCardinal, "/Cardinal/res/HostMIDIMap.svg" },
+    { kModeCardinal, "/Cardinal/res/HostParameters.svg" },
+    { kModeCardinal, "/Cardinal/res/HostParamsMap.svg" },
+    { kModeCardinal, "/Cardinal/res/HostTime.svg" },
+    { kModeCardinal, "/Cardinal/res/Ildaeil.svg" },
     // GPLv3+
-    { "/forsitan-modulare/res/alea.svg", {}, -1 },
-    { "/forsitan-modulare/res/cumuli.svg", {}, -1 },
-    { "/forsitan-modulare/res/deinde.svg", {}, -1 },
-    { "/forsitan-modulare/res/interea.svg", {}, -1 },
-    { "/forsitan-modulare/res/palette.svg", {}, -1 },
-    { "/forsitan-modulare/res/pavo.svg", {}, -1 },
+    { kModeExtratone, "/Extratone/res/Darwinism.svg" },
+    // { kModeExtratone, "/Extratone/res/HalluciMemory.svg" },
+    { kModeExtratone, "/Extratone/res/Ichneumonid.svg" },
+    { kModeExtratone, "/Extratone/res/Meganeura.svg" },
+    { kModeExtratone, "/Extratone/res/Mesoglea.svg" },
+    { kModeExtratone, "/Extratone/res/Mesoglea2.svg" },
+    { kModeExtratone, "/Extratone/res/Mesohyl.svg" },
+    { kModeExtratone, "/Extratone/res/Modulo.svg" },
+    { kModeExtratone, "/Extratone/res/Opabinia.svg" },
+    { kModeExtratone, "/Extratone/res/Pureneura.svg" },
+    { kModeExtratone, "/Extratone/res/Puzzlebox.svg" },
+    { kModeExtratone, "/Extratone/res/Splitterburst.svg" },
+    { kModeExtratone, "/Extratone/res/XtrtnBlank.svg" },
     // GPLv3+
-    { "/Fundamental/res/8vert.svg", {}, -1 },
-    { "/Fundamental/res/ADSR.svg", {}, -1 },
-    { "/Fundamental/res/Delay.svg", {}, -1 },
-    { "/Fundamental/res/LFO.svg", {}, -1 },
-    { "/Fundamental/res/Merge.svg", {}, -1 },
-    { "/Fundamental/res/MidSide.svg", {}, -1 },
-    { "/Fundamental/res/Mixer.svg", {}, -1 },
-    { "/Fundamental/res/Mutes.svg", {}, -1 },
-    { "/Fundamental/res/Noise.svg", {}, -1 },
-    { "/Fundamental/res/Octave.svg", {}, -1 },
-    { "/Fundamental/res/Pulses.svg", {}, -1 },
-    { "/Fundamental/res/Quantizer.svg", {}, -1 },
-    { "/Fundamental/res/Random.svg", {}, -1 },
-    { "/Fundamental/res/SEQ3.svg", {}, -1 },
-    { "/Fundamental/res/Scope.svg", {}, -1 },
-    { "/Fundamental/res/SequentialSwitch1.svg", {}, -1 },
-    { "/Fundamental/res/SequentialSwitch2.svg", {}, -1 },
-    { "/Fundamental/res/Split.svg", {}, -1 },
-    { "/Fundamental/res/Sum.svg", {}, -1 },
-    { "/Fundamental/res/VCA-1.svg", {}, -1 },
-    { "/Fundamental/res/VCA.svg", {}, -1 },
-    { "/Fundamental/res/VCF.svg", {}, -1 },
-    { "/Fundamental/res/VCMixer.svg", {}, -1 },
-    { "/Fundamental/res/VCO.svg", {}, -1 },
-    { "/Fundamental/res/WTLFO.svg", {}, -1 },
-    { "/Fundamental/res/WTVCO.svg", {}, -1 },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Arpanet.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Aspect.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Botzinger.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Chi.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Components" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Fax.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Lilt.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Luigi.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Monte.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Nova.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Planck.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/PSIOP.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Rasoir.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Sigma.svg" },
+    { kModeFehlerFabrik, "/FehlerFabrik/res/Components/FFHexScrew.svg" },
+    // GPLv3+
+    { kModeForsitan, "/forsitan-modulare/res/alea.svg" },
+    { kModeForsitan, "/forsitan-modulare/res/cumuli.svg" },
+    { kModeForsitan, "/forsitan-modulare/res/deinde.svg" },
+    { kModeForsitan, "/forsitan-modulare/res/interea.svg" },
+    { kModeForsitan, "/forsitan-modulare/res/palette.svg" },
+    { kModeForsitan, "/forsitan-modulare/res/pavo.svg" },
+    // GPLv3+
+    { kModeFundamental, "/Fundamental/res/8vert.svg" },
+    { kModeFundamental, "/Fundamental/res/ADSR.svg" },
+    { kModeFundamental, "/Fundamental/res/Delay.svg" },
+    { kModeFundamental, "/Fundamental/res/LFO.svg" },
+    { kModeFundamental, "/Fundamental/res/Merge.svg" },
+    { kModeFundamental, "/Fundamental/res/MidSide.svg" },
+    { kModeFundamental, "/Fundamental/res/Mixer.svg" },
+    { kModeFundamental, "/Fundamental/res/Mutes.svg" },
+    { kModeFundamental, "/Fundamental/res/Noise.svg" },
+    { kModeFundamental, "/Fundamental/res/Octave.svg" },
+    { kModeFundamental, "/Fundamental/res/Pulses.svg" },
+    { kModeFundamental, "/Fundamental/res/Quantizer.svg" },
+    { kModeFundamental, "/Fundamental/res/Random.svg" },
+    { kModeFundamental, "/Fundamental/res/SEQ3.svg" },
+    { kModeFundamental, "/Fundamental/res/Scope.svg" },
+    { kModeFundamental, "/Fundamental/res/SequentialSwitch1.svg" },
+    { kModeFundamental, "/Fundamental/res/SequentialSwitch2.svg" },
+    { kModeFundamental, "/Fundamental/res/Split.svg" },
+    { kModeFundamental, "/Fundamental/res/Sum.svg" },
+    { kModeFundamental, "/Fundamental/res/VCA-1.svg" },
+    { kModeFundamental, "/Fundamental/res/VCA.svg" },
+    { kModeFundamental, "/Fundamental/res/VCF.svg" },
+    { kModeFundamental, "/Fundamental/res/VCMixer.svg" },
+    { kModeFundamental, "/Fundamental/res/VCO.svg" },
+    { kModeFundamental, "/Fundamental/res/WTLFO.svg" },
+    { kModeFundamental, "/Fundamental/res/WTVCO.svg" },
+    { kModeFundamental, "/Fundamental/res/components/ADSR-bg.svg" },
+    { kModeFundamental, "/Fundamental/res/components/Scope-bg.svg" },
+    // GPLv3+
+    { kModeGoodSheperd, "/GoodSheperd/res/Holzschnabel.svg" },
+    { kModeGoodSheperd, "/GoodSheperd/res/Hurdle.svg" },
+    { kModeGoodSheperd, "/GoodSheperd/res/SEQ3st.svg" },
+    { kModeGoodSheperd, "/GoodSheperd/res/Seqtrol.svg" },
+    { kModeGoodSheperd, "/GoodSheperd/res/Stable16.svg" },
+    { kModeGoodSheperd, "/GoodSheperd/res/Stall.svg" },
+    { kModeGoodSheperd, "/GoodSheperd/res/Switch1.svg" },
+    { kModeGoodSheperd, "/GoodSheperd/res/components/SquareSwitch_0.svg" },
+    { kModeGoodSheperd, "/GoodSheperd/res/components/SquareSwitch_1.svg" },
+    // GPLv3+
+    { kModeH4n4, "/h4n4-modules/res/XenQnt.svg" },
     // MIT
-    { "/HamptonHarmonics/res/Arp.svg", {}, -1 },
-    { "/HamptonHarmonics/res/Progress.svg", {}, -1 },
+    { kModeHamptonHarmonics, "/HamptonHarmonics/res/Arp.svg" },
+    { kModeHamptonHarmonics, "/HamptonHarmonics/res/Progress.svg" },
     // GPLv3+
-    { "/LomasModules/res/AdvancedSampler.svg", {}, -1 },
-    { "/LomasModules/res/GateSequencer.svg", {}, -1 },
+    { kModeLomas, "/LomasModules/res/AdvancedSampler.svg" },
+    { kModeLomas, "/LomasModules/res/GateSequencer.svg" },
+    // MIT
+    { kModeMockba, "/MockbaModular/res/Empty_gray.svg" },
+    // CC0
+    { kModeMog, "/Mog/res/Network.svg" },
+    { kModeMog, "/Mog/res/Nexus.svg" },
+    // CC-BY-SA-4.0
+    { kModePrism, "/Prism/res/prism_Droplet.svg" },
+    { kModePrism, "/Prism/res/prism_Rainbow.svg" },
+    { kModePrism, "/Prism/res/RainbowScaleExpander.svg" },
+    // CC-BY-SA-4.0
+    { kModeRepelzen, "/repelzen/res/reface/reburst_bg.svg" },
+    { kModeRepelzen, "/repelzen/res/reface/refold_bg.svg" },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg1.svg" },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg2.svg" },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg3.svg" },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg4.svg" },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg5.svg" },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg6.svg" },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg7.svg" },
+    { kModeRepelzen, "/repelzen/res/reface/repelzen_bg8.svg" },
+    { kModeRepelzen, "/repelzen/res/reface/retrig_bg.svg" },
+    { kModeRepelzen, "/repelzen/res/reface/rewin_bg.svg" },
+    { kModeRepelzen, "/repelzen/res/reface/rexmix_bg.svg" },
     // GPLv3+
-    { "/sonusmodular/res/addiction.svg", {}, -1 },
-    { "/sonusmodular/res/bitter.svg", {}, -1 },
-    { "/sonusmodular/res/bymidside.svg", {}, -1 },
-    { "/sonusmodular/res/campione.svg", {}, -1 },
-    { "/sonusmodular/res/chainsaw.svg", {}, -1 },
-    { "/sonusmodular/res/ctrl.svg", {}, -1 },
-    { "/sonusmodular/res/deathcrush.svg", {}, -1 },
-    { "/sonusmodular/res/fraction.svg", {}, -1 },
-    { "/sonusmodular/res/harmony.svg", {}, -1 },
-    { "/sonusmodular/res/ladrone.svg", {}, -1 },
-    { "/sonusmodular/res/luppolo.svg", {}, -1 },
-    { "/sonusmodular/res/luppolo3.svg", {}, -1 },
-    { "/sonusmodular/res/micromacro.svg", {}, -1 },
-    { "/sonusmodular/res/mrcheb.svg", {}, -1 },
-    { "/sonusmodular/res/multimulti.svg", {}, -1 },
-    { "/sonusmodular/res/neurosc.svg", {}, -1 },
-    { "/sonusmodular/res/oktagon.svg", {}, -1 },
-    { "/sonusmodular/res/osculum.svg", {}, -1 },
-    { "/sonusmodular/res/paramath.svg", {}, -1 },
-    { "/sonusmodular/res/piconoise.svg", {}, -1 },
-    { "/sonusmodular/res/pith.svg", {}, -1 },
-    { "/sonusmodular/res/pusher.svg", {}, -1 },
-    { "/sonusmodular/res/ringo.svg", {}, -1 },
-    { "/sonusmodular/res/scramblase.svg", {}, -1 },
-    { "/sonusmodular/res/tropicana.svg", {}, -1 },
-    { "/sonusmodular/res/twoff.svg", {}, -1 },
-    { "/sonusmodular/res/yabp.svg", {}, -1 },
-    // TODO bacon, chowdsp, ???
+    { kModeSonusmodular, "/sonusmodular/res/addiction.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/bitter.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/bymidside.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/campione.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/chainsaw.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/ctrl.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/deathcrush.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/fraction.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/harmony.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/ladrone.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/luppolo.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/luppolo3.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/micromacro.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/mrcheb.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/multimulti.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/neurosc.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/oktagon.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/osculum.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/paramath.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/piconoise.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/pith.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/pusher.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/ringo.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/scramblase.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/tropicana.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/twoff.svg" },
+    { kModeSonusmodular, "/sonusmodular/res/yabp.svg" },
 };
 
 static inline
@@ -481,24 +658,25 @@ unsigned int invertColor(const unsigned int color) noexcept
 }
 
 static inline
-bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char* const svgFileToInvert = nullptr)
+bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpaint& paint, const char* const svgFileToInvert)
 {
-    if (paint.type == NSVG_PAINT_LINEAR_GRADIENT && svgFileToInvert != nullptr)
+    if (paint.type == NSVG_PAINT_LINEAR_GRADIENT)
     {
-        // Special case for DrumKit background gradient
-        if (std::strncmp(svgFileToInvert, "/DrumKit/", 9) == 0)
+        switch (mode)
         {
+        // Special case for DrumKit background gradient
+        case kModeDrumKit:
             std::free(paint.gradient);
             paint.type = NSVG_PAINT_COLOR;
             paint.color = 0xff191919;
             return true;
-        }
         // Special case for PathSet shifty gradient
-        if (std::strncmp(svgFileToInvert, "/PathSet/", 9) == 0)
-        {
+        case kModePathSet:
             paint.gradient->stops[0].color = 0xff7c4919; // 50% darker than main blue
             paint.gradient->stops[1].color = 0xff5b3a1a; // 33.3% darker than main blue
             return false;
+        default:
+            break;
         }
     }
 
@@ -507,9 +685,10 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
     if (paint.type != NSVG_PAINT_COLOR)
         return false;
 
-    // Special case for Bidoo red color
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/Bidoo/", 7) == 0)
+    switch (mode)
     {
+    // Special case for Bidoo red color
+    case kModeBidoo:
         if (paint.color == 0xff001fcd)
         {
             paint.color = 0xcf8b94c4;
@@ -527,11 +706,9 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
                 return false;
             }
         }
-    }
-
+        break;
     // Special case for JW-Modules colors
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/JW-Modules/", 12) == 0)
-    {
+    case kModeJW:
         switch (paint.color)
         {
         // do nothing
@@ -565,11 +742,9 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
             paint.color = 0xffc0c0c0;
             return true;
         }
-    }
-
+        break;
     // Special case for Lilac
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/LilacLoop/", 11) == 0)
-    {
+    case kModeLilacLoop:
         switch (paint.color)
         {
         // main bg (custom)
@@ -589,11 +764,9 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
             paint.color = 0x00000000;
             return true;
         }
-    }
-
+        break;
     // Special case for Nonlinear Circuits
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/nonlinearcircuits/", 19) == 0)
-    {
+    case kModeNonlinearcircuits:
         switch (paint.color)
         {
             case 0xff9a7900:
@@ -612,11 +785,9 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
                 paint.color = 0x00000000;
                 return true;
         }
-    }
-
+        break;
     // Special case for PathSet colors
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/PathSet/", 9) == 0)
-    {
+    case kModePathSet:
         // only invert main colors for Nudge.svg
         if (std::strcmp(svgFileToInvert, "/PathSet/res/Nudge.svg") == 0)
         {
@@ -639,6 +810,8 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
             {
             // main blue tone
             case 0xffdf7a1a:
+            case 0xffe78a31:
+            case 0xffc26a16:
                 if (shape->opacity == 0.5f && std::strcmp(svgFileToInvert, "/PathSet/res/AstroVibe.svg") == 0)
                 {
                     shape->opacity = 0.2f;
@@ -655,6 +828,13 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
                     return true;
                 }
                 break;
+            /*
+            // OneShot beverage
+            case 0xff021755:
+            case 0xff03299a:
+            case 0xff032ba2:
+                return false;
+            */
             // pink step 2 (pink with 50% opacity on bg)
             case 0xffef73ea:
                 paint.color = 0xff812d7d;
@@ -690,11 +870,9 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
                 return true;
             }
         }
-    }
-
+        break;
     // Special case for voxglitch colors
-    if (svgFileToInvert != nullptr && std::strncmp(svgFileToInvert, "/voxglitch/", 11) == 0)
-    {
+    case kModeVoxglitch:
         switch (paint.color)
         {
         // wavbank blue
@@ -708,6 +886,9 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
             paint.color = 0x7f3219ac;
             return true;
         }
+        break;
+    default:
+        break;
     }
 
     switch (paint.color)
@@ -751,29 +932,249 @@ bool invertPaintForDarkMode(NSVGshape* const shape, NSVGpaint& paint, const char
 }
 
 static inline
-bool invertPaintForLightMode(NSVGshape* const shape, NSVGpaint& paint)
+bool invertPaintForLightMode(const LightMode mode, NSVGshape* const shape, NSVGpaint& paint)
 {
-    switch(paint.type)
+    if (paint.type == NSVG_PAINT_LINEAR_GRADIENT)
     {
-    case NSVG_PAINT_NONE:
-        return true;
-    case NSVG_PAINT_LINEAR_GRADIENT:
-        for (int i=0; i<paint.gradient->nstops; ++i)
-            paint.gradient->stops[i].color = invertColor(paint.gradient->stops[i].color);
-        return true;
-    case NSVG_PAINT_COLOR:
-        paint.color = invertColor(paint.color);
-        return true;
-    default:
-        return false;
+        switch (mode)
+        {
+        case kModeFundamental:
+            paint.gradient->stops[0].color = 0xffffffff;
+            paint.gradient->stops[1].color = 0xffe6d6d6;
+            return true;
+        default:
+            for (int i=0; i<paint.gradient->nstops; ++i)
+                paint.gradient->stops[i].color = invertColor(paint.gradient->stops[i].color);
+            return true;
+        }
     }
+
+    if (paint.type == NSVG_PAINT_RADIAL_GRADIENT && mode == kModeMog)
+    {
+        std::free(paint.gradient);
+        paint.type = NSVG_PAINT_COLOR;
+        paint.color = 0xffe5e5e5;
+        return true;
+    }
+
+    if (paint.type == NSVG_PAINT_NONE)
+        return true;
+    if (paint.type != NSVG_PAINT_COLOR)
+        return false;
+
+    switch (mode)
+    {
+    case kMode8Mode:
+        switch (paint.color)
+        {
+        case 0xff000000:
+            if (std::strcmp(shape->id, "rect1211") == 0)
+                break;
+            return false;
+        case 0xff1a1a1a:
+            if (std::strcmp(shape->id, "rect1523") != 0)
+                break;
+            return false;
+        default:
+            return false;
+        }
+        break;
+    case kModeAutinn:
+        switch (paint.color)
+        {
+        // red stripe
+        case 0xff0a115e:
+            paint.color = 0xffa1a8f5;
+            return true;
+        // logo
+        case 0xff00d7ff:
+            paint.color = 0xff005868;
+            return true;
+        }
+        break;
+    case kModeExtratone:
+        switch (paint.color)
+        {
+        case 0x00000000:
+        case 0x00ffffff:
+        case 0xff000000:
+        case 0xffd5ffe5:
+        case 0xfff2f2f2:
+        case 0xfff2ffff:
+        case 0xfff9f9f9:
+        case 0xffffffff:
+            break;
+        default:
+            return false;
+        }
+        break;
+    case kModeFehlerFabrik:
+        switch (paint.color)
+        {
+        // make a few colors reverse in luminance/lightness
+        case 0xff3edcfc: paint.color = 0xff039fbf; return true;
+        case 0xff4a6fff: paint.color = 0xff0024b2; return true;
+        case 0xff5c49fd: paint.color = 0xff1502b6; return true;
+        case 0xff61a6ff: paint.color = 0xff00459e; return true;
+        case 0xff6e97ad: paint.color = 0xff537c93; return true;
+        case 0xff78ffb1: paint.color = 0xff008739; return true;
+        case 0xffb5cf00: paint.color = 0xff627000; return true;
+        case 0xffbfa463: paint.color = 0xff9c8140; return true;
+        case 0xffcba5e4: paint.color = 0xff411b5a; return true;
+        case 0xffce86ef: paint.color = 0xff58107a; return true;
+        case 0xffcf7685: paint.color = 0xff8a303e; return true;
+        case 0xffd1e471: paint.color = 0xff798c1b; return true;
+        // screw core
+        case 0xff1a1a1a: paint.color = 0xffcccccc; return true;
+        // keep already darkish colors
+        case 0xff6a8800:
+        case 0xff7cce00:
+            return false;
+        }
+        break;
+    case kModeFundamental:
+        switch (paint.color)
+        {
+        case 0xc0000000:
+            paint.color = 0xe6000000;
+            return true;
+        case 0xff909092:
+            paint.color = 0xff000000;
+            return true;
+        case 0xff000000:
+            if (shape->opacity == 0.5f)
+            {
+                shape->opacity = 0.9f;
+                return false;
+            }
+            break;
+        }
+        break;
+    case kModeGoodSheperd:
+        switch (paint.color)
+        {
+        // background
+        case 0xff332e21: paint.color = 0xffdfdacd; return true;
+        case 0xff462f17: paint.color = 0xffe8d2ba; return true;
+        // jack box overlays
+        case 0xff56534a: paint.color = 0xffb6b3aa; return true;
+        case 0xffbc9d8e: paint.color = 0xff705142; return true;
+        case 0xfeede9e2: paint.color = 0xff1c1812; return true;
+        // colors to keep the same
+        case 0xff2400fe:
+        case 0xffcab39b:
+            return false;
+        }
+        break;
+    case kModeH4n4:
+        switch (paint.color)
+        {
+        case 0xffffb380:
+            return false;
+        case 0xffffccaa:
+            paint.color = 0xff572300;
+            return true;
+        }
+        break;
+    case kModeMockba:
+        switch (paint.color)
+        {
+        case 0xff1a1a1a:
+        case 0xff666666:
+            paint.color = 0xffd7e3f4;
+            return true;
+        default:
+            return false;
+        }
+        break;
+    case kModeMog:
+        switch (paint.color)
+        {
+        case 0xff442499:
+        case 0xff587ee2:
+        case 0xff1ecae8:
+        case 0xff2dd6ac:
+        case 0xffcf924c:
+        case 0xffd8b3bb:
+        case 0xff29165d:
+        case 0xff354d89:
+        case 0xff127b8d:
+        case 0xff1b8269:
+        case 0xff7e592e:
+        case 0xff836d72:
+            return false;
+        }
+        break;
+    case kModePrism:
+        switch (paint.color)
+        {
+        case 0xff000000:
+        case 0xff505770:
+        case 0xff657c9b:
+        case 0xff7ba357:
+        case 0xff7f64f2:
+        case 0xff99e4ff:
+        case 0xffa7ff6c:
+        case 0xffc279e2:
+        case 0xffe079c4:
+        case 0xffe5ff66:
+        case 0xffff88d0:
+        case 0xffffa369:
+            return false;
+        case 0xff0f0f0f:
+            if (std::strcmp(shape->id, "path10") == 0 || std::strcmp(shape->id, "circle506") == 0)
+            {
+                paint.color = 0xffffffff;
+                return true;
+            }
+            return false;
+        case 0xffbababa:
+            paint.color = 0xff000000;
+            return true;
+        }
+        break;
+    case kModeRepelzen:
+        switch (paint.color)
+        {
+        case 0xff4c4ccc:
+        case 0xff87a610:
+        case 0xffb78e09:
+            return false;
+        case 0xff44bbd8:
+            paint.color = 0xff228ba5;
+            return true;
+        }
+        break;
+    case kModeSonusmodular:
+        switch (paint.color)
+        {
+        case 0xff2a2aff:
+        case 0xff4e4ed3:
+        case 0xff55ddff:
+        case 0xff87cdde:
+        case 0xffdbdbe3:
+        case 0xffe9afaf:
+            return false;
+        case 0xff0a1284:
+            paint.color = 0xff7a82f5;
+            return true;
+        }
+        break;
+    default:
+        break;
+    }
+
+    paint.color = invertColor(paint.color);
+    return true;
 }
+#endif // HEADLESS
 
 extern "C" {
 NSVGimage* nsvgParseFromFileCardinal(const char* filename, const char* units, float dpi);
 void nsvgDeleteCardinal(NSVGimage*);
 }
 
+#ifndef HEADLESS
 struct ExtendedNSVGimage {
     NSVGimage* const handle;
     NSVGimage* handleOrig;
@@ -788,11 +1189,11 @@ static std::list<ExtendedNSVGimage> loadedLightSVGs;
 static inline
 void nsvg__duplicatePaint(NSVGpaint& dst, NSVGpaint& src)
 {
-	if (dst.type == NSVG_PAINT_LINEAR_GRADIENT || dst.type == NSVG_PAINT_RADIAL_GRADIENT)
+    if (dst.type == NSVG_PAINT_LINEAR_GRADIENT || dst.type == NSVG_PAINT_RADIAL_GRADIENT)
     {
         const size_t size = sizeof(NSVGgradient) + sizeof(NSVGgradientStop)*(src.gradient->nstops-1);
-		dst.gradient = static_cast<NSVGgradient*>(malloc(size));
-		std::memcpy(dst.gradient, src.gradient, size);
+        dst.gradient = static_cast<NSVGgradient*>(malloc(size));
+        std::memcpy(dst.gradient, src.gradient, size);
     }
 }
 
@@ -858,11 +1259,38 @@ void deleteExtendedNSVGimage(ExtendedNSVGimage& ext)
         ext.handleOrig = nullptr;
     }
 }
+#endif // HEADLESS
 
 NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* const units, const float dpi)
 {
     if (NSVGimage* const handle = nsvgParseFromFile(filename, units, dpi))
     {
+        /*
+        if (NSVGshape* const shapes = handle->shapes)
+        {
+            for (NSVGshape *next, *shape = shapes;;)
+            {
+                next = shape->next;
+
+                nsvg__deletePaint(&shape->fill);
+                nsvg__deletePaint(&shape->stroke);
+                std::free(shape);
+
+                if (next == nullptr)
+                    break;
+
+                shape = next;
+            }
+        }
+        handle->shapes = static_cast<NSVGshape*>(std::calloc(1, sizeof(NSVGshape)));
+        handle->shapes->stroke.color = 0xff00ff00;
+        handle->shapes->stroke.type = NSVG_PAINT_COLOR;
+        handle->shapes->fill.color = 0xff000000;
+        handle->shapes->fill.type = NSVG_PAINT_COLOR;
+        return handle;
+        */
+
+       #ifndef HEADLESS
         const size_t filenamelen = std::strlen(filename);
 
         bool hasDarkMode = false;
@@ -872,22 +1300,28 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
         NSVGshape* shapesOrig;
         NSVGshape* shapesMOD;
 
-        // Special case for light/dark screws
-        if (std::strncmp(filename + (filenamelen-16), "/ScrewSilver.svg", 16) == 0)
+        if (filenamelen < 18)
         {
-            const std::string blackfilename = std::string(filename).substr(0, filenamelen-10) + "Black.svg";
-            hasDarkMode = true;
             shapesOrig = shapesMOD = nullptr;
-            handleMOD = nsvgParseFromFile(blackfilename.c_str(), units, dpi);
             goto postparse;
         }
 
-        if (std::strncmp(filename + (filenamelen-15), "/ScrewBlack.svg", 15) == 0)
+        // Special case for light/dark screws
+        if (std::strncmp(filename + (filenamelen-15), "/ScrewBlack.svg", 15) == 0 && filename[filenamelen-16] != '.')
         {
             const std::string silverfilename = std::string(filename).substr(0, filenamelen-9) + "Silver.svg";
             hasLightMode = true;
             shapesOrig = shapesMOD = nullptr;
             handleMOD = nsvgParseFromFile(silverfilename.c_str(), units, dpi);
+            goto postparse;
+        }
+
+        if (std::strncmp(filename + (filenamelen-16), "/ScrewSilver.svg", 16) == 0 && filename[filenamelen-17] != '.')
+        {
+            const std::string blackfilename = std::string(filename).substr(0, filenamelen-10) + "Black.svg";
+            hasDarkMode = true;
+            shapesOrig = shapesMOD = nullptr;
+            handleMOD = nsvgParseFromFile(blackfilename.c_str(), units, dpi);
             goto postparse;
         }
 
@@ -926,6 +1360,7 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             if (std::strncmp(filename + (filenamelen-filterlen), svgFileToInvert, filterlen) != 0)
                 continue;
 
+            const DarkMode mode = svgFilesToInvertForDarkMode[i].mode;
             const char* const* const shapeIdsToIgnore = svgFilesToInvertForDarkMode[i].shapeIdsToIgnore;
             const int shapeNumberToIgnore = svgFilesToInvertForDarkMode[i].shapeNumberToIgnore;
             int shapeCounter = 0;
@@ -953,8 +1388,8 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
                 if (ignore)
                     continue;
 
-                if (invertPaintForDarkMode(shape, shape->fill, svgFileToInvert))
-                    invertPaintForDarkMode(shape, shape->stroke, svgFileToInvert);
+                if (invertPaintForDarkMode(mode, shape, shape->fill, svgFileToInvert))
+                    invertPaintForDarkMode(mode, shape, shape->stroke, svgFileToInvert);
             }
 
             goto postparse;
@@ -971,6 +1406,8 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             if (std::strncmp(filename + (filenamelen-filterlen), svgFileToInvert, filterlen) != 0)
                 continue;
 
+            const LightMode mode = svgFilesToInvertForLightMode[i].mode;
+
             hasLightMode = true;
             handleMOD = nullptr;
             shapesOrig = handle->shapes;
@@ -979,8 +1416,8 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             // shape paint inversion
             for (NSVGshape* shape = shapesMOD; shape != nullptr; shape = shape->next)
             {
-                if (invertPaintForLightMode(shape, shape->fill))
-                    invertPaintForLightMode(shape, shape->stroke);
+                if (invertPaintForLightMode(mode, shape, shape->fill))
+                    invertPaintForLightMode(mode, shape, shape->stroke);
             }
 
             goto postparse;
@@ -1029,6 +1466,7 @@ postparse:
                     std::memcpy(handle, handleMOD, sizeof(NSVGimage));
             }
         }
+       #endif // HEADLESS
 
         return handle;
     }
@@ -1038,6 +1476,7 @@ postparse:
 
 void nsvgDeleteCardinal(NSVGimage* const handle)
 {
+   #ifndef HEADLESS
     for (auto it = loadedDarkSVGs.begin(), end = loadedDarkSVGs.end(); it != end; ++it)
     {
         ExtendedNSVGimage& ext(*it);
@@ -1061,16 +1500,23 @@ void nsvgDeleteCardinal(NSVGimage* const handle)
         loadedLightSVGs.erase(it);
         break;
     }
+   #endif
 
     nsvgDelete(handle);
 }
 
+namespace rack {
+
 void switchDarkMode(const bool darkMode)
 {
-    if (rack::settings::darkMode == darkMode)
+   #ifndef HEADLESS
+    if (settings::darkMode == darkMode)
         return;
 
-    rack::settings::darkMode = darkMode;
+    settings::darkMode = darkMode;
+    settings::uiTheme = darkMode ? "dark" : "light";
+    ui::refreshTheme();
+    plugin::updateStaticPluginsDarkMode();
 
     for (ExtendedNSVGimage& ext : loadedDarkSVGs)
     {
@@ -1087,12 +1533,13 @@ void switchDarkMode(const bool darkMode)
         else if (ext.handleMOD != nullptr)
             std::memcpy(ext.handle, !darkMode ? ext.handleMOD : ext.handleOrig, sizeof(NSVGimage));
     }
+   #endif
 }
 
-namespace rack {
 namespace asset {
 
 void destroy() {
+   #ifndef HEADLESS
     for (auto it = loadedDarkSVGs.begin(), end = loadedDarkSVGs.end(); it != end; ++it)
     {
         ExtendedNSVGimage& ext(*it);
@@ -1107,6 +1554,7 @@ void destroy() {
 
     loadedDarkSVGs.clear();
     loadedLightSVGs.clear();
+   #endif
 }
 
 }

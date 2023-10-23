@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,17 +17,13 @@
 
 /**
  * This file is an edited version of VCVRack's app/Scene.cpp
- * Copyright (C) 2016-2021 VCV.
+ * Copyright (C) 2016-2023 VCV.
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  */
-
-#include <thread>
-
-#include <osdialog.h>
 
 #include <app/Scene.hpp>
 #include <app/Browser.hpp>
@@ -46,18 +42,10 @@
 # undef DEBUG
 #endif
 
-#ifdef STATIC_BUILD
-# undef HAVE_LIBLO
-#endif
-
-#ifdef HAVE_LIBLO
-# include <lo/lo.h>
-#endif
-
 #include "../CardinalCommon.hpp"
-#include "extra/Base64.hpp"
-#include "DistrhoUtils.hpp"
+#include "../CardinalRemote.hpp"
 
+#include <algorithm>
 
 namespace rack {
 namespace app {
@@ -131,30 +119,8 @@ struct Scene::Internal {
 
 	bool heldArrowKeys[4] = {};
 
-#ifdef HAVE_LIBLO
 	double lastSceneChangeTime = 0.0;
 	int historyActionIndex = -1;
-
-	bool oscAutoDeploy = false;
-	bool oscConnected = false;
-	lo_server oscServer = nullptr;
-
-	static int osc_handler(const char* const path, const char* const types, lo_arg** argv, const int argc, lo_message, void* const self)
-	{
-		d_stdout("osc_handler(\"%s\", \"%s\", %p, %i)", path, types, argv, argc);
-
-		if (std::strcmp(path, "/resp") == 0 && argc == 2 && types[0] == 's' && types[1] == 's') {
-			d_stdout("osc_handler(\"%s\", ...) - got resp | '%s' '%s'", path, &argv[0]->s, &argv[1]->s);
-			if (std::strcmp(&argv[0]->s, "hello") == 0 && std::strcmp(&argv[1]->s, "ok") == 0)
-				static_cast<Internal*>(self)->oscConnected = true;
-		}
-		return 0;
-	}
-
-	~Internal() {
-		lo_server_free(oscServer);
-	}
-#endif
 };
 
 
@@ -173,7 +139,7 @@ Scene::Scene() {
 	browser->hide();
 	addChild(browser);
 
-	if (isStandalone())
+	if (isStandalone() || isMini())
 		return;
 
 	internal->resizeHandle = new ResizeHandle;
@@ -238,22 +204,33 @@ void Scene::step() {
 		rackScroll->offset += arrowDelta * arrowSpeed;
 	}
 
-#ifdef HAVE_LIBLO
-	if (internal->oscServer != nullptr) {
-		while (lo_server_recv_noblock(internal->oscServer, 0) != 0) {}
+	if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote()) {
+		idleRemote(remoteDetails);
 
-		if (internal->oscAutoDeploy) {
+		if (remoteDetails->autoDeploy) {
 			const int actionIndex = APP->history->actionIndex;
 			const double time = system::getTime();
-			if (internal->historyActionIndex != actionIndex && time - internal->lastSceneChangeTime >= 5.0) {
+
+			if (internal->historyActionIndex == -1) {
 				internal->historyActionIndex = actionIndex;
 				internal->lastSceneChangeTime = time;
-				patchUtils::deployToRemote();
-				window::generateScreenshot();
+			} else if (internal->historyActionIndex != actionIndex && actionIndex > 0 && time - internal->lastSceneChangeTime >= 1.0) {
+				const std::string& name(APP->history->actions[actionIndex - 1]->name);
+				static const std::vector<std::string> ignoredNames = {
+					"move knob",
+					"move modules",
+					"move switch",
+				};
+				if (std::find(ignoredNames.cbegin(), ignoredNames.cend(), name) == ignoredNames.cend()) {
+					printf("action '%s'\n", APP->history->actions[actionIndex - 1]->name.c_str());
+					remoteUtils::sendFullPatchToRemote(remoteDetails);
+					window::generateScreenshot();
+				}
+				internal->historyActionIndex = actionIndex;
+				internal->lastSceneChangeTime = time;
 			}
 		}
 	}
-#endif
 
 	Widget::step();
 }
@@ -284,7 +261,7 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		// DEBUG("key '%d '%c' scancode %d '%c' keyName '%s'", e.key, e.key, e.scancode, e.scancode, e.keyName.c_str());
 		if (e.keyName == "n" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			patchUtils::loadTemplateDialog();
+			patchUtils::loadTemplateDialog(false);
 			e.consume(this);
 		}
 		if (e.keyName == "q" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -299,13 +276,16 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			patchUtils::revertDialog();
 			e.consume(this);
 		}
-#ifndef DISTRHO_OS_WASM
 		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			// NOTE: will do nothing if path is empty, intentionally
-			patchUtils::saveDialog(APP->patch->path);
+			// NOTE: for plugin versions it will do nothing if path is empty, intentionally
+			if (APP->patch->path.empty()) {
+				if (isStandalone())
+					patchUtils::saveAsDialog();
+			} else {
+				patchUtils::saveDialog(APP->patch->path);
+			}
 			e.consume(this);
 		}
-#endif
 		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
 			patchUtils::saveAsDialog();
 			e.consume(this);
@@ -352,8 +332,11 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
-			patchUtils::deployToRemote();
-			window::generateScreenshot();
+			if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
+			{
+				remoteUtils::sendFullPatchToRemote(remoteDetails);
+				window::generateScreenshot();
+			}
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F9 && (e.mods & RACK_MOD_MASK) == 0) {
@@ -363,6 +346,8 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 #ifdef DISTRHO_OS_WASM
 		if (e.key == GLFW_KEY_F11 && (e.mods & RACK_MOD_MASK) == 0) {
 			APP->window->setFullScreen(!APP->window->isFullScreen());
+			// The MenuBar will be hidden when the mouse moves over the RackScrollWidget.
+			// menuBar->hide();
 			e.consume(this);
 		}
 #endif
@@ -489,94 +474,3 @@ void Scene::onPathDrop(const PathDropEvent& e) {
 
 } // namespace app
 } // namespace rack
-
-
-namespace patchUtils {
-
-
-bool connectToRemote() {
-#ifdef HAVE_LIBLO
-	rack::app::Scene::Internal* const internal = APP->scene->internal;
-
-	if (internal->oscServer == nullptr) {
-		const lo_server oscServer = lo_server_new_with_proto(nullptr, LO_UDP, nullptr);
-		DISTRHO_SAFE_ASSERT_RETURN(oscServer != nullptr, false);
-		lo_server_add_method(oscServer, "/resp", nullptr, rack::app::Scene::Internal::osc_handler, internal);
-		internal->oscServer = oscServer;
-	}
-
-	const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
-	DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr, false);
-	lo_send(addr, "/hello", "");
-	lo_address_free(addr);
-
-	return true;
-#else
-	return false;
-#endif
-}
-
-
-bool isRemoteConnected() {
-#ifdef HAVE_LIBLO
-	return APP->scene->internal->oscConnected;
-#else
-	return false;
-#endif
-}
-
-
-bool isRemoteAutoDeployed() {
-#ifdef HAVE_LIBLO
-	return APP->scene->internal->oscAutoDeploy;
-#else
-	return false;
-#endif
-}
-
-
-void setRemoteAutoDeploy(bool autoDeploy) {
-#ifdef HAVE_LIBLO
-	APP->scene->internal->oscAutoDeploy = autoDeploy;
-#endif
-}
-
-
-void deployToRemote() {
-#ifdef HAVE_LIBLO
-	const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
-	DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
-
-	APP->engine->prepareSave();
-	APP->patch->saveAutosave();
-	APP->patch->cleanAutosave();
-	std::vector<uint8_t> data(rack::system::archiveDirectory(APP->patch->autosavePath, 1));
-
-	if (const lo_blob blob = lo_blob_new(data.size(), data.data())) {
-		lo_send(addr, "/load", "b", blob);
-		lo_blob_free(blob);
-	}
-
-	lo_address_free(addr);
-#endif
-}
-
-
-void sendScreenshotToRemote(const char* const screenshot) {
-#ifdef HAVE_LIBLO
-	const lo_address addr = lo_address_new_with_proto(LO_UDP, REMOTE_HOST, REMOTE_HOST_PORT);
-	DISTRHO_SAFE_ASSERT_RETURN(addr != nullptr,);
-
-	std::vector<uint8_t> data(d_getChunkFromBase64String(screenshot));
-
-	if (const lo_blob blob = lo_blob_new(data.size(), data.data())) {
-		lo_send(addr, "/screenshot", "b", blob);
-		lo_blob_free(blob);
-	}
-
-	lo_address_free(addr);
-#endif
-}
-
-
-} // namespace patchUtils

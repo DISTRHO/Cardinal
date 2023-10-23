@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,10 +16,11 @@
  */
 
 #pragma once
-#include_next <condition_variable>
-#include "mingw.condition_variable.h"
 
-#undef IN
-#undef OUT
-#undef far
-#undef near
+#if (defined(__i386__) || defined(__x86_64__) || defined(__EMSCRIPTEN__)) && !defined(CARDINAL_NOSIMD)
+# include_next <emmintrin.h>
+#else
+# define SIMDE_ENABLE_NATIVE_ALIASES
+# include "simde/x86/sse.h"
+# undef SIMDE_ENABLE_NATIVE_ALIASES
+#endif

@@ -3,7 +3,7 @@
 
    This file is part of the Water library.
    Copyright (c) 2016 ROLI Ltd.
-   Copyright (C) 2017-2019 Filipe Coelho <falktx@falktx.com>
+   Copyright (C) 2017-2022 Filipe Coelho <falktx@falktx.com>
 
    Permission is granted to use this software under the terms of the ISC license
    http://www.isc.org/downloads/software-support-policy/isc-license/
@@ -27,7 +27,7 @@
 #define WATER_SHAREDRESOURCEPOINTER_HPP_INCLUDED
 
 #include "ReferenceCountedObject.hpp"
-#include "SpinLock.hpp"
+#include "extra/Mutex.hpp"
 #include "extra/ScopedPointer.hpp"
 
 START_NAMESPACE_DISTRHO
@@ -107,6 +107,13 @@ public:
         initialise_variant<T>(variant);
     }
 
+    template<class T1, class T2>
+    SharedResourcePointer(const T1* const v1, const T2* const v2)
+      : sharedObject(nullptr)
+    {
+        initialise_variant2<T1, T2>(v1, v2);
+    }
+
     SharedResourcePointer (const SharedResourcePointer&)
       : sharedObject(nullptr)
     {
@@ -120,7 +127,7 @@ public:
     ~SharedResourcePointer()
     {
         SharedObjectHolder& holder = getSharedObjectHolder();
-        const SpinLock::ScopedLockType sl (holder.lock);
+        const MutexLocker cml (holder.lock);
 
         if (--(holder.refCount) == 0)
             holder.sharedInstance = nullptr;
@@ -143,7 +150,7 @@ public:
 private:
     struct SharedObjectHolder  : public ReferenceCountedObject
     {
-        SpinLock lock;
+        Mutex lock;
         ScopedPointer<SharedObjectType> sharedInstance;
         int refCount;
     };
@@ -159,7 +166,7 @@ private:
     void initialise()
     {
         SharedObjectHolder& holder = getSharedObjectHolder();
-        const SpinLock::ScopedLockType sl (holder.lock);
+        const MutexLocker cml (holder.lock);
 
         if (++(holder.refCount) == 1)
             holder.sharedInstance = new SharedObjectType();
@@ -171,10 +178,22 @@ private:
     void initialise_variant(const T* const variant)
     {
         SharedObjectHolder& holder = getSharedObjectHolder();
-        const SpinLock::ScopedLockType sl (holder.lock);
+        const MutexLocker cml (holder.lock);
 
         if (++(holder.refCount) == 1)
             holder.sharedInstance = new SharedObjectType(variant);
+
+        sharedObject = holder.sharedInstance;
+    }
+
+    template<class T1, class T2>
+    void initialise_variant2(const T1* const v1, const T2* const v2)
+    {
+        SharedObjectHolder& holder = getSharedObjectHolder();
+        const MutexLocker cml (holder.lock);
+
+        if (++(holder.refCount) == 1)
+            holder.sharedInstance = new SharedObjectType(v1, v2);
 
         sharedObject = holder.sharedInstance;
     }

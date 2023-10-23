@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
-project(Cardinal VERSION 22.09)
+project(Cardinal VERSION 23.10)
 
-add_subdirectory(JUCE)
+include(FetchContent)
+FetchContent_Declare(JUCE
+  GIT_REPOSITORY https://github.com/DISTRHO/JUCE.git
+  GIT_TAG v6.1.6
+  GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(JUCE)
 
 # Config
 
@@ -36,9 +42,6 @@ set_property(TARGET lilv PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../ca
 
 add_library(rtmempool STATIC IMPORTED)
 set_property(TARGET rtmempool PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/rtmempool.a")
-
-add_library(sfzero STATIC IMPORTED)
-set_property(TARGET sfzero PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/sfzero.a")
 
 add_library(water STATIC IMPORTED)
 set_property(TARGET water PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../carla/build/modules/${CMAKE_BUILD_TYPE}/water.a")
@@ -88,6 +91,30 @@ set_property(TARGET libspeexdsp PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR
 
 add_library(libzstd STATIC IMPORTED)
 set_property(TARGET libzstd PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/../src/Rack/dep/lib/libzstd.a")
+
+set(SURGE_DEP_PATH "${PROJECT_SOURCE_DIR}/../deps/surge-build")
+
+add_library(surgedep01 STATIC IMPORTED)
+add_library(surgedep02 STATIC IMPORTED)
+add_library(surgedep03 STATIC IMPORTED)
+add_library(surgedep04 STATIC IMPORTED)
+add_library(surgedep05 STATIC IMPORTED)
+add_library(surgedep06 STATIC IMPORTED)
+add_library(surgedep07 STATIC IMPORTED)
+#add_library(surgedep08 STATIC IMPORTED)
+add_library(surgedep09 STATIC IMPORTED)
+add_library(surgedep10 STATIC IMPORTED)
+
+set_property(TARGET surgedep01 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/src/common/libsurge-common.a")
+set_property(TARGET surgedep02 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/src/common/libjuce_dsp_rack_sub.a")
+set_property(TARGET surgedep03 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/airwindows/libairwindows.a")
+set_property(TARGET surgedep04 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/eurorack/libeurorack.a")
+set_property(TARGET surgedep05 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/fmt/libfmt.a")
+set_property(TARGET surgedep06 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sqlite-3.23.3/libsqlite.a")
+set_property(TARGET surgedep07 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libsst-plugininfra.a")
+#set_property(TARGET surgedep08 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libs/filesystem/libfilesystem.a")
+set_property(TARGET surgedep09 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libs/strnatcmp/libstrnatcmp.a")
+set_property(TARGET surgedep10 PROPERTY IMPORTED_LOCATION "${SURGE_DEP_PATH}/libs/sst/sst-plugininfra/libs/tinyxml/libtinyxml.a")
 
 # dependencies
 
@@ -139,6 +166,7 @@ target_sources(Cardinal
 target_include_directories(Cardinal
     PRIVATE
         ../dpf/distrho
+        ../dpf/dgl/src/pugl-upstream/include
         ../src/Cardinal)
 
 target_compile_definitions(Cardinal
@@ -155,9 +183,9 @@ target_compile_definitions(Cardinal
         JUCE_USE_OGGVORBIS=0
         JUCE_USE_XINERAMA=0
         JUCE_VST3_CAN_REPLACE_VST2=0
-        JUCE_ALSA=1
+        JUCE_ALSA=0
         JUCE_DIRECTSOUND=0
-        JUCE_JACK=1
+        JUCE_JACK=0
         JUCE_WASAPI=0
         JUCE_WEB_BROWSER=0)
 
@@ -176,11 +204,20 @@ target_link_libraries(Cardinal
         jackbridge
         lilv
         rtmempool
-        sfzero
         water
         ysfx
         zita_resampler
         dgl
+        surgedep01
+        surgedep02
+        surgedep03
+        surgedep04
+        surgedep05
+        surgedep06
+        surgedep07
+        #surgedep08
+        surgedep09
+        surgedep10
         libaubio
         libarchive
         libjansson
@@ -203,7 +240,6 @@ target_link_libraries(Cardinal
         -lmagic
     PUBLIC
         juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
 #]]
 
@@ -232,6 +268,7 @@ target_sources(CardinalFX
 target_include_directories(CardinalFX
     PRIVATE
         ../dpf/distrho
+        ../dpf/dgl/src/pugl-upstream/include
         ../src/CardinalFX)
 
 target_compile_definitions(CardinalFX
@@ -248,9 +285,9 @@ target_compile_definitions(CardinalFX
         JUCE_USE_OGGVORBIS=0
         JUCE_USE_XINERAMA=0
         JUCE_VST3_CAN_REPLACE_VST2=0
-        JUCE_ALSA=1
+        JUCE_ALSA=0
         JUCE_DIRECTSOUND=0
-        JUCE_JACK=1
+        JUCE_JACK=0
         JUCE_WASAPI=0
         JUCE_WEB_BROWSER=0)
 
@@ -269,11 +306,20 @@ target_link_libraries(CardinalFX
         jackbridge
         lilv
         rtmempool
-        sfzero
         water
         ysfx
         zita_resampler
         dgl
+        surgedep01
+        surgedep02
+        surgedep03
+        surgedep04
+        surgedep05
+        surgedep06
+        surgedep07
+        #surgedep08
+        surgedep09
+        surgedep10
         libaubio
         libarchive
         libjansson
@@ -296,7 +342,107 @@ target_link_libraries(CardinalFX
         -lmagic
     PUBLIC
         juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
+        juce::juce_recommended_warning_flags)
+
+# MIDI variant
+
+juce_add_plugin(CardinalMIDI
+    AU_MAIN_TYPE kAudioUnitType_MIDIProcessor
+    COMPANY_COPYRIGHT "GPL-3.0-or-later"
+    COMPANY_NAME "DISTRHO"
+    COMPANY_WEBSITE "https://github.com/DISTRHO/Cardinal"
+    DESCRIPTION "Virtual modular synthesizer plugin"
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    FORMATS ${PLUGIN_FORMATS}
+    IS_MIDI_EFFECT TRUE
+    IS_SYNTH FALSE
+    NEEDS_MIDI_INPUT TRUE
+    NEEDS_MIDI_OUTPUT TRUE
+    PLUGIN_CODE DcnM
+    PLUGIN_MANUFACTURER_CODE Dstr
+    PRODUCT_NAME "CardinalMIDI")
+
+target_sources(CardinalMIDI
+    PRIVATE
+        CardinalWrapper.cpp)
+
+target_include_directories(CardinalMIDI
+    PRIVATE
+        ../dpf/distrho
+        ../dpf/dgl/src/pugl-upstream/include
+        ../src/CardinalFX)
+
+target_compile_definitions(CardinalMIDI
+    PUBLIC
+        DISTRHO_NAMESPACE=CardinalDISTRHO
+        DGL_NAMESPACE=CardinalDGL
+        JucePlugin_PreferredChannelConfigurations=2,2
+        JUCE_CHECK_MEMORY_LEAKS=0
+        JUCE_DISABLE_NATIVE_FILECHOOSERS=1
+        JUCE_DISPLAY_SPLASH_SCREEN=0
+        JUCE_MODAL_LOOPS_PERMITTED=0
+        JUCE_USE_CURL=0
+        JUCE_USE_FLAC=0
+        JUCE_USE_OGGVORBIS=0
+        JUCE_USE_XINERAMA=0
+        JUCE_VST3_CAN_REPLACE_VST2=0
+        JUCE_ALSA=0
+        JUCE_DIRECTSOUND=0
+        JUCE_JACK=0
+        JUCE_WASAPI=0
+        JUCE_WEB_BROWSER=0)
+
+target_link_libraries(CardinalMIDI
+    PRIVATE
+        juce::juce_audio_utils
+        ${STATIC_LIBS_START}
+        sPlugins
+        sCardinalFX
+        sRack
+        carla_host_plugin
+        carla_engine_plugin
+        carla_plugin
+        native_plugins
+        audio_decoder
+        jackbridge
+        lilv
+        rtmempool
+        water
+        ysfx
+        zita_resampler
+        dgl
+        surgedep01
+        surgedep02
+        surgedep03
+        surgedep04
+        surgedep05
+        surgedep06
+        surgedep07
+        #surgedep08
+        surgedep09
+        surgedep10
+        libaubio
+        libarchive
+        libjansson
+        libquickjs
+        libsamplerate
+        libspeexdsp
+        libzstd
+        ${STATIC_LIBS_END}
+        ${GL_LIBRARIES}
+        ${DBUS_LIBRARIES}
+        -L${LIBLO_LIBRARY_DIRS}
+        ${FFTW3F_LIBRARIES}
+        ${LIBLO_LIBRARIES}
+        ${SNDFILE_LIBRARIES}
+        ${X11_LIBRARIES}
+        ${XCURSOR_LIBRARIES}
+        ${XEXT_LIBRARIES}
+        ${XRANDR_LIBRARIES}
+        ${EXTRA_LIBS}
+        -lmagic
+    PUBLIC
+        juce::juce_recommended_config_flags
         juce::juce_recommended_warning_flags)
 
 # Synth variant
@@ -324,6 +470,7 @@ target_sources(CardinalSynth
 target_include_directories(CardinalSynth
     PRIVATE
         ../dpf/distrho
+        ../dpf/dgl/src/pugl-upstream/include
         ../src/CardinalSynth)
 
 target_compile_definitions(CardinalSynth
@@ -340,9 +487,9 @@ target_compile_definitions(CardinalSynth
         JUCE_USE_OGGVORBIS=0
         JUCE_USE_XINERAMA=0
         JUCE_VST3_CAN_REPLACE_VST2=0
-        JUCE_ALSA=1
+        JUCE_ALSA=0
         JUCE_DIRECTSOUND=0
-        JUCE_JACK=1
+        JUCE_JACK=0
         JUCE_WASAPI=0
         JUCE_WEB_BROWSER=0)
 
@@ -361,11 +508,20 @@ target_link_libraries(CardinalSynth
         jackbridge
         lilv
         rtmempool
-        sfzero
         water
         ysfx
         zita_resampler
         dgl
+        surgedep01
+        surgedep02
+        surgedep03
+        surgedep04
+        surgedep05
+        surgedep06
+        surgedep07
+        #surgedep08
+        surgedep09
+        surgedep10
         libaubio
         libarchive
         libjansson
@@ -388,5 +544,4 @@ target_link_libraries(CardinalSynth
         -lmagic
     PUBLIC
         juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)

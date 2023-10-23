@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,19 +17,11 @@
 
 #pragma once
 
-/* On mingw stdio functions like printf are not inline, and thus get defined every time they are used.
- * We go through a few steps to ensure unique symbol names.
- */
-#ifdef STDIO_OVERRIDE
-
-// helper macros
-# define STDIO_OVERRIDE_HELPER(NS, SEP, FN) NS ## SEP ## FN
-# define STDIO_OVERRIDE_MACRO(NS, FN) STDIO_OVERRIDE_HELPER(NS, _, FN)
-
-// prefix the needed stdio functions
-# define printf STDIO_OVERRIDE_MACRO(STDIO_OVERRIDE, printf)
-
-#endif // STDIO_OVERRIDE
-
-// now just include the real stdio.h
-#include_next <stdio.h>
+#if (defined(__i386__) || defined(__x86_64__) || defined(__EMSCRIPTEN__)) && !defined(CARDINAL_NOSIMD)
+# include_next <immintrin.h>
+#else
+# define SIMDE_ENABLE_NATIVE_ALIASES
+# include "../simde/simde/x86/sse.h"
+# include "../simde/simde/x86/sse2.h"
+# undef SIMDE_ENABLE_NATIVE_ALIASES
+#endif

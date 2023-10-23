@@ -1,0 +1,176 @@
+--- ../Rack/src/app/ModuleWidget.cpp	2023-09-10 12:59:02.630898560 +0200
++++ ModuleWidget.cpp	2023-05-20 18:40:08.948302802 +0200
+@@ -1,8 +1,35 @@
++/*
++ * DISTRHO Cardinal Plugin
++ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * For a full copy of the GNU General Public License see the LICENSE file.
++ */
++
++/**
++ * This file is an edited version of VCVRack's ModuleWidget.cpp
++ * Copyright (C) 2016-2023 VCV.
++ *
++ * This program is free software: you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or (at your option) any later version.
++ */
++
++#include "../../CardinalCommon.hpp"
++
+ #include <thread>
+ #include <regex>
+ 
+-#include <osdialog.h>
+-
+ #include <app/ModuleWidget.hpp>
+ #include <app/Scene.hpp>
+ #include <engine/Engine.hpp>
+@@ -375,7 +402,7 @@
+ 			if (e.action == GLFW_PRESS) {
+ 				// Open selection context menu on right-click
+ 				ui::Menu* menu = createMenu();
+-				APP->scene->rack->appendSelectionContextMenu(menu);
++				patchUtils::appendSelectionContextMenu(menu);
+ 			}
+ 			e.consume(this);
+ 		}
+@@ -629,6 +656,9 @@
+ 	std::string presetDir = model->getUserPresetDirectory();
+ 	system::createDirectories(presetDir);
+ 
++	WeakPtr<ModuleWidget> weakThis = this;
++	async_dialog_filebrowser(false, nullptr, presetDir.c_str(), "Load preset", [=](char* pathC) {
++
+ 	// Delete directories if empty
+ 	DEFER({
+ 		try {
+@@ -640,10 +670,8 @@
+ 		}
+ 	});
+ 
+-	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
+-	DEFER({osdialog_filters_free(filters);});
+-
+-	char* pathC = osdialog_file(OSDIALOG_OPEN, presetDir.c_str(), NULL, filters);
++	if (!weakThis)
++		return;
+ 	if (!pathC) {
+ 		// No path selected
+ 		return;
+@@ -651,11 +679,13 @@
+ 	DEFER({std::free(pathC);});
+ 
+ 	try {
+-		loadAction(pathC);
++		weakThis->loadAction(pathC);
+ 	}
+ 	catch (Exception& e) {
+-		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, e.what());
++		async_dialog_message(e.what());
+ 	}
++
++	});
+ }
+ 
+ void ModuleWidget::save(std::string filename) {
+@@ -670,7 +700,7 @@
+ 	FILE* file = std::fopen(filename.c_str(), "w");
+ 	if (!file) {
+ 		std::string message = string::f("Could not save preset to file %s", filename.c_str());
+-		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
++		async_dialog_message(message.c_str());
+ 		return;
+ 	}
+ 	DEFER({std::fclose(file);});
+@@ -688,10 +718,12 @@
+ void ModuleWidget::saveTemplateDialog() {
+ 	if (hasTemplate()) {
+ 		std::string message = string::f("Overwrite default preset for %s?", model->getFullName().c_str());
+-		if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, message.c_str()))
+-			return;
++		WeakPtr<ModuleWidget> weakThis = this;
++		async_dialog_message(message.c_str(), [=]{
++			if (weakThis)
++				weakThis->saveTemplate();
++		});
+ 	}
+-	saveTemplate();
+ }
+ 
+ bool ModuleWidget::hasTemplate() {
+@@ -708,15 +740,20 @@
+ 
+ void ModuleWidget::clearTemplateDialog() {
+ 	std::string message = string::f("Delete default preset for %s?", model->getFullName().c_str());
+-	if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, message.c_str()))
+-		return;
+-	clearTemplate();
++	WeakPtr<ModuleWidget> weakThis = this;
++	async_dialog_message(message.c_str(), [=]{
++		if (weakThis)
++			weakThis->clearTemplate();
++	});
+ }
+ 
+ void ModuleWidget::saveDialog() {
+ 	std::string presetDir = model->getUserPresetDirectory();
+ 	system::createDirectories(presetDir);
+ 
++	WeakPtr<ModuleWidget> weakThis = this;
++	async_dialog_filebrowser(true, "preset.vcvm", presetDir.c_str(), "Save preset", [=](char* pathC) {
++
+ 	// Delete directories if empty
+ 	DEFER({
+ 		try {
+@@ -728,10 +765,8 @@
+ 		}
+ 	});
+ 
+-	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
+-	DEFER({osdialog_filters_free(filters);});
+-
+-	char* pathC = osdialog_file(OSDIALOG_SAVE, presetDir.c_str(), "Untitled.vcvm", filters);
++	if (!weakThis)
++		return;
+ 	if (!pathC) {
+ 		// No path selected
+ 		return;
+@@ -743,7 +778,8 @@
+ 	if (system::getExtension(path) != ".vcvm")
+ 		path += ".vcvm";
+ 
+-	save(path);
++	weakThis->save(path);
++	});
+ }
+ 
+ void ModuleWidget::disconnect() {
+@@ -965,7 +1001,7 @@
+ 						moduleWidget->loadAction(path);
+ 					}
+ 					catch (Exception& e) {
+-						osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, e.what());
++						async_dialog_message(e.what());
+ 					}
+ 				}));
+ 			}
+@@ -1129,4 +1165,4 @@
+ 
+ 
+ } // namespace app
+-} // namespace rack
+\ No newline at end of file
++} // namespace rack

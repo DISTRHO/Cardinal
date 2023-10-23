@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,21 +15,5 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#pragma once
-
-#include_next <rack.hpp>
-
-#ifdef BUILDING_PLUGIN_MODULES
-namespace rack {
-namespace app {
-struct CardinalModuleWidget : ModuleWidget {
-    CardinalModuleWidget() : ModuleWidget() {}
-    DEPRECATED CardinalModuleWidget(engine::Module* module) : ModuleWidget() {
-        setModule(module);
-    }
-    void onButton(const ButtonEvent& e) override;
-};
-}
-}
-# define ModuleWidget CardinalModuleWidget
-#endif
+#define CARDINAL_COMMON_DSP_ONLY
+#include "../CardinalCommon.cpp"

@@ -4,12 +4,6 @@
 [submodule "dpf"]
 	path = dpf
 	url = https://github.com/DISTRHO/DPF.git
-[submodule "plugins/Cardinal/mingw-std-threads"]
-	path = include/mingw-std-threads
-	url = https://github.com/meganz/mingw-std-threads.git
-[submodule "plugins/Cardinal/sse2neon"]
-	path = include/sse2neon
-	url = https://github.com/DLTcollab/sse2neon.git
 [submodule "plugins/Befaco"]
 	path = plugins/Befaco
 	url = https://github.com/VCVRack/Befaco.git
@@ -209,6 +203,36 @@
 [submodule "plugins/myth-modules"]
 	path = plugins/myth-modules
 	url = https://github.com/Ahineya/vcv-myth-plugin.git
+[submodule "plugins/alefsbits"]
+	path = plugins/alefsbits
+	url = https://github.com/alefnull/alefsbits.git
+[submodule "plugins/h4n4-modules"]
+	path = plugins/h4n4-modules
+	url = https://github.com/hannakoppelaar/h4n4-modules.git
+[submodule "plugins/dBiz"]
+	path = plugins/dBiz
+	url = https://github.com/dBiz/dBiz.git
+[submodule "include/simde"]
+	path = include/simde
+	url = https://github.com/simd-everywhere/simde.git
+[submodule "plugins/RebelTech"]
+	path = plugins/RebelTech
+	url = https://github.com/hemmer/rebel-tech-vcv.git
+[submodule "plugins/stoermelder-packone"]
+	path = plugins/stoermelder-packone
+	url = https://github.com/stoermelder/vcvrack-packone.git
+[submodule "plugins/surgext"]
+	path = plugins/surgext
+	url = https://github.com/surge-synthesizer/surge-rack.git
+[submodule "plugins/Sapphire"]
+	path = plugins/Sapphire
+	url = https://github.com/cosinekitty/sapphire.git
+[submodule "plugins/Cardinal/src/AIDA-X/RTNeural"]
+	path = plugins/Cardinal/src/AIDA-X/RTNeural
+	url = https://github.com/jatinchowdhury18/RTNeural.git
+[submodule "plugins/EnigmaCurry"]
+	path = plugins/EnigmaCurry
+	url = https://github.com/EnigmaCurry/EnigmaCurry-vcv-pack.git
 [submodule "plugins/StarlingVia"]
 	path = plugins/StarlingVia
 	url = https://github.com/starlingcode/Via-for-Rack.git

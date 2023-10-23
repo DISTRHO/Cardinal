@@ -16,6 +16,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | 21kHz                   | MIT                      | |
 | 8Mode                   | BSD-3-Clause             | |
 | Aaron Static            | MIT                      | |
+| alef's bits             | GPL-3.0-or-later         | |
 | AlgoritmArte            | GPL-3.0-or-later         | |
 | Amalgamated Harmonics   | BSD-3-Clause             | |
 | Animated Circuits       | GPL-3.0-or-later         | |
@@ -32,7 +33,9 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Catro/Modulo            | BSD-3-Clause             | |
 | cf                      | BSD-3-Clause             | |
 | ChowDSP                 | GPL-3.0-or-later         | |
+| dBiz                    | GPL-3.0-or-later         | |
 | DrumKit                 | CC0-1.0                  | |
+| EnigmaCurry             | GPL-3.0-or-later         | |
 | E-Series                | GPL-3.0-or-later         | |
 | ExpertSleepers Encoders | MIT                      | |
 | Extratone               | GPL-3.0-or-later         | |
@@ -42,6 +45,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Glue the Giant          | GPL-3.0-or-later         | |
 | GoodSheperd             | GPL-3.0-or-later         | |
 | Grande                  | GPL-3.0-or-later         | |
+| H4N4 Modules            | GPL-3.0-or-later         | |
 | Hampton Harmonics       | MIT                      | |
 | HetrickCV               | CC0-1.0                  | |
 | ihtsyn                  | GPL-3.0-or-later         | |
@@ -69,9 +73,13 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Prism                   | BSD-3-Clause             | |
 | Rackwindows             | MIT                      | |
 | repelzen                | GPL-3.0-or-later         | |
+| RebelTech               | GPL-2.0-or-later         | |
+| Sapphire                | GPL-3.0-or-later         | |
 | Sonus Modular           | GPL-3.0-or-later         | |
 | Starling Via            | MIT                      | |
 | stocaudio               | GPL-3.0-or-later         | |
+| Stoermelder Pack-One    | GPL-3.0-or-later         | |
+| Surge XT                | GPL-3.0-or-later         | |
 | unless_modules          | GPL-3.0-or-later         | |
 | Valley                  | GPL-3.0-or-later         | |
 | Voxglitch               | GPL-3.0-or-later         | |
@@ -99,6 +107,7 @@ Below is a list of artwork licenses from plugins
 | 8Mode                                   | BSD-3-Clause     | No artwork specific license provided |
 | AaronStatic/*                           | MIT              | No artwork specific license provided |
 | AaronStatic/fonts/PixelOperator.ttf     | CC0-1.0          | |
+| alefsbits/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | Algoritmarte/*                          | GPL-3.0-or-later | No artwork specific license provided |
 | Algoritmarte/LEDSliderGreenHandle.svg   | CC-BY-NC-4.0     | |
 | AmalgamatedHarmonics/*                  | BSD-3-Clause     | No artwork specific license provided |
@@ -122,8 +131,15 @@ Below is a list of artwork licenses from plugins
 | BaconPlugs/*                            | GPL-3.0-or-later | No artwork specific license provided |
 | BaconPlugs/midi/*                       | CC-BY-SA-3.0-DE  | |
 | BaconPlugs/midi/beeth/*                 | ???              | Unused in Cardinal, taken from http://www.jsbach.net/ |
-| BaconPlugs/1f953.svg                    | CC-BY-4.0        | |
+| BaconPlugs/FiraMono-Regular.ttf         | OFL-1.1-RFN      | |
+| BaconPlugs/Monitorica-Bd.ttf            | CC-BY-SA-4.0     | |
 | BaconPlugs/Keypunch029.json             | OFL-1.1          | |
+| BaconPlugs/1f953.svg                    | CC-BY-4.0        | |
+| BaconPlugs/1f60d.svg                    | CC-BY-4.0        | |
+| BaconPlugs/HelpActive.svg               | CC0-1.0          | |
+| BaconPlugs/HelpActiveSmall.svg          | CC0-1.0          | |
+| BaconPlugs/SABROG-*.svg                 | CC0-1.0          | |
+| BaconPlugs/sabrog-*.svg                 | CC0-1.0          | |
 | Bidoo/*                                 | CC-BY-NC-ND-4.0  | [Special permission granted for runtime dark mode](https://github.com/sebastien-bouffier/Bidoo/issues/191) |
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
 | Befaco/fonts/Segment7Standard.otf       | OFL-1.1-RFN      | |
@@ -141,8 +157,15 @@ Below is a list of artwork licenses from plugins
 | cf/VT323-Regular.ttf                    | OFL-1.1-no-RFN   | |
 | ChowDSP/*                               | GPL-3.0-or-later | Same license as source code |
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
+| dBiz/*                                  | CC-BY-NC-ND-4.0  | |
+| dBiz/DejaVuSansMono.ttf                 | Bitstream-Vera   | |
+| dBiz/ShareTechMono-Regular.ttf          | OFL-1.1          | |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
+| EnigmaCurry/res/fonts/dseg/*            | OFL-1.1-RFN      | |
+| EnigmaCurry/res/fonts/Fantasque/*       | OFL-1.1          | |
+| EnigmaCurry/res/fonts/manrope/*         | OFL-1.1          | |
+| EnigmaCurry/res/*.svg                   | CC0-1.0          | |
 | E-Series/*                              | Custom           | Copyright © Synthesis Technology, [used and distributed with permission](LICENSE-PERMISSIONS.md#eseries-paul-schreiber--synthtech) |
 | ExpertSleepers-Encoders/*               | MIT              | [Same license as source code](https://github.com/expertsleepersltd/vcvrack-encoders/issues/3) |
 | Extratone/*                             | GPL-3.0-or-later | [Same license as source code](https://github.com/EaterOfSheep/Extratone/issues/7) |
@@ -153,6 +176,7 @@ Below is a list of artwork licenses from plugins
 | GlueTheGiant/fonts/DSEG7-*              | OFL-1.1-RFN      | |
 | GoodSheperd/*                           | GPL-3.0-or-later | No artwork specific license provided |
 | GrandeModular/*                         | CC-BY-NC-ND-4.0  | |
+| h4n4-modules/*                          | GPL-3.0-or-later | No artwork specific license provided |
 | HamptonHarmonics/*                      | MIT              | No artwork specific license provided |
 | HamptonHarmonics/PixelOperator.ttf      | CC0-1.0          | |
 | HetrickCV/*                             | CC0-1.0          | |
@@ -201,9 +225,16 @@ Below is a list of artwork licenses from plugins
 | Prism/RobotoCondensed-Regular.ttf       | Apache-2.0       | |
 | Rackwindows/*                           | MIT              | [Same license as source code](https://github.com/n0jo/rackwindows/issues/15) |
 | repelzen/*                              | CC-BY-SA-4.0     | |
+| RebelTech/*                             | CC-BY-NC-4.0     | |
+| Sapphire/*                              | GPL-3.0-or-later | No artwork specific license provided |
 | sonusmodular/*                          | GPL-3.0-or-later | [Same license as source code](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
 | StarlingVia/*                           | MIT              | No artwork specific license provided |
 | stocaudio/*                             | GPL-3.0-or-later | No artwork specific license provided |
+| stoermelder-packone/*                   | GPL-3.0-or-later | No artwork specific license provided |
+| stoermelder-packone/fonts/RedkostComic.otf | OFL-1.1-RFN   | |
+| surgext/*                               | GPL-3.0-or-later | |
+| surgext/xt/*                            | CC-BY-NC-SA-4.0  | |
+| surgext/xt/fonts/quicksand/*            | OFL-1.1-RFN      | |
 | unless_modules/*                        | CC-BY-NC-ND-4.0  | |
 | unless_modules/font/CuteFont-Regular.ttf| OFL-1.1          | |
 | unless_modules/font/Terminus.ttf        | GPL-2.0-or-later | [Starting from v4.32, font license is OFL-1.1](https://files.ax86.net/terminus-ttf/#license) |

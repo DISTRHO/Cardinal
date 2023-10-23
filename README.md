@@ -3,13 +3,13 @@
 *Cardinal, the Rack!*
 
 Cardinal is a free and open-source virtual modular synthesizer plugin,
-available as JACK standalone and AU, LV2, VST2 and VST3 audio plugin for FreeBSD, Linux, macOS and Windows.  
+available in AudioUnit/CLAP/LV2/VST2/VST3 plugin formats and as a standalone app for FreeBSD, Linux, macOS, Windows and the Web.  
 It is based on the popular [VCV Rack](https://vcvrack.com/) but with a focus on being a fully self-contained plugin version.
 
 More specifically, this is a [DPF-based](https://github.com/DISTRHO/DPF/)
 plugin wrapper around [VCV Rack](https://github.com/VCVRack/Rack/),
 using its code directly instead of forking the project,
-with the target of having a **proper, self-contained, fully free and open-source plugin version of Rack**.  
+with the target of having a **self-contained, fully free and open-source plugin version of Rack**.  
 See the [why section](#Why) below for the reasons Cardinal exists,
 also for frequently asked questions check this [FAQ document](docs/FAQ.md).
 
@@ -25,14 +25,16 @@ All VCV branding has been removed (to the best of our knowledge) in order to avo
 Cardinal should be considered stable, if you spot any bugs please report them.  
 Currently the following should be noted:
 
-- Windows 32bit builds do not work well [#80](https://github.com/DISTRHO/Cardinal/issues/80)
+- CLAP support is a work-in-progress [DPF#383](https://github.com/DISTRHO/DPF/issues/383)
+- VST3 plugin hosting (inside Carla or Ildaeil modules) mostly works but is considered experimental
+- Windows 32bit builds still have a few problematic modules [#80](https://github.com/DISTRHO/Cardinal/issues/80)
 
 ### Stable release
 
 Cardinal releases have official builds for Linux, macOS and Windows.  
 You can find these under https://github.com/DISTRHO/Cardinal/releases.
 
-There are Linux builds for various architectures (armhf, arm64, i686 and x86_64), macOS "universal" (arm64 + intel) and Windows 32 and 64bit builds.
+There are Linux builds for various architectures (armhf, arm64, i686, riscv64 and x86_64), macOS "universal" (arm64 + intel) and Windows 32 and 64bit builds.
 Both macOS and Windows builds have an installer.  
 Install instructions are available [here](https://github.com/DISTRHO/Cardinal/wiki/Install).
 
@@ -62,9 +64,10 @@ All variants have MIDI input and output support.
 
 ### Main
 
-This variant provides 8 audio inputs and outputs and 10 CV inputs and outputs.  
+This variant provides 8 audio inputs and outputs and 10 CV inputs and outputs.
 
-NOTE: Due to AU and VST2 formats not supporting CV ports, this variant is not available for those formats.
+NOTE: Due to AU and VST2 formats not supporting CV ports, this variant is not available for those formats.  
+NOTE: This variant is not available in CLAP yet, to be added in a later release
 
 ### Synth
 
@@ -75,6 +78,19 @@ Plugin type is set as "instrument".
 
 This variant provides 2 audio inputs and outputs, but no CV ports.  
 Plugin type is set as regular "effect".
+
+### Mini
+
+This is a special variant with a very small, hand-picked module selection and limited IO (2 audio ports plus 5 CV).  
+It only exists as LV2 and Standalone plugin.
+
+For now the list of selected modules is quite small, intentionally. We will add a few more as the need appears.  
+All included modules support polyphony, reducing confusion for new users not yet used to mono vs poly approach in Rack/Cardinal.
+
+The main reason for this variant to exist is being able to support DSP/UI separation, which is only possible with more simple modules.  
+The DSP/UI separation means we can run the DSP on a different machine than the UI.  
+This is particularly interesting for running Cardinal on embed systems, being controlled remotely via a web browser or a native desktop application.  
+Such setup is already in use in [Cardinal Mini for MOD Audio](https://forum.mod.audio/t/distrho-cardinal-mini/9262/).
 
 
 ## Screenshots
@@ -103,77 +119,85 @@ But a couple of modules background's have their colors flipped, because damn we 
 
 At the moment the following 3rd-party modules are provided:
 
-- 21kHz
-- 8Mode
-- Aaron Static
-- AlgoritmArte
-- Amalgamated Harmonics
-- Animated Circuits
-- Arable Instruments
-- Aria Salvatrice
-- AS
-- Audible Instruments
-- Autinn
-- Axioma
-- Bacon Music
-- Befaco
-- Bidoo
-- Bogaudio
-- Catro/Modulo
-- cf
-- ChowDSP
-- DrumKit
-- E-Series
-- ExpertSleepers Encoders
-- Extratone
-- Fehler Fabrik
-- forsitan modulare
-- Fundamental
-- Glue the Giant
-- GoodSheperd
-- Grande
-- Hampton Harmonics
-- HetrickCV
-- ihtsyn
-- Impromptu
-- JW-Modules
-- kocmoc
-- LifeFormModular
-- Lilac Loop
-- Little Utils
-- Lomas Modules
-- Lyrae Modules
-- Meander
-- MindMeld
-- ML Modules
-- Mockba Modular
-- Mog
-- mscHack
-- MSM
-- Myth
-- Nonlinear Circuits
-- Orbits
-- Parable Instruments
-- Path Set
-- PinkTrombone
-- Prism
-- rackwindows
-- repelzen
-- Sonus Modular
-- Starling Via
-- stocaudio
-- unless_modules
-- Valley
-- Voxglitch
-- WhatTheRack
-- ZetaCarinae
-- ZZC
+- [21kHz](https://github.com/netboy3/21kHz-rack-plugins)
+- [8Mode](https://github.com/8Mode/8Mode-VCV_Modules)
+- [Aaron Static](https://github.com/aaronstatic/AaronStatic_modules)
+- [alef's bits](https://github.com/alefnull/alefsbits)
+- [AlgoritmArte](https://github.com/algoritmarte/AlgoritmarteVCVPlugin)
+- [Amalgamated Harmonics](https://github.com/jhoar/AmalgamatedHarmonics)
+- [Animated Circuits](https://github.com/AnimatedCircuits/RackModules)
+- [Arable Instruments](https://github.com/adbrant/ArableInstruments)
+- [Aria Salvatrice](https://aria.dog/modules/)
+- [AS](https://github.com/AScustomWorks/AS)
+- [Audible Instruments](https://vcvrack.com/AudibleInstruments)
+- [Autinn](https://github.com/NikolaiVChr/Autinn)
+- [Axioma](https://github.com/kauewerner/Axioma)
+- [Bacon Music](https://github.com/baconpaul/BaconPlugs)
+- [Befaco](https://github.com/VCVRack/Befaco)
+- [Bidoo](https://github.com/sebastien-bouffier/Bidoo)
+- [Bogaudio](https://github.com/bogaudio/BogaudioModules)
+- [Catro/Modulo](https://github.com/catronomix/catro-modulo)
+- [cf](https://github.com/cfoulc/cf)
+- [ChowDSP](https://github.com/jatinchowdhury18/ChowDSP-VCV)
+- [dBiz](https://github.com/dBiz/dBiz)
+- [DrumKit](https://svmodular.com/plugin/vcv/drumkit.html)
+- [EnigmaCurry](https://github.com/EnigmaCurry/EnigmaCurry-vcv-pack)
+- [E-Series](https://github.com/VCVRack/ESeries)
+- [ExpertSleepers Encoders](https://expert-sleepers.co.uk/vcvrack_encoders.html)
+- [Extratone](http://extratone.xyz/modules)
+- [Fehler Fabrik](https://github.com/RCameron93/FehlerFabrik)
+- [forsitan modulare](https://github.com/gosub/forsitan-modulare)
+- [Fundamental](https://github.com/VCVRack/Fundamental)
+- [Glue the Giant](https://github.com/gluethegiant/gtg-rack)
+- [GoodSheperd](https://github.com/jensschulze/GoodSheperd)
+- [Grande](https://github.com/dbgrande/GrandeModular)
+- [H4N4 Modules](https://github.com/hannakoppelaar/h4n4-modules)
+- [Hampton Harmonics](https://gitlab.com/hampton-harmonics/hampton-harmonics-modules)
+- [HetrickCV](https://github.com/mhetrick/hetrickcv)
+- [ihtsyn](https://github.com/nysthi/ihtsyn)
+- [Impromptu](https://github.com/MarcBoule/ImpromptuModular)
+- [JW-Modules](https://github.com/jeremywen/JW-Modules)
+- [kocmoc](https://github.com/janne808/kocmoc-rack-modules)
+- [LifeFormModular](https://github.com/TimeControlledOrganism/LifeFormModular)
+- [Lilac Loop](https://grough.github.io/lilac-loop-vcv)
+- [Little Utils](https://github.com/mgunyho/Little-Utils)
+- [Lomas Modules](https://github.com/LomasModules/LomasModules)
+- [Lyrae Modules](https://github.com/VegaDeftwing/LyraeModules)
+- [Meander](https://github.com/knchaffin/Meander)
+- [MindMeld](https://github.com/MarcBoule/MindMeldModular)
+- [ML Modules](https://github.com/martin-lueders/ML_modules)
+- [Mockba Modular](https://github.com/MockbaTheBorg/MockbaModular)
+- [Mog](https://github.com/JustMog/Mog-VCV)
+- [mscHack](https://github.com/mschack/VCV-Rack-Plugins)
+- [MSM](https://github.com/netboy3/MSM-vcvrack-plugin)
+- [Myth](https://github.com/Ahineya/vcv-myth-plugin)
+- [Nonlinear Circuits](https://github.com/mhetrick/nonlinearcircuits)
+- [Orbits](https://github.com/RareBreeds/Orbits)
+- [Parable Instruments](https://github.com/adbrant/ArableInstruments)
+- [Path Set](https://github.com/patheros/PathSetModules)
+- [PinkTrombone](https://github.com/VegaDeftwing/PinkTromboneVCV)
+- [Prism](https://github.com/SteveRussell33/Prism)
+- [rackwindows](https://github.com/n0jo/rackwindows)
+- [RebelTech](https://github.com/hemmer/rebel-tech-vcv)
+- [repelzen](https://github.com/wiqid/repelzen)
+- [Sapphire](https://github.com/cosinekitty/sapphire)
+- [Sonus Modular](https://gitlab.com/sonusdept/sonusmodular)
+- [stocaudio](https://github.com/aptrn/stocaudio-modules)
+- [Starling Via](https://github.com/starlingcode/Via-for-Rack)
+- [Stoermelder Pack-One](https://github.com/stoermelder/vcvrack-packone)
+- [Surge XT](https://github.com/surge-synthesizer/surge-rack)
+- [unless_modules](https://gitlab.com/unlessgames/unless_modules)
+- [Valley](https://github.com/ValleyAudio/ValleyRackFree)
+- [Voxglitch](https://github.com/clone45/voxglitch)
+- [WhatTheRack](https://github.com/korfuri/WhatTheRack)
+- [ZetaCarinae](https://github.com/mhampton/ZetaCarinaeModules)
+- [ZZC](https://github.com/zezic/ZZC)
 
 Additionally Cardinal provides its own modules for DAW/Host automation, time position, audio to CV pitch conversion and internal plugin hosting.
 
 ### Adding modules
 
-Install new modules on a Cardinal build is not possible, but we can add new modules to the build.  
+Installing new modules on a Cardinal build is not possible, but we can integrate existing open-source modules to be part of Cardinal.
 Details on this are available [here](https://github.com/DISTRHO/Cardinal/discussions/28).  
 Also check [this wiki page](https://github.com/DISTRHO/Cardinal/wiki/Possible-modules-to-include)
 where we discuss possible modules to include.  
@@ -223,7 +247,6 @@ Other relevant reasons include:
 
  - LV2 plugin version from the start
  - Proper dark mode support
- - Proper optimized build (because all code is compiled to a single file, we can use LTO over the whole thing)
  - Real CV ports to and from the plugin
  - Removing online access from the plugin and included modules (no phone-home here!)
  - Works as a test case for [DPF](https://github.com/DISTRHO/DPF/) and [Carla](https://github.com/falkTX/Carla/)
@@ -250,4 +273,4 @@ An overview of the included code and linked submodules can be seen [here](docs/L
 ## Community chat
 
 Currently we are all on #cardinal IRC room in irc.libera.chat server.  
-Come join us in your favorite IRC client or through a Matrix bridge.
+Come join us in your favorite IRC client.

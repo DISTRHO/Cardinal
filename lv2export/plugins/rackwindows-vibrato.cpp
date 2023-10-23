@@ -20,8 +20,8 @@
 #define PLUGIN_BRAND "Rackwindows"
 #define PLUGIN_LABEL "Vibrato"
 #define PLUGIN_MODEL modelVibrato
-#define PLUGIN_CV_INPUTS {1,1,1,1,1,0}
-#define PLUGIN_CV_OUTPUTS {1,0,1}
+#define PLUGIN_CV_INPUTS {Bi,Bi,Bi,Bi,Bi,Audio}
+#define PLUGIN_CV_OUTPUTS {Bi,Audio,Bi}
 #define PLUGIN_LV2_CATEGORY "lv2:DynamicsPlugin"
 
 #include "lv2plugin.cpp"

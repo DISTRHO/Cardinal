@@ -3,29 +3,32 @@
     <title>Cardinal</title>
     <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true" />
     <license file="@builddir@/../LICENSE" mime-type="text/plain" />
-    <options customize="always" hostArchitectures="@buildarchs@" require-scripts="false" rootVolumeOnly="true" />
+    <options customize="always" hostArchitectures="arm64,x86_64" require-scripts="false" rootVolumeOnly="true" />
     <pkg-ref id="studio.kx.distrho.cardinal" />
     <welcome file="@builddir@/../utils/macOS/welcome.txt" mime-type="text/plain" />
-    <choice id="studio.kx.distrho.cardinal-res" title="Resources" description="Install resources" visible="false">
+    <choice id="studio.kx.distrho.cardinal-res" title="Resources" description="Install resources" visible="true" enabled="false" selected="true">
         <pkg-ref id="studio.kx.distrho.cardinal-resources" version="0">dpf-cardinal-resources.pkg</pkg-ref>
     </choice>
-    <choice id="studio.kx.distrho.cardinal-jack" title="Standalone (JACK)" description="Install Standalone for usage with JACK. See https://jackaudio.org/ for details." visible="true">
+    <choice id="studio.kx.distrho.cardinal-jack" title="Standalone (JACK)" description="Install Standalone for usage with JACK. See https://jackaudio.org/ for details." visible="true" start_selected="true">
         <pkg-ref id="studio.kx.distrho.cardinal-jack" version="0">dpf-cardinal-jack.pkg</pkg-ref>
     </choice>
-    <choice id="studio.kx.distrho.cardinal-native" title="Standalone (Native)" description="Install Standalone that uses native Audio and MIDI" visible="true">
+    <choice id="studio.kx.distrho.cardinal-native" title="Standalone (Native)" description="Install Standalone that uses native Audio and MIDI" visible="true" start_selected="true">
         <pkg-ref id="studio.kx.distrho.cardinal-native" version="0">dpf-cardinal-native.pkg</pkg-ref>
     </choice>
-    <choice id="studio.kx.distrho.cardinal-au" title="AU" description="Install AU plugins" visible="true">
+    <choice id="studio.kx.distrho.cardinal-au" title="AU" description="Install AU plugins" visible="true" start_selected="true">
         <pkg-ref id="studio.kx.distrho.cardinal-components" version="0">dpf-cardinal-components.pkg</pkg-ref>
     </choice>
-    <choice id="studio.kx.distrho.cardinal-lv2" title="LV2" description="Install LV2 plugins" visible="true">
+    <choice id="studio.kx.distrho.cardinal-lv2" title="LV2" description="Install LV2 plugins" visible="true" start_selected="true">
         <pkg-ref id="studio.kx.distrho.cardinal-lv2bundles" version="0">dpf-cardinal-lv2bundles.pkg</pkg-ref>
     </choice>
-    <choice id="studio.kx.distrho.cardinal-vst2" title="VST2" description="Install VST2 plugins" visible="true">
+    <choice id="studio.kx.distrho.cardinal-vst2" title="VST2" description="Install VST2 plugins" visible="true" start_selected="true">
         <pkg-ref id="studio.kx.distrho.cardinal-vst2bundles" version="0">dpf-cardinal-vst2bundles.pkg</pkg-ref>
     </choice>
-    <choice id="studio.kx.distrho.cardinal-vst3" title="VST3" description="Install VST3 plugins" visible="true">
+    <choice id="studio.kx.distrho.cardinal-vst3" title="VST3" description="Install VST3 plugins" visible="true" start_selected="true">
         <pkg-ref id="studio.kx.distrho.cardinal-vst3bundles" version="0">dpf-cardinal-vst3bundles.pkg</pkg-ref>
+    </choice>
+    <choice id="studio.kx.distrho.cardinal-clap" title="CLAP" description="Install CLAP plugins" visible="true" start_selected="true">
+        <pkg-ref id="studio.kx.distrho.cardinal-clapbundles" version="0">dpf-cardinal-clapbundles.pkg</pkg-ref>
     </choice>
     <choices-outline>
         <line choice="studio.kx.distrho.cardinal-res"/>
@@ -35,5 +38,6 @@
         <line choice="studio.kx.distrho.cardinal-lv2"/>
         <line choice="studio.kx.distrho.cardinal-vst2"/>
         <line choice="studio.kx.distrho.cardinal-vst3"/>
+        <line choice="studio.kx.distrho.cardinal-clap"/>
     </choices-outline>
 </installer-gui-script>

@@ -4,23 +4,9 @@
 # Created by falkTX
 #
 
-# --------------------------------------------------------------
-# Import base definitions
-
-DISTRHO_NAMESPACE = CardinalDISTRHO
-DGL_NAMESPACE = CardinalDGL
-USE_NANOVG_FBO = true
-WASM_EXCEPTIONS = true
-include ../dpf/Makefile.base.mk
-
-# --------------------------------------------------------------
-# Build config
-
-ifeq ($(BSD),true)
-SYSDEPS ?= true
-else
-SYSDEPS ?= false
-endif
+BUILDING_RACK = true
+ROOT = ..
+include $(ROOT)/Makefile.base.mk
 
 # --------------------------------------------------------------
 # List of drwav functions, used in several modules
@@ -232,10 +218,12 @@ DRWAV += drwav_write_raw
 # Files to build
 
 PLUGIN_FILES = plugins.cpp
+MINIPLUGIN_FILES = plugins-mini.cpp
 
 # --------------------------------------------------------------
 # Cardinal (built-in)
 
+PLUGIN_FILES += Cardinal/src/AIDA-X.cpp
 PLUGIN_FILES += Cardinal/src/Blank.cpp
 PLUGIN_FILES += Cardinal/src/ExpanderInputMIDI.cpp
 PLUGIN_FILES += Cardinal/src/ExpanderOutputMIDI.cpp
@@ -250,6 +238,17 @@ PLUGIN_FILES += Cardinal/src/HostParameters-Map.cpp
 PLUGIN_FILES += Cardinal/src/HostTime.cpp
 PLUGIN_FILES += Cardinal/src/TextEditor.cpp
 
+MINIPLUGIN_FILES += Cardinal/src/HostAudio.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostCV.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostMIDI.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostMIDI-CC.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostMIDI-Gate.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostMIDI-Map.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostParameters.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostParameters-Map.cpp
+MINIPLUGIN_FILES += Cardinal/src/HostTime.cpp
+MINIPLUGIN_FILES += Cardinal/src/TextEditor.cpp
+
 ifneq ($(USE_GLES2),true)
 ifneq ($(USE_GLES3),true)
 PLUGIN_FILES += Cardinal/src/glBars.cpp
@@ -260,8 +259,8 @@ ifneq ($(STATIC_BUILD),true)
 PLUGIN_FILES += Cardinal/src/AudioFile.cpp
 ifneq ($(WASM),true)
 PLUGIN_FILES += Cardinal/src/Carla.cpp
-endif
 PLUGIN_FILES += Cardinal/src/Ildaeil.cpp
+endif
 ifneq ($(HEADLESS),true)
 ifeq ($(HAVE_X11),true)
 PLUGIN_FILES += Cardinal/src/EmbedWidget.cpp
@@ -276,10 +275,15 @@ PLUGIN_FILES += Cardinal/src/ImGuiTextEditor.cpp
 PLUGIN_FILES += Cardinal/src/SassyScope.cpp
 PLUGIN_FILES += Cardinal/src/DearImGui.cpp
 PLUGIN_FILES += Cardinal/src/DearImGuiColorTextEditor.cpp
+MINIPLUGIN_FILES += Cardinal/src/ImGuiWidget.cpp
+MINIPLUGIN_FILES += Cardinal/src/ImGuiTextEditor.cpp
+MINIPLUGIN_FILES += Cardinal/src/DearImGui.cpp
+MINIPLUGIN_FILES += Cardinal/src/DearImGuiColorTextEditor.cpp
 endif
 
 ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
 PLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
+# MINIPLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
 BASE_FLAGS += -DHAVE_FFTW3F
 endif
 
@@ -289,15 +293,29 @@ endif
 PLUGIN_FILES += $(filter-out Fundamental/src/plugin.cpp,$(wildcard Fundamental/src/*.cpp))
 PLUGIN_FILES += Fundamental/src/dr_wav.c
 
+MINIPLUGIN_FILES += Fundamental/src/ADSR.cpp
+MINIPLUGIN_FILES += Fundamental/src/LFO.cpp
+MINIPLUGIN_FILES += Fundamental/src/Merge.cpp
+MINIPLUGIN_FILES += Fundamental/src/MidSide.cpp
+MINIPLUGIN_FILES += Fundamental/src/Noise.cpp
+MINIPLUGIN_FILES += Fundamental/src/Quantizer.cpp
+MINIPLUGIN_FILES += Fundamental/src/Random.cpp
+MINIPLUGIN_FILES += Fundamental/src/Scope.cpp
+MINIPLUGIN_FILES += Fundamental/src/Split.cpp
+MINIPLUGIN_FILES += Fundamental/src/Sum.cpp
+MINIPLUGIN_FILES += Fundamental/src/VCA-1.cpp
+MINIPLUGIN_FILES += Fundamental/src/VCF.cpp
+MINIPLUGIN_FILES += Fundamental/src/VCMixer.cpp
+MINIPLUGIN_FILES += Fundamental/src/VCO.cpp
+
 # modules/types which are present in other plugins
 FUNDAMENTAL_CUSTOM = $(DRWAV)
 
 # --------------------------------------------------------------
-# ZamAudio (always enabled)
+# ZamAudio (always enabled) - TODO
 
-PLUGIN_FILES += $(wildcard ZamAudio/src/*.cpp)
+# PLUGIN_FILES += $(wildcard ZamAudio/src/*.cpp)
 
-ifneq ($(NOPLUGINS),true)
 # --------------------------------------------------------------
 # 21kHz
 
@@ -307,6 +325,14 @@ PLUGIN_FILES += $(filter-out 21kHz/src/21kHz.cpp,$(wildcard 21kHz/src/*.cpp))
 # 8Mode
 
 PLUGIN_FILES += $(filter-out 8Mode/src/8mode.cpp,$(wildcard 8Mode/src/*.cpp))
+
+# --------------------------------------------------------------
+# alefsbits
+
+PLUGIN_FILES += $(filter-out alefsbits/src/plugin.cpp,$(wildcard alefsbits/src/*.cpp))
+
+# modules/types which are present in other plugins
+ALEFSBITS_CUSTOM = Steps Logic
 
 # --------------------------------------------------------------
 # AlgoritmArte
@@ -371,6 +397,9 @@ PLUGIN_FILES += AriaModules/src/Splirge.cpp
 PLUGIN_FILES += AriaModules/src/Splort.cpp
 PLUGIN_FILES += AriaModules/src/Swerge.cpp
 PLUGIN_FILES += AriaModules/src/Undular.cpp
+
+MINIPLUGIN_FILES += AriaModules/src/Spleet.cpp
+MINIPLUGIN_FILES += AriaModules/src/Swerge.cpp
 
 # modules/types which are present in other plugins
 ARIA_CUSTOM = Blank
@@ -484,6 +513,21 @@ PLUGIN_FILES += AudibleInstruments/eurorack/streams/svf.cc
 PLUGIN_FILES += AudibleInstruments/eurorack/streams/vactrol.cc
 PLUGIN_FILES += AudibleInstruments/eurorack/streams/compressor.cc
 
+MINIPLUGIN_FILES += AudibleInstruments/src/Plaits.cpp
+# MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/macro_oscillator.cc
+# MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/analog_oscillator.cc
+# MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/digital_oscillator.cc
+# MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/quantizer.cc
+# MINIPLUGIN_FILES += AudibleInstruments/eurorack/braids/resources.cc
+MINIPLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/*.cc)
+MINIPLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/engine/*.cc)
+MINIPLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/speech/*.cc)
+MINIPLUGIN_FILES += $(wildcard AudibleInstruments/eurorack/plaits/dsp/physical_modelling/*.cc)
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/plaits/resources.cc
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/atan.cc
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/stmlib/dsp/units.cc
+MINIPLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
+
 # --------------------------------------------------------------
 # Autinn
 
@@ -503,6 +547,8 @@ PLUGIN_FILES += $(filter-out BaconPlugs/src/BaconPlugs.cpp,$(wildcard BaconPlugs
 PLUGIN_FILES += $(wildcard BaconPlugs/libs/midifile/src/*.cpp)
 PLUGIN_FILES += $(wildcard BaconPlugs/libs/open303-code/Source/DSPCode/*.cpp)
 
+MINIPLUGIN_FILES += BaconPlugs/src/Style.cpp
+
 # --------------------------------------------------------------
 # Befaco
 
@@ -511,7 +557,7 @@ PLUGIN_FILES += $(wildcard Befaco/src/noise-plethora/*/*.cpp)
 PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 
 # modules/types which are present in other plugins
-BEFACO_CUSTOM = ADSR Mixer
+BEFACO_CUSTOM = ADSR Mixer chowdsp
 
 # --------------------------------------------------------------
 # Bidoo
@@ -525,7 +571,7 @@ PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/s
 PLUGIN_FILES += BidooDark/plugin.cpp
 
 # modules/types which are present in other plugins
-BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter $(DRWAV)
+BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter PitchShifter $(DRWAV)
 BIDOO_CUSTOM_PER_FILE = channel channel filterType
 
 # --------------------------------------------------------------
@@ -534,6 +580,42 @@ BIDOO_CUSTOM_PER_FILE = channel channel filterType
 PLUGIN_FILES += $(filter-out BogaudioModules/src/bogaudio.cpp,$(wildcard BogaudioModules/src/*.cpp))
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/*.cpp)
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/filters/*.cpp)
+
+MINIPLUGIN_FILES += BogaudioModules/src/AD.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/LFO.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/Noise.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/Offset.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/SampleHold.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/Switch.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/Switch18.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/Unison.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/VCA.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/VCF.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/VCO.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/disable_output_limit.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/lfo_base.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/matrix_base.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/menu.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/module.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/param_quantities.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/poly_channels.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/rack_overrides.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/save_latch_to_patch.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/skins.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/utils.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/vco_base.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/widgets.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/analyzer.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/envelope.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/math.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/noise.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/oscillator.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/signal.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/table.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/experiments.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/filter.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/multimode.cpp
+MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/resample.cpp
 
 # modules/types which are present in other plugins
 BOGAUDIO_CUSTOM = ADSR BlueNoiseGenerator LFO Noise VCA VCO VCF
@@ -545,6 +627,9 @@ BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
 PLUGIN_FILES += $(wildcard ChowDSP/src/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/src/*/*/*.cpp)
 PLUGIN_FILES += $(wildcard ChowDSP/lib/r8lib/*.cpp)
+
+# modules/types which are present in other plugins
+CHOWDSP_CUSTOM = sign
 
 # --------------------------------------------------------------
 # CatroModulo
@@ -563,6 +648,15 @@ PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 CF_CUSTOM = $(DRWAV)
 
 # --------------------------------------------------------------
+# dBiz
+
+PLUGIN_FILES += $(filter-out dBiz/src/plugin.cpp,$(wildcard dBiz/src/*.cpp))
+
+# modules/types which are present in other plugins
+DBIZ_CUSTOM  = Chord DarkDefaultItem Divider FourSeq FourSeqWidget OrangeLight VCA4 Wavefolder darkPanelID lightPanelID
+DBIZ_CUSTOM_PER_FILE = LERP MultiFilter Oscillator calcOutput sineOsc subBank
+
+# --------------------------------------------------------------
 # DrumKit
 
 PLUGIN_FILES += $(wildcard DrumKit/src/*.cpp)
@@ -574,6 +668,13 @@ PLUGIN_FILES += $(wildcard DrumKit/deps/SynthDevKit/src/*.cpp)
 
 # modules/types which are present in other plugins
 DRUMKIT_CUSTOM = ADSR Envelope LowFrequencyOscillator
+
+# --------------------------------------------------------------
+# EnigmaCurry
+
+PLUGIN_FILES += $(filter-out EnigmaCurry/src/plugin.cpp,$(wildcard EnigmaCurry/src/*.cpp))
+# modules/types which are present in other plugins
+ENIGMACURRY_CUSTOM = Pulse
 
 # --------------------------------------------------------------
 # ESeries
@@ -617,6 +718,11 @@ PLUGIN_FILES += $(filter-out GoodSheperd/src/plugin.cpp,$(wildcard GoodSheperd/s
 # GrandeModular
 
 PLUGIN_FILES += $(filter-out GrandeModular/src/plugin.cpp,$(wildcard GrandeModular/src/*.cpp))
+
+# --------------------------------------------------------------
+# H4N4 Modules
+
+PLUGIN_FILES += $(filter-out h4n4-modules/src/plugin.cpp,$(wildcard h4n4-modules/src/*.cpp))
 
 # --------------------------------------------------------------
 # Hampton Harmonics
@@ -741,11 +847,12 @@ PLUGIN_FILES += $(wildcard MindMeldModular/src/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/comp/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/EqMaster/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/MixMaster/*.cpp)
+PLUGIN_FILES += $(wildcard MindMeldModular/src/PatchSet/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/ShapeMaster/*.cpp)
 PLUGIN_FILES += $(wildcard MindMeldModular/src/Utilities/*.cpp)
 
 # modules/types which are present in other plugins
-MINDMELD_CUSTOM = printNote
+MINDMELD_CUSTOM = Trigger printNote
 
 # --------------------------------------------------------------
 # ML_modules
@@ -763,6 +870,14 @@ PLUGIN_FILES += $(filter-out MockbaModular/src/plugin.cpp MockbaModular/src/Mock
 
 # modules/types which are present in other plugins
 MOCKBAMODULAR_CUSTOM = Blank Comparator
+
+MINIPLUGIN_FILES += MockbaModular/src/CZOsc.cpp
+MINIPLUGIN_FILES += MockbaModular/src/Filtah.cpp
+MINIPLUGIN_FILES += MockbaModular/src/MaugOsc.cpp
+MINIPLUGIN_FILES += MockbaModular/src/Mixah.cpp
+MINIPLUGIN_FILES += MockbaModular/src/Pannah.cpp
+MINIPLUGIN_FILES += MockbaModular/src/ReVoltah.cpp
+MINIPLUGIN_FILES += MockbaModular/src/Shapah.cpp
 
 # --------------------------------------------------------------
 # Mog
@@ -824,6 +939,9 @@ PARABLE_CUSTOM = Clouds CustomPanel CloudsWidget FreezeLight clouds stmlib
 
 PLUGIN_FILES += $(filter-out PathSet/src/plugin.cpp,$(wildcard PathSet/src/*.cpp))
 
+# modules/types which are present in other plugins
+PATHSET_CUSTOM = PitchShifter
+
 # --------------------------------------------------------------
 # PinkTrombone
 
@@ -848,12 +966,25 @@ PRISM_CUSTOM = bogaudio Scale
 PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/src/*.cpp))
 
 # --------------------------------------------------------------
+# RebelTech
+
+PLUGIN_FILES += $(filter-out RebelTech/src/plugin.cpp,$(wildcard RebelTech/src/*.cpp))
+
+# modules/types which are present in other plugins
+REBELTECH_CUSTOM = BefacoInputPort BefacoOutputPort
+
+# --------------------------------------------------------------
 # repelzen
 
 PLUGIN_FILES += $(filter-out repelzen/src/repelzen.cpp,$(wildcard repelzen/src/*.cpp))
 
 # modules/types which are present in other plugins
 REPELZEN_CUSTOM = Blank Mixer Werner tanh_pade
+
+# --------------------------------------------------------------
+# Sapphire
+
+PLUGIN_FILES += $(filter-out Sapphire/src/plugin.cpp,$(wildcard Sapphire/src/*.cpp))
 
 # --------------------------------------------------------------
 # sonusmodular
@@ -876,13 +1007,114 @@ STARLINGVIA_CUSTOM = Scanner
 PLUGIN_FILES += $(filter-out stocaudio/src/plugin.cpp,$(wildcard stocaudio/src/*.cpp))
 
 # --------------------------------------------------------------
+# stoermelder-packone
 
+STOERMELDER_PACKONE_IGNORED = pluginsettings
+
+# will never work
+STOERMELDER_PACKONE_IGNORED += AudioInterface64
+
+# maybe?
+STOERMELDER_PACKONE_IGNORED += MidiCat MidiCatCtx MidiCatMem MidiKey MidiMon MidiPlug MidiStep
+
+PLUGIN_FILES += $(filter-out $(STOERMELDER_PACKONE_IGNORED:%=stoermelder-packone/src/%.cpp),$(wildcard stoermelder-packone/src/*.cpp stoermelder-packone/src/mb/*.cpp))
+
+# modules/types which are present in other plugins
+STOERMELDER_PACKONE_CUSTOM = LongPressButton
+STOERMELDER_PACKONE_CUSTOM_PER_FILE = InputLedDisplay IntermixEnvModule
+
+# --------------------------------------------------------------
+# surgext
+
+PLUGIN_FILES += $(filter-out surgext/src/SurgeXT.cpp,$(wildcard surgext/src/*.cpp))
+PLUGIN_FILES += surgext-helper/surgext-helper.cpp
+
+# modules/types which are present in other plugins
+SURGEXT_CUSTOM = HysteresisProcessing Patch SolverType Tunings Wavetable ghc clouds plaits stmlib
+
+SURGEXT_FLAGS  = $(filter-out -fsingle-precision-constant,$(filter-out -std=gnu++11,$(BUILD_CXX_FLAGS)))
+SURGEXT_FLAGS += $(NOFINITE_FLAGS)
+SURGEXT_FLAGS += -std=gnu++17
+SURGEXT_FLAGS += -DTIXML_USE_STL=1
+SURGEXT_FLAGS += \
+	-Isurgext/libs/sst/sst-basic-blocks/include \
+	-Isurgext/surge/src/common \
+	-Isurgext/surge/src/common/dsp \
+	-Isurgext/surge/src/common/dsp/filters \
+	-Isurgext/surge/src/common/dsp/vembertech \
+	-Isurgext/surge/src/common/dsp/utilities \
+	-Isurgext/surge/src/common/dsp/oscillators \
+	-Isurgext/surge/src/common/dsp/modulators \
+	-Isurgext/surge/src/surge-testrunner \
+	-Isurgext/surge/libs/sst/sst-filters/include \
+	-Isurgext/surge/libs/sst/sst-cpputils/include \
+	-Isurgext/surge/libs/sst/sst-waveshapers/include \
+	-Isurgext/surge/libs/sst/sst-plugininfra/include \
+	-Isurgext/surge/libs/sst/sst-plugininfra/libs/tinyxml/include \
+	-Isurgext/surge/libs/sst/sst-plugininfra/libs/filesystem \
+	-Isurgext/surge/libs/fmt/include \
+	-Isurgext/surge/libs/LuaJitLib/LuaJIT/src \
+	-Isurgext/surge/libs/strnatcmp \
+	-Isurgext/surge/src/headless \
+	-Isurgext/surge/libs/tuning-library/include \
+	-I../deps/surge-build/libs/sst/sst-plugininfra/libs/filesystem/include \
+	-include limits \
+	-include cstdint \
+	-DSURGE_COMPILE_BLOCK_SIZE=8 \
+	-DSURGE_SKIP_ODDSOUND_MTS \
+	-DHAS_LUA=0 \
+	-DHAS_JUCE=0 \
+	-DSKIP_JUCE=1
+
+ifneq ($(DEBUG),true)
+SURGEXT_FLAGS += -DRELEASE=1
+endif
+
+ifeq ($(MACOS),true)
+SURGEXT_FLAGS += -Wno-undefined-bool-conversion -Wno-unused-variable -Wno-reorder -Wno-char-subscripts -Wno-sign-compare -Wno-ignored-qualifiers -Wno-c++17-extensions -Wno-unused-private-field
+SURGEXT_FLAGS += -DMAC
+else ifeq ($(WINDOWS),true)
+SURGEXT_FLAGS += -Wno-suggest-override -Wno-sign-compare -Wno-ignored-qualifiers -Wno-unused-variable -Wno-char-subscripts -Wno-reorder -Wno-int-in-bool-context
+SURGEXT_FLAGS += -DWINDOWS
+SURGEXT_FLAGS += -DSKIP_MINGW_FORMAT
+else
+SURGEXT_FLAGS += -Wno-unused-value -Wno-suggest-override -Wno-implicit-fallthrough -Wno-ignored-qualifiers
+SURGEXT_FLAGS += -Wno-nonnull-compare -Wno-sign-compare -Wno-char-subscripts -Wno-unused-variable -Wno-unused-but-set-variable -Wno-reorder -Wno-multichar
+SURGEXT_FLAGS += -DLINUX
+SURGEXT_FLAGS += -Isurge/src/linux
+endif
+
+SURGEXT_FLAGS += -DSURGE_RACK_BASE_VERSION=XT1-0-1
+SURGEXT_FLAGS += -DSURGE_RACK_PLUG_VERSION=Cardinal
+SURGEXT_FLAGS += -DSURGE_RACK_SURGE_VERSION=Cardinal
+
+SURGEXT_FLAGS += -I$(abspath ../carla/source/modules)
+
+MINIPLUGIN_FILES += surgext/src/Delay.cpp
+MINIPLUGIN_FILES += surgext/src/DelayLineByFreq.cpp
+MINIPLUGIN_FILES += surgext/src/DelayLineByFreqExpanded.cpp
+MINIPLUGIN_FILES += surgext/src/EGxVCA.cpp
+MINIPLUGIN_FILES += surgext/src/FX.cpp
+MINIPLUGIN_FILES += surgext/src/LFO.cpp
+MINIPLUGIN_FILES += surgext/src/Mixer.cpp
+MINIPLUGIN_FILES += surgext/src/ModMatrix.cpp
+MINIPLUGIN_FILES += surgext/src/QuadAD.cpp
+MINIPLUGIN_FILES += surgext/src/QuadLFO.cpp
+MINIPLUGIN_FILES += surgext/src/VCO.cpp
+MINIPLUGIN_FILES += surgext/src/VCF.cpp
+MINIPLUGIN_FILES += surgext/src/Waveshaper.cpp
+MINIPLUGIN_FILES += surgext/src/XTModule.cpp
+MINIPLUGIN_FILES += surgext/src/XTModuleWidget.cpp
+MINIPLUGIN_FILES += surgext/src/XTStyle.cpp
+MINIPLUGIN_FILES += surgext-helper/surgext-helper.cpp
+
+# --------------------------------------------------------------
 # unless_modules
 
 PLUGIN_FILES += $(filter-out unless_modules/src/unless.cpp,$(wildcard unless_modules/src/*.cpp))
 
 # modules/types which are present in other plugins
-UNLESS_MODULES_CUSTOM = Selection
+UNLESS_MODULES_CUSTOM = Selection sign
 
 # --------------------------------------------------------------
 # ValleyAudio
@@ -956,6 +1188,58 @@ PLUGIN_BINARIES += ValleyAudio/src/VOICE_6.bin
 PLUGIN_BINARIES += ValleyAudio/src/VOX_MACH.bin
 PLUGIN_BINARIES += ValleyAudio/src/XFADE.bin
 
+# MINIPLUGIN_FILES += ValleyAudio/src/PlainText.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/SteppedSlider.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/ValleyChoiceMenu.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/Common/FreqLUT.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/Common/Utilities.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/Common/DSP/OnePoleFilters.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/Common/DSP/OTAFilter.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/Common/SIMD/QuadOsc.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/Common/SIMD/VecLoopingADSR.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/Common/SIMD/VecOnePoleFilters.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/Common/SIMD/VecOTAFilter.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/Dexter/Dexter.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/Dexter/DexterRoutingMatrix.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/Dexter/Osc4Core_SIMD.cpp
+# MINIPLUGIN_FILES += ValleyAudio/src/Interzone/Interzone.cpp
+
+# MINIPLUGIN_BINARIES += ValleyAudio/src/ADD_BANK1.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/ADD_SAW.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/ADD_SINE.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/ADD_SQR.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/ALTOSAX.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/AM_HARM.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/BASIC.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/BITCRUSH1.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/BITCRUSH2.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/BI_PULSE.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/CELLO_1.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/CELLO_2.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/CHIP_1.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/CHIP_2.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/OBOE.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/OPAL.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/OVERTONE1.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/OVERTONE2.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/PIANO.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/PLUCK.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/PWM.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/SAW_GAP1.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/SAW_GAP2.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/SINE_HARM.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/SWEEPHARM.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/SYMMETRY.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/TEE_EKS.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/THEREMIN.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/VIDEOGAME.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/VIOLIN.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_1.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_2.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_3.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_4.bin
+# MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_5.bin
+
 # modules/types which are present in other plugins
 VALLEYAUDIO_CUSTOM = $(DRWAV) DigitalDisplay
 VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
@@ -966,7 +1250,7 @@ VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
 
 # modules/types which are present in other plugins
-VOXGLITCH_CUSTOM = $(DRWAV) ADSR AudioFile Looper Readout
+VOXGLITCH_CUSTOM = ADSR AudioFile Looper Readout
 VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain SamplePlayer Sequencer SequencerDisplay VoltageSequencer
 
 # --------------------------------------------------------------
@@ -990,126 +1274,35 @@ PLUGIN_FILES += $(filter-out ZZC/src/ZZC.cpp ZZC/src/WavetablePlayer.cpp,$(wildc
 ZZC_CUSTOM = Clock LowFrequencyOscillator
 
 # --------------------------------------------------------------
-
-endif # !NOPLUGINS
-
-# --------------------------------------------------------------
 # Build setup
 
-BUILD_DIR = ../build/plugins
-
-ifeq ($(MACOS),true)
-BASE_FLAGS += -DARCH_MAC
-else ifeq ($(WINDOWS),true)
-BASE_FLAGS += -DARCH_WIN
+ifeq ($(HEADLESS),true)
+BUILD_DIR = ../build-headless/plugins
 else
-BASE_FLAGS += -DARCH_LIN
+BUILD_DIR = ../build/plugins
 endif
 
 BASE_FLAGS += -DBUILDING_PLUGIN_MODULES
-BASE_FLAGS += -I../dpf/dgl/src/nanovg
-BASE_FLAGS += -I../dpf/distrho
-
-BASE_FLAGS += -I../include
-BASE_FLAGS += -I../include/osdialog-stub
-BASE_FLAGS += -I../include/simd-compat
-
-ifeq ($(HAVE_X11),true)
-BASE_FLAGS += -DHAVE_X11
-endif
-
-ifeq ($(SYSDEPS),true)
-BASE_FLAGS += -DCARDINAL_SYSDEPS
-BASE_FLAGS += $(shell $(PKG_CONFIG) --cflags jansson libarchive samplerate speexdsp)
-BASE_FLAGS += -I../deps/sysroot/include
-else
-BASE_FLAGS += -DZSTDLIB_VISIBILITY=
-BASE_FLAGS += -I../src/Rack/dep/include
-endif
-
-BASE_FLAGS += -I../src
-BASE_FLAGS += -I../src/Rack/include
-BASE_FLAGS += -I../src/Rack/include/dsp
-BASE_FLAGS += -I../src/Rack/dep/filesystem/include
-# # BASE_FLAGS += -I../src/Rack/dep/fuzzysearchdatabase/src
-BASE_FLAGS += -I../src/Rack/dep/glfw/include
-BASE_FLAGS += -I../src/Rack/dep/nanosvg/src
-BASE_FLAGS += -I../src/Rack/dep/oui-blendish
-BASE_FLAGS += -I../src/Rack/dep/pffft
-
-ifeq ($(DEBUG),true)
-BASE_FLAGS += -UDEBUG
-ifeq ($(WASM),true)
-# SSE must always be enabled on wasm, even in debug builds
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-endif
-endif
-
-ifeq ($(HEADLESS),true)
-BASE_FLAGS += -DHEADLESS
-ifeq ($(WITH_LTO),true)
-BASE_FLAGS += -ffat-lto-objects
-endif
-endif
+BASE_FLAGS += -I$(abspath $(ROOT)/include/osdialog-stub)
 
 ifeq ($(BSD)$(WASM),true)
 BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
 BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
 endif
 
-ifneq ($(WASM),true)
-ifneq ($(HAIKU),true)
-BASE_FLAGS += -pthread
-endif
-endif
-
-ifeq ($(WINDOWS),true)
-BASE_FLAGS += -D_USE_MATH_DEFINES
-BASE_FLAGS += -DWIN32_LEAN_AND_MEAN
-BASE_FLAGS += -I../include/mingw-compat
-BASE_FLAGS += -I../include/mingw-std-threads
-endif
-
-ifeq ($(NOPLUGINS),true)
-BASE_FLAGS += -DNOPLUGINS
-endif
-
-ifeq ($(USE_GLES2),true)
-BASE_FLAGS += -DNANOVG_GLES2_FORCED
-else ifeq ($(USE_GLES3),true)
-BASE_FLAGS += -DNANOVG_GLES3_FORCED
-endif
-
 ifeq ($(shell $(PKG_CONFIG) --exists sndfile && echo true),true)
 BASE_FLAGS += -DHAVE_SNDFILE
 endif
 
-BUILD_C_FLAGS += -std=gnu11
-BUILD_C_FLAGS += -fno-finite-math-only -fno-strict-aliasing
-BUILD_CXX_FLAGS += -fno-finite-math-only -fno-strict-aliasing 
-
-ifneq ($(MACOS),true)
-BUILD_CXX_FLAGS += -faligned-new -Wno-abi
+ifeq ($(HAVE_X11),true)
+BASE_FLAGS += -DHAVE_X11
 endif
 
-# Rack code is not tested for this flag, unset it
-BUILD_CXX_FLAGS += -U_GLIBCXX_ASSERTIONS -Wp,-U_GLIBCXX_ASSERTIONS
-
-# Ignore bad behaviour from Rack API
-BUILD_CXX_FLAGS += -Wno-format-security
-
-ifeq ($(WASM),true)
-BUILD_CXX_FLAGS += -fexceptions
-endif
+# Use this for any plugins that rely on NaN presence
+NOFINITE_FLAGS = -fno-finite-math-only -fno-strict-aliasing
 
 # --------------------------------------------------------------
-# lots of warnings from VCV side
-
-BASE_FLAGS += -Wno-unused-parameter
-BASE_FLAGS += -Wno-unused-variable
-
-# --------------------------------------------------------------
-# also from plugins
+# lots of warnings from plugins
 
 BASE_FLAGS += -Wno-deprecated-declarations
 
@@ -1135,28 +1328,45 @@ CARLA_FLAGS += -DDISTRHO_RUNNER_INDIRECT_WASM_CALLS
 endif
 
 # --------------------------------------------------------------
+# RTNeural flags, used in AIDA-X
+
+RTNEURAL_FLAGS  = -std=gnu++17
+RTNEURAL_FLAGS += -DBiquad=AidaBiquad
+RTNEURAL_FLAGS += -DEigen=Aida_Eigen
+RTNEURAL_FLAGS += -Dconst_blas_data_mapper=Aida_const_blas_data_mapper
+RTNEURAL_FLAGS += -Devaluator=Aida_evaluator
+RTNEURAL_FLAGS += -DSKIP_MINGW_FORMAT
+RTNEURAL_FLAGS += -DRTNEURAL_DEFAULT_ALIGNMENT=16
+RTNEURAL_FLAGS += -DRTNEURAL_USE_EIGEN=1
+
+ifeq ($(WASM),true)
+RTNEURAL_FLAGS += -DEIGEN_DONT_VECTORIZE=1
+endif
+
+RTNEURAL_FLAGS += -ICardinal/src/AIDA-X/RTNeural
+RTNEURAL_FLAGS += -ICardinal/src/AIDA-X/RTNeural/modules/Eigen
+
+# --------------------------------------------------------------
 # Build targets
 
-TARGET = plugins.a
+ifeq ($(HEADLESS),true)
+TARGET_SUFFIX = -headless
+endif
 
-all: $(TARGET)
+TARGETS = plugins$(TARGET_SUFFIX).a plugins-mini$(TARGET_SUFFIX).a
+
+all: $(TARGETS)
+ifneq ($(HEADLESS),true)
+	$(MAKE) HEADLESS=true plugins-mini-headless.a
+endif
 
 clean:
-	rm -f $(TARGET)
+	rm -f *.a
 	rm -rf $(BUILD_DIR)
+	rm -rf surgext/build
 
 # --------------------------------------------------------------
 
-ifeq ($(NOPLUGINS),true)
-PLUGIN_LIST = Cardinal Fundamental ZamAudio
-
-RESOURCE_FILES = \
-		$(wildcard Cardinal/res/*.svg) \
-		$(wildcard Fundamental/res/*.svg) \
-		$(wildcard Fundamental/res/components/*.svg) \
-		$(wildcard ZamAudio/res/*.svg) \
-		Fundamental/presets
-else
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 
 UNWANTED_FILES  = HetrickCV/res/illustrator - deprecated/MyModule.svg
@@ -1170,6 +1380,8 @@ RESOURCE_FILES = \
 		$(wildcard */res/*.svg) \
 		$(wildcard */res/*/*.svg) \
 		$(wildcard */res/*/*/*.svg) \
+		$(wildcard */res/*/*/*/*.svg) \
+		$(wildcard */res/*/*/*/*/*.svg) \
 		$(wildcard */res/*.otf) \
 		$(wildcard */res/*/*.otf) \
 		$(wildcard */res/*/*/*.otf) \
@@ -1194,44 +1406,383 @@ RESOURCE_FILES += Meander/res
 RESOURCE_FILES += Mog/res
 RESOURCE_FILES += nonlinearcircuits/res
 RESOURCE_FILES += ParableInstruments/res/Neil.png
+RESOURCE_FILES += surgext/build/surge-data/configuration.xml
+RESOURCE_FILES += surgext/build/surge-data/fx_presets
+RESOURCE_FILES += surgext/build/surge-data/wavetables
+RESOURCE_FILES += surgext/build/surge-data/windows.wt
+RESOURCE_FILES += surgext/patches
+RESOURCE_FILES += $(wildcard surgext/res/xt/fonts/quicksand/*.ttf)
 RESOURCE_FILES += $(wildcard unless_modules/art/*.art)
 RESOURCE_FILES += $(wildcard unless_modules/art/svg/*/*.svg)
 RESOURCE_FILES += $(wildcard unless_modules/font/*.ttf)
 # RESOURCE_FILES += $(wildcard unless_modules/manual/*)
-endif
 
+JACK_RESOURCES  = $(CURDIR)/surgext/build/surge-data/configuration.xml
+JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/fx_presets
+JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/wavetables
+JACK_RESOURCES += $(CURDIR)/surgext/build/surge-data/windows.wt
+
+RESOURCE_FILES += $(wildcard Cardinal/res/*.png)
 RESOURCE_FILES += Cardinal/res/Miku/Miku.png
+
+MINIPLUGIN_LIST     = Cardinal
+MINIPLUGIN_LIST    += AriaModules
+MINIPLUGIN_LIST    += AudibleInstruments
+MINIPLUGIN_LIST    += BogaudioModules
+MINIPLUGIN_LIST    += Fundamental
+MINIPLUGIN_LIST    += MockbaModular
+MINIPLUGIN_LIST    += surgext
+# MINIPLUGIN_LIST    += ValleyAudio
+
+MINIRESOURCE_FILES  = AriaModules/res/components/jack-transparent.svg
+MINIRESOURCE_FILES += AriaModules/res/components/pushbutton-500-off.svg
+MINIRESOURCE_FILES += AriaModules/res/components/pushbutton-500-on.svg
+MINIRESOURCE_FILES += AriaModules/res/components/pushbutton-500-pink.svg
+MINIRESOURCE_FILES += AriaModules/res/components/screw.svg
+MINIRESOURCE_FILES += AriaModules/res/faceplates/Spleet.svg
+MINIRESOURCE_FILES += AriaModules/res/faceplates/Swerge.svg
+MINIRESOURCE_FILES += AriaModules/res/signature/signature.svg
+
+MINIRESOURCE_FILES += AudibleInstruments/res/Plaits.svg
+# MINIRESOURCE_FILES += AudibleInstruments/res/hdad-segment14-1.002/Segment14.ttf
+
+MINIRESOURCE_FILES += BogaudioModules/res/AD-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Additator-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AddrSeq-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AddrSeqX-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/ADSR-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AMRM-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Analyzer-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/AnalyzerXL.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Arp-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/ASR-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Assign-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Bool-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_18px_0.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_18px_1_green.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_18px_1_orange.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_18px_1.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_9px_0.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_9px_1_green.svg
+MINIRESOURCE_FILES += BogaudioModules/res/button_9px_1.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Chirp-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Clpr-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Cmp-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/CmpDist-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/CVD-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/DADSRH-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/DADSRHPlus-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Detune-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/DGate-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Edge-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EightFO-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EightOne-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EQ-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/EQS-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FFB-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FlipFlop-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FMOp-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Follow-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FourFO-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/FourMan-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Inv-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_16px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_19px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_26px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_29px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_38px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_45px-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/knob_68px-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Lag-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/LFO-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Lgsw-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LLFO-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LLPG-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Lmtr-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LPG-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LVCF-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/LVCO-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Manual-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/MegaGate-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix1-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix2-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix4-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix4x-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix8-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mix8x-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mono-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mult-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mumix-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Mute8-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Noise-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Nsgt-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Offset-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/OneEight-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pan-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14XF-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14XR-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ14XV-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ6-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ6XF-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PEQ-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pgmr-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PgmrX-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyCon16-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyCon8-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyMult-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyOff16-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/PolyOff8-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/port-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pressor-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Pulse-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Ranalyzer.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Reftone-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/RGate-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/SampleHold-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Shaper-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/ShaperPlus-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Sine-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Slew-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/slider_switch_2_14px_0.svg
+MINIRESOURCE_FILES += BogaudioModules/res/slider_switch_2_14px_1.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Stack-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Sums-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Switch-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch1616-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Switch18-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch44-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch81-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Switch88-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Test-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Test2-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestExpanderBase-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestExpanderExtension-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestGl-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/TestVCF-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/UMix-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/Unison-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCA-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/VCAmp-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCF-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/VCM-dark.svg
+MINIRESOURCE_FILES += BogaudioModules/res/VCO-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Velo-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Vish-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/VU-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Walk2-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/Walk-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/XCO-dark.svg
+# MINIRESOURCE_FILES += BogaudioModules/res/XFade-dark.svg
+
+MINIRESOURCE_FILES += Cardinal/res/HostAudio.svg
+MINIRESOURCE_FILES += Cardinal/res/HostCV.svg
+MINIRESOURCE_FILES += Cardinal/res/HostMIDICC.svg
+MINIRESOURCE_FILES += Cardinal/res/HostMIDIGate.svg
+MINIRESOURCE_FILES += Cardinal/res/HostMIDIMap.svg
+MINIRESOURCE_FILES += Cardinal/res/HostMIDI.svg
+MINIRESOURCE_FILES += Cardinal/res/HostParameters.svg
+MINIRESOURCE_FILES += Cardinal/res/HostParamsMap.svg
+MINIRESOURCE_FILES += Cardinal/res/HostTime.svg
+
+MINIRESOURCE_FILES += Fundamental/presets
+MINIRESOURCE_FILES += Fundamental/res/ADSR.svg
+MINIRESOURCE_FILES += Fundamental/res/LFO.svg
+MINIRESOURCE_FILES += Fundamental/res/Merge.svg
+MINIRESOURCE_FILES += Fundamental/res/MidSide.svg
+MINIRESOURCE_FILES += Fundamental/res/Noise.svg
+MINIRESOURCE_FILES += Fundamental/res/Quantizer.svg
+MINIRESOURCE_FILES += Fundamental/res/Random.svg
+MINIRESOURCE_FILES += Fundamental/res/Scope.svg
+MINIRESOURCE_FILES += Fundamental/res/Split.svg
+MINIRESOURCE_FILES += Fundamental/res/Sum.svg
+MINIRESOURCE_FILES += Fundamental/res/VCA-1.svg
+MINIRESOURCE_FILES += Fundamental/res/VCF.svg
+MINIRESOURCE_FILES += Fundamental/res/VCMixer.svg
+MINIRESOURCE_FILES += Fundamental/res/VCO.svg
+MINIRESOURCE_FILES += Fundamental/res/components/ADSR-bg.svg
+MINIRESOURCE_FILES += Fundamental/res/components/button-off.svg
+MINIRESOURCE_FILES += Fundamental/res/components/button-on.svg
+MINIRESOURCE_FILES += Fundamental/res/components/knob-marker-small.svg
+MINIRESOURCE_FILES += Fundamental/res/components/knob-marker.svg
+MINIRESOURCE_FILES += Fundamental/res/components/knob-small.svg
+MINIRESOURCE_FILES += Fundamental/res/components/knob.svg
+MINIRESOURCE_FILES += Fundamental/res/components/port.svg
+MINIRESOURCE_FILES += Fundamental/res/components/Quantizer-keyboard.svg
+MINIRESOURCE_FILES += Fundamental/res/components/Scope-bg.svg
+
+MINIRESOURCE_FILES += MockbaModular/res/CZOsc.svg
+MINIRESOURCE_FILES += MockbaModular/res/Empty_gray.svg
+MINIRESOURCE_FILES += MockbaModular/res/Filtah.svg
+MINIRESOURCE_FILES += MockbaModular/res/HSW_0.svg
+MINIRESOURCE_FILES += MockbaModular/res/HSW_1.svg
+MINIRESOURCE_FILES += MockbaModular/res/HSW_2.svg
+MINIRESOURCE_FILES += MockbaModular/res/knob.svg
+MINIRESOURCE_FILES += MockbaModular/res/MaugOsc.svg
+MINIRESOURCE_FILES += MockbaModular/res/Mixah.svg
+MINIRESOURCE_FILES += MockbaModular/res/Pannah.svg
+MINIRESOURCE_FILES += MockbaModular/res/port.svg
+MINIRESOURCE_FILES += MockbaModular/res/ReVoltah.svg
+MINIRESOURCE_FILES += MockbaModular/res/screw.svg
+MINIRESOURCE_FILES += MockbaModular/res/selector.svg
+MINIRESOURCE_FILES += MockbaModular/res/Shapah.svg
+
+MINIRESOURCE_FILES += surgext/build/surge-data/configuration.xml
+MINIRESOURCE_FILES += surgext/build/surge-data/windows.wt
+MINIRESOURCE_FILES += surgext/res/xt/fonts/quicksand/Quicksand-Regular.ttf
+MINIRESOURCE_FILES += surgext/res/xt/fonts/quicksand/Quicksand-Bold.ttf
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/fader_bg.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/fader_bg_25.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/fader_handle.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/knob-9.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/knob-12.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/knob-14.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/knob-16.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/knob-pointer-9.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/knob-pointer-12.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/knob-pointer-14.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/knob-pointer-16.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/mod-button.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/components/port.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/panels/other/EGLFO.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/panels/other/Matrix.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/panels/other/Mixer.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/panels/vco/BlankVCO.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_0.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_1.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_2.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_3.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_4.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_5.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_6.svg
+MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_7.svg
+
+# MINIRESOURCE_FILES += ValleyAudio/res/DexterPanelDark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/InterzonePanelDark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/LightLEDButton80.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/PJ301MDarkSmallOut.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/PJ301MDarkSmall.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo0.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo1.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo2.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo3.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo4.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo5.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo6.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo7.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo8.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo9.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo10.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo11.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo12.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo13.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo14.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo15.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo16.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo17.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo18.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo19.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo20.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo21.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo22.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo0Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo1Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo2Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo3Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo4Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo5Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo6Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo7Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo8Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo9Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo10Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo11Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo12Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo13Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo14Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo15Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo16Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo17Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo18Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo19Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo20Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo21Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/algo22Dark.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/din1451alt.ttf
+# MINIRESOURCE_FILES += ValleyAudio/res/sliderBlue.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/sliderGreen.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/sliderRed.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/sliderOrange.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/sliderYellow.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/valleySliderBackground.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSBlueMed.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSBlueMed-fg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSBlueMedSmall.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSBlueMedSmall-fg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSMed-bg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSMedSmall-bg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSGreenMed.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSGreenMed-fg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSOrangeMed.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSOrangeMed-fg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSRedMed.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSRedMed-fg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSPurpleMed.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Med/Rogan1PSPurpleMed-fg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSSmall-bg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSBlueSmall.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSBlueSmall-fg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSOrangeSmall.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSOrangeSmall-fg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSGreenSmall.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSGreenSmall-fg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSRedSmall.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSRedSmall-fg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSMustardSmall.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSMustardSmall-fg.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSPurpleSmall.svg
+# MINIRESOURCE_FILES += ValleyAudio/res/v2/Small/Rogan1PSPurpleSmall-fg.svg
 
 # MOD builds only have LV2 main and FX variant
 ifeq ($(MOD_BUILD),true)
 
 LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(MINIPLUGIN_LIST:%=../bin/CardinalMini.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
+LV2_RESOURCES += $(MINIRESOURCE_FILES:%=../bin/CardinalMini.lv2/resources/%)
 
 # MOD builds only have LV2 FX variant for now
 else ifeq ($(WASM),true)
 
 LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalNative.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(MINIPLUGIN_LIST:%=../bin/CardinalMini.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalNative.lv2/resources/%)
+LV2_RESOURCES += $(MINIRESOURCE_FILES:%=../bin/CardinalMini.lv2/resources/%)
 
 else
 
 LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(MINIPLUGIN_LIST:%=../bin/CardinalMini.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.lv2/resources/%)
+LV2_RESOURCES += $(MINIRESOURCE_FILES:%=../bin/CardinalMini.lv2/resources/%)
 
 ifeq ($(MACOS),true)
 VST2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json)
 VST2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.vst/Contents/Resources/PluginManifests/%.json)
 VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.vst/Contents/Resources/%)
 VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst/Contents/Resources/%)
-CLAP_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalFX.clap/Contents/Resources/PluginManifests/%.json)
+CLAP_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.clap/Contents/Resources/PluginManifests/%.json)
+CLAP_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.clap/Contents/Resources/PluginManifests/%.json)
+CLAP_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.clap/Contents/Resources/PluginManifests/%.json)
+CLAP_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.clap/Contents/Resources/%)
 CLAP_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.clap/Contents/Resources/%)
+CLAP_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.clap/Contents/Resources/%)
 else
 VST2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.vst/resources/PluginManifests/%.json)
 VST2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.vst/resources/%)
@@ -1248,13 +1799,17 @@ VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst3/Contents/Resource
 
 endif
 
-resources: $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES) $(CLAP_RESOURCES)
+resources: $(JACK_RESOURCES) $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES) $(CLAP_RESOURCES)
 
 ../bin/Cardinal.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
 ../bin/CardinalFX.lv2/resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalMini.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
@@ -1267,7 +1822,15 @@ resources: $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES) $(CLAP_RESOURCES
 	$(SILENT)ln -sf $(abspath $<) $@
 
 ifeq ($(MOD_BUILD),true)
+../bin/Cardinal.lv2/resources/%.svg: %.svg ../deps/svg2stub.py
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)python3 ../deps/svg2stub.py $< $@
+
 ../bin/CardinalFX.lv2/resources/%.svg: %.svg ../deps/svg2stub.py
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)python3 ../deps/svg2stub.py $< $@
+
+../bin/CardinalMini.lv2/resources/%.svg: %.svg ../deps/svg2stub.py
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)python3 ../deps/svg2stub.py $< $@
 endif
@@ -1277,6 +1840,10 @@ endif
 	$(SILENT)ln -sf $(abspath $<) $@
 
 ../bin/CardinalFX.lv2/resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalMini.lv2/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
@@ -1317,10 +1884,6 @@ ifeq ($(MACOS),true)
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/CardinalFX.clap/Contents/Resources/%: %
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
-
 ../bin/CardinalSynth.vst/Contents/Resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
@@ -1329,11 +1892,31 @@ ifeq ($(MACOS),true)
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
+../bin/CardinalSynth.vst/Contents/Resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/Cardinal.clap/Contents/Resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalFX.clap/Contents/Resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalSynth.clap/Contents/Resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/Cardinal.clap/Contents/Resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
 ../bin/CardinalFX.clap/Contents/Resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/CardinalSynth.vst/Contents/Resources/PluginManifests/%.json: %/plugin.json
+../bin/CardinalSynth.clap/Contents/Resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 else
@@ -1341,11 +1924,11 @@ else
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/Cardinal.clap/resources/%: %
+../bin/Cardinal.vst/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
-../bin/Cardinal.vst/resources/PluginManifests/%.json: %/plugin.json
+../bin/Cardinal.clap/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
@@ -1354,11 +1937,31 @@ else
 	$(SILENT)ln -sf $(abspath $<) $@
 endif
 
+%/surgext/build/surge-data/configuration.xml: surgext/surge/resources/surge-shared/configuration.xml
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+%/surgext/build/surge-data/fx_presets:
+	-@mkdir -p "$@"
+	cp -R surgext/surge/resources/data/fx_presets/* $@/
+	cp -R surgext/res/surge_extra_data/fx_presets/* $@/
+
+%/surgext/build/surge-data/wavetables: surgext/surge/resources/data/wavetables
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+%/surgext/build/surge-data/windows.wt: surgext/surge/resources/surge-shared/windows.wt
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
 # --------------------------------------------------------------
 # Build commands
 
 PLUGIN_OBJS  = $(PLUGIN_FILES:%=$(BUILD_DIR)/%.o)
 PLUGIN_OBJS += $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.o)
+
+MINIPLUGIN_OBJS  = $(MINIPLUGIN_FILES:%=$(BUILD_DIR)/%.o)
+MINIPLUGIN_OBJS += $(MINIPLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.o)
 
 .PRECIOUS: $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.c)
 
@@ -1366,7 +1969,12 @@ PLUGIN_OBJS += $(PLUGIN_BINARIES:%=$(BUILD_DIR)/%.bin.o)
 custom_module_names = -D${1}=${2}${1} -Dmodel${1}=model${2}${1} -D${1}Widget=${2}${1}Widget
 custom_per_file_names = -D${1}=${2}_${1}
 
-$(TARGET): $(PLUGIN_OBJS)
+plugins$(TARGET_SUFFIX).a: $(PLUGIN_OBJS)
+	@echo "Creating $@"
+	$(SILENT)rm -f $@
+	$(SILENT)$(AR) crs $@ $^
+
+plugins-mini$(TARGET_SUFFIX).a: $(MINIPLUGIN_OBJS)
 	@echo "Creating $@"
 	$(SILENT)rm -f $@
 	$(SILENT)$(AR) crs $@ $^
@@ -1386,6 +1994,16 @@ $(BUILD_DIR)/plugins.cpp.o: plugins.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
 
+$(BUILD_DIR)/plugins-mini.cpp.o: plugins-mini.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
+
+$(BUILD_DIR)/noplugins.cpp.o: plugins.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
+
 $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -1396,6 +2014,19 @@ $(BUILD_DIR)/Cardinal/%.cpp.o: Cardinal/%.cpp
 		-Dstbtt_fontinfo=stbtt_fontinfo_cardinal \
 		-Dstbrp_node=stbrp_node_cardinal \
 		-Dstbrp_rect=stbrp_rect_cardinal \
+		$(CARLA_FLAGS)
+
+$(BUILD_DIR)/Cardinal/src/AIDA-X.cpp.o: Cardinal/src/AIDA-X.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		-DpluginInstance=pluginInstance__Cardinal \
+		-Dstbrp_context=stbrp_context_cardinal \
+		-Dstbrp_coord=stbrp_coord_cardinal \
+		-Dstbtt_fontinfo=stbtt_fontinfo_cardinal \
+		-Dstbrp_node=stbrp_node_cardinal \
+		-Dstbrp_rect=stbrp_rect_cardinal \
+		$(RTNEURAL_FLAGS) \
 		$(CARLA_FLAGS)
 
 $(BUILD_DIR)/21kHz/%.cpp.o: 21kHz/%.cpp
@@ -1419,6 +2050,13 @@ $(BUILD_DIR)/AaronStatic/%.cpp.o: AaronStatic/%.cpp
 		$(foreach m,$(AARONSTATIC_CUSTOM),$(call custom_module_names,$(m),AaronStatic)) \
 		-DpluginInstance=pluginInstance__AaronStatic \
 		-Dinit=init__AaronStatic
+
+$(BUILD_DIR)/alefsbits/%.cpp.o: alefsbits/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ALEFSBITS_CUSTOM),$(call custom_module_names,$(m),alefsbits)) \
+		-DpluginInstance=pluginInstance__alefsbits
 
 $(BUILD_DIR)/Algoritmarte/%.cpp.o: Algoritmarte/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1483,11 +2121,10 @@ $(BUILD_DIR)/AudibleInstruments/%.o: AudibleInstruments/%
 $(BUILD_DIR)/Autinn/%.cpp.o: Autinn/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(AUTINN_CUSTOM),$(call custom_module_names,$(m),Autinn)) \
 		-DpluginInstance=pluginInstance__Autinn \
 		-Dinit=init__Autinn
-
 
 $(BUILD_DIR)/Axioma/%.cpp.o: Axioma/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1499,7 +2136,7 @@ $(BUILD_DIR)/Axioma/%.cpp.o: Axioma/%.cpp
 $(BUILD_DIR)/BaconPlugs/%.cpp.o: BaconPlugs/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -std=gnu++17 -c -o $@ \
 		$(foreach m,$(BACON_CUSTOM),$(call custom_module_names,$(m),BaconPlugs)) \
 		-DpluginInstance=pluginInstance__Bacon \
 		-DDARK_BACON \
@@ -1562,7 +2199,7 @@ $(BUILD_DIR)/CatroModulo/src/%.cpp.o: CatroModulo/src/%.cpp
 $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
 		-DpluginInstance=pluginInstance__cf \
 		-Wno-misleading-indentation
@@ -1570,7 +2207,7 @@ $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(CHOWDSP_CUSTOM),$(call custom_module_names,$(m),ChowDSP)) \
 		-DpluginInstance=pluginInstance__ChowDSP \
 		-DUSE_EIGEN \
@@ -1578,6 +2215,14 @@ $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 		-IChowDSP/lib \
 		-IChowDSP/lib/chowdsp_utils/modules/chowdsp_dsp/WDF \
 		-Wno-deprecated-copy
+
+$(BUILD_DIR)/dBiz/src/%.cpp.o: dBiz/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(DBIZ_CUSTOM),$(call custom_module_names,$(m),dBiz)) \
+		$(foreach m,$(DBIZ_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),dBiz_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__dBiz
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1587,6 +2232,14 @@ $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 		-DpluginInstance=pluginInstance__DrumKit \
 		-Dinit=init__DrumKit \
 		-Wno-sign-compare
+
+$(BUILD_DIR)/EnigmaCurry/src/%.cpp.o: EnigmaCurry/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+		$(foreach m,$(ENIGMACURRY_CUSTOM),$(call custom_module_names,$(m),EnigmaCurry)) \
+		-DpluginInstance=pluginInstance__EnigmaCurry \
+		-Wno-misleading-indentation
 
 $(BUILD_DIR)/ESeries/%.cpp.o: ESeries/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1612,7 +2265,7 @@ $(BUILD_DIR)/Extratone/src/%.cpp.o: Extratone/src/%.cpp
 $(BUILD_DIR)/FehlerFabrik/%.cpp.o: FehlerFabrik/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(FEHLERFABRIK_CUSTOM),$(call custom_module_names,$(m),FehlerFabrik)) \
 		-DpluginInstance=pluginInstance__FehlerFabrik
 
@@ -1620,7 +2273,7 @@ $(BUILD_DIR)/forsitan-modulare/%.cpp.o: forsitan-modulare/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(GLUETHEGIANT_CUSTOM),$(call custom_module_names,$(m),forsitan)) \
+		$(foreach m,$(FORSITAN_CUSTOM),$(call custom_module_names,$(m),forsitan)) \
 		-DpluginInstance=pluginInstance__forsitan
 
 $(BUILD_DIR)/Fundamental/%.c.o: Fundamental/%.c
@@ -1634,6 +2287,13 @@ $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
+		-DpluginInstance=pluginInstance__Fundamental
+
+$(BUILD_DIR)/Fundamental/src/Scope.cpp.o: Fundamental/src/Scope.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
 		-DpluginInstance=pluginInstance__Fundamental
 
@@ -1663,12 +2323,19 @@ $(BUILD_DIR)/GoodSheperd/%.cpp.o: GoodSheperd/%.cpp
 $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(GRANDEMODULAR_CUSTOM),$(call custom_module_names,$(m),GrandeModular)) \
 		-DpluginInstance=pluginInstance__GrandeModular \
 		-Wno-missing-braces \
 		-Wno-narrowing \
 		-Wno-self-assign
+
+$(BUILD_DIR)/h4n4-modules/%.cpp.o: h4n4-modules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(H4N4_CUSTOM),$(call custom_module_names,$(m),H4N4)) \
+		-DpluginInstance=pluginInstance__H4N4
 
 $(BUILD_DIR)/HamptonHarmonics/%.cpp.o: HamptonHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1680,7 +2347,7 @@ $(BUILD_DIR)/HamptonHarmonics/%.cpp.o: HamptonHarmonics/%.cpp
 $(BUILD_DIR)/HetrickCV/%.cpp.o: HetrickCV/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(HETRICKCV_CUSTOM),$(call custom_module_names,$(m),HetrickCV)) \
 		-DpluginInstance=pluginInstance__HetrickCV \
 		-DSTDIO_OVERRIDE=HetrickCV \
@@ -1690,7 +2357,7 @@ $(BUILD_DIR)/HetrickCV/%.cpp.o: HetrickCV/%.cpp
 $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
 		-DStepAttributes=StepAttributesKernel \
@@ -1698,16 +2365,15 @@ $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cp
 $(BUILD_DIR)/ImpromptuModular/src/ImpromptuModular.cpp.o: ImpromptuModular/src/ImpromptuModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
-		-Dinit=init__ImpromptuModular \
-		-UBUILDING_PLUGIN_MODULES
+		-Dinit=init__ImpromptuModular
 
 $(BUILD_DIR)/ImpromptuModular%.cpp.o: ImpromptuModular%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ImpromptuModular_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
@@ -1771,7 +2437,7 @@ $(BUILD_DIR)/LilacLoop/%.cpp.o: LilacLoop/%.cpp
 $(BUILD_DIR)/LittleUtils/%.cpp.o: LittleUtils/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(LITTLEUTILS_CUSTOM),$(call custom_module_names,$(m),LittleUtils)) \
 		-DpluginInstance=pluginInstance__LittleUtils
 
@@ -1801,7 +2467,7 @@ $(BUILD_DIR)/Meander/src/Meander.cpp.o: Meander/src/Meander.cpp
 $(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),MindMeld)) \
 		-DpluginInstance=pluginInstance__MindMeld \
 		-Dinit=init__MindMeld
@@ -1809,7 +2475,7 @@ $(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/Mind
 $(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),MindMeld)) \
 		-DpluginInstance=pluginInstance__MindMeld
 
@@ -1837,7 +2503,7 @@ $(BUILD_DIR)/Mog/%.cpp.o: Mog/%.cpp
 $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(MSCHACK_CUSTOM),$(call custom_module_names,$(m),mscHack)) \
 		$(foreach m,$(MSCHACK_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),mscHack_$(shell basename $*))) \
 		-DthePlugin=pluginInstance__mscHack \
@@ -1852,8 +2518,7 @@ $(BUILD_DIR)/MSM/%.cpp.o: MSM/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MSM_CUSTOM),$(call custom_module_names,$(m),MSM)) \
-		-DpluginInstance=pluginInstance__MSM \
-		-DDARKTHEME
+		-DpluginInstance=pluginInstance__MSM
 
 $(BUILD_DIR)/myth-modules/%.cpp.o: myth-modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1891,7 +2556,7 @@ $(BUILD_DIR)/ParableInstruments/%.o: ParableInstruments/%
 $(BUILD_DIR)/PathSet/%.cpp.o: PathSet/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
 		$(foreach m,$(PATHSET_CUSTOM),$(call custom_module_names,$(m),PathSet)) \
 		-DpluginInstance=pluginInstance__PathSet
 
@@ -1919,12 +2584,26 @@ $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 		-Wno-implicit-fallthrough \
 		-Wno-sign-compare
 
+$(BUILD_DIR)/RebelTech/%.cpp.o: RebelTech/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(REBELTECH_CUSTOM),$(call custom_module_names,$(m),RebelTech)) \
+		-DpluginInstance=pluginInstance__RebelTech
+
 $(BUILD_DIR)/repelzen/%.cpp.o: repelzen/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(REPELZEN_CUSTOM),$(call custom_module_names,$(m),repelzen)) \
 		-DpluginInstance=pluginInstance__repelzen
+
+$(BUILD_DIR)/Sapphire/%.cpp.o: Sapphire/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+		$(foreach m,$(SAPPHIRE_CUSTOM),$(call custom_module_names,$(m),Sapphire)) \
+		-DpluginInstance=pluginInstance__sapphire
 
 $(BUILD_DIR)/sonusmodular/%.cpp.o: sonusmodular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -1947,12 +2626,28 @@ $(BUILD_DIR)/StarlingVia/%.cpp.o: StarlingVia/%.cpp
 		-IStarlingVia/Via/ui/inc \
 		-I./dep/starling-dsp
 
+$(BUILD_DIR)/stoermelder-packone/%.cpp.o: stoermelder-packone/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(STOERMELDER_PACKONE_CUSTOM),$(call custom_module_names,$(m),stoermelder_p1)) \
+		$(foreach m,$(STOERMELDER_PACKONE_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),stoermelder_p1_$(shell basename $*))) \
+		-DpluginInstance=pluginInstance__stoermelder_p1 \
+		-Dinit=init__stoermelder_p1
+
 $(BUILD_DIR)/stocaudio/%.cpp.o: stocaudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(STOCAUDIO_CUSTOM),$(call custom_module_names,$(m),stocaudio)) \
 		-DpluginInstance=pluginInstance__stocaudio
+
+$(BUILD_DIR)/surgext%.cpp.o: surgext%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(SURGEXT_FLAGS) -c -o $@ \
+		$(foreach m,$(SURGEXT_CUSTOM),$(call custom_module_names,$(m),surgext)) \
+		-DpluginInstance=pluginInstance__surgext
 
 $(BUILD_DIR)/unless_modules/%.cpp.o: unless_modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

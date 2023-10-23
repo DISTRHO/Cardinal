@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -30,10 +30,10 @@ GLFWAPI const char* glfwGetClipboardString(GLFWwindow*)
 {
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr, nullptr);
-    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr, nullptr);
+    DISTRHO_SAFE_ASSERT_RETURN(context->tlw != nullptr, nullptr);
 
     size_t dataSize;
-    return static_cast<const char*>(context->ui->getClipboard(dataSize));
+    return static_cast<const char*>(context->tlw->getClipboard(dataSize));
 }
 
 GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char* const text)
@@ -42,24 +42,24 @@ GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char* const text)
 
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr,);
-    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr,);
+    DISTRHO_SAFE_ASSERT_RETURN(context->tlw != nullptr,);
 
-    context->ui->setClipboard(nullptr, text, std::strlen(text)+1);
+    context->tlw->setClipboard(nullptr, text, std::strlen(text)+1);
 }
 
 GLFWAPI GLFWcursor* glfwCreateStandardCursor(const int shape)
 {
     static GLFWcursor cursors[] = {
-        { kMouseCursorArrow        }, // GLFW_ARROW_CURSOR
-        { kMouseCursorCaret        }, // GLFW_IBEAM_CURSOR
-        { kMouseCursorCrosshair    }, // GLFW_CROSSHAIR_CURSOR
-        { kMouseCursorHand         }, // GLFW_POINTING_HAND_CURSOR
-        { kMouseCursorNotAllowed   }, // GLFW_NOT_ALLOWED_CURSOR
-        { kMouseCursorLeftRight    }, // GLFW_RESIZE_EW_CURSOR
-        { kMouseCursorUpDown       }, // GLFW_RESIZE_NS_CURSOR
-        { kMouseCursorDiagonal     }, // GLFW_RESIZE_NWSE_CURSOR
-        { kMouseCursorAntiDiagonal }, // GLFW_RESIZE_NESW_CURSOR
-        // NOTE GLFW_RESIZE_ALL_CURSOR is unsupported in pugl
+        { kMouseCursorArrow           }, // GLFW_ARROW_CURSOR
+        { kMouseCursorCaret           }, // GLFW_IBEAM_CURSOR
+        { kMouseCursorCrosshair       }, // GLFW_CROSSHAIR_CURSOR
+        { kMouseCursorHand            }, // GLFW_POINTING_HAND_CURSOR
+        { kMouseCursorNotAllowed      }, // GLFW_NOT_ALLOWED_CURSOR
+        { kMouseCursorLeftRight       }, // GLFW_RESIZE_EW_CURSOR
+        { kMouseCursorUpDown          }, // GLFW_RESIZE_NS_CURSOR
+        { kMouseCursorUpLeftDownRight }, // GLFW_RESIZE_NWSE_CURSOR
+        { kMouseCursorUpRightDownLeft }, // GLFW_RESIZE_NESW_CURSOR
+        { kMouseCursorAllScroll       }, // GLFW_RESIZE_ALL_CURSOR
     };
 
     switch (shape)
@@ -79,9 +79,11 @@ GLFWAPI GLFWcursor* glfwCreateStandardCursor(const int shape)
     case GLFW_RESIZE_NS_CURSOR:
         return &cursors[kMouseCursorUpDown];
     case GLFW_RESIZE_NWSE_CURSOR:
-        return &cursors[kMouseCursorDiagonal];
+        return &cursors[kMouseCursorUpLeftDownRight];
     case GLFW_RESIZE_NESW_CURSOR:
-        return &cursors[kMouseCursorAntiDiagonal];
+        return &cursors[kMouseCursorUpRightDownLeft];
+    case GLFW_RESIZE_ALL_CURSOR:
+        return &cursors[kMouseCursorAllScroll];
     default:
         return nullptr;
     }
@@ -91,18 +93,18 @@ GLFWAPI void glfwSetCursor(GLFWwindow*, GLFWcursor* const cursor)
 {
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr,);
-    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr,);
+    DISTRHO_SAFE_ASSERT_RETURN(context->tlw != nullptr,);
 
-    context->ui->setCursor(cursor != nullptr ? cursor->cursorId : kMouseCursorArrow);
+    context->tlw->setCursor(cursor != nullptr ? cursor->cursorId : kMouseCursorArrow);
 }
 
 GLFWAPI double glfwGetTime(void)
 {
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
     DISTRHO_SAFE_ASSERT_RETURN(context != nullptr, 0.0);
-    DISTRHO_SAFE_ASSERT_RETURN(context->ui != nullptr, 0.0);
+    DISTRHO_SAFE_ASSERT_RETURN(context->tlw != nullptr, 0.0);
 
-    return context->ui->getApp().getTime();
+    return context->tlw->getApp().getTime();
 }
 
 GLFWAPI const char* glfwGetKeyName(const int key, int)

@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,23 +15,21 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#ifndef HEADLESS
-#include "OpenGL.hpp"
+#include "DistrhoPluginInfo.h"
+
+#ifndef DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+# error wrong build 1
+#endif
+#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS && !defined(HEADLESS)
+# error wrong build 2
 #endif
 
 #include "nanovg.h"
 
-#ifdef HEADLESS
 struct NVGLUframebuffer;
 void nvgluBindFramebuffer(NVGLUframebuffer* fb) {}
 NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags) { return nullptr; }
 void nvgluDeleteFramebuffer(NVGLUframebuffer* fb) {}
-#else
-# define NANOVG_GLES2_IMPLEMENTATION
-# define NANOVG_FBO_VALID 1
-# include "nanovg_gl.h"
-# include "nanovg_gl_utils.h"
-#endif
 
 #if defined(__GNUC__) && (__GNUC__ >= 6)
 # pragma GCC diagnostic push
@@ -61,8 +59,3 @@ GLFWAPI int glfwGetKeyScancode(int) { return 0; }
 GLFWAPI double glfwGetTime(void) { return 0.0; }
 
 }
-
-#ifndef HEADLESS
-# define STB_IMAGE_WRITE_IMPLEMENTATION
-# include "../src/Rack/dep/glfw/deps/stb_image_write.h"
-#endif

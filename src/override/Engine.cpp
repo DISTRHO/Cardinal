@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 
 /**
  * This file is an edited version of VCVRack's engine/Engine.cpp
- * Copyright (C) 2016-2021 VCV.
+ * Copyright (C) 2016-2023 VCV.
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -33,6 +33,7 @@
 #include <atomic>
 #include <tuple>
 #include <pmmintrin.h>
+#include <unordered_map>
 
 #include <engine/Engine.hpp>
 #include <engine/TerminalModule.hpp>
@@ -48,6 +49,7 @@
 # undef DEBUG
 #endif
 
+#include "../CardinalRemote.hpp"
 #include "DistrhoUtils.hpp"
 
 
@@ -57,6 +59,13 @@ extern std::vector<rack::plugin::Model*> hostTerminalModels;
 
 namespace rack {
 namespace engine {
+
+
+static constexpr const int PORT_DIVIDER = 7;
+// Arbitrary prime number so it doesn't over- or under-estimate time of buffered processors.
+static constexpr const int METER_DIVIDER = 37;
+static constexpr const int METER_BUFFER_LEN = 32;
+static constexpr const float METER_TIME = 1.f;
 
 
 struct Engine::Internal {
@@ -74,8 +83,8 @@ struct Engine::Internal {
 
 	float sampleRate = 0.f;
 	float sampleTime = 0.f;
-	int64_t block = 0;
 	int64_t frame = 0;
+	int64_t block = 0;
 	int64_t blockFrame = 0;
 	double blockTime = 0.0;
 	int blockFrames = 0;
@@ -96,11 +105,25 @@ struct Engine::Internal {
 	int smoothParamId = 0;
 	float smoothValue = 0.f;
 
+	// Remote control
+	remoteUtils::RemoteDetails* remoteDetails = nullptr;
+
 	/** Mutex that guards the Engine state, such as settings, Modules, and Cables.
 	Writers lock when mutating the engine's state or stepping the block.
 	Readers lock when using the engine's state.
 	*/
 	SharedMutex mutex;
+};
+
+
+struct Module::Internal {
+	bool bypassed = false;
+
+	int meterSamples = 0;
+	float meterDurationTotal = 0.f;
+
+	float meterBuffer[METER_BUFFER_LEN] = {};
+	int meterIndex = 0;
 };
 
 
@@ -135,11 +158,9 @@ static void Cable_step(Cable* that) {
 	const int channels = output->channels;
 	// Copy all voltages from output to input
 	for (int c = 0; c < channels; c++) {
-		float v = output->voltages[c];
-		// Set 0V if infinite or NaN
-		if (!std::isfinite(v))
-			v = 0.f;
-		input->voltages[c] = v;
+		if (!std::isfinite(output->voltages[c]))
+			__builtin_unreachable();
+		input->voltages[c] = output->voltages[c];
 	}
 	// Set higher channel voltages to 0
 	for (int c = channels; c < input->channels; c++) {
@@ -149,6 +170,7 @@ static void Cable_step(Cable* that) {
 }
 
 
+#ifndef HEADLESS
 static void Port_step(Port* that, float deltaTime) {
 	// Set plug lights
 	if (that->channels == 0) {
@@ -169,9 +191,10 @@ static void Port_step(Port* that, float deltaTime) {
 		that->plugLights[2].setSmoothBrightness(v, deltaTime);
 	}
 }
+#endif
 
 
-static void TerminalModule__doProcess(TerminalModule* terminalModule, const Module::ProcessArgs& args, bool input) {
+static void TerminalModule__doProcess(TerminalModule* const terminalModule, const Module::ProcessArgs& args, bool input) {
 	// Step module
 	if (input) {
 		terminalModule->processTerminalInput(args);
@@ -183,9 +206,10 @@ static void TerminalModule__doProcess(TerminalModule* terminalModule, const Modu
 		terminalModule->processTerminalOutput(args);
 	}
 
+#ifndef HEADLESS
 	// Iterate ports to step plug lights
-	if (args.frame % 7 /* PORT_DIVIDER */ == 0) {
-		float portTime = args.sampleTime * 7 /* PORT_DIVIDER */;
+	if (args.frame % PORT_DIVIDER == 0) {
+		float portTime = args.sampleTime * PORT_DIVIDER;
 		for (Input& input : terminalModule->inputs) {
 			Port_step(&input, portTime);
 		}
@@ -193,6 +217,68 @@ static void TerminalModule__doProcess(TerminalModule* terminalModule, const Modu
 			Port_step(&output, portTime);
 		}
 	}
+#endif
+}
+
+
+static void Module__doProcess(Module* const module, const Module::ProcessArgs& args) {
+	Module::Internal* const internal = module->internal;
+
+#ifndef HEADLESS
+	// This global setting can change while the function is running, so use a local variable.
+	bool meterEnabled = settings::cpuMeter && (args.frame % METER_DIVIDER == 0);
+
+	// Start CPU timer
+	double startTime;
+	if (meterEnabled) {
+		startTime = system::getTime();
+	}
+#endif
+
+	// Step module
+	if (!internal->bypassed)
+		module->process(args);
+	else
+		module->processBypass(args);
+
+#ifndef HEADLESS
+	// Stop CPU timer
+	if (meterEnabled) {
+		double endTime = system::getTime();
+		// Subtract call time of getTime() itself, since we only want to measure process() time.
+		double endTime2 = system::getTime();
+		float duration = (endTime - startTime) - (endTime2 - endTime);
+
+		internal->meterSamples++;
+		internal->meterDurationTotal += duration;
+
+		// Seconds we've been measuring
+		float meterTime = internal->meterSamples * METER_DIVIDER * args.sampleTime;
+
+		if (meterTime >= METER_TIME) {
+			// Push time to buffer
+			if (internal->meterSamples > 0) {
+				internal->meterIndex++;
+				internal->meterIndex %= METER_BUFFER_LEN;
+				internal->meterBuffer[internal->meterIndex] = internal->meterDurationTotal / internal->meterSamples;
+			}
+			// Reset total
+			internal->meterSamples = 0;
+			internal->meterDurationTotal = 0.f;
+		}
+	}
+
+	// Iterate ports to step plug lights
+	if (args.frame % PORT_DIVIDER == 0) {
+		float portTime = args.sampleTime * PORT_DIVIDER;
+		for (Input& input : module->inputs) {
+			Port_step(&input, portTime);
+		}
+		for (Output& output : module->outputs) {
+			Port_step(&output, portTime);
+		}
+	}
+#endif
 }
 
 
@@ -208,10 +294,16 @@ static void Engine_stepFrame(Engine* that) {
 		float smoothValue = internal->smoothValue;
 		Param* smoothParam = &smoothModule->params[smoothParamId];
 		float value = smoothParam->value;
-		// Use decay rate of roughly 1 graphics frame
-		const float smoothLambda = 60.f;
-		float newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
-		if (value == newValue) {
+		float newValue;
+		if (internal->remoteDetails != nullptr) {
+			newValue = value;
+			sendParamChangeToRemote(internal->remoteDetails, smoothModule->id, smoothParamId, value);
+		} else {
+			// Use decay rate of roughly 1 graphics frame
+			const float smoothLambda = 60.f;
+			newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
+		}
+		if (d_isEqual(value, newValue)) {
 			// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats)
 			smoothParam->setValue(smoothValue);
 			internal->smoothModule = NULL;
@@ -247,7 +339,7 @@ static void Engine_stepFrame(Engine* that) {
 
 	// Step each module and cables
 	for (Module* module : internal->modules) {
-		module->doProcess(processArgs);
+		Module__doProcess(module, processArgs);
 		for (Output& output : module->outputs) {
 			for (Cable* cable : output.cables)
 				Cable_step(cable);
@@ -275,6 +367,75 @@ static void Port_setConnected(Port* that) {
 	if (that->channels > 0)
 		return;
 	that->channels = 1;
+}
+
+
+template<typename T>
+using IdentityDictionary = std::unordered_map<T, T>;
+
+template<typename T>
+inline bool dictContains(IdentityDictionary<T>& dict, T key) {
+	return dict.find(key) != dict.end();
+}
+
+template<typename T>
+inline void dictAdd(IdentityDictionary<T>& dict, T key) {
+	dict[key] = key;
+}
+
+static void Engine_storeTerminalModulesIDs(std::vector<TerminalModule*> terminalModules, IdentityDictionary<int64_t>& terminalModulesIDs) {
+	for (TerminalModule* terminalModule : terminalModules)
+		dictAdd(terminalModulesIDs, terminalModule->id);
+}
+
+static void Engine_orderModule(Module* module, IdentityDictionary<Module*>& touchedModules, std::vector<Module*>& orderedModules, IdentityDictionary<int64_t>& terminalModulesIDs) {
+	if (!dictContains(touchedModules, module) && !dictContains(terminalModulesIDs, module->id)) { // Ignore feedback loops and terminal modules
+		dictAdd(touchedModules, module);
+		for (Output& output : module->outputs) {
+			for (Cable* cable : output.cables) {
+				Module* receiver = cable->inputModule; // The input to the cable is the receiving module
+				Engine_orderModule(receiver, touchedModules, orderedModules, terminalModulesIDs);
+			}
+		}
+		orderedModules.push_back(module);
+	}
+}
+
+static void Engine_assignOrderedModules(std::vector<Module*>& modules, std::vector<Module*>& orderedModules) {
+	std::reverse(orderedModules.begin(), orderedModules.end()); // These are stored bottom up
+	if (orderedModules.size() == modules.size()) {
+		for (unsigned int i = 0; i < orderedModules.size(); i++)
+			modules[i] = orderedModules[i];
+	}
+}
+
+#if DEBUG_ORDERED_MODULES
+static void Engine_debugOrderedModules(std::vector<Module*>& modules) {
+	printf("\n--- Ordered modules ---\n");
+	for (unsigned int i = 0; i < modules.size(); i++)
+		printf("%d) %s - %ld\n", i, modules[i]->model->getFullName().c_str(), modules[i]->id);
+}
+#endif
+
+/** Order the modules so that they always read the most recent sample from their inputs
+*/
+static void Engine_orderModules(Engine* that) {
+	Engine::Internal* internal = that->internal;
+
+	IdentityDictionary<int64_t> terminalModulesIDs;
+	Engine_storeTerminalModulesIDs(internal->terminalModules, terminalModulesIDs);
+
+	IdentityDictionary<Module*> touchedModules;
+	std::vector<Module*> orderedModules; 
+	orderedModules.reserve(internal->modules.size());
+	for (Module* module : internal->modules)
+		Engine_orderModule(module, touchedModules, orderedModules, terminalModulesIDs);
+
+	Engine_assignOrderedModules(internal->modules, orderedModules);
+
+#if DEBUG_ORDERED_MODULES
+	Engine_debugOrderedModules(internal->modules);
+#endif
 }
 
 
@@ -320,6 +481,8 @@ static void Engine_updateConnected(Engine* that) {
 		Port_setDisconnected(output);
 		DISTRHO_SAFE_ASSERT(output->cables.empty());
 	}
+	// Order the modules according to their connections
+	Engine_orderModules(that);
 }
 
 
@@ -490,18 +653,13 @@ void Engine::yieldWorkers() {
 }
 
 
-int64_t Engine::getBlock() {
-	return internal->block;
-}
-
-
 int64_t Engine::getFrame() {
 	return internal->frame;
 }
 
 
-void Engine::setFrame(int64_t frame) {
-	internal->frame = frame;
+int64_t Engine::getBlock() {
+	return internal->block;
 }
 
 
@@ -619,6 +777,9 @@ void Engine::addModule(Module* module) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = module;
 	}
+#if DEBUG_ORDERED_MODULES
+	printf("New module: %s - %ld\n", module->model->getFullName().c_str(), module->id);
+#endif
 }
 
 
@@ -933,19 +1094,22 @@ void Engine::setParamValue(Module* module, int paramId, float value) {
 		internal->smoothModule = NULL;
 		internal->smoothParamId = 0;
 	}
-	module->params[paramId].value = value;
+	if (internal->remoteDetails != nullptr) {
+		sendParamChangeToRemote(internal->remoteDetails, module->id, paramId, value);
+	}
+	module->params[paramId].setValue(value);
 }
 
 
 float Engine::getParamValue(Module* module, int paramId) {
-	return module->params[paramId].value;
+	return module->params[paramId].getValue();
 }
 
 
 void Engine::setParamSmoothValue(Module* module, int paramId, float value) {
 	// If another param is being smoothed, jump value
 	if (internal->smoothModule && !(internal->smoothModule == module && internal->smoothParamId == paramId)) {
-		internal->smoothModule->params[internal->smoothParamId].value = internal->smoothValue;
+		internal->smoothModule->params[internal->smoothParamId].setValue(internal->smoothValue);
 	}
 	internal->smoothParamId = paramId;
 	internal->smoothValue = value;
@@ -957,7 +1121,7 @@ void Engine::setParamSmoothValue(Module* module, int paramId, float value) {
 float Engine::getParamSmoothValue(Module* module, int paramId) {
 	if (internal->smoothModule == module && internal->smoothParamId == paramId)
 		return internal->smoothValue;
-	return module->params[paramId].value;
+	return module->params[paramId].getValue();
 }
 
 
@@ -1180,6 +1344,11 @@ void Engine::startFallbackThread() {
 
 void Engine_setAboutToClose(Engine* const engine) {
 	engine->internal->aboutToClose = true;
+}
+
+
+void Engine_setRemoteDetails(Engine* const engine, remoteUtils::RemoteDetails* const remoteDetails) {
+	engine->internal->remoteDetails = remoteDetails;
 }
 
 

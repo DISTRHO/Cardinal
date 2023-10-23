@@ -43,10 +43,16 @@ where we discuss possible modules to include.
 
 ## Changes are lost on restart
 
-This is intentional.  
-Cardinal is meant to be a self-contained plugin, and as such it does not save any files whatsoever.
-This includes user preferences (like list of favourites) or last used project.  
-As a plugin, the state will be saved together with the host/DAW project.
+This is intentional. Unlike VCV Rack, Cardinal does not automatically save.
+
+Also, different variants (main vs FX vs Synth) use different files for saving their settings, so there might be some confusion arising from that.  
+But on the other hand this allows you to have a different template and other defaults per variant, which is quite handy.
+
+## Scaling/High-DPI not working properly, how to fix it?
+
+Cardinal, using [DPF](https://github.com/DISTRHO/DPF), will try to automatically detect the system scaling and adjust to that.  
+On cases where that does not work you can set `DPF_SCALE_FACTOR` environment variable to a value of your choosing in order to force a custom scale factor.  
+Note that this applies to all DPF-based plugins and not just Cardinal.
 
 ## On BSD/Linux/X11 the menu item "Save As/Export..." does nothing
 

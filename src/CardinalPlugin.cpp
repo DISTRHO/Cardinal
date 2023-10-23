@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,7 +15,6 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#include <asset.hpp>
 #include <library.hpp>
 #include <midi.hpp>
 #include <patch.hpp>
@@ -24,10 +23,10 @@
 #include <settings.hpp>
 #include <system.hpp>
 
-#include <app/Browser.hpp>
 #include <app/Scene.hpp>
 #include <engine/Engine.hpp>
 #include <ui/common.hpp>
+#include <widget/Widget.hpp>
 #include <window/Window.hpp>
 
 #ifdef NDEBUG
@@ -39,12 +38,15 @@
 # include "extra/Thread.hpp"
 #endif
 
+#include <cfloat>
 #include <list>
 
 #include "CardinalCommon.hpp"
 #include "DistrhoPluginUtils.hpp"
 #include "PluginContext.hpp"
 #include "extra/Base64.hpp"
+#include "extra/ScopedDenormalDisable.hpp"
+#include "extra/ScopedSafeLocale.hpp"
 
 #ifdef DISTRHO_OS_WASM
 # include <emscripten/emscripten.h>
@@ -52,44 +54,26 @@
 # include "extra/SharedResourcePointer.hpp"
 #endif
 
-#if CARDINAL_VARIANT_FX
-# define CARDINAL_TEMPLATE_NAME "init/fx.vcv"
-#elif CARDINAL_VARIANT_NATIVE
-# define CARDINAL_TEMPLATE_NAME "init/native.vcv"
-#elif CARDINAL_VARIANT_SYNTH
-# define CARDINAL_TEMPLATE_NAME "init/synth.vcv"
-#else
-# define CARDINAL_TEMPLATE_NAME "init/main.vcv"
-#endif
-
-static const constexpr uint kCardinalStateBaseCount = 3; // patch, screenshot, comment
-
-#ifndef HEADLESS
+#if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
 # include "extra/ScopedValueSetter.hpp"
-# include "WindowParameters.hpp"
-static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount + 2; // moduleInfos, windowSize
-#else
-# define kWindowParameterCount 0
-static const constexpr uint kCardinalStateCount = kCardinalStateBaseCount;
 #endif
+
+extern const std::string CARDINAL_VERSION;
 
 namespace rack {
+#if (CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS) || defined(HEADLESS)
+namespace app {
+rack::widget::Widget* createMenuBar() { return new rack::widget::Widget; }
+}
+#endif
+#ifdef DISTRHO_OS_WASM
 namespace asset {
 std::string patchesPath();
-void destroy();
 }
+#endif
 namespace engine {
 void Engine_setAboutToClose(Engine*);
 }
-namespace plugin {
-void initStaticPlugins();
-void destroyStaticPlugins();
-}
-#ifndef HEADLESS
-namespace window {
-void WindowInit(Window* window, DISTRHO_NAMESPACE::Plugin* plugin);
-}
-#endif
 }
 
 START_NAMESPACE_DISTRHO
@@ -100,6 +84,11 @@ bool d_isDiffHigherThanLimit(const T& v1, const T& v2, const T& limit)
 {
     return v1 != v2 ? (v1 > v2 ? v1 - v2 : v2 - v1) > limit : false;
 }
+
+#if DISTRHO_PLUGIN_HAS_UI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+const char* UI::getBundlePath() const noexcept { return nullptr; }
+void UI::setState(const char*, const char*) {}
+#endif
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -144,356 +133,25 @@ static char* getPatchStorageSlug() {
 };
 #endif
 
-// -----------------------------------------------------------------------------------------------------------
-
-struct Initializer
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
-: public Thread
-#endif
+#if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+float RackKnobModeToFloat(const rack::settings::KnobMode knobMode) noexcept
 {
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
-    lo_server oscServer = nullptr;
-    CardinalBasePlugin* oscPlugin = nullptr;
-#endif
-    std::string templatePath;
-    std::string factoryTemplatePath;
-
-    Initializer(const CardinalBasePlugin* const plugin)
+    switch (knobMode)
     {
-        using namespace rack;
-
-#ifdef DISTRHO_OS_WASM
-        settings::allowCursorLock = true;
-#else
-        settings::allowCursorLock = false;
-#endif
-        settings::autoCheckUpdates = false;
-        settings::autosaveInterval = 0;
-        settings::devMode = true;
-        settings::isPlugin = true;
-        settings::skipLoadOnLaunch = true;
-        settings::showTipsOnLaunch = false;
-        settings::windowPos = math::Vec(0, 0);
-#ifdef HEADLESS
-        settings::headless = true;
-#endif
-
-        // copied from https://community.vcvrack.com/t/16-colour-cable-palette/15951
-        settings::cableColors = {
-            color::fromHexString("#ff5252"),
-            color::fromHexString("#ff9352"),
-            color::fromHexString("#ffd452"),
-            color::fromHexString("#e8ff52"),
-            color::fromHexString("#a8ff52"),
-            color::fromHexString("#67ff52"),
-            color::fromHexString("#52ff7d"),
-            color::fromHexString("#52ffbe"),
-            color::fromHexString("#52ffff"),
-            color::fromHexString("#52beff"),
-            color::fromHexString("#527dff"),
-            color::fromHexString("#6752ff"),
-            color::fromHexString("#a852ff"),
-            color::fromHexString("#e952ff"),
-            color::fromHexString("#ff52d4"),
-            color::fromHexString("#ff5293"),
-        };
-
-        system::init();
-        logger::init();
-        random::init();
-        ui::init();
-
-        if (asset::systemDir.empty())
-        {
-            if (const char* const bundlePath = plugin->getBundlePath())
-            {
-                if (const char* const resourcePath = getResourcePath(bundlePath))
-                {
-                    asset::systemDir = resourcePath;
-                    asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
-                }
-            }
-
-            if (asset::systemDir.empty() || ! system::exists(asset::systemDir) || ! system::exists(asset::bundlePath))
-            {
-               #ifdef CARDINAL_PLUGIN_SOURCE_DIR
-                // Make system dir point to source code location as fallback
-                asset::systemDir = CARDINAL_PLUGIN_SOURCE_DIR DISTRHO_OS_SEP_STR "Rack";
-                asset::bundlePath.clear();
-
-                // If source code dir does not exist use install target prefix as system dir
-                if (!system::exists(system::join(asset::systemDir, "res")))
-               #endif
-                {
-                   #if defined(DISTRHO_OS_WASM)
-                    asset::systemDir = "/resources";
-                   #elif defined(ARCH_MAC)
-                    asset::systemDir = "/Library/Application Support/Cardinal";
-                   #elif defined(ARCH_WIN)
-                    const std::string commonprogfiles = getSpecialPath(kSpecialPathCommonProgramFiles);
-                    if (! commonprogfiles.empty())
-                        asset::systemDir = system::join(commonprogfiles, "Cardinal");
-                   #else
-                    asset::systemDir = CARDINAL_PLUGIN_PREFIX "/share/cardinal";
-                   #endif
-
-                    asset::bundlePath = system::join(asset::systemDir, "PluginManifests");
-                }
-            }
-
-            asset::userDir = asset::systemDir;
-        }
-
-        const std::string patchesPath = asset::patchesPath();
-       #ifdef DISTRHO_OS_WASM
-        templatePath = system::join(patchesPath, CARDINAL_WASM_WELCOME_TEMPLATE_FILENAME);
-       #else
-        templatePath = system::join(patchesPath, CARDINAL_TEMPLATE_NAME);
-       #endif
-        factoryTemplatePath = system::join(patchesPath, CARDINAL_TEMPLATE_NAME);
-
-        // Log environment
-        INFO("%s %s v%s", APP_NAME.c_str(), APP_EDITION.c_str(), APP_VERSION.c_str());
-        INFO("%s", system::getOperatingSystemInfo().c_str());
-        INFO("Binary filename: %s", getBinaryFilename());
-        INFO("Bundle path: %s", plugin->getBundlePath());
-        INFO("System directory: %s", asset::systemDir.c_str());
-        INFO("User directory: %s", asset::userDir.c_str());
-        INFO("Template patch: %s", templatePath.c_str());
-        INFO("System template patch: %s", factoryTemplatePath.c_str());
-
-        // Report to user if something is wrong with the installation
-        if (asset::systemDir.empty())
-        {
-            d_stderr2("Failed to locate Cardinal plugin bundle.\n"
-                      "Install Cardinal with its bundle folder intact and try again.");
-        }
-        else if (! system::exists(asset::systemDir))
-        {
-            d_stderr2("System directory \"%s\" does not exist.\n"
-                      "Make sure Cardinal was downloaded and installed correctly.", asset::systemDir.c_str());
-        }
-
-        INFO("Initializing plugins");
-        plugin::initStaticPlugins();
-
-        INFO("Initializing plugin browser DB");
-        app::browserInit();
-
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
-        INFO("Initializing OSC Remote control");
-        oscServer = lo_server_new_with_proto(REMOTE_HOST_PORT, LO_UDP, osc_error_handler);
-        DISTRHO_SAFE_ASSERT_RETURN(oscServer != nullptr,);
-
-        lo_server_add_method(oscServer, "/hello", "", osc_hello_handler, this);
-        lo_server_add_method(oscServer, "/load", "b", osc_load_handler, this);
-        lo_server_add_method(oscServer, "/screenshot", "b", osc_screenshot_handler, this);
-        lo_server_add_method(oscServer, nullptr, nullptr, osc_fallback_handler, nullptr);
-
-        startThread();
-#elif defined(HEADLESS)
-        INFO("OSC Remote control is not enabled in this build");
-#endif
-    }
-
-    ~Initializer()
-    {
-        using namespace rack;
-
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
-        if (oscServer != nullptr)
-        {
-            stopThread(5000);
-            lo_server_del_method(oscServer, nullptr, nullptr);
-            lo_server_free(oscServer);
-            oscServer = nullptr;
-        }
-#endif
-
-        INFO("Clearing asset paths");
-        asset::bundlePath.clear();
-        asset::systemDir.clear();
-        asset::userDir.clear();
-
-        INFO("Destroying plugins");
-        plugin::destroyStaticPlugins();
-
-        INFO("Destroying colourized assets");
-        asset::destroy();
-
-        INFO("Destroying settings");
-        settings::destroy();
-
-        INFO("Destroying logger");
-        logger::destroy();
-    }
-
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
-    void run() override
-    {
-        INFO("OSC Thread Listening for remote commands");
-
-        while (! shouldThreadExit())
-        {
-            d_msleep(200);
-            while (lo_server_recv_noblock(oscServer, 0) != 0) {}
-        }
-
-        INFO("OSC Thread Closed");
-    }
-
-    static void osc_error_handler(int num, const char* msg, const char* path)
-    {
-        d_stderr("Cardinal OSC Error: code: %i, msg: \"%s\", path: \"%s\")", num, msg, path);
-    }
-
-    static int osc_fallback_handler(const char* const path, const char* const types, lo_arg**, int, lo_message, void*)
-    {
-        d_stderr("Cardinal OSC unhandled message \"%s\" with types \"%s\"", path, types);
-        return 0;
-    }
-
-    static int osc_hello_handler(const char*, const char*, lo_arg**, int, const lo_message m, void* const self)
-    {
-        d_stdout("osc_hello_handler()");
-        const lo_address source = lo_message_get_source(m);
-        lo_send_from(source, static_cast<Initializer*>(self)->oscServer, LO_TT_IMMEDIATE, "/resp", "ss", "hello", "ok");
-        return 0;
-    }
-
-    static int osc_load_handler(const char*, const char* types, lo_arg** argv, int argc, const lo_message m, void* const self)
-    {
-        d_stdout("osc_load_handler()");
-        DISTRHO_SAFE_ASSERT_RETURN(argc == 1, 0);
-        DISTRHO_SAFE_ASSERT_RETURN(types != nullptr && types[0] == 'b', 0);
-
-        const int32_t size = argv[0]->blob.size;
-        DISTRHO_SAFE_ASSERT_RETURN(size > 4, 0);
-
-        const uint8_t* const blob = (uint8_t*)(&argv[0]->blob.data);
-        DISTRHO_SAFE_ASSERT_RETURN(blob != nullptr, 0);
-
-        bool ok = false;
-
-        if (CardinalBasePlugin* const plugin = static_cast<Initializer*>(self)->oscPlugin)
-        {
-            CardinalPluginContext* const context = plugin->context;
-            std::vector<uint8_t> data(size);
-            std::memcpy(data.data(), blob, size);
-
-            rack::contextSet(context);
-            rack::system::removeRecursively(context->patch->autosavePath);
-            rack::system::createDirectories(context->patch->autosavePath);
-            try {
-                rack::system::unarchiveToDirectory(data, context->patch->autosavePath);
-                context->patch->loadAutosave();
-                ok = true;
-            }
-            catch (rack::Exception& e) {
-                WARN("%s", e.what());
-            }
-            rack::contextSet(nullptr);
-        }
-
-        const lo_address source = lo_message_get_source(m);
-        lo_send_from(source, static_cast<Initializer*>(self)->oscServer,
-                     LO_TT_IMMEDIATE, "/resp", "ss", "load", ok ? "ok" : "fail");
-        return 0;
-    }
-
-    static int osc_screenshot_handler(const char*, const char* types, lo_arg** argv, int argc, const lo_message m, void* const self)
-    {
-        d_stdout("osc_screenshot_handler()");
-        DISTRHO_SAFE_ASSERT_RETURN(argc == 1, 0);
-        DISTRHO_SAFE_ASSERT_RETURN(types != nullptr && types[0] == 'b', 0);
-
-        const int32_t size = argv[0]->blob.size;
-        DISTRHO_SAFE_ASSERT_RETURN(size > 4, 0);
-
-        const uint8_t* const blob = (uint8_t*)(&argv[0]->blob.data);
-        DISTRHO_SAFE_ASSERT_RETURN(blob != nullptr, 0);
-
-        bool ok = false;
-
-        if (CardinalBasePlugin* const plugin = static_cast<Initializer*>(self)->oscPlugin)
-            ok = plugin->updateStateValue("screenshot", String::asBase64(blob, size).buffer());
-
-        const lo_address source = lo_message_get_source(m);
-        lo_send_from(source, static_cast<Initializer*>(self)->oscServer,
-                     LO_TT_IMMEDIATE, "/resp", "ss", "screenshot", ok ? "ok" : "fail");
-        return 0;
-    }
-#endif
-};
-
-// -----------------------------------------------------------------------------------------------------------
-
-void CardinalPluginContext::writeMidiMessage(const rack::midi::Message& message, const uint8_t channel)
-{
-    if (bypassed)
-        return;
-
-    const size_t size = message.bytes.size();
-    DISTRHO_SAFE_ASSERT_RETURN(size > 0,);
-    DISTRHO_SAFE_ASSERT_RETURN(message.frame >= 0,);
-
-    MidiEvent event;
-    event.frame = message.frame;
-
-    switch (message.bytes[0] & 0xF0)
-    {
-    case 0x80:
-    case 0x90:
-    case 0xA0:
-    case 0xB0:
-    case 0xE0:
-        event.size = 3;
+    case rack::settings::KNOB_MODE_LINEAR:
+        return 0.f;
+    case rack::settings::KNOB_MODE_ROTARY_ABSOLUTE:
+        return 1.f;
+    case rack::settings::KNOB_MODE_ROTARY_RELATIVE:
+        return 2.f;
+    // unused in Rack
+    case rack::settings::KNOB_MODE_SCALED_LINEAR:
         break;
-    case 0xC0:
-    case 0xD0:
-        event.size = 2;
-        break;
-    case 0xF0:
-        switch (message.bytes[0] & 0x0F)
-        {
-        case 0x0:
-        case 0x4:
-        case 0x5:
-        case 0x7:
-        case 0x9:
-        case 0xD:
-            // unsupported
-            return;
-        case 0x1:
-        case 0x2:
-        case 0x3:
-        case 0xE:
-            event.size = 3;
-            break;
-        case 0x6:
-        case 0x8:
-        case 0xA:
-        case 0xB:
-        case 0xC:
-        case 0xF:
-            event.size = 1;
-            break;
-        }
-        break;
-    default:
-        // invalid
-        return;
     }
 
-    DISTRHO_SAFE_ASSERT_RETURN(size >= event.size,);
-
-    std::memcpy(event.data, message.bytes.data(), event.size);
-
-    if (channel != 0 && event.data[0] < 0xF0)
-        event.data[0] |= channel & 0x0F;
-
-    plugin->writeMidiEvent(event);
+    return 0.f;
 }
+#endif
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -508,7 +166,6 @@ struct ScopedContext {
         rack::contextSet(nullptr);
     }
 };
-
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -533,7 +190,7 @@ class CardinalPlugin : public CardinalBasePlugin
     struct {
         String comment;
         String screenshot;
-       #ifndef HEADLESS
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         String windowSize;
        #endif
     } fState;
@@ -542,18 +199,21 @@ class CardinalPlugin : public CardinalBasePlugin
     bool fWasBypassed;
     MidiEvent bypassMidiEvents[16];
 
-   #ifndef HEADLESS
+   #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
     // real values, not VCV interpreted ones
     float fWindowParameters[kWindowParameterCount];
+   #endif
+   #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+    float fMiniReportValues[kCardinalParameterCountAtMini - kCardinalParameterStartMini];
    #endif
 
 public:
     CardinalPlugin()
-        : CardinalBasePlugin(kModuleParameters + kWindowParameterCount + 1, 0, kCardinalStateCount),
+        : CardinalBasePlugin(kCardinalParameterCount, 0, kCardinalStateCount),
          #ifdef DISTRHO_OS_WASM
-          fInitializer(new Initializer(this)),
+          fInitializer(new Initializer(this, static_cast<const CardinalBaseUI*>(nullptr))),
          #else
-          fInitializer(this),
+          fInitializer(this, static_cast<const CardinalBaseUI*>(nullptr)),
          #endif
          #if DISTRHO_PLUGIN_NUM_INPUTS != 0
           fAudioBufferCopy(nullptr),
@@ -561,21 +221,36 @@ public:
           fNextExpectedFrame(0),
           fWasBypassed(false)
     {
-       #ifndef HEADLESS
-        fWindowParameters[kWindowParameterShowTooltips] = 1.0f;
-        fWindowParameters[kWindowParameterCableOpacity] = 50.0f;
-        fWindowParameters[kWindowParameterCableTension] = 75.0f;
-        fWindowParameters[kWindowParameterRackBrightness] = 100.0f;
-        fWindowParameters[kWindowParameterHaloBrightness] = 25.0f;
-        fWindowParameters[kWindowParameterKnobMode] = 0.0f;
-        fWindowParameters[kWindowParameterWheelKnobControl] = 0.0f;
-        fWindowParameters[kWindowParameterWheelSensitivity] = 1.0f;
-        fWindowParameters[kWindowParameterLockModulePositions] = 0.0f;
+        // check if first time loading a real instance
+        if (!fInitializer->shouldSaveSettings && !isDummyInstance())
+            fInitializer->loadSettings(true);
+
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+        fWindowParameters[kWindowParameterShowTooltips] = rack::settings::tooltips ? 1.f : 0.f;
+        fWindowParameters[kWindowParameterCableOpacity] = std::min(100.f, std::max(0.f, rack::settings::cableOpacity * 100));
+        fWindowParameters[kWindowParameterCableTension] = std::min(100.f, std::max(0.f, rack::settings::cableTension * 100));
+        fWindowParameters[kWindowParameterRackBrightness] = std::min(100.f, std::max(0.f, rack::settings::rackBrightness * 100));
+        fWindowParameters[kWindowParameterHaloBrightness] = std::min(100.f, std::max(0.f, rack::settings::haloBrightness * 100));
+        fWindowParameters[kWindowParameterKnobMode] = RackKnobModeToFloat(rack::settings::knobMode);
+        fWindowParameters[kWindowParameterWheelKnobControl] = rack::settings::knobScroll ? 1.f : 0.f;
+        fWindowParameters[kWindowParameterWheelSensitivity] = std::min(10.f, std::max(0.1f, rack::settings::knobScrollSensitivity * 1000));
+        fWindowParameters[kWindowParameterLockModulePositions] = rack::settings::lockModules ? 1.f : 0.f;
+        fWindowParameters[kWindowParameterBrowserSort] = std::min(rack::settings::BROWSER_SORT_RANDOM,
+                                                                  std::max(rack::settings::BROWSER_SORT_UPDATED,
+                                                                           rack::settings::browserSort));
+        fWindowParameters[kWindowParameterBrowserZoom] = std::min(200.f, std::max(25.f, std::pow(2.f, rack::settings::browserZoom) * 100.0f));
+        fWindowParameters[kWindowParameterInvertZoom] = rack::settings::invertZoom ? 1.f : 0.f;
+        fWindowParameters[kWindowParameterSqueezeModulePositions] = rack::settings::squeezeModules ? 1.f : 0.f;
+        // not saved
         fWindowParameters[kWindowParameterUpdateRateLimit] = 0.0f;
-        fWindowParameters[kWindowParameterBrowserSort] = 3.0f;
-        fWindowParameters[kWindowParameterBrowserZoom] = 50.0f;
-        fWindowParameters[kWindowParameterInvertZoom] = 0.0f;
-        fWindowParameters[kWindowParameterSqueezeModulePositions] = 1.0f;
+       #endif
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        std::memset(fMiniReportValues, 0, sizeof(fMiniReportValues));
+        fMiniReportValues[kCardinalParameterMiniTimeBar - kCardinalParameterStartMini] = 1;
+        fMiniReportValues[kCardinalParameterMiniTimeBeat - kCardinalParameterStartMini] = 1;
+        fMiniReportValues[kCardinalParameterMiniTimeBeatsPerBar - kCardinalParameterStartMini] = 4;
+        fMiniReportValues[kCardinalParameterMiniTimeBeatType - kCardinalParameterStartMini] = 4;
+        fMiniReportValues[kCardinalParameterMiniTimeBeatsPerMinute - kCardinalParameterStartMini] = 120;
        #endif
 
         // create unique temporary path for this instance
@@ -639,19 +314,18 @@ public:
         {
             context->patch->loadTemplate();
             context->scene->rackScroll->reset();
-            // swap to factory template after first load
-            context->patch->templatePath = context->patch->factoryTemplatePath;
         }
 
-       #if defined(HAVE_LIBLO) && defined(HEADLESS)
-        fInitializer->oscPlugin = this;
+       #ifdef CARDINAL_INIT_OSC_THREAD
+        fInitializer->remotePluginInstance = this;
        #endif
     }
 
     ~CardinalPlugin() override
     {
-       #if defined(HAVE_LIBLO) && defined(HEADLESS)
-        fInitializer->oscPlugin = nullptr;
+       #ifdef HAVE_LIBLO
+        if (fInitializer->remotePluginInstance == this)
+            fInitializer->remotePluginInstance = nullptr;
        #endif
 
         {
@@ -659,7 +333,7 @@ public:
             context->patch->clear();
 
             // do a little dance to prevent context scene deletion from saving to temp dir
-           #ifndef HEADLESS
+           #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
             const ScopedValueSetter<bool> svs(rack::settings::headless, true);
            #endif
             Engine_setAboutToClose(context->engine);
@@ -674,6 +348,37 @@ public:
     {
         return context;
     }
+
+   #ifdef HAVE_LIBLO
+    bool startRemoteServer(const char* const port) override
+    {
+        if (fInitializer->remotePluginInstance != nullptr)
+            return false;
+        
+        if (fInitializer->startRemoteServer(port))
+        {
+            fInitializer->remotePluginInstance = this;
+            return true;
+        }
+
+        return false;
+    }
+
+    void stopRemoteServer() override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(fInitializer->remotePluginInstance == this,);
+
+        fInitializer->remotePluginInstance = nullptr;
+        fInitializer->stopRemoteServer();
+    }
+    
+    void stepRemoteServer() override
+    {
+        DISTRHO_SAFE_ASSERT_RETURN(fInitializer->remotePluginInstance == this,);
+
+        fInitializer->stepRemoteServer();
+    }
+   #endif
 
 protected:
    /* --------------------------------------------------------------------------------------------------------
@@ -712,13 +417,15 @@ protected:
 
     uint32_t getVersion() const override
     {
-        return d_version(0, 22, 9);
+        return d_version(0, 23, 10);
     }
 
     int64_t getUniqueId() const override
     {
        #if CARDINAL_VARIANT_MAIN || CARDINAL_VARIANT_NATIVE
         return d_cconst('d', 'C', 'd', 'n');
+       #elif CARDINAL_VARIANT_MINI
+        return d_cconst('d', 'C', 'd', 'M');
        #elif CARDINAL_VARIANT_FX
         return d_cconst('d', 'C', 'n', 'F');
        #elif CARDINAL_VARIANT_SYNTH
@@ -733,17 +440,23 @@ protected:
 
     void initAudioPort(const bool input, uint32_t index, AudioPort& port) override
     {
-       #if CARDINAL_VARIANT_MAIN
-        if (index < 8)
+       #if CARDINAL_VARIANT_MAIN || CARDINAL_VARIANT_MINI
+        static_assert(CARDINAL_NUM_AUDIO_INPUTS == CARDINAL_NUM_AUDIO_OUTPUTS, "inputs == outputs");
+
+        if (index < CARDINAL_NUM_AUDIO_INPUTS)
         {
+           #if CARDINAL_VARIANT_MINI
+            port.groupId = kPortGroupStereo;
+           #else
             port.groupId = index / 2;
+           #endif
         }
         else
         {
-            port.hints = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange;
-            index -= 8;
+            port.hints = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange | kCVPortIsOptional;
+            index -= CARDINAL_NUM_AUDIO_INPUTS;
         }
-       #elif CARDINAL_VARIANT_FX || CARDINAL_VARIANT_NATIVE || CARDINAL_VARIANT_SYNTH
+       #elif CARDINAL_VARIANT_NATIVE || CARDINAL_VARIANT_FX || CARDINAL_VARIANT_SYNTH
         if (index < 2)
             port.groupId = kPortGroupStereo;
        #endif
@@ -778,7 +491,7 @@ protected:
 
     void initParameter(const uint32_t index, Parameter& parameter) override
     {
-        if (index < kModuleParameters)
+        if (index < kCardinalParameterCountAtModules)
         {
             parameter.name = "Parameter ";
             parameter.name += String(index + 1);
@@ -792,181 +505,370 @@ protected:
             return;
         }
 
-        if (index == kModuleParameters)
+        if (index == kCardinalParameterBypass)
         {
             parameter.initDesignation(kParameterDesignationBypass);
             return;
         }
 
-       #ifndef HEADLESS
-        switch (index - kModuleParameters - 1)
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+        if (index < kCardinalParameterCountAtWindow)
         {
-        case kWindowParameterShowTooltips:
-            parameter.name = "Show tooltips";
-            parameter.symbol = "tooltips";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
-            parameter.ranges.def = 1.0f;
+            switch (index - kCardinalParameterStartWindow)
+            {
+            case kWindowParameterShowTooltips:
+                parameter.name = "Show tooltips";
+                parameter.symbol = "tooltips";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = rack::settings::tooltips ? 1.f : 0.f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 1.0f;
+                break;
+            case kWindowParameterCableOpacity:
+                parameter.name = "Cable opacity";
+                parameter.symbol = "cableOpacity";
+                parameter.unit = "%";
+                parameter.hints = kParameterIsAutomatable;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = std::min(100.f, std::max(0.f, rack::settings::cableOpacity * 100));
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 100.0f;
+                break;
+            case kWindowParameterCableTension:
+                parameter.name = "Cable tension";
+                parameter.symbol = "cableTension";
+                parameter.unit = "%";
+                parameter.hints = kParameterIsAutomatable;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = std::min(100.f, std::max(0.f, rack::settings::cableTension * 100));
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 100.0f;
+                break;
+            case kWindowParameterRackBrightness:
+                parameter.name = "Room brightness";
+                parameter.symbol = "rackBrightness";
+                parameter.unit = "%";
+                parameter.hints = kParameterIsAutomatable;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = std::min(100.f, std::max(0.f, rack::settings::rackBrightness * 100));
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 100.0f;
+                break;
+            case kWindowParameterHaloBrightness:
+                parameter.name = "Light Bloom";
+                parameter.symbol = "haloBrightness";
+                parameter.unit = "%";
+                parameter.hints = kParameterIsAutomatable;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = std::min(100.f, std::max(0.f, rack::settings::haloBrightness * 100));
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 100.0f;
+                break;
+            case kWindowParameterKnobMode:
+                parameter.name = "Knob mode";
+                parameter.symbol = "knobMode";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = RackKnobModeToFloat(rack::settings::knobMode);
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 2.0f;
+                parameter.enumValues.count = 3;
+                parameter.enumValues.restrictedMode = true;
+                parameter.enumValues.values = new ParameterEnumerationValue[3];
+                parameter.enumValues.values[0].label = "Linear";
+                parameter.enumValues.values[0].value = 0.0f;
+                parameter.enumValues.values[1].label = "Absolute rotary";
+                parameter.enumValues.values[1].value = 1.0f;
+                parameter.enumValues.values[2].label = "Relative rotary";
+                parameter.enumValues.values[2].value = 2.0f;
+                break;
+            case kWindowParameterWheelKnobControl:
+                parameter.name = "Scroll wheel knob control";
+                parameter.symbol = "knobScroll";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = rack::settings::knobScroll ? 1.f : 0.f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 1.0f;
+                break;
+            case kWindowParameterWheelSensitivity:
+                parameter.name = "Scroll wheel knob sensitivity";
+                parameter.symbol = "knobScrollSensitivity";
+                parameter.hints = kParameterIsAutomatable|kParameterIsLogarithmic;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = std::min(10.f, std::max(0.1f, rack::settings::knobScrollSensitivity * 1000));
+                parameter.ranges.min = 0.1f;
+                parameter.ranges.max = 10.0f;
+                break;
+            case kWindowParameterLockModulePositions:
+                parameter.name = "Lock module positions";
+                parameter.symbol = "lockModules";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = rack::settings::lockModules ? 1.f : 0.f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 1.0f;
+                break;
+            case kWindowParameterUpdateRateLimit:
+                parameter.name = "Update rate limit";
+                parameter.symbol = "rateLimit";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = 0.0f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 2.0f;
+                parameter.enumValues.count = 3;
+                parameter.enumValues.restrictedMode = true;
+                parameter.enumValues.values = new ParameterEnumerationValue[3];
+                parameter.enumValues.values[0].label = "None";
+                parameter.enumValues.values[0].value = 0.0f;
+                parameter.enumValues.values[1].label = "2x";
+                parameter.enumValues.values[1].value = 1.0f;
+                parameter.enumValues.values[2].label = "4x";
+                parameter.enumValues.values[2].value = 2.0f;
+                break;
+            case kWindowParameterBrowserSort:
+                parameter.name = "Browser sort";
+                parameter.symbol = "browserSort";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = std::min(rack::settings::BROWSER_SORT_RANDOM,
+                                                std::max(rack::settings::BROWSER_SORT_UPDATED,
+                                                         rack::settings::browserSort));
+                parameter.ranges.min = rack::settings::BROWSER_SORT_UPDATED;
+                parameter.ranges.max = rack::settings::BROWSER_SORT_RANDOM;
+                parameter.enumValues.count = 6;
+                parameter.enumValues.restrictedMode = true;
+                parameter.enumValues.values = new ParameterEnumerationValue[6];
+                parameter.enumValues.values[0].label = "Updated";
+                parameter.enumValues.values[0].value = rack::settings::BROWSER_SORT_UPDATED;
+                parameter.enumValues.values[1].label = "Last used";
+                parameter.enumValues.values[1].value = rack::settings::BROWSER_SORT_LAST_USED;
+                parameter.enumValues.values[2].label = "Most used";
+                parameter.enumValues.values[2].value = rack::settings::BROWSER_SORT_MOST_USED;
+                parameter.enumValues.values[3].label = "Brand";
+                parameter.enumValues.values[3].value = rack::settings::BROWSER_SORT_BRAND;
+                parameter.enumValues.values[4].label = "Name";
+                parameter.enumValues.values[4].value = rack::settings::BROWSER_SORT_NAME;
+                parameter.enumValues.values[5].label = "Random";
+                parameter.enumValues.values[5].value = rack::settings::BROWSER_SORT_RANDOM;
+                break;
+            case kWindowParameterBrowserZoom:
+                parameter.name = "Browser zoom";
+                parameter.symbol = "browserZoom";
+                parameter.hints = kParameterIsAutomatable;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.unit = "%";
+                parameter.ranges.def = std::min(200.f, std::max(25.f, std::pow(2.f, rack::settings::browserZoom) * 100.0f));
+                parameter.ranges.min = 25.0f;
+                parameter.ranges.max = 200.0f;
+                parameter.enumValues.count = 7;
+                parameter.enumValues.restrictedMode = true;
+                parameter.enumValues.values = new ParameterEnumerationValue[7];
+                parameter.enumValues.values[0].label = "25";
+                parameter.enumValues.values[0].value = 25.0f;
+                parameter.enumValues.values[1].label = "35";
+                parameter.enumValues.values[1].value = 35.0f;
+                parameter.enumValues.values[2].label = "50";
+                parameter.enumValues.values[2].value = 50.0f;
+                parameter.enumValues.values[3].label = "71";
+                parameter.enumValues.values[3].value = 71.0f;
+                parameter.enumValues.values[4].label = "100";
+                parameter.enumValues.values[4].value = 100.0f;
+                parameter.enumValues.values[5].label = "141";
+                parameter.enumValues.values[5].value = 141.0f;
+                parameter.enumValues.values[6].label = "200";
+                parameter.enumValues.values[6].value = 200.0f;
+                break;
+            case kWindowParameterInvertZoom:
+                parameter.name = "Invert zoom";
+                parameter.symbol = "invertZoom";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = rack::settings::invertZoom ? 1.f : 0.f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 1.0f;
+                break;
+            case kWindowParameterSqueezeModulePositions:
+                parameter.name = "Auto-squeeze module positions";
+                parameter.symbol = "squeezeModules";
+                parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                parameter.hints |= kParameterIsHidden;
+               #endif
+                parameter.ranges.def = rack::settings::squeezeModules ? 1.f : 0.f;
+                parameter.ranges.min = 0.0f;
+                parameter.ranges.max = 1.0f;
+                break;
+            }
+        }
+       #endif
+
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        switch (index)
+        {
+        case kCardinalParameterMiniAudioIn1:
+            parameter.name = "Report Audio Input 1";
+            parameter.symbol = "r_audio_in_1";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 0.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 1.0f;
             break;
-        case kWindowParameterCableOpacity:
-            parameter.name = "Cable opacity";
-            parameter.symbol = "cableOpacity";
-            parameter.unit = "%";
-            parameter.hints = kParameterIsAutomatable;
-            parameter.ranges.def = 50.0f;
-            parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 100.0f;
-            break;
-        case kWindowParameterCableTension:
-            parameter.name = "Cable tension";
-            parameter.symbol = "cableTension";
-            parameter.unit = "%";
-            parameter.hints = kParameterIsAutomatable;
-            parameter.ranges.def = 75.0f;
-            parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 100.0f;
-            break;
-        case kWindowParameterRackBrightness:
-            parameter.name = "Room brightness";
-            parameter.symbol = "rackBrightness";
-            parameter.unit = "%";
-            parameter.hints = kParameterIsAutomatable;
-            parameter.ranges.def = 100.0f;
-            parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 100.0f;
-            break;
-        case kWindowParameterHaloBrightness:
-            parameter.name = "Light Bloom";
-            parameter.symbol = "haloBrightness";
-            parameter.unit = "%";
-            parameter.hints = kParameterIsAutomatable;
-            parameter.ranges.def = 25.0f;
-            parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 100.0f;
-            break;
-        case kWindowParameterKnobMode:
-            parameter.name = "Knob mode";
-            parameter.symbol = "knobMode";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
-            parameter.ranges.def = 0.0f;
-            parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 2.0f;
-            parameter.enumValues.count = 3;
-            parameter.enumValues.restrictedMode = true;
-            parameter.enumValues.values = new ParameterEnumerationValue[3];
-            parameter.enumValues.values[0].label = "Linear";
-            parameter.enumValues.values[0].value = 0.0f;
-            parameter.enumValues.values[1].label = "Absolute rotary";
-            parameter.enumValues.values[1].value = 1.0f;
-            parameter.enumValues.values[2].label = "Relative rotary";
-            parameter.enumValues.values[2].value = 2.0f;
-            break;
-        case kWindowParameterWheelKnobControl:
-            parameter.name = "Scroll wheel knob control";
-            parameter.symbol = "knobScroll";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+        case kCardinalParameterMiniAudioIn2:
+            parameter.name = "Report Audio Input 2";
+            parameter.symbol = "r_audio_in_2";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
             parameter.ranges.def = 0.0f;
             parameter.ranges.min = 0.0f;
             parameter.ranges.max = 1.0f;
             break;
-        case kWindowParameterWheelSensitivity:
-            parameter.name = "Scroll wheel knob sensitivity";
-            parameter.symbol = "knobScrollSensitivity";
-            parameter.hints = kParameterIsAutomatable|kParameterIsLogarithmic;
-            parameter.ranges.def = 1.0f;
-            parameter.ranges.min = 0.1f;
+        case kCardinalParameterMiniCVIn1:
+            parameter.name = "Report CV Input 1";
+            parameter.symbol = "r_cv_in_1";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = -10.0f;
+            parameter.ranges.min = 0.0f;
             parameter.ranges.max = 10.0f;
             break;
-        case kWindowParameterLockModulePositions:
-            parameter.name = "Lock module positions";
-            parameter.symbol = "lockModules";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
-            parameter.ranges.def = 0.0f;
+        case kCardinalParameterMiniCVIn2:
+            parameter.name = "Report CV Input 2";
+            parameter.symbol = "r_cv_in_2";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = -10.0f;
             parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 1.0f;
+            parameter.ranges.max = 10.0f;
             break;
-        case kWindowParameterUpdateRateLimit:
-            parameter.name = "Update rate limit";
-            parameter.symbol = "rateLimit";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
-            parameter.ranges.def = 0.0f;
+        case kCardinalParameterMiniCVIn3:
+            parameter.name = "Report CV Input 3";
+            parameter.symbol = "r_cv_in_3";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = -10.0f;
             parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 2.0f;
-            parameter.enumValues.count = 3;
-            parameter.enumValues.restrictedMode = true;
-            parameter.enumValues.values = new ParameterEnumerationValue[3];
-            parameter.enumValues.values[0].label = "None";
-            parameter.enumValues.values[0].value = 0.0f;
-            parameter.enumValues.values[1].label = "2x";
-            parameter.enumValues.values[1].value = 1.0f;
-            parameter.enumValues.values[2].label = "4x";
-            parameter.enumValues.values[2].value = 2.0f;
+            parameter.ranges.max = 10.0f;
             break;
-        case kWindowParameterBrowserSort:
-            parameter.name = "Browser sort";
-            parameter.symbol = "browserSort";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger;
-            parameter.ranges.def = 3.0f;
+        case kCardinalParameterMiniCVIn4:
+            parameter.name = "Report CV Input 4";
+            parameter.symbol = "r_cv_in_4";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = -10.0f;
             parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 5.0f;
-            parameter.enumValues.count = 6;
-            parameter.enumValues.restrictedMode = true;
-            parameter.enumValues.values = new ParameterEnumerationValue[6];
-            parameter.enumValues.values[0].label = "Updated";
-            parameter.enumValues.values[0].value = 0.0f;
-            parameter.enumValues.values[1].label = "Last used";
-            parameter.enumValues.values[1].value = 1.0f;
-            parameter.enumValues.values[2].label = "Most used";
-            parameter.enumValues.values[2].value = 2.0f;
-            parameter.enumValues.values[3].label = "Brand";
-            parameter.enumValues.values[3].value = 3.0f;
-            parameter.enumValues.values[4].label = "Name";
-            parameter.enumValues.values[4].value = 4.0f;
-            parameter.enumValues.values[5].label = "Random";
-            parameter.enumValues.values[5].value = 5.0f;
+            parameter.ranges.max = 10.0f;
             break;
-        case kWindowParameterBrowserZoom:
-            parameter.name = "Browser zoom";
-            parameter.symbol = "browserZoom";
-            parameter.hints = kParameterIsAutomatable;
-            parameter.unit = "%";
-            parameter.ranges.def = 50.0f;
-            parameter.ranges.min = 25.0f;
-            parameter.ranges.max = 200.0f;
-            parameter.enumValues.count = 7;
-            parameter.enumValues.restrictedMode = true;
-            parameter.enumValues.values = new ParameterEnumerationValue[7];
-            parameter.enumValues.values[0].label = "25";
-            parameter.enumValues.values[0].value = 25.0f;
-            parameter.enumValues.values[1].label = "35";
-            parameter.enumValues.values[1].value = 35.0f;
-            parameter.enumValues.values[2].label = "50";
-            parameter.enumValues.values[2].value = 50.0f;
-            parameter.enumValues.values[3].label = "71";
-            parameter.enumValues.values[3].value = 71.0f;
-            parameter.enumValues.values[4].label = "100";
-            parameter.enumValues.values[4].value = 100.0f;
-            parameter.enumValues.values[5].label = "141";
-            parameter.enumValues.values[5].value = 141.0f;
-            parameter.enumValues.values[6].label = "200";
-            parameter.enumValues.values[6].value = 200.0f;
-            break;
-        case kWindowParameterInvertZoom:
-            parameter.name = "Invert zoom";
-            parameter.symbol = "invertZoom";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
-            parameter.ranges.def = 0.0f;
+        case kCardinalParameterMiniCVIn5:
+            parameter.name = "Report CV Input 5";
+            parameter.symbol = "r_cv_in_5";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = -10.0f;
             parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 1.0f;
+            parameter.ranges.max = 10.0f;
             break;
-        case kWindowParameterSqueezeModulePositions:
-            parameter.name = "Auto-squeeze module positions";
-            parameter.symbol = "squeezeModules";
-            parameter.hints = kParameterIsAutomatable|kParameterIsInteger|kParameterIsBoolean;
+        case kCardinalParameterMiniTimeFlags:
+            parameter.name = "Report Time Flags";
+            parameter.symbol = "r_time_flags";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 0x0;
+            parameter.ranges.min = 0x0;
+            parameter.ranges.max = 0x7;
+            break;
+        case kCardinalParameterMiniTimeBar:
+            parameter.name = "Report Time Bar";
+            parameter.symbol = "r_time_bar";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
             parameter.ranges.def = 1.0f;
+            parameter.ranges.min = 1.0f;
+            parameter.ranges.max = FLT_MAX;
+            break;
+        case kCardinalParameterMiniTimeBeat:
+            parameter.name = "Report Time Beat";
+            parameter.symbol = "r_time_beat";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 1.0f;
+            parameter.ranges.min = 1.0f;
+            parameter.ranges.max = 128.0f;
+            break;
+        case kCardinalParameterMiniTimeBeatsPerBar:
+            parameter.name = "Report Time Beats Per Bar";
+            parameter.symbol = "r_time_beatsPerBar";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 4.0f;
             parameter.ranges.min = 0.0f;
-            parameter.ranges.max = 1.0f;
+            parameter.ranges.max = 128.0f;
+            break;
+        case kCardinalParameterMiniTimeBeatType:
+            parameter.name = "Report Time Beat Type";
+            parameter.symbol = "r_time_beatType";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 4.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 128.0f;
+            break;
+        case kCardinalParameterMiniTimeFrame:
+            parameter.name = "Report Time Frame";
+            parameter.symbol = "r_time_frame";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = FLT_MAX;
+            break;
+        case kCardinalParameterMiniTimeBarStartTick:
+            parameter.name = "Report Time BarStartTick";
+            parameter.symbol = "r_time_barStartTick";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = FLT_MAX;
+            break;
+        case kCardinalParameterMiniTimeBeatsPerMinute:
+            parameter.name = "Report Time Beats Per Minute";
+            parameter.symbol = "r_time_bpm";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 20.0f;
+            parameter.ranges.min = 120.0f;
+            parameter.ranges.max = 999.0f;
+            break;
+        case kCardinalParameterMiniTimeTick:
+            parameter.name = "Report Time Tick";
+            parameter.symbol = "r_time_tick";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 8192.0f;
+            break;
+        case kCardinalParameterMiniTimeTicksPerBeat:
+            parameter.name = "Report Time Ticks Per Beat";
+            parameter.symbol = "r_time_ticksPerBeat";
+            parameter.hints = kParameterIsAutomatable|kParameterIsOutput;
+            parameter.ranges.def = 0.0f;
+            parameter.ranges.min = 0.0f;
+            parameter.ranges.max = 8192.0f;
             break;
         }
        #endif
@@ -976,31 +878,62 @@ protected:
     {
         switch (index)
         {
-        case 0:
-            state.hints = kStateIsBase64Blob | kStateIsOnlyForDSP;
+        case kCardinalStatePatch:
+           #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+            state.hints = kStateIsHostReadable;
+           #else
+            state.hints = kStateIsOnlyForDSP | kStateIsBase64Blob;
+           #endif
+            if (FILE* const f = std::fopen(context->patch->factoryTemplatePath.c_str(), "r"))
+            {
+                std::fseek(f, 0, SEEK_END);
+                if (const long fileSize = std::ftell(f))
+                {
+                    std::fseek(f, 0, SEEK_SET);
+                    char* const fileContent = new char[fileSize+1];
+
+                    if (std::fread(fileContent, fileSize, 1, f) == 1)
+                    {
+                        fileContent[fileSize] = '\0';
+                       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                        state.defaultValue = fileContent;
+                       #else
+                        state.defaultValue = String::asBase64(fileContent, fileSize);
+                       #endif
+                    }
+
+                    delete[] fileContent;
+                }
+                std::fclose(f);
+            }
             state.key = "patch";
             state.label = "Patch";
             break;
-        case 1:
+        case kCardinalStateScreenshot:
             state.hints = kStateIsHostReadable | kStateIsBase64Blob;
             state.key = "screenshot";
             state.label = "Screenshot";
             break;
-        case 2:
+        case kCardinalStateComment:
             state.hints = kStateIsHostWritable;
             state.key = "comment";
             state.label = "Comment";
             break;
-        case 3:
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+        case kCardinalStateWindowSize:
             state.hints = kStateIsOnlyForUI;
-            state.key = "moduleInfos";
-            state.label = "moduleInfos";
-            break;
-        case 4:
-            state.hints = kStateIsOnlyForUI;
+            // state.defaultValue = String("%d:%d", DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT);
             state.key = "windowSize";
             state.label = "Window size";
             break;
+       #endif
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        case kCardinalStateParamChange:
+            state.hints = kStateIsHostReadable | kStateIsOnlyForDSP;
+            state.key = "param";
+            state.label = "ParamChange";
+            break;
+       #endif
         }
     }
 
@@ -1010,19 +943,21 @@ protected:
     float getParameterValue(uint32_t index) const override
     {
         // host mapped parameters
-        if (index < kModuleParameters)
+        if (index < kCardinalParameterCountAtModules)
             return context->parameters[index];
 
         // bypass
-        if (index == kModuleParameters)
+        if (index == kCardinalParameterBypass)
             return context->bypassed ? 1.0f : 0.0f;
 
-       #ifndef HEADLESS
-        // window related parameters
-        index -= kModuleParameters + 1;
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+        if (index < kCardinalParameterCountAtWindow)
+            return fWindowParameters[index - kCardinalParameterStartWindow];
+       #endif
 
-        if (index < kWindowParameterCount)
-            return fWindowParameters[index];
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        if (index < kCardinalParameterCountAtMini)
+            return fMiniReportValues[index - kCardinalParameterStartMini];
        #endif
 
         return 0.0f;
@@ -1031,26 +966,23 @@ protected:
     void setParameterValue(uint32_t index, float value) override
     {
         // host mapped parameters
-        if (index < kModuleParameters)
+        if (index < kCardinalParameterCountAtModules)
         {
             context->parameters[index] = value;
             return;
         }
 
         // bypass
-        if (index == kModuleParameters)
+        if (index == kCardinalParameterBypass)
         {
             context->bypassed = value > 0.5f;
             return;
         }
 
-       #ifndef HEADLESS
-        // window related parameters
-        index -= kModuleParameters + 1;
-
-        if (index < kWindowParameterCount)
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+        if (index < kCardinalParameterCountAtWindow)
         {
-            fWindowParameters[index] = value;
+            fWindowParameters[index - kCardinalParameterStartWindow] = value;
             return;
         }
        #endif
@@ -1058,50 +990,7 @@ protected:
 
     String getState(const char* const key) const override
     {
-       #ifndef HEADLESS
-        if (std::strcmp(key, "moduleInfos") == 0)
-        {
-            json_t* const rootJ = json_object();
-            DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr, String());
-
-            for (const auto& pluginPair : rack::settings::moduleInfos)
-            {
-                json_t* const pluginJ = json_object();
-                DISTRHO_SAFE_ASSERT_CONTINUE(pluginJ != nullptr);
-
-                for (const auto& modulePair : pluginPair.second)
-                {
-                    json_t* const moduleJ = json_object();
-                    DISTRHO_SAFE_ASSERT_CONTINUE(moduleJ != nullptr);
-
-                    const rack::settings::ModuleInfo& m(modulePair.second);
-
-                    // To make setting.json smaller, only set properties if not default values.
-                    if (m.favorite)
-                        json_object_set_new(moduleJ, "favorite", json_boolean(m.favorite));
-                    if (m.added > 0)
-                        json_object_set_new(moduleJ, "added", json_integer(m.added));
-                    if (std::isfinite(m.lastAdded))
-                        json_object_set_new(moduleJ, "lastAdded", json_real(m.lastAdded));
-
-                    if (json_object_size(moduleJ))
-                        json_object_set_new(pluginJ, modulePair.first.c_str(), moduleJ);
-                    else
-                        json_decref(moduleJ);
-                }
-
-                if (json_object_size(pluginJ))
-                    json_object_set_new(rootJ, pluginPair.first.c_str(), pluginJ);
-                else
-                    json_decref(pluginJ);
-            }
-
-            const String info(json_dumps(rootJ, JSON_COMPACT), false);
-            json_decref(rootJ);
-
-            return info;
-        }
-
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         if (std::strcmp(key, "windowSize") == 0)
             return fState.windowSize;
        #endif
@@ -1126,9 +1015,30 @@ protected:
             context->patch->cleanAutosave();
             // context->history->setSaved();
 
+           #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+            FILE* const f = std::fopen(rack::system::join(context->patch->autosavePath, "patch.json").c_str(), "r");
+            DISTRHO_SAFE_ASSERT_RETURN(f != nullptr, String());
+
+            DEFER({
+                std::fclose(f);
+            });
+
+            std::fseek(f, 0, SEEK_END);
+            const long fileSize = std::ftell(f);
+            DISTRHO_SAFE_ASSERT_RETURN(fileSize > 0, String());
+
+            std::fseek(f, 0, SEEK_SET);
+            char* const fileContent = static_cast<char*>(std::malloc(fileSize+1));
+
+            DISTRHO_SAFE_ASSERT_RETURN(std::fread(fileContent, fileSize, 1, f) == 1, String());
+            fileContent[fileSize] = '\0';
+
+            return String(fileContent, false);
+           #else
             try {
                 data = rack::system::archiveDirectory(fAutosavePath, 1);
             } DISTRHO_SAFE_EXCEPTION_RETURN("getState archiveDirectory", String());
+           #endif
         }
 
         return String::asBase64(data.data(), data.size());
@@ -1136,41 +1046,26 @@ protected:
 
     void setState(const char* const key, const char* const value) override
     {
-       #ifndef HEADLESS
-        if (std::strcmp(key, "moduleInfos") == 0)
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        if (std::strcmp(key, "param") == 0)
         {
-            json_error_t error;
-            json_t* const rootJ = json_loads(value, 0, &error);
-            DISTRHO_SAFE_ASSERT_RETURN(rootJ != nullptr,);
-
-            const char* pluginSlug;
-            json_t* pluginJ;
-
-            json_object_foreach(rootJ, pluginSlug, pluginJ)
+            long long moduleId = 0;
+            int paramId = 0;
+            float paramValue = 0.f;
             {
-                const char* moduleSlug;
-                json_t* moduleJ;
-
-                json_object_foreach(pluginJ, moduleSlug, moduleJ)
-                {
-                    rack::settings::ModuleInfo m;
-
-                    if (json_t* const favoriteJ = json_object_get(moduleJ, "favorite"))
-                        m.favorite = json_boolean_value(favoriteJ);
-
-                    if (json_t* const addedJ = json_object_get(moduleJ, "added"))
-                        m.added = json_integer_value(addedJ);
-
-                    if (json_t* const lastAddedJ = json_object_get(moduleJ, "lastAdded"))
-                        m.lastAdded = json_number_value(lastAddedJ);
-
-                    rack::settings::moduleInfos[pluginSlug][moduleSlug] = m;
-                }
+                const ScopedSafeLocale cssl;
+                std::sscanf(value, "%lld:%d:%f", &moduleId, &paramId, &paramValue);
             }
 
-            json_decref(rootJ);
+            rack::engine::Module* const module = context->engine->getModule(moduleId);
+            DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);
+
+            context->engine->setParamValue(module, paramId, paramValue);
             return;
         }
+       #endif
+
+       #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
         if (std::strcmp(key, "windowSize") == 0)
         {
             fState.windowSize = value;
@@ -1187,9 +1082,6 @@ protected:
         if (std::strcmp(key, "screenshot") == 0)
         {
             fState.screenshot = value;
-           #if defined(HAVE_LIBLO) && !defined(HEADLESS)
-            patchUtils::sendScreenshotToRemote(value);
-           #endif
             return;
         }
 
@@ -1198,11 +1090,19 @@ protected:
         if (fAutosavePath.empty())
             return;
 
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        rack::system::removeRecursively(fAutosavePath);
+        rack::system::createDirectories(fAutosavePath);
+
+        FILE* const f = std::fopen(rack::system::join(fAutosavePath, "patch.json").c_str(), "w");
+        DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
+
+        std::fwrite(value, std::strlen(value), 1, f);
+        std::fclose(f);
+       #else
         const std::vector<uint8_t> data(d_getChunkFromBase64String(value));
 
         DISTRHO_SAFE_ASSERT_RETURN(data.size() >= 4,);
-
-        const ScopedContext sc(this);
 
         rack::system::removeRecursively(fAutosavePath);
         rack::system::createDirectories(fAutosavePath);
@@ -1223,9 +1123,14 @@ protected:
                 rack::system::unarchiveToDirectory(data, fAutosavePath);
             } DISTRHO_SAFE_EXCEPTION_RETURN("setState unarchiveToDirectory",);
         }
+       #endif
+
+        const ScopedContext sc(this);
 
         try {
             context->patch->loadAutosave();
+        } catch(const rack::Exception& e) {
+            d_stderr(e.what());
         } DISTRHO_SAFE_EXCEPTION_RETURN("setState loadAutosave",);
 
         // context->history->setSaved();
@@ -1263,6 +1168,8 @@ protected:
     void run(const float** const inputs, float** const outputs, const uint32_t frames,
              const MidiEvent* const midiEvents, const uint32_t midiEventCount) override
     {
+        const ScopedDenormalDisable sdd;
+
         rack::contextSet(context);
 
         const bool bypassed = context->bypassed;
@@ -1270,7 +1177,11 @@ protected:
         {
             const TimePosition& timePos(getTimePosition());
 
-            const bool reset = timePos.playing && (timePos.frame == 0 || d_isDiffHigherThanLimit(fNextExpectedFrame, timePos.frame, (uint64_t)2));
+            bool reset = timePos.playing && (timePos.frame == 0 || d_isDiffHigherThanLimit(fNextExpectedFrame, timePos.frame, (uint64_t)2));
+
+            // ignore hosts which cannot supply time frame position
+            if (context->playing == timePos.playing && timePos.frame == 0 && context->frame == 0)
+                reset = false;
 
             context->playing = timePos.playing;
             context->bbtValid = timePos.bbt.valid;
@@ -1292,10 +1203,28 @@ protected:
                 context->ticksPerClock = timePos.bbt.ticksPerBeat / timePos.bbt.beatType;
                 context->ticksPerFrame = 1.0 / samplesPerTick;
                 context->tickClock = std::fmod(timePos.bbt.tick, context->ticksPerClock);
+               #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+                fMiniReportValues[kCardinalParameterMiniTimeBar - kCardinalParameterStartMini] = timePos.bbt.bar;
+                fMiniReportValues[kCardinalParameterMiniTimeBeat - kCardinalParameterStartMini] = timePos.bbt.beat;
+                fMiniReportValues[kCardinalParameterMiniTimeBeatsPerBar - kCardinalParameterStartMini] = timePos.bbt.beatsPerBar;
+                fMiniReportValues[kCardinalParameterMiniTimeBeatType - kCardinalParameterStartMini] = timePos.bbt.beatType;
+                fMiniReportValues[kCardinalParameterMiniTimeBarStartTick - kCardinalParameterStartMini] = timePos.bbt.barStartTick;
+                fMiniReportValues[kCardinalParameterMiniTimeBeatsPerMinute - kCardinalParameterStartMini] = timePos.bbt.beatsPerMinute;
+                fMiniReportValues[kCardinalParameterMiniTimeTick - kCardinalParameterStartMini] = timePos.bbt.tick;
+                fMiniReportValues[kCardinalParameterMiniTimeTicksPerBeat - kCardinalParameterStartMini] = timePos.bbt.ticksPerBeat;
+               #endif
             }
 
             context->reset = reset;
             fNextExpectedFrame = timePos.playing ? timePos.frame + frames : 0;
+
+           #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+            const int flags = (timePos.playing ? 0x1 : 0x0)
+                            | (timePos.bbt.valid ? 0x2 : 0x0)
+                            | (reset ? 0x4 : 0x0);
+            fMiniReportValues[kCardinalParameterMiniTimeFlags - kCardinalParameterStartMini] = flags;
+            fMiniReportValues[kCardinalParameterMiniTimeFrame - kCardinalParameterStartMini] = timePos.frame / getSampleRate();
+           #endif
         }
 
         // separate buffers, use them
@@ -1310,8 +1239,8 @@ protected:
            #if DISTRHO_PLUGIN_NUM_INPUTS != 0
             for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
             {
-               #if CARDINAL_VARIANT_MAIN
-                // can be null on main variant
+               #if CARDINAL_VARIANT_MAIN || CARDINAL_VARIANT_MINI
+                // can be null on main and mini variants
                 if (inputs[i] != nullptr)
                #endif
                     std::memcpy(fAudioBufferCopy[i], inputs[i], sizeof(float)*frames);
@@ -1325,12 +1254,17 @@ protected:
 
         for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
         {
-           #if CARDINAL_VARIANT_MAIN
-            // can be null on main variant
+           #if CARDINAL_VARIANT_MAIN || CARDINAL_VARIANT_MINI
+            // can be null on main and mini variants
             if (outputs[i] != nullptr)
            #endif
                 std::memset(outputs[i], 0, sizeof(float)*frames);
         }
+
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
+            fMiniReportValues[i] = context->dataIns[i][0];
+       #endif
 
         if (bypassed)
         {
@@ -1387,6 +1321,6 @@ Plugin* createPlugin()
     return new CardinalPlugin();
 }
 
-// -----------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 END_NAMESPACE_DISTRHO

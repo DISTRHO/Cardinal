@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -39,7 +39,6 @@
 # include <ui/Label.hpp>
 # include <ui/MenuOverlay.hpp>
 # include <ui/SequentialLayout.hpp>
-# include "CardinalCommon.hpp"
 # include <emscripten/emscripten.h>
 #endif
 
@@ -47,17 +46,33 @@
 # undef DEBUG
 #endif
 
-#include <Application.hpp>
+#include "Application.hpp"
 #include "AsyncDialog.hpp"
+#include "CardinalCommon.hpp"
 #include "PluginContext.hpp"
 #include "WindowParameters.hpp"
+#include "extra/Base64.hpp"
+
+#ifndef DISTRHO_OS_WASM
+# include "extra/SharedResourcePointer.hpp"
+#endif
+
+#ifndef HEADLESS
+# include "extra/ScopedValueSetter.hpp"
+#endif
 
 namespace rack {
-namespace app {
-    widget::Widget* createMenuBar(bool isStandalone);
+#ifdef DISTRHO_OS_WASM
+namespace asset {
+std::string patchesPath();
+}
+#endif
+namespace engine {
+void Engine_setAboutToClose(Engine*);
+void Engine_setRemoteDetails(Engine*, remoteUtils::RemoteDetails*);
 }
 namespace window {
-    void WindowSetPluginUI(Window* window, DISTRHO_NAMESPACE::UI* ui);
+    void WindowSetPluginUI(Window* window, CardinalBaseUI* ui);
     void WindowSetMods(Window* window, int mods);
     void WindowSetInternalSize(rack::window::Window* window, math::Vec size);
 }
@@ -65,43 +80,19 @@ namespace window {
 
 START_NAMESPACE_DISTRHO
 
-// -----------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
-bool CardinalPluginContext::addIdleCallback(IdleCallback* const cb) const
-{
-    if (ui == nullptr)
-        return false;
+#if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+uint32_t Plugin::getBufferSize() const noexcept { return 0; }
+double Plugin::getSampleRate() const noexcept { return 0.0; }
+const char* Plugin::getBundlePath() const noexcept { return nullptr; }
+bool Plugin::isSelfTestInstance() const noexcept { return false; }
+bool Plugin::writeMidiEvent(const MidiEvent&) noexcept { return false; }
+#endif
 
-    ui->addIdleCallback(cb);
-    return true;
-}
+// --------------------------------------------------------------------------------------------------------------------
 
-void CardinalPluginContext::removeIdleCallback(IdleCallback* const cb) const
-{
-    if (ui == nullptr)
-        return;
-
-    ui->removeIdleCallback(cb);
-}
-
-void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, bool started)
-{
-    DISTRHO_SAFE_ASSERT_RETURN(pcontext->ui != nullptr,);
-
-    if (started)
-    {
-        pcontext->ui->editParameter(index, true);
-        pcontext->ui->setParameterValue(index, pcontext->parameters[index]);
-    }
-    else
-    {
-        pcontext->ui->editParameter(index, false);
-    }
-}
-
-// -----------------------------------------------------------------------------------------------------------
-
-#ifdef DISTRHO_OS_WASM
+#if defined(DISTRHO_OS_WASM) && ! CARDINAL_VARIANT_MINI
 struct WasmWelcomeDialog : rack::widget::OpaqueWidget
 {
     static const constexpr float margin = 10;
@@ -260,7 +251,7 @@ static void downloadRemotePatchFailed(const char* const filename)
     }
 
     using namespace rack;
-    context->patch->templatePath = system::join(asset::systemDir, "init/wasm.vcv"); // FIXME
+    context->patch->templatePath = rack::system::join(asset::patchesPath(), "templates/main.vcv");
     context->patch->loadTemplate();
     context->scene->rackScroll->reset();
 }
@@ -291,8 +282,8 @@ static void downloadRemotePatchSucceeded(const char* const filename)
         return;
     }
 
+    context->patch->path.clear();
     context->scene->rackScroll->reset();
-    context->patch->path = "";
     context->history->setSaved();
 }
 #endif
@@ -302,10 +293,19 @@ static void downloadRemotePatchSucceeded(const char* const filename)
 class CardinalUI : public CardinalBaseUI,
                    public WindowParametersCallback
 {
+  #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+   #ifdef DISTRHO_OS_WASM
+    ScopedPointer<Initializer> fInitializer;
+   #else
+    SharedResourcePointer<Initializer> fInitializer;
+   #endif
+    std::string fAutosavePath;
+  #endif
+
     rack::math::Vec lastMousePos;
     WindowParameters windowParameters;
     int rateLimitStep = 0;
-   #ifdef DISTRHO_OS_WASM
+   #if defined(DISTRHO_OS_WASM) && ! CARDINAL_VARIANT_MINI
     int8_t counterForFirstIdlePoint = 0;
    #endif
    #ifdef DPF_RUNTIME_TESTING
@@ -339,8 +339,78 @@ class CardinalUI : public CardinalBaseUI,
 
 public:
     CardinalUI()
-        : CardinalBaseUI(DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT)
+        : CardinalBaseUI(DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT),
+        #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+         #ifdef DISTRHO_OS_WASM
+          fInitializer(new Initializer(static_cast<const CardinalBasePlugin*>(nullptr), this)),
+         #else
+          fInitializer(static_cast<const CardinalBasePlugin*>(nullptr), this),
+         #endif
+        #endif
+          lastMousePos()
     {
+        rack::contextSet(context);
+
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        // create unique temporary path for this instance
+        try {
+            char uidBuf[24];
+            const std::string tmp = rack::system::getTempDirectory();
+
+            for (int i=1;; ++i)
+            {
+                std::snprintf(uidBuf, sizeof(uidBuf), "Cardinal.%04d", i);
+                const std::string trypath = rack::system::join(tmp, uidBuf);
+
+                if (! rack::system::exists(trypath))
+                {
+                    if (rack::system::createDirectories(trypath))
+                        fAutosavePath = trypath;
+                    break;
+                }
+            }
+        } DISTRHO_SAFE_EXCEPTION("create unique temporary path");
+
+        const float sampleRate = 60; // fake audio running at 60 fps
+        rack::settings::sampleRate = sampleRate;
+
+        context->dataIns = new const float*[DISTRHO_PLUGIN_NUM_INPUTS];
+        context->dataOuts = new float*[DISTRHO_PLUGIN_NUM_OUTPUTS];
+
+        for (uint32_t i=0; i<DISTRHO_PLUGIN_NUM_INPUTS;++i)
+        {
+            float** const bufferptr = const_cast<float**>(&context->dataIns[i]);
+            *bufferptr = new float[1];
+            (*bufferptr)[0] = 0.f;
+        }
+        for (uint32_t i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS;++i)
+            context->dataOuts[i] = new float[1];
+
+        context->bufferSize = 1;
+        context->sampleRate = sampleRate;
+
+        context->engine = new rack::engine::Engine;
+        context->engine->setSampleRate(sampleRate);
+
+        context->history = new rack::history::State;
+        context->patch = new rack::patch::Manager;
+        context->patch->autosavePath = fAutosavePath;
+        context->patch->templatePath = context->patch->factoryTemplatePath = fInitializer->factoryTemplatePath;
+
+        context->event = new rack::widget::EventState;
+        context->scene = new rack::app::Scene;
+        context->event->rootWidget = context->scene;
+
+        context->window = new rack::window::Window;
+
+        context->patch->loadTemplate();
+        context->scene->rackScroll->reset();
+
+        DISTRHO_SAFE_ASSERT(remoteUtils::connectToRemote(CARDINAL_DEFAULT_REMOTE_URL));
+
+        Engine_setRemoteDetails(context->engine, remoteDetails);
+       #endif
+
         Window& window(getWindow());
 
         window.setIgnoringKeyRepeat(true);
@@ -350,21 +420,22 @@ public:
 
         setGeometryConstraints(648 * scaleFactor, 538 * scaleFactor);
 
-        if (scaleFactor != 1.0)
-            setSize(DISTRHO_UI_DEFAULT_WIDTH * scaleFactor, DISTRHO_UI_DEFAULT_HEIGHT * scaleFactor);
-
-        rack::contextSet(context);
-
-        rack::window::WindowSetPluginUI(context->window, this);
-
-        if (rack::widget::Widget* const menuBar = context->scene->menuBar)
+        if (rack::isStandalone() && rack::system::exists(rack::settings::settingsPath))
         {
-            context->scene->removeChild(menuBar);
-            delete menuBar;
+            const double width = std::max(648.f, rack::settings::windowSize.x) * scaleFactor;
+            const double height = std::max(538.f, rack::settings::windowSize.y) * scaleFactor;
+            setSize(width, height);
+        }
+        else if (scaleFactor != 1.0)
+        {
+            setSize(DISTRHO_UI_DEFAULT_WIDTH * scaleFactor, DISTRHO_UI_DEFAULT_HEIGHT * scaleFactor);
         }
 
-        context->scene->menuBar = rack::app::createMenuBar(getApp().isStandalone());
-        context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
+       #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        const DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(window);
+       #endif
+
+        rack::window::WindowSetPluginUI(context->window, this);
 
         // hide "Browse VCV Library" button
         rack::widget::Widget* const browser = context->scene->browser->children.back();
@@ -398,7 +469,7 @@ public:
             }
         }
 
-       #ifdef DISTRHO_OS_WASM
+       #if defined(DISTRHO_OS_WASM) && ! CARDINAL_VARIANT_MINI
         if (rack::patchStorageSlug != nullptr)
         {
             psDialog = new WasmRemotePatchLoadingDialog(true);
@@ -431,16 +502,33 @@ public:
 
         context->nativeWindowId = 0;
 
-        if (rack::widget::Widget* const menuBar = context->scene->menuBar)
+        rack::window::WindowSetPluginUI(context->window, nullptr);
+
+        context->tlw = nullptr;
+        context->ui = nullptr;
+
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         {
-            context->scene->removeChild(menuBar);
-            delete menuBar;
+            const ScopedContext sc(this);
+            context->patch->clear();
+
+            // do a little dance to prevent context scene deletion from saving to temp dir
+            const ScopedValueSetter<bool> svs(rack::settings::headless, true);
+            Engine_setAboutToClose(context->engine);
+            delete context;
         }
 
-        context->scene->menuBar = rack::app::createMenuBar();
-        context->scene->addChildBelow(context->scene->menuBar, context->scene->rackScroll);
+        if (! fAutosavePath.empty())
+            rack::system::removeRecursively(fAutosavePath);
+       #endif
 
-        rack::window::WindowSetPluginUI(context->window, nullptr);
+       #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        if (fInitializer->shouldSaveSettings)
+        {
+            INFO("Save settings");
+            rack::settings::save();
+        }
+       #endif
 
         rack::contextSet(nullptr);
     }
@@ -515,7 +603,7 @@ public:
         }
        #endif
 
-       #ifdef DISTRHO_OS_WASM
+       #if defined(DISTRHO_OS_WASM) && ! CARDINAL_VARIANT_MINI
         if (counterForFirstIdlePoint >= 0 && ++counterForFirstIdlePoint == 30)
         {
             counterForFirstIdlePoint = -1;
@@ -556,6 +644,16 @@ public:
             filebrowseraction = nullptr;
             filebrowserhandle = nullptr;
         }
+
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        {
+            const ScopedContext sc(this);
+            for (uint32_t i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS;++i)
+                context->dataOuts[i][0] = 0.f;
+            ++context->processCounter;
+            context->engine->stepBlock(1);
+        }
+       #endif
 
         if (windowParameters.rateLimit != 0 && ++rateLimitStep % (windowParameters.rateLimit * 2))
             return;
@@ -637,7 +735,7 @@ public:
             return;
         }
 
-        setParameterValue(kModuleParameters + param + 1, value * mult);
+        setParameterValue(kCardinalParameterStartWindow + param, value * mult);
     }
 
 protected:
@@ -650,108 +748,209 @@ protected:
     */
     void parameterChanged(const uint32_t index, const float value) override
     {
-        // host mapped parameters + bypass
-        if (index <= kModuleParameters)
-            return;
-
-        switch (index - kModuleParameters - 1)
+        // host mapped parameters
+        if (index < kCardinalParameterCountAtModules)
         {
-        case kWindowParameterShowTooltips:
-            windowParameters.tooltips = value > 0.5f;
-            break;
-        case kWindowParameterCableOpacity:
-            windowParameters.cableOpacity = value / 100.0f;
-            break;
-        case kWindowParameterCableTension:
-            windowParameters.cableTension = value / 100.0f;
-            break;
-        case kWindowParameterRackBrightness:
-            windowParameters.rackBrightness = value / 100.0f;
-            break;
-        case kWindowParameterHaloBrightness:
-            windowParameters.haloBrightness = value / 100.0f;
-            break;
-        case kWindowParameterKnobMode:
-            switch (static_cast<int>(value + 0.5f))
-            {
-            case 0:
-                windowParameters.knobMode = rack::settings::KNOB_MODE_LINEAR;
-                break;
-            case 1:
-                windowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_ABSOLUTE;
-                break;
-            case 2:
-                windowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_RELATIVE;
-                break;
-            }
-            break;
-        case kWindowParameterWheelKnobControl:
-            windowParameters.knobScroll = value > 0.5f;
-            break;
-        case kWindowParameterWheelSensitivity:
-            windowParameters.knobScrollSensitivity = value / 1000.0f;
-            break;
-        case kWindowParameterLockModulePositions:
-            windowParameters.lockModules = value > 0.5f;
-            break;
-        case kWindowParameterUpdateRateLimit:
-            windowParameters.rateLimit = static_cast<int>(value + 0.5f);
-            rateLimitStep = 0;
-            break;
-        case kWindowParameterBrowserSort:
-            windowParameters.browserSort = static_cast<int>(value + 0.5f);
-            break;
-        case kWindowParameterBrowserZoom:
-            // round up to nearest valid value
-            {
-                float rvalue = value - 1.0f;
-
-                if (rvalue <= 25.0f)
-                    rvalue = -2.0f;
-                else if (rvalue <= 35.0f)
-                    rvalue = -1.5f;
-                else if (rvalue <= 50.0f)
-                    rvalue = -1.0f;
-                else if (rvalue <= 71.0f)
-                    rvalue = -0.5f;
-                else if (rvalue <= 100.0f)
-                    rvalue = 0.0f;
-                else if (rvalue <= 141.0f)
-                    rvalue = 0.5f;
-                else if (rvalue <= 200.0f)
-                    rvalue = 1.0f;
-                else
-                    rvalue = 0.0f;
-
-                windowParameters.browserZoom = rvalue;
-            }
-            break;
-        case kWindowParameterInvertZoom:
-            windowParameters.invertZoom = value > 0.5f;
-            break;
-        case kWindowParameterSqueezeModulePositions:
-            windowParameters.squeezeModules = value > 0.5f;
-            break;
-        default:
+           #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+            context->parameters[index] = value;
+           #endif
             return;
         }
 
-        WindowParametersSetValues(context->window, windowParameters);
+        // bypass
+        if (index == kCardinalParameterBypass)
+        {
+           #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+            context->bypassed = value > 0.5f;
+           #endif
+            return;
+        }
+
+        if (index < kCardinalParameterCountAtWindow)
+        {
+            switch (index - kCardinalParameterStartWindow)
+            {
+            case kWindowParameterShowTooltips:
+                windowParameters.tooltips = value > 0.5f;
+                break;
+            case kWindowParameterCableOpacity:
+                windowParameters.cableOpacity = value / 100.0f;
+                break;
+            case kWindowParameterCableTension:
+                windowParameters.cableTension = value / 100.0f;
+                break;
+            case kWindowParameterRackBrightness:
+                windowParameters.rackBrightness = value / 100.0f;
+                break;
+            case kWindowParameterHaloBrightness:
+                windowParameters.haloBrightness = value / 100.0f;
+                break;
+            case kWindowParameterKnobMode:
+                switch (static_cast<int>(value + 0.5f))
+                {
+                case 0:
+                    windowParameters.knobMode = rack::settings::KNOB_MODE_LINEAR;
+                    break;
+                case 1:
+                    windowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_ABSOLUTE;
+                    break;
+                case 2:
+                    windowParameters.knobMode = rack::settings::KNOB_MODE_ROTARY_RELATIVE;
+                    break;
+                }
+                break;
+            case kWindowParameterWheelKnobControl:
+                windowParameters.knobScroll = value > 0.5f;
+                break;
+            case kWindowParameterWheelSensitivity:
+                windowParameters.knobScrollSensitivity = value / 1000.0f;
+                break;
+            case kWindowParameterLockModulePositions:
+                windowParameters.lockModules = value > 0.5f;
+                break;
+            case kWindowParameterUpdateRateLimit:
+                windowParameters.rateLimit = static_cast<int>(value + 0.5f);
+                rateLimitStep = 0;
+                break;
+            case kWindowParameterBrowserSort:
+                windowParameters.browserSort = static_cast<int>(value + 0.5f);
+                break;
+            case kWindowParameterBrowserZoom:
+                // round up to nearest valid value
+                {
+                    float rvalue = value - 1.0f;
+
+                    if (rvalue <= 25.0f)
+                        rvalue = -2.0f;
+                    else if (rvalue <= 35.0f)
+                        rvalue = -1.5f;
+                    else if (rvalue <= 50.0f)
+                        rvalue = -1.0f;
+                    else if (rvalue <= 71.0f)
+                        rvalue = -0.5f;
+                    else if (rvalue <= 100.0f)
+                        rvalue = 0.0f;
+                    else if (rvalue <= 141.0f)
+                        rvalue = 0.5f;
+                    else if (rvalue <= 200.0f)
+                        rvalue = 1.0f;
+                    else
+                        rvalue = 0.0f;
+
+                    windowParameters.browserZoom = rvalue;
+                }
+                break;
+            case kWindowParameterInvertZoom:
+                windowParameters.invertZoom = value > 0.5f;
+                break;
+            case kWindowParameterSqueezeModulePositions:
+                windowParameters.squeezeModules = value > 0.5f;
+                break;
+            default:
+                return;
+            }
+
+            WindowParametersSetValues(context->window, windowParameters);
+            return;
+        }
+
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        if (index < kCardinalParameterCountAtMiniBuffers)
+        {
+            float* const buffer = *const_cast<float**>(&context->dataIns[index - kCardinalParameterStartMiniBuffers]);
+            buffer[0] = value;
+            return;
+        }
+
+        switch (index)
+        {
+        case kCardinalParameterMiniTimeFlags: {
+            const int32_t flags = static_cast<int32_t>(value + 0.5f);
+            context->playing = flags & 0x1;
+            context->bbtValid = flags & 0x2;
+            context->reset = flags & 0x4;
+            return;
+        }
+        case kCardinalParameterMiniTimeBar:
+            context->bar = static_cast<int32_t>(value + 0.5f);
+            return;
+        case kCardinalParameterMiniTimeBeat:
+            context->beat = static_cast<int32_t>(value + 0.5f);
+            return;
+        case kCardinalParameterMiniTimeBeatsPerBar:
+            context->beatsPerBar = static_cast<int32_t>(value + 0.5f);
+            return;
+        case kCardinalParameterMiniTimeBeatType:
+            context->beatType = static_cast<int32_t>(value + 0.5f);
+            context->ticksPerClock = context->ticksPerBeat / context->beatType;
+            context->tickClock = std::fmod(context->tick, context->ticksPerClock);
+            return;
+        case kCardinalParameterMiniTimeFrame:
+            context->frame = static_cast<uint64_t>(value * context->sampleRate + 0.5f);
+            return;
+        case kCardinalParameterMiniTimeBarStartTick:
+            context->barStartTick = value;
+            return;
+        case kCardinalParameterMiniTimeBeatsPerMinute:
+            context->beatsPerMinute = value;
+            context->ticksPerFrame = 1.0 / (60.0 * context->sampleRate / context->beatsPerMinute / context->ticksPerBeat);
+            return;
+        case kCardinalParameterMiniTimeTick:
+            context->tick = value;
+            context->tickClock = std::fmod(context->tick, context->ticksPerClock);
+            return;
+        case kCardinalParameterMiniTimeTicksPerBeat:
+            context->ticksPerBeat = value;
+            context->ticksPerClock = context->ticksPerBeat / context->beatType;
+            context->ticksPerFrame = 1.0 / (60.0 * context->sampleRate / context->beatsPerMinute / context->ticksPerBeat);
+            context->tickClock = std::fmod(context->tick, context->ticksPerClock);
+            return;
+        }
+       #endif
     }
 
     void stateChanged(const char* const key, const char* const value) override
     {
-        if (std::strcmp(key, "windowSize") != 0)
-            return;
-
-        int width = 0;
-        int height = 0;
-        std::sscanf(value, "%i:%i", &width, &height);
-
-        if (width > 0 && height > 0)
+       #if CARDINAL_VARIANT_MINI && ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
+        if (std::strcmp(key, "patch") == 0)
         {
-            const double scaleFactor = getScaleFactor();
-            setSize(width * scaleFactor, height * scaleFactor);
+            if (fAutosavePath.empty())
+                return;
+
+            rack::system::removeRecursively(fAutosavePath);
+            rack::system::createDirectories(fAutosavePath);
+
+            FILE* const f = std::fopen(rack::system::join(fAutosavePath, "patch.json").c_str(), "w");
+            DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
+
+            std::fwrite(value, std::strlen(value), 1, f);
+            std::fclose(f);
+
+            const ScopedContext sc(this);
+
+            try {
+                context->patch->loadAutosave();
+            } catch(const rack::Exception& e) {
+                d_stderr(e.what());
+            } DISTRHO_SAFE_EXCEPTION_RETURN("setState loadAutosave",);
+
+            return;
+        }
+       #endif
+
+        if (std::strcmp(key, "windowSize") == 0)
+        {
+            int width = 0;
+            int height = 0;
+            std::sscanf(value, "%d:%d", &width, &height);
+
+            if (width > 0 && height > 0)
+            {
+                const double scaleFactor = getScaleFactor();
+                setSize(width * scaleFactor, height * scaleFactor);
+            }
+
+            return;
         }
     }
 
@@ -800,9 +999,9 @@ protected:
 
         switch (ev.button)
         {
-        case 1: button = GLFW_MOUSE_BUTTON_LEFT;   break;
-        case 2: button = GLFW_MOUSE_BUTTON_RIGHT;  break;
-        case 3: button = GLFW_MOUSE_BUTTON_MIDDLE; break;
+        case kMouseButtonLeft: button = GLFW_MOUSE_BUTTON_LEFT;   break;
+        case kMouseButtonRight: button = GLFW_MOUSE_BUTTON_RIGHT;  break;
+        case kMouseButtonMiddle: button = GLFW_MOUSE_BUTTON_MIDDLE; break;
         default:
             button = ev.button;
             break;
@@ -846,10 +1045,10 @@ protected:
         if (inSelfTest) return false;
        #endif
 
-        rack::math::Vec scrollDelta = rack::math::Vec(ev.delta.getX(), ev.delta.getY());
-#ifndef DISTRHO_OS_MAC
+        rack::math::Vec scrollDelta = rack::math::Vec(-ev.delta.getX(), ev.delta.getY());
+       #ifndef DISTRHO_OS_MAC
         scrollDelta = scrollDelta.mult(50.0);
-#endif
+       #endif
 
         const int mods = glfwMods(ev.mod);
         const ScopedContext sc(this, mods);
@@ -879,34 +1078,15 @@ protected:
         const int action = ev.press ? GLFW_PRESS : GLFW_RELEASE;
         const int mods = glfwMods(ev.mod);
 
-        /* These are unsupported in pugl right now
-        #define GLFW_KEY_KP_0               320
-        #define GLFW_KEY_KP_1               321
-        #define GLFW_KEY_KP_2               322
-        #define GLFW_KEY_KP_3               323
-        #define GLFW_KEY_KP_4               324
-        #define GLFW_KEY_KP_5               325
-        #define GLFW_KEY_KP_6               326
-        #define GLFW_KEY_KP_7               327
-        #define GLFW_KEY_KP_8               328
-        #define GLFW_KEY_KP_9               329
-        #define GLFW_KEY_KP_DECIMAL         330
-        #define GLFW_KEY_KP_DIVIDE          331
-        #define GLFW_KEY_KP_MULTIPLY        332
-        #define GLFW_KEY_KP_SUBTRACT        333
-        #define GLFW_KEY_KP_ADD             334
-        #define GLFW_KEY_KP_ENTER           335
-        #define GLFW_KEY_KP_EQUAL           336
-        */
-
         int key;
         switch (ev.key)
         {
-        case '\r': key = GLFW_KEY_ENTER; break;
         case '\t': key = GLFW_KEY_TAB; break;
         case kKeyBackspace: key = GLFW_KEY_BACKSPACE; break;
+        case kKeyEnter: key = GLFW_KEY_ENTER; break;
         case kKeyEscape: key = GLFW_KEY_ESCAPE; break;
         case kKeyDelete: key = GLFW_KEY_DELETE; break;
+        case kKeySpace: key = GLFW_KEY_SPACE; break;
         case kKeyF1: key = GLFW_KEY_F1; break;
         case kKeyF2: key = GLFW_KEY_F2; break;
         case kKeyF3: key = GLFW_KEY_F3; break;
@@ -919,15 +1099,21 @@ protected:
         case kKeyF10: key = GLFW_KEY_F10; break;
         case kKeyF11: key = GLFW_KEY_F11; break;
         case kKeyF12: key = GLFW_KEY_F12; break;
+        case kKeyPageUp: key = GLFW_KEY_PAGE_UP; break;
+        case kKeyPageDown: key = GLFW_KEY_PAGE_DOWN; break;
+        case kKeyEnd: key = GLFW_KEY_END; break;
+        case kKeyHome: key = GLFW_KEY_HOME; break;
         case kKeyLeft: key = GLFW_KEY_LEFT; break;
         case kKeyUp: key = GLFW_KEY_UP; break;
         case kKeyRight: key = GLFW_KEY_RIGHT; break;
         case kKeyDown: key = GLFW_KEY_DOWN; break;
-        case kKeyPageUp: key = GLFW_KEY_PAGE_UP; break;
-        case kKeyPageDown: key = GLFW_KEY_PAGE_DOWN; break;
-        case kKeyHome: key = GLFW_KEY_HOME; break;
-        case kKeyEnd: key = GLFW_KEY_END; break;
+        case kKeyPrintScreen: key = GLFW_KEY_PRINT_SCREEN; break;
         case kKeyInsert: key = GLFW_KEY_INSERT; break;
+        case kKeyPause: key = GLFW_KEY_PAUSE; break;
+        case kKeyMenu: key = GLFW_KEY_MENU; break;
+        case kKeyNumLock: key = GLFW_KEY_NUM_LOCK; break;
+        case kKeyScrollLock: key = GLFW_KEY_SCROLL_LOCK; break;
+        case kKeyCapsLock: key = GLFW_KEY_CAPS_LOCK; break;
         case kKeyShiftL: key = GLFW_KEY_LEFT_SHIFT; break;
         case kKeyShiftR: key = GLFW_KEY_RIGHT_SHIFT; break;
         case kKeyControlL: key = GLFW_KEY_LEFT_CONTROL; break;
@@ -936,12 +1122,39 @@ protected:
         case kKeyAltR: key = GLFW_KEY_RIGHT_ALT; break;
         case kKeySuperL: key = GLFW_KEY_LEFT_SUPER; break;
         case kKeySuperR: key = GLFW_KEY_RIGHT_SUPER; break;
-        case kKeyMenu: key = GLFW_KEY_MENU; break;
-        case kKeyCapsLock: key = GLFW_KEY_CAPS_LOCK; break;
-        case kKeyScrollLock: key = GLFW_KEY_SCROLL_LOCK; break;
-        case kKeyNumLock: key = GLFW_KEY_NUM_LOCK; break;
-        case kKeyPrintScreen: key = GLFW_KEY_PRINT_SCREEN; break;
-        case kKeyPause: key = GLFW_KEY_PAUSE; break;
+        case kKeyPad0: key = GLFW_KEY_KP_0; break;
+        case kKeyPad1: key = GLFW_KEY_KP_1; break;
+        case kKeyPad2: key = GLFW_KEY_KP_2; break;
+        case kKeyPad3: key = GLFW_KEY_KP_3; break;
+        case kKeyPad4: key = GLFW_KEY_KP_4; break;
+        case kKeyPad5: key = GLFW_KEY_KP_5; break;
+        case kKeyPad6: key = GLFW_KEY_KP_6; break;
+        case kKeyPad7: key = GLFW_KEY_KP_7; break;
+        case kKeyPad8: key = GLFW_KEY_KP_8; break;
+        case kKeyPad9: key = GLFW_KEY_KP_9; break;
+        case kKeyPadEnter: key = GLFW_KEY_KP_ENTER; break;
+        /* undefined in glfw
+        case kKeyPadPageUp:
+        case kKeyPadPageDown:
+        case kKeyPadEnd:
+        case kKeyPadHome:
+        case kKeyPadLeft:
+        case kKeyPadUp:
+        case kKeyPadRight:
+        case kKeyPadDown:
+        case kKeyPadClear:
+        case kKeyPadInsert:
+        case kKeyPadDelete:
+        */
+        case kKeyPadEqual: key = GLFW_KEY_KP_EQUAL; break;
+        case kKeyPadMultiply: key = GLFW_KEY_KP_MULTIPLY; break;
+        case kKeyPadAdd: key = GLFW_KEY_KP_ADD; break;
+        /* undefined in glfw
+        case kKeyPadSeparator:
+        */
+        case kKeyPadSubtract: key = GLFW_KEY_KP_SUBTRACT; break;
+        case kKeyPadDecimal: key = GLFW_KEY_KP_DECIMAL; break;
+        case kKeyPadDivide: key = GLFW_KEY_KP_DIVIDE; break;
         default:
             // glfw expects uppercase
             if (ev.key >= 'a' && ev.key <= 'z')
@@ -963,10 +1176,15 @@ protected:
             WindowSetInternalSize(context->window, rack::math::Vec(ev.size.getWidth(), ev.size.getHeight()));
 
         const double scaleFactor = getScaleFactor();
-        char sizeString[64];
-        std::snprintf(sizeString, sizeof(sizeString), "%d:%d",
-                      (int)(ev.size.getWidth() / scaleFactor), (int)(ev.size.getHeight() / scaleFactor));
+        const int width = static_cast<int>(ev.size.getWidth() / scaleFactor + 0.5);
+        const int height = static_cast<int>(ev.size.getHeight() / scaleFactor + 0.5);
+
+        char sizeString[64] = {};
+        std::snprintf(sizeString, sizeof(sizeString), "%d:%d", width, height);
         setState("windowSize", sizeString);
+
+        if (rack::isStandalone())
+            rack::settings::windowSize = rack::math::Vec(width, height);
     }
 
     void uiFocus(const bool focus, CrossingMode) override
@@ -1038,7 +1256,14 @@ protected:
         }
 
         context->patch->path = sfilename;
+        context->patch->pushRecentPath(sfilename);
         context->history->setSaved();
+
+       #ifdef DISTRHO_OS_WASM
+        rack::syncfs();
+       #else
+        rack::settings::save();
+       #endif
     }
 
 #if 0

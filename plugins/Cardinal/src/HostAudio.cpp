@@ -127,19 +127,12 @@ struct HostAudio2 : HostAudio<2> {
 #ifndef HEADLESS
     // for stereo meter
     uint32_t internalDataFrame = 0;
-    float internalDataBuffer[2][128];
+    float internalDataBufferL[128] = {};
+    float internalDataBufferR[128] = {};
     volatile bool resetMeters = true;
     float gainMeterL = 0.0f;
     float gainMeterR = 0.0f;
 #endif
-
-    HostAudio2()
-        : HostAudio<2>()
-    {
-#ifndef HEADLESS
-        std::memset(internalDataBuffer, 0, sizeof(internalDataBuffer));
-#endif
-    }
 
 #ifndef HEADLESS
     void onReset() override
@@ -189,6 +182,9 @@ struct HostAudio2 : HostAudio<2> {
 
         if (in1connected)
         {
+            if (!std::isfinite(dataOuts[0][k]))
+                __builtin_unreachable();
+
             valueL = inputs[0].getVoltageSum() * 0.1f;
 
             if (dcFilterEnabled)
@@ -207,6 +203,9 @@ struct HostAudio2 : HostAudio<2> {
 
         if (in2connected)
         {
+            if (!std::isfinite(dataOuts[1][k]))
+                __builtin_unreachable();
+
             valueR = inputs[1].getVoltageSum() * 0.1f;
 
             if (dcFilterEnabled)
@@ -229,25 +228,51 @@ struct HostAudio2 : HostAudio<2> {
             valueR = 0.0f;
         }
 
-        const uint32_t j = internalDataFrame++;
-        internalDataBuffer[0][j] = valueL;
-        internalDataBuffer[1][j] = valueR;
-
-        if (internalDataFrame == 128)
+        if (pcontext->variant == kCardinalVariantMini)
         {
-            internalDataFrame = 0;
+            const uint32_t j = internalDataFrame++;
+            internalDataBufferL[j] = valueL;
+            internalDataBufferR[j] = valueR;
 
-            if (resetMeters)
-                gainMeterL = gainMeterR = 0.0f;
+            if (internalDataFrame == 4)
+            {
+                internalDataFrame = 0;
 
-            gainMeterL = std::max(gainMeterL, d_findMaxNormalizedFloat(internalDataBuffer[0], 128));
+                if (resetMeters)
+                    gainMeterL = gainMeterR = 0.0f;
 
-            if (in2connected)
-                gainMeterR = std::max(gainMeterR, d_findMaxNormalizedFloat(internalDataBuffer[1], 128));
-            else
-                gainMeterR = gainMeterL;
+                gainMeterL = std::max(gainMeterL, d_findMaxNormalizedFloat<4>(internalDataBufferL));
 
-            resetMeters = false;
+                if (in2connected)
+                    gainMeterR = std::max(gainMeterR, d_findMaxNormalizedFloat<4>(internalDataBufferR));
+                else
+                    gainMeterR = gainMeterL;
+
+                resetMeters = false;
+            }
+        }
+        else
+        {
+            const uint32_t j = internalDataFrame++;
+            internalDataBufferL[j] = valueL;
+            internalDataBufferR[j] = valueR;
+
+            if (internalDataFrame == 128)
+            {
+                internalDataFrame = 0;
+
+                if (resetMeters)
+                    gainMeterL = gainMeterR = 0.0f;
+
+                gainMeterL = std::max(gainMeterL, d_findMaxNormalizedFloat128(internalDataBufferL));
+
+                if (in2connected)
+                    gainMeterR = std::max(gainMeterR, d_findMaxNormalizedFloat128(internalDataBufferR));
+                else
+                    gainMeterR = gainMeterL;
+
+                resetMeters = false;
+            }
         }
 #endif
     }
@@ -294,19 +319,23 @@ struct HostAudio8 : HostAudio<8> {
 template<int numIO>
 struct HostAudioWidget : ModuleWidgetWith8HP {
     HostAudio<numIO>* const module;
+    CardinalPluginContext* const pcontext;
 
     HostAudioWidget(HostAudio<numIO>* const m)
-        : module(m)
+        : module(m),
+          pcontext(static_cast<CardinalPluginContext*>(APP))
     {
         setModule(m);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostAudio.svg")));
 
         createAndAddScrews();
 
+        const uint8_t ioCount = pcontext->variant == kCardinalVariantMain ? 8 : 2;
+
         for (uint i=0; i<numIO; ++i)
         {
-            createAndAddInput(i);
-            createAndAddOutput(i);
+            createAndAddInput(i, i, i<ioCount);
+            createAndAddOutput(i, i, i<ioCount);
         }
     }
 
@@ -376,11 +405,13 @@ struct HostAudioWidget8 : HostAudioWidget<8> {
 
     void draw(const DrawArgs& args) override
     {
+        const uint8_t ioCount = pcontext->variant == kCardinalVariantMain ? 8 : 2;
+
         drawBackground(args.vg);
-        drawOutputJacksArea(args.vg, 8);
+        drawOutputJacksArea(args.vg, ioCount);
         setupTextLines(args.vg);
 
-        for (int i=0; i<8; ++i)
+        for (int i=0; i<ioCount; ++i)
         {
             char text[] = {'A','u','d','i','o',' ',static_cast<char>('0'+i+1),'\0'};
             drawTextLine(args.vg, i, text);

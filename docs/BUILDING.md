@@ -22,7 +22,7 @@ Use them as `make SOMEOPTION=SOMEVALUE` syntax. You can specify as many options 
 Developer related options:
 
 * `DEBUG=true` build non-stripped debug binaries (terrible performance, only useful for developers)
-* `NOPLUGINS=true` build only the Cardinal Core plugins (not recommended, only useful for developers)
+* `NOSIMD=true` build without SIMD (not recommended, only useful for developers)
 
 Packaging related options:
 
@@ -51,7 +51,7 @@ Dependencies for using system libraries:
 
 ```
 # common
-sudo pkg install -A dbus libglvnd liblo libsndfile libX11 libXcursor libXext libXrandr python3
+sudo pkg install -A cmake dbus fftw libglvnd liblo libsndfile libX11 libXcursor libXext libXrandr python3
 # system libraries
 sudo pkg install -A libarchive libsamplerate jansson speexdsp
 ```
@@ -67,7 +67,7 @@ Dependencies for using system libraries, that is, with `SYSDEPS=true`:
 
 ```
 # common
-sudo pacman -S dbus file libgl liblo libsndfile libx11 libxcursor libxext libxrandr python3
+sudo pacman -S cmake dbus file fftw libgl liblo libsndfile libx11 libxcursor libxext libxrandr python3
 # system libraries
 sudo pacman -S libarchive libsamplerate jansson speexdsp
 ```
@@ -76,9 +76,9 @@ Dependencies for vendored libraries:
 
 ```
 # common
-sudo pacman -S dbus file libgl liblo libsndfile libx11 libxcursor libxext libxrandr python3
+sudo pacman -S cmake dbus file fftw libgl liblo libsndfile libx11 libxcursor libxext libxrandr python3
 # nedeed by vendored libraries
-sudo pacman -S cmake wget
+sudo pacman -S wget
 ```
 
 ### Debian
@@ -87,7 +87,7 @@ Dependencies for using system libraries, that is, with `SYSDEPS=true`:
 
 ```
 # common
-sudo apt install libdbus-1-dev libgl1-mesa-dev liblo-dev libmagic-dev libsndfile1-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev python3
+sudo apt install cmake libdbus-1-dev libgl1-mesa-dev liblo-dev libfftw3-dev libmagic-dev libsndfile1-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev python3
 # system libraries
 sudo apt install libarchive-dev libjansson-dev libsamplerate0-dev libspeexdsp-dev
 ```
@@ -96,9 +96,9 @@ Dependencies for vendored libraries:
 
 ```
 # common
-sudo apt install libdbus-1-dev libgl1-mesa-dev liblo-dev libmagic-dev libsndfile1-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev python3
+sudo apt install cmake libdbus-1-dev libgl1-mesa-dev liblo-dev libfftw3-dev libmagic-dev libsndfile1-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev python3
 # nedeed by vendored libraries
-sudo apt install cmake wget
+sudo apt install wget
 ```
 
 ## macOS
@@ -115,20 +115,50 @@ export CXXFLAGS="${CFLAGS}"
 # make etc..
 ```
 
+## Web assembly
+
+Cardinal uses emscripten for its web version, see the official instructions on installing emscripten [here](https://emscripten.org/docs/getting_started/downloads.html).  
+Once installed, setup the build by importing the emscripten environment and setup the default build tools to point to them, like so:
+
+```
+source /path/to/emsdk/emsdk_env.sh
+export AR=emar
+export CC=emcc
+export CXX=em++
+export NM=emnm
+export RANLIB=emranlib
+export STRIP=emstrip
+```
+
+Then for the actual build we just need to force graphics rendering to use GLES2 instead of the default "desktop" OpenGL mode, like so:
+
+```
+make USE_GLES2=true # add any other relevant options..
+```
+
+You can place the generated files on a webserver, or run `emrun bin/CardinalNative.html` for an easy way to test it.
+
+Please note the web build only contains CardinalNative, no other variants will be built.  
+This is expected and intentional.
+
 ## Windows
 
 Cardinal does not support msvc, using mingw is required.  
-You can either cross-compile Cardinal for Windows from Linux, or install and use msys2 natively on a Windows system.
+It also requires a file-system with support for symbolic links, which Windows cannot do.
+For these reasons it is only possible to build Cardinal for Windows from a Linux, macOS or any regular POSIX system.
 
 ### Cross-compile
 
 For cross-compilation, first install the relevant mingw packages.  
 On Ubuntu these are `binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64`.  
-Then build with `CC` and `CXX` pointing to the mingw compiler, like so:
+Then build with `AR`, `CC` and `CXX` pointing to the mingw compiler tools, like so:
 
 ```
+export AR=x86_64-w64-mingw32-gcc
 export CC=x86_64-w64-mingw32-gcc
 export CXX=x86_64-w64-mingw32-g++
+export EXE_WRAPPER=wine # for running generated windows binaries
+export PKG_CONFIG=false # ignore pkg-config from base system
 # make etc..
 ```
 

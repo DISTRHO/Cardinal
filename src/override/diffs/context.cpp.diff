@@ -1,9 +1,9 @@
---- ../Rack/src/context.cpp	2022-04-11 20:05:02.007283878 +0100
-+++ context.cpp	2022-04-11 19:51:05.409742542 +0100
-@@ -1,3 +1,30 @@
+--- ../Rack/src/context.cpp	2023-09-10 12:59:02.630898560 +0200
++++ context.cpp	2023-05-20 18:08:56.497736615 +0200
+@@ -1,14 +1,44 @@
 +/*
 + * DISTRHO Cardinal Plugin
-+ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
 + *
 + * This program is free software; you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 +
 +/**
 + * This file is an edited version of VCVRack's context.cpp
-+ * Copyright (C) 2016-2021 VCV.
++ * Copyright (C) 2016-2023 VCV.
 + *
 + * This program is free software: you can redistribute it and/or
 + * modify it under the terms of the GNU General Public License as
@@ -31,9 +31,10 @@
  #include <context.hpp>
  #include <window/Window.hpp>
  #include <patch.hpp>
-@@ -6,9 +33,13 @@
+ #include <engine/Engine.hpp>
+ #include <app/Scene.hpp>
  #include <history.hpp>
- #include <settings.hpp>
+-#include <midiloopback.hpp>
  
 +#ifdef NDEBUG
 +# undef DEBUG
@@ -46,7 +47,17 @@
  
  Context::~Context() {
  	// Deleting NULL is safe in C++.
-@@ -44,7 +75,7 @@
+@@ -38,17 +68,13 @@
+ 	INFO("Deleting engine");
+ 	delete engine;
+ 	engine = NULL;
+-
+-	INFO("Deleting MIDI loopback");
+-	delete midiLoopbackContext;
+-	midiLoopbackContext = NULL;
+ }
+ 
+ 
  static thread_local Context* threadContext = NULL;
  
  Context* contextGet() {

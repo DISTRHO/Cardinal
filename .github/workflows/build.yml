@@ -1,26 +1,31 @@
 name: build
 
-on:
-  push:
+on: [push, pull_request]
 
 env:
-  CACHE_VERSION: 31
+  CACHE_VERSION: 4
   CARDINAL_UNDER_WINE: 1
-  DEBIAN_FRONTEND: noninteractive
-  HOMEBREW_NO_AUTO_UPDATE: 1
-  LIBGL_ALWAYS_SOFTWARE: 'true'
-  WITH_LTO: 'false'
+  CIBUILD: true
+  EMSCRIPTEN_VERSION: 3.1.27
+  LIBGL_ALWAYS_SOFTWARE: true
+  PAWPAW_SKIP_LTO: 1
+  PAWPAW_SKIP_GLIB: 1
+  PAWPAW_SKIP_LV2: 1
+  PAWPAW_SKIP_SAMPLERATE: 1
 
 jobs:
-  linux-arm64:
+  linux:
+    strategy:
+      matrix:
+        target: [aarch64, armhf, i386, riscv64, x86_64]
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - name: Set up cache
+      - name: Set up build cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/PawPawBuilds
@@ -31,295 +36,98 @@ jobs:
             src/Rack/dep/jansson-2.12
             src/Rack/dep/libarchive-3.4.3
             src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
-          key: linux-arm64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: linux-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Fix GitHub's mess
         run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo rm /etc/apt/sources.list.d/*.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-      - name: Set up dependencies
+          sudo apt-get purge -yqq git-man libclang* libgbm* libllvm* libmono* libnginx* moby* mono* nginx* perl php* libgdiplus libpcre2-posix3 libselinux1-dev libzip4
+          sudo apt-get install -yqq --allow-downgrades autoconf/focal automake/focal build-essential/focal git/focal libgd3/focal libglib2.0-0/focal libglib2.0-dev/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal pkg-config/focal
+          sudo apt-get clean
+      - name: Setup dependencies (aarch64)
+        if: ${{ matrix.target == 'aarch64' }}
+        shell: bash
         run: |
           sudo dpkg --add-architecture arm64
           sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
+          sudo sed -i "s/deb mirror/deb [arch=amd64] mirror/" /etc/apt/sources.list
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-arm64.list
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-aarch64-linux-gnu libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libglib2.0-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-linux-arm64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Build extra dependencies
-        env:
-          PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          ./deps/PawPaw/bootstrap-cardinal.sh linux-aarch64 && ./deps/PawPaw/.cleanup.sh linux-aarch64
-      - name: Build linux arm64 cross-compiled
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env linux-aarch64; popd
-          make features
-          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
-          make unzipfx
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)  ../CardinalJACK ../CardinalNative
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-linux-arm64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.tar.gz
-
-  linux-armhf:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: linux-armhf-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Fix GitHub's mess
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-      - name: Set up dependencies
+          sudo apt-get install -yqq g++-aarch64-linux-gnu libasound2-dev:arm64 libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libglib2.0-dev:arm64 libsdl2-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 gperf meson qemu-user-static
+          sudo apt-get clean
+      - name: Setup dependencies (armhf)
+        if: ${{ matrix.target == 'armhf' }}
+        shell: bash
         run: |
           sudo dpkg --add-architecture armhf
           sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
+          sudo sed -i "s/deb mirror/deb [arch=amd64] mirror/" /etc/apt/sources.list
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-armhf.list
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-arm-linux-gnueabihf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libglib2.0-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-linux-armhf-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Build extra dependencies
-        env:
-          PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          ./deps/PawPaw/bootstrap-cardinal.sh linux-armhf && ./deps/PawPaw/.cleanup.sh linux-armhf
-      - name: Build linux armhf cross-compiled
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env linux-armhf; popd
-          make features
-          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
-          make unzipfx
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)  ../CardinalJACK ../CardinalNative
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-linux-armhf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.tar.gz
-
-  linux-i686:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: linux-i686-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Fix GitHub's mess
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-      - name: Set up dependencies
+          sudo apt-get install -yqq g++-arm-linux-gnueabihf libasound2-dev:armhf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libglib2.0-dev:armhf libsdl2-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf gperf meson qemu-user-static
+          sudo apt-get clean
+      - name: Setup dependencies (i386)
+        if: ${{ matrix.target == 'i386' }}
+        shell: bash
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -yqq g++-multilib libdbus-1-dev:i386 libgl1-mesa-dev:i386 libglib2.0-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-linux-i686-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Build extra dependencies
-        env:
-          PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
+          sudo apt-get install -yqq g++-i686-linux-gnu libasound2-dev:i386 libdbus-1-dev:i386 libgl1-mesa-dev:i386 libglib2.0-dev:i386 libsdl2-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386 gperf meson
+          sudo apt-get clean
+      - name: Setup dependencies (riscv64)
+        if: ${{ matrix.target == 'riscv64' }}
+        shell: bash
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          ./deps/PawPaw/bootstrap-cardinal.sh linux-i686 && ./deps/PawPaw/.cleanup.sh linux-i686
-      - name: Build linux i686
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env linux-i686; popd
-          make features
-          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
-          make unzipfx
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst) ../CardinalJACK ../CardinalNative
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-linux-i686-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.tar.gz
-
-  linux-x86_64:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: linux-x86_64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up dependencies
+          sudo dpkg --add-architecture riscv64
+          sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
+          sudo sed -i "s/deb mirror/deb [arch=amd64] mirror/" /etc/apt/sources.list
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-riscv64.list
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
+          sudo apt-get update -qq
+          sudo apt-get install -yqq g++-riscv64-linux-gnu libasound2-dev:riscv64 libdbus-1-dev:riscv64 libgl1-mesa-dev:riscv64 libglapi-mesa:riscv64 libglvnd0:riscv64 libglib2.0-dev:riscv64 libsdl2-dev:riscv64 libx11-dev:riscv64 libxcursor-dev:riscv64 libxext-dev:riscv64 libxrandr-dev:riscv64 gperf meson qemu-user-static
+          sudo apt-get clean
+      - name: Setup dependencies (x86_64)
+        if: ${{ matrix.target == 'x86_64' }}
+        shell: bash
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev libglib2.0-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+          sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf meson
+          sudo apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-linux-x86_64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
+          key: ccache-linux-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
+        env:
+          PKG_CONFIG_PATH: /usr/lib/${{ matrix.target }}-linux-gnu/pkgconfig
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          ./deps/PawPaw/bootstrap-cardinal.sh linux && ./deps/PawPaw/.cleanup.sh linux
-      - name: Build linux x86_64
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-${{ matrix.target }} && ./deps/PawPaw/.cleanup.sh linux-${{ matrix.target }}
+      - name: Build linux
         run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
           export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env linux; popd
+          source deps/PawPaw/local.env linux-${{ matrix.target }}
+          export PKG_CONFIG_PATH+=:/usr/lib/${{ matrix.target }}-linux-gnu/pkgconfig
           make features
-          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
+          make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
           make unzipfx
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)  ../CardinalJACK ../CardinalNative
-      - uses: actions/upload-artifact@v2
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
+      - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-linux-x86_64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-linux-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
       - uses: softprops/action-gh-release@v1
@@ -335,35 +143,367 @@ jobs:
   linux-x86_64-debug:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+          sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev liblo-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf meson
+          sudo apt-get clean
       - name: Build linux x86_64 (debug)
         env:
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
           make features
-          make DEBUG=true -j $(nproc)
+          # multiple jobs for building carla, deps and plugins
+          make DEBUG=true carla deps dgl plugins resources -j $(nproc)
+          # single job for final build stage, otherwise we might get killed due to OOM
+          make DEBUG=true HAVE_PULSEAUDIO=false clap lv2 vst2 vst3 -j 1
       - name: Set sha8
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst)
-      - uses: actions/upload-artifact@v2
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../LICENSE ../README.md ../docs
+      - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
 
-  linux-x86_64-headless:
+  macos:
+    strategy:
+      matrix:
+        target: [universal-10.15]
+    runs-on: macos-11
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/PawPawBuilds
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/zstd-1.4.5
+          key: macos-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+      - name: Setup dependencies
+        run: |
+          brew install autoconf automake meson
+      - name: Build extra dependencies
+        run: |
+          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
+          ./deps/PawPaw/bootstrap-cardinal.sh macos-${{ matrix.target }} && ./deps/PawPaw/.cleanup.sh macos-${{ matrix.target }}
+      - name: Set up ccache
+        if: steps.cache.outputs.cache-hit == 'true'
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-macos-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+      - name: Build macOS (base)
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
+          source deps/PawPaw/local.env macos-${{ matrix.target }}
+          make features
+          make NOOPT=true -j $(sysctl -n hw.logicalcpu)
+      - name: Build macOS (AU using juce)
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
+          source deps/PawPaw/local.env macos-${{ matrix.target }}
+          mkdir -p jucewrapper/build
+          pushd jucewrapper/build; cmake -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
+          mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
+      - name: Build macOS (packaging)
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          source deps/PawPaw/local.env macos-${{ matrix.target }}
+          ./utils/create-macos-installer.sh
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
+      - name: Rename macOS bundle
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.pkg
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.event.repository.name }}-macOS-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
+          path: |
+            ${{ github.event.repository.name }}-*.pkg
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            ${{ github.event.repository.name }}-*.pkg
+
+  modaudio:
+    strategy:
+      matrix:
+        include:
+          - name: modduo
+            target: modduo-static
+            extraflags: MODDUO=true
+          - name: modduox
+            target: modduox-static
+          - name: moddwarf
+            target: moddwarf
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up cache
+        uses: actions/cache@v3
+        id: mpb-cache
+        with:
+          path: |
+            ~/mod-workdir
+          key: ${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
+          sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
+          sudo apt-get clean
+      - name: Bootstrap toolchain
+        if: steps.mpb-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
+          sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
+          $(pwd)/deps/mod-plugin-builder/bootstrap.sh ${{ matrix.target }} minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh ${{ matrix.target }}
+      - name: Build for modaudio
+        if: steps.mpb-cache.outputs.cache-hit == 'true'
+        run: |
+          make HEADLESS=true ${{ matrix.name }}-features
+          make HEADLESS=true ${{ matrix.extraflags }} ${{ matrix.name }} -j $(nproc)
+      - name: Set sha8
+        id: slug
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
+      - name: Pack binaries
+        if: steps.mpb-cache.outputs.cache-hit == 'true'
+        run: |
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-${{ matrix.name }}-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep lv2)
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.event.repository.name }}-${{ matrix.name }}-${{ github.event.pull_request.number || env.SHA8 }}
+          path: |
+            *.tar.gz
+
+  wasm:
+    strategy:
+      matrix:
+        target: [simd, nosimd]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/PawPawBuilds
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/zstd-1.4.5
+          key: wasm-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -yqq brotli gperf meson
+          sudo apt-get clean
+          [ -e ~/PawPawBuilds/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/PawPawBuilds/emsdk
+          cd ~/PawPawBuilds/emsdk && ./emsdk install ${{ env.EMSCRIPTEN_VERSION }} && ./emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
+      - name: Build extra dependencies
+        run: |
+          ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
+          source ~/PawPawBuilds/emsdk/emsdk_env.sh
+          ./deps/PawPaw/bootstrap-cardinal.sh wasm && ./deps/PawPaw/.cleanup.sh wasm
+      - name: Build wasm cross-compiled
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
+          source ~/PawPawBuilds/emsdk/emsdk_env.sh
+          source deps/PawPaw/local.env wasm
+          # FIXME send patch upstream, assuming this works..
+          sed -i -e 's/defined(__riscv)/defined(__riscv) || defined(__EMSCRIPTEN__)/' plugins/surgext/surge/src/common/globals.h
+          make features
+          make HAVE_LIBLO=false NOOPT=true NOSIMD=${{ matrix.target == 'nosimd' }} -j $(nproc)
+      - name: Build modgui
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
+          source ~/PawPawBuilds/emsdk/emsdk_env.sh
+          source deps/PawPaw/local.env wasm
+          make HAVE_LIBLO=false NOOPT=true NOSIMD=${{ matrix.target == 'nosimd' }} -j $(nproc) -C src/CardinalMiniSep modgui
+      - name: Make wasm versioned and compress
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          ${{ matrix.target == 'nosimd' }} && export SUFFIX="-nosimd"
+          VERSION=$(cat Makefile | awk 'sub("VERSION = ","")')
+          cd bin
+          sed -i "s/CardinalMini\./CardinalMini-v${VERSION}\./g" *.html *.js
+          sed -i "s/CardinalNative\./CardinalNative-v${VERSION}\./g" *.html *.js
+          sed -i "s/CardinalMini-nosimd\./CardinalMini-nosimd-v${VERSION}\./g" *.html *.js
+          sed -i "s/CardinalNative-nosimd\./CardinalNative-nosimd-v${VERSION}\./g" *.html *.js
+          mv CardinalMini.data   CardinalMini${SUFFIX}-v${VERSION}.data
+          mv CardinalMini.js     CardinalMini${SUFFIX}-v${VERSION}.js
+          mv CardinalMini.wasm   CardinalMini${SUFFIX}-v${VERSION}.wasm
+          mv CardinalNative.data CardinalNative${SUFFIX}-v${VERSION}.data
+          mv CardinalNative.js   CardinalNative${SUFFIX}-v${VERSION}.js
+          mv CardinalNative.wasm CardinalNative${SUFFIX}-v${VERSION}.wasm
+          brotli -k -q 11 *.data *.html *.js *.wasm
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
+      - name: Pack binaries
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm) CardinalMini.lv2/modgui
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.event.repository.name }}-wasm-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
+          path: |
+            *.zip
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            *.zip
+
+  windows:
+    strategy:
+      matrix:
+        target: [win32, win64]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/PawPawBuilds
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/zstd-1.4.5
+          key: ${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+      - name: Fix GitHub's mess
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
+          sudo apt-get install -yqq --allow-downgrades libc6:i386 libgcc-s1:i386 libstdc++6:i386
+          sudo apt-get clean
+      - name: Set up dependencies
+        if: ${{ matrix.target == 'win32' }}
+        run: |
+          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 gperf meson qttools5-dev qttools5-dev-tools xvfb
+          sudo apt-get clean
+      - name: Set up dependencies
+        if: ${{ matrix.target == 'win64' }}
+        run: |
+          sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable gperf meson qttools5-dev qttools5-dev-tools xvfb
+          sudo apt-get clean
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+      - name: Build extra dependencies
+        run: |
+          ./deps/PawPaw/bootstrap-cardinal.sh ${{ matrix.target }} && ./deps/PawPaw/.cleanup.sh ${{ matrix.target }}
+      - name: Build cross-compiled (base)
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          export PATH="/usr/lib/ccache:${PATH}"
+          source deps/PawPaw/local.env ${{ matrix.target }}
+          make features
+          make NOOPT=true -j $(nproc)
+      - name: Build cross-compiled (carla)
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          export PATH="/usr/lib/ccache:${PATH}"
+          source deps/PawPaw/local.env ${{ matrix.target }}
+          make carla-win32 -j $(nproc)
+          make -C carla EMBED_TARGET=true TESTING=true dist
+          make -C carla EMBED_TARGET=true TESTING=true dist
+      - name: Build cross-compiled (packaging)
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          source deps/PawPaw/local.env ${{ matrix.target }}
+          xvfb-run ./utils/create-windows-installer.sh ${{ matrix.target }}
+          make unzipfx
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
+      - name: Pack binaries
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          pushd bin
+          zip -r -9 ../${{ github.event.repository.name }}-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
+          popd
+          zip -u -9 ${{ github.event.repository.name }}-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip LICENSE README.md docs/*.* CardinalJACK.exe CardinalNative.exe
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.event.repository.name }}-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
+          path: |
+            Cardinal-*.exe
+            Cardinal-*.zip
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            Cardinal-*.exe
+            Cardinal-*.zip
+
+  headless:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up dependencies
@@ -371,654 +511,68 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get remove -yqq libcairo2-dev libx11-dev libx11-dev libxext-dev
           sudo apt-get install -yqq liblo-dev
-      - name: Build linux x86_64 (headless)
+          sudo apt-get clean
+      - name: Build linux (headless)
         run: |
           make HEADLESS=true features
           make HEADLESS=true -j $(nproc)
 
-  linux-x86_64-sysdeps:
+  lto:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libjansson-dev libsamplerate0-dev libsndfile1-dev libspeexdsp-dev
-      - name: Build linux x86_64 (sysdeps)
+          sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev liblo-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
+          sudo apt-get clean
+      - name: Build linux (LTO)
+        run: |
+          make features
+          make WITH_LTO=true -j $(nproc) native
+
+  sysdeps:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev libarchive-dev libfftw3-dev libjansson-dev libsamplerate0-dev libsndfile1-dev libspeexdsp-dev
+          sudo apt-get clean
+      - name: Build linux (sysdeps)
         run: |
           make features
           make SYSDEPS=true -j $(nproc)
 
-  macos-intel:
-    runs-on: macos-11
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: macos-intel-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-macos-intel-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Build extra dependencies
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          ./deps/PawPaw/bootstrap-cardinal.sh macos && ./deps/PawPaw/.cleanup.sh macos
-      - name: Build macOS intel (base)
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          pushd deps/PawPaw; source local.env macos; popd
-          make features
-          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(sysctl -n hw.logicalcpu)
-      - name: Build macOS intel (AU using juce)
-        env:
-          MACOSX_DEPLOYMENT_TARGET: '10.8'
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          pushd deps/PawPaw; source local.env macos; popd
-          git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
-          sed -i -e 's/kAudioUnitProperty_SupportsMPE/kAudioUnitProperty_ignore_SupportsMPE/' jucewrapper/JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h
-          mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_OSX_SYSROOT="macosx" -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
-          mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
-      - name: Build macOS intel (packaging)
-        env:
-          MACOS_ARCHS: 'x86_64'
-        run: |
-          pushd deps/PawPaw; source local.env macos; popd
-          ./utils/create-macos-installer.sh
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - name: Rename macOS bundle
-        run: |
-          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            ${{ github.event.repository.name }}-*.pkg
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            ${{ github.event.repository.name }}-*.pkg
-
-  macos-universal:
-    runs-on: macos-11
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: macos-universal-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-macos-universal-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Build extra dependencies
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          ./deps/PawPaw/bootstrap-cardinal.sh macos-universal && ./deps/PawPaw/.cleanup.sh macos-universal
-      - name: Build macOS universal (base)
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          pushd deps/PawPaw; source local.env macos-universal; popd
-          make features
-          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(sysctl -n hw.logicalcpu)
-      - name: Build macOS universal (AU using juce)
-        env:
-          MACOSX_DEPLOYMENT_TARGET: '10.12'
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          pushd deps/PawPaw; source local.env macos-universal; popd
-          git clone --depth=1 -b 6.1.6 https://github.com/juce-framework/JUCE.git jucewrapper/JUCE
-          mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_OSX_SYSROOT="macosx" -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
-          mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
-      - name: Build macOS universal (packaging)
-        env:
-          MACOS_ARCHS: 'arm64,x86_64'
-        run: |
-          pushd deps/PawPaw; source local.env macos-universal; popd
-          ./utils/create-macos-installer.sh
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - name: Rename macOS bundle
-        run: |
-          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.pkg
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            ${{ github.event.repository.name }}-*.pkg
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            ${{ github.event.repository.name }}-*.pkg
-
-  modduo:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        uses: actions/cache@v2
-        id: mpb-cache
-        with:
-          path: |
-            ~/mod-workdir
-          key: modduo-static-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
-          sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
-      - name: Bootstrap toolchain
-        if: steps.mpb-cache.outputs.cache-hit != 'true'
-        run: |
-          git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
-          sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
-          $(pwd)/deps/mod-plugin-builder/bootstrap.sh modduo-static minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduo-static
-      - name: Build for modduo
-        run: |
-          make modduo HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} MODDUO=true -j $(nproc)
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-modduo-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
-
-  modduox:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        uses: actions/cache@v2
-        id: mpb-cache
-        with:
-          path: |
-            ~/mod-workdir
-          key: modduox-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
-          sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
-      - name: Bootstrap toolchain
-        if: steps.mpb-cache.outputs.cache-hit != 'true'
-        run: |
-          git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
-          sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
-          $(pwd)/deps/mod-plugin-builder/bootstrap.sh modduox-static minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh modduox-static
-      - name: Build for modduox
-        run: |
-          make modduox HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-modduox-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
-
-  moddwarf:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        uses: actions/cache@v2
-        id: mpb-cache
-        with:
-          path: |
-            ~/mod-workdir
-          key: moddwarf-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python libtool-bin liblo-dev qemu-user-static
-          sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
-      - name: Bootstrap toolchain
-        if: steps.mpb-cache.outputs.cache-hit != 'true'
-        run: |
-          git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
-          sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
-          $(pwd)/deps/mod-plugin-builder/bootstrap.sh moddwarf minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh moddwarf
-      - name: Build for moddwarf
-        run: |
-          make moddwarf HEADLESS=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Pack binaries
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-moddwarf-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.tar.gz
-
-  wasm:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: wasm-v${{ env.CACHE_VERSION }}
-      - name: Set up dependencies
-        run: |
-            [ -e ~/PawPawBuilds/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/PawPawBuilds/emsdk
-            cd ~/PawPawBuilds/emsdk && ./emsdk install latest && ./emsdk activate latest
-      - name: Build extra dependencies
-        run: |
-          source ~/PawPawBuilds/emsdk/emsdk_env.sh
-          ./deps/PawPaw/bootstrap-cardinal.sh wasm && ./deps/PawPaw/.cleanup.sh wasm
-      - name: Build wasm cross-compiled
-        run: |
-          source ~/PawPawBuilds/emsdk/emsdk_env.sh
-          pushd deps/PawPaw; source local.env wasm; popd
-          make features
-          make CIBUILD=true NOOPT=true USE_GLES2=true -j $(nproc)
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - name: Pack binaries
-        run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls *.html *.data *.js *.wasm)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-wasm-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.zip
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.zip
-
-  wasm-mini:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/emsdk
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: wasm-mini-v${{ env.CACHE_VERSION }}
-      - name: Set up dependencies
-        run: |
-            [ -e ~/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/emsdk
-            cd ~/emsdk && ./emsdk install latest && ./emsdk activate latest
-      - name: Build wasm-mini cross-compiled
-        env:
-          AR: emar
-          CC: emcc
-          CXX: em++
-          NM: emnm
-          RANLIB: emranlib
-          STRIP: emstrip
-        run: |
-          source ~/emsdk/emsdk_env.sh
-          make features
-          make CIBUILD=true NOPLUGINS=true STATIC_BUILD=true USE_GLES2=true -j $(nproc)
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - name: Pack binaries
-        run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls *.html *.data *.js *.wasm)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-wasm-mini-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.zip
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.zip
-
-  win32:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: win32-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Fix GitHub's mess
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-          sudo apt-get purge -yqq libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
-      - name: Set up dependencies
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update -qq
-          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 qttools5-dev qttools5-dev-tools xvfb
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-win32-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Build extra dependencies
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          ./deps/PawPaw/bootstrap-cardinal.sh win32 && ./deps/PawPaw/.cleanup.sh win32
-      - name: Build win32 cross-compiled (base)
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env win32; popd
-          make features
-          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
-      - name: Build win64 cross-compiled (carla)
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env win32; popd
-          make -C carla CARLA_BACKEND_NAMESPACE=Cardinal EXTERNAL_PLUGINS=true HAVE_FLUIDSYNTH=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false HAVE_PYQT=true HAVE_QT5=true HAVE_QT5PKG=true STATIC_PLUGIN_TARGET=true USING_CUSTOM_DPF=true CUSTOM_DPF_PATH=$(pwd)/dpf -j $(nproc)
-          make -C carla EMBED_TARGET=true TESTING=true dist
-          make -C carla EMBED_TARGET=true TESTING=true dist
-      - name: Build win64 cross-compiled (packaging)
-        run: |
-          pushd deps/PawPaw; source local.env win32; popd
-          xvfb-run ./utils/create-windows-installer.sh 32
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - name: Pack binaries
-        run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.exe
-            *.zip
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.exe
-            *.zip
-
-  win64:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Set up cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/PawPawBuilds
-            src/Rack/dep/bin
-            src/Rack/dep/include
-            src/Rack/dep/lib
-            src/Rack/dep/share
-            src/Rack/dep/jansson-2.12
-            src/Rack/dep/libarchive-3.4.3
-            src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
-            src/Rack/dep/zstd-1.4.5
-          key: win64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Fix GitHub's mess
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-          sudo apt-get purge -yqq libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
-      - name: Set up dependencies
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update -qq
-          sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable qttools5-dev qttools5-dev-tools xvfb
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-win64-v${{ env.CACHE_VERSION }}-${{ env.WITH_LTO }}
-      - name: Build extra dependencies
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          ./deps/PawPaw/bootstrap-cardinal.sh win64 && ./deps/PawPaw/.cleanup.sh win64
-      - name: Build win64 cross-compiled (base)
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env win64; popd
-          make features
-          make CIBUILD=true NOOPT=true WITH_LTO=${{ env.WITH_LTO }} -j $(nproc)
-      - name: Build win64 cross-compiled (carla)
-        run: |
-          if [ "${{ env.WITH_LTO }}" != "true" ]; then export PAWPAW_SKIP_LTO=1; fi
-          export PATH="/usr/lib/ccache:${PATH}"
-          pushd deps/PawPaw; source local.env win64; popd
-          make -C carla CARLA_BACKEND_NAMESPACE=Cardinal EXTERNAL_PLUGINS=true HAVE_FLUIDSYNTH=false HAVE_ZYN_DEPS=false HAVE_ZYN_UI_DEPS=false HAVE_PYQT=true HAVE_QT5=true HAVE_QT5PKG=true STATIC_PLUGIN_TARGET=true USING_CUSTOM_DPF=true CUSTOM_DPF_PATH=$(pwd)/dpf all win32r -j $(nproc)
-          make -C carla EMBED_TARGET=true TESTING=true dist
-          make -C carla EMBED_TARGET=true TESTING=true dist
-      - name: Build win64 cross-compiled (packaging)
-        run: |
-          pushd deps/PawPaw; source local.env win64; popd
-          xvfb-run ./utils/create-windows-installer.sh 64
-      - name: Set sha8 (non-release)
-        if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-      - name: Set sha8 (release)
-        if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - name: Pack binaries
-        run: |
-          cd bin; zip -r -9 ../${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}.zip $(ls | grep -e lv2 -e vst)
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-          path: |
-            *.exe
-            *.zip
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            *.exe
-            *.zip
-
   source-tarball:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -yqq liblo-dev
+          sudo apt-get clean
       - name: Create source tarball
         run: |
           make HEADLESS=true tarball
           make HEADLESS=true tarball+deps
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
-        id: slug1
-        run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
-        id: slug2
-        run: echo "::set-output name=sha8::$(echo ${{ github.ref_name }})"
-      - name: Set sha8
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${{ steps.slug1.outputs.sha8 || steps.slug2.outputs.sha8 }})"
-      - uses: actions/upload-artifact@v2
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
+      - uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.event.repository.name }}-source-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+          name: ${{ github.event.repository.name }}-source-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             /home/runner/cardinal*.tar.xz
             /home/runner/*/cardinal*.tar.xz
@@ -1038,12 +592,12 @@ jobs:
   plugin-validation:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             src/Rack/dep/bin
@@ -1053,7 +607,6 @@ jobs:
             src/Rack/dep/jansson-2.12
             src/Rack/dep/libarchive-3.4.3
             src/Rack/dep/libsamplerate-0.1.9
-            src/Rack/dep/speexdsp-SpeexDSP-1.2rc3
             src/Rack/dep/zstd-1.4.5
           key: pluginval-v${{ env.CACHE_VERSION }}
       - name: Set up dependencies
@@ -1066,19 +619,27 @@ jobs:
           sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
           # runtime testing
           sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ccache-pluginval-v${{ env.CACHE_VERSION }}
-      - name: Build Cardinal
+          sudo apt-get clean
+      # multiple jobs for building carla, deps and plugins
+      - name: Build Cardinal (carla, deps and plugins)
         env:
           CFLAGS: -g
-          CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING
+          CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING -Wno-pmf-conversions
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
-          export PATH="/usr/lib/ccache:${PATH}"
           make features
-          make NOOPT=true SKIP_STRIPPING=true -j $(nproc)
+          make NOOPT=true SKIP_STRIPPING=true carla deps dgl plugins resources -j $(nproc)
+      # single job for final build stage, otherwise we might get killed due to OOM
+      - name: Build Cardinal (final build stage)
+        env:
+          CFLAGS: -g
+          CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING -Wno-pmf-conversions
+          LDFLAGS: -static-libgcc -static-libstdc++
+        run: |
+          make features
+          make NOOPT=true SKIP_STRIPPING=true -j 1 -C src jack
+          make NOOPT=true -j 1
+          ./dpf/utils/generate-ttl.sh
       - name: Run Cardinal self-tests
         run: |
           # --exit-on-first-error=yes
@@ -1087,23 +648,24 @@ jobs:
                 --error-exitcode=255 \
                 --leak-check=no \
                 --track-origins=yes \
+                --keep-debuginfo=yes \
                 --suppressions=./dpf/utils/valgrind-dpf.supp \
                 ./bin/Cardinal selftest
       - name: Validate LV2 ttl syntax
         run: |
           lv2_validate \
-              /usr/lib/lv2/mod.lv2/*.ttl \
               /usr/lib/lv2/kx-meta/*.ttl \
               /usr/lib/lv2/kx-control-input-port-change-request.lv2/*.ttl \
               /usr/lib/lv2/kx-programs.lv2/*.ttl \
+              /usr/lib/lv2/mod.lv2/*.ttl \
+              /usr/lib/lv2/modgui.lv2/*.ttl \
               ./bin/*.lv2/*.ttl
       - name: Validate LV2 metadata and binaries
         run: |
           export LV2_PATH=/tmp/lv2-path
           mkdir ${LV2_PATH}
-          cp -r bin/CardinalFX.lv2 bin/CardinalSynth.lv2 \
-              /usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,instance-access,midi,mod,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 \
-              ${LV2_PATH}
+          mv bin/CardinalFX.lv2 bin/CardinalSynth.lv2 ${LV2_PATH}
+          cp -r /usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,instance-access,midi,mod,modgui,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 ${LV2_PATH}
           xvfb-run lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
       - name: Test LV2 plugin
         run: |
@@ -1114,8 +676,9 @@ jobs:
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
+                    --keep-debuginfo=yes \
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
-                    /usr/lib/carla/carla-bridge-native lv2 "" ${p} 1>/dev/null; \
+                    /usr/lib/carla/carla-bridge-native lv2 "" ${p}; \
             done
       - name: Test VST2 plugin
         run: |
@@ -1125,8 +688,9 @@ jobs:
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
+                    --keep-debuginfo=yes \
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
-                    /usr/lib/carla/carla-bridge-native vst2 ./${p} "" 1>/dev/null; \
+                    /usr/lib/carla/carla-bridge-native vst2 ./${p} ""; \
             done
       - name: Test VST3 plugin
         run: |
@@ -1136,6 +700,7 @@ jobs:
                     --error-exitcode=255 \
                     --leak-check=no \
                     --track-origins=yes \
+                    --keep-debuginfo=yes \
                     --suppressions=./dpf/utils/valgrind-dpf.supp \
-                    /usr/lib/carla/carla-bridge-native vst3 ./bin/${p} "" 1>/dev/null; \
+                    /usr/lib/carla/carla-bridge-native vst3 ./bin/${p} ""; \
             done

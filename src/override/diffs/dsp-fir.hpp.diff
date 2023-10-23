@@ -1,0 +1,56 @@
+--- ../Rack/include/dsp/fir.hpp	2022-09-21 20:49:12.181540170 +0200
++++ ../../include/dsp/fir.hpp	2022-09-21 20:41:45.860647778 +0200
+@@ -1,4 +1,32 @@
++/*
++ * DISTRHO Cardinal Plugin
++ * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * For a full copy of the GNU General Public License see the LICENSE file.
++ */
++
++/**
++ * This file is an edited version of VCVRack's dsp/fir.hpp
++ * Copyright (C) 2016-2021 VCV.
++ *
++ * This program is free software: you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 3 of
++ * the License, or (at your option) any later version.
++ */
++
+ #pragma once
++
+ #include <pffft.h>
+ 
+ #include <dsp/common.hpp>
+@@ -42,16 +70,16 @@
+ 	RealTimeConvolver(size_t blockSize) {
+ 		this->blockSize = blockSize;
+ 		pffft = pffft_new_setup(blockSize * 2, PFFFT_REAL);
+-		outputTail = new float[blockSize];
++		outputTail = (float*) pffft_aligned_malloc(sizeof(float) * blockSize);
+ 		std::memset(outputTail, 0, blockSize * sizeof(float));
+-		tmpBlock = new float[blockSize * 2];
++		tmpBlock = (float*) pffft_aligned_malloc(sizeof(float) * blockSize * 2);
+ 		std::memset(tmpBlock, 0, blockSize * 2 * sizeof(float));
+ 	}
+ 
+ 	~RealTimeConvolver() {
+ 		setKernel(NULL, 0);
+-		delete[] outputTail;
+-		delete[] tmpBlock;
++		pffft_aligned_free(outputTail);
++		pffft_aligned_free(tmpBlock);
+ 		pffft_destroy_setup(pffft);
+ 	}
+ 

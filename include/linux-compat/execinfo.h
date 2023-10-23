@@ -17,19 +17,25 @@
 
 #pragma once
 
-#define pthread_setname_np(...)
+#include <pthread.h>
 
-int pthread_getcpuclockid(pthread_t, clockid_t* const clock_id)
+static inline
+int pthread_getcpuclockid_custom(pthread_t, clockid_t* const clock_id)
 {
     *clock_id = CLOCK_REALTIME;
     return 0;
 }
 
-static int backtrace(void**, int)
+#define pthread_getcpuclockid pthread_getcpuclockid_custom
+#define pthread_setname_np(...)
+
+static inline
+int backtrace(void**, int)
 {
     return 0;
 }
 
+static inline
 char** backtrace_symbols(void* const*, int)
 {
     return nullptr;

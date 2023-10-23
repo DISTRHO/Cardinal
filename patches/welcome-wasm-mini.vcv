@@ -1,6 +1,5 @@
 {
-  "version": "2.1.2",
-  "unsaved": true,
+  "version": "2.1.1",
   "zoom": 1.0,
   "modules": [
     {
@@ -9,15 +8,15 @@
       "model": "TextEditor",
       "version": "2.0",
       "params": [],
-      "leftModuleId": 799138358763949,
+      "leftModuleId": 1202678850202654,
       "data": {
         "filepath": "",
         "lang": "None",
-        "etext": "Welcome to Cardinal!\n\nThis is the Web/Wasm variant\nIt has 2 audio outputs, enabled by default.\nUse Engine menu to enable input and/or MIDI.\n\nA basic VCO + ADSR + VCA is the default patch\n\n",
-        "width": 23
+        "etext": "Welcome to Cardinal!\n\nThis is the mini variant\nIt has 2 audio outputs, with optional audio input and MIDI (enabled via Engine menu)\n\nA basic VCO + ADSR + VCA is the default patch\n\nHave fun!\n\n",
+        "width": 19
       },
       "pos": [
-        49,
+        58,
         0
       ]
     },
@@ -151,7 +150,7 @@
         }
       ],
       "leftModuleId": 4828178296911509,
-      "rightModuleId": 799138358763949,
+      "rightModuleId": 4,
       "data": {
         "dcFilter": true
       },
@@ -183,26 +182,42 @@
       ]
     },
     {
-      "id": 799138358763949,
+      "id": 4,
       "plugin": "Cardinal",
-      "model": "HostMIDIMap",
+      "model": "HostParameters",
       "version": "2.0",
       "params": [],
       "leftModuleId": 1,
+      "rightModuleId": 1202678850202654,
+      "data": {
+        "smooth": true
+      },
+      "pos": [
+        38,
+        0
+      ]
+    },
+    {
+      "id": 1202678850202654,
+      "plugin": "Cardinal",
+      "model": "HostParametersMap",
+      "version": "2.0",
+      "params": [],
+      "leftModuleId": 4,
       "rightModuleId": 8712245256622475,
       "data": {
         "maps": [
           {
-            "cc": -1,
+            "hostParamId": 255,
+            "inverted": false,
+            "smooth": true,
             "moduleId": -1,
             "paramId": 0
           }
-        ],
-        "smooth": true,
-        "channel": 0
+        ]
       },
       "pos": [
-        38,
+        47,
         0
       ]
     }
