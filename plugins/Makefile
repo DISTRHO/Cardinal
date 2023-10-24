@@ -998,6 +998,12 @@ PLUGIN_FILES += $(wildcard StarlingVia/src/*.cpp)
 PLUGIN_FILES += $(wildcard StarlingVia/Via/io/src/*.cpp)
 PLUGIN_FILES += $(wildcard StarlingVia/Via/ui/src/*.cpp)
 PLUGIN_FILES += $(wildcard StarlingVia/Via/modules/*/*.cpp)
+PLUGIN_BINARIES += StarlingVia/res/original.gateseq
+PLUGIN_BINARIES += StarlingVia/res/original.meta
+PLUGIN_BINARIES += StarlingVia/res/original.osc3
+PLUGIN_BINARIES += StarlingVia/res/original.scanner
+PLUGIN_BINARIES += StarlingVia/res/original.sync
+PLUGIN_BINARIES += StarlingVia/res/original.sync3
 
 # modules/types which are present in other plugins
 STARLINGVIA_CUSTOM = Scanner
