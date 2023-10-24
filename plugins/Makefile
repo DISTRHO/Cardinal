@@ -1006,7 +1006,7 @@ PLUGIN_BINARIES += StarlingVia/res/original.sync
 PLUGIN_BINARIES += StarlingVia/res/original.sync3
 
 # modules/types which are present in other plugins
-STARLINGVIA_CUSTOM = Scanner
+STARLINGVIA_CUSTOM = Scanner Scale Wavetable
 
 # --------------------------------------------------------------
 # stocaudio

@@ -731,8 +731,12 @@ void addThemeMenuItems(Menu*, ModuleTheme*) {}
 
 // Starling Via
 #define modelScanner modelStarlingViaScanner
+#define Scale starlingViaScale
+#define Wavetable starlingViaWavetable
 #include "StarlingVia/src/starling.hpp"
 #undef modelScanner
+#undef Scale
+#undef Wavetable
 
 // stocaudio
 #include "stocaudio/src/plugin.hpp"
@@ -2829,6 +2833,8 @@ static void initStatic__StarlingVia()
     if (spl.ok())
     {
 #define modelScanner modelStarlingViaScanner
+#define Scale starlingViaScale
+#define Wavetable starlingViaWavetable
         p->addModel(modelMeta);
         p->addModel(modelGateseq);
         p->addModel(modelScanner);
@@ -2839,6 +2845,8 @@ static void initStatic__StarlingVia()
         p->addModel(modelSync3XL);
         p->addModel(modelSync3XLLevels);
 #undef modelScanner
+#undef Scale
+#undef Wavetable
     }
 }
 
