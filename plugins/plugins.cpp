@@ -2769,7 +2769,10 @@ static void initStatic__Sapphire()
     if (spl.ok())
     {
         p->addModel(modelElastika);
+        p->addModel(modelFrolic);
         p->addModel(modelMoots);
+        p->addModel(modelTin);
+        p->addModel(modelTricorder);
         p->addModel(modelTubeUnit);
     }
 }
