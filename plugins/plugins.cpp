@@ -2770,6 +2770,7 @@ static void initStatic__Sapphire()
     {
         p->addModel(modelElastika);
         p->addModel(modelFrolic);
+        p->addModel(modelGlee);
         p->addModel(modelMoots);
         p->addModel(modelTin);
         p->addModel(modelTricorder);
