@@ -36,12 +36,6 @@
 
 namespace rack {
 
-#ifndef HEADLESS
-namespace asset {
-void updateForcingBlackSilverScrewMode(std::string slug);
-}
-#endif
-
 struct CardinalPluginModelHelper : plugin::Model {
     virtual app::ModuleWidget* createModuleWidgetFromEngineLoad(engine::Module* m) = 0;
     virtual void removeCachedModuleWidget(engine::Module* m) = 0;
@@ -78,9 +72,6 @@ struct CardinalPluginModel : CardinalPluginModelHelper
             }
             tm = dynamic_cast<TModule*>(m);
         }
-       #ifndef HEADLESS
-        asset::updateForcingBlackSilverScrewMode(slug);
-       #endif
         app::ModuleWidget* const tmw = new TModuleWidget(tm);
         DISTRHO_CUSTOM_SAFE_ASSERT_RETURN(m != nullptr ? m->model->name.c_str() : "null", tmw->module == m, nullptr);
         tmw->setModel(this);
@@ -95,9 +86,6 @@ struct CardinalPluginModel : CardinalPluginModelHelper
         TModule* const tm = dynamic_cast<TModule*>(m);
         DISTRHO_SAFE_ASSERT_RETURN(tm != nullptr, nullptr);
 
-       #ifndef HEADLESS
-        asset::updateForcingBlackSilverScrewMode(slug);
-       #endif
         TModuleWidget* const tmw = new TModuleWidget(tm);
         DISTRHO_SAFE_ASSERT_RETURN(tmw->module == m, nullptr);
         tmw->setModel(this);

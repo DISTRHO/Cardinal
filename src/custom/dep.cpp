@@ -23,49 +23,10 @@
 #include <string>
 
 namespace rack {
-#ifndef HEADLESS
-namespace asset {
-bool forceBlackScrew = false;
-bool forceSilverScrew = false;
-void updateForcingBlackSilverScrewMode(std::string slug) {
-    forceBlackScrew = (
-        // arable instruments
-        slug == "Joni"
-        // axioma
-        || slug == "TheBifurcator"
-        || slug == "Tesseract"
-        || slug == "Ikeda"
-        || slug == "Rhodonea"
-        // parable instruments
-        || slug == "Neil"
-        // rackwindows
-        || slug == "bitshiftgain"
-        || slug == "capacitor"
-        || slug == "capacitor_stereo"
-        || slug == "chorus"
-        || slug == "console"
-        || slug == "console_mm"
-        || slug == "distance"
-        || slug == "golem"
-        || slug == "holt"
-        || slug == "hombre"
-        || slug == "interstage"
-        || slug == "monitoring"
-        || slug == "mv"
-        || slug == "rasp"
-        || slug == "reseq"
-        || slug == "tape"
-        || slug == "tremolo"
-        || slug == "vibrato"
-    );
-}
-}
-#endif
 namespace plugin {
 void updateStaticPluginsDarkMode();
 }
 namespace settings {
-bool darkMode = true;
 int rateLimit = 0;
 extern std::string uiTheme;
 }
@@ -90,7 +51,7 @@ float FollowerBase::efGainMaxDecibelsDebug = 12.0f;
 extern "C" {
 NVGcolor nvgRGBblank(const unsigned char r, const unsigned char g, const unsigned char b)
 {
-    return rack::settings::darkMode ? nvgRGB(0x20, 0x20, 0x20) : nvgRGB(r, g, b);
+    return rack::settings::preferDarkPanels ? nvgRGB(0x20, 0x20, 0x20) : nvgRGB(r, g, b);
 }
 }
 
@@ -1510,10 +1471,9 @@ namespace rack {
 void switchDarkMode(const bool darkMode)
 {
    #ifndef HEADLESS
-    if (settings::darkMode == darkMode)
-        return;
+    // TODO sort this out after build with Rack2.4 succeeds
+    return;
 
-    settings::darkMode = darkMode;
     settings::uiTheme = darkMode ? "dark" : "light";
     ui::refreshTheme();
     plugin::updateStaticPluginsDarkMode();

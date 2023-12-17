@@ -17,41 +17,21 @@
 
 #pragma once
 
-#if (defined(__i386__) || defined(__x86_64__)) && !defined(CARDINAL_NOSIMD)
+#if (defined(__i386__) || defined(__x86_64__) || defined(__EMSCRIPTEN__)) && !defined(CARDINAL_NOSIMD)
 # include_next <pmmintrin.h>
-
-// bring in extra SSE3 support via simde
-# define SIMDE_X86_SSE2_NATIVE
-# define SIMDE_X86_SSE3_ENABLE_NATIVE_ALIASES
-
-// make sure to not include windows.h here
-# ifdef _WIN32
-#  define _WIN32_WAS_DEFINED
-#  undef _WIN32
-# endif
-
-// assume SSE3 only on macOS
-# ifndef ARCH_MAC
-#  include "simde/x86/sse3.h"
-# endif
-
-# ifdef _WIN32_WAS_DEFINED
-#  define _WIN32
-#  undef _WIN32_WAS_DEFINED
-# endif
-
-# undef SIMDE_X86_SSE2_NATIVE
-# undef SIMDE_X86_SSE3_ENABLE_NATIVE_ALIASES
-
-#elif defined(__EMSCRIPTEN__) && !defined(CARDINAL_NOSIMD)
-# include_next <pmmintrin.h>
-
+# if defined(__EMSCRIPTEN__) && !defined(CARDINAL_NOSIMD)
 static __inline__ __m64 __attribute__((__always_inline__, __nodebug__))
 _mm_set1_pi16(short w)
 {
     return __extension__ (__m64){ static_cast<float>(w), static_cast<float>(w) };
 }
-
+# endif
+#else
+# define SIMDE_ENABLE_NATIVE_ALIASES
+# include "simde/x86/sse.h"
+# include "simde/x86/sse2.h"
+# include "simde/x86/sse3.h"
+# undef SIMDE_ENABLE_NATIVE_ALIASES
 /*
 #elif defined(__ARM_NEON)
 # include "../sse2neon/sse2neon.h"
@@ -68,11 +48,4 @@ __m64 _mm_set1_pi16(short w)
     return vreinterpret_s64_s16(vdup_n_s16(w));
 }
 */
-
-#else
-# define SIMDE_ENABLE_NATIVE_ALIASES
-# include "simde/x86/sse.h"
-# include "simde/x86/sse2.h"
-# include "simde/x86/sse3.h"
-# undef SIMDE_ENABLE_NATIVE_ALIASES
 #endif

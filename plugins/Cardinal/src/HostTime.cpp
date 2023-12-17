@@ -214,10 +214,10 @@ struct HostTimeWidget : ModuleWidgetWith8HP {
         const float y = startY_cv + offset * padding;
         nvgBeginPath(vg);
         nvgRoundedRect(vg, startX - 1.0f, y - 2.f, box.size.x - startX * 2 + 2.f, 28.f, 4);
-        nvgFillColor(vg, rack::settings::darkMode ? nvgRGB(0xd0, 0xd0, 0xd0) : nvgRGB(0x2f, 0x2f, 0x2f));
+        nvgFillColor(vg, rack::settings::preferDarkPanels ? nvgRGB(0xd0, 0xd0, 0xd0) : nvgRGB(0x2f, 0x2f, 0x2f));
         nvgFill(vg);
         nvgBeginPath(vg);
-        nvgFillColor(vg, rack::settings::darkMode ? color::BLACK : color::WHITE);
+        nvgFillColor(vg, rack::settings::preferDarkPanels ? color::BLACK : color::WHITE);
         nvgText(vg, startX + 36, y + 16, text, nullptr);
     }
 

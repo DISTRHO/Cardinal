@@ -783,8 +783,8 @@ std::vector<Model*> hostTerminalModels;
 #ifndef NOPLUGINS
 // stuff that reads config files, we don't want that
 int loadConsoleType() { return 0; }
-bool loadDarkAsDefault() { return settings::darkMode; }
-ModuleTheme loadDefaultTheme() { return settings::darkMode ? DARK_THEME : LIGHT_THEME; }
+bool loadDarkAsDefault() { return settings::preferDarkPanels; }
+ModuleTheme loadDefaultTheme() { return settings::preferDarkPanels ? DARK_THEME : LIGHT_THEME; }
 int loadDirectOutMode() { return 0; }
 void readDefaultTheme() { defaultPanelTheme = loadDefaultTheme(); }
 void saveConsoleType(int) {}
@@ -1558,7 +1558,7 @@ static void initStatic__BogaudioModules()
     {
         // Make sure to use dark theme as default
         Skins& skins(Skins::skins());
-        skins._default = settings::darkMode ? "dark" : "light";
+        skins._default = settings::preferDarkPanels ? "dark" : "light";
 #define modelADSR modelBogaudioADSR
 #define modelLFO modelBogaudioLFO
 #define modelNoise modelBogaudioNoise
@@ -3173,7 +3173,7 @@ void destroyStaticPlugins()
 void updateStaticPluginsDarkMode()
 {
 #ifndef NOPLUGINS
-    const bool darkMode = settings::darkMode;
+    const bool darkMode = settings::preferDarkPanels;
     // bogaudio
     {
         Skins& skins(Skins::skins());

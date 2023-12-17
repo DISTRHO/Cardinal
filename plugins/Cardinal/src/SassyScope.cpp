@@ -285,7 +285,7 @@ struct SassyScopeWidget : ImGuiWidget {
         ImGui::SetNextWindowSize(ImVec2(box.size.x * scaleFactor, box.size.y * scaleFactor));
 
         ScopeData* const scope = module != nullptr ? &module->scope : getFakeScopeInstance();
-        scope->darkMode = settings::darkMode;
+        scope->darkMode = settings::preferDarkPanels;
         do_show_scope_window(scope, scaleFactor);
     }
 

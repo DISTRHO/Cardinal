@@ -153,10 +153,10 @@ ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
 endif
 
-ifeq ($(USE_GLES2),true)
-BASE_FLAGS += -DNANOVG_GLES2_FORCED
-else ifeq ($(USE_GLES3),true)
+ifeq ($(USE_GLES3),true)
 BASE_FLAGS += -DNANOVG_GLES3_FORCED
+else ifeq ($(USE_GLES2),true)
+BASE_FLAGS += -DNANOVG_GLES2_FORCED
 endif
 
 # needed for enabling SSE in pffft
@@ -175,7 +175,7 @@ BASE_FLAGS += -msse -msse2 -msse3 -msimd128
 else ifeq ($(CPU_ARM32),true)
 BASE_FLAGS += -mfpu=neon-vfpv4 -mfloat-abi=hard
 else ifeq ($(CPU_I386_OR_X86_64),true)
-BASE_FLAGS += -msse -msse2 -mfpmath=sse
+BASE_FLAGS += -msse -msse2 -msse3 -mfpmath=sse
 endif
 
 endif

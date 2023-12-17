@@ -1,5 +1,5 @@
---- ../Rack/src/window/Window.cpp	2023-09-10 12:59:02.631898592 +0200
-+++ Window.cpp	2023-08-28 09:55:57.292032175 +0200
+--- ../Rack/src/window/Window.cpp	2023-12-17 12:57:01.139429461 +0100
++++ Window.cpp	2023-10-22 13:33:43.777041594 +0200
 @@ -1,33 +1,94 @@
 +/*
 + * DISTRHO Cardinal Plugin
@@ -119,7 +119,7 @@
  		throw Exception("Failed to load font %s", filename.c_str());
  	}
  	INFO("Loaded font %s", filename.c_str());
-@@ -79,338 +139,478 @@
+@@ -79,340 +139,478 @@
  }
  
  
@@ -194,7 +194,7 @@
 +	Internal()
 +#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 +		: hiddenApp(false),
-+		  hiddenWindow(hiddenApp)
++		  hiddenWindow(hiddenApp, 0, DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT, 0.0, true)
 +	{
 +		hiddenWindow.setIgnoringKeyRepeat(true);
 +		hiddenApp.idle();
@@ -269,7 +269,7 @@
 -	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
 -	(void) cursorMode;
 +#if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
-+	DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
++	const DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(internal->hiddenWindow);
 +	vg = nvgCreateGL(nvgFlags);
 +#else
 +	vg = static_cast<CardinalPluginContext*>(APP)->tlw->getContext();
@@ -684,6 +684,7 @@
  
 -	if (APP->scene) {
 -		widget::Widget::ContextCreateEvent e;
+-		e.vg = vg;
 -		APP->scene->onContextCreate(e);
 +#if defined NANOVG_GLES2
 +		nvgDeleteGLES2(window->internal->r_fbVg);
@@ -706,6 +707,7 @@
  Window::~Window() {
 -	if (APP->scene) {
 -		widget::Widget::ContextDestroyEvent e;
+-		e.vg = vg;
 -		APP->scene->onContextDestroy(e);
 -	}
 +	{
@@ -852,7 +854,7 @@
  	double frameTime = system::getTime();
  	if (std::isfinite(internal->frameTime)) {
  		internal->lastFrameDuration = frameTime - internal->frameTime;
-@@ -422,57 +622,52 @@
+@@ -424,57 +622,52 @@
  	// Make event handlers and step() have a clean NanoVG context
  	nvgReset(vg);
  
@@ -945,7 +947,7 @@
  	windowRatio = (float)fbWidth / winWidth;
  	// t1 = system::getTime();
  
-@@ -486,10 +681,8 @@
+@@ -488,10 +681,8 @@
  		// t2 = system::getTime();
  
  		// Render scene
@@ -957,7 +959,7 @@
  			nvgScale(vg, pixelRatio, pixelRatio);
  
  			// Draw scene
-@@ -500,23 +693,16 @@
+@@ -502,23 +693,16 @@
  			// t3 = system::getTime();
  
  			glViewport(0, 0, fbWidth, fbHeight);
@@ -985,7 +987,7 @@
  	// t5 = system::getTime();
  	// DEBUG("pre-step %6.1f step %6.1f draw %6.1f nvgEndFrame %6.1f glfwSwapBuffers %6.1f total %6.1f",
  	// 	(t1 - frameTime) * 1e3f,
-@@ -526,163 +712,132 @@
+@@ -528,168 +712,132 @@
  	// 	(t5 - t4) * 1e3f,
  	// 	(t5 - frameTime) * 1e3f
  	// );
@@ -1068,6 +1070,11 @@
  
  
  void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
+-	// Disable preferDarkPanels
+-	bool preferDarkPanels = settings::preferDarkPanels;
+-	settings::preferDarkPanels = false;
+-	DEFER({settings::preferDarkPanels = preferDarkPanels;});
+-
 -	// Iterate plugins and create directories
 -	system::createDirectories(screenshotsDir);
 -	for (plugin::Plugin* p : plugin::plugins) {
@@ -1227,7 +1234,7 @@
  }
  
  
-@@ -702,7 +857,7 @@
+@@ -709,7 +857,7 @@
  
  
  double Window::getFrameDurationRemaining() {
@@ -1236,7 +1243,7 @@
  	return frameDuration - (system::getTime() - internal->frameTime);
  }
  
-@@ -713,14 +868,15 @@
+@@ -720,14 +868,15 @@
  		return pair->second;
  
  	// Load font
@@ -1255,7 +1262,7 @@
  	}
  	internal->fontCache[filename] = font;
  	return font;
-@@ -733,14 +889,15 @@
+@@ -740,14 +889,15 @@
  		return pair->second;
  
  	// Load image
@@ -1274,7 +1281,7 @@
  	}
  	internal->imageCache[filename] = image;
  	return image;
-@@ -757,28 +914,156 @@
+@@ -764,28 +914,156 @@
  }
  
  

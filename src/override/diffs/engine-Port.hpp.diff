@@ -1,4 +1,4 @@
---- ../Rack/include/engine/Port.hpp	2023-09-10 12:59:02.629898529 +0200
+--- ../Rack/include/engine/Port.hpp	2023-12-17 12:57:01.129428435 +0100
 +++ ../../include/engine/Port.hpp	2023-07-07 18:20:12.030329564 +0200
 @@ -1,19 +1,57 @@
 +/*
@@ -60,11 +60,11 @@
  		/** Unstable API. Use getVoltage() and setVoltage() instead. */
  		float voltages[PORT_MAX_CHANNELS] = {};
  		/** DEPRECATED. Unstable API. Use getVoltage() and setVoltage() instead. */
-@@ -40,40 +78,40 @@
+@@ -40,41 +78,41 @@
  	};
  
  	/** Sets the voltage of the given channel. */
--	void setVoltage(float voltage, int channel = 0) {
+-	void setVoltage(float voltage, uint8_t channel = 0) {
 +	void setVoltage(float voltage, int channel = 0) noexcept {
  		voltages[channel] = voltage;
  	}
@@ -72,24 +72,24 @@
  	/** Returns the voltage of the given channel.
  	Because of proper bookkeeping, all channels higher than the input port's number of channels should be 0V.
  	*/
--	float getVoltage(int channel = 0) {
+-	float getVoltage(uint8_t channel = 0) {
 +	float getVoltage(int channel = 0) const noexcept {
  		return voltages[channel];
  	}
  
  	/** Returns the given channel's voltage if the port is polyphonic, otherwise returns the first voltage (channel 0). */
--	float getPolyVoltage(int channel) {
+-	float getPolyVoltage(uint8_t channel) {
 +	float getPolyVoltage(int channel) const noexcept {
  		return isMonophonic() ? getVoltage(0) : getVoltage(channel);
  	}
  
  	/** Returns the voltage if a cable is connected, otherwise returns the given normal voltage. */
--	float getNormalVoltage(float normalVoltage, int channel = 0) {
+-	float getNormalVoltage(float normalVoltage, uint8_t channel = 0) {
 +	float getNormalVoltage(float normalVoltage, int channel = 0) const noexcept {
  		return isConnected() ? getVoltage(channel) : normalVoltage;
  	}
  
--	float getNormalPolyVoltage(float normalVoltage, int channel) {
+-	float getNormalPolyVoltage(float normalVoltage, uint8_t channel) {
 +	float getNormalPolyVoltage(float normalVoltage, int channel) const noexcept {
  		return isConnected() ? getPolyVoltage(channel) : normalVoltage;
  	}
@@ -97,24 +97,34 @@
  	/** Returns a pointer to the array of voltages beginning with firstChannel.
  	The pointer can be used for reading and writing.
  	*/
--	float* getVoltages(int firstChannel = 0) {
+-	float* getVoltages(uint8_t firstChannel = 0) {
 +	float* getVoltages(int firstChannel = 0) noexcept {
  		return &voltages[firstChannel];
  	}
  
  	/** Copies the port's voltages to an array of size at least `channels`. */
 -	void readVoltages(float* v) {
+-		for (uint8_t c = 0; c < channels; c++) {
 +	void readVoltages(float* v) const noexcept {
- 		for (int c = 0; c < channels; c++) {
++		for (int c = 0; c < channels; c++) {
  			v[c] = voltages[c];
  		}
-@@ -89,14 +127,14 @@
+ 	}
+@@ -83,22 +121,22 @@
+ 	Remember to set the number of channels *before* calling this method.
+ 	*/
+ 	void writeVoltages(const float* v) {
+-		for (uint8_t c = 0; c < channels; c++) {
++		for (int c = 0; c < channels; c++) {
+ 			voltages[c] = v[c];
+ 		}
  	}
  
  	/** Sets all voltages to 0. */
 -	void clearVoltages() {
+-		for (uint8_t c = 0; c < channels; c++) {
 +	void clearVoltages() noexcept {
- 		for (int c = 0; c < channels; c++) {
++		for (int c = 0; c < channels; c++) {
  			voltages[c] = 0.f;
  		}
  	}
@@ -123,8 +133,11 @@
 -	float getVoltageSum() {
 +	float getVoltageSum() const noexcept {
  		float sum = 0.f;
- 		for (int c = 0; c < channels; c++) {
+-		for (uint8_t c = 0; c < channels; c++) {
++		for (int c = 0; c < channels; c++) {
  			sum += voltages[c];
+ 		}
+ 		return sum;
 @@ -107,7 +145,7 @@
  	/** Returns the root-mean-square of all voltages.
  	Uses sqrt() which is slow, so use a custom approximation if calling frequently.
@@ -134,45 +147,61 @@
  		if (channels == 0) {
  			return 0.f;
  		}
-@@ -124,22 +162,22 @@
+@@ -116,7 +154,7 @@
+ 		}
+ 		else {
+ 			float sum = 0.f;
+-			for (uint8_t c = 0; c < channels; c++) {
++			for (int c = 0; c < channels; c++) {
+ 				sum += std::pow(voltages[c], 2);
+ 			}
+ 			return std::sqrt(sum);
+@@ -124,27 +162,27 @@
  	}
  
  	template <typename T>
--	T getVoltageSimd(int firstChannel) {
+-	T getVoltageSimd(uint8_t firstChannel) {
 +	T getVoltageSimd(int firstChannel) const noexcept {
  		return T::load(&voltages[firstChannel]);
  	}
  
  	template <typename T>
--	T getPolyVoltageSimd(int firstChannel) {
+-	T getPolyVoltageSimd(uint8_t firstChannel) {
 +	T getPolyVoltageSimd(int firstChannel) const noexcept {
  		return isMonophonic() ? getVoltage(0) : getVoltageSimd<T>(firstChannel);
  	}
  
  	template <typename T>
--	T getNormalVoltageSimd(T normalVoltage, int firstChannel) {
+-	T getNormalVoltageSimd(T normalVoltage, uint8_t firstChannel) {
 +	T getNormalVoltageSimd(T normalVoltage, int firstChannel) const noexcept {
  		return isConnected() ? getVoltageSimd<T>(firstChannel) : normalVoltage;
  	}
  
  	template <typename T>
--	T getNormalPolyVoltageSimd(T normalVoltage, int firstChannel) {
+-	T getNormalPolyVoltageSimd(T normalVoltage, uint8_t firstChannel) {
 +	T getNormalPolyVoltageSimd(T normalVoltage, int firstChannel) const noexcept {
  		return isConnected() ? getPolyVoltageSimd<T>(firstChannel) : normalVoltage;
+ 	}
+ 
+ 	template <typename T>
+-	void setVoltageSimd(T voltage, uint8_t firstChannel) {
++	void setVoltageSimd(T voltage, int firstChannel) {
+ 		voltage.store(&voltages[firstChannel]);
  	}
  
 @@ -153,13 +191,15 @@
  	If disconnected, this does nothing (`channels` remains 0).
  	If 0 is given, `channels` is set to 1 but all voltages are cleared.
  	*/
--	void setChannels(int channels) {
+-	void setChannels(uint8_t channels) {
 +	void setChannels(int channels) noexcept {
  		// If disconnected, keep the number of channels at 0.
  		if (this->channels == 0) {
  			return;
  		}
  		// Set higher channel voltages to 0
- 		for (int c = channels; c < this->channels; c++) {
+-		for (uint8_t c = channels; c < this->channels; c++) {
++		for (int c = channels; c < this->channels; c++) {
 +			if (c >= PORT_MAX_CHANNELS)
 +				__builtin_unreachable();
  			voltages[c] = 0.f;

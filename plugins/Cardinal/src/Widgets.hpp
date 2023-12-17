@@ -231,7 +231,7 @@ struct NanoKnob : Knob {
             // bottom label (name)
             bndIconLabelValue(args.vg, -w, knobStartY + knobSize + BND_WIDGET_HEIGHT * 0.75f,
                               w*3, BND_WIDGET_HEIGHT, -1,
-                              settings::darkMode ? SCHEME_WHITE : SCHEME_BLACK, BND_CENTER,
+                              settings::preferDarkPanels ? SCHEME_WHITE : SCHEME_BLACK, BND_CENTER,
                               BND_LABEL_FONT_SIZE, displayLabel.c_str(), nullptr);
         }
 
