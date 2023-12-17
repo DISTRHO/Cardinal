@@ -30,6 +30,7 @@ namespace settings {
 int rateLimit = 0;
 extern bool preferDarkPanels;
 extern std::string uiTheme;
+bool darkMode; // TODO remove after updating all plugins
 }
 namespace ui {
 void refreshTheme();
@@ -1472,6 +1473,7 @@ namespace rack {
 void switchDarkMode(const bool darkMode)
 {
    #ifndef HEADLESS
+    settings::darkMode = darkMode; // TODO remove after updating all plugins
     settings::preferDarkPanels = darkMode;
     settings::uiTheme = darkMode ? "dark" : "light";
     ui::refreshTheme();

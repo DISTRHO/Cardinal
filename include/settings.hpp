@@ -24,5 +24,8 @@ namespace settings {
 
 extern int rateLimit;
 
+// TODO remove after updating all plugins
+extern bool darkMode;
+
 } // namespace settings
 } // namespace rack
