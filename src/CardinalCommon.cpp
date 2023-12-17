@@ -410,7 +410,7 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
     settings::browserZoom = -1.f;
     settings::invertZoom = false;
     settings::squeezeModules = true;
-    settings::darkMode = true;
+    settings::preferDarkPanels = true;
     settings::uiTheme = "dark";
 
     // runtime behaviour

@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include "emmintrin.h"
-#include "immintrin.h"
-#include "pmmintrin.h"
-
-#define SIMDE_ENABLE_NATIVE_ALIASES
-#include "simde/x86/ssse3.h"
-#include "simde/x86/sse4.1.h"
-#include "simde/x86/sse4.2.h"
+#include "simd/common.hpp"
+#include_next "simd/functions.hpp"
+#undef SIMDE_MM_FROUND_NO_EXC

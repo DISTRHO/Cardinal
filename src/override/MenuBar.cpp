@@ -625,10 +625,10 @@ struct ViewButton : MenuButton {
 
 #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
 		std::string darkModeText;
-		if (settings::darkMode)
+		if (settings::preferDarkPanels)
 			darkModeText = CHECKMARK_STRING;
 		menu->addChild(createMenuItem("Dark Mode", darkModeText, []() {
-			switchDarkMode(!settings::darkMode);
+			switchDarkMode(!settings::preferDarkPanels);
 			setAllFramebufferWidgetsDirty(APP->scene);
 		}));
 #endif

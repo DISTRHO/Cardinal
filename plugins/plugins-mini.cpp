@@ -353,7 +353,7 @@ static void initStatic__BogaudioModules()
     {
         // Make sure to use match Cardinal theme
         Skins& skins(Skins::skins());
-        skins._default = settings::darkMode ? "dark" : "light";
+        skins._default = settings::preferDarkPanels ? "dark" : "light";
 
         p->addModel(modelAD);
         p->addModel(modelBogaudioLFO);
@@ -649,7 +649,7 @@ void destroyStaticPlugins()
 
 void updateStaticPluginsDarkMode()
 {
-    const bool darkMode = settings::darkMode;
+    const bool darkMode = settings::preferDarkPanels;
     // bogaudio
     {
         Skins& skins(Skins::skins());

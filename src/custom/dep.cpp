@@ -28,6 +28,7 @@ void updateStaticPluginsDarkMode();
 }
 namespace settings {
 int rateLimit = 0;
+extern bool preferDarkPanels;
 extern std::string uiTheme;
 }
 namespace ui {
@@ -1405,7 +1406,7 @@ postparse:
             const ExtendedNSVGimage ext = { handle, handleOrig, handleMOD, shapesOrig, shapesMOD };
             loadedDarkSVGs.push_back(ext);
 
-            if (rack::settings::darkMode)
+            if (rack::settings::preferDarkPanels)
             {
                 if (shapesMOD != nullptr)
                     handle->shapes = shapesMOD;
@@ -1419,7 +1420,7 @@ postparse:
             const ExtendedNSVGimage ext = { handle, handleOrig, handleMOD, shapesOrig, shapesMOD };
             loadedLightSVGs.push_back(ext);
 
-            if (!rack::settings::darkMode)
+            if (!rack::settings::preferDarkPanels)
             {
                 if (shapesMOD != nullptr)
                     handle->shapes = shapesMOD;
@@ -1471,9 +1472,7 @@ namespace rack {
 void switchDarkMode(const bool darkMode)
 {
    #ifndef HEADLESS
-    // TODO sort this out after build with Rack2.4 succeeds
-    return;
-
+    settings::preferDarkPanels = darkMode;
     settings::uiTheme = darkMode ? "dark" : "light";
     ui::refreshTheme();
     plugin::updateStaticPluginsDarkMode();
