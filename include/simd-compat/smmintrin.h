@@ -8,13 +8,16 @@
 
 #include "simd-compat.h"
 
-#ifdef SIMDE_X86_SSE_NATIVE
-# include_next <xmmintrin.h>
+#ifdef SIMDE_X86_SSE4_1_NATIVE
+# include_next <smmintrin.h>
 #else
 # include "mmintrin.h"
-# define SIMDE_ENABLE_NATIVE_ALIASES
-# include "simde/x86/sse.h"
-# undef SIMDE_ENABLE_NATIVE_ALIASES
-// always use SSE2 mode, as seen in gcc
+# include "xmmintrin.h"
 # include "emmintrin.h"
+# include "pmmintrin.h"
+# include "tmmintrin.h"
+# define SIMDE_ENABLE_NATIVE_ALIASES
+# include "simde/x86/sse4.1.h"
+# include "simde/x86/sse4.2.h"
+# undef SIMDE_ENABLE_NATIVE_ALIASES
 #endif

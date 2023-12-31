@@ -269,19 +269,6 @@ endif
 # use custom JUCE from DISTRHO and Carla
 SURGE_CXX_FLAGS += -I$(abspath ../carla/source/modules)
 
-# SIMD must always be enabled, even in debug builds
-ifeq ($(NOSIMD),true)
-SURGE_CXX_FLAGS += -DCARDINAL_NOSIMD
-else ifeq ($(DEBUG),true)
-ifeq ($(WASM),true)
-SURGE_CXX_FLAGS += -msse -msse2 -msse3 -msimd128
-else ifeq ($(CPU_ARM32),true)
-SURGE_CXX_FLAGS += -mfpu=neon-vfpv4 -mfloat-abi=hard
-else ifeq ($(CPU_I386_OR_X86_64),true)
-SURGE_CXX_FLAGS += -msse -msse2 -mfpmath=sse
-endif
-endif
-
 # possibly use fftw?
 # ifeq ($(shell $(PKG_CONFIG) --exists fftw3 fftw3f && echo true),true)
 # SURGE_CXX_FLAGS += -DJUCE_DSP_USE_STATIC_FFTW=1

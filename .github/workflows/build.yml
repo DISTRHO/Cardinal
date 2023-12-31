@@ -53,7 +53,7 @@ jobs:
         shell: bash
         run: |
           ./deps/PawPaw/.github/workflows/bootstrap-deps.sh linux-${{ matrix.target }}
-          apt-get install -yqq wget
+          apt-get install -yqq wget zip
       - name: Setup dependencies (aarch64)
         if: ${{ matrix.target == 'aarch64' }}
         shell: bash
@@ -417,7 +417,7 @@ jobs:
       - name: Set up dependencies
         run: |
           ./deps/PawPaw/.github/workflows/bootstrap-deps.sh ${{ matrix.target }}
-          apt-get install -yqq wget
+          apt-get install -yqq wget zip
           apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2

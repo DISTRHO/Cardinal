@@ -284,7 +284,6 @@ endif
 ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
 PLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
 # MINIPLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
-BASE_FLAGS += -DHAVE_FFTW3F
 endif
 
 # --------------------------------------------------------------
@@ -1280,6 +1279,14 @@ BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
 BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
 endif
 
+ifeq ($(WASM),true)
+BASE_FLAGS += -DEIGEN_DONT_VECTORIZE=1
+endif
+
+ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
+BASE_FLAGS += -DHAVE_FFTW3F
+endif
+
 ifeq ($(shell $(PKG_CONFIG) --exists sndfile && echo true),true)
 BASE_FLAGS += -DHAVE_SNDFILE
 endif
@@ -1328,10 +1335,6 @@ RTNEURAL_FLAGS += -Devaluator=Aida_evaluator
 RTNEURAL_FLAGS += -DSKIP_MINGW_FORMAT
 RTNEURAL_FLAGS += -DRTNEURAL_DEFAULT_ALIGNMENT=16
 RTNEURAL_FLAGS += -DRTNEURAL_USE_EIGEN=1
-
-ifeq ($(WASM),true)
-RTNEURAL_FLAGS += -DEIGEN_DONT_VECTORIZE=1
-endif
 
 RTNEURAL_FLAGS += -ICardinal/src/AIDA-X/RTNeural
 RTNEURAL_FLAGS += -ICardinal/src/AIDA-X/RTNeural/modules/Eigen
