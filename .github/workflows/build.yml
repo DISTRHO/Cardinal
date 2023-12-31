@@ -3,10 +3,9 @@ name: build
 on: [push, pull_request]
 
 env:
-  CACHE_VERSION: 4
+  CACHE_VERSION: 5
   CARDINAL_UNDER_WINE: 1
   CIBUILD: true
-  EMSCRIPTEN_VERSION: 3.1.27
   LIBGL_ALWAYS_SOFTWARE: true
   PAWPAW_SKIP_LTO: 1
   PAWPAW_SKIP_GLIB: 1
@@ -335,18 +334,14 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -yqq brotli gperf meson
           sudo apt-get clean
-          [ -e ~/PawPawBuilds/emsdk ] || git clone https://github.com/emscripten-core/emsdk.git ~/PawPawBuilds/emsdk
-          cd ~/PawPawBuilds/emsdk && ./emsdk install ${{ env.EMSCRIPTEN_VERSION }} && ./emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
       - name: Build extra dependencies
         run: |
           ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
-          source ~/PawPawBuilds/emsdk/emsdk_env.sh
           ./deps/PawPaw/bootstrap-cardinal.sh wasm && ./deps/PawPaw/.cleanup.sh wasm
       - name: Build wasm cross-compiled
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
-          source ~/PawPawBuilds/emsdk/emsdk_env.sh
           source deps/PawPaw/local.env wasm
           # FIXME send patch upstream, assuming this works..
           sed -i -e 's/defined(__riscv)/defined(__riscv) || defined(__EMSCRIPTEN__)/' plugins/surgext/surge/src/common/globals.h
@@ -356,7 +351,6 @@ jobs:
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
-          source ~/PawPawBuilds/emsdk/emsdk_env.sh
           source deps/PawPaw/local.env wasm
           make HAVE_LIBLO=false NOOPT=true NOSIMD=${{ matrix.target == 'nosimd' }} -j $(nproc) -C src/CardinalMiniSep modgui
       - name: Make wasm versioned and compress
