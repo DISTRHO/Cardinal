@@ -3,22 +3,34 @@ name: build
 on: [push, pull_request]
 
 env:
-  CACHE_VERSION: 5
+  CACHE_VERSION: 6
   CARDINAL_UNDER_WINE: 1
   CIBUILD: true
+  DEBIAN_FRONTEND: noninteractive
   LIBGL_ALWAYS_SOFTWARE: true
-  PAWPAW_SKIP_LTO: 1
   PAWPAW_SKIP_GLIB: 1
+  PAWPAW_SKIP_LTO: 1
   PAWPAW_SKIP_LV2: 1
+  PAWPAW_SKIP_OPENSSL: 1
   PAWPAW_SKIP_SAMPLERATE: 1
+  PAWPAW_SKIP_TESTS: 1
 
 jobs:
   linux:
     strategy:
       matrix:
-        target: [aarch64, armhf, i386, riscv64, x86_64]
-    runs-on: ubuntu-20.04
+        target: [aarch64, armhf, i686, riscv64, x86_64]
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:20.04
     steps:
+      - name: Install git
+        run: |
+          apt-get update -qq && apt-get install -yqq --no-install-recommends ca-certificates curl git openssl
+          curl -sLO https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/git_2.34.1-1ubuntu1~bpo20.04.1~ppa1_amd64.deb
+          curl -sLO https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/git-man_2.34.1-1ubuntu1~bpo20.04.1~ppa1_all.deb
+          dpkg -i *.deb
+          rm *.deb
       - uses: actions/checkout@v3
         with:
           submodules: recursive
@@ -37,81 +49,53 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/zstd-1.4.5
           key: linux-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
-      - name: Fix GitHub's mess
+      - name: Setup dependencies
+        shell: bash
         run: |
-          sudo rm /etc/apt/sources.list.d/*.list
-          sudo apt-get update -qq
-          sudo apt-get purge -yqq git-man libclang* libgbm* libllvm* libmono* libnginx* moby* mono* nginx* perl php* libgdiplus libpcre2-posix3 libselinux1-dev libzip4
-          sudo apt-get install -yqq --allow-downgrades autoconf/focal automake/focal build-essential/focal git/focal libgd3/focal libglib2.0-0/focal libglib2.0-dev/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal pkg-config/focal
-          sudo apt-get clean
+          ./deps/PawPaw/.github/workflows/bootstrap-deps.sh linux-${{ matrix.target }}
+          apt-get install -yqq wget
       - name: Setup dependencies (aarch64)
         if: ${{ matrix.target == 'aarch64' }}
         shell: bash
         run: |
-          sudo dpkg --add-architecture arm64
-          sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
-          sudo sed -i "s/deb mirror/deb [arch=amd64] mirror/" /etc/apt/sources.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-arm64.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq g++-aarch64-linux-gnu libasound2-dev:arm64 libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libglib2.0-dev:arm64 libsdl2-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 gperf meson qemu-user-static
-          sudo apt-get clean
+          apt-get install -yqq libsdl2-dev:arm64
+          apt-get clean
       - name: Setup dependencies (armhf)
         if: ${{ matrix.target == 'armhf' }}
         shell: bash
         run: |
-          sudo dpkg --add-architecture armhf
-          sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
-          sudo sed -i "s/deb mirror/deb [arch=amd64] mirror/" /etc/apt/sources.list
-          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-armhf.list
-          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
-          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq g++-arm-linux-gnueabihf libasound2-dev:armhf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libglib2.0-dev:armhf libsdl2-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf gperf meson qemu-user-static
-          sudo apt-get clean
-      - name: Setup dependencies (i386)
-        if: ${{ matrix.target == 'i386' }}
+          apt-get install -yqq libsdl2-dev:armhf
+          apt-get clean
+      - name: Setup dependencies (i686)
+        if: ${{ matrix.target == 'i686' }}
         shell: bash
         run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update -qq
-          sudo apt-get install -yqq g++-i686-linux-gnu libasound2-dev:i386 libdbus-1-dev:i386 libgl1-mesa-dev:i386 libglib2.0-dev:i386 libsdl2-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386 gperf meson
-          sudo apt-get clean
+          apt-get install -yqq libsdl2-dev:i386
+          apt-get clean
       - name: Setup dependencies (riscv64)
         if: ${{ matrix.target == 'riscv64' }}
         shell: bash
         run: |
-          sudo dpkg --add-architecture riscv64
-          sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
-          sudo sed -i "s/deb mirror/deb [arch=amd64] mirror/" /etc/apt/sources.list
-          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-riscv64.list
-          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
-          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq g++-riscv64-linux-gnu libasound2-dev:riscv64 libdbus-1-dev:riscv64 libgl1-mesa-dev:riscv64 libglapi-mesa:riscv64 libglvnd0:riscv64 libglib2.0-dev:riscv64 libsdl2-dev:riscv64 libx11-dev:riscv64 libxcursor-dev:riscv64 libxext-dev:riscv64 libxrandr-dev:riscv64 gperf meson qemu-user-static
-          sudo apt-get clean
+          apt-get install -yqq libsdl2-dev:riscv64
+          apt-get clean
       - name: Setup dependencies (x86_64)
         if: ${{ matrix.target == 'x86_64' }}
         shell: bash
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev libsdl2-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf meson
-          sudo apt-get clean
+          apt-get install -yqq libsdl2-dev
+          apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           key: ccache-linux-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Build extra dependencies
-        env:
-          PKG_CONFIG_PATH: /usr/lib/${{ matrix.target }}-linux-gnu/pkgconfig
         run: |
           ./deps/PawPaw/bootstrap-cardinal.sh linux-${{ matrix.target }} && ./deps/PawPaw/.cleanup.sh linux-${{ matrix.target }}
       - name: Build linux
+        shell: bash
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           source deps/PawPaw/local.env linux-${{ matrix.target }}
-          export PKG_CONFIG_PATH+=:/usr/lib/${{ matrix.target }}-linux-gnu/pkgconfig
           make features
           make HAVE_PULSEAUDIO=false NOOPT=true USING_GLES2=${{ matrix.target == 'aarch64' || matrix.target == 'armhf' }} -j $(nproc)
           make unzipfx
@@ -197,7 +181,7 @@ jobs:
           key: macos-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Setup dependencies
         run: |
-          brew install autoconf automake meson
+          ./deps/PawPaw/.github/workflows/bootstrap-deps.sh macos-${{ matrix.target }}
       - name: Build extra dependencies
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
@@ -209,6 +193,7 @@ jobs:
           key: ccache-macos-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
       - name: Build macOS (base)
         if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           source deps/PawPaw/local.env macos-${{ matrix.target }}
@@ -216,6 +201,7 @@ jobs:
           make NOOPT=true -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS (AU using juce)
         if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           source deps/PawPaw/local.env macos-${{ matrix.target }}
@@ -224,6 +210,7 @@ jobs:
           mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS (packaging)
         if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
         run: |
           source deps/PawPaw/local.env macos-${{ matrix.target }}
           ./utils/create-macos-installer.sh
@@ -340,6 +327,7 @@ jobs:
           ./deps/PawPaw/bootstrap-cardinal.sh wasm && ./deps/PawPaw/.cleanup.sh wasm
       - name: Build wasm cross-compiled
         if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
         run: |
           ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
           source deps/PawPaw/local.env wasm
@@ -349,12 +337,14 @@ jobs:
           make HAVE_LIBLO=false NOOPT=true NOSIMD=${{ matrix.target == 'nosimd' }} -j $(nproc)
       - name: Build modgui
         if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
         run: |
           ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
           source deps/PawPaw/local.env wasm
           make HAVE_LIBLO=false NOOPT=true NOSIMD=${{ matrix.target == 'nosimd' }} -j $(nproc) -C src/CardinalMiniSep modgui
       - name: Make wasm versioned and compress
         if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
         run: |
           ${{ matrix.target == 'nosimd' }} && export SUFFIX="-nosimd"
           VERSION=$(cat Makefile | awk 'sub("VERSION = ","")')
@@ -399,8 +389,13 @@ jobs:
     strategy:
       matrix:
         target: [win32, win64]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:22.04
     steps:
+      - name: Install git
+        run: |
+          apt-get update -qq && apt-get install -yqq --no-install-recommends ca-certificates git openssl
       - uses: actions/checkout@v3
         with:
           submodules: recursive
@@ -419,23 +414,11 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/zstd-1.4.5
           key: ${{ matrix.target }}-v${{ env.CACHE_VERSION }}
-      - name: Fix GitHub's mess
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo dpkg --add-architecture i386
-          sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libc6:i386 libgcc-s1:i386 libstdc++6:i386
-          sudo apt-get clean
       - name: Set up dependencies
-        if: ${{ matrix.target == 'win32' }}
         run: |
-          sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386 gperf meson qttools5-dev qttools5-dev-tools xvfb
-          sudo apt-get clean
-      - name: Set up dependencies
-        if: ${{ matrix.target == 'win64' }}
-        run: |
-          sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable gperf meson qttools5-dev qttools5-dev-tools xvfb
-          sudo apt-get clean
+          ./deps/PawPaw/.github/workflows/bootstrap-deps.sh ${{ matrix.target }}
+          apt-get install -yqq wget
+          apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -445,6 +428,7 @@ jobs:
           ./deps/PawPaw/bootstrap-cardinal.sh ${{ matrix.target }} && ./deps/PawPaw/.cleanup.sh ${{ matrix.target }}
       - name: Build cross-compiled (base)
         if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           source deps/PawPaw/local.env ${{ matrix.target }}
@@ -452,6 +436,7 @@ jobs:
           make NOOPT=true -j $(nproc)
       - name: Build cross-compiled (carla)
         if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
         run: |
           export PATH="/usr/lib/ccache:${PATH}"
           source deps/PawPaw/local.env ${{ matrix.target }}
@@ -460,6 +445,7 @@ jobs:
           make -C carla EMBED_TARGET=true TESTING=true dist
       - name: Build cross-compiled (packaging)
         if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
         run: |
           source deps/PawPaw/local.env ${{ matrix.target }}
           xvfb-run ./utils/create-windows-installer.sh ${{ matrix.target }}
