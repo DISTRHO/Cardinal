@@ -335,6 +335,12 @@ clean:
 	rm -rf $(RACK_DEP_PATH)/jansson-2.12
 	rm -rf $(RACK_DEP_PATH)/libarchive-3.4.3
 	rm -rf $(RACK_DEP_PATH)/libsamplerate-0.1.9
+	rm -rf $(RACK_DEP_PATH)/speexdsp/autom4te.cache
+	rm -rf $(RACK_DEP_PATH)/speexdsp/libspeexdsp/.deps
+	rm -rf $(RACK_DEP_PATH)/speexdsp/libspeexdsp/.libs
+	rm -rf $(RACK_DEP_PATH)/speexdsp/libspeexdsp/*.lo
+	rm -rf $(RACK_DEP_PATH)/speexdsp/libspeexdsp/*.o
+	rm -rf $(RACK_DEP_PATH)/speexdsp/Makefile
 	rm -rf $(RACK_DEP_PATH)/zstd-1.4.5
 	rm -rf $(SURGE_DEP_PATH)
 

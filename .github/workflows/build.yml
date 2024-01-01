@@ -417,7 +417,7 @@ jobs:
       - name: Set up dependencies
         run: |
           ./deps/PawPaw/.github/workflows/bootstrap-deps.sh ${{ matrix.target }}
-          apt-get install -yqq wget zip
+          apt-get install -yqq wget xvfb zip
           apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
@@ -458,6 +458,7 @@ jobs:
         run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
       - name: Pack binaries
         if: steps.cache.outputs.cache-hit == 'true'
+        shell: bash
         run: |
           pushd bin
           zip -r -9 ../${{ github.event.repository.name }}-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls | grep -e lv2 -e vst -e clap)

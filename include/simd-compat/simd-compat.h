@@ -50,3 +50,17 @@
 #  define SIMDE_WASM_SIMD128_NATIVE
 # endif
 #endif
+
+// fix win32 build
+#ifdef _WIN32
+static inline
+float simde_math_roundevenf(float v) {
+    float rounded = __builtin_roundf(v);
+    float diff = rounded - v;
+    if (__builtin_expect(!!(__builtin_fabsf(diff) == 0.5f) && ((int)rounded & 1), 0)) {
+        rounded = v - diff;
+    }
+    return rounded;
+}
+#define simde_math_roundevenf simde_math_roundevenf
+#endif

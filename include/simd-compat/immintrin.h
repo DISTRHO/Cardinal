@@ -9,7 +9,9 @@
 #include "simd-compat.h"
 
 #ifdef SIMDE_X86_SSE_NATIVE
+# define CARDINAL_INCLUDING_IMMINTRIN_H
 # include_next <immintrin.h>
+# undef CARDINAL_INCLUDING_IMMINTRIN_H
 #else
 # include "mmintrin.h"
 # include "xmmintrin.h"

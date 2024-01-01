@@ -268,9 +268,6 @@ clean:
 	$(MAKE) clean -C plugins
 	$(MAKE) clean -C src
 	rm -rf bin build build-headless dpf/utils/lv2_ttl_generator.d
-	# FIXME
-	rm -f src/Rack/BaconMusic/default-skin.json
-	rm -f src/Rack/SurgeXTRack/default-skin.json
 
 # --------------------------------------------------------------
 # Install step

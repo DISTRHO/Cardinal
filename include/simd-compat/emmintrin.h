@@ -8,7 +8,7 @@
 
 #include "simd-compat.h"
 
-#ifdef SIMDE_X86_SSE2_NATIVE
+#if defined(CARDINAL_INCLUDING_IMMINTRIN_H) || defined(SIMDE_X86_SSE2_NATIVE)
 # include_next <emmintrin.h>
 #else
 # include "mmintrin.h"
