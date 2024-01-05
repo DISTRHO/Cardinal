@@ -1026,7 +1026,7 @@ SURGEXT_FLAGS += $(NOFINITE_FLAGS)
 SURGEXT_FLAGS += -std=gnu++17
 SURGEXT_FLAGS += -DTIXML_USE_STL=1
 SURGEXT_FLAGS += \
-	-Isurgext/libs/sst/sst-basic-blocks/include \
+	-Isurgext/libs/sst-rackhelpers/include \
 	-Isurgext/surge/src/common \
 	-Isurgext/surge/src/common/dsp \
 	-Isurgext/surge/src/common/dsp/filters \
@@ -1035,20 +1035,20 @@ SURGEXT_FLAGS += \
 	-Isurgext/surge/src/common/dsp/oscillators \
 	-Isurgext/surge/src/common/dsp/modulators \
 	-Isurgext/surge/src/surge-testrunner \
-	-Isurgext/surge/libs/sst/sst-filters/include \
+	-Isurgext/surge/libs/fmt/include \
+	-Isurgext/surge/libs/LuaJitLib/LuaJIT/src \
+	-Isurgext/surge/libs/sst/sst-basic-blocks/include \
 	-Isurgext/surge/libs/sst/sst-cpputils/include \
-	-Isurgext/surge/libs/sst/sst-waveshapers/include \
+	-Isurgext/surge/libs/sst/sst-effects/include \
+	-Isurgext/surge/libs/sst/sst-filters/include \
 	-Isurgext/surge/libs/sst/sst-plugininfra/include \
 	-Isurgext/surge/libs/sst/sst-plugininfra/libs/tinyxml/include \
 	-Isurgext/surge/libs/sst/sst-plugininfra/libs/filesystem \
-	-Isurgext/surge/libs/fmt/include \
-	-Isurgext/surge/libs/LuaJitLib/LuaJIT/src \
+	-Isurgext/surge/libs/sst/sst-waveshapers/include \
 	-Isurgext/surge/libs/strnatcmp \
 	-Isurgext/surge/src/headless \
 	-Isurgext/surge/libs/tuning-library/include \
 	-I../deps/surge-build/libs/sst/sst-plugininfra/libs/filesystem/include \
-	-include limits \
-	-include cstdint \
 	-DSURGE_COMPILE_BLOCK_SIZE=8 \
 	-DSURGE_SKIP_ODDSOUND_MTS \
 	-DHAS_LUA=0 \
@@ -1403,7 +1403,6 @@ RESOURCE_FILES += surgext/build/surge-data/configuration.xml
 RESOURCE_FILES += surgext/build/surge-data/fx_presets
 RESOURCE_FILES += surgext/build/surge-data/wavetables
 RESOURCE_FILES += surgext/build/surge-data/windows.wt
-RESOURCE_FILES += surgext/patches
 RESOURCE_FILES += $(wildcard surgext/res/xt/fonts/quicksand/*.ttf)
 RESOURCE_FILES += $(wildcard unless_modules/art/*.art)
 RESOURCE_FILES += $(wildcard unless_modules/art/svg/*/*.svg)

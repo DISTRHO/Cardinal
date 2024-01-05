@@ -330,8 +330,6 @@ SYMLINKED_DIRS_RESOURCES += Orbits/presets
 SYMLINKED_DIRS_RESOURCES += stoermelder-packone/presets
 SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/fx_presets
 SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/wavetables
-SYMLINKED_DIRS_RESOURCES += surgext/patches
-SYMLINKED_DIRS_RESOURCES += surgext/presets
 endif
 LINK_FLAGS += $(foreach d,$(SYMLINKED_DIRS_RESOURCES),--preload-file=../../bin/CardinalNative.lv2/resources/$(d)@/resources/$(d))
 
