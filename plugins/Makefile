@@ -656,6 +656,11 @@ DBIZ_CUSTOM  = Chord DarkDefaultItem Divider FourSeq FourSeqWidget OrangeLight V
 DBIZ_CUSTOM_PER_FILE = LERP MultiFilter Oscillator calcOutput sineOsc subBank
 
 # --------------------------------------------------------------
+# DHE-Modules
+
+PLUGIN_FILES += $(filter-out DHE-Modules/src/plugin.cpp,$(wildcard DHE-Modules/src/modules/*/init.cpp))
+
+# --------------------------------------------------------------
 # DrumKit
 
 PLUGIN_FILES += $(wildcard DrumKit/src/*.cpp)
@@ -1390,6 +1395,7 @@ RESOURCE_FILES += BaconPlugs/res/midi/chopin
 RESOURCE_FILES += BaconPlugs/res/midi/debussy
 RESOURCE_FILES += BaconPlugs/res/midi/goldberg
 RESOURCE_FILES += cf/playeroscs
+RESOURCE_FILES += DHE-Modules/svg
 RESOURCE_FILES += DrumKit/res/samples
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
@@ -2215,6 +2221,14 @@ $(BUILD_DIR)/dBiz/src/%.cpp.o: dBiz/src/%.cpp
 		$(foreach m,$(DBIZ_CUSTOM),$(call custom_module_names,$(m),dBiz)) \
 		$(foreach m,$(DBIZ_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),dBiz_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__dBiz
+
+$(BUILD_DIR)/DHE-Modules/src/%.cpp.o: DHE-Modules/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(DHE_CUSTOM),$(call custom_module_names,$(m),DHE)) \
+		-DpluginInstance=pluginInstance__DHE \
+		-IDHE-Modules/src
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

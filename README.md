@@ -140,6 +140,7 @@ At the moment the following 3rd-party modules are provided:
 - [cf](https://github.com/cfoulc/cf)
 - [ChowDSP](https://github.com/jatinchowdhury18/ChowDSP-VCV)
 - [dBiz](https://github.com/dBiz/dBiz)
+- [DHE Modules](https://github.com/dhemery/DHE-Modules)
 - [DrumKit](https://svmodular.com/plugin/vcv/drumkit.html)
 - [EnigmaCurry](https://github.com/EnigmaCurry/EnigmaCurry-vcv-pack)
 - [E-Series](https://github.com/VCVRack/ESeries)

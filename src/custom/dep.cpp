@@ -74,6 +74,7 @@ enum DarkMode {
     kModeAudibleInstruments,
     kModeBidoo,
     kModeCf,
+    kModeDHE,
     kModeDrumKit,
     kModeESeries,
     kModeHetrickCV,
@@ -226,6 +227,35 @@ static const struct {
     { kModeCf, "/cf/res/SUB.svg", {}, -1 },
     { kModeCf, "/cf/res/trSEQ.svg", {}, -1 },
     { kModeCf, "/cf/res/VARIABLE.svg", {}, -1 },
+    // MIT
+    { kModeDHE, "/DHE-Modules/svg/blossom.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/booster-stage.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/buttons.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/cubic.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/curve-sequencer-4.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/curve-sequencer-8.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/curve-sequencer-16.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/func.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/func-6.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/fuzzy-logic-h.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/fuzzy-logic-z.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/gator.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/hostage.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/ranger.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/scannibal-4.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/scannibal-8.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/scannibal-16.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/sequencizer-4.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/sequencizer-8.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/sequencizer-16.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/stage.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/swave.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/tapers.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/truth-2.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/truth-3.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/truth-4.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/upstage.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/xycloid.svg", {}, -1 },
     // CC0-1.0
     { kModeDrumKit, "/DrumKit/res/Baronial.svg", {}, -1 },
     { kModeDrumKit, "/DrumKit/res/BD9.svg", {}, -1 },
@@ -612,6 +642,15 @@ static const struct {
 };
 
 static inline
+unsigned int darkerColor(const unsigned int color) noexcept
+{
+    return (color & 0xff000000)
+         | (std::max<int>(0, ((color & 0xff0000) >> 16) - 0x80) << 16)
+         | (std::max<int>(0, ((color & 0xff00) >> 8) - 0x80) << 8)
+         | (std::max<int>(0, (color & 0xff) - 0x80));
+}
+
+static inline
 unsigned int invertColor(const unsigned int color) noexcept
 {
     return (color & 0xff000000)
@@ -670,6 +709,10 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
             }
         }
         break;
+    // Special case for DHE, mark things darker instead of inverting
+    case kModeDHE:
+        paint.color = darkerColor(paint.color);
+        return true;
     // Special case for JW-Modules colors
     case kModeJW:
         switch (paint.color)

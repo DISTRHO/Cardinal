@@ -1,18 +1,7 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * For a full copy of the GNU General Public License see the LICENSE file.
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #include "rack.hpp"
@@ -334,6 +323,26 @@ extern Model* modelTestVCF;
 #undef modelDivider
 #undef modelFourSeq
 #undef modelVCA4
+
+// DHEModules
+// NOTE very unique way of handling init, needs special handling
+namespace dhe {
+namespace blossom { void init(Plugin*); }
+namespace buttons { void init(Plugin*); }
+namespace cubic { void init(Plugin*); }
+namespace curve_sequencer { void init(Plugin*); }
+namespace envelope { void init(Plugin*); }
+namespace func { void init(Plugin*); }
+namespace fuzzy_logic { void init(Plugin*); }
+namespace gator { void init(Plugin*); }
+namespace ranger { void init(Plugin*); }
+namespace scannibal { void init(Plugin*); }
+namespace sequencizer { void init(Plugin*); }
+namespace swave { void init(Plugin*); }
+namespace tapers { void init(Plugin*); }
+namespace truth { void init(Plugin*); }
+namespace xycloid { void init(Plugin*); }
+}
 
 // DrumKit
 #include "DrumKit/src/DrumKit.hpp"
@@ -821,6 +830,7 @@ Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
 Plugin* pluginInstance__dBiz;
+Plugin* pluginInstance__DHE;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__EnigmaCurry;
 Plugin* pluginInstance__ESeries;
@@ -1832,6 +1842,32 @@ static void initStatic__dBiz()
 #undef modelDivider
 #undef modelFourSeq
 #undef modelVCA4
+    }
+}
+
+static void initStatic__DHE()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__DHE = p;
+
+    const StaticPluginLoader spl(p, "DHE-Modules");
+    if (spl.ok())
+    {
+        dhe::blossom::init(p);
+        dhe::buttons::init(p);
+        dhe::cubic::init(p);
+        dhe::curve_sequencer::init(p);
+        dhe::envelope::init(p);
+        dhe::func::init(p);
+        dhe::fuzzy_logic::init(p);
+        dhe::gator::init(p);
+        dhe::ranger::init(p);
+        dhe::scannibal::init(p);
+        dhe::sequencizer::init(p);
+        dhe::swave::init(p);
+        dhe::tapers::init(p);
+        dhe::truth::init(p);
+        dhe::xycloid::init(p);
     }
 }
 
@@ -3116,6 +3152,7 @@ void initStaticPlugins()
     initStatic__cf();
     initStatic__ChowDSP();
     initStatic__dBiz();
+    initStatic__DHE();
     initStatic__DrumKit();
     initStatic__EnigmaCurry();
     initStatic__ESeries();

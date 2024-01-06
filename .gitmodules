@@ -230,3 +230,6 @@
 [submodule "plugins/EnigmaCurry"]
 	path = plugins/EnigmaCurry
 	url = https://github.com/EnigmaCurry/EnigmaCurry-vcv-pack.git
+[submodule "plugins/DHE-Modules"]
+	path = plugins/DHE-Modules
+	url = https://github.com/dhemery/DHE-Modules.git
