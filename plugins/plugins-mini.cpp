@@ -353,7 +353,7 @@ static void initStatic__BogaudioModules()
     {
         // Make sure to use match Cardinal theme
         Skins& skins(Skins::skins());
-        skins._default = settings::darkMode ? "dark" : "light";
+        skins._default = settings::preferDarkPanels ? "dark" : "light";
 
         p->addModel(modelAD);
         p->addModel(modelBogaudioLFO);
@@ -559,28 +559,34 @@ static void initStatic__surgext()
         // Add the ported ones
         p->addModel(modelSurgeLFO);
         p->addModel(modelSurgeMixer);
+        p->addModel(modelSurgeMixerSlider);
         p->addModel(modelSurgeModMatrix);
         p->addModel(modelSurgeWaveshaper);
         /*
         p->addModel(modelSurgeDelay);
         p->addModel(modelSurgeDelayLineByFreq);
         p->addModel(modelSurgeDelayLineByFreqExpanded);
+        p->addModel(modelSurgeDigitalRingMods);
         p->addModel(modelSurgeVCF);
         */
         spl.removeModule("SurgeXTDelay");
         spl.removeModule("SurgeXTDelayLineByFreq");
         spl.removeModule("SurgeXTDelayLineByFreqExpanded");
+        spl.removeModule("SurgeXTDigitalRingMod");
         spl.removeModule("SurgeXTVCF");
 
+        spl.removeModule("SurgeXTFXBonsai");
         spl.removeModule("SurgeXTFXChorus");
         spl.removeModule("SurgeXTFXChow");
         spl.removeModule("SurgeXTFXCombulator");
+        spl.removeModule("SurgeXTDigitalRingMod");
         spl.removeModule("SurgeXTFXDistortion");
         spl.removeModule("SurgeXTFXExciter");
         spl.removeModule("SurgeXTFXEnsemble");
         spl.removeModule("SurgeXTFXFlanger");
         spl.removeModule("SurgeXTFXFrequencyShifter");
         spl.removeModule("SurgeXTFXNeuron");
+        spl.removeModule("SurgeXTFXNimbus");
         spl.removeModule("SurgeXTFXPhaser");
         spl.removeModule("SurgeXTFXResonator");
         spl.removeModule("SurgeXTFXReverb");
@@ -595,10 +601,14 @@ static void initStatic__surgext()
         p->addModel(modelEGxVCA);
         p->addModel(modelQuadAD);
         p->addModel(modelQuadLFO);
+        p->addModel(modelUnisonHelper);
+        p->addModel(modelUnisonHelperCVExpander);
         */
         spl.removeModule("SurgeXTEGxVCA");
         spl.removeModule("SurgeXTQuadAD");
         spl.removeModule("SurgeXTQuadLFO");
+        spl.removeModule("SurgeXTUnisonHelper");
+        spl.removeModule("SurgeXTUnisonHelperCVExpander");
 
         surgext_rack_initialize();
     }
@@ -649,7 +659,7 @@ void destroyStaticPlugins()
 
 void updateStaticPluginsDarkMode()
 {
-    const bool darkMode = settings::darkMode;
+    const bool darkMode = settings::preferDarkPanels;
     // bogaudio
     {
         Skins& skins(Skins::skins());

@@ -70,7 +70,7 @@ struct ModuleWidgetWithSideScrews : ModuleWidget {
     void drawBackground(NVGcontext* const vg) {
         nvgBeginPath(vg);
         nvgRect(vg, 0, 0, box.size.x, box.size.y);
-        if (rack::settings::darkMode)
+        if (rack::settings::preferDarkPanels)
             nvgFillPaint(vg, nvgLinearGradient(vg, 0, 0, 0, box.size.y,
                                                nvgRGB(0x18, 0x19, 0x19), nvgRGB(0x21, 0x22, 0x22)));
         else
@@ -82,14 +82,14 @@ struct ModuleWidgetWithSideScrews : ModuleWidget {
     void drawOutputJacksArea(NVGcontext* const vg, const int numOutputs) {
         nvgBeginPath(vg);
         nvgRoundedRect(vg, startX_Out - 2.5f, startY - 2.0f, padding, padding * numOutputs, 4);
-        nvgFillColor(vg, rack::settings::darkMode ? nvgRGB(0xd0, 0xd0, 0xd0) : nvgRGB(0x2f, 0x2f, 0x2f));
+        nvgFillColor(vg, rack::settings::preferDarkPanels ? nvgRGB(0xd0, 0xd0, 0xd0) : nvgRGB(0x2f, 0x2f, 0x2f));
         nvgFill(vg);
     }
 
     void drawTextLine(NVGcontext* const vg, const uint posY, const char* const text) {
         const float y = startY + posY * padding;
         nvgBeginPath(vg);
-        nvgFillColor(vg, rack::settings::darkMode ? color::WHITE : color::BLACK);
+        nvgFillColor(vg, rack::settings::preferDarkPanels ? color::WHITE : color::BLACK);
         nvgText(vg, box.size.x * 0.5f, y + 16, text, nullptr);
     }
 

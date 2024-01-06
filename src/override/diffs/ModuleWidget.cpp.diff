@@ -1,4 +1,4 @@
---- ../Rack/src/app/ModuleWidget.cpp	2023-09-10 12:59:02.630898560 +0200
+--- ../Rack/src/app/ModuleWidget.cpp	2023-12-17 12:57:01.136429153 +0100
 +++ ModuleWidget.cpp	2023-05-20 18:40:08.948302802 +0200
 @@ -1,8 +1,35 @@
 +/*
@@ -167,7 +167,20 @@
  					}
  				}));
  			}
-@@ -1129,4 +1165,4 @@
+@@ -990,12 +1026,6 @@
+ 	// Info
+ 	menu->addChild(createSubmenuItem("Info", "", [=](ui::Menu* menu) {
+ 		model->appendContextMenu(menu);
+-
+-		if (!weakThis)
+-			return;
+-		menu->addChild(new ui::MenuSeparator);
+-		menu->addChild(createMenuLabel("Module instance ID:"));
+-		menu->addChild(createMenuLabel(string::f("%lld", (long long) weakThis->module->getId())));
+ 	}));
+ 
+ 	// Preset
+@@ -1135,4 +1165,4 @@
  
  
  } // namespace app

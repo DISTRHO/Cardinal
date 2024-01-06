@@ -1,18 +1,7 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * For a full copy of the GNU General Public License see the LICENSE file.
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 /**
@@ -63,7 +52,7 @@ const std::string APP_NAME = "Cardinal";
 const std::string APP_EDITION = getPluginFormatName();
 const std::string APP_EDITION_NAME = "Audio Plugin";
 const std::string APP_VERSION_MAJOR = "2";
-const std::string APP_VERSION = "2.3.0";
+const std::string APP_VERSION = "2.4.1";
 #if defined ARCH_WIN
 	const std::string APP_OS = "win";
 #elif defined ARCH_MAC

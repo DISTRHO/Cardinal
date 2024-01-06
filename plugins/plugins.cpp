@@ -1,18 +1,7 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * For a full copy of the GNU General Public License see the LICENSE file.
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #include "rack.hpp"
@@ -29,7 +18,6 @@
 // ZamAudio (always enabled) - TODO
 // #include "ZamAudio/src/plugin.hpp"
 
-#ifndef NOPLUGINS
 // 21kHz
 #include "21kHz/src/21kHz.hpp"
 
@@ -334,6 +322,26 @@ extern Model* modelTestVCF;
 #undef modelDivider
 #undef modelFourSeq
 #undef modelVCA4
+
+// DHEModules
+// NOTE very unique way of handling init, needs special handling
+namespace dhe {
+namespace blossom { void init(Plugin*); }
+namespace buttons { void init(Plugin*); }
+namespace cubic { void init(Plugin*); }
+namespace curve_sequencer { void init(Plugin*); }
+namespace envelope { void init(Plugin*); }
+namespace func { void init(Plugin*); }
+namespace fuzzy_logic { void init(Plugin*); }
+namespace gator { void init(Plugin*); }
+namespace ranger { void init(Plugin*); }
+namespace scannibal { void init(Plugin*); }
+namespace sequencizer { void init(Plugin*); }
+namespace swave { void init(Plugin*); }
+namespace tapers { void init(Plugin*); }
+namespace truth { void init(Plugin*); }
+namespace xycloid { void init(Plugin*); }
+}
 
 // DrumKit
 #include "DrumKit/src/DrumKit.hpp"
@@ -785,16 +793,13 @@ void surgext_rack_update_theme();
 #include "ZZC/src/ZZC.hpp"
 #undef modelClock
 
-#endif // NOPLUGINS
-
 // known terminal modules
 std::vector<Model*> hostTerminalModels;
 
-#ifndef NOPLUGINS
 // stuff that reads config files, we don't want that
 int loadConsoleType() { return 0; }
-bool loadDarkAsDefault() { return settings::darkMode; }
-ModuleTheme loadDefaultTheme() { return settings::darkMode ? DARK_THEME : LIGHT_THEME; }
+bool loadDarkAsDefault() { return settings::preferDarkPanels; }
+ModuleTheme loadDefaultTheme() { return settings::preferDarkPanels ? DARK_THEME : LIGHT_THEME; }
 int loadDirectOutMode() { return 0; }
 void readDefaultTheme() { defaultPanelTheme = loadDefaultTheme(); }
 void saveConsoleType(int) {}
@@ -803,13 +808,11 @@ void saveDefaultTheme(ModuleTheme) {}
 void saveDirectOutMode(bool) {}
 void saveHighQualityAsDefault(bool) {}
 void writeDefaultTheme() {}
-#endif
 
 // plugin instances
 Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__Fundamental;
 // Plugin* pluginInstance__ZamAudio;
-#ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
 extern Plugin* pluginInstance__AaronStatic;
@@ -831,6 +834,7 @@ Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
 Plugin* pluginInstance__dBiz;
+Plugin* pluginInstance__DHE;
 extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__EnigmaCurry;
 Plugin* pluginInstance__ESeries;
@@ -882,7 +886,6 @@ Plugin* pluginInstance__Voxglitch;
 Plugin* pluginInstance__WhatTheRack;
 Plugin* pluginInstance__ZetaCarinaeModules;
 Plugin* pluginInstance__ZZC;
-#endif // NOPLUGINS
 
 namespace rack {
 
@@ -1104,7 +1107,6 @@ static void initStatic__ZamAudio()
 }
 */
 
-#ifndef NOPLUGINS
 static void initStatic__21kHz()
 {
     Plugin* const p = new Plugin;
@@ -1569,7 +1571,7 @@ static void initStatic__BogaudioModules()
     {
         // Make sure to use dark theme as default
         Skins& skins(Skins::skins());
-        skins._default = settings::darkMode ? "dark" : "light";
+        skins._default = settings::preferDarkPanels ? "dark" : "light";
 #define modelADSR modelBogaudioADSR
 #define modelLFO modelBogaudioLFO
 #define modelNoise modelBogaudioNoise
@@ -1843,6 +1845,32 @@ static void initStatic__dBiz()
 #undef modelDivider
 #undef modelFourSeq
 #undef modelVCA4
+    }
+}
+
+static void initStatic__DHE()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__DHE = p;
+
+    const StaticPluginLoader spl(p, "DHE-Modules");
+    if (spl.ok())
+    {
+        dhe::blossom::init(p);
+        dhe::buttons::init(p);
+        dhe::cubic::init(p);
+        dhe::curve_sequencer::init(p);
+        dhe::envelope::init(p);
+        dhe::func::init(p);
+        dhe::fuzzy_logic::init(p);
+        dhe::gator::init(p);
+        dhe::ranger::init(p);
+        dhe::scannibal::init(p);
+        dhe::sequencizer::init(p);
+        dhe::swave::init(p);
+        dhe::tapers::init(p);
+        dhe::truth::init(p);
+        dhe::xycloid::init(p);
     }
 }
 
@@ -2780,7 +2808,11 @@ static void initStatic__Sapphire()
     if (spl.ok())
     {
         p->addModel(modelElastika);
+        p->addModel(modelFrolic);
+        p->addModel(modelGlee);
         p->addModel(modelMoots);
+        p->addModel(modelTin);
+        p->addModel(modelTricorder);
         p->addModel(modelTubeUnit);
     }
 }
@@ -2954,9 +2986,11 @@ static void initStatic__surgext()
         p->addModel(modelSurgeDelay);
         p->addModel(modelSurgeDelayLineByFreq);
         p->addModel(modelSurgeDelayLineByFreqExpanded);
+        p->addModel(modelSurgeDigitalRingMods);
         p->addModel(modelSurgeWaveshaper);
         p->addModel(modelSurgeLFO);
         p->addModel(modelSurgeMixer);
+        p->addModel(modelSurgeMixerSlider);
         p->addModel(modelSurgeModMatrix);
 
         p->addModel(modelFXReverb);
@@ -2975,12 +3009,16 @@ static void initStatic__surgext()
         p->addModel(modelFXExciter);
         p->addModel(modelFXEnsemble);
         p->addModel(modelFXCombulator);
+        p->addModel(modelFXNimbus);
         p->addModel(modelFXSpringReverb);
         p->addModel(modelFXTreeMonster);
+        p->addModel(modelFXBonsai);
 
         p->addModel(modelEGxVCA);
         p->addModel(modelQuadAD);
         p->addModel(modelQuadLFO);
+        p->addModel(modelUnisonHelper);
+        p->addModel(modelUnisonHelperCVExpander);
 
         surgext_rack_initialize();
     }
@@ -3115,14 +3153,12 @@ static void initStatic__ZZC()
 #undef modelClock
     }
 }
-#endif // NOPLUGINS
 
 void initStaticPlugins()
 {
     initStatic__Cardinal();
     initStatic__Fundamental();
     // initStatic__ZamAudio();
-#ifndef NOPLUGINS
     initStatic__21kHz();
     initStatic__8Mode();
     initStatic__AaronStatic();
@@ -3144,6 +3180,7 @@ void initStaticPlugins()
     initStatic__cf();
     initStatic__ChowDSP();
     initStatic__dBiz();
+    initStatic__DHE();
     initStatic__DrumKit();
     initStatic__EnigmaCurry();
     initStatic__ESeries();
@@ -3195,7 +3232,6 @@ void initStaticPlugins()
     initStatic__WhatTheRack();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();
-#endif // NOPLUGINS
 }
 
 void destroyStaticPlugins()
@@ -3207,8 +3243,7 @@ void destroyStaticPlugins()
 
 void updateStaticPluginsDarkMode()
 {
-#ifndef NOPLUGINS
-    const bool darkMode = settings::darkMode;
+    const bool darkMode = settings::preferDarkPanels;
     // bogaudio
     {
         Skins& skins(Skins::skins());
@@ -3231,7 +3266,6 @@ void updateStaticPluginsDarkMode()
     {
         surgext_rack_update_theme();
     }
-#endif
 }
 
 }

@@ -68,6 +68,12 @@ endif
 
 ifeq ($(NOSIMD),true)
 BASE_FLAGS += -DCARDINAL_NOSIMD
+else ifeq ($(WASM),true)
+BASE_FLAGS += -msse -msse2 -msse3 -msimd128
+else ifeq ($(CPU_ARM32),true)
+BASE_FLAGS += -mfpu=neon-vfpv4 -mfloat-abi=hard
+else ifeq ($(CPU_I386_OR_X86_64),true)
+BASE_FLAGS += -msse -msse2 -msse3
 endif
 
 ifeq ($(SYSDEPS),true)
@@ -109,10 +115,6 @@ BASE_FLAGS += -DSIMDE_FAST_NANS
 BASE_FLAGS += -DSIMDE_FAST_ROUND_MODE
 BASE_FLAGS += -DSIMDE_FAST_ROUND_TIES
 
-# unwanted
-BASE_FLAGS += -DSIMDE_X86_SSE4_1_H
-BASE_FLAGS += -DSIMDE_X86_SSE4_2_H
-
 # -----------------------------------------------------------------------------
 # Rack build flags
 
@@ -153,32 +155,15 @@ ifeq ($(HEADLESS),true)
 BASE_FLAGS += -DHEADLESS
 endif
 
-ifeq ($(USE_GLES2),true)
-BASE_FLAGS += -DNANOVG_GLES2_FORCED
-else ifeq ($(USE_GLES3),true)
+ifeq ($(USE_GLES3),true)
 BASE_FLAGS += -DNANOVG_GLES3_FORCED
+else ifeq ($(USE_GLES2),true)
+BASE_FLAGS += -DNANOVG_GLES2_FORCED
 endif
 
 # needed for enabling SSE in pffft
 ifeq ($(CPU_I386),true)
-ifneq ($(NOSIMD),true)
 BASE_FLAGS += -Di386
-endif
-endif
-
-# SIMD must always be enabled, even in debug builds
-ifneq ($(NOSIMD),true)
-ifeq ($(DEBUG),true)
-
-ifeq ($(WASM),true)
-BASE_FLAGS += -msse -msse2 -msse3 -msimd128
-else ifeq ($(CPU_ARM32),true)
-BASE_FLAGS += -mfpu=neon-vfpv4 -mfloat-abi=hard
-else ifeq ($(CPU_I386_OR_X86_64),true)
-BASE_FLAGS += -msse -msse2 -mfpmath=sse
-endif
-
-endif
 endif
 
 BASE_FLAGS += -I$(abspath $(ROOT)/dpf/dgl/src/nanovg)

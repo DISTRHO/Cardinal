@@ -234,11 +234,11 @@ void ImGuiTextEditor::onHoverScroll(const HoverScrollEvent& e)
 
 void ImGuiTextEditor::step()
 {
-    if (pData->darkMode != settings::darkMode)
+    if (pData->darkMode != settings::preferDarkPanels)
     {
-        pData->darkMode = settings::darkMode;
-        pData->editor.SetPalette(settings::darkMode ? TextEditor::GetDarkPalette()
-                                                    : TextEditor::GetLightPalette());
+        pData->darkMode = settings::preferDarkPanels;
+        pData->editor.SetPalette(settings::preferDarkPanels ? TextEditor::GetDarkPalette()
+                                                            : TextEditor::GetLightPalette());
     }
 
     ImGuiWidget::step();

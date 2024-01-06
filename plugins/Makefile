@@ -284,7 +284,6 @@ endif
 ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
 PLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
 # MINIPLUGIN_FILES += Cardinal/src/AudioToCVPitch.cpp
-BASE_FLAGS += -DHAVE_FFTW3F
 endif
 
 # --------------------------------------------------------------
@@ -655,6 +654,11 @@ PLUGIN_FILES += $(filter-out dBiz/src/plugin.cpp,$(wildcard dBiz/src/*.cpp))
 # modules/types which are present in other plugins
 DBIZ_CUSTOM  = Chord DarkDefaultItem Divider FourSeq FourSeqWidget OrangeLight VCA4 Wavefolder darkPanelID lightPanelID
 DBIZ_CUSTOM_PER_FILE = LERP MultiFilter Oscillator calcOutput sineOsc subBank
+
+# --------------------------------------------------------------
+# DHE-Modules
+
+PLUGIN_FILES += $(filter-out DHE-Modules/src/plugin.cpp,$(wildcard DHE-Modules/src/modules/*/init.cpp))
 
 # --------------------------------------------------------------
 # DrumKit
@@ -1043,7 +1047,7 @@ SURGEXT_FLAGS += $(NOFINITE_FLAGS)
 SURGEXT_FLAGS += -std=gnu++17
 SURGEXT_FLAGS += -DTIXML_USE_STL=1
 SURGEXT_FLAGS += \
-	-Isurgext/libs/sst/sst-basic-blocks/include \
+	-Isurgext/libs/sst-rackhelpers/include \
 	-Isurgext/surge/src/common \
 	-Isurgext/surge/src/common/dsp \
 	-Isurgext/surge/src/common/dsp/filters \
@@ -1052,20 +1056,20 @@ SURGEXT_FLAGS += \
 	-Isurgext/surge/src/common/dsp/oscillators \
 	-Isurgext/surge/src/common/dsp/modulators \
 	-Isurgext/surge/src/surge-testrunner \
-	-Isurgext/surge/libs/sst/sst-filters/include \
+	-Isurgext/surge/libs/fmt/include \
+	-Isurgext/surge/libs/LuaJitLib/LuaJIT/src \
+	-Isurgext/surge/libs/sst/sst-basic-blocks/include \
 	-Isurgext/surge/libs/sst/sst-cpputils/include \
-	-Isurgext/surge/libs/sst/sst-waveshapers/include \
+	-Isurgext/surge/libs/sst/sst-effects/include \
+	-Isurgext/surge/libs/sst/sst-filters/include \
 	-Isurgext/surge/libs/sst/sst-plugininfra/include \
 	-Isurgext/surge/libs/sst/sst-plugininfra/libs/tinyxml/include \
 	-Isurgext/surge/libs/sst/sst-plugininfra/libs/filesystem \
-	-Isurgext/surge/libs/fmt/include \
-	-Isurgext/surge/libs/LuaJitLib/LuaJIT/src \
+	-Isurgext/surge/libs/sst/sst-waveshapers/include \
 	-Isurgext/surge/libs/strnatcmp \
 	-Isurgext/surge/src/headless \
 	-Isurgext/surge/libs/tuning-library/include \
 	-I../deps/surge-build/libs/sst/sst-plugininfra/libs/filesystem/include \
-	-include limits \
-	-include cstdint \
 	-DSURGE_COMPILE_BLOCK_SIZE=8 \
 	-DSURGE_SKIP_ODDSOUND_MTS \
 	-DHAS_LUA=0 \
@@ -1296,6 +1300,14 @@ BASE_FLAGS += -D'aligned_alloc_16(ptr)'='aligned_alloc(16,ptr)'
 BASE_FLAGS += -D'aligned_free_16(ptr)'='free(ptr)'
 endif
 
+ifeq ($(WASM),true)
+BASE_FLAGS += -DEIGEN_DONT_VECTORIZE=1
+endif
+
+ifeq ($(shell $(PKG_CONFIG) --exists fftw3f && echo true),true)
+BASE_FLAGS += -DHAVE_FFTW3F
+endif
+
 ifeq ($(shell $(PKG_CONFIG) --exists sndfile && echo true),true)
 BASE_FLAGS += -DHAVE_SNDFILE
 endif
@@ -1344,10 +1356,6 @@ RTNEURAL_FLAGS += -Devaluator=Aida_evaluator
 RTNEURAL_FLAGS += -DSKIP_MINGW_FORMAT
 RTNEURAL_FLAGS += -DRTNEURAL_DEFAULT_ALIGNMENT=16
 RTNEURAL_FLAGS += -DRTNEURAL_USE_EIGEN=1
-
-ifeq ($(WASM),true)
-RTNEURAL_FLAGS += -DEIGEN_DONT_VECTORIZE=1
-endif
 
 RTNEURAL_FLAGS += -ICardinal/src/AIDA-X/RTNeural
 RTNEURAL_FLAGS += -ICardinal/src/AIDA-X/RTNeural/modules/Eigen
@@ -1403,6 +1411,7 @@ RESOURCE_FILES += BaconPlugs/res/midi/chopin
 RESOURCE_FILES += BaconPlugs/res/midi/debussy
 RESOURCE_FILES += BaconPlugs/res/midi/goldberg
 RESOURCE_FILES += cf/playeroscs
+RESOURCE_FILES += DHE-Modules/svg
 RESOURCE_FILES += DrumKit/res/samples
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
@@ -1416,7 +1425,6 @@ RESOURCE_FILES += surgext/build/surge-data/configuration.xml
 RESOURCE_FILES += surgext/build/surge-data/fx_presets
 RESOURCE_FILES += surgext/build/surge-data/wavetables
 RESOURCE_FILES += surgext/build/surge-data/windows.wt
-RESOURCE_FILES += surgext/patches
 RESOURCE_FILES += $(wildcard surgext/res/xt/fonts/quicksand/*.ttf)
 RESOURCE_FILES += $(wildcard unless_modules/art/*.art)
 RESOURCE_FILES += $(wildcard unless_modules/art/svg/*/*.svg)
@@ -2229,6 +2237,14 @@ $(BUILD_DIR)/dBiz/src/%.cpp.o: dBiz/src/%.cpp
 		$(foreach m,$(DBIZ_CUSTOM),$(call custom_module_names,$(m),dBiz)) \
 		$(foreach m,$(DBIZ_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),dBiz_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__dBiz
+
+$(BUILD_DIR)/DHE-Modules/src/%.cpp.o: DHE-Modules/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(DHE_CUSTOM),$(call custom_module_names,$(m),DHE)) \
+		-DpluginInstance=pluginInstance__DHE \
+		-IDHE-Modules/src
 
 $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

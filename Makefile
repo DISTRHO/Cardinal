@@ -1,8 +1,7 @@
 #!/usr/bin/make -f
-# Makefile for DISTRHO Plugins #
-# ---------------------------- #
-# Created by falkTX
-#
+# DISTRHO Cardinal Plugin
+# Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 ROOT = .
 include $(ROOT)/Makefile.base.mk
@@ -16,7 +15,7 @@ include $(ROOT)/Makefile.base.mk
 # src/CardinalPlugin.cpp `getVersion`
 # utils/macOS/Info_{JACK,Native}.plist
 # jucewrapper/CMakeLists.txt src/CardinalCommon.cpp src/CardinalPlugin.cpp utils/macOS/Info_{JACK,Native}.plist
-VERSION = 23.10
+VERSION = 24.01
 
 # --------------------------------------------------------------
 # Build targets
@@ -268,9 +267,6 @@ clean:
 	$(MAKE) clean -C plugins
 	$(MAKE) clean -C src
 	rm -rf bin build build-headless dpf/utils/lv2_ttl_generator.d
-	# FIXME
-	rm -f src/Rack/BaconMusic/default-skin.json
-	rm -f src/Rack/SurgeXTRack/default-skin.json
 
 # --------------------------------------------------------------
 # Install step

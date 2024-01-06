@@ -1,6 +1,6 @@
---- ../Rack/src/plugin.cpp	2023-09-10 12:59:02.631898592 +0200
+--- ../Rack/src/plugin.cpp	2023-12-17 12:57:01.138429358 +0100
 +++ plugin.cpp	2023-05-20 18:43:27.496323540 +0200
-@@ -1,356 +1,46 @@
+@@ -1,363 +1,46 @@
 -#include <thread>
 -#include <map>
 -#include <stdexcept>
@@ -134,14 +134,7 @@
 -	libraryExt = "dylib";
 -#endif
 -
--#if defined ARCH_X64
--	// Use `plugin.EXT` on x64 for backward compatibility.
--	// Change to `plugin-OS-CPU.EXT` in Rack 3.
 -	std::string libraryFilename = "plugin." + libraryExt;
--#else
--	// Use `plugin-CPU.EXT` on other CPUs like ARM64
--	std::string libraryFilename = "plugin-" + APP_CPU + "." + libraryExt;
--#endif
 -	std::string libraryPath = system::join(plugin->path, libraryFilename);
 -
 -	// Check file existence
@@ -291,9 +284,23 @@
 -	// Load Core
 -	loadPlugin("");
 -
--	pluginsPath = asset::user("plugins");
--
 -	// Get user plugins directory
+-	if (settings::devMode) {
+-		pluginsPath = asset::user("plugins");
+-	}
+-	else {
+-		pluginsPath = asset::user("plugins-" + APP_OS + "-" + APP_CPU);
+-	}
+-
+-	// In Rack <2.4.0, plugins dir was "plugins" regardless of arch.
+-	// Rename old dir if running x64.
+-#if defined ARCH_X64
+-	std::string oldPluginsPath = asset::user("plugins");
+-	if (system::isDirectory(oldPluginsPath)) {
+-		system::rename(oldPluginsPath, pluginsPath);
+-	}
+-#endif
+-
 -	system::createDirectory(pluginsPath);
 -
 -	// Don't load plugins if safe mode is enabled
@@ -387,7 +394,15 @@
  */
  static const std::map<std::string, std::string> pluginSlugFallbacks = {
  	{"VultModulesFree", "VultModules"},
-@@ -399,8 +89,19 @@
+@@ -365,7 +48,6 @@
+ 	{"AudibleInstrumentsPreview", "AudibleInstruments"},
+ 	{"SequelSequencers", "DanielDavies"},
+ 	{"DelexanderVol1", "DelexandraVol1"},
+-	{"VCV-Pro", "Fundamental"},
+ 	// {"", ""},
+ };
+ 
+@@ -407,8 +89,19 @@
  */
  using PluginModuleSlug = std::tuple<std::string, std::string>;
  static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = {
@@ -408,7 +423,7 @@
  	// {{"", ""}, {"", ""}},
  };
  
-@@ -488,7 +189,6 @@
+@@ -496,7 +189,6 @@
  }
  
  

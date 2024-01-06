@@ -1,4 +1,4 @@
---- ../Rack/src/app/MenuBar.cpp	2023-09-10 12:59:02.630898560 +0200
+--- ../Rack/src/app/MenuBar.cpp	2023-12-17 12:57:01.136429153 +0100
 +++ MenuBar.cpp	2023-08-15 17:56:23.782915145 +0200
 @@ -1,8 +1,33 @@
 +/*
@@ -248,26 +248,26 @@
 +				wasmSaveAs();
 +			else
 +				patchUtils::saveDialog(APP->patch->path);
- 		}));
- 
--		menu->addChild(createMenuItem("Save as", RACK_MOD_CTRL_NAME "+Shift+S", []() {
--			APP->patch->saveAsDialog();
++		}));
++
 +		menu->addChild(createMenuItem("Save as...", "", []() {
 +			wasmSaveAs();
  		}));
  
--		menu->addChild(createMenuItem("Save a copy", "", []() {
--			APP->patch->saveAsDialog(false);
+-		menu->addChild(createMenuItem("Save as", RACK_MOD_CTRL_NAME "+Shift+S", []() {
+-			APP->patch->saveAsDialog();
 +		menu->addChild(createMenuItem("Save and download compressed", "", []() {
 +			patchUtils::saveAsDialog();
  		}));
  
+-		menu->addChild(createMenuItem("Save a copy", "", []() {
+-			APP->patch->saveAsDialog(false);
 +		menu->addChild(createMenuItem("Save and download uncompressed", "", []() {
 +			patchUtils::saveAsDialogUncompressed();
-+		}));
+ 		}));
 +#endif
 +#endif
-+
+ 
  		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
 -			APP->patch->revertDialog();
 -		}, APP->patch->path == ""));
@@ -462,11 +462,11 @@
  
  		static const std::vector<std::string> knobModeLabels = {
  			"Linear",
-@@ -487,11 +692,34 @@
+@@ -487,13 +692,34 @@
  		menu->addChild(knobScrollSensitivitySlider);
  
  		menu->addChild(new ui::MenuSeparator);
--		menu->addChild(createMenuLabel("Module"));
+-		menu->addChild(createMenuLabel("Modules"));
 +		menu->addChild(createMenuLabel("Window"));
  
 -		menu->addChild(createBoolPtrMenuItem("Lock positions", "", &settings::lockModules));
@@ -480,9 +480,10 @@
 +		}));
 +#endif
  
--		menu->addChild(createBoolPtrMenuItem("Auto-squeeze algorithm (experimental)", "", &settings::squeezeModules));
+-		menu->addChild(createBoolPtrMenuItem("Smart rearrangement", "", &settings::squeezeModules));
 +		menu->addChild(createBoolPtrMenuItem("Invert zoom", "", &settings::invertZoom));
-+
+ 
+-		menu->addChild(createBoolPtrMenuItem("Use dark panels if available (experimental)", "", &settings::preferDarkPanels));
 +		static const std::vector<std::string> rateLimitLabels = {
 +			"None",
 +			"2x",
@@ -500,7 +501,7 @@
  	}
  };
  
-@@ -501,48 +729,11 @@
+@@ -503,48 +729,11 @@
  ////////////////////
  
  
@@ -553,7 +554,7 @@
  	void onAction(const ActionEvent& e) override {
  		ui::Menu* menu = createMenu();
  		menu->cornerFlags = BND_CORNER_TOP;
-@@ -555,269 +746,87 @@
+@@ -557,292 +746,87 @@
  			settings::cpuMeter ^= true;
  		}));
  
@@ -664,25 +665,41 @@
 -			return NULL;
 -		library::UpdateInfo update = it->second;
 -
--		if (update.changelogUrl == "")
--			return NULL;
--
 -		ui::Menu* menu = new ui::Menu;
 -
--		std::string changelogUrl = update.changelogUrl;
--		menu->addChild(createMenuItem("Changelog", "", [=]() {
--			system::openBrowser(changelogUrl);
--		}));
+-		if (update.minRackVersion != "") {
+-			menu->addChild(createMenuLabel(string::f("Requires Rack %s+", update.minRackVersion.c_str())));
+-		}
 -
+-		if (update.changelogUrl != "") {
+-			std::string changelogUrl = update.changelogUrl;
+-			menu->addChild(createMenuItem("Changelog", "", [=]() {
+-				system::openBrowser(changelogUrl);
+-			}));
+-		}
+-
+-		if (menu->children.empty()) {
+-			delete menu;
+-			return NULL;
+-		}
 -		return menu;
 -	}
 -
 -	void step() override {
--		disabled = library::isSyncing;
+-		disabled = false;
+-
+-		if (library::isSyncing)
+-			disabled = true;
 -
 -		auto it = library::updateInfos.find(slug);
--		if (it != library::updateInfos.end()) {
+-		if (it == library::updateInfos.end()) {
+-			disabled = true;
+-		}
+-		else {
 -			library::UpdateInfo update = it->second;
+-
+-			if (update.minRackVersion != "")
+-				disabled = true;
 -
 -			if (update.downloaded) {
 -				rightText = CHECKMARK_STRING;
@@ -713,7 +730,7 @@
 -				rightText += update.version;
 -			}
 -		}
- 
+-
 -		MenuItem::step();
 -	}
 -
@@ -725,18 +742,13 @@
 -		e.unconsume();
 -	}
 -};
-+				async_dialog_text_input("OSC network port", CARDINAL_DEFAULT_REMOTE_PORT, [=](char* const port) {
-+					if (port == nullptr)
-+						return;
- 
-+					if (plugin->startRemoteServer(port))
-+						remoteServerStarted = true;
- 
+-
+-
 -struct LibraryMenu : ui::Menu {
 -	LibraryMenu() {
 -		refresh();
 -	}
--
+ 
 -	void step() override {
 -		// Refresh menu when appropriate
 -		if (library::refreshRequested) {
@@ -745,11 +757,16 @@
 -		}
 -		Menu::step();
 -	}
--
++				async_dialog_text_input("OSC network port", CARDINAL_DEFAULT_REMOTE_PORT, [=](char* const port) {
++					if (port == nullptr)
++						return;
+ 
 -	void refresh() {
 -		setChildMenu(NULL);
 -		clearChildren();
--
++					if (plugin->startRemoteServer(port))
++						remoteServerStarted = true;
+ 
 -		if (settings::devMode) {
 -			addChild(createMenuLabel("Disabled in development mode"));
 -		}
@@ -759,9 +776,7 @@
 +					std::free(port);
 +				});
  			}));
-+		}
-+#endif
- 
+-
 -			ui::TextField* emailField = new ui::TextField;
 -			emailField->placeholder = "Email";
 -			emailField->box.size.x = 240.0;
@@ -779,35 +794,21 @@
 -			logInItem->passwordField = passwordField;
 -			passwordField->logInItem = logInItem;
 -			addChild(logInItem);
--		}
+ 		}
 -		else {
 -			addChild(createMenuItem("Log out", "", [=]() {
 -				library::logOut();
 -			}));
-+		if (isUsingNativeAudio()) {
-+			if (supportsAudioInput()) {
-+				const bool enabled = isAudioInputEnabled();
-+				std::string rightText;
-+				if (enabled)
-+					rightText = CHECKMARK_STRING;
-+				menu->addChild(createMenuItem("Enable Audio Input", rightText, [enabled]() {
-+					if (!enabled)
-+						requestAudioInput();
-+				}));
-+			}
++#endif
  
+-			addChild(createMenuItem("Account settings", "", [=]() {
+-				system::openBrowser("https://vcvrack.com/account");
+-			}));
+-
 -			addChild(createMenuItem("Browse VCV Library", "", [=]() {
 -				system::openBrowser("https://library.vcvrack.com/");
 -			}));
-+			if (supportsMIDI()) {
-+				std::string rightText;
-+				if (isMIDIEnabled())
-+					rightText = CHECKMARK_STRING;
-+				menu->addChild(createMenuItem("Enable/Reconnect MIDI", rightText, []() {
-+					requestMIDI();
-+				}));
-+			}
- 
+-
 -			SyncUpdatesItem* syncItem = new SyncUpdatesItem;
 -			syncItem->text = "Update all";
 -			addChild(syncItem);
@@ -821,6 +822,50 @@
 -					updateItem->setUpdate(pair.first);
 -					addChild(updateItem);
 -				}
++		if (isUsingNativeAudio()) {
++			if (supportsAudioInput()) {
++				const bool enabled = isAudioInputEnabled();
++				std::string rightText;
++				if (enabled)
++					rightText = CHECKMARK_STRING;
++				menu->addChild(createMenuItem("Enable Audio Input", rightText, [enabled]() {
++					if (!enabled)
++						requestAudioInput();
++				}));
+ 			}
+-		}
+-	}
+-};
+ 
++			if (supportsMIDI()) {
++				std::string rightText;
++				if (isMIDIEnabled())
++					rightText = CHECKMARK_STRING;
++				menu->addChild(createMenuItem("Enable/Reconnect MIDI", rightText, []() {
++					requestMIDI();
++				}));
++			}
+ 
+-struct LibraryButton : MenuButton {
+-	NotificationIcon* notification;
+-
+-	LibraryButton() {
+-		notification = new NotificationIcon;
+-		addChild(notification);
+-	}
+-
+-	void onAction(const ActionEvent& e) override {
+-		ui::Menu* menu = createMenu<LibraryMenu>();
+-		menu->cornerFlags = BND_CORNER_TOP;
+-		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+-
+-		// Check for updates when menu is opened
+-		if (!settings::devMode) {
+-			std::thread t([&]() {
+-				system::setThreadName("Library");
+-				library::checkUpdates();
+-			});
+-			t.detach();
 +			if (supportsBufferSizeChanges()) {
 +				static const std::vector<uint32_t> bufferSizes = {
 +					#ifdef DISTRHO_OS_WASM
@@ -838,31 +883,9 @@
 +						));
 +					}
 +				}));
- 			}
++			}
  		}
  	}
--};
--
--
--struct LibraryButton : MenuButton {
--	NotificationIcon* notification;
--
--	LibraryButton() {
--		notification = new NotificationIcon;
--		addChild(notification);
--	}
--
--	void onAction(const ActionEvent& e) override {
--		ui::Menu* menu = createMenu<LibraryMenu>();
--		menu->cornerFlags = BND_CORNER_TOP;
--		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
--		// Check for updates when menu is opened
--		std::thread t([&]() {
--			system::setThreadName("Library");
--			library::checkUpdates();
--		});
--		t.detach();
--	}
  
 +#ifdef HAVE_LIBLO
  	void step() override {
@@ -888,7 +911,7 @@
  };
  
  
-@@ -827,63 +836,30 @@
+@@ -852,63 +836,30 @@
  
  
  struct HelpButton : MenuButton {
@@ -906,14 +929,14 @@
  
 -		menu->addChild(createMenuItem("Tips", "", [=]() {
 -			APP->scene->addChild(tipWindowCreate());
--		}));
--
--		menu->addChild(createMenuItem("User manual", "F1", [=]() {
--			system::openBrowser("https://vcvrack.com/manual");
 +		menu->addChild(createMenuItem("Rack User manual", "F1", [=]() {
 +			patchUtils::openBrowser("https://vcvrack.com/manual");
  		}));
  
+-		menu->addChild(createMenuItem("User manual", "F1", [=]() {
+-			system::openBrowser("https://vcvrack.com/manual");
+-		}));
+-
 -		menu->addChild(createMenuItem("Support", "", [=]() {
 -			system::openBrowser("https://vcvrack.com/support");
 -		}));
@@ -960,7 +983,7 @@
  	}
  };
  
-@@ -926,15 +902,19 @@
+@@ -951,15 +902,19 @@
  
  		text = "";
  
@@ -983,7 +1006,7 @@
  
  		Label::step();
  	}
-@@ -944,7 +924,9 @@
+@@ -969,7 +924,9 @@
  struct MenuBar : widget::OpaqueWidget {
  	InfoLabel* infoLabel;
  
@@ -994,7 +1017,7 @@
  		const float margin = 5;
  		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
  
-@@ -953,7 +935,7 @@
+@@ -978,7 +935,7 @@
  		layout->spacing = math::Vec(0, 0);
  		addChild(layout);
  
@@ -1003,7 +1026,7 @@
  		fileButton->text = "File";
  		layout->addChild(fileButton);
  
-@@ -965,13 +947,11 @@
+@@ -990,13 +947,11 @@
  		viewButton->text = "View";
  		layout->addChild(viewButton);
  
@@ -1019,7 +1042,7 @@
  
  		HelpButton* helpButton = new HelpButton;
  		helpButton->text = "Help";
-@@ -1003,7 +983,7 @@
+@@ -1028,7 +983,7 @@
  
  
  widget::Widget* createMenuBar() {

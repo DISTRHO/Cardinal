@@ -229,7 +229,7 @@ struct ImGuiWidget::PrivateData {
         colors[ImGuiCol_HeaderHovered]    = color_DimCardinal;
         colors[ImGuiCol_HeaderActive]     = color_Cardinal;
 
-        if (!settings::darkMode)
+        if (!settings::preferDarkPanels)
         {
             for (int c = 0; c < ImGuiCol_COUNT; ++c)
             {
@@ -432,9 +432,9 @@ void ImGuiWidget::onSelectText(const SelectTextEvent& e)
 
 void ImGuiWidget::step()
 {
-    if (imData->darkMode != settings::darkMode)
+    if (imData->darkMode != settings::preferDarkPanels)
     {
-        imData->darkMode = settings::darkMode;
+        imData->darkMode = settings::preferDarkPanels;
         imData->resetEverything(true);
     }
 

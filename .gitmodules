@@ -212,9 +212,6 @@
 [submodule "plugins/dBiz"]
 	path = plugins/dBiz
 	url = https://github.com/dBiz/dBiz.git
-[submodule "include/simde"]
-	path = include/simde
-	url = https://github.com/simd-everywhere/simde.git
 [submodule "plugins/RebelTech"]
 	path = plugins/RebelTech
 	url = https://github.com/hemmer/rebel-tech-vcv.git
@@ -233,6 +230,9 @@
 [submodule "plugins/EnigmaCurry"]
 	path = plugins/EnigmaCurry
 	url = https://github.com/EnigmaCurry/EnigmaCurry-vcv-pack.git
+[submodule "plugins/DHE-Modules"]
+	path = plugins/DHE-Modules
+	url = https://github.com/dhemery/DHE-Modules.git
 [submodule "plugins/StarlingVia"]
 	path = plugins/StarlingVia
 	url = https://github.com/starlingcode/Via-for-Rack.git

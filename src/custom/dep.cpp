@@ -1,18 +1,7 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * For a full copy of the GNU General Public License see the LICENSE file.
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #define STDIO_OVERRIDE Rackdep
@@ -23,51 +12,14 @@
 #include <string>
 
 namespace rack {
-#ifndef HEADLESS
-namespace asset {
-bool forceBlackScrew = false;
-bool forceSilverScrew = false;
-void updateForcingBlackSilverScrewMode(std::string slug) {
-    forceBlackScrew = (
-        // arable instruments
-        slug == "Joni"
-        // axioma
-        || slug == "TheBifurcator"
-        || slug == "Tesseract"
-        || slug == "Ikeda"
-        || slug == "Rhodonea"
-        // parable instruments
-        || slug == "Neil"
-        // rackwindows
-        || slug == "bitshiftgain"
-        || slug == "capacitor"
-        || slug == "capacitor_stereo"
-        || slug == "chorus"
-        || slug == "console"
-        || slug == "console_mm"
-        || slug == "distance"
-        || slug == "golem"
-        || slug == "holt"
-        || slug == "hombre"
-        || slug == "interstage"
-        || slug == "monitoring"
-        || slug == "mv"
-        || slug == "rasp"
-        || slug == "reseq"
-        || slug == "tape"
-        || slug == "tremolo"
-        || slug == "vibrato"
-    );
-}
-}
-#endif
 namespace plugin {
 void updateStaticPluginsDarkMode();
 }
 namespace settings {
-bool darkMode = true;
 int rateLimit = 0;
+extern bool preferDarkPanels;
 extern std::string uiTheme;
+bool darkMode; // TODO remove after updating all plugins
 }
 namespace ui {
 void refreshTheme();
@@ -90,7 +42,7 @@ float FollowerBase::efGainMaxDecibelsDebug = 12.0f;
 extern "C" {
 NVGcolor nvgRGBblank(const unsigned char r, const unsigned char g, const unsigned char b)
 {
-    return rack::settings::darkMode ? nvgRGB(0x20, 0x20, 0x20) : nvgRGB(r, g, b);
+    return rack::settings::preferDarkPanels ? nvgRGB(0x20, 0x20, 0x20) : nvgRGB(r, g, b);
 }
 }
 
@@ -111,6 +63,7 @@ enum DarkMode {
     kModeAudibleInstruments,
     kModeBidoo,
     kModeCf,
+    kModeDHE,
     kModeDrumKit,
     kModeESeries,
     kModeHetrickCV,
@@ -263,6 +216,35 @@ static const struct {
     { kModeCf, "/cf/res/SUB.svg", {}, -1 },
     { kModeCf, "/cf/res/trSEQ.svg", {}, -1 },
     { kModeCf, "/cf/res/VARIABLE.svg", {}, -1 },
+    // MIT
+    { kModeDHE, "/DHE-Modules/svg/blossom.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/booster-stage.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/buttons.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/cubic.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/curve-sequencer-4.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/curve-sequencer-8.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/curve-sequencer-16.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/func.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/func-6.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/fuzzy-logic-h.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/fuzzy-logic-z.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/gator.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/hostage.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/ranger.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/scannibal-4.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/scannibal-8.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/scannibal-16.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/sequencizer-4.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/sequencizer-8.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/sequencizer-16.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/stage.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/swave.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/tapers.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/truth-2.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/truth-3.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/truth-4.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/upstage.svg", {}, -1 },
+    { kModeDHE, "/DHE-Modules/svg/xycloid.svg", {}, -1 },
     // CC0-1.0
     { kModeDrumKit, "/DrumKit/res/Baronial.svg", {}, -1 },
     { kModeDrumKit, "/DrumKit/res/BD9.svg", {}, -1 },
@@ -649,6 +631,24 @@ static const struct {
 };
 
 static inline
+unsigned int darkerColor(const unsigned int color) noexcept
+{
+    return (color & 0xff000000)
+         | (std::max<int>(0, ((color & 0xff0000) >> 16) - 0x80) << 16)
+         | (std::max<int>(0, ((color & 0xff00) >> 8) - 0x80) << 8)
+         | (std::max<int>(0, (color & 0xff) - 0x80));
+}
+
+static inline
+unsigned int lighterColor(const unsigned int color) noexcept
+{
+    return (color & 0xff000000)
+         | (std::min<int>(0xff, ((color & 0xff0000) >> 16) + 0x80) << 16)
+         | (std::min<int>(0xff, ((color & 0xff00) >> 8) + 0x80) << 8)
+         | (std::min<int>(0xff, (color & 0xff) + 0x80));
+}
+
+static inline
 unsigned int invertColor(const unsigned int color) noexcept
 {
     return (color & 0xff000000)
@@ -707,6 +707,10 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
             }
         }
         break;
+    // Special case for DHE, mark things darker instead of inverting
+    case kModeDHE:
+        paint.color = darkerColor(paint.color);
+        return true;
     // Special case for JW-Modules colors
     case kModeJW:
         switch (paint.color)
@@ -1444,7 +1448,7 @@ postparse:
             const ExtendedNSVGimage ext = { handle, handleOrig, handleMOD, shapesOrig, shapesMOD };
             loadedDarkSVGs.push_back(ext);
 
-            if (rack::settings::darkMode)
+            if (rack::settings::preferDarkPanels)
             {
                 if (shapesMOD != nullptr)
                     handle->shapes = shapesMOD;
@@ -1458,7 +1462,7 @@ postparse:
             const ExtendedNSVGimage ext = { handle, handleOrig, handleMOD, shapesOrig, shapesMOD };
             loadedLightSVGs.push_back(ext);
 
-            if (!rack::settings::darkMode)
+            if (!rack::settings::preferDarkPanels)
             {
                 if (shapesMOD != nullptr)
                     handle->shapes = shapesMOD;
@@ -1510,10 +1514,8 @@ namespace rack {
 void switchDarkMode(const bool darkMode)
 {
    #ifndef HEADLESS
-    if (settings::darkMode == darkMode)
-        return;
-
-    settings::darkMode = darkMode;
+    settings::darkMode = darkMode; // TODO remove after updating all plugins
+    settings::preferDarkPanels = darkMode;
     settings::uiTheme = darkMode ? "dark" : "light";
     ui::refreshTheme();
     plugin::updateStaticPluginsDarkMode();

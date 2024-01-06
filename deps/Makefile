@@ -269,19 +269,6 @@ endif
 # use custom JUCE from DISTRHO and Carla
 SURGE_CXX_FLAGS += -I$(abspath ../carla/source/modules)
 
-# SIMD must always be enabled, even in debug builds
-ifeq ($(NOSIMD),true)
-SURGE_CXX_FLAGS += -DCARDINAL_NOSIMD
-else ifeq ($(DEBUG),true)
-ifeq ($(WASM),true)
-SURGE_CXX_FLAGS += -msse -msse2 -msse3 -msimd128
-else ifeq ($(CPU_ARM32),true)
-SURGE_CXX_FLAGS += -mfpu=neon-vfpv4 -mfloat-abi=hard
-else ifeq ($(CPU_I386_OR_X86_64),true)
-SURGE_CXX_FLAGS += -msse -msse2 -mfpmath=sse
-endif
-endif
-
 # possibly use fftw?
 # ifeq ($(shell $(PKG_CONFIG) --exists fftw3 fftw3f && echo true),true)
 # SURGE_CXX_FLAGS += -DJUCE_DSP_USE_STATIC_FFTW=1
@@ -348,6 +335,12 @@ clean:
 	rm -rf $(RACK_DEP_PATH)/jansson-2.12
 	rm -rf $(RACK_DEP_PATH)/libarchive-3.4.3
 	rm -rf $(RACK_DEP_PATH)/libsamplerate-0.1.9
+	rm -rf $(RACK_DEP_PATH)/speexdsp/autom4te.cache
+	rm -rf $(RACK_DEP_PATH)/speexdsp/libspeexdsp/.deps
+	rm -rf $(RACK_DEP_PATH)/speexdsp/libspeexdsp/.libs
+	rm -rf $(RACK_DEP_PATH)/speexdsp/libspeexdsp/*.lo
+	rm -rf $(RACK_DEP_PATH)/speexdsp/libspeexdsp/*.o
+	rm -rf $(RACK_DEP_PATH)/speexdsp/Makefile
 	rm -rf $(RACK_DEP_PATH)/zstd-1.4.5
 	rm -rf $(SURGE_DEP_PATH)
 

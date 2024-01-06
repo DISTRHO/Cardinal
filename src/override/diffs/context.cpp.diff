@@ -1,4 +1,4 @@
---- ../Rack/src/context.cpp	2023-09-10 12:59:02.630898560 +0200
+--- ../Rack/src/context.cpp	2023-12-17 12:57:01.137429255 +0100
 +++ context.cpp	2023-05-20 18:08:56.497736615 +0200
 @@ -1,14 +1,44 @@
 +/*
@@ -47,7 +47,7 @@
  
  Context::~Context() {
  	// Deleting NULL is safe in C++.
-@@ -38,17 +68,13 @@
+@@ -38,16 +68,13 @@
  	INFO("Deleting engine");
  	delete engine;
  	engine = NULL;
@@ -61,7 +61,6 @@
  static thread_local Context* threadContext = NULL;
  
  Context* contextGet() {
--	assert(threadContext);
 +	DISTRHO_SAFE_ASSERT(threadContext != nullptr);
  	return threadContext;
  }

@@ -384,8 +384,8 @@ struct TextEditorModuleWidget : ModuleWidget {
     {
         nvgBeginPath(args.vg);
         nvgRect(args.vg, 0.0, 0.0, box.size.x, box.size.y);
-        nvgFillColor(args.vg, settings::darkMode ? nvgRGB(0x20, 0x20, 0x20)
-                                                 : nvgRGB(0xe6, 0xe6, 0xe6));
+        nvgFillColor(args.vg, settings::preferDarkPanels ? nvgRGB(0x20, 0x20, 0x20)
+                                                         : nvgRGB(0xe6, 0xe6, 0xe6));
         nvgFill(args.vg);
         ModuleWidget::draw(args);
     }

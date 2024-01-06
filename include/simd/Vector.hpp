@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 
 /**
  * This file is an edited version of VCVRack's simd/Vector.hpp
- * Copyright (C) 2016-2021 VCV.
+ * Copyright (C) 2016-2023 VCV.
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
