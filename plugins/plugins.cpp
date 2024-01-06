@@ -18,7 +18,6 @@
 // ZamAudio (always enabled) - TODO
 // #include "ZamAudio/src/plugin.hpp"
 
-#ifndef NOPLUGINS
 // 21kHz
 #include "21kHz/src/21kHz.hpp"
 
@@ -784,12 +783,9 @@ void surgext_rack_update_theme();
 #include "ZZC/src/ZZC.hpp"
 #undef modelClock
 
-#endif // NOPLUGINS
-
 // known terminal modules
 std::vector<Model*> hostTerminalModels;
 
-#ifndef NOPLUGINS
 // stuff that reads config files, we don't want that
 int loadConsoleType() { return 0; }
 bool loadDarkAsDefault() { return settings::preferDarkPanels; }
@@ -802,13 +798,11 @@ void saveDefaultTheme(ModuleTheme) {}
 void saveDirectOutMode(bool) {}
 void saveHighQualityAsDefault(bool) {}
 void writeDefaultTheme() {}
-#endif
 
 // plugin instances
 Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__Fundamental;
 // Plugin* pluginInstance__ZamAudio;
-#ifndef NOPLUGINS
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
 extern Plugin* pluginInstance__AaronStatic;
@@ -881,7 +875,6 @@ Plugin* pluginInstance__Voxglitch;
 Plugin* pluginInstance__WhatTheRack;
 Plugin* pluginInstance__ZetaCarinaeModules;
 Plugin* pluginInstance__ZZC;
-#endif // NOPLUGINS
 
 namespace rack {
 
@@ -1103,7 +1096,6 @@ static void initStatic__ZamAudio()
 }
 */
 
-#ifndef NOPLUGINS
 static void initStatic__21kHz()
 {
     Plugin* const p = new Plugin;
@@ -3123,14 +3115,12 @@ static void initStatic__ZZC()
 #undef modelClock
     }
 }
-#endif // NOPLUGINS
 
 void initStaticPlugins()
 {
     initStatic__Cardinal();
     initStatic__Fundamental();
     // initStatic__ZamAudio();
-#ifndef NOPLUGINS
     initStatic__21kHz();
     initStatic__8Mode();
     initStatic__AaronStatic();
@@ -3203,7 +3193,6 @@ void initStaticPlugins()
     initStatic__WhatTheRack();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();
-#endif // NOPLUGINS
 }
 
 void destroyStaticPlugins()
@@ -3215,7 +3204,6 @@ void destroyStaticPlugins()
 
 void updateStaticPluginsDarkMode()
 {
-#ifndef NOPLUGINS
     const bool darkMode = settings::preferDarkPanels;
     // bogaudio
     {
@@ -3239,7 +3227,6 @@ void updateStaticPluginsDarkMode()
     {
         surgext_rack_update_theme();
     }
-#endif
 }
 
 }
