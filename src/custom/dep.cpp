@@ -1310,25 +1310,6 @@ NSVGimage* nsvgParseFromFileCardinal(const char* const filename, const char* con
             goto postparse;
         }
 
-        // Special case for light/dark screws
-        if (std::strncmp(filename + (filenamelen-15), "/ScrewBlack.svg", 15) == 0 && filename[filenamelen-16] != '.')
-        {
-            const std::string silverfilename = std::string(filename).substr(0, filenamelen-9) + "Silver.svg";
-            hasLightMode = true;
-            shapesOrig = shapesMOD = nullptr;
-            handleMOD = nsvgParseFromFile(silverfilename.c_str(), units, dpi);
-            goto postparse;
-        }
-
-        if (std::strncmp(filename + (filenamelen-16), "/ScrewSilver.svg", 16) == 0 && filename[filenamelen-17] != '.')
-        {
-            const std::string blackfilename = std::string(filename).substr(0, filenamelen-10) + "Black.svg";
-            hasDarkMode = true;
-            shapesOrig = shapesMOD = nullptr;
-            handleMOD = nsvgParseFromFile(blackfilename.c_str(), units, dpi);
-            goto postparse;
-        }
-
 #if 0
         // Special case for GlueTheGiant
         if (std::strstr(filename, "/GlueTheGiant/res/") != nullptr)
