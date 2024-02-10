@@ -103,6 +103,8 @@ struct HostMIDI : TerminalModule {
         // Indexed by channel
         uint8_t notes[16];
         bool gates[16];
+        bool gatesForceGap[16];
+        bool gateForceGaps;
         uint8_t velocities[16];
         uint8_t aftertouches[16];
         std::vector<uint8_t> heldNotes;
@@ -148,6 +150,7 @@ struct HostMIDI : TerminalModule {
             channels = 1;
             polyMode = ROTATE_MODE;
             pwRange = 0;
+            gateForceGaps = false;
             panic(true);
         }
 
@@ -157,6 +160,7 @@ struct HostMIDI : TerminalModule {
             for (int c = 0; c < 16; c++) {
                 notes[c] = 60;
                 gates[c] = false;
+                gatesForceGap[c] = false;
                 velocities[c] = 0;
                 aftertouches[c] = 0;
                 pwFilters[c].reset();
@@ -290,10 +294,11 @@ struct HostMIDI : TerminalModule {
                 float pw = pwValues[(polyMode == MPE_MODE) ? c : 0];
                 float pitch = (notes[c] - 60.f + pw * pwRange) / 12.f;
                 outputs[PITCH_OUTPUT].setVoltage(pitch, c);
-                outputs[GATE_OUTPUT].setVoltage(gates[c] ? 10.f : 0.f, c);
+                outputs[GATE_OUTPUT].setVoltage(gates[c] && !gatesForceGap[c] ? 10.f : 0.f, c);
                 outputs[VELOCITY_OUTPUT].setVoltage(rescale(velocities[c], 0, 127, 0.f, 10.f), c);
                 outputs[AFTERTOUCH_OUTPUT].setVoltage(rescale(aftertouches[c], 0, 127, 0.f, 10.f), c);
                 outputs[RETRIGGER_OUTPUT].setVoltage(retriggerPulses[c].process(args.sampleTime) ? 10.f : 0.f, c);
+                gatesForceGap[c] = false;
             }
 
             outputs[START_OUTPUT].setVoltage(startPulse.process(args.sampleTime) ? 10.f : 0.f);
@@ -483,6 +488,9 @@ struct HostMIDI : TerminalModule {
             for (int c = 0; c < channels; c++) {
                 if (notes[c] == note) {
                     gates[c] = false;
+                    // this will stay low even when gates[c] = true
+                    // is set by a note on before the gate is sent as low
+                    gatesForceGap[c] = gateForceGaps;
                 }
             }
             // Set last note if monophonic
@@ -709,6 +717,7 @@ struct HostMIDI : TerminalModule {
 
         json_object_set_new(rootJ, "pwRange", json_real(midiInput.pwRange));
         json_object_set_new(rootJ, "smooth", json_boolean(midiInput.smooth));
+        json_object_set_new(rootJ, "forceGateGaps", json_boolean(midiInput.gateForceGaps));
         json_object_set_new(rootJ, "channels", json_integer(midiInput.channels));
         json_object_set_new(rootJ, "polyMode", json_integer(midiInput.polyMode));
 
@@ -735,6 +744,9 @@ struct HostMIDI : TerminalModule {
 
         if (json_t* const smoothJ = json_object_get(rootJ, "smooth"))
             midiInput.smooth = json_boolean_value(smoothJ);
+
+        if (json_t* const forceGateGapsJ = json_object_get(rootJ, "forceGateGaps"))
+            midiInput.gateForceGaps = json_boolean_value(forceGateGapsJ);
 
         if (json_t* const channelsJ = json_object_get(rootJ, "channels"))
             midiInput.setChannels(json_integer_value(channelsJ));
@@ -816,6 +828,8 @@ struct HostMIDIWidget : ModuleWidgetWith9HP {
     {
         menu->addChild(new MenuSeparator);
         menu->addChild(createMenuLabel("MIDI Input"));
+
+        menu->addChild(createBoolPtrMenuItem("Force gate gaps between notes", "", &module->midiInput.gateForceGaps));
 
         menu->addChild(createBoolPtrMenuItem("Smooth pitch/mod wheel", "", &module->midiInput.smooth));
 
