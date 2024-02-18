@@ -647,6 +647,11 @@ PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 CF_CUSTOM = $(DRWAV)
 
 # --------------------------------------------------------------
+# Computerscare
+
+PLUGIN_FILES += $(filter-out Computerscare/src/Computerscare.cpp,$(wildcard Computerscare/src/*.cpp))
+
+# --------------------------------------------------------------
 # dBiz
 
 PLUGIN_FILES += $(filter-out dBiz/src/plugin.cpp,$(wildcard dBiz/src/*.cpp))
@@ -2201,6 +2206,13 @@ $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
 		-DpluginInstance=pluginInstance__cf \
 		-Wno-misleading-indentation
+
+$(BUILD_DIR)/Computerscare/src/%.cpp.o: Computerscare/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),Computerscare)) \
+		-DpluginInstance=pluginInstance__Computerscare
 
 $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
