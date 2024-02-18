@@ -2211,7 +2211,7 @@ $(BUILD_DIR)/Computerscare/src/%.cpp.o: Computerscare/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),Computerscare)) \
+		$(foreach m,$(COMPUTERSCARE_CUSTOM),$(call custom_module_names,$(m),Computerscare)) \
 		-DpluginInstance=pluginInstance__Computerscare
 
 $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
