@@ -649,7 +649,7 @@ CF_CUSTOM = $(DRWAV)
 # --------------------------------------------------------------
 # Computerscare
 
-PLUGIN_FILES += $(filter-out Computerscare/src/Computerscare.cpp,$(wildcard Computerscare/src/*.cpp))
+PLUGIN_FILES += $(filter-out Computerscare/src/Computerscare.cpp Computerscare/src/test.cpp,$(wildcard Computerscare/src/*.cpp))
 
 # modules/types which are present in other plugins
 COMPUTERSCARE_CUSTOM = Quantizer PanelBorder
