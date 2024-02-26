@@ -2656,6 +2656,7 @@ $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 		$(foreach m,$(VALLEYAUDIO_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ValleyAudio_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__ValleyAudio \
 		-DSTDIO_OVERRIDE=ValleyAudio \
+		-IValleyAudio/src \
 		-Wno-sign-compare \
 		-Wno-unused-but-set-variable
 
