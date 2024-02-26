@@ -1108,7 +1108,7 @@ MINIPLUGIN_FILES += surgext-helper/surgext-helper.cpp
 PLUGIN_FILES += $(filter-out unless_modules/src/unless.cpp,$(wildcard unless_modules/src/*.cpp))
 
 # modules/types which are present in other plugins
-UNLESS_MODULES_CUSTOM = Chord Selection sign
+UNLESS_MODULES_CUSTOM = Selection sign
 
 # --------------------------------------------------------------
 # ValleyAudio
@@ -1235,7 +1235,7 @@ PLUGIN_BINARIES += ValleyAudio/src/XFADE.bin
 # MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_5.bin
 
 # modules/types which are present in other plugins
-VALLEYAUDIO_CUSTOM = $(DRWAV) DigitalDisplay
+VALLEYAUDIO_CUSTOM = $(DRWAV) Chord DigitalDisplay
 VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 
 # --------------------------------------------------------------
