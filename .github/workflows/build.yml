@@ -199,15 +199,6 @@ jobs:
           source deps/PawPaw/local.env macos-${{ matrix.target }}
           make features
           make NOOPT=true -j $(sysctl -n hw.logicalcpu)
-      - name: Build macOS (AU using juce)
-        if: steps.cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: |
-          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          source deps/PawPaw/local.env macos-${{ matrix.target }}
-          mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
-          mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS (packaging)
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
