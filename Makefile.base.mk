@@ -57,6 +57,7 @@ endif
 # -----------------------------------------------------------------------------
 # Custom build flags
 
+BASE_FLAGS += -DUSING_CARDINAL_NOT_RACK
 BASE_FLAGS += -I$(abspath $(ROOT)/include)
 BASE_FLAGS += -I$(abspath $(ROOT)/include/simd-compat)
 BASE_FLAGS += -I$(RACK_DEP_PATH)/include

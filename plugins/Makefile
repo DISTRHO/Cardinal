@@ -1027,7 +1027,6 @@ PLUGIN_FILES += surgext-helper/surgext-helper.cpp
 SURGEXT_CUSTOM = HysteresisProcessing Patch SolverType Tunings Wavetable ghc clouds plaits stmlib
 
 SURGEXT_FLAGS  = $(filter-out -fsingle-precision-constant,$(filter-out -std=gnu++11,$(BUILD_CXX_FLAGS)))
-SURGEXT_FLAGS += $(NOFINITE_FLAGS)
 SURGEXT_FLAGS += -std=gnu++17
 SURGEXT_FLAGS += -DTIXML_USE_STL=1
 SURGEXT_FLAGS += \
@@ -1299,9 +1298,6 @@ endif
 ifeq ($(HAVE_X11),true)
 BASE_FLAGS += -DHAVE_X11
 endif
-
-# Use this for any plugins that rely on NaN presence
-NOFINITE_FLAGS = -fno-finite-math-only -fno-strict-aliasing
 
 # --------------------------------------------------------------
 # lots of warnings from plugins
@@ -2119,7 +2115,7 @@ $(BUILD_DIR)/AudibleInstruments/%.o: AudibleInstruments/%
 $(BUILD_DIR)/Autinn/%.cpp.o: Autinn/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(AUTINN_CUSTOM),$(call custom_module_names,$(m),Autinn)) \
 		-DpluginInstance=pluginInstance__Autinn \
 		-Dinit=init__Autinn
@@ -2197,7 +2193,7 @@ $(BUILD_DIR)/CatroModulo/src/%.cpp.o: CatroModulo/src/%.cpp
 $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
 		-DpluginInstance=pluginInstance__cf \
 		-Wno-misleading-indentation
@@ -2205,7 +2201,7 @@ $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(CHOWDSP_CUSTOM),$(call custom_module_names,$(m),ChowDSP)) \
 		-DpluginInstance=pluginInstance__ChowDSP \
 		-DUSE_EIGEN \
@@ -2242,7 +2238,7 @@ $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 $(BUILD_DIR)/EnigmaCurry/src/%.cpp.o: EnigmaCurry/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ENIGMACURRY_CUSTOM),$(call custom_module_names,$(m),EnigmaCurry)) \
 		-DpluginInstance=pluginInstance__EnigmaCurry \
 		-Wno-misleading-indentation
@@ -2271,7 +2267,7 @@ $(BUILD_DIR)/Extratone/src/%.cpp.o: Extratone/src/%.cpp
 $(BUILD_DIR)/FehlerFabrik/%.cpp.o: FehlerFabrik/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(FEHLERFABRIK_CUSTOM),$(call custom_module_names,$(m),FehlerFabrik)) \
 		-DpluginInstance=pluginInstance__FehlerFabrik
 
@@ -2299,7 +2295,7 @@ $(BUILD_DIR)/Fundamental/%.cpp.o: Fundamental/%.cpp
 $(BUILD_DIR)/Fundamental/src/Scope.cpp.o: Fundamental/src/Scope.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(FUNDAMENTAL_CUSTOM),$(call custom_module_names,$(m),Fundamental)) \
 		-DpluginInstance=pluginInstance__Fundamental
 
@@ -2329,7 +2325,7 @@ $(BUILD_DIR)/GoodSheperd/%.cpp.o: GoodSheperd/%.cpp
 $(BUILD_DIR)/GrandeModular/%.cpp.o: GrandeModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(GRANDEMODULAR_CUSTOM),$(call custom_module_names,$(m),GrandeModular)) \
 		-DpluginInstance=pluginInstance__GrandeModular \
 		-Wno-missing-braces \
@@ -2353,7 +2349,7 @@ $(BUILD_DIR)/HamptonHarmonics/%.cpp.o: HamptonHarmonics/%.cpp
 $(BUILD_DIR)/HetrickCV/%.cpp.o: HetrickCV/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(HETRICKCV_CUSTOM),$(call custom_module_names,$(m),HetrickCV)) \
 		-DpluginInstance=pluginInstance__HetrickCV \
 		-DSTDIO_OVERRIDE=HetrickCV \
@@ -2363,7 +2359,7 @@ $(BUILD_DIR)/HetrickCV/%.cpp.o: HetrickCV/%.cpp
 $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
 		-DStepAttributes=StepAttributesKernel \
@@ -2371,7 +2367,7 @@ $(BUILD_DIR)/ImpromptuModular/src/Foundr%.cpp.o: ImpromptuModular/src/Foundr%.cp
 $(BUILD_DIR)/ImpromptuModular/src/ImpromptuModular.cpp.o: ImpromptuModular/src/ImpromptuModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
 		-Dinit=init__ImpromptuModular
@@ -2379,7 +2375,7 @@ $(BUILD_DIR)/ImpromptuModular/src/ImpromptuModular.cpp.o: ImpromptuModular/src/I
 $(BUILD_DIR)/ImpromptuModular%.cpp.o: ImpromptuModular%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM),$(call custom_module_names,$(m),ImpromptuModular)) \
 		$(foreach m,$(IMPROMPTUMODULAR_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ImpromptuModular_$(shell basename $*))) \
 		-DpluginInstance=pluginInstance__ImpromptuModular \
@@ -2443,7 +2439,7 @@ $(BUILD_DIR)/LilacLoop/%.cpp.o: LilacLoop/%.cpp
 $(BUILD_DIR)/LittleUtils/%.cpp.o: LittleUtils/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(LITTLEUTILS_CUSTOM),$(call custom_module_names,$(m),LittleUtils)) \
 		-DpluginInstance=pluginInstance__LittleUtils
 
@@ -2473,7 +2469,7 @@ $(BUILD_DIR)/Meander/src/Meander.cpp.o: Meander/src/Meander.cpp
 $(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),MindMeld)) \
 		-DpluginInstance=pluginInstance__MindMeld \
 		-Dinit=init__MindMeld
@@ -2481,7 +2477,7 @@ $(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/Mind
 $(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MINDMELD_CUSTOM),$(call custom_module_names,$(m),MindMeld)) \
 		-DpluginInstance=pluginInstance__MindMeld
 
@@ -2509,7 +2505,7 @@ $(BUILD_DIR)/Mog/%.cpp.o: Mog/%.cpp
 $(BUILD_DIR)/mscHack/%.cpp.o: mscHack/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MSCHACK_CUSTOM),$(call custom_module_names,$(m),mscHack)) \
 		$(foreach m,$(MSCHACK_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),mscHack_$(shell basename $*))) \
 		-DthePlugin=pluginInstance__mscHack \
@@ -2562,7 +2558,7 @@ $(BUILD_DIR)/ParableInstruments/%.o: ParableInstruments/%
 $(BUILD_DIR)/PathSet/%.cpp.o: PathSet/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(PATHSET_CUSTOM),$(call custom_module_names,$(m),PathSet)) \
 		-DpluginInstance=pluginInstance__PathSet
 
@@ -2607,7 +2603,7 @@ $(BUILD_DIR)/repelzen/%.cpp.o: repelzen/%.cpp
 $(BUILD_DIR)/Sapphire/%.cpp.o: Sapphire/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) $(NOFINITE_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(SAPPHIRE_CUSTOM),$(call custom_module_names,$(m),Sapphire)) \
 		-DpluginInstance=pluginInstance__sapphire
 

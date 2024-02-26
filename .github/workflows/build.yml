@@ -148,7 +148,7 @@ jobs:
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../LICENSE ../README.md ../docs
+          tar -c -h --hard-dereference -J -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || env.SHA8 }}.tar.xz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../LICENSE ../README.md ../docs
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || env.SHA8 }}
