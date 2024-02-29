@@ -746,7 +746,7 @@ PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/Domain.cpp)
 PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/scl.cpp)
 
 # modules/types which are present in other plugins
-HETRICKCV_CUSTOM = ASR BlankPanel FlipFlop MidSide MinMax
+HETRICKCV_CUSTOM = ASR BlankPanel FlipFlop MidSide MinMax PanelBaseWidget InverterWidget
 
 # --------------------------------------------------------------
 # ImpromptuModular
