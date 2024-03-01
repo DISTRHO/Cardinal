@@ -553,7 +553,6 @@ MINIPLUGIN_FILES += BaconPlugs/src/Style.cpp
 
 PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
 PLUGIN_FILES += $(wildcard Befaco/src/noise-plethora/*/*.cpp)
-PLUGIN_BINARIES += Befaco/src/SpringReverbIR.pcm
 
 # modules/types which are present in other plugins
 BEFACO_CUSTOM = ADSR Mixer chowdsp
@@ -1391,6 +1390,7 @@ RESOURCE_FILES += BaconPlugs/res/Keypunch029.json
 RESOURCE_FILES += BaconPlugs/res/midi/chopin
 RESOURCE_FILES += BaconPlugs/res/midi/debussy
 RESOURCE_FILES += BaconPlugs/res/midi/goldberg
+RESOURCE_FILES += Befaco/res/SpringReverbIR.f32
 RESOURCE_FILES += cf/playeroscs
 RESOURCE_FILES += DHE-Modules/svg
 RESOURCE_FILES += DrumKit/res/samples
