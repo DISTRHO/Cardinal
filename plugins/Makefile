@@ -741,6 +741,7 @@ HAMPTONHARMONICS_CUSTOM = Arp Progress
 
 PLUGIN_FILES += $(filter-out HetrickCV/src/HetrickCV.cpp,$(wildcard HetrickCV/src/*.cpp))
 PLUGIN_FILES += $(wildcard HetrickCV/src/DSP/*.cpp)
+PLUGIN_FILES += $(wildcard HetrickCV/src/DSP/Phasors/*.cpp)
 PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/arr.cpp)
 PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/Domain.cpp)
 PLUGIN_FILES += $(wildcard HetrickCV/Gamma/src/scl.cpp)
