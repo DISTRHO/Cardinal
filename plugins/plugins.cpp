@@ -1842,7 +1842,7 @@ static void initStatic__CVfunk()
 		p->addModel(modelImpulseController);
 		p->addModel(modelSignals);
 		p->addModel(modelRanges);
-		#undef modelSteps
+#undef modelSteps
     }
 }
 
