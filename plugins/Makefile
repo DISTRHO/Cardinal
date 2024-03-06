@@ -650,6 +650,10 @@ CF_CUSTOM = $(DRWAV)
 
 PLUGIN_FILES += $(filter-out CVfunk/src/plugin.cpp,$(wildcard CVfunk/src/*.cpp))
 
+# modules/types which are present in other plugins
+CVFUNK_CUSTOM = modelSteps
+
+
 # --------------------------------------------------------------
 # dBiz
 
@@ -2209,7 +2213,7 @@ $(BUILD_DIR)/CVfunk/src/%.cpp.o: CVfunk/src/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
-		-DpluginInstance=pluginInstance__CVfunk \
+		-DpluginInstance=pluginInstance__CVfunk
 
 
 $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
