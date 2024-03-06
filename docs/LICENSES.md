@@ -160,6 +160,7 @@ Below is a list of artwork licenses from plugins
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
 | Computerscare/*                         | BSD-3-Clause     | No artwork specific license provided |
 | Computerscare/Oswald-Regular.ttf        | OFL-1.1          | |
+| Computerscare/digital-7.ttf             | Custom           | Freeware for personal use. For commercial use please contact us. Created by Sizenko Alexander. © 2008 Style-7. All rights reserved. http://www.styleseven.com NOTE: Link is dead... |
 | dBiz/*                                  | CC-BY-NC-ND-4.0  | |
 | dBiz/DejaVuSansMono.ttf                 | Bitstream-Vera   | |
 | dBiz/ShareTechMono-Regular.ttf          | OFL-1.1          | |
