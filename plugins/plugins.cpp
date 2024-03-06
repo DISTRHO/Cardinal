@@ -299,8 +299,9 @@ extern Model* modelTestVCF;
 #include "cf/src/plugin.hpp"
 
 // CVfunk
+#define modelSteps modelCVfunkSteps
 #include "CVfunk/src/plugin.hpp"
-
+#undef modelSteps
 
 // ChowDSP
 #include "ChowDSP/src/plugin.hpp"
@@ -1834,7 +1835,7 @@ static void initStatic__CVfunk()
     const StaticPluginLoader spl(p, "CVfunk");
     if (spl.ok())
     {
-		#define modelSteps modelCVfunkSteps
+#define modelSteps modelCVfunkSteps
 		p->addModel(modelSteps);
 		p->addModel(modelEnvelopeArray);
 		p->addModel(modelPentaSequencer);
