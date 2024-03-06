@@ -1834,16 +1834,16 @@ static void initStatic__CVfunk()
     const StaticPluginLoader spl(p, "CVfunk");
     if (spl.ok())
     {
+		#define modelSteps modelCVfunkSteps
 		p->addModel(modelSteps);
 		p->addModel(modelEnvelopeArray);
 		p->addModel(modelPentaSequencer);
 		p->addModel(modelImpulseController);
 		p->addModel(modelSignals);
 		p->addModel(modelRanges);
+		#undef modelSteps
     }
 }
-
-
 
 static void initStatic__dBiz()
 {
