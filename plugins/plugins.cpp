@@ -298,6 +298,10 @@ extern Model* modelTestVCF;
 // cf
 #include "cf/src/plugin.hpp"
 
+// CVfunk
+#include "CVfunk/src/plugin.hpp"
+
+
 // ChowDSP
 #include "ChowDSP/src/plugin.hpp"
 #define init initChowDSP
@@ -859,6 +863,7 @@ Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
+Plugin* pluginInstance__CVfunk;
 Plugin* pluginInstance__dBiz;
 Plugin* pluginInstance__DHE;
 extern Plugin* pluginInstance__DrumKit;
@@ -1820,6 +1825,25 @@ static void initStatic__ChowDSP()
         p->addModel(modelChowChorus);
     }
 }
+
+static void initStatic__CVfunk()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__CVfunk = p;
+
+    const StaticPluginLoader spl(p, "CVfunk");
+    if (spl.ok())
+    {
+		p->addModel(modelSteps);
+		p->addModel(modelEnvelopeArray);
+		p->addModel(modelPentaSequencer);
+		p->addModel(modelImpulseController);
+		p->addModel(modelSignals);
+		p->addModel(modelRanges);
+    }
+}
+
+
 
 static void initStatic__dBiz()
 {
@@ -3213,6 +3237,7 @@ void initStaticPlugins()
     initStatic__CatroModulo();
     initStatic__cf();
     initStatic__ChowDSP();
+    initStatic__CVfunk();
     initStatic__dBiz();
     initStatic__DHE();
     initStatic__DrumKit();

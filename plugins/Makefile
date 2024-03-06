@@ -646,6 +646,13 @@ PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 CF_CUSTOM = $(DRWAV)
 
 # --------------------------------------------------------------
+# CVfunk
+
+PLUGIN_FILES += $(filter-out CVfunk/src/plugin.cpp,$(wildcard CVfunk/src/*.cpp))
+
+
+
+# --------------------------------------------------------------
 # dBiz
 
 PLUGIN_FILES += $(filter-out dBiz/src/plugin.cpp,$(wildcard dBiz/src/*.cpp))
@@ -2198,6 +2205,14 @@ $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
 		-DpluginInstance=pluginInstance__cf \
 		-Wno-misleading-indentation
+
+$(BUILD_DIR)/CVfunk/src/%.cpp.o: CVfunk/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
+		-DpluginInstance=pluginInstance__CVfunk \
+
 
 $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
