@@ -2211,7 +2211,7 @@ $(BUILD_DIR)/CVfunk/src/%.cpp.o: CVfunk/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
+		$(foreach m,$(CVFUNK_CUSTOM),$(call custom_module_names,$(m),CVfunk)) \
 		-DpluginInstance=pluginInstance__CVfunk
 
 $(BUILD_DIR)/ChowDSP/%.cpp.o: ChowDSP/%.cpp
