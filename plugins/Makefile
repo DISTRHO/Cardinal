@@ -650,8 +650,6 @@ CF_CUSTOM = $(DRWAV)
 
 PLUGIN_FILES += $(filter-out CVfunk/src/plugin.cpp,$(wildcard CVfunk/src/*.cpp))
 
-
-
 # --------------------------------------------------------------
 # dBiz
 
