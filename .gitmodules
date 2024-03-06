@@ -236,3 +236,6 @@
 [submodule "plugins/plugins/CVfunk"]
 	path = plugins/plugins/CVfunk
 	url = https://github.com/codygeary/CVfunk-Modules.git
+[submodule "plugins/CVfunk"]
+	path = plugins/CVfunk
+	url = https://github.com/codygeary/CVfunk-Modules.git
