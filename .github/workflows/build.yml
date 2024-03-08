@@ -31,12 +31,12 @@ jobs:
           curl -sLO https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/git-man_2.34.1-1ubuntu1~bpo20.04.1~ppa1_all.deb
           dpkg -i *.deb
           rm *.deb
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up build cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/PawPawBuilds
@@ -108,7 +108,7 @@ jobs:
       - name: Pack binaries
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-linux-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
@@ -126,7 +126,7 @@ jobs:
   linux-x86_64-debug:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up dependencies
@@ -148,12 +148,12 @@ jobs:
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
       - name: Pack binaries
         run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../LICENSE ../README.md ../docs
-      - uses: actions/upload-artifact@v3
+          tar -c -h --hard-dereference -J -f ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || env.SHA8 }}.tar.xz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../LICENSE ../README.md ../docs
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-linux-x86_64-debug-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
-            *.tar.gz
+            *.tar.xz
 
   macos:
     strategy:
@@ -161,12 +161,12 @@ jobs:
         target: [universal-10.15]
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/PawPawBuilds
@@ -199,15 +199,6 @@ jobs:
           source deps/PawPaw/local.env macos-${{ matrix.target }}
           make features
           make NOOPT=true -j $(sysctl -n hw.logicalcpu)
-      - name: Build macOS (AU using juce)
-        if: steps.cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: |
-          export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          source deps/PawPaw/local.env macos-${{ matrix.target }}
-          mkdir -p jucewrapper/build
-          pushd jucewrapper/build; cmake -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j $(sysctl -n hw.logicalcpu); popd
-          mv jucewrapper/build/*_artefacts/Release/AU/*.component bin/
       - name: Build macOS (packaging)
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
@@ -224,7 +215,7 @@ jobs:
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.pkg
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-macOS-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
@@ -252,11 +243,11 @@ jobs:
             target: moddwarf
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: mpb-cache
         with:
           path: |
@@ -286,7 +277,7 @@ jobs:
         if: steps.mpb-cache.outputs.cache-hit == 'true'
         run: |
           tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-${{ matrix.name }}-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-${{ matrix.name }}-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
@@ -298,12 +289,12 @@ jobs:
         target: [simd, nosimd]
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/PawPawBuilds
@@ -370,7 +361,7 @@ jobs:
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           cd bin; zip -r -9 ../${{ github.event.repository.name }}-wasm-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls *.br *.html *.data *.js *.wasm) CardinalMini.lv2/modgui
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-wasm-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
@@ -396,12 +387,12 @@ jobs:
       - name: Install git
         run: |
           apt-get update -qq && apt-get install -yqq --no-install-recommends ca-certificates git openssl
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/PawPawBuilds
@@ -464,7 +455,7 @@ jobs:
           zip -r -9 ../${{ github.event.repository.name }}-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip $(ls | grep -e lv2 -e vst -e clap)
           popd
           zip -u -9 ${{ github.event.repository.name }}-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.zip LICENSE README.md docs/*.* CardinalJACK.exe CardinalNative.exe
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
@@ -484,7 +475,7 @@ jobs:
   headless:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up dependencies
@@ -501,7 +492,7 @@ jobs:
   lto:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up dependencies
@@ -517,7 +508,7 @@ jobs:
   sysdeps:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up dependencies
@@ -533,7 +524,7 @@ jobs:
   source-tarball:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up dependencies
@@ -551,7 +542,7 @@ jobs:
       - name: Set sha8 (release)
         if: startsWith(github.ref, 'refs/tags/')
         run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-source-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
@@ -573,12 +564,12 @@ jobs:
   plugin-validation:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             src/Rack/dep/bin

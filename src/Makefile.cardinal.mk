@@ -203,6 +203,7 @@ LV2_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).lv2/resources/%)
 VST3_RESOURCES  = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%)
 
 ifeq ($(MACOS),true)
+AU_RESOURCES   = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).component/Contents/Resources/%)
 CLAP_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/$(NAME).clap/Contents/Resources/%)
 else
 CLAP_RESOURCES = $(CORE_RESOURCES:%=$(TARGET_DIR)/Cardinal.clap/resources/%)
@@ -418,15 +419,22 @@ TARGETS = jack
 else ifeq ($(CARDINAL_VARIANT),native)
 TARGETS = jack
 else
-TARGETS = lv2 vst2 vst3 clap static
+TARGETS = au clap lv2 vst2 vst3
 endif
 
 all: $(TARGETS)
-lv2: $(LV2_RESOURCES)
-lv2_sep: $(LV2_RESOURCES)
-vst2: $(VST2_RESOURCES)
-vst3: $(VST3_RESOURCES)
+
+au: $(AU_RESOURCES)
+
 clap: $(CLAP_RESOURCES)
+
+lv2: $(LV2_RESOURCES)
+
+lv2_sep: $(LV2_RESOURCES)
+
+vst2: $(VST2_RESOURCES)
+
+vst3: $(VST3_RESOURCES)
 
 # --------------------------------------------------------------
 # Extra rules for macOS app bundle
@@ -503,15 +511,19 @@ $(TARGET_DIR)/Cardinal.clap/resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
+$(TARGET_DIR)/$(NAME).clap/Contents/Resources/%: ../Rack/res/%
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+$(TARGET_DIR)/$(NAME).component/Contents/Resources/%: ../Rack/res/%
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
 $(TARGET_DIR)/$(NAME).vst/Contents/Resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
 $(TARGET_DIR)/$(NAME).vst3/Contents/Resources/%: ../Rack/res/%
-	-@mkdir -p "$(shell dirname $@)"
-	$(SILENT)ln -sf $(abspath $<) $@
-
-$(TARGET_DIR)/$(NAME).clap/Contents/Resources/%: ../Rack/res/%
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 

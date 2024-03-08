@@ -67,7 +67,6 @@ namespace std {
 
 // Cardinal specific API
 #include <functional>
-#define USING_CARDINAL_NOT_RACK
 
 // OS separator macros
 #ifdef ARCH_WIN

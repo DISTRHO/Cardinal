@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -33,6 +33,10 @@
 #define DISTRHO_PLUGIN_URI     "https://distrho.kx.studio/plugins/cardinal"
 #define DISTRHO_PLUGIN_CLAP_ID "studio.kx.distrho.cardinal"
 
+#define DISTRHO_PLUGIN_AU_TYPE   aumf
+#define DISTRHO_PLUGIN_BRAND_ID  Dstr
+#define DISTRHO_PLUGIN_UNIQUE_ID DcnM
+
 #ifdef HEADLESS
 #define DISTRHO_PLUGIN_HAS_UI             0
 #define DISTRHO_PLUGIN_WANT_DIRECT_ACCESS 0
@@ -55,5 +59,7 @@
 #define DISTRHO_PLUGIN_WANT_TIMEPOS       1
 #define DISTRHO_PLUGIN_USES_CUSTOM_MODGUI 1
 #define DISTRHO_PLUGIN_LV2_CATEGORY       "mod:ControlVoltagePlugin, lv2:UtilityPlugin"
+
+#define DPF_VST3_DONT_USE_BRAND_ID
 
 #endif // DISTRHO_PLUGIN_INFO_H_INCLUDED

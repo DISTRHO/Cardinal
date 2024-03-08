@@ -298,6 +298,11 @@ extern Model* modelTestVCF;
 // cf
 #include "cf/src/plugin.hpp"
 
+// CVfunk
+#define modelSteps modelCVfunkSteps
+#include "CVfunk/src/plugin.hpp"
+#undef modelSteps
+
 // ChowDSP
 #include "ChowDSP/src/plugin.hpp"
 #define init initChowDSP
@@ -397,6 +402,8 @@ void saveGtgPluginDefault(const char*, int) {}
 #define modelFlipFlop modelHetrickCVFlipFlop
 #define modelMidSide modelHetrickCVMidSide
 #define modelMinMax modelHetrickCVMinMax
+#define PanelBaseWidget HetrickCVPanelBaseWidget
+#define InverterWidget HetrickCVInverterWidget
 extern Model* modelTwoToFour;
 extern Model* modelAnalogToDigital;
 extern Model* modelASR;
@@ -421,15 +428,47 @@ extern Model* modelExponent;
 extern Model* modelFBSineChaos;
 extern Model* modelFlipFlop;
 extern Model* modelFlipPan;
+extern Model* modelGateDelay;
 extern Model* modelGateJunction;
+extern Model* modelGateJunctionExp;
 extern Model* modelGingerbread;
 extern Model* modelLogicCombine;
 extern Model* modelMidSide;
 extern Model* modelMinMax;
+extern Model* modelPhaseDrivenSequencer;
+extern Model* modelPhaseDrivenSequencer32;
+extern Model* modelPhasorAnalyzer;
+extern Model* modelPhasorBurstGen;
+extern Model* modelPhasorDivMult;
+extern Model* modelPhasorEuclidean;
+extern Model* modelPhasorGates;
+extern Model* modelPhasorGates32;
+extern Model* modelPhasorGates64;
+extern Model* modelPhasorGen;
+extern Model* modelPhasorGeometry;
+extern Model* modelPhasorHumanizer;
+extern Model* modelPhasorMixer;
+extern Model* modelPhasorOctature;
+extern Model* modelPhasorQuadrature;
+extern Model* modelPhasorRandom;
+extern Model* modelPhasorRanger;
+extern Model* modelPhasorReset;
+extern Model* modelPhasorRhythmGroup;
+extern Model* modelPhasorShape;
+extern Model* modelPhasorShift;
+extern Model* modelPhasorStutter;
+extern Model* modelPhasorSubstepShape;
+extern Model* modelPhasorSwing;
+extern Model* modelPhasorTimetable;
+extern Model* modelPhasorToClock;
+extern Model* modelPhasorToLFO;
+extern Model* modelPhasorToWaveforms;
+extern Model* modelProbability;
 extern Model* modelRandomGates;
 extern Model* modelRotator;
 extern Model* modelRungler;
 extern Model* modelScanner;
+extern Model* modelVectorMix;
 extern Model* modelWaveshape;
 extern Model* modelXYToPolar;
 #undef modelASR
@@ -437,6 +476,8 @@ extern Model* modelXYToPolar;
 #undef modelFlipFlop
 #undef modelMidSide
 #undef modelMinMax
+#undef PanelBaseWidget
+#undef InverterWidget
 
 // ImpromptuModular
 /* NOTE too much noise in original include, do this a different way
@@ -833,6 +874,7 @@ Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
+Plugin* pluginInstance__CVfunk;
 Plugin* pluginInstance__dBiz;
 Plugin* pluginInstance__DHE;
 extern Plugin* pluginInstance__DrumKit;
@@ -1796,6 +1838,25 @@ static void initStatic__ChowDSP()
     }
 }
 
+static void initStatic__CVfunk()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__CVfunk = p;
+
+    const StaticPluginLoader spl(p, "CVfunk");
+    if (spl.ok())
+    {
+#define modelSteps modelCVfunkSteps
+		p->addModel(modelSteps);
+		p->addModel(modelEnvelopeArray);
+		p->addModel(modelPentaSequencer);
+		p->addModel(modelImpulseController);
+		p->addModel(modelSignals);
+		p->addModel(modelRanges);
+#undef modelSteps
+    }
+}
+
 static void initStatic__dBiz()
 {
     Plugin* const p = new Plugin;
@@ -2124,6 +2185,8 @@ static void initStatic__HetrickCV()
 #define modelFlipFlop modelHetrickCVFlipFlop
 #define modelMidSide modelHetrickCVMidSide
 #define modelMinMax modelHetrickCVMinMax
+#define PanelBaseWidget HetrickCVPanelBaseWidget
+#define InverterWidget HetrickCVInverterWidget
         p->addModel(modelTwoToFour);
         p->addModel(modelAnalogToDigital);
         p->addModel(modelASR);
@@ -2148,15 +2211,47 @@ static void initStatic__HetrickCV()
         p->addModel(modelFBSineChaos);
         p->addModel(modelFlipFlop);
         p->addModel(modelFlipPan);
+        p->addModel(modelGateDelay);
         p->addModel(modelGateJunction);
+        p->addModel(modelGateJunctionExp);
         p->addModel(modelGingerbread);
         p->addModel(modelLogicCombine);
         p->addModel(modelMidSide);
         p->addModel(modelMinMax);
+        p->addModel(modelPhaseDrivenSequencer);
+        p->addModel(modelPhaseDrivenSequencer32);
+        p->addModel(modelPhasorAnalyzer);
+        p->addModel(modelPhasorBurstGen);
+        p->addModel(modelPhasorDivMult);
+        p->addModel(modelPhasorEuclidean);
+        p->addModel(modelPhasorGates);
+        p->addModel(modelPhasorGates32);
+        p->addModel(modelPhasorGates64);
+        p->addModel(modelPhasorGen);
+        p->addModel(modelPhasorGeometry);
+        p->addModel(modelPhasorHumanizer);
+        p->addModel(modelPhasorMixer);
+        p->addModel(modelPhasorOctature);
+        p->addModel(modelPhasorQuadrature);
+        p->addModel(modelPhasorRandom);
+        p->addModel(modelPhasorRanger);
+        p->addModel(modelPhasorReset);
+        p->addModel(modelPhasorRhythmGroup);
+        p->addModel(modelPhasorShape);
+        p->addModel(modelPhasorShift);
+        p->addModel(modelPhasorStutter);
+        p->addModel(modelPhasorSubstepShape);
+        p->addModel(modelPhasorSwing);
+        p->addModel(modelPhasorTimetable);
+        p->addModel(modelPhasorToClock);
+        p->addModel(modelPhasorToLFO);
+        p->addModel(modelPhasorToWaveforms);
+        p->addModel(modelProbability);
         p->addModel(modelRandomGates);
         p->addModel(modelRotator);
         p->addModel(modelRungler);
         p->addModel(modelScanner);
+        p->addModel(modelVectorMix);
         p->addModel(modelWaveshape);
         p->addModel(modelXYToPolar);
 #undef modelASR
@@ -2164,6 +2259,8 @@ static void initStatic__HetrickCV()
 #undef modelFlipFlop
 #undef modelMidSide
 #undef modelMinMax
+#undef PanelBaseWidget
+#undef InverterWidget
     }
 }
 
@@ -3179,6 +3276,7 @@ void initStaticPlugins()
     initStatic__CatroModulo();
     initStatic__cf();
     initStatic__ChowDSP();
+    initStatic__CVfunk();
     initStatic__dBiz();
     initStatic__DHE();
     initStatic__DrumKit();

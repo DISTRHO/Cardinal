@@ -303,8 +303,8 @@ struct CardinalExpanderForInputMIDIWidget : ModuleWidgetWith3HP {
         setModule(m);
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/ExpanderMIDI.svg")));
 
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-        addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+        addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
         for (int i=0; i<CardinalExpanderForInputMIDI::NUM_INPUTS; ++i)
             addInput(createInput<PJ301MPort>(Vec(startX + 4.0f, startY + padding * i), m, i));
