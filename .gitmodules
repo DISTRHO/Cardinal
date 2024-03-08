@@ -233,3 +233,6 @@
 [submodule "plugins/DHE-Modules"]
 	path = plugins/DHE-Modules
 	url = https://github.com/dhemery/DHE-Modules.git
+[submodule "plugins/CVfunk"]
+	path = plugins/CVfunk
+	url = https://github.com/codygeary/CVfunk-Modules.git

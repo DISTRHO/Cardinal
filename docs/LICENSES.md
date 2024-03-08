@@ -33,6 +33,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Catro/Modulo            | BSD-3-Clause             | |
 | cf                      | BSD-3-Clause             | |
 | ChowDSP                 | GPL-3.0-or-later         | |
+| CVfunk                  | MIT                      | |
 | dBiz                    | GPL-3.0-or-later         | |
 | DHE-Modules             | MIT                      | |
 | DrumKit                 | CC0-1.0                  | |
@@ -157,6 +158,7 @@ Below is a list of artwork licenses from plugins
 | cf/VT323-Regular.ttf                    | OFL-1.1-no-RFN   | |
 | ChowDSP/*                               | GPL-3.0-or-later | Same license as source code |
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
+| CVfunk/*                                | MIT              | Same license as source code |
 | dBiz/*                                  | CC-BY-NC-ND-4.0  | |
 | dBiz/DejaVuSansMono.ttf                 | Bitstream-Vera   | |
 | dBiz/ShareTechMono-Regular.ttf          | OFL-1.1          | |
