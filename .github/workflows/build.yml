@@ -3,7 +3,7 @@ name: build
 on: [push, pull_request]
 
 env:
-  CACHE_VERSION: 8
+  CACHE_VERSION: 9
   CARDINAL_UNDER_WINE: 1
   CIBUILD: true
   DEBIAN_FRONTEND: noninteractive
