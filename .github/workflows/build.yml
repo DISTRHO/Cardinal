@@ -3,11 +3,12 @@ name: build
 on: [push, pull_request]
 
 env:
-  CACHE_VERSION: 7
+  CACHE_VERSION: 8
   CARDINAL_UNDER_WINE: 1
   CIBUILD: true
   DEBIAN_FRONTEND: noninteractive
   LIBGL_ALWAYS_SOFTWARE: true
+  PAWPAW_FAST_MATH: 1
   PAWPAW_SKIP_GLIB: 1
   PAWPAW_SKIP_LTO: 1
   PAWPAW_SKIP_LV2: 1
@@ -600,7 +601,7 @@ jobs:
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
           make features
-          make NOOPT=true SKIP_STRIPPING=true carla deps dgl plugins resources -j $(nproc)
+          make CIBUILD=false NOOPT=true SKIP_STRIPPING=true carla deps dgl plugins resources -j $(nproc)
       # single job for final build stage, otherwise we might get killed due to OOM
       - name: Build Cardinal (final build stage)
         env:
@@ -609,8 +610,8 @@ jobs:
           LDFLAGS: -static-libgcc -static-libstdc++
         run: |
           make features
-          make NOOPT=true SKIP_STRIPPING=true -j 1 -C src jack
-          make NOOPT=true -j 1
+          make CIBUILD=false NOOPT=true SKIP_STRIPPING=true -j 1 -C src jack
+          make CIBUILD=false NOOPT=true -j 1
           ./dpf/utils/generate-ttl.sh
       - name: Run Cardinal self-tests
         run: |
