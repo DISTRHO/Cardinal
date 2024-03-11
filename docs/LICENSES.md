@@ -34,6 +34,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | cf                      | BSD-3-Clause             | |
 | ChowDSP                 | GPL-3.0-or-later         | |
 | Computerscare           | BSD-3-Clause             | |
+| CVfunk                  | MIT                      | |
 | dBiz                    | GPL-3.0-or-later         | |
 | DHE-Modules             | MIT                      | |
 | DrumKit                 | CC0-1.0                  | |
@@ -160,7 +161,8 @@ Below is a list of artwork licenses from plugins
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
 | Computerscare/*                         | BSD-3-Clause     | No artwork specific license provided |
 | Computerscare/Oswald-Regular.ttf        | OFL-1.1          | |
-| Computerscare/digital-7.ttf             | Custom           | Freeware for personal use. For commercial use please contact us. Created by Sizenko Alexander. © 2008 Style-7. All rights reserved. http://www.styleseven.com NOTE: Link is dead... |
+| Computerscare/Segment7Standard.ttf      | OFL-1.1-RFN      | |
+| CVfunk/*                                | MIT              | Same license as source code |
 | dBiz/*                                  | CC-BY-NC-ND-4.0  | |
 | dBiz/DejaVuSansMono.ttf                 | Bitstream-Vera   | |
 | dBiz/ShareTechMono-Regular.ttf          | OFL-1.1          | |

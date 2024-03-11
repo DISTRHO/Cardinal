@@ -237,3 +237,6 @@
 	path = plugins/Computerscare
 	url = https://github.com/freddyz/computerscare-vcv-modules.git
 	branch = v2.0.4
+[submodule "plugins/CVfunk"]
+	path = plugins/CVfunk
+	url = https://github.com/codygeary/CVfunk-Modules.git

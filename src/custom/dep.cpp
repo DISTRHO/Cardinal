@@ -19,7 +19,6 @@ namespace settings {
 int rateLimit = 0;
 extern bool preferDarkPanels;
 extern std::string uiTheme;
-bool darkMode; // TODO remove after updating all plugins
 }
 namespace ui {
 void refreshTheme();
@@ -67,7 +66,6 @@ enum DarkMode {
     kModeDHE,
     kModeDrumKit,
     kModeESeries,
-    kModeHetrickCV,
     kModeJW,
     kModeLilacLoop,
     kModeLittleUtils,
@@ -282,49 +280,6 @@ static const struct {
     // Custom, runtime dark mode used with permission
     { kModeESeries,"/ESeries/res/E340.svg", {}, -1 },
     // CC0-1.0
-    { kModeHetrickCV, "/HetrickCV/res/1OpChaos.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/2OpChaos.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/2To4.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/3OpChaos.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/ASR.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/AToD.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/BinaryGate.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/BinaryNoise.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Bitshift.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Boolean3.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/ChaoticAttractors.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/ClockedNoise.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Comparator.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Contrast.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Crackle.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/DataCompander.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Delta.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/DToA.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Dust.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Exponent.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/FBSineChaos.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/FlipFlop.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/FlipPan.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/GateJunction.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Gingerbread.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/LogicCombiner.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/LogicInverter.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/MidSide.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/MinMax.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/RandomGates.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Rotator.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Rungler.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Scanner.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/TrigShaper.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Waveshape.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/XYToPolar.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel1.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel2.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel3.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel5.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel6.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel7.svg", {}, -1},
-    { kModeHetrickCV, "/HetrickCV/res/Blanks/BlankPanel8.svg", {}, -1},
     // BSD-3-Clause
     { kModeJW, "/JW-Modules/res/Add5.svg", {}, -1 },
     { kModeJW, "/JW-Modules/res/BlankPanel1hp.svg", {}, -1 },
@@ -1532,7 +1487,6 @@ namespace rack {
 void switchDarkMode(const bool darkMode)
 {
    #ifndef HEADLESS
-    settings::darkMode = darkMode; // TODO remove after updating all plugins
     settings::preferDarkPanels = darkMode;
     settings::uiTheme = darkMode ? "dark" : "light";
     ui::refreshTheme();

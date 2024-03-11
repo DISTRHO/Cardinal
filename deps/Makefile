@@ -286,12 +286,13 @@ SURGE_ENV = env \
 SURGE_LIB = $(SURGE_DEP_PATH)/src/common/libsurge-common.a
 
 $(SURGE_LIB): $(SURGE_DEP_PATH)/Makefile
-	$(DEP_MAKE) -C $(SURGE_DEP_PATH) surge-common
+	+$(DEP_MAKE) -C $(SURGE_DEP_PATH) surge-common
 
 $(SURGE_DEP_PATH)/Makefile: $(SURGE_SRC_PATH)/CMakeLists.txt
 	mkdir -p $(SURGE_DEP_PATH)
 	cd $(SURGE_DEP_PATH) && \
 		$(SURGE_ENV) $(CMAKE) \
+		-DSURGE_BUILD_32BIT_LINUX=TRUE \
 		-DSURGE_COMPILE_BLOCK_SIZE=8 \
 		-DSURGE_SKIP_AIRWINDOWS=TRUE \
 		-DSURGE_SKIP_JUCE_FOR_RACK=TRUE \
