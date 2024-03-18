@@ -684,7 +684,7 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
         }
         break;
     // Special case for Computerscare
-    case kModeComputerscare:
+    /*case kModeComputerscare:
         switch (paint.color)
         {
         // Make all panel BGs one shade of gray
@@ -697,7 +697,7 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
         case 0xffd5d9d5:
             paint.color = 0xff2d2d2d;
             return true;
-        }
+        }*/
         break;
     // Special case for DHE, mark things darker instead of inverting
     case kModeDHE:
