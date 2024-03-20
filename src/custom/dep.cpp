@@ -217,6 +217,9 @@ static const struct {
     { kModeCf, "/cf/res/VARIABLE.svg", {}, -1 },
     // BSD-3 Clause
     { kModeComputerscare, "/Computerscare/res/computerscare-clk-text.svg", {}, -1},
+    { kModeComputerscare, "/Computerscare/res/vertical-x-1.svg", {}, -1},
+    { kModeComputerscare, "/Computerscare/res/vertical-x-2.svg", {}, -1},
+    { kModeComputerscare, "/Computerscare/res/vertical-x-3.svg", {}, -1},
     { kModeComputerscare, "/Computerscare/res/computerscare-logo-normal.svg", {}, -1},
     { kModeComputerscare, "/Computerscare/res/computerscare-logo-sad.svg", {}, -1},
     { kModeComputerscare, "/Computerscare/res/ComputerscareDebugPanel.svg", {}, -1 },
@@ -684,20 +687,13 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
         }
         break;
     // Special case for Computerscare
-    /*case kModeComputerscare:
+    case kModeComputerscare:
         switch (paint.color)
         {
-        // Make all panel BGs one shade of gray
-        case 0xffd9e0e0:
-        case 0xfff9f9f9:
-        case 0xffececec:
-        case 0xfff5f4f2:
-        case 0xffe8e7e6:
-        case 0xffe0e0e0:
-        case 0xffd5d9d5:
-            paint.color = 0xff2d2d2d;
-            return true;
-        }*/
+        // Just make vertical-x-* visible
+        case 0xffa6c924:
+            return false;
+        }
         break;
     // Special case for DHE, mark things darker instead of inverting
     case kModeDHE:
