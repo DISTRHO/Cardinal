@@ -1843,6 +1843,8 @@ static void initStatic__CVfunk()
 		p->addModel(modelSignals);
 		p->addModel(modelRanges);
 		p->addModel(modelHexMod);
+		p->addModel(modelCollatz);		
+		p->addModel(modelStrings);		
 #undef modelSteps
     }
 }
