@@ -1,0 +1,42 @@
+name: Bug Report
+description: Report a bug with Cardinal
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: "23.07"
+    validations:
+      required: true
+  - type: dropdown
+    id: plugin-type
+    attributes:
+      label: Plugin type
+      multiple: true
+      options:
+        - Native
+        - AU
+        - CLAP
+        - LV2
+        - VST2
+        - VST3
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      multiple: true
+      options:
+        - FreeBSD
+        - Linux
+        - macOS
+        - Windows
+    validations:
+      required: true
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Description
+    validations:
+      required: true

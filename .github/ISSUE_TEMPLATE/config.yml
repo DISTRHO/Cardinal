@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Module request
+    url: https://github.com/DISTRHO/Cardinal/wiki/Possible-modules-to-include
+    about: To request a new module, add it to the wiki page here
+  - name: Discussions
+    url: https://github.com/DISTRHO/Cardinal/discussions
+    about: Ask other questions or share what you've made with Cardinal
