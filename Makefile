@@ -10,12 +10,11 @@ include $(ROOT)/Makefile.base.mk
 # Set version
 
 # also set in:
-# jucewrapper/CMakeLists.txt `project`
 # src/CardinalCommon.cpp `CARDINAL_VERSION`
 # src/CardinalPlugin.cpp `getVersion`
 # utils/macOS/Info_{JACK,Native}.plist
-# jucewrapper/CMakeLists.txt src/CardinalCommon.cpp src/CardinalPlugin.cpp utils/macOS/Info_{JACK,Native}.plist
-VERSION = 24.01
+# src/CardinalCommon.cpp src/CardinalPlugin.cpp utils/macOS/Info_{JACK,Native}.plist
+VERSION = 24.03
 
 # --------------------------------------------------------------
 # Build targets
