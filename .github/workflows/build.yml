@@ -333,7 +333,7 @@ jobs:
         run: |
           ${{ matrix.target == 'nosimd' }} && export PAWPAW_NOSIMD=1
           source deps/PawPaw/local.env wasm
-          make HAVE_LIBLO=false NOOPT=true NOSIMD=${{ matrix.target == 'nosimd' }} -j $(nproc) -C src/CardinalMiniSep modgui
+          make HAVE_LIBLO=false NOOPT=true NOSIMD=${{ matrix.target == 'nosimd' }} -j $(nproc) modgui
       - name: Make wasm versioned and compress
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
