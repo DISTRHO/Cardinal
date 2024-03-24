@@ -11,11 +11,11 @@
 	<key>CFBundleIdentifier</key>
 	<string>studio.kx.distrho.cardinal.native</string>
 	<key>CFBundleShortVersionString</key>
-	<string>24.01</string>
+	<string>24.03</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.15</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>(C) 2011-2023 Filipe Coelho.
+	<string>(C) 2011-2024 Filipe Coelho.
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or any later version.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
