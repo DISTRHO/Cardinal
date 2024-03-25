@@ -10,12 +10,11 @@ include $(ROOT)/Makefile.base.mk
 # Set version
 
 # also set in:
-# jucewrapper/CMakeLists.txt `project`
 # src/CardinalCommon.cpp `CARDINAL_VERSION`
 # src/CardinalPlugin.cpp `getVersion`
 # utils/macOS/Info_{JACK,Native}.plist
-# jucewrapper/CMakeLists.txt src/CardinalCommon.cpp src/CardinalPlugin.cpp utils/macOS/Info_{JACK,Native}.plist
-VERSION = 24.01
+# src/CardinalCommon.cpp src/CardinalPlugin.cpp utils/macOS/Info_{JACK,Native}.plist
+VERSION = 24.03
 
 # --------------------------------------------------------------
 # Build targets
@@ -128,7 +127,6 @@ EXTRA_MOD_FLAGS += -ffat-lto-objects
 endif
 
 MOD_ENVIRONMENT += HEADLESS=true
-MOD_ENVIRONMENT += MOD_BUILD=true
 MOD_ENVIRONMENT += STATIC_BUILD=true
 
 # --------------------------------------------------------------
@@ -226,6 +224,9 @@ vst2: carla deps dgl plugins resources
 
 vst3: carla deps dgl plugins resources
 	$(MAKE) vst3 -C src $(CARLA_EXTRA_ARGS)
+
+modgui:
+	$(MAKE) modgui -C src/CardinalMiniSep
 
 # --------------------------------------------------------------
 # Packaging standalone for CI
