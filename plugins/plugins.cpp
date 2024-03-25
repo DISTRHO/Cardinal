@@ -1845,6 +1845,7 @@ static void initStatic__CVfunk()
 		p->addModel(modelHexMod);
 		p->addModel(modelCollatz);		
 		p->addModel(modelStrings);		
+		p->addModel(modelMagnets);		
 #undef modelSteps
     }
 }
