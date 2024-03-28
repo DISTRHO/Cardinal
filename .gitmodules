@@ -233,6 +233,10 @@
 [submodule "plugins/DHE-Modules"]
 	path = plugins/DHE-Modules
 	url = https://github.com/dhemery/DHE-Modules.git
+[submodule "plugins/Computerscare"]
+	path = plugins/Computerscare
+	url = https://github.com/freddyz/computerscare-vcv-modules.git
+	branch = v2.0.4
 [submodule "plugins/CVfunk"]
 	path = plugins/CVfunk
 	url = https://github.com/codygeary/CVfunk-Modules.git

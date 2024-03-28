@@ -139,6 +139,7 @@ At the moment the following 3rd-party modules are provided:
 - [Catro/Modulo](https://github.com/catronomix/catro-modulo)
 - [cf](https://github.com/cfoulc/cf)
 - [ChowDSP](https://github.com/jatinchowdhury18/ChowDSP-VCV)
+- [Computerscare](https://github.com/freddyz/computerscare-vcv-modules)
 - [CVfunk](https://github.com/codygeary/CVfunk-Modules)
 - [dBiz](https://github.com/dBiz/dBiz)
 - [DHE Modules](https://github.com/dhemery/DHE-Modules)

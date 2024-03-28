@@ -309,6 +309,9 @@ extern Model* modelTestVCF;
 #include "ChowDSP/src/plugin.cpp"
 #undef init
 
+// Computerscare
+#include "Computerscare/src/Computerscare.hpp"
+
 // dBiz
 #define DarkDefaultItem dBizDarkDefaultItem
 #define OrangeLight dBizOrangeLight
@@ -864,6 +867,7 @@ Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
+Plugin* pluginInstance__Computerscare;
 Plugin* pluginInstance__CVfunk;
 Plugin* pluginInstance__dBiz;
 Plugin* pluginInstance__DHE;
@@ -1824,6 +1828,34 @@ static void initStatic__ChowDSP()
         p->addModel(modelChowTapeDegrade);
         p->addModel(modelChowTapeLoss);
         p->addModel(modelChowChorus);
+    }
+}
+
+static void initStatic__Computerscare()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Computerscare = p;
+
+    const StaticPluginLoader spl(p, "Computerscare");
+    if (spl.ok())
+    {
+    	p->addModel(modelComputerscarePatchSequencer);
+        p->addModel(modelComputerscareDebug);
+        p->addModel(modelComputerscareLaundrySoup);
+        p->addModel(modelComputerscareILoveCookies);
+        p->addModel(modelComputerscareOhPeas);
+        p->addModel(modelComputerscareHorseADoodleDoo);
+        p->addModel(modelComputerscareKnolyPobs);
+        p->addModel(modelComputerscareBolyPuttons);
+        p->addModel(modelComputerscareRolyPouter);
+        p->addModel(modelComputerscareSolyPequencer);
+        p->addModel(modelComputerscareTolyPools);
+        p->addModel(modelComputerscareMolyPatrix);
+        p->addModel(modelComputerscareGolyPenerator);
+        p->addModel(modelComputerscareFolyPace);
+        p->addModel(modelComputerscareStolyFickPigure);
+        p->addModel(modelComputerscareBlank);
+        p->addModel(modelComputerscareBlankExpander);
     }
 }
 
@@ -3242,6 +3274,7 @@ void initStaticPlugins()
     initStatic__CatroModulo();
     initStatic__cf();
     initStatic__ChowDSP();
+    initStatic__Computerscare();
     initStatic__CVfunk();
     initStatic__dBiz();
     initStatic__DHE();
