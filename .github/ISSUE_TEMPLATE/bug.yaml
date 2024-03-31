@@ -22,16 +22,10 @@ body:
         - VST3
     validations:
       required: true
-  - type: dropdown
+  - type: input
     id: os
     attributes:
       label: OS
-      multiple: true
-      options:
-        - FreeBSD
-        - Linux
-        - macOS
-        - Windows
     validations:
       required: true
   - type: input
