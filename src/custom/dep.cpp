@@ -413,6 +413,7 @@ static const struct {
     { kModeBefaco, "/Befaco/res/components/Knurlie.svg" },
     { kModeBefaco, "/Befaco/res/panels/ABC.svg" },
     { kModeBefaco, "/Befaco/res/panels/ADSR.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Burst.svg" },
     { kModeBefaco, "/Befaco/res/panels/ChoppingKinky.svg" },
     { kModeBefaco, "/Befaco/res/panels/DualAtenuverter.svg" },
     { kModeBefaco, "/Befaco/res/panels/EvenVCO.svg" },
@@ -432,6 +433,7 @@ static const struct {
     { kModeBefaco, "/Befaco/res/panels/SlewLimiter.svg" },
     { kModeBefaco, "/Befaco/res/panels/SpringReverb.svg" },
     { kModeBefaco, "/Befaco/res/panels/StereoStrip.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Voltio.svg" },
     // GPLv3+
     { kModeCardinal, "/Cardinal/res/AudioFile.svg" },
     { kModeCardinal, "/Cardinal/res/AudioToCVPitch.svg" },
