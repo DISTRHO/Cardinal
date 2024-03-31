@@ -137,9 +137,11 @@ extern Model* modelChord;
 // Befaco
 #define modelADSR modelBefacoADSR
 #define modelMixer modelBefacoMixer
+#define modelBurst modelBefacoBurst
 #include "Befaco/src/plugin.hpp"
 #undef modelADSR
 #undef modelMixer
+#undef modelBurst
 
 // Bidoo
 #include "Bidoo/src/plugin.hpp"
@@ -1504,6 +1506,7 @@ static void initStatic__Befaco()
     {
 #define modelADSR modelBefacoADSR
 #define modelMixer modelBefacoMixer
+#define modelBurst modelBefacoBurst
         p->addModel(modelEvenVCO);
         p->addModel(modelRampage);
         p->addModel(modelABC);
@@ -1525,8 +1528,11 @@ static void initStatic__Befaco()
         p->addModel(modelChannelStrip);
         p->addModel(modelPonyVCO);
         p->addModel(modelMotionMTR);
+        p->addModel(modelBurst);
+        p->addModel(modelVoltio);
 #undef modelADSR
 #undef modelMixer
+#undef modelBurst
     }
 }
 
