@@ -5,7 +5,7 @@ body:
     id: version
     attributes:
       label: Version
-      placeholder: "23.07"
+      value: "23.10"
     validations:
       required: true
   - type: dropdown
@@ -34,6 +34,12 @@ body:
         - Windows
     validations:
       required: true
+  - type: input
+    id: daw-host
+    attributes:
+      label: "DAW / host"
+    validations:
+      required: false
   - type: textarea
     id: bug-description
     attributes:
