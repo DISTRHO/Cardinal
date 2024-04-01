@@ -555,7 +555,7 @@ PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
 PLUGIN_FILES += $(wildcard Befaco/src/noise-plethora/*/*.cpp)
 
 # modules/types which are present in other plugins
-BEFACO_CUSTOM = ADSR Mixer chowdsp
+BEFACO_CUSTOM = ADSR Mixer chowdsp Burst
 
 # --------------------------------------------------------------
 # Bidoo
