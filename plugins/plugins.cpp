@@ -312,13 +312,7 @@ extern Model* modelTestVCF;
 #undef init
 
 // Computerscare
-#define BGPanel ComputerscareBGPanel
-#define BLACK COLOR_COMPUTERSCARE_BLACK
-#define SmallKnob ComputerscareSmallKnob
 #include "Computerscare/src/Computerscare.hpp"
-#undef SmallKnob
-#undef BLACK
-#undef BGPanel
 
 // dBiz
 #define DarkDefaultItem dBizDarkDefaultItem
