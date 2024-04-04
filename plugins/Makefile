@@ -1030,6 +1030,7 @@ STARLINGVIA_CUSTOM = Scanner Scale Wavetable
 
 # --------------------------------------------------------------
 # stocaudio
+
 PLUGIN_FILES += $(filter-out stocaudio/src/plugin.cpp,$(wildcard stocaudio/src/*.cpp))
 
 # --------------------------------------------------------------

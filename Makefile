@@ -10,10 +10,11 @@ include $(ROOT)/Makefile.base.mk
 # Set version
 
 # also set in:
+# .github/ISSUE_TEMPLATE/bug.yaml
 # src/CardinalCommon.cpp `CARDINAL_VERSION`
 # src/CardinalPlugin.cpp `getVersion`
 # utils/macOS/Info_{JACK,Native}.plist
-# src/CardinalCommon.cpp src/CardinalPlugin.cpp utils/macOS/Info_{JACK,Native}.plist
+# .github/ISSUE_TEMPLATE/bug.yaml src/CardinalCommon.cpp src/CardinalPlugin.cpp utils/macOS/Info_{JACK,Native}.plist
 VERSION = 24.04
 
 # --------------------------------------------------------------
