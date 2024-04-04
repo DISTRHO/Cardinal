@@ -782,6 +782,16 @@ void addThemeMenuItems(Menu*, ModuleTheme*) {}
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
 
+
+// Starling Via
+#define modelScanner modelStarlingViaScanner
+#define Scale starlingViaScale
+#define Wavetable starlingViaWavetable
+#include "StarlingVia/src/starling.hpp"
+#undef modelScanner
+#undef Scale
+#undef Wavetable
+
 // stocaudio
 #include "stocaudio/src/plugin.hpp"
 
@@ -914,6 +924,7 @@ Plugin* pluginInstance__RebelTech;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sapphire;
 Plugin* pluginInstance__sonusmodular;
+extern Plugin* pluginInstance__StarlingVia;
 Plugin* pluginInstance__stocaudio;
 extern Plugin* pluginInstance__stoermelder_p1;
 Plugin* pluginInstance__surgext;
@@ -2987,6 +2998,33 @@ static void initStatic__sonusmodular()
     }
 }
 
+
+static void initStatic__StarlingVia()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__StarlingVia = p;
+
+    const StaticPluginLoader spl(p, "StarlingVia");
+    if (spl.ok())
+    {
+#define modelScanner modelStarlingViaScanner
+#define Scale starlingViaScale
+#define Wavetable starlingViaWavetable
+        p->addModel(modelMeta);
+        p->addModel(modelGateseq);
+        p->addModel(modelScanner);
+        p->addModel(modelSync);
+        p->addModel(modelAtsr);
+        p->addModel(modelOsc3);
+        p->addModel(modelSync3);
+        p->addModel(modelSync3XL);
+        p->addModel(modelSync3XLLevels);
+#undef modelScanner
+#undef Scale
+#undef Wavetable
+    }
+}
+
 static void initStatic__stocaudio()
 {
     Plugin* const p = new Plugin;
@@ -3329,6 +3367,7 @@ void initStaticPlugins()
     initStatic__repelzen();
     initStatic__Sapphire();
     initStatic__sonusmodular();
+    initStatic__StarlingVia();
     initStatic__stocaudio();
     initStatic__stoermelder_p1();
     initStatic__surgext();

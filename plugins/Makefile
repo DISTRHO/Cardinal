@@ -1012,8 +1012,24 @@ PLUGIN_FILES += $(filter-out Sapphire/src/plugin.cpp,$(wildcard Sapphire/src/*.c
 PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular.cpp,$(wildcard sonusmodular/src/*.cpp))
 
 # --------------------------------------------------------------
-# stocaudio
+# Starling Via
 
+PLUGIN_FILES += $(wildcard StarlingVia/src/*.cpp)
+PLUGIN_FILES += $(wildcard StarlingVia/Via/io/src/*.cpp)
+PLUGIN_FILES += $(wildcard StarlingVia/Via/ui/src/*.cpp)
+PLUGIN_FILES += $(wildcard StarlingVia/Via/modules/*/*.cpp)
+PLUGIN_BINARIES += StarlingVia/res/original.gateseq
+PLUGIN_BINARIES += StarlingVia/res/original.meta
+PLUGIN_BINARIES += StarlingVia/res/original.osc3
+PLUGIN_BINARIES += StarlingVia/res/original.scanner
+PLUGIN_BINARIES += StarlingVia/res/original.sync
+PLUGIN_BINARIES += StarlingVia/res/original.sync3
+
+# modules/types which are present in other plugins
+STARLINGVIA_CUSTOM = Scanner Scale Wavetable
+
+# --------------------------------------------------------------
+# stocaudio
 PLUGIN_FILES += $(filter-out stocaudio/src/plugin.cpp,$(wildcard stocaudio/src/*.cpp))
 
 # --------------------------------------------------------------
@@ -2644,6 +2660,21 @@ $(BUILD_DIR)/sonusmodular/%.cpp.o: sonusmodular/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(SONUSMODULAR_CUSTOM),$(call custom_module_names,$(m),sonusmodular)) \
 		-DpluginInstance=pluginInstance__sonusmodular
+
+$(BUILD_DIR)/StarlingVia/%.cpp.o: StarlingVia/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(STARLINGVIA_CUSTOM),$(call custom_module_names,$(m),StarlingVia)) \
+		-DpluginInstance=pluginInstance__StarlingVia \
+		-DBUILD_VIRTUAL \
+		-IStarlingVia/dep/starling-dsp \
+		-IStarlingVia/Via/modules/inc \
+		-IStarlingVia/Via/synthesis/inc \
+		-IStarlingVia/Via/io/inc \
+		-IStarlingVia/Via/ui/inc \
+		-IStarlingVia/src/dep/starling-dsp \
+		-IStarlingVia/src/dep/starling-rack-ui
 
 $(BUILD_DIR)/stoermelder-packone/%.cpp.o: stoermelder-packone/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

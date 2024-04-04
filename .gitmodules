@@ -236,7 +236,9 @@
 [submodule "plugins/Computerscare"]
 	path = plugins/Computerscare
 	url = https://github.com/freddyz/computerscare-vcv-modules.git
-	branch = v2.0.4
 [submodule "plugins/CVfunk"]
 	path = plugins/CVfunk
 	url = https://github.com/codygeary/CVfunk-Modules.git
+[submodule "plugins/StarlingVia"]
+	path = plugins/StarlingVia
+	url = https://github.com/starlingcode/Via-for-Rack.git
