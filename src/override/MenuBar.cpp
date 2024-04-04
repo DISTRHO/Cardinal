@@ -605,10 +605,8 @@ static void setAllFramebufferWidgetsDirty(widget::Widget* const widget)
 	for (widget::Widget* child : widget->children)
 	{
 		if (widget::FramebufferWidget* const fbw = dynamic_cast<widget::FramebufferWidget*>(child))
-		{
 			fbw->setDirty();
-			break;
-		}
+
 		setAllFramebufferWidgetsDirty(child);
 	}
 }
