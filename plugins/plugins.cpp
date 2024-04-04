@@ -779,6 +779,11 @@ void addThemeMenuItems(Menu*, ModuleTheme*) {}
 // Sapphire
 #include "Sapphire/src/plugin.hpp"
 
+// Sculpt-O-Sound
+#define LedLight Sculpt_O_SoundLedLight
+#include "Sculpt-O-Sound/src/Sculpt-O-Sound.hpp"
+#undef LedLight
+
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
 
@@ -913,6 +918,7 @@ Plugin* pluginInstance__rackwindows;
 Plugin* pluginInstance__RebelTech;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sapphire;
+Plugin* pluginInstance__Sculpt_O_Sound;
 Plugin* pluginInstance__sonusmodular;
 Plugin* pluginInstance__stocaudio;
 extern Plugin* pluginInstance__stoermelder_p1;
@@ -2949,6 +2955,19 @@ static void initStatic__Sapphire()
     }
 }
 
+static void initStatic__Sculpt_O_Sound()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Sculpt_O_Sound = p;
+
+    const StaticPluginLoader spl(p, "Sculpt-O-Sound");
+    if (spl.ok())
+    {
+        p->addModel(modelVocode_O_Matic_XL);
+        p->addModel(modelVocode_O_Matic);
+    }
+}
+
 static void initStatic__sonusmodular()
 {
     Plugin* const p = new Plugin;
@@ -3328,6 +3347,7 @@ void initStaticPlugins()
     initStatic__RebelTech();
     initStatic__repelzen();
     initStatic__Sapphire();
+    initStatic__Sculpt_O_Sound();
     initStatic__sonusmodular();
     initStatic__stocaudio();
     initStatic__stoermelder_p1();

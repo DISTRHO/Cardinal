@@ -78,6 +78,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | repelzen                | GPL-3.0-or-later         | |
 | RebelTech               | GPL-2.0-or-later         | |
 | Sapphire                | GPL-3.0-or-later         | |
+| Sculpt-O-Sound          | GPL-3.0-or-later         | |
 | Sonus Modular           | GPL-3.0-or-later         | |
 | stocaudio               | GPL-3.0-or-later         | |
 | Stoermelder Pack-One    | GPL-3.0-or-later         | |
@@ -234,6 +235,10 @@ Below is a list of artwork licenses from plugins
 | repelzen/*                              | CC-BY-SA-4.0     | |
 | RebelTech/*                             | CC-BY-NC-4.0     | |
 | Sapphire/*                              | GPL-3.0-or-later | No artwork specific license provided |
+| Sculpt-O-Sound/*                        | CC-BY-NC-ND 4.0  | |
+| Sculpt-O-Sound/Segment7Standard.ttf     | OFL-1.1-RFN      | |
+| Sculpt-O-Sound/mschack/*                | MIT              | |
+| Sculpt-O-Sound/tresamigos/*             | MIT              | |
 | sonusmodular/*                          | GPL-3.0-or-later | [Same license as source code](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
 | stocaudio/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | stoermelder-packone/*                   | GPL-3.0-or-later | No artwork specific license provided |

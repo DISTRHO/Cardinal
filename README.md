@@ -184,6 +184,7 @@ At the moment the following 3rd-party modules are provided:
 - [RebelTech](https://github.com/hemmer/rebel-tech-vcv)
 - [repelzen](https://github.com/wiqid/repelzen)
 - [Sapphire](https://github.com/cosinekitty/sapphire)
+- [Sculpt-O-Sound](https://github.com/josbouten/Sculpt-O-Sound)
 - [Sonus Modular](https://gitlab.com/sonusdept/sonusmodular)
 - [stocaudio](https://github.com/aptrn/stocaudio-modules)
 - [Stoermelder Pack-One](https://github.com/stoermelder/vcvrack-packone)
