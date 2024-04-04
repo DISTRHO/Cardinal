@@ -386,6 +386,7 @@ enum LightMode {
     kModeAutinn,
     kModeBefaco,
     kModeCardinal,
+    kModeComputerscareLight,
     kModeExtratone,
     kModeFehlerFabrik,
     kModeForsitan,
@@ -474,6 +475,8 @@ static const struct {
     { kModeCardinal, "/Cardinal/res/HostParamsMap.svg" },
     { kModeCardinal, "/Cardinal/res/HostTime.svg" },
     { kModeCardinal, "/Cardinal/res/Ildaeil.svg" },
+    // BSD-3 Clause
+    { kModeComputerscareLight, "/Computerscare/res/ComputerscareStolyFickPigurePanel.svg" },
     // GPLv3+
     { kModeExtratone, "/Extratone/res/Darwinism.svg" },
     // { kModeExtratone, "/Extratone/res/HalluciMemory.svg" },
