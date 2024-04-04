@@ -1,0 +1,42 @@
+name: Bug Report
+description: Report a bug with Cardinal
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      value: "23.10"
+    validations:
+      required: true
+  - type: dropdown
+    id: plugin-type
+    attributes:
+      label: Plugin type
+      multiple: true
+      options:
+        - Native
+        - AU
+        - CLAP
+        - LV2
+        - VST2
+        - VST3
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS
+    validations:
+      required: true
+  - type: input
+    id: daw-host
+    attributes:
+      label: "DAW / host"
+    validations:
+      required: false
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Description
+    validations:
+      required: true
