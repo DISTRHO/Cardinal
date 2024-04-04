@@ -646,6 +646,14 @@ PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 CF_CUSTOM = $(DRWAV)
 
 # --------------------------------------------------------------
+# Computerscare
+
+PLUGIN_FILES += $(filter-out Computerscare/src/Computerscare.cpp Computerscare/src/test.cpp,$(wildcard Computerscare/src/*.cpp))
+
+# modules/types which are present in other plugins
+COMPUTERSCARE_CUSTOM = Quantizer PanelBorder
+
+# --------------------------------------------------------------
 # CVfunk
 
 PLUGIN_FILES += $(filter-out CVfunk/src/plugin.cpp,$(wildcard CVfunk/src/*.cpp))
@@ -2206,6 +2214,13 @@ $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
 		-DpluginInstance=pluginInstance__cf \
 		-Wno-misleading-indentation
+
+$(BUILD_DIR)/Computerscare/src/%.cpp.o: Computerscare/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(COMPUTERSCARE_CUSTOM),$(call custom_module_names,$(m),Computerscare)) \
+		-DpluginInstance=pluginInstance__Computerscare
 
 $(BUILD_DIR)/CVfunk/src/%.cpp.o: CVfunk/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
