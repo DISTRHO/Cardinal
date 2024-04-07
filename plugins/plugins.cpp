@@ -146,6 +146,13 @@ extern Model* modelChord;
 // Bidoo
 #include "Bidoo/src/plugin.hpp"
 
+// Biset
+#define Clock BisetClock
+#define ButtonTrigger BisetButtonTrigger
+#include "Biset/src/plugin.hpp"
+#undef ButtonTrigger
+#undef Clock
+
 // BogaudioModules - integrate theme/skin support
 #include <mutex>
 #include <string>
@@ -875,6 +882,7 @@ Plugin* pluginInstance__Axioma;
 Plugin* pluginInstance__Bacon;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
+Plugin* pluginInstance__Biset;
 Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
@@ -1610,6 +1618,42 @@ static void initStatic__Bidoo()
         // NOTE disabled in Cardinal due to curl usage
         // p->addModel(modelANTN);
         spl.removeModule("antN");
+    }
+}
+
+static void initStatic__Biset()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Biset = p;
+
+    const StaticPluginLoader spl(p, "Biset");
+    if (spl.ok())
+    {
+        p->addModel(modelTracker);
+		p->addModel(modelTrackerSynth);
+		p->addModel(modelTrackerDrum);
+		p->addModel(modelTrackerClock);
+		p->addModel(modelTrackerPhase);
+		p->addModel(modelTrackerQuant);
+		p->addModel(modelTrackerState);
+		p->addModel(modelTrackerControl);
+
+		p->addModel(modelRegex);
+		p->addModel(modelRegexCondensed);
+		p->addModel(modelRegexExp);
+
+		p->addModel(modelTree);
+		p->addModel(modelTreeSeed);
+
+		p->addModel(modelGbu);
+		p->addModel(modelPkm);
+
+		p->addModel(modelIgc);
+		p->addModel(modelOmega3);
+		p->addModel(modelOmega6);
+
+		p->addModel(modelSegfault);
+		p->addModel(modelBlank);
     }
 }
 
@@ -3314,6 +3358,7 @@ void initStaticPlugins()
     initStatic__Bacon();
     initStatic__Befaco();
     initStatic__Bidoo();
+    initStatic__Biset();
     initStatic__BogaudioModules();
     initStatic__CatroModulo();
     initStatic__cf();

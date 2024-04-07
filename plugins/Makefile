@@ -573,6 +573,12 @@ BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter PitchShifter 
 BIDOO_CUSTOM_PER_FILE = channel channel filterType
 
 # --------------------------------------------------------------
+# Biset
+
+PLUGIN_FILES += $(filter-out Biset/src/plugin.cpp,$(wildcard Biset/src/*.cpp))
+PLUGIN_FILES += $(wildcard Biset/src/*/*.cpp)
+
+# --------------------------------------------------------------
 # BogaudioModules
 
 PLUGIN_FILES += $(filter-out BogaudioModules/src/bogaudio.cpp,$(wildcard BogaudioModules/src/*.cpp))
@@ -2192,6 +2198,13 @@ $(BUILD_DIR)/Bidoo%.cpp.o: Bidoo%.cpp
 		-Wno-ignored-qualifiers \
 		-Wno-sign-compare \
 		-Wno-unused-function
+
+$(BUILD_DIR)/Biset/src/%.cpp.o: Biset/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(BISET_CUSTOM),$(call custom_module_names,$(m),Biset)) \
+		-DpluginInstance=pluginInstance__Biset
 
 $(BUILD_DIR)/BogaudioModules/src/follower_base.cpp.o: BogaudioModules/src/follower_base.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

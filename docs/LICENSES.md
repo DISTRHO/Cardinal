@@ -29,6 +29,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Bacon Music             | GPL-3.0-or-later         | |
 | Befaco                  | GPL-3.0-or-later         | |
 | Bidoo                   | GPL-3.0-or-later         | |
+| Biset                   | MIT                      | |
 | Bogaudio                | GPL-3.0-or-later         | |
 | Catro/Modulo            | BSD-3-Clause             | |
 | cf                      | BSD-3-Clause             | |
@@ -147,6 +148,9 @@ Below is a list of artwork licenses from plugins
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
 | Befaco/fonts/Segment7Standard.otf       | OFL-1.1-RFN      | |
 | Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), [used and distributed with permission](LICENSE-PERMISSIONS.md#befaco-manu-retamero--befaco) |
+| Biset/*                                 | MIT              | No artwork specific license provided |
+| Biset/FT88-Regular.ttf                  | OFL              | |
+| Biset/Recursive_VF_1.085.ttf            | OFL-1.1-no-RFN   | |
 | BogaudioModules/*                       | CC-BY-SA-4.0     | |
 | BogaudioModules/fonts/audiowide.ttf     | OFL-1.1-RFN      | |
 | BogaudioModules/fonts/inconsolata*.ttf  | OFL-1.1-no-RFN   | |
