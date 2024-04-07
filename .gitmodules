@@ -242,3 +242,6 @@
 [submodule "plugins/StarlingVia"]
 	path = plugins/StarlingVia
 	url = https://github.com/starlingcode/Via-for-Rack.git
+[submodule "plugins/Biset"]
+	path = plugins/Biset
+	url = https://github.com/gibbonjoyeux/VCV-Biset.git
