@@ -1642,8 +1642,8 @@ static void initStatic__Biset()
 		p->addModel(modelRegexCondensed);
 		p->addModel(modelRegexExp);
 
-		p->addModel(modelTree);
-		p->addModel(modelTreeSeed);
+		p->addModel(modelBisetTree);
+		p->addModel(modelBisetTreeSeed);
 
 		p->addModel(modelGbu);
 		p->addModel(modelPkm);
