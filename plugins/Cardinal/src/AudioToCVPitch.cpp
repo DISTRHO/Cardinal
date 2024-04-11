@@ -1,7 +1,7 @@
 /*
  * DISTRHO Cardinal Plugin
  * Copyright (C) 2021-2022 Bram Giesen
- * Copyright (C) 2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2022-2024 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,15 +16,13 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#include "plugincontext.hpp"
+#include "plugin.hpp"
 #include "ModuleWidgets.hpp"
 #include "Widgets.hpp"
 
 extern "C" {
 #include "aubio.h"
 }
-
-USE_NAMESPACE_DISTRHO;
 
 // --------------------------------------------------------------------------------------------------------------------
 

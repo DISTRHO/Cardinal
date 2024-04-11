@@ -12,6 +12,8 @@
 
 extern const std::string CARDINAL_VERSION;
 
+struct CardinalPluginContext;
+
 // -----------------------------------------------------------------------------------------------------------
 
 namespace rack {
@@ -84,7 +86,6 @@ START_NAMESPACE_DISTRHO
 
 class CardinalBasePlugin;
 class CardinalBaseUI;
-struct CardinalPluginContext;
 
 struct Initializer
 {

@@ -147,9 +147,13 @@ extern Model* modelChord;
 #include "Bidoo/src/plugin.hpp"
 
 // Biset
+#define modelBlank modelBisetBlank
+#define modelTree modelBisetTree
 #define Clock BisetClock
 #define ButtonTrigger BisetButtonTrigger
 #include "Biset/src/plugin.hpp"
+#undef modelBlank
+#undef modelTree
 #undef ButtonTrigger
 #undef Clock
 
@@ -1629,31 +1633,35 @@ static void initStatic__Biset()
     const StaticPluginLoader spl(p, "Biset");
     if (spl.ok())
     {
+#define modelBlank modelBisetBlank
+#define modelTree modelBisetTree
         p->addModel(modelTracker);
-		p->addModel(modelTrackerSynth);
-		p->addModel(modelTrackerDrum);
-		p->addModel(modelTrackerClock);
-		p->addModel(modelTrackerPhase);
-		p->addModel(modelTrackerQuant);
-		p->addModel(modelTrackerState);
-		p->addModel(modelTrackerControl);
+        p->addModel(modelTrackerSynth);
+        p->addModel(modelTrackerDrum);
+        p->addModel(modelTrackerClock);
+        p->addModel(modelTrackerPhase);
+        p->addModel(modelTrackerQuant);
+        p->addModel(modelTrackerState);
+        p->addModel(modelTrackerControl);
 
-		p->addModel(modelRegex);
-		p->addModel(modelRegexCondensed);
-		p->addModel(modelRegexExp);
+        p->addModel(modelRegex);
+        p->addModel(modelRegexCondensed);
+        p->addModel(modelRegexExp);
 
-		p->addModel(modelBisetTree);
-		p->addModel(modelBisetTreeSeed);
+        p->addModel(modelTree);
+        p->addModel(modelTreeSeed);
 
-		p->addModel(modelGbu);
-		p->addModel(modelPkm);
+        p->addModel(modelGbu);
+        p->addModel(modelPkm);
 
-		p->addModel(modelIgc);
-		p->addModel(modelOmega3);
-		p->addModel(modelOmega6);
+        p->addModel(modelIgc);
+        p->addModel(modelOmega3);
+        p->addModel(modelOmega6);
 
-		p->addModel(modelSegfault);
-		p->addModel(modelBlank);
+        p->addModel(modelSegfault);
+        p->addModel(modelBlank);
+#undef modelBlank
+#undef modelTree
     }
 }
 
