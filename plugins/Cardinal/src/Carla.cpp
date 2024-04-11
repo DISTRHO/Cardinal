@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,6 +15,7 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
+#include "plugin.hpp"
 #include "plugincontext.hpp"
 #include "Expander.hpp"
 #include "ModuleWidgets.hpp"
@@ -427,8 +428,6 @@ struct CarlaModule : Module {
                                            0, 0, nullptr, e.sampleRate);
         fCarlaPluginDescriptor->activate(fCarlaPluginHandle);
     }
-
-    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CarlaModule)
 };
 
 static_assert((int)CarlaModule::NUM_INPUTS == (int)CarlaModule::NUM_OUTPUTS, "inputs must match outputs");
@@ -715,8 +714,6 @@ struct CarlaModuleWidget : ModuleWidgetWith9HP, IdleCallback {
         e.consume(this);
         showUI();
     }
-
-    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CarlaModuleWidget)
 };
 
 static void host_ui_closed(NativeHostHandle handle)

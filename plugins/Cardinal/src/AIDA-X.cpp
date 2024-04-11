@@ -1,11 +1,11 @@
 /*
  * AIDA-X Cardinal plugin
  * Copyright (C) 2022-2023 Massimo Pennazio <maxipenna@libero.it>
- * Copyright (C) 2023 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2023-2024 Filipe Coelho <falktx@falktx.com>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#include "plugincontext.hpp"
+#include "plugin.hpp"
 #include "ModuleWidgets.hpp"
 
 #ifndef HEADLESS
@@ -250,7 +250,6 @@ struct AidaPluginModule : Module {
         NUM_LIGHTS
     };
 
-    CardinalPluginContext* const pcontext;
     bool fileChanged = false;
     std::string currentFile;
 
@@ -272,7 +271,6 @@ struct AidaPluginModule : Module {
 #endif
 
     AidaPluginModule()
-        : pcontext(static_cast<CardinalPluginContext*>(APP))
     {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
@@ -656,8 +654,6 @@ struct AidaPluginModule : Module {
                            cachedParams[kParameterPRESENCE]);
     }
 #endif
-
-    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AidaPluginModule)
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1093,8 +1089,6 @@ struct AidaWidget : ModuleWidgetWithSideScrews<23> {
 
         menu->addChild(new LoadModelFileItem(module));
     }
-
-    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AidaWidget)
 };
 #else
 struct AidaWidget : ModuleWidget {

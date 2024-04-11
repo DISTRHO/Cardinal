@@ -101,8 +101,6 @@ void destroyStaticPlugins();
 
 const std::string CARDINAL_VERSION = "24.04";
 
-START_NAMESPACE_DISTRHO
-
 // -----------------------------------------------------------------------------------------------------------
 
 #ifndef HEADLESS
@@ -125,6 +123,51 @@ void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, 
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
+
+CardinalPluginContext::CardinalPluginContext(Plugin* const p)
+    : bufferSize(p != nullptr ? p->getBufferSize() : 0),
+      processCounter(0),
+      sampleRate(p != nullptr ? p->getSampleRate() : 0.0),
+     #if CARDINAL_VARIANT_MAIN
+      variant(kCardinalVariantMain),
+     #elif CARDINAL_VARIANT_MINI
+      variant(kCardinalVariantMini),
+     #elif CARDINAL_VARIANT_FX
+      variant(kCardinalVariantFX),
+     #elif CARDINAL_VARIANT_NATIVE
+      variant(kCardinalVariantNative),
+     #elif CARDINAL_VARIANT_SYNTH
+      variant(kCardinalVariantSynth),
+     #else
+      #error cardinal variant not set
+     #endif
+      bypassed(false),
+      playing(false),
+      reset(false),
+      bbtValid(false),
+      bar(1),
+      beat(1),
+      beatsPerBar(4),
+      beatType(4),
+      frame(0),
+      barStartTick(0.0),
+      beatsPerMinute(120.0),
+      tick(0.0),
+      tickClock(0.0),
+      ticksPerBeat(0.0),
+      ticksPerClock(0.0),
+      ticksPerFrame(0.0),
+      nativeWindowId(0),
+      dataIns(nullptr),
+      dataOuts(nullptr),
+      midiEvents(nullptr),
+      midiEventCount(0),
+      plugin(p),
+      tlw(nullptr),
+      ui(nullptr)
+{
+    std::memset(parameters, 0, sizeof(parameters));
+}
 
 #ifndef HEADLESS
 bool CardinalPluginContext::addIdleCallback(IdleCallback* const cb) const
@@ -221,6 +264,86 @@ void CardinalPluginContext::writeMidiMessage(const rack::midi::Message& message,
 
     plugin->writeMidiEvent(event);
 }
+
+// -----------------------------------------------------------------------------------------------------------
+
+namespace rack {
+namespace midi {
+
+struct InputQueue::Internal {
+    CardinalPluginContext* const pcontext = static_cast<CardinalPluginContext*>(APP);
+    const CardinalDISTRHO::MidiEvent* midiEvents = nullptr;
+    uint32_t midiEventsLeft = 0;
+    uint32_t lastProcessCounter = 0;
+    int64_t lastBlockFrame = 0;
+};
+
+InputQueue::InputQueue() {
+	internal = new Internal;
+}
+
+InputQueue::~InputQueue() {
+	delete internal;
+}
+
+bool InputQueue::tryPop(Message* const messageOut, int64_t maxFrame)
+{
+    const uint32_t processCounter = internal->pcontext->processCounter;
+    const bool processCounterChanged = internal->lastProcessCounter != processCounter;
+
+    if (processCounterChanged)
+    {
+        internal->lastBlockFrame = pcontext->engine->getBlockFrame();
+        internal->lastProcessCounter = processCounter;
+
+        internal->midiEvents = pcontext->midiEvents;
+        internal->midiEventsLeft = pcontext->midiEventCount;
+    }
+
+    if (internal->midiEventsLeft == 0 || maxFrame < internal->lastBlockFrame)
+        return false;
+
+    const uint32_t frame = maxFrame - internal->lastBlockFrame;
+
+    if (frame > internal->midiEvents->frame)
+        return false;
+
+    const CardinalDISTRHO::MidiEvent& midiEvent(*internal->midiEvents);
+
+    const uint8_t* data;
+    if (midiEvent.size > CardinalDISTRHO::MidiEvent::kDataSize)
+    {
+        data = midiEvent.dataExt;
+        messageOut->bytes.resize(midiEvent.size);
+    }
+    else
+    {
+        data = midiEvent.data;
+    }
+
+    messageOut->frame = frame;
+    std::memcpy(messageOut->bytes.data(), data, midiEvent.size);
+
+    ++internal->midiEvents;
+    --internal->midiEventsLeft;
+    return true;
+}
+
+json_t* InputQueue::toJson() const
+{
+    return nullptr;
+}
+
+void InputQueue::fromJson(json_t* rootJ)
+{
+}
+
+}
+}
+
+// -----------------------------------------------------------------------------------------------------------
+
+START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 

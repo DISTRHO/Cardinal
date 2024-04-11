@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,6 +15,7 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
+#include "plugin.hpp"
 #include "plugincontext.hpp"
 #include "ModuleWidgets.hpp"
 #include "extra/Runner.hpp"
@@ -39,6 +40,7 @@ const NativePluginDescriptor* carla_getNativePluginDescriptor(const std::size_t 
 // --------------------------------------------------------------------------------------------------------------------
 
 using namespace CARLA_BACKEND_NAMESPACE;
+using namespace DISTRHO_NAMESPACE;
 
 static uint32_t host_get_buffer_size(NativeHostHandle);
 static double host_get_sample_rate(NativeHostHandle);
@@ -335,8 +337,6 @@ struct CarlaInternalPluginModule : Module, Runner {
                                            0, 0, nullptr, e.sampleRate);
         fCarlaPluginDescriptor->activate(fCarlaPluginHandle);
     }
-
-    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CarlaInternalPluginModule)
 };
 
 // -----------------------------------------------------------------------------------------------------------
@@ -679,8 +679,6 @@ struct AudioFileWidget : ModuleWidgetWithSideScrews<23> {
 
         menu->addChild(new LoadAudioFileItem(module));
     }
-
-    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioFileWidget)
 };
 #else
 struct AudioFileWidget : ModuleWidget {

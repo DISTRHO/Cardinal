@@ -578,8 +578,8 @@ BIDOO_CUSTOM_PER_FILE = channel channel filterType
 PLUGIN_FILES += $(filter-out Biset/src/plugin.cpp,$(wildcard Biset/src/*.cpp))
 PLUGIN_FILES += $(wildcard Biset/src/*/*.cpp)
 
-# # modules/types which are present in other plugins
-BISET_CUSTOM = Blank
+# modules/types which are present in other plugins
+BISET_CUSTOM = Blank ButtonTrigger Clock Tree
 
 # --------------------------------------------------------------
 # BogaudioModules
@@ -1318,6 +1318,7 @@ BUILD_DIR = ../build/plugins
 endif
 
 BASE_FLAGS += -DBUILDING_PLUGIN_MODULES
+BASE_FLAGS += -DDONT_SET_USING_DISTRHO_NAMESPACE
 BASE_FLAGS += -I$(abspath $(ROOT)/include/osdialog-stub)
 
 ifeq ($(BSD)$(WASM),true)

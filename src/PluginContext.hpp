@@ -36,28 +36,13 @@
 
 #ifndef HEADLESS
 # include "DistrhoUI.hpp"
-#else
-# include "Base.hpp"
-START_NAMESPACE_DGL
-class TopLevelWidget;
-template <class BaseWidget> class NanoBaseWidget;
-typedef NanoBaseWidget<TopLevelWidget> NanoTopLevelWidget;
-END_NAMESPACE_DGL
 #endif
+
+#include "plugincontext.hpp"
 
 START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
-
-static constexpr const uint kModuleParameterCount = 24;
-
-enum CardinalVariant {
-    kCardinalVariantMain,
-    kCardinalVariantMini,
-    kCardinalVariantFX,
-    kCardinalVariantNative,
-    kCardinalVariantSynth,
-};
 
 enum CardinalParameters {
     kCardinalParameterCountAtModules = kModuleParameterCount,
@@ -125,82 +110,6 @@ static_assert(kCardinalParameterStartMini == kModuleParameterCount + kWindowPara
 static_assert(kCardinalParameterCountAtWindow == kModuleParameterCount + kWindowParameterCount + 1, "valid parameter indexes");
 static_assert(DISTRHO_PLUGIN_NUM_INPUTS == kCardinalParameterCountAtMiniBuffers - kCardinalParameterStartMiniBuffers, "valid parameter indexes");
 #endif
-
-class UI;
-
-// -----------------------------------------------------------------------------------------------------------
-
-struct CardinalPluginContext : rack::Context {
-    uint32_t bufferSize, processCounter;
-    double sampleRate;
-    float parameters[kModuleParameterCount];
-    CardinalVariant variant;
-    bool bypassed, playing, reset, bbtValid;
-    int32_t bar, beat, beatsPerBar, beatType;
-    uint64_t frame;
-    double barStartTick, beatsPerMinute;
-    double tick, tickClock, ticksPerBeat, ticksPerClock, ticksPerFrame;
-    uintptr_t nativeWindowId;
-    const float* const* dataIns;
-    float** dataOuts;
-    const MidiEvent* midiEvents;
-    uint32_t midiEventCount;
-    Plugin* const plugin;
-    NanoTopLevelWidget* tlw;
-    UI* ui;
-
-    CardinalPluginContext(Plugin* const p)
-        : bufferSize(p != nullptr ? p->getBufferSize() : 0),
-          processCounter(0),
-          sampleRate(p != nullptr ? p->getSampleRate() : 0.0),
-         #if CARDINAL_VARIANT_MAIN
-          variant(kCardinalVariantMain),
-         #elif CARDINAL_VARIANT_MINI
-          variant(kCardinalVariantMini),
-         #elif CARDINAL_VARIANT_FX
-          variant(kCardinalVariantFX),
-         #elif CARDINAL_VARIANT_NATIVE
-          variant(kCardinalVariantNative),
-         #elif CARDINAL_VARIANT_SYNTH
-          variant(kCardinalVariantSynth),
-         #else
-          #error cardinal variant not set
-         #endif
-          bypassed(false),
-          playing(false),
-          reset(false),
-          bbtValid(false),
-          bar(1),
-          beat(1),
-          beatsPerBar(4),
-          beatType(4),
-          frame(0),
-          barStartTick(0.0),
-          beatsPerMinute(120.0),
-          tick(0.0),
-          tickClock(0.0),
-          ticksPerBeat(0.0),
-          ticksPerClock(0.0),
-          ticksPerFrame(0.0),
-          nativeWindowId(0),
-          dataIns(nullptr),
-          dataOuts(nullptr),
-          midiEvents(nullptr),
-          midiEventCount(0),
-          plugin(p),
-          tlw(nullptr),
-          ui(nullptr)
-    {
-        std::memset(parameters, 0, sizeof(parameters));
-    }
-
-    void writeMidiMessage(const rack::midi::Message& message, uint8_t channel);
-
-   #ifndef HEADLESS
-    bool addIdleCallback(IdleCallback* cb) const;
-    void removeIdleCallback(IdleCallback* cb) const;
-   #endif
-};
 
 // -----------------------------------------------------------------------------------------------------------
 
