@@ -29,6 +29,8 @@
 
 #include "choc/choc_SmallVector.h"
 
+#include <jansson.h>
+
 namespace rack {
 /** Abstraction for all MIDI drivers in Rack */
 namespace midi {
