@@ -279,11 +279,11 @@ struct InputQueue::Internal {
 };
 
 InputQueue::InputQueue() {
-	internal = new Internal;
+    internal = new Internal;
 }
 
 InputQueue::~InputQueue() {
-	delete internal;
+    delete internal;
 }
 
 bool InputQueue::tryPop(Message* const messageOut, int64_t maxFrame)
@@ -293,11 +293,11 @@ bool InputQueue::tryPop(Message* const messageOut, int64_t maxFrame)
 
     if (processCounterChanged)
     {
-        internal->lastBlockFrame = pcontext->engine->getBlockFrame();
+        internal->lastBlockFrame = internal->pcontext->engine->getBlockFrame();
         internal->lastProcessCounter = processCounter;
 
-        internal->midiEvents = pcontext->midiEvents;
-        internal->midiEventsLeft = pcontext->midiEventCount;
+        internal->midiEvents = internal->pcontext->midiEvents;
+        internal->midiEventsLeft = internal->pcontext->midiEventCount;
     }
 
     if (internal->midiEventsLeft == 0 || maxFrame < internal->lastBlockFrame)
