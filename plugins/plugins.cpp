@@ -147,15 +147,33 @@ extern Model* modelChord;
 #include "Bidoo/src/plugin.hpp"
 
 // Biset
+/* NOTE too much noise in original include, do this a different way
+// #include "Biset/src/plugin.hpp"
+*/
 #define modelBlank modelBisetBlank
 #define modelTree modelBisetTree
-#define Clock BisetClock
-#define ButtonTrigger BisetButtonTrigger
-#include "Biset/src/plugin.hpp"
+extern Model* modelTracker;
+extern Model* modelTrackerSynth;
+extern Model* modelTrackerDrum;
+extern Model* modelTrackerClock;
+extern Model* modelTrackerPhase;
+extern Model* modelTrackerQuant;
+extern Model* modelTrackerState;
+extern Model* modelTrackerControl;
+extern Model* modelRegex;
+extern Model* modelRegexCondensed;
+extern Model* modelRegexExp;
+extern Model* modelTree;
+extern Model* modelTreeSeed;
+extern Model* modelGbu;
+extern Model* modelPkm;
+extern Model* modelIgc;
+extern Model* modelOmega3;
+extern Model* modelOmega6;
+extern Model* modelSegfault;
+extern Model* modelBlank;
 #undef modelBlank
 #undef modelTree
-#undef ButtonTrigger
-#undef Clock
 
 // BogaudioModules - integrate theme/skin support
 #include <mutex>

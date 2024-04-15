@@ -579,7 +579,7 @@ PLUGIN_FILES += $(filter-out Biset/src/plugin.cpp,$(wildcard Biset/src/*.cpp))
 PLUGIN_FILES += $(wildcard Biset/src/*/*.cpp)
 
 # modules/types which are present in other plugins
-BISET_CUSTOM = Blank ButtonTrigger Clock Tree
+BISET_CUSTOM = Blank ButtonTrigger Clock Tree TreeDisplay
 
 # --------------------------------------------------------------
 # BogaudioModules
