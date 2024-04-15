@@ -1895,6 +1895,7 @@ static void initStatic__CVfunk()
 		p->addModel(modelCollatz);		
 		p->addModel(modelStrings);		
 		p->addModel(modelMagnets);		
+		p->addModel(modelOuros);		
 #undef modelSteps
     }
 }
