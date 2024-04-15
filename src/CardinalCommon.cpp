@@ -17,7 +17,7 @@
 #include "CardinalCommon.hpp"
 
 #include "AsyncDialog.hpp"
-#include "PluginContext.hpp"
+#include "CardinalPluginContext.hpp"
 #include "DistrhoPluginUtils.hpp"
 
 #include <asset.hpp>
@@ -162,9 +162,11 @@ CardinalPluginContext::CardinalPluginContext(Plugin* const p)
       dataOuts(nullptr),
       midiEvents(nullptr),
       midiEventCount(0),
-      plugin(p),
-      tlw(nullptr),
-      ui(nullptr)
+      plugin(p)
+   #ifndef HEADLESS
+    , tlw(nullptr)
+    , ui(nullptr)
+   #endif
 {
     std::memset(parameters, 0, sizeof(parameters));
 }
