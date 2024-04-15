@@ -1081,7 +1081,7 @@ protected:
         int key;
         switch (ev.key)
         {
-        case '\t': key = GLFW_KEY_TAB; break;
+        case kKeyTab: key = GLFW_KEY_TAB; break;
         case kKeyBackspace: key = GLFW_KEY_BACKSPACE; break;
         case kKeyEnter: key = GLFW_KEY_ENTER; break;
         case kKeyEscape: key = GLFW_KEY_ESCAPE; break;
