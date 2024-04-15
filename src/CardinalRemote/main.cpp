@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -30,7 +30,7 @@
 #include <engine/Engine.hpp>
 #include <ui/common.hpp>
 
-#include "PluginContext.hpp"
+#include "CardinalPluginContext.hpp"
 #include "extra/ScopedValueSetter.hpp"
 
 #define CARDINAL_TEMPLATE_NAME "init/main.vcv"
