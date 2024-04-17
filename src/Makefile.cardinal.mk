@@ -316,6 +316,7 @@ SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/chopin
 SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/debussy
 SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/goldberg
 SYMLINKED_DIRS_RESOURCES += cf/playeroscs
+SYMLINKED_DIRS_RESOURCES += DHE-Modules/svg
 SYMLINKED_DIRS_RESOURCES += DrumKit/res/samples
 SYMLINKED_DIRS_RESOURCES += GrandeModular/presets
 SYMLINKED_DIRS_RESOURCES += LyraeModules/presets

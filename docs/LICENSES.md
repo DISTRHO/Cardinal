@@ -29,10 +29,12 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Bacon Music             | GPL-3.0-or-later         | |
 | Befaco                  | GPL-3.0-or-later         | |
 | Bidoo                   | GPL-3.0-or-later         | |
+| Biset                   | MIT                      | |
 | Bogaudio                | GPL-3.0-or-later         | |
 | Catro/Modulo            | BSD-3-Clause             | |
 | cf                      | BSD-3-Clause             | |
 | ChowDSP                 | GPL-3.0-or-later         | |
+| Computerscare           | BSD-3-Clause             | |
 | CVfunk                  | MIT                      | |
 | dBiz                    | GPL-3.0-or-later         | |
 | DHE-Modules             | MIT                      | |
@@ -78,6 +80,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | RebelTech               | GPL-2.0-or-later         | |
 | Sapphire                | GPL-3.0-or-later         | |
 | Sonus Modular           | GPL-3.0-or-later         | |
+| Starling Via            | MIT                      | |
 | stocaudio               | GPL-3.0-or-later         | |
 | Stoermelder Pack-One    | GPL-3.0-or-later         | |
 | Surge XT                | GPL-3.0-or-later         | |
@@ -145,6 +148,9 @@ Below is a list of artwork licenses from plugins
 | Befaco/components/*                     | CC-BY-NC-4.0     | |
 | Befaco/fonts/Segment7Standard.otf       | OFL-1.1-RFN      | |
 | Befaco/panels/*                         | Custom           | Copyright © [Befaco](https://www.befaco.org/), [used and distributed with permission](LICENSE-PERMISSIONS.md#befaco-manu-retamero--befaco) |
+| Biset/*                                 | MIT              | No artwork specific license provided |
+| Biset/FT88-Regular.ttf                  | OFL              | |
+| Biset/Recursive_VF_1.085.ttf            | OFL-1.1-no-RFN   | |
 | BogaudioModules/*                       | CC-BY-SA-4.0     | |
 | BogaudioModules/fonts/audiowide.ttf     | OFL-1.1-RFN      | |
 | BogaudioModules/fonts/inconsolata*.ttf  | OFL-1.1-no-RFN   | |
@@ -158,6 +164,9 @@ Below is a list of artwork licenses from plugins
 | cf/VT323-Regular.ttf                    | OFL-1.1-no-RFN   | |
 | ChowDSP/*                               | GPL-3.0-or-later | Same license as source code |
 | ChowDSP/fonts/RobotoCondensed-*.ttf     | Apache-2.0       | |
+| Computerscare/*                         | BSD-3-Clause     | No artwork specific license provided |
+| Computerscare/Oswald-Regular.ttf        | OFL-1.1          | |
+| Computerscare/Segment7Standard.ttf      | OFL-1.1-RFN      | |
 | CVfunk/*                                | MIT              | Same license as source code |
 | dBiz/*                                  | CC-BY-NC-ND-4.0  | |
 | dBiz/DejaVuSansMono.ttf                 | Bitstream-Vera   | |
@@ -231,6 +240,7 @@ Below is a list of artwork licenses from plugins
 | RebelTech/*                             | CC-BY-NC-4.0     | |
 | Sapphire/*                              | GPL-3.0-or-later | No artwork specific license provided |
 | sonusmodular/*                          | GPL-3.0-or-later | [Same license as source code](https://gitlab.com/sonusdept/sonusmodular/-/issues/14) |
+| StarlingVia/*                           | MIT              | No artwork specific license provided |
 | stocaudio/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | stoermelder-packone/*                   | GPL-3.0-or-later | No artwork specific license provided |
 | stoermelder-packone/fonts/RedkostComic.otf | OFL-1.1-RFN   | |

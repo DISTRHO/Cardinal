@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@
  * the License, or (at your option) any later version.
  */
 
+#include "plugin.hpp"
 #include "plugincontext.hpp"
 #include "Expander.hpp"
 
@@ -98,6 +99,7 @@ namespace ildaeil {
 // --------------------------------------------------------------------------------------------------------------------
 
 using namespace CARLA_BACKEND_NAMESPACE;
+using namespace DISTRHO_NAMESPACE;
 
 static uint32_t host_get_buffer_size(NativeHostHandle);
 static double host_get_sample_rate(NativeHostHandle);
@@ -768,8 +770,6 @@ struct IldaeilModule : Module {
                                            0, 0, nullptr, e.sampleRate);
         fCarlaPluginDescriptor->activate(fCarlaPluginHandle);
     }
-
-    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IldaeilModule)
 };
 
 // -----------------------------------------------------------------------------------------------------------
@@ -2252,8 +2252,6 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
 
         ImGui::End();
     }
-
-    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IldaeilWidget)
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -2435,8 +2433,6 @@ struct IldaeilModuleWidget : ModuleWidgetWithSideScrews<26> {
 
         ModuleWidgetWithSideScrews<26>::step();
     }
-
-    DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IldaeilModuleWidget)
 };
 #else
 static void host_ui_parameter_changed(NativeHostHandle, uint32_t, float) {}

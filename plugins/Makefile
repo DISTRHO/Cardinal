@@ -573,6 +573,15 @@ BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter PitchShifter 
 BIDOO_CUSTOM_PER_FILE = channel channel filterType
 
 # --------------------------------------------------------------
+# Biset
+
+PLUGIN_FILES += $(filter-out Biset/src/plugin.cpp,$(wildcard Biset/src/*.cpp))
+PLUGIN_FILES += $(wildcard Biset/src/*/*.cpp)
+
+# modules/types which are present in other plugins
+BISET_CUSTOM = Blank ButtonTrigger Clock Tree TreeDisplay
+
+# --------------------------------------------------------------
 # BogaudioModules
 
 PLUGIN_FILES += $(filter-out BogaudioModules/src/bogaudio.cpp,$(wildcard BogaudioModules/src/*.cpp))
@@ -644,6 +653,14 @@ PLUGIN_FILES += $(filter-out cf/src/plugin.cpp,$(wildcard cf/src/*.cpp))
 
 # modules/types which are present in other plugins
 CF_CUSTOM = $(DRWAV)
+
+# --------------------------------------------------------------
+# Computerscare
+
+PLUGIN_FILES += $(filter-out Computerscare/src/Computerscare.cpp Computerscare/src/test.cpp,$(wildcard Computerscare/src/*.cpp))
+
+# modules/types which are present in other plugins
+COMPUTERSCARE_CUSTOM = Quantizer PanelBorder
 
 # --------------------------------------------------------------
 # CVfunk
@@ -1004,6 +1021,23 @@ PLUGIN_FILES += $(filter-out Sapphire/src/plugin.cpp,$(wildcard Sapphire/src/*.c
 PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular.cpp,$(wildcard sonusmodular/src/*.cpp))
 
 # --------------------------------------------------------------
+# Starling Via
+
+PLUGIN_FILES += $(wildcard StarlingVia/src/*.cpp)
+PLUGIN_FILES += $(wildcard StarlingVia/Via/io/src/*.cpp)
+PLUGIN_FILES += $(wildcard StarlingVia/Via/ui/src/*.cpp)
+PLUGIN_FILES += $(wildcard StarlingVia/Via/modules/*/*.cpp)
+PLUGIN_BINARIES += StarlingVia/res/original.gateseq
+PLUGIN_BINARIES += StarlingVia/res/original.meta
+PLUGIN_BINARIES += StarlingVia/res/original.osc3
+PLUGIN_BINARIES += StarlingVia/res/original.scanner
+PLUGIN_BINARIES += StarlingVia/res/original.sync
+PLUGIN_BINARIES += StarlingVia/res/original.sync3
+
+# modules/types which are present in other plugins
+STARLINGVIA_CUSTOM = Scanner Scale Wavetable
+
+# --------------------------------------------------------------
 # stocaudio
 
 PLUGIN_FILES += $(filter-out stocaudio/src/plugin.cpp,$(wildcard stocaudio/src/*.cpp))
@@ -1284,6 +1318,7 @@ BUILD_DIR = ../build/plugins
 endif
 
 BASE_FLAGS += -DBUILDING_PLUGIN_MODULES
+BASE_FLAGS += -DDONT_SET_USING_DISTRHO_NAMESPACE
 BASE_FLAGS += -I$(abspath $(ROOT)/include/osdialog-stub)
 
 ifeq ($(BSD)$(WASM),true)
@@ -1402,11 +1437,11 @@ RESOURCE_FILES += Befaco/res/SpringReverbIR.f32
 RESOURCE_FILES += cf/playeroscs
 RESOURCE_FILES += DHE-Modules/svg
 RESOURCE_FILES += DrumKit/res/samples
+RESOURCE_FILES += Meander/res
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
-RESOURCE_FILES += Meander/res
 RESOURCE_FILES += Mog/res
 RESOURCE_FILES += nonlinearcircuits/res
 RESOURCE_FILES += ParableInstruments/res/Neil.png
@@ -2168,6 +2203,13 @@ $(BUILD_DIR)/Bidoo%.cpp.o: Bidoo%.cpp
 		-Wno-sign-compare \
 		-Wno-unused-function
 
+$(BUILD_DIR)/Biset/src/%.cpp.o: Biset/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(BISET_CUSTOM),$(call custom_module_names,$(m),Biset)) \
+		-DpluginInstance=pluginInstance__Biset
+
 $(BUILD_DIR)/BogaudioModules/src/follower_base.cpp.o: BogaudioModules/src/follower_base.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -2206,6 +2248,13 @@ $(BUILD_DIR)/cf/src/%.cpp.o: cf/src/%.cpp
 		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),cf)) \
 		-DpluginInstance=pluginInstance__cf \
 		-Wno-misleading-indentation
+
+$(BUILD_DIR)/Computerscare/src/%.cpp.o: Computerscare/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(COMPUTERSCARE_CUSTOM),$(call custom_module_names,$(m),Computerscare)) \
+		-DpluginInstance=pluginInstance__Computerscare
 
 $(BUILD_DIR)/CVfunk/src/%.cpp.o: CVfunk/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -2629,6 +2678,21 @@ $(BUILD_DIR)/sonusmodular/%.cpp.o: sonusmodular/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(SONUSMODULAR_CUSTOM),$(call custom_module_names,$(m),sonusmodular)) \
 		-DpluginInstance=pluginInstance__sonusmodular
+
+$(BUILD_DIR)/StarlingVia/%.cpp.o: StarlingVia/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(STARLINGVIA_CUSTOM),$(call custom_module_names,$(m),StarlingVia)) \
+		-DpluginInstance=pluginInstance__StarlingVia \
+		-DBUILD_VIRTUAL \
+		-IStarlingVia/dep/starling-dsp \
+		-IStarlingVia/Via/modules/inc \
+		-IStarlingVia/Via/synthesis/inc \
+		-IStarlingVia/Via/io/inc \
+		-IStarlingVia/Via/ui/inc \
+		-IStarlingVia/src/dep/starling-dsp \
+		-IStarlingVia/src/dep/starling-rack-ui
 
 $(BUILD_DIR)/stoermelder-packone/%.cpp.o: stoermelder-packone/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

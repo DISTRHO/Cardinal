@@ -32,7 +32,7 @@
 
 #include "CardinalCommon.hpp"
 #include "DistrhoPluginUtils.hpp"
-#include "PluginContext.hpp"
+#include "CardinalPluginContext.hpp"
 #include "extra/Base64.hpp"
 #include "extra/ScopedDenormalDisable.hpp"
 #include "extra/ScopedSafeLocale.hpp"
@@ -406,7 +406,7 @@ protected:
 
     uint32_t getVersion() const override
     {
-        return d_version(0, 24, 3);
+        return d_version(0, 24, 4);
     }
 
     int64_t getUniqueId() const override

@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -53,7 +53,7 @@
 
 #include "../CardinalCommon.hpp"
 #include "../CardinalRemote.hpp"
-#include "../PluginContext.hpp"
+#include "../CardinalPluginContext.hpp"
 #include "DistrhoPlugin.hpp"
 #include "DistrhoStandaloneUtils.hpp"
 
@@ -605,10 +605,8 @@ static void setAllFramebufferWidgetsDirty(widget::Widget* const widget)
 	for (widget::Widget* child : widget->children)
 	{
 		if (widget::FramebufferWidget* const fbw = dynamic_cast<widget::FramebufferWidget*>(child))
-		{
 			fbw->setDirty();
-			break;
-		}
+
 		setAllFramebufferWidgetsDirty(child);
 	}
 }

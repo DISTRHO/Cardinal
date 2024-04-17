@@ -62,6 +62,7 @@ enum DarkMode {
     kModeAudibleInstruments,
     kModeBidoo,
     kModeCf,
+    kModeComputerscare,
     kModeDHE,
     kModeDrumKit,
     kModeESeries,
@@ -214,6 +215,29 @@ static const struct {
     { kModeCf, "/cf/res/SUB.svg", {}, -1 },
     { kModeCf, "/cf/res/trSEQ.svg", {}, -1 },
     { kModeCf, "/cf/res/VARIABLE.svg", {}, -1 },
+    // BSD-3 Clause
+    { kModeComputerscare, "/Computerscare/res/computerscare-clk-text.svg", {}, -1},
+    { kModeComputerscare, "/Computerscare/res/vertical-x-1.svg", {}, -1},
+    { kModeComputerscare, "/Computerscare/res/vertical-x-2.svg", {}, -1},
+    { kModeComputerscare, "/Computerscare/res/vertical-x-3.svg", {}, -1},
+    { kModeComputerscare, "/Computerscare/res/computerscare-logo-normal.svg", {}, -1},
+    { kModeComputerscare, "/Computerscare/res/computerscare-logo-sad.svg", {}, -1},
+    { kModeComputerscare, "/Computerscare/res/ComputerscareDebugPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareOhPeasPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareFolyPacePanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareKnolyPobsPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareTolyPoolsPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareMolyPatrixPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareRolyPouterPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareBolyPuttonsPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareCustomBlankPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareLaundrySoupPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareILoveCookiesPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareGolyPeneratorPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareSolyPequencerPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscarePatchSequencerPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareHorseADoodleDooPanel.svg", {}, -1 },
+    { kModeComputerscare, "/Computerscare/res/ComputerscareCustomBlankExpanderPanel.svg", {}, -1 },
     // MIT
     { kModeDHE, "/DHE-Modules/svg/blossom.svg", {}, -1 },
     { kModeDHE, "/DHE-Modules/svg/booster-stage.svg", {}, -1 },
@@ -362,6 +386,7 @@ enum LightMode {
     kModeAutinn,
     kModeBefaco,
     kModeCardinal,
+    kModeComputerscareLight,
     kModeExtratone,
     kModeFehlerFabrik,
     kModeForsitan,
@@ -450,6 +475,8 @@ static const struct {
     { kModeCardinal, "/Cardinal/res/HostParamsMap.svg" },
     { kModeCardinal, "/Cardinal/res/HostTime.svg" },
     { kModeCardinal, "/Cardinal/res/Ildaeil.svg" },
+    // BSD-3 Clause
+    { kModeComputerscareLight, "/Computerscare/res/ComputerscareStolyFickPigurePanel.svg" },
     // GPLv3+
     { kModeExtratone, "/Extratone/res/Darwinism.svg" },
     // { kModeExtratone, "/Extratone/res/HalluciMemory.svg" },
@@ -662,6 +689,15 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
             case 0xffb2b2b2:
                 return false;
             }
+        }
+        break;
+    // Special case for Computerscare
+    case kModeComputerscare:
+        switch (paint.color)
+        {
+        // Just make vertical-x-* visible
+        case 0xffa6c924:
+            return false;
         }
         break;
     // Special case for DHE, mark things darker instead of inverting

@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -49,7 +49,7 @@
 #include "Application.hpp"
 #include "AsyncDialog.hpp"
 #include "CardinalCommon.hpp"
-#include "PluginContext.hpp"
+#include "CardinalPluginContext.hpp"
 #include "WindowParameters.hpp"
 #include "extra/Base64.hpp"
 
@@ -1081,7 +1081,7 @@ protected:
         int key;
         switch (ev.key)
         {
-        case '\t': key = GLFW_KEY_TAB; break;
+        case kKeyTab: key = GLFW_KEY_TAB; break;
         case kKeyBackspace: key = GLFW_KEY_BACKSPACE; break;
         case kKeyEnter: key = GLFW_KEY_ENTER; break;
         case kKeyEscape: key = GLFW_KEY_ESCAPE; break;

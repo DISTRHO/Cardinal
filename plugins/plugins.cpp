@@ -146,6 +146,35 @@ extern Model* modelChord;
 // Bidoo
 #include "Bidoo/src/plugin.hpp"
 
+// Biset
+/* NOTE too much noise in original include, do this a different way
+// #include "Biset/src/plugin.hpp"
+*/
+#define modelBlank modelBisetBlank
+#define modelTree modelBisetTree
+extern Model* modelTracker;
+extern Model* modelTrackerSynth;
+extern Model* modelTrackerDrum;
+extern Model* modelTrackerClock;
+extern Model* modelTrackerPhase;
+extern Model* modelTrackerQuant;
+extern Model* modelTrackerState;
+extern Model* modelTrackerControl;
+extern Model* modelRegex;
+extern Model* modelRegexCondensed;
+extern Model* modelRegexExp;
+extern Model* modelTree;
+extern Model* modelTreeSeed;
+extern Model* modelGbu;
+extern Model* modelPkm;
+extern Model* modelIgc;
+extern Model* modelOmega3;
+extern Model* modelOmega6;
+extern Model* modelSegfault;
+extern Model* modelBlank;
+#undef modelBlank
+#undef modelTree
+
 // BogaudioModules - integrate theme/skin support
 #include <mutex>
 #include <string>
@@ -310,6 +339,9 @@ extern Model* modelTestVCF;
 #define init initChowDSP
 #include "ChowDSP/src/plugin.cpp"
 #undef init
+
+// Computerscare
+#include "Computerscare/src/Computerscare.hpp"
 
 // dBiz
 #define DarkDefaultItem dBizDarkDefaultItem
@@ -779,6 +811,16 @@ void addThemeMenuItems(Menu*, ModuleTheme*) {}
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
 
+
+// Starling Via
+#define modelScanner modelStarlingViaScanner
+#define Scale starlingViaScale
+#define Wavetable starlingViaWavetable
+#include "StarlingVia/src/starling.hpp"
+#undef modelScanner
+#undef Scale
+#undef Wavetable
+
 // stocaudio
 #include "stocaudio/src/plugin.hpp"
 
@@ -862,10 +904,12 @@ Plugin* pluginInstance__Axioma;
 Plugin* pluginInstance__Bacon;
 Plugin* pluginInstance__Befaco;
 Plugin* pluginInstance__Bidoo;
+Plugin* pluginInstance__Biset;
 Plugin* pluginInstance__BogaudioModules;
 Plugin* pluginInstance__CatroModulo;
 Plugin* pluginInstance__cf;
 Plugin* pluginInstance__ChowDSP;
+Plugin* pluginInstance__Computerscare;
 Plugin* pluginInstance__CVfunk;
 Plugin* pluginInstance__dBiz;
 Plugin* pluginInstance__DHE;
@@ -910,6 +954,7 @@ Plugin* pluginInstance__RebelTech;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sapphire;
 Plugin* pluginInstance__sonusmodular;
+extern Plugin* pluginInstance__StarlingVia;
 Plugin* pluginInstance__stocaudio;
 extern Plugin* pluginInstance__stoermelder_p1;
 Plugin* pluginInstance__surgext;
@@ -1598,6 +1643,46 @@ static void initStatic__Bidoo()
     }
 }
 
+static void initStatic__Biset()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Biset = p;
+
+    const StaticPluginLoader spl(p, "Biset");
+    if (spl.ok())
+    {
+#define modelBlank modelBisetBlank
+#define modelTree modelBisetTree
+        p->addModel(modelTracker);
+        p->addModel(modelTrackerSynth);
+        p->addModel(modelTrackerDrum);
+        p->addModel(modelTrackerClock);
+        p->addModel(modelTrackerPhase);
+        p->addModel(modelTrackerQuant);
+        p->addModel(modelTrackerState);
+        p->addModel(modelTrackerControl);
+
+        p->addModel(modelRegex);
+        p->addModel(modelRegexCondensed);
+        p->addModel(modelRegexExp);
+
+        p->addModel(modelTree);
+        p->addModel(modelTreeSeed);
+
+        p->addModel(modelGbu);
+        p->addModel(modelPkm);
+
+        p->addModel(modelIgc);
+        p->addModel(modelOmega3);
+        p->addModel(modelOmega6);
+
+        p->addModel(modelSegfault);
+        p->addModel(modelBlank);
+#undef modelBlank
+#undef modelTree
+    }
+}
+
 static void initStatic__BogaudioModules()
 {
     Plugin* const p = new Plugin;
@@ -1830,6 +1915,34 @@ static void initStatic__ChowDSP()
         p->addModel(modelChowTapeDegrade);
         p->addModel(modelChowTapeLoss);
         p->addModel(modelChowChorus);
+    }
+}
+
+static void initStatic__Computerscare()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Computerscare = p;
+
+    const StaticPluginLoader spl(p, "Computerscare");
+    if (spl.ok())
+    {
+    	p->addModel(modelComputerscarePatchSequencer);
+        p->addModel(modelComputerscareDebug);
+        p->addModel(modelComputerscareLaundrySoup);
+        p->addModel(modelComputerscareILoveCookies);
+        p->addModel(modelComputerscareOhPeas);
+        p->addModel(modelComputerscareHorseADoodleDoo);
+        p->addModel(modelComputerscareKnolyPobs);
+        p->addModel(modelComputerscareBolyPuttons);
+        p->addModel(modelComputerscareRolyPouter);
+        p->addModel(modelComputerscareSolyPequencer);
+        p->addModel(modelComputerscareTolyPools);
+        p->addModel(modelComputerscareMolyPatrix);
+        p->addModel(modelComputerscareGolyPenerator);
+        p->addModel(modelComputerscareFolyPace);
+        p->addModel(modelComputerscareStolyFickPigure);
+        p->addModel(modelComputerscareBlank);
+        p->addModel(modelComputerscareBlankExpander);
     }
 }
 
@@ -2956,6 +3069,29 @@ static void initStatic__sonusmodular()
     }
 }
 
+
+static void initStatic__StarlingVia()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__StarlingVia = p;
+
+    const StaticPluginLoader spl(p, "StarlingVia");
+    if (spl.ok())
+    {
+#define modelScanner modelStarlingViaScanner
+        p->addModel(modelMeta);
+        p->addModel(modelGateseq);
+        p->addModel(modelScanner);
+        p->addModel(modelSync);
+        p->addModel(modelAtsr);
+        p->addModel(modelOsc3);
+        p->addModel(modelSync3);
+        p->addModel(modelSync3XL);
+        p->addModel(modelSync3XLLevels);
+#undef modelScanner
+    }
+}
+
 static void initStatic__stocaudio()
 {
     Plugin* const p = new Plugin;
@@ -3249,10 +3385,12 @@ void initStaticPlugins()
     initStatic__Bacon();
     initStatic__Befaco();
     initStatic__Bidoo();
+    initStatic__Biset();
     initStatic__BogaudioModules();
     initStatic__CatroModulo();
     initStatic__cf();
     initStatic__ChowDSP();
+    initStatic__Computerscare();
     initStatic__CVfunk();
     initStatic__dBiz();
     initStatic__DHE();
@@ -3297,6 +3435,7 @@ void initStaticPlugins()
     initStatic__repelzen();
     initStatic__Sapphire();
     initStatic__sonusmodular();
+    initStatic__StarlingVia();
     initStatic__stocaudio();
     initStatic__stoermelder_p1();
     initStatic__surgext();

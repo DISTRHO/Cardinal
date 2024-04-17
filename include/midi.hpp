@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -28,6 +28,8 @@
 #pragma once
 
 #include "choc/choc_SmallVector.h"
+
+#include <jansson.h>
 
 namespace rack {
 /** Abstraction for all MIDI drivers in Rack */
@@ -108,6 +110,18 @@ struct Message {
 	void setFrame(int64_t frame) {
 		this->frame = frame;
 	}
+};
+
+
+struct InputQueue {
+	struct Internal;
+	Internal* internal;
+
+	InputQueue();
+	~InputQueue();
+	bool tryPop(Message* const messageOut, int64_t maxFrame);
+	json_t* toJson() const;
+	void fromJson(json_t* rootJ);
 };
 
 
