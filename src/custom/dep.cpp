@@ -69,6 +69,7 @@ enum DarkMode {
     kModeJW,
     kModeLilacLoop,
     kModeLittleUtils,
+    kModeLOGinstruments,
     kModeKocmoc,
     kModeMyth,
     kModeNonlinearcircuits,
@@ -315,6 +316,11 @@ static const struct {
     { kModeLittleUtils, "/LittleUtils/res/PulseGenerator.svg", {}, -1 },
     { kModeLittleUtils, "/LittleUtils/res/TeleportIn.svg", {}, -1 },
     { kModeLittleUtils, "/LittleUtils/res/TeleportOut.svg", {}, -1 },
+    // BSD-3 Clause
+    { kModeLOGinstruments, "/LOGinstruments/res/crystal-nofonts.svg", {}, -1 },
+    { kModeLOGinstruments, "/LOGinstruments/res/LessMess_nofonts.svg", {}, -1 },
+    { kModeLOGinstruments, "/LOGinstruments/res/Speck_nofonts2.svg", {}, -1 },
+    { kModeLOGinstruments, "/LOGinstruments/res/velvet-nofonts.svg", {}, -1 },
     // GPL-3.0-or-later
     { kModeKocmoc, "/kocmoc/res/DDLY.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/LADR.svg", {}, -1 },
@@ -654,6 +660,11 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
             paint.type = NSVG_PAINT_COLOR;
             paint.color = 0xff191919;
             return true;
+        // Special case for LOGinstruments gradient
+        case kModeLOGinstruments:
+            paint.gradient->stops[0].color = 0xd95c5c5c; // original color from stop 1 was copied to this stop and made ~25% darker
+            paint.gradient->stops[1].color = 0xd91f1f1f; // color was made ~75% darker
+            return false;
         // Special case for PathSet shifty gradient
         case kModePathSet:
             paint.gradient->stops[0].color = 0xff7c4919; // 50% darker than main blue
@@ -760,6 +771,15 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
         case 0xff727272:
             paint.color = 0x00000000;
             return true;
+        }
+        break;
+    // Special case for LOGinstruments
+    case kModeLOGinstruments:
+        switch (paint.color)
+        {
+        // Don't change Speck scope color
+        case 0xff1a1a1a:
+            return false;
         }
         break;
     // Special case for Nonlinear Circuits
