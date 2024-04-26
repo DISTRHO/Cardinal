@@ -164,6 +164,7 @@ At the moment the following 3rd-party modules are provided:
 - [LifeFormModular](https://github.com/TimeControlledOrganism/LifeFormModular)
 - [Lilac Loop](https://grough.github.io/lilac-loop-vcv)
 - [Little Utils](https://github.com/mgunyho/Little-Utils)
+- [LOGinstruments](https://github.com/LOGUNIVPM/LOGinstruments)
 - [Lomas Modules](https://github.com/LomasModules/LomasModules)
 - [Lyrae Modules](https://github.com/VegaDeftwing/LyraeModules)
 - [Meander](https://github.com/knchaffin/Meander)

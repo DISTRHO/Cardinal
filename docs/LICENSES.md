@@ -59,6 +59,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | LifeFormModular         | MIT                      | |
 | Lilac Loop              | GPL-3.0-or-later         | |
 | Little Utils            | EUPL-1.2                 | |
+| LOGinstruments          | BSD-3-Clause             | |
 | Lomas Modules           | GPL-3.0-or-later         | |
 | Lyrae Modules           | GPL-3.0-or-later         | |
 | Meander                 | GPL-3.0-or-later         | |
@@ -204,6 +205,8 @@ Below is a list of artwork licenses from plugins
 | LittleUtils/fonts/CooperHewitt-*.ttf    | OFL-1.1-RFN      | |
 | LittleUtils/fonts/Overpass-*.ttf        | OFL-1.1-RFN      | |
 | LittleUtils/fonts/RobotoMono-*.ttf      | Apache-2.0       | |
+| LOGinstruments/*                        | BSD-3-Clause     | No artwork specific license provided |
+| LOGinstruments/DejaVuSansMono.ttf       | Bitstream Vera   | |
 | LomasModules/*                          | GPL-3.0-or-later | [Same license as source code](https://github.com/LomasModules/LomasModules/issues/26) |
 | LomasModules/Fonts/FiraMono-Bold.ttf    | OFL-1.1-RFN      | |
 | LyraeModules/*                          | CC-BY-NC-SA-4.0  | |
