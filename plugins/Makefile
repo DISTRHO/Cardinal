@@ -846,7 +846,7 @@ LILACLOOP_CUSTOM = AudioFile Mode
 PLUGIN_FILES += $(filter-out LittleUtils/src/plugin.cpp,$(wildcard LittleUtils/src/*.cpp))
 
 # modules/types which are present in other plugins
-LITTLEUTILS_CUSTOM = MsDisplayWidget
+LITTLEUTILS_CUSTOM = MsDisplayWidget MAX_POLY_CHANNELS
 
 # --------------------------------------------------------------
 # LomasModules
@@ -970,6 +970,13 @@ PLUGIN_FILES += $(filter-out PathSet/src/plugin.cpp,$(wildcard PathSet/src/*.cpp
 
 # modules/types which are present in other plugins
 PATHSET_CUSTOM = PitchShifter
+
+# --------------------------------------------------------------
+# PdArray
+PLUGIN_FILES += $(filter-out PdArray/src/plugin.cpp,$(wildcard PdArray/src/*.cpp))
+
+# modules/types which are present in other plugins
+PDARRAY_CUSTOM = MAX_POLY_CHANNELS draw
 
 # --------------------------------------------------------------
 # PinkTrombone
@@ -2626,6 +2633,13 @@ $(BUILD_DIR)/PathSet/%.cpp.o: PathSet/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(PATHSET_CUSTOM),$(call custom_module_names,$(m),PathSet)) \
 		-DpluginInstance=pluginInstance__PathSet
+
+$(BUILD_DIR)/PdArray/%.cpp.o: PdArray/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(PDARRAY_CUSTOM),$(call custom_module_names,$(m),PdArray)) \
+		-DpluginInstance=pluginInstance__PdArray
 
 $(BUILD_DIR)/PinkTrombone/%.cpp.o: PinkTrombone/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

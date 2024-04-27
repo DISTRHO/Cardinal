@@ -776,6 +776,11 @@ extern Model* modelBlankPanel;
 // Path Set
 #include "PathSet/src/plugin.hpp"
 
+// PdArray
+#define MAX_POLY_CHANNELS PDARRAYMAX_POLY_CHANNELS
+#include "PdArray/src/plugin.hpp"
+#undef PDARRAYMAX_POLY_CHANNELS
+
 // PinkTrombone
 #include "PinkTrombone/src/plugin.hpp"
 
@@ -947,6 +952,7 @@ Plugin* pluginInstance__nonlinearcircuits;
 Plugin* pluginInstance__Orbits;
 Plugin* pluginInstance__ParableInstruments;
 Plugin* pluginInstance__PathSet;
+Plugin* pluginInstance__PdArray;
 Plugin* pluginInstance__PinkTrombone;
 Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
@@ -1962,10 +1968,10 @@ static void initStatic__CVfunk()
 		p->addModel(modelSignals);
 		p->addModel(modelRanges);
 		p->addModel(modelHexMod);
-		p->addModel(modelCollatz);		
-		p->addModel(modelStrings);		
-		p->addModel(modelMagnets);		
-		p->addModel(modelOuros);		
+		p->addModel(modelCollatz);
+		p->addModel(modelStrings);
+		p->addModel(modelMagnets);
+		p->addModel(modelOuros);
 #undef modelSteps
     }
 }
@@ -2913,6 +2919,22 @@ static void initStatic__PathSet()
     }
 }
 
+static void initStatic__PdArray()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__PdArray = p;
+
+    const StaticPluginLoader spl(p, "PdArray");
+    if (spl.ok())
+    {
+#define MAX_POLY_CHANNELS PDARRAYMAX_POLY_CHANNELS
+        p->addModel(modelArray);
+        p->addModel(modelMiniramp);
+        p->addModel(modelMinistep);
+#undef PDARRAYMAX_POLY_CHANNELS
+    }
+}
+
 static void initStatic__PinkTrombone()
 {
     Plugin* const p = new Plugin;
@@ -3428,6 +3450,7 @@ void initStaticPlugins()
     initStatic__Orbits();
     initStatic__ParableInstruments();
     initStatic__PathSet();
+    initStatic__PdArray();
     initStatic__PinkTrombone();
     initStatic__Prism();
     initStatic__rackwindows();
