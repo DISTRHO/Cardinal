@@ -778,8 +778,10 @@ extern Model* modelBlankPanel;
 
 // PdArray
 #define MAX_POLY_CHANNELS PDARRAYMAX_POLY_CHANNELS
+#define TextBox PdArrayTextBox
 #include "PdArray/src/plugin.hpp"
 #undef PDARRAYMAX_POLY_CHANNELS
+#undef Textbox
 
 // PinkTrombone
 #include "PinkTrombone/src/plugin.hpp"
@@ -2928,10 +2930,12 @@ static void initStatic__PdArray()
     if (spl.ok())
     {
 #define MAX_POLY_CHANNELS PDARRAYMAX_POLY_CHANNELS
+#define TextBox PdArrayTextBox
         p->addModel(modelArray);
         p->addModel(modelMiniramp);
         p->addModel(modelMinistep);
 #undef PDARRAYMAX_POLY_CHANNELS
+#undef TextBox
     }
 }
 
