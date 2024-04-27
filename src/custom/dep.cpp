@@ -662,8 +662,10 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
             return true;
         // Special case for LOGinstruments gradient
         case kModeLOGinstruments:
-            paint.gradient->stops[0].color = 0xd95c5c5c; // original color from stop 1 was copied to this stop and made ~25% darker
-            paint.gradient->stops[1].color = 0xd91f1f1f; // color was made ~75% darker
+            // original color from stop 1 was copied to this stop and made ~25% darker
+            paint.gradient->stops[0].color = 0xd95c5c5c;
+            // color was made ~75% darker
+            paint.gradient->stops[1].color = 0xd91f1f1f;
             return false;
         // Special case for PathSet shifty gradient
         case kModePathSet:
