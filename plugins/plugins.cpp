@@ -588,7 +588,6 @@ extern Model* modelLooperOne;
 extern Model* modelLooperTwo;
 
 // LOGinstruments
-#include "LOGinstruments/src/kiss_fft.c"
 #include "LOGinstruments/src/LOGinstruments.hpp"
 
 // LomasModules
