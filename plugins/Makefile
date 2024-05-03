@@ -411,7 +411,7 @@ PLUGIN_FILES += AS/freeverb/revmodel.cpp
 
 # modules/types which are present in other plugins
 AS_CUSTOM = ADSR BpmDisplayWidget LabelDisplayWidget LedLight LowFrequencyOscillator SigDisplayWidget VCA WaveShaper YellowRedLight allpass comb revmodel
-AS_CUSTOM_PER_FILE = NumberDisplayWidget MsDisplayWidget
+AS_CUSTOM_PER_FILE = NumberDisplayWidget
 
 # --------------------------------------------------------------
 # AudibleInstruments
@@ -846,7 +846,7 @@ LILACLOOP_CUSTOM = AudioFile Mode
 PLUGIN_FILES += $(filter-out LittleUtils/src/plugin.cpp,$(wildcard LittleUtils/src/*.cpp))
 
 # modules/types which are present in other plugins
-LITTLEUTILS_CUSTOM = CustomTrimpot MsDisplayWidget MAX_POLY_CHANNELS
+LITTLEUTILS_CUSTOM = MsDisplayWidget
 
 # --------------------------------------------------------------
 # LomasModules
@@ -973,10 +973,11 @@ PATHSET_CUSTOM = PitchShifter
 
 # --------------------------------------------------------------
 # PdArray
+
 PLUGIN_FILES += $(filter-out PdArray/src/plugin.cpp,$(wildcard PdArray/src/*.cpp))
 
 # modules/types which are present in other plugins
-PDARRAY_CUSTOM = $(DRWAV) MAX_POLY_CHANNELS TextBox CustomTrimpot MsDisplayWidget
+PDARRAY_CUSTOM = $(DRWAV) CustomTrimpot MsDisplayWidget TextBox
 
 # --------------------------------------------------------------
 # PinkTrombone

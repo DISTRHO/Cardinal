@@ -777,15 +777,15 @@ extern Model* modelBlankPanel;
 #include "PathSet/src/plugin.hpp"
 
 // PdArray
-#define MAX_POLY_CHANNELS PDARRAYMAX_POLY_CHANNELS
 #define TextBox PdArrayTextBox
 #define CustomTrimpot PdArrayCustomTrimpot
 #define MsDisplayWidget PdArrayMsDisplayWidget
+#define MAX_POLY_CHANNELS PDARRAY_MAX_POLY_CHANNELS
 #include "PdArray/src/plugin.hpp"
-#undef PDARRAYMAX_POLY_CHANNELS
 #undef Textbox
 #undef CustomTrimpot
 #undef MsDisplayWidget
+#undef PDARRAY_MAX_POLY_CHANNELS
 
 // PinkTrombone
 #include "PinkTrombone/src/plugin.hpp"
@@ -2934,17 +2934,9 @@ static void initStatic__PdArray()
     const StaticPluginLoader spl(p, "PdArray");
     if (spl.ok())
     {
-#define MAX_POLY_CHANNELS PDARRAYMAX_POLY_CHANNELS
-#define TextBox PdArrayTextBox
-#define CustomTrimpot PdArrayCustomTrimpot
-#define MsDisplayWidget PdArrayMsDisplayWidget
         p->addModel(modelArray);
         p->addModel(modelMiniramp);
         p->addModel(modelMinistep);
-#undef PDARRAYMAX_POLY_CHANNELS
-#undef TextBox
-#undef CustomTrimpot
-#undef MsDisplayWidget
     }
 }
 
