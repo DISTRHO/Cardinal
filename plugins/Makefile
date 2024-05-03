@@ -976,7 +976,7 @@ PATHSET_CUSTOM = PitchShifter
 PLUGIN_FILES += $(filter-out PdArray/src/plugin.cpp,$(wildcard PdArray/src/*.cpp))
 
 # modules/types which are present in other plugins
-PDARRAY_CUSTOM = MAX_POLY_CHANNELS TextBox
+PDARRAY_CUSTOM = $(DRWAV) MAX_POLY_CHANNELS TextBox
 
 # --------------------------------------------------------------
 # PinkTrombone
