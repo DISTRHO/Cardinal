@@ -785,7 +785,7 @@ extern Model* modelBlankPanel;
 #undef Textbox
 #undef CustomTrimpot
 #undef MsDisplayWidget
-#undef PDARRAY_MAX_POLY_CHANNELS
+#undef MAX_POLY_CHANNELS
 
 // PinkTrombone
 #include "PinkTrombone/src/plugin.hpp"
