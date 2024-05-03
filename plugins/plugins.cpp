@@ -1974,6 +1974,7 @@ static void initStatic__CVfunk()
 		p->addModel(modelStrings);
 		p->addModel(modelMagnets);
 		p->addModel(modelOuros);
+		p->addModel(modelPressedDuck);
 #undef modelSteps
     }
 }
