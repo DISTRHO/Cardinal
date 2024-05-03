@@ -223,6 +223,9 @@ lv2: carla deps dgl plugins resources
 vst2: carla deps dgl plugins resources
 	$(MAKE) vst2 -C src $(CARLA_EXTRA_ARGS)
 
+vst2fx: carla deps dgl plugins resources
+	$(MAKE) vst2fx -C src $(CARLA_EXTRA_ARGS)
+
 vst3: carla deps dgl plugins resources
 	$(MAKE) vst3 -C src $(CARLA_EXTRA_ARGS)
 

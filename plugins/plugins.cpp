@@ -811,7 +811,6 @@ void addThemeMenuItems(Menu*, ModuleTheme*) {}
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
 
-
 // Starling Via
 #define modelScanner modelStarlingViaScanner
 #define Scale starlingViaScale
@@ -954,7 +953,7 @@ Plugin* pluginInstance__RebelTech;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sapphire;
 Plugin* pluginInstance__sonusmodular;
-extern Plugin* pluginInstance__StarlingVia;
+Plugin* pluginInstance__StarlingVia;
 Plugin* pluginInstance__stocaudio;
 extern Plugin* pluginInstance__stoermelder_p1;
 Plugin* pluginInstance__surgext;
@@ -3069,7 +3068,6 @@ static void initStatic__sonusmodular()
         p->addModel(modelYabp);
     }
 }
-
 
 static void initStatic__StarlingVia()
 {
