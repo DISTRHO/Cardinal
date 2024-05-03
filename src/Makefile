@@ -152,6 +152,9 @@ vst2: $(TARGETS)
 	$(MAKE) vst2 -C CardinalFX $(CARDINAL_FX_ARGS)
 	$(MAKE) vst2 -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
 
+vst2fx: $(TARGETS)
+	$(MAKE) vst2 -C CardinalFX $(CARDINAL_FX_ARGS)
+
 vst3: $(TARGETS)
 	$(MAKE) vst3 -C Cardinal
 	$(MAKE) vst3 -C CardinalFX $(CARDINAL_FX_ARGS)

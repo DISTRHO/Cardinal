@@ -1031,7 +1031,7 @@ PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular.cpp,$(wildcard sonusm
 # --------------------------------------------------------------
 # Starling Via
 
-PLUGIN_FILES += $(wildcard StarlingVia/src/*.cpp)
+PLUGIN_FILES += $(filter-out StarlingVia/src/starling.cpp,$(wildcard StarlingVia/src/*.cpp))
 PLUGIN_FILES += $(wildcard StarlingVia/Via/io/src/*.cpp)
 PLUGIN_FILES += $(wildcard StarlingVia/Via/ui/src/*.cpp)
 PLUGIN_FILES += $(wildcard StarlingVia/Via/modules/*/*.cpp)
@@ -1453,6 +1453,7 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
 RESOURCE_FILES += Mog/res
 RESOURCE_FILES += nonlinearcircuits/res
 RESOURCE_FILES += ParableInstruments/res/Neil.png
+RESOURCE_FILES += $(wildcard StarlingVia/res/original.*)
 RESOURCE_FILES += surgext/build/surge-data/configuration.xml
 RESOURCE_FILES += surgext/build/surge-data/fx_presets
 RESOURCE_FILES += surgext/build/surge-data/wavetables
