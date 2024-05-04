@@ -73,6 +73,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Orbits                  | GPL-3.0-or-later         | |
 | Parable Instruments     | GPL-3.0-or-later         | |
 | Path Set                | GPL-3.0-or-later         | |
+| PdArray                 | EUPL-1.2                 | |
 | PinkTrombone            | GPL-3.0-or-later         | |
 | Prism                   | BSD-3-Clause             | |
 | Rackwindows             | MIT                      | |
@@ -232,6 +233,9 @@ Below is a list of artwork licenses from plugins
 | Orbits/fonts/ShareTechMono-Regular.ttf  | OFL-1.1-RFN      | |
 | ParableInstruments/*                    | Custom           | Copyright © Alex Brandt, [used and distributed with permission](https://github.com/adbrant/ArableInstruments/issues/21) |
 | PathSet/*                               | GPL-3.0-or-later | No artwork specific license provided |
+| PdArray/res/*svg                        | EUPL-1.2         | No artwork specific license provided |
+| PdArray/res/fonts/Overpass-*.ttf        | OFL-1.1-RFN      | |
+| PdArray/res/fonts/Roboto-*.ttf          | Apache-2.0       | |
 | PinkTrombone/*                          | GPL-3.0-or-later | No artwork specific license provided |
 | Prism/*                                 | CC-BY-SA-4.0     | |
 | Prism/RobotoCondensed-Regular.ttf       | Apache-2.0       | |
