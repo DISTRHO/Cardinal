@@ -972,6 +972,14 @@ PLUGIN_FILES += $(filter-out PathSet/src/plugin.cpp,$(wildcard PathSet/src/*.cpp
 PATHSET_CUSTOM = PitchShifter
 
 # --------------------------------------------------------------
+# PdArray
+
+PLUGIN_FILES += $(filter-out PdArray/src/plugin.cpp,$(wildcard PdArray/src/*.cpp))
+
+# modules/types which are present in other plugins
+PDARRAY_CUSTOM = $(DRWAV) CustomTrimpot MsDisplayWidget TextBox
+
+# --------------------------------------------------------------
 # PinkTrombone
 
 PLUGIN_FILES += $(filter-out PinkTrombone/src/plugin.cpp,$(wildcard PinkTrombone/src/*.cpp))
@@ -1023,7 +1031,7 @@ PLUGIN_FILES += $(filter-out sonusmodular/src/sonusmodular.cpp,$(wildcard sonusm
 # --------------------------------------------------------------
 # Starling Via
 
-PLUGIN_FILES += $(wildcard StarlingVia/src/*.cpp)
+PLUGIN_FILES += $(filter-out StarlingVia/src/starling.cpp,$(wildcard StarlingVia/src/*.cpp))
 PLUGIN_FILES += $(wildcard StarlingVia/Via/io/src/*.cpp)
 PLUGIN_FILES += $(wildcard StarlingVia/Via/ui/src/*.cpp)
 PLUGIN_FILES += $(wildcard StarlingVia/Via/modules/*/*.cpp)
@@ -1449,6 +1457,7 @@ RESOURCE_FILES += surgext/build/surge-data/configuration.xml
 RESOURCE_FILES += surgext/build/surge-data/fx_presets
 RESOURCE_FILES += surgext/build/surge-data/wavetables
 RESOURCE_FILES += surgext/build/surge-data/windows.wt
+RESOURCE_FILES += $(wildcard StarlingVia/res/original.*)
 RESOURCE_FILES += $(wildcard surgext/res/xt/fonts/quicksand/*.ttf)
 RESOURCE_FILES += $(wildcard unless_modules/art/*.art)
 RESOURCE_FILES += $(wildcard unless_modules/art/svg/*/*.svg)
@@ -2627,6 +2636,13 @@ $(BUILD_DIR)/PathSet/%.cpp.o: PathSet/%.cpp
 		$(foreach m,$(PATHSET_CUSTOM),$(call custom_module_names,$(m),PathSet)) \
 		-DpluginInstance=pluginInstance__PathSet
 
+$(BUILD_DIR)/PdArray/%.cpp.o: PdArray/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(PDARRAY_CUSTOM),$(call custom_module_names,$(m),PdArray)) \
+		-DpluginInstance=pluginInstance__PdArray
+
 $(BUILD_DIR)/PinkTrombone/%.cpp.o: PinkTrombone/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -2668,7 +2684,7 @@ $(BUILD_DIR)/repelzen/%.cpp.o: repelzen/%.cpp
 $(BUILD_DIR)/Sapphire/%.cpp.o: Sapphire/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -std=gnu++17 -c -o $@ \
 		$(foreach m,$(SAPPHIRE_CUSTOM),$(call custom_module_names,$(m),Sapphire)) \
 		-DpluginInstance=pluginInstance__sapphire
 

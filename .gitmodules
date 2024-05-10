@@ -245,3 +245,6 @@
 [submodule "plugins/Biset"]
 	path = plugins/Biset
 	url = https://github.com/gibbonjoyeux/VCV-Biset.git
+[submodule "plugins/PdArray"]
+	path = plugins/PdArray
+	url = https://github.com/mgunyho/PdArray.git

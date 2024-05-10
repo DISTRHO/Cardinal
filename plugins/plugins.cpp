@@ -776,6 +776,17 @@ extern Model* modelBlankPanel;
 // Path Set
 #include "PathSet/src/plugin.hpp"
 
+// PdArray
+#define TextBox PdArrayTextBox
+#define CustomTrimpot PdArrayCustomTrimpot
+#define MsDisplayWidget PdArrayMsDisplayWidget
+#define MAX_POLY_CHANNELS PDARRAY_MAX_POLY_CHANNELS
+#include "PdArray/src/plugin.hpp"
+#undef Textbox
+#undef CustomTrimpot
+#undef MsDisplayWidget
+#undef MAX_POLY_CHANNELS
+
 // PinkTrombone
 #include "PinkTrombone/src/plugin.hpp"
 
@@ -810,7 +821,6 @@ void addThemeMenuItems(Menu*, ModuleTheme*) {}
 
 // sonusmodular
 #include "sonusmodular/src/sonusmodular.hpp"
-
 
 // Starling Via
 #define modelScanner modelStarlingViaScanner
@@ -947,6 +957,7 @@ Plugin* pluginInstance__nonlinearcircuits;
 Plugin* pluginInstance__Orbits;
 Plugin* pluginInstance__ParableInstruments;
 Plugin* pluginInstance__PathSet;
+Plugin* pluginInstance__PdArray;
 Plugin* pluginInstance__PinkTrombone;
 Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
@@ -954,7 +965,7 @@ Plugin* pluginInstance__RebelTech;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sapphire;
 Plugin* pluginInstance__sonusmodular;
-extern Plugin* pluginInstance__StarlingVia;
+Plugin* pluginInstance__StarlingVia;
 Plugin* pluginInstance__stocaudio;
 extern Plugin* pluginInstance__stoermelder_p1;
 Plugin* pluginInstance__surgext;
@@ -1962,11 +1973,11 @@ static void initStatic__CVfunk()
 		p->addModel(modelSignals);
 		p->addModel(modelRanges);
 		p->addModel(modelHexMod);
-		p->addModel(modelCollatz);		
-		p->addModel(modelStrings);		
-		p->addModel(modelMagnets);		
-		p->addModel(modelOuros);		
-		p->addModel(modelPressedDuck);		
+		p->addModel(modelCollatz);
+		p->addModel(modelStrings);
+		p->addModel(modelMagnets);
+		p->addModel(modelOuros);
+		p->addModel(modelPressedDuck);
 #undef modelSteps
     }
 }
@@ -2914,6 +2925,20 @@ static void initStatic__PathSet()
     }
 }
 
+static void initStatic__PdArray()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__PdArray = p;
+
+    const StaticPluginLoader spl(p, "PdArray");
+    if (spl.ok())
+    {
+        p->addModel(modelArray);
+        p->addModel(modelMiniramp);
+        p->addModel(modelMinistep);
+    }
+}
+
 static void initStatic__PinkTrombone()
 {
     Plugin* const p = new Plugin;
@@ -3069,7 +3094,6 @@ static void initStatic__sonusmodular()
         p->addModel(modelYabp);
     }
 }
-
 
 static void initStatic__StarlingVia()
 {
@@ -3429,6 +3453,7 @@ void initStaticPlugins()
     initStatic__Orbits();
     initStatic__ParableInstruments();
     initStatic__PathSet();
+    initStatic__PdArray();
     initStatic__PinkTrombone();
     initStatic__Prism();
     initStatic__rackwindows();
