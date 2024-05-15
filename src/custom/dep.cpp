@@ -74,6 +74,7 @@ enum DarkMode {
     kModeMyth,
     kModeNonlinearcircuits,
     kModeParableInstruments,
+    kModePdArray,
     kModePathSet,
     kModeVoxglitch,
     kModeWhatTheRack,
@@ -361,6 +362,10 @@ static const struct {
     { kModePathSet, "/PathSet/res/PlusPane.svg", {}, -1 },
     { kModePathSet, "/PathSet/res/ShiftyExpander.svg", {}, -1 },
     { kModePathSet, "/PathSet/res/ShiftyMod.svg", {}, -1 },
+    // EUPL-1.2
+    { kModePdArray, "/PdArray/res/Array.svg", {}, -1 },
+    { kModePdArray, "/PdArray/res/Miniramp.svg", {}, -1 },
+    { kModePdArray, "/PdArray/res/Ministep.svg", {}, -1 },
     // BSD-3-Clause
     { kModeVoxglitch, "/voxglitch/res/autobreak_front_panel.svg", {}, -1 },
     { kModeVoxglitch, "/voxglitch/res/bytebeat_front_panel.svg", {}, -1 },

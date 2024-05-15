@@ -248,3 +248,6 @@
 [submodule "plugins/LOGinstruments"]
 	path = plugins/LOGinstruments
 	url = https://github.com/LOGUNIVPM/LOGinstruments.git
+[submodule "plugins/PdArray"]
+	path = plugins/PdArray
+	url = https://github.com/mgunyho/PdArray.git

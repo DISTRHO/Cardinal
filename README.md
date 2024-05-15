@@ -179,6 +179,7 @@ At the moment the following 3rd-party modules are provided:
 - [Orbits](https://github.com/RareBreeds/Orbits)
 - [Parable Instruments](https://github.com/adbrant/ArableInstruments)
 - [Path Set](https://github.com/patheros/PathSetModules)
+- [PdArray](https://github.com/mgunyho/PdArray)
 - [PinkTrombone](https://github.com/VegaDeftwing/PinkTromboneVCV)
 - [Prism](https://github.com/SteveRussell33/Prism)
 - [rackwindows](https://github.com/n0jo/rackwindows)
