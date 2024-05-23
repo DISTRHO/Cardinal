@@ -412,7 +412,7 @@ BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 # Enable all possible plugin types and setup resources
 
 ifeq ($(CARDINAL_VARIANT),main)
-TARGETS = jack lv2 vst3 clap
+TARGETS = clap jack lv2 vst3
 else ifeq ($(DSP_UI_SPLIT),true)
 TARGETS = lv2_sep
 else ifeq ($(CARDINAL_VARIANT),mini)

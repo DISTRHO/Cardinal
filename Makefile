@@ -220,6 +220,9 @@ native: carla deps dgl plugins resources
 mini: carla deps dgl mini-plugins mini-resources
 	$(MAKE) mini -C src $(CARLA_EXTRA_ARGS)
 
+au: carla deps dgl plugins resources
+	$(MAKE) au -C src $(CARLA_EXTRA_ARGS)
+
 clap: carla deps dgl plugins resources
 	$(MAKE) clap -C src $(CARLA_EXTRA_ARGS)
 

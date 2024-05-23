@@ -196,6 +196,14 @@ class CardinalPlugin : public CardinalBasePlugin
     float fMiniReportValues[kCardinalParameterCountAtMini - kCardinalParameterStartMini];
    #endif
 
+   #ifdef DISTRHO_PLUGIN_EXTRA_IO
+    uint16_t fNumActiveInputs = DISTRHO_PLUGIN_NUM_INPUTS;
+    uint16_t fNumActiveOutputs = DISTRHO_PLUGIN_NUM_OUTPUTS;
+   #else
+    static constexpr const uint16_t fNumActiveInputs = DISTRHO_PLUGIN_NUM_INPUTS;
+    static constexpr const uint16_t fNumActiveOutputs = DISTRHO_PLUGIN_NUM_OUTPUTS;
+   #endif
+
 public:
     CardinalPlugin()
         : CardinalBasePlugin(kCardinalParameterCount, 0, kCardinalStateCount),
@@ -1135,7 +1143,10 @@ protected:
        #if DISTRHO_PLUGIN_NUM_INPUTS != 0
         fAudioBufferCopy = new float*[DISTRHO_PLUGIN_NUM_INPUTS];
         for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
+        {
             fAudioBufferCopy[i] = new float[context->bufferSize];
+            std::memset(fAudioBufferCopy[i], 0, sizeof(float) * context->bufferSize);
+        }
        #endif
 
         fNextExpectedFrame = 0;
@@ -1226,7 +1237,7 @@ protected:
         else
         {
            #if DISTRHO_PLUGIN_NUM_INPUTS != 0
-            for (int i=0; i<DISTRHO_PLUGIN_NUM_INPUTS; ++i)
+            for (int i=0; i<fNumActiveInputs; ++i)
             {
                #if CARDINAL_VARIANT_MAIN || CARDINAL_VARIANT_MINI
                 // can be null on main and mini variants
@@ -1241,7 +1252,7 @@ protected:
             context->dataOuts = outputs;
         }
 
-        for (int i=0; i<DISTRHO_PLUGIN_NUM_OUTPUTS; ++i)
+        for (int i=0; i<fNumActiveOutputs; ++i)
         {
            #if CARDINAL_VARIANT_MAIN || CARDINAL_VARIANT_MINI
             // can be null on main and mini variants
@@ -1287,6 +1298,14 @@ protected:
         context->sampleRate = newSampleRate;
         context->engine->setSampleRate(newSampleRate);
     }
+
+   #ifdef DISTRHO_PLUGIN_EXTRA_IO
+    void ioChanged(const uint16_t numInputs, const uint16_t numOutputs) override
+    {
+        fNumActiveInputs = numInputs;
+        fNumActiveOutputs = numOutputs;
+    }
+   #endif
 
     // -------------------------------------------------------------------------------------------------------
 
