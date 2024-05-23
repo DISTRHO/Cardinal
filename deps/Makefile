@@ -266,9 +266,6 @@ ifeq ($(CPU_I386),true)
 SURGE_CXX_FLAGS += -D__sigemptyset=sigemptyset
 endif
 
-# use custom JUCE from DISTRHO and Carla
-SURGE_CXX_FLAGS += -I$(abspath ../carla/source/modules)
-
 # possibly use fftw?
 # ifeq ($(shell $(PKG_CONFIG) --exists fftw3 fftw3f && echo true),true)
 # SURGE_CXX_FLAGS += -DJUCE_DSP_USE_STATIC_FFTW=1
@@ -298,7 +295,6 @@ $(SURGE_DEP_PATH)/Makefile: $(SURGE_SRC_PATH)/CMakeLists.txt
 		-DSURGE_SKIP_JUCE_FOR_RACK=TRUE \
 		-DSURGE_SKIP_LUA=TRUE \
 		-DSURGE_SKIP_ODDSOUND_MTS=TRUE \
-		-DSURGE_JUCE_PATH=$(abspath ../carla/source) \
 		-DSURGE_SIMDE_PATH=$(abspath ../src/Rack/dep/simde) \
 		$(SURGE_SRC_PATH)
 

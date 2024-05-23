@@ -629,11 +629,11 @@ struct IldaeilModule : Module {
 
         CarlaEngine* const engine = carla_get_engine_from_handle(fCarlaHostHandle);
 
-        water::XmlDocument xml(projectState);
+        water::XmlDocument xmlState{water::String(projectState)};
 
         {
             const MutexLocker cml(sPluginInfoLoadMutex);
-            engine->loadProjectInternal(xml, true);
+            engine->loadProjectInternal(xmlState, true);
         }
 
         projectLoadedFromDSP(fUI);
@@ -1664,7 +1664,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
         // save plugin info into cache
         if (sha1sum != nullptr)
         {
-            const water::String configDir(asset::config("Ildaeil"));
+            const String configDir(asset::config("Ildaeil").c_str());
             const water::File cacheFile(configDir + CARLA_OS_SEP_STR "cache" CARLA_OS_SEP_STR + sha1sum);
 
             if (cacheFile.create().ok())
@@ -1755,7 +1755,7 @@ struct IldaeilWidget : ImGuiWidget, IdleCallback, Runner {
         if (sha1sum == nullptr)
             return false;
 
-        const water::String configDir(asset::config("Ildaeil"));
+        const String configDir(asset::config("Ildaeil").c_str());
         const water::File cacheFile(configDir + CARLA_OS_SEP_STR "cache" CARLA_OS_SEP_STR + sha1sum);
 
         if (cacheFile.existsAsFile())
