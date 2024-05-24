@@ -248,3 +248,6 @@
 [submodule "plugins/PdArray"]
 	path = plugins/PdArray
 	url = https://github.com/mgunyho/PdArray.git
+[submodule "deps/JUCE"]
+	path = deps/JUCE
+	url = https://github.com/CardinalModules/JUCE.git
