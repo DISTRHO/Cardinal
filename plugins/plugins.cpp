@@ -3005,19 +3005,17 @@ static void initStatic__RCM()
     Plugin* const p = new Plugin;
     pluginInstance__RCM = p;
 
-    const StaticPluginLoader spl(p, "RCM");
+    const StaticPluginLoader spl(p, "rcm-modules");
     if (spl.ok())
     {
         p->addModel(modelGVerbModule);
-        p->addModel(modelDuckModule);
         p->addModel(modelCV0to10Module);
         p->addModel(modelCVS0to10Module);
         p->addModel(modelCV5to5Module);
         p->addModel(modelCVMmtModule);
         p->addModel(modelCVTglModule);
         p->addModel(modelPianoRollModule);
-        p->addModel(modelSongRollModule);
-        p->addModel(modelButtonTest);
+        p->addModel(modelDuckModule);
         p->addModel(modelSEQAdapterModule);
         p->addModel(modelSyncModule);
         p->addModel(modelPolyNosModule);

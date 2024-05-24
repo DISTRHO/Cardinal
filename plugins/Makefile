@@ -1006,8 +1006,8 @@ PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/s
 # RCM
 
 PLUGIN_FILES += $(filter-out rcm-modules/src/plugin.cpp,$(wildcard rcm-modules/src/*.cpp))
+PLUGIN_FILES += $(wildcard rcm-modules/src/*.c)
 PLUGIN_FILES += $(wildcard rcm-modules/src/PianoRoll/*.cpp)
-PLUGIN_FILES += $(wildcard rcm-modules/src/SongRoll/*.cppx)
 
 # --------------------------------------------------------------
 # RebelTech
@@ -2687,7 +2687,13 @@ $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 		-Wno-implicit-fallthrough \
 		-Wno-sign-compare
 
-$(BUILD_DIR)/rcm-modules/%.o: rcm-modules/%
+$(BUILD_DIR)/rcm-modules/%.c.o: rcm-modules/%.c
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@ \
+		$(foreach m,$(RCM_CUSTOM),$(call custom_module_names,$(m),RCM))
+
+$(BUILD_DIR)/rcm-modules/%.cpp.o: rcm-modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
