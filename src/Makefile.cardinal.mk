@@ -188,7 +188,7 @@ endif
 ifeq ($(MACOS),true)
 EXTRA_DSP_LIBS += -framework Accelerate -framework AppKit
 else ifeq ($(WINDOWS),true)
-EXTRA_DSP_LIBS += -lole32 -lshlwapi -luuid -lversion
+EXTRA_DSP_LIBS += -lole32 -lshlwapi -luuid -lversion -lwininet
 endif
 
 # --------------------------------------------------------------
