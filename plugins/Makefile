@@ -1009,6 +1009,9 @@ PLUGIN_FILES += $(filter-out rcm-modules/src/plugin.cpp,$(wildcard rcm-modules/s
 PLUGIN_FILES += $(wildcard rcm-modules/src/*.c)
 PLUGIN_FILES += $(wildcard rcm-modules/src/PianoRoll/*.cpp)
 
+# modules/types which are present in other plugins
+RCM_CUSTOM = Transport
+
 # --------------------------------------------------------------
 # RebelTech
 
