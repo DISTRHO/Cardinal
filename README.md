@@ -135,6 +135,7 @@ At the moment the following 3rd-party modules are provided:
 - [Bacon Music](https://github.com/baconpaul/BaconPlugs)
 - [Befaco](https://github.com/VCVRack/Befaco)
 - [Bidoo](https://github.com/sebastien-bouffier/Bidoo)
+- [Biset](https://github.com/gibbonjoyeux/VCV-Biset)
 - [Bogaudio](https://github.com/bogaudio/BogaudioModules)
 - [Catro/Modulo](https://github.com/catronomix/catro-modulo)
 - [cf](https://github.com/cfoulc/cf)
