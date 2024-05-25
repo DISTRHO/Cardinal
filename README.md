@@ -182,6 +182,7 @@ At the moment the following 3rd-party modules are provided:
 - [PinkTrombone](https://github.com/VegaDeftwing/PinkTromboneVCV)
 - [Prism](https://github.com/SteveRussell33/Prism)
 - [rackwindows](https://github.com/n0jo/rackwindows)
+- [RCM](https://github.com/Rcomian/rcm-modules/)
 - [RebelTech](https://github.com/hemmer/rebel-tech-vcv)
 - [repelzen](https://github.com/wiqid/repelzen)
 - [Sapphire](https://github.com/cosinekitty/sapphire)

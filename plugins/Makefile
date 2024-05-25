@@ -1003,6 +1003,16 @@ PRISM_CUSTOM = bogaudio Scale
 PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/src/*.cpp))
 
 # --------------------------------------------------------------
+# RCM
+
+PLUGIN_FILES += $(filter-out rcm-modules/src/plugin.cpp,$(wildcard rcm-modules/src/*.cpp))
+PLUGIN_FILES += $(wildcard rcm-modules/src/*.c)
+PLUGIN_FILES += $(wildcard rcm-modules/src/PianoRoll/*.cpp)
+
+# modules/types which are present in other plugins
+RCM_CUSTOM = Transport
+
+# --------------------------------------------------------------
 # RebelTech
 
 PLUGIN_FILES += $(filter-out RebelTech/src/plugin.cpp,$(wildcard RebelTech/src/*.cpp))
@@ -2679,6 +2689,19 @@ $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 		-DpluginInstance=pluginInstance__rackwindows \
 		-Wno-implicit-fallthrough \
 		-Wno-sign-compare
+
+$(BUILD_DIR)/rcm-modules/%.c.o: rcm-modules/%.c
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@ \
+		$(foreach m,$(RCM_CUSTOM),$(call custom_module_names,$(m),RCM))
+
+$(BUILD_DIR)/rcm-modules/%.cpp.o: rcm-modules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(RCM_CUSTOM),$(call custom_module_names,$(m),RCM)) \
+		-DpluginInstance=pluginInstance__RCM
 
 $(BUILD_DIR)/RebelTech/%.cpp.o: RebelTech/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
