@@ -799,6 +799,9 @@ extern Model* modelBlankPanel;
 // rackwindows
 #include "rackwindows/src/plugin.hpp"
 
+// RCM
+#include "rcm-modules/src/plugin.hpp"
+
 // RebelTech
 #define BefacoInputPort BefacoInputPortRebelTech
 #define BefacoOutputPort BefacoOutputPortRebelTech
@@ -965,6 +968,7 @@ Plugin* pluginInstance__PdArray;
 Plugin* pluginInstance__PinkTrombone;
 Plugin* pluginInstance__Prism;
 Plugin* pluginInstance__rackwindows;
+Plugin* pluginInstance__RCM;
 Plugin* pluginInstance__RebelTech;
 Plugin* pluginInstance__repelzen;
 Plugin* pluginInstance__sapphire;
@@ -1982,6 +1986,7 @@ static void initStatic__CVfunk()
 		p->addModel(modelMagnets);
 		p->addModel(modelOuros);
 		p->addModel(modelPressedDuck);
+		p->addModel(modelFlowerPatch);
 #undef modelSteps
     }
 }
@@ -3014,6 +3019,28 @@ static void initStatic__rackwindows()
     }
 }
 
+static void initStatic__RCM()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__RCM = p;
+
+    const StaticPluginLoader spl(p, "rcm-modules");
+    if (spl.ok())
+    {
+        p->addModel(modelGVerbModule);
+        p->addModel(modelCV0to10Module);
+        p->addModel(modelCVS0to10Module);
+        p->addModel(modelCV5to5Module);
+        p->addModel(modelCVMmtModule);
+        p->addModel(modelCVTglModule);
+        p->addModel(modelPianoRollModule);
+        p->addModel(modelDuckModule);
+        p->addModel(modelSEQAdapterModule);
+        p->addModel(modelSyncModule);
+        p->addModel(modelPolyNosModule);
+    }
+}
+
 static void initStatic__RebelTech()
 {
     Plugin* const p = new Plugin;
@@ -3477,6 +3504,7 @@ void initStaticPlugins()
     initStatic__PinkTrombone();
     initStatic__Prism();
     initStatic__rackwindows();
+    initStatic__RCM();
     initStatic__RebelTech();
     initStatic__repelzen();
     initStatic__Sapphire();

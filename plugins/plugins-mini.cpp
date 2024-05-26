@@ -575,6 +575,7 @@ static void initStatic__surgext()
         spl.removeModule("SurgeXTDigitalRingMod");
         spl.removeModule("SurgeXTVCF");
 
+        p->addModel(modelFXNimbus);
         spl.removeModule("SurgeXTFXBonsai");
         spl.removeModule("SurgeXTFXChorus");
         spl.removeModule("SurgeXTFXChow");
@@ -586,7 +587,6 @@ static void initStatic__surgext()
         spl.removeModule("SurgeXTFXFlanger");
         spl.removeModule("SurgeXTFXFrequencyShifter");
         spl.removeModule("SurgeXTFXNeuron");
-        spl.removeModule("SurgeXTFXNimbus");
         spl.removeModule("SurgeXTFXPhaser");
         spl.removeModule("SurgeXTFXResonator");
         spl.removeModule("SurgeXTFXReverb");

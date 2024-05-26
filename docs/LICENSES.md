@@ -78,6 +78,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | PinkTrombone            | GPL-3.0-or-later         | |
 | Prism                   | BSD-3-Clause             | |
 | Rackwindows             | MIT                      | |
+| RCM                     | GPL-2.0-or-later         | |
 | repelzen                | GPL-3.0-or-later         | |
 | RebelTech               | GPL-2.0-or-later         | |
 | Sapphire                | GPL-3.0-or-later         | |
@@ -243,6 +244,7 @@ Below is a list of artwork licenses from plugins
 | Prism/*                                 | CC-BY-SA-4.0     | |
 | Prism/RobotoCondensed-Regular.ttf       | Apache-2.0       | |
 | Rackwindows/*                           | MIT              | [Same license as source code](https://github.com/n0jo/rackwindows/issues/15) |
+| RCM/*                                   | GPL-2.0-or-later | No artwork specific license provided |
 | repelzen/*                              | CC-BY-SA-4.0     | |
 | RebelTech/*                             | CC-BY-NC-4.0     | |
 | Sapphire/*                              | GPL-3.0-or-later | No artwork specific license provided |

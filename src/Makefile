@@ -142,6 +142,10 @@ native: $(TARGETS)
 mini: $(TARGETS)
 	$(MAKE) jack -C CardinalMini
 
+au: $(TARGETS)
+	$(MAKE) au -C CardinalFX $(CARDINAL_SYNTH_ARGS)
+	$(MAKE) au -C CardinalSynth $(CARDINAL_SYNTH_ARGS)
+
 lv2: $(TARGETS)
 	$(MAKE) lv2 -C Cardinal
 	$(MAKE) lv2 -C CardinalFX $(CARDINAL_FX_ARGS)
