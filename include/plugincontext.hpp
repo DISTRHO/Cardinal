@@ -89,16 +89,12 @@ struct CardinalPluginContext : rack::Context {
     const CardinalDISTRHO::MidiEvent* midiEvents;
     uint32_t midiEventCount;
     CardinalDISTRHO::Plugin* const plugin;
-   #ifndef HEADLESS
     CardinalDGL::NanoTopLevelWidget* tlw;
     CardinalDISTRHO::UI* ui;
-   #endif
     CardinalPluginContext(CardinalDISTRHO::Plugin* const p);
     void writeMidiMessage(const rack::midi::Message& message, uint8_t channel);
-   #ifndef HEADLESS
     bool addIdleCallback(IdleCallback* cb) const;
     void removeIdleCallback(IdleCallback* cb) const;
-   #endif
 };
 
 #ifndef HEADLESS

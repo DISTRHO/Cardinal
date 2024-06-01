@@ -11,7 +11,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>studio.kx.distrho.cardinal.jack</string>
 	<key>CFBundleShortVersionString</key>
-	<string>23.04</string>
+	<string>24.05</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.15</string>
 	<key>NSHumanReadableCopyright</key>

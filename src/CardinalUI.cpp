@@ -426,10 +426,6 @@ public:
             const double height = std::max(538.f, rack::settings::windowSize.y) * scaleFactor;
             setSize(width, height);
         }
-        else if (scaleFactor != 1.0)
-        {
-            setSize(DISTRHO_UI_DEFAULT_WIDTH * scaleFactor, DISTRHO_UI_DEFAULT_HEIGHT * scaleFactor);
-        }
 
        #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
         const DGL_NAMESPACE::Window::ScopedGraphicsContext sgc(window);
@@ -932,7 +928,7 @@ protected:
                 context->patch->loadAutosave();
             } catch(const rack::Exception& e) {
                 d_stderr(e.what());
-            } DISTRHO_SAFE_EXCEPTION_RETURN("setState loadAutosave",);
+            } DISTRHO_SAFE_EXCEPTION_RETURN("stateChanged loadAutosave",);
 
             return;
         }
@@ -1180,7 +1176,7 @@ protected:
         const int height = static_cast<int>(ev.size.getHeight() / scaleFactor + 0.5);
 
         char sizeString[64] = {};
-        std::snprintf(sizeString, sizeof(sizeString), "%d:%d", width, height);
+        std::snprintf(sizeString, sizeof(sizeString) - 1, "%d:%d", width, height);
         setState("windowSize", sizeString);
 
         if (rack::isStandalone())

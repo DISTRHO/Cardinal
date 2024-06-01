@@ -1003,6 +1003,16 @@ PRISM_CUSTOM = bogaudio Scale
 PLUGIN_FILES += $(filter-out rackwindows/src/plugin.cpp,$(wildcard rackwindows/src/*.cpp))
 
 # --------------------------------------------------------------
+# RCM
+
+PLUGIN_FILES += $(filter-out rcm-modules/src/plugin.cpp,$(wildcard rcm-modules/src/*.cpp))
+PLUGIN_FILES += $(wildcard rcm-modules/src/*.c)
+PLUGIN_FILES += $(wildcard rcm-modules/src/PianoRoll/*.cpp)
+
+# modules/types which are present in other plugins
+RCM_CUSTOM = Transport
+
+# --------------------------------------------------------------
 # RebelTech
 
 PLUGIN_FILES += $(filter-out RebelTech/src/plugin.cpp,$(wildcard RebelTech/src/*.cpp))
@@ -1405,6 +1415,11 @@ ifneq ($(HEADLESS),true)
 	$(MAKE) HEADLESS=true plugins-mini-headless.a
 endif
 
+mini: plugins-mini$(TARGET_SUFFIX).a
+ifneq ($(HEADLESS),true)
+	$(MAKE) HEADLESS=true plugins-mini-headless.a
+endif
+
 clean:
 	rm -f *.a
 	rm -rf $(BUILD_DIR)
@@ -1691,6 +1706,7 @@ MINIRESOURCE_FILES += surgext/res/xt/dark/components/knob-pointer-14.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/components/knob-pointer-16.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/components/mod-button.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/components/port.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/panels/fx/BlankNoDisplay.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/panels/other/EGLFO.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/panels/other/Matrix.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/panels/other/Mixer.svg
@@ -1793,31 +1809,37 @@ MINIRESOURCE_FILES += surgext/res/xt/glyphs/lt_7.svg
 # MOD builds only have LV2 main and FX variant
 ifeq ($(MOD_BUILD),true)
 
-LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
+MINI_RESOURCES  = $(MINIPLUGIN_LIST:%=../bin/CardinalMini.lv2/resources/PluginManifests/%.json)
+MINI_RESOURCES += $(MINIRESOURCE_FILES:%=../bin/CardinalMini.lv2/resources/%)
+
+LV2_RESOURCES  = $(MINI_RESOURCES)
+LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
-LV2_RESOURCES += $(MINIPLUGIN_LIST:%=../bin/CardinalMini.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
-LV2_RESOURCES += $(MINIRESOURCE_FILES:%=../bin/CardinalMini.lv2/resources/%)
 
 # MOD builds only have LV2 FX variant for now
 else ifeq ($(WASM),true)
 
-LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalNative.lv2/resources/PluginManifests/%.json)
-LV2_RESOURCES += $(MINIPLUGIN_LIST:%=../bin/CardinalMini.lv2/resources/PluginManifests/%.json)
+MINI_RESOURCES  = $(MINIPLUGIN_LIST:%=../bin/CardinalMini.lv2/resources/PluginManifests/%.json)
+MINI_RESOURCES += $(MINIRESOURCE_FILES:%=../bin/CardinalMini.lv2/resources/%)
+
+LV2_RESOURCES  = $(MINI_RESOURCES)
+LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalNative.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalNative.lv2/resources/%)
-LV2_RESOURCES += $(MINIRESOURCE_FILES:%=../bin/CardinalMini.lv2/resources/%)
 
 else
 
-LV2_RESOURCES  = $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
-LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(MINIPLUGIN_LIST:%=../bin/CardinalMini.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(MINIRESOURCE_FILES:%=../bin/CardinalMini.lv2/resources/%)
+
+LV2_RESOURCES  = $(MINI_RESOURCES)
+LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/Cardinal.lv2/resources/PluginManifests/%.json)
+LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalSynth.lv2/resources/PluginManifests/%.json)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.lv2/resources/%)
-LV2_RESOURCES += $(MINIRESOURCE_FILES:%=../bin/CardinalMini.lv2/resources/%)
 
 ifeq ($(MACOS),true)
 VST2_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalFX.vst/Contents/Resources/PluginManifests/%.json)
@@ -1847,6 +1869,8 @@ VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst3/Contents/Resource
 endif
 
 resources: $(JACK_RESOURCES) $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES) $(CLAP_RESOURCES)
+
+mini-resources: $(MINI_RESOURCES)
 
 ../bin/Cardinal.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
@@ -2666,6 +2690,19 @@ $(BUILD_DIR)/rackwindows/%.cpp.o: rackwindows/%.cpp
 		-DpluginInstance=pluginInstance__rackwindows \
 		-Wno-implicit-fallthrough \
 		-Wno-sign-compare
+
+$(BUILD_DIR)/rcm-modules/%.c.o: rcm-modules/%.c
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@ \
+		$(foreach m,$(RCM_CUSTOM),$(call custom_module_names,$(m),RCM))
+
+$(BUILD_DIR)/rcm-modules/%.cpp.o: rcm-modules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(RCM_CUSTOM),$(call custom_module_names,$(m),RCM)) \
+		-DpluginInstance=pluginInstance__RCM
 
 $(BUILD_DIR)/RebelTech/%.cpp.o: RebelTech/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

@@ -15,7 +15,7 @@ include $(ROOT)/Makefile.base.mk
 # src/CardinalPlugin.cpp `getVersion`
 # utils/macOS/Info_{JACK,Native}.plist
 # .github/ISSUE_TEMPLATE/bug.yaml src/CardinalCommon.cpp src/CardinalPlugin.cpp utils/macOS/Info_{JACK,Native}.plist
-VERSION = 24.04
+VERSION = 24.05
 
 # --------------------------------------------------------------
 # Build targets
@@ -192,6 +192,12 @@ plugins: deps
 resources:
 	$(MAKE) resources -C plugins
 
+mini-plugins: deps
+	$(MAKE) mini -C plugins
+
+mini-resources:
+	$(MAKE) mini-resources -C plugins
+
 ifneq ($(CROSS_COMPILING),true)
 gen: cardinal resources dpf/utils/lv2_ttl_generator
 	@$(CURDIR)/dpf/utils/generate-ttl.sh
@@ -211,8 +217,11 @@ jack: carla deps dgl plugins resources
 native: carla deps dgl plugins resources
 	$(MAKE) native -C src $(CARLA_EXTRA_ARGS)
 
-mini: carla deps dgl plugins resources
+mini: carla deps dgl mini-plugins mini-resources
 	$(MAKE) mini -C src $(CARLA_EXTRA_ARGS)
+
+au: carla deps dgl plugins resources
+	$(MAKE) au -C src $(CARLA_EXTRA_ARGS)
 
 clap: carla deps dgl plugins resources
 	$(MAKE) clap -C src $(CARLA_EXTRA_ARGS)

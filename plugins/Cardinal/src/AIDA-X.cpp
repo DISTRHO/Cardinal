@@ -439,6 +439,7 @@ struct AidaPluginModule : Module {
         model = newmodel.release();
 
         // if processing, wait for process cycle to complete
+        using DISTRHO_NAMESPACE::d_msleep;
         while (oldmodel != nullptr && activeModel.load())
             d_msleep(1);
 
