@@ -1984,6 +1984,9 @@ static void initStatic__CVfunk()
 		p->addModel(modelPressedDuck);
 		p->addModel(modelFlowerPatch);
 		p->addModel(modelSyncro);
+		p->addModel(modelNona);
+		p->addModel(modelDecima);
+		p->addModel(modelMorta);
 #undef modelSteps
     }
 }
