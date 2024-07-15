@@ -56,16 +56,22 @@ Note that this applies to all DPF-based plugins and not just Cardinal.
 
 ## On BSD/Linux/X11 the menu item "Save As/Export..." does nothing
 
-The save-file dialogs in Cardinal requires a working [xdg-desktop-portal](https://github.com/flatpak/xdg-desktop-portal) DBus implementation from your desktop environment.  
-Typically your desktop already provides this, if not consider looking for a package to install with "desktop-portal" in the name.  
-If you are running a window manager without a "real" desktop environment (like custom X11 or i3 setups),
-you will need to manually activate the systemd unit that provides these DBus services, like so:
+Cardinal relies on [xdg-desktop-portal](https://github.com/flatpak/xdg-desktop-portal)
+for save file dialogs. Typically a desktop environment (DE) handles this,
+lightweight setups without DEs may require extra work.
 
-```
-systemctl enable xdg-desktop-portal --user --now
+To make the dialogs appear, first install `xdg-desktop-portal` and one of its
+backends (`xdg-desktop-portal-gtk` is a good default option). Then you'll need
+to set up environment variables for portal to work, like this:
+
+```bash
+dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY
 ```
 
-Note: The open-file dialogs in Cardinal do not have this restriction, with a fallback in case the desktop portal is not available.
+It's recommended that you add this command to `~/.xinitrc` so that runs
+automatically every time you boot your system.
+
+For further discussion, see [this issue](https://github.com/DISTRHO/Cardinal/issues/135).
 
 ## Why IRC and not Discord?
 
