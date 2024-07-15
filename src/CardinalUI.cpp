@@ -1041,10 +1041,7 @@ protected:
         if (inSelfTest) return false;
        #endif
 
-        rack::math::Vec scrollDelta = rack::math::Vec(-ev.delta.getX(), ev.delta.getY());
-       #ifndef DISTRHO_OS_MAC
-        scrollDelta = scrollDelta.mult(50.0);
-       #endif
+        const rack::math::Vec scrollDelta = rack::math::Vec(-ev.delta.getX(), ev.delta.getY());
 
         const int mods = glfwMods(ev.mod);
         const ScopedContext sc(this, mods);
