@@ -162,19 +162,16 @@ CardinalPluginContext::CardinalPluginContext(Plugin* const p)
       dataOuts(nullptr),
       midiEvents(nullptr),
       midiEventCount(0),
-      plugin(p)
-   #ifndef HEADLESS
-    , tlw(nullptr)
-    , ui(nullptr)
-   #endif
+      plugin(p),
+      tlw(nullptr),
+      ui(nullptr)
 {
     std::memset(parameters, 0, sizeof(parameters));
 }
 
-#ifndef HEADLESS
 bool CardinalPluginContext::addIdleCallback(IdleCallback* const cb) const
 {
-   #ifndef CARDINAL_COMMON_DSP_ONLY
+   #if !(defined(HEADLESS) || defined(CARDINAL_COMMON_DSP_ONLY))
     if (ui != nullptr)
     {
         ui->addIdleCallback(cb);
@@ -190,7 +187,7 @@ bool CardinalPluginContext::addIdleCallback(IdleCallback* const cb) const
 
 void CardinalPluginContext::removeIdleCallback(IdleCallback* const cb) const
 {
-   #ifndef CARDINAL_COMMON_DSP_ONLY
+   #if !(defined(HEADLESS) || defined(CARDINAL_COMMON_DSP_ONLY))
     if (ui != nullptr)
         ui->removeIdleCallback(cb);
    #else
@@ -198,7 +195,6 @@ void CardinalPluginContext::removeIdleCallback(IdleCallback* const cb) const
     (void)cb;
    #endif
 }
-#endif
 
 void CardinalPluginContext::writeMidiMessage(const rack::midi::Message& message, const uint8_t channel)
 {

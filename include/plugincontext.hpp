@@ -20,12 +20,7 @@ struct Message;
 // Base DISTRHO classes
 
 #ifndef DISTRHO_DETAILS_HPP_INCLUDED
-
 namespace CardinalDISTRHO {
-
-class Plugin;
-class UI;
-
 struct MidiEvent {
     static const uint32_t kDataSize = 4;
     uint32_t frame;
@@ -33,9 +28,19 @@ struct MidiEvent {
     uint8_t data[kDataSize];
     const uint8_t* dataExt;
 };
-
 }
+#endif
 
+#ifndef DISTRHO_PLUGIN_HPP_INCLUDED
+namespace CardinalDISTRHO {
+class Plugin;
+}
+#endif
+
+#ifndef DISTRHO_UI_HPP_INCLUDED
+namespace CardinalDISTRHO {
+class UI;
+}
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -89,16 +94,12 @@ struct CardinalPluginContext : rack::Context {
     const CardinalDISTRHO::MidiEvent* midiEvents;
     uint32_t midiEventCount;
     CardinalDISTRHO::Plugin* const plugin;
-   #ifndef HEADLESS
     CardinalDGL::NanoTopLevelWidget* tlw;
     CardinalDISTRHO::UI* ui;
-   #endif
     CardinalPluginContext(CardinalDISTRHO::Plugin* const p);
     void writeMidiMessage(const rack::midi::Message& message, uint8_t channel);
-   #ifndef HEADLESS
     bool addIdleCallback(IdleCallback* cb) const;
     void removeIdleCallback(IdleCallback* cb) const;
-   #endif
 };
 
 #ifndef HEADLESS

@@ -1712,6 +1712,7 @@ MINIRESOURCE_FILES += surgext/res/xt/dark/components/knob-pointer-14.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/components/knob-pointer-16.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/components/mod-button.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/components/port.svg
+MINIRESOURCE_FILES += surgext/res/xt/dark/panels/fx/BlankNoDisplay.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/panels/other/EGLFO.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/panels/other/Matrix.svg
 MINIRESOURCE_FILES += surgext/res/xt/dark/panels/other/Mixer.svg
