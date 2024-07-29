@@ -3074,17 +3074,20 @@ static void initStatic__Sapphire()
     const StaticPluginLoader spl(p, "Sapphire");
     if (spl.ok())
     {
-        p->addModel(modelElastika);
-        p->addModel(modelFrolic);
-        p->addModel(modelGlee);
-        p->addModel(modelHiss);
-        p->addModel(modelMoots);
-        p->addModel(modelNucleus);
-        p->addModel(modelPolynucleus);
-        p->addModel(modelTin);
-        p->addModel(modelTout);
-        p->addModel(modelTricorder);
-        p->addModel(modelTubeUnit);
+        p->addModel(modelSapphireElastika);
+        p->addModel(modelSapphireFrolic);
+        p->addModel(modelSapphireGalaxy);
+        p->addModel(modelSapphireGlee);
+        p->addModel(modelSapphireHiss);
+        p->addModel(modelSapphireMoots);
+        p->addModel(modelSapphireNucleus);
+        p->addModel(modelSapphirePivot);
+        p->addModel(modelSapphirePolynucleus);
+        p->addModel(modelSapphireRotini);
+        p->addModel(modelSapphireTin);
+        p->addModel(modelSapphireTout);
+        p->addModel(modelSapphireTricorder);
+        p->addModel(modelSapphireTubeUnit);
     }
 }
 
