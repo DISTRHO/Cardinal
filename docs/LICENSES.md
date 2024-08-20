@@ -6,12 +6,12 @@ While Cardinal itself is licensed under GPLv3+, some modules/plugins used by it 
 And since Cardinal builds the entire Rack and modules as a static library,
 the more restrictive of the **code licenses** will apply to the final binary.
 
-Bellow follows a list of all code licenses used in Cardinal and linked submodules.
+Below follows a list of all code licenses used in Cardinal and linked submodules.
 
 | Name                    | License(s)               | Additional notes |
 |-------------------------|--------------------------|------------------|
 | Carla                   | GPL-2.0-or-later         | Used as plugin host within Cardinal |
-| DPF                     | ISC, GPL-2.0-or-later    | Used as the plugin framework, VST2 binary GPLv2+ licensed |
+| DPF                     | ISC                      | Used as the plugin framework |
 | Rack                    | GPL-3.0-or-later         | The actual Rack code, internal dependencies are compatible with GPLv3+ |
 | 21kHz                   | MIT                      | |
 | 8Mode                   | BSD-3-Clause             | |
