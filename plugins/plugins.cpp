@@ -1590,9 +1590,13 @@ static void initStatic__Befaco()
         p->addModel(modelMotionMTR);
         p->addModel(modelBurst);
         p->addModel(modelVoltio);
+        p->addModel(modelOctaves);
 #undef modelADSR
 #undef modelMixer
 #undef modelBurst
+
+        // NOTE disabled in Cardinal due to MIDI usage
+        spl.removeModule("MidiThingV2");
     }
 }
 
