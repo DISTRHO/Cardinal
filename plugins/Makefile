@@ -1301,9 +1301,10 @@ VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 # Voxglitch
 
 PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
+PLUGIN_FILES += voxglitch/src/vgLib-2.0/constants.cpp
 
 # modules/types which are present in other plugins
-VOXGLITCH_CUSTOM = ADSR AudioFile Looper Readout
+VOXGLITCH_CUSTOM = $(DRWAV) ADSR AudioFile Looper Readout constants
 VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain SamplePlayer Sequencer SequencerDisplay VoltageSequencer
 
 # --------------------------------------------------------------
