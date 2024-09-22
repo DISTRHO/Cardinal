@@ -99,7 +99,7 @@ void destroyStaticPlugins();
 }
 }
 
-const std::string CARDINAL_VERSION = "24.05";
+const std::string CARDINAL_VERSION = "24.09";
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -362,6 +362,15 @@ static int osc_hello_handler(const char*, const char*, lo_arg**, int, const lo_m
     d_stdout("Hello received from OSC, saying hello back to them o/");
     const lo_address source = lo_message_get_source(m);
     const lo_server server = static_cast<Initializer*>(self)->oscServer;
+
+    // send list of features first
+   #ifdef CARDINAL_INIT_OSC_THREAD
+    lo_send_from(source, server, LO_TT_IMMEDIATE, "/resp", "ss", "features", ":screenshot:");
+   #else
+    lo_send_from(source, server, LO_TT_IMMEDIATE, "/resp", "ss", "features", "");
+   #endif
+
+    // then finally hello reply
     lo_send_from(source, server, LO_TT_IMMEDIATE, "/resp", "ss", "hello", "ok");
     return 0;
 }
@@ -386,7 +395,10 @@ static int osc_load_handler(const char*, const char* types, lo_arg** argv, int a
         std::vector<uint8_t> data(size);
         std::memcpy(data.data(), blob, size);
 
+       #ifdef CARDINAL_INIT_OSC_THREAD
         rack::contextSet(context);
+       #endif
+
         rack::system::removeRecursively(context->patch->autosavePath);
         rack::system::createDirectories(context->patch->autosavePath);
         try {
@@ -397,7 +409,10 @@ static int osc_load_handler(const char*, const char* types, lo_arg** argv, int a
         catch (rack::Exception& e) {
             WARN("%s", e.what());
         }
+
+       #ifdef CARDINAL_INIT_OSC_THREAD
         rack::contextSet(nullptr);
+       #endif
     }
 
     const lo_address source = lo_message_get_source(m);
@@ -423,10 +438,18 @@ static int osc_param_handler(const char*, const char* types, lo_arg** argv, int 
         const int paramId = argv[1]->i;
         const float paramValue = argv[2]->f;
 
+       #ifdef CARDINAL_INIT_OSC_THREAD
+        rack::contextSet(context);
+       #endif
+
         rack::engine::Module* const module = context->engine->getModule(moduleId);
         DISTRHO_SAFE_ASSERT_RETURN(module != nullptr, 0);
 
         context->engine->setParamValue(module, paramId, paramValue);
+
+       #ifdef CARDINAL_INIT_OSC_THREAD
+        rack::contextSet(nullptr);
+       #endif
     }
 
     return 0;

@@ -1,18 +1,7 @@
 /*
  * DISTRHO Cardinal Plugin
  * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * For a full copy of the GNU General Public License see the LICENSE file.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #include <engine/Engine.hpp>
@@ -40,6 +29,12 @@
 # include <lo/lo.h>
 #endif
 
+namespace rack {
+namespace engine {
+void Engine_setRemoteDetails(Engine*, remoteUtils::RemoteDetails*);
+}
+}
+
 // -----------------------------------------------------------------------------------------------------------
 
 namespace remoteUtils {
@@ -53,8 +48,15 @@ static int osc_handler(const char* const path, const char* const types, lo_arg**
     {
         d_stdout("osc_handler(\"%s\", ...) - got resp | '%s' '%s'", path, &argv[0]->s, &argv[1]->s);
 
-        if (std::strcmp(&argv[0]->s, "hello") == 0 && std::strcmp(&argv[1]->s, "ok") == 0)
-            static_cast<RemoteDetails*>(self)->connected = true;
+        if (std::strcmp(&argv[0]->s, "hello") == 0)
+        {
+            if (std::strcmp(&argv[1]->s, "ok") == 0)
+                static_cast<RemoteDetails*>(self)->connected = true;
+        }
+        else if (std::strcmp(&argv[0]->s, "features") == 0)
+        {
+            static_cast<RemoteDetails*>(self)->screenshot = std::strstr(&argv[1]->s, ":screenshot:") != nullptr;
+        }
     }
     return 0;
 }
@@ -92,8 +94,10 @@ bool connectToRemote(const char* const url)
         ui->remoteDetails = remoteDetails = new RemoteDetails;
         remoteDetails->handle = ui;
         remoteDetails->url = strdup(url);
-        remoteDetails->connected = true;
         remoteDetails->autoDeploy = true;
+        remoteDetails->connected = true;
+        remoteDetails->first = false;
+        remoteDetails->screenshot = false;
     }
    #elif defined(HAVE_LIBLO)
     const lo_address addr = lo_address_new_from_url(url);
@@ -107,10 +111,16 @@ bool connectToRemote(const char* const url)
         ui->remoteDetails = remoteDetails = new RemoteDetails;
         remoteDetails->handle = oscServer;
         remoteDetails->url = strdup(url);
+        remoteDetails->autoDeploy = true;
+        remoteDetails->first = true;
         remoteDetails->connected = false;
-        remoteDetails->autoDeploy = false;
+        remoteDetails->screenshot = false;
 
         lo_server_add_method(oscServer, "/resp", nullptr, osc_handler, remoteDetails);
+
+        sendFullPatchToRemote(remoteDetails);
+
+        Engine_setRemoteDetails(context->engine, remoteDetails);
     }
     else if (std::strcmp(remoteDetails->url, url) != 0)
     {

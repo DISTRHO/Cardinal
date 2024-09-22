@@ -1041,7 +1041,7 @@ protected:
         if (inSelfTest) return false;
        #endif
 
-        const rack::math::Vec scrollDelta = rack::math::Vec(-ev.delta.getX(), ev.delta.getY());
+        const rack::math::Vec scrollDelta = rack::math::Vec(-ev.delta.getX(), ev.delta.getY()) * 50 ;
 
         const int mods = glfwMods(ev.mod);
         const ScopedContext sc(this, mods);

@@ -1590,9 +1590,13 @@ static void initStatic__Befaco()
         p->addModel(modelMotionMTR);
         p->addModel(modelBurst);
         p->addModel(modelVoltio);
+        p->addModel(modelOctaves);
 #undef modelADSR
 #undef modelMixer
 #undef modelBurst
+
+        // NOTE disabled in Cardinal due to MIDI usage
+        spl.removeModule("MidiThingV2");
     }
 }
 
@@ -3083,7 +3087,9 @@ static void initStatic__Sapphire()
         p->addModel(modelSapphireNucleus);
         p->addModel(modelSapphirePivot);
         p->addModel(modelSapphirePolynucleus);
+        p->addModel(modelSapphirePop);
         p->addModel(modelSapphireRotini);
+        p->addModel(modelSapphireSam);
         p->addModel(modelSapphireTin);
         p->addModel(modelSapphireTout);
         p->addModel(modelSapphireTricorder);

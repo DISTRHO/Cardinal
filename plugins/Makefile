@@ -551,7 +551,7 @@ MINIPLUGIN_FILES += BaconPlugs/src/Style.cpp
 # --------------------------------------------------------------
 # Befaco
 
-PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
+PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp Befaco/src/MidiThing.cpp,$(wildcard Befaco/src/*.cpp))
 PLUGIN_FILES += $(wildcard Befaco/src/noise-plethora/*/*.cpp)
 
 # modules/types which are present in other plugins
