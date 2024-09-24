@@ -1472,6 +1472,7 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
 RESOURCE_FILES += Mog/res
+RESOURCE_FILES += MUS-X/presets
 RESOURCE_FILES += nonlinearcircuits/res
 RESOURCE_FILES += ParableInstruments/res/Neil.png
 RESOURCE_FILES += surgext/build/surge-data/configuration.xml
