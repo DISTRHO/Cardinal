@@ -931,6 +931,11 @@ PLUGIN_FILES += $(filter-out MSM/src/MSM.cpp,$(wildcard MSM/src/*.cpp))
 MSM_CUSTOM = ADSR BlankPanel Delay LFO LowFrequencyOscillator Mult Noise OP VCA VCO sawTable triTable
 
 # --------------------------------------------------------------
+# MUS-X
+
+PLUGIN_FILES += $(filter-out MUS-X/src/plugin.cpp,$(wildcard MUS-X/src/*.cpp))
+
+# --------------------------------------------------------------
 # myth-modules
 
 PLUGIN_FILES += $(filter-out myth-modules/src/plugin.cpp,$(wildcard myth-modules/src/*.cpp))
@@ -2620,6 +2625,13 @@ $(BUILD_DIR)/MSM/%.cpp.o: MSM/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MSM_CUSTOM),$(call custom_module_names,$(m),MSM)) \
 		-DpluginInstance=pluginInstance__MSM
+
+$(BUILD_DIR)/MUS-X/%.cpp.o: MUS-X/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MUS_X_CUSTOM),$(call custom_module_names,$(m),MUS_X)) \
+		-DpluginInstance=pluginInstance__MUS_X
 
 $(BUILD_DIR)/myth-modules/%.cpp.o: myth-modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

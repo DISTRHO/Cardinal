@@ -759,6 +759,9 @@ extern Model* modelBlankPanel;
 #undef modelVCA
 #undef modelVCO
 
+// MUS-X
+#include "MUS-X/src/plugin.hpp"
+
 // myth-modules
 #include "myth-modules/src/plugin.hpp"
 
@@ -955,6 +958,7 @@ Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__MSM;
+Plugin* pluginInstance__MUS_X;
 Plugin* pluginInstance__myth_modules;
 Plugin* pluginInstance__nonlinearcircuits;
 Plugin* pluginInstance__Orbits;
@@ -2850,6 +2854,30 @@ static void initStatic__MSM()
     }
 }
 
+static void initStatic__MUS_X()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__MUS_X = p;
+
+    const StaticPluginLoader spl(p, "MUS-X");
+    if (spl.ok())
+    {
+    	p->addModel(musx::modelADSR);
+    	p->addModel(musx::modelDelay);
+    	p->addModel(musx::modelDrift);
+    	p->addModel(musx::modelFilter);
+    	p->addModel(musx::modelLast);
+    	p->addModel(musx::modelLFO);
+    	p->addModel(musx::modelModMatrix);
+    	p->addModel(musx::modelOnePole);
+    	p->addModel(musx::modelOnePoleLP);
+    	p->addModel(musx::modelOscillators);
+    	p->addModel(musx::modelSplitStack);
+    	p->addModel(musx::modelSynth);
+    	p->addModel(musx::modelTuner);
+    }
+}
+
 static void initStatic__myth_modules()
 {
     Plugin* const p = new Plugin;
@@ -3495,6 +3523,7 @@ void initStaticPlugins()
     initStatic__Mog();
     initStatic__mscHack();
     initStatic__MSM();
+    initStatic__MUS_X();
     initStatic__myth_modules();
     initStatic__nonlinearcircuits();
     initStatic__Orbits();
