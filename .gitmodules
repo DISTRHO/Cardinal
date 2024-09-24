@@ -257,6 +257,3 @@
 [submodule "plugins/rcm-modules"]
 	path = plugins/rcm-modules
 	url = https://github.com/Rcomian/rcm-modules.git
-[submodule "plugins/MUS-X"]
-	path = plugins/MUS-X
-	url = https://github.com/Jojosito/MUS-X.git
