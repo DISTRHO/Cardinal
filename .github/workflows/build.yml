@@ -159,12 +159,20 @@ jobs:
   macos:
     strategy:
       matrix:
+        debug: [0, 1]
         target: [universal-10.15]
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Set debug or release
+        shell: bash
+        run: |
+          if [ "${{ matrix.debug }}" -eq 1 ]; then
+            echo "TARGET_SUFFIX=-debug" >> $GITHUB_ENV
+            echo "PAWPAW_DEBUG=1" >> $GITHUB_ENV
+          fi
       - name: Set up cache
         id: cache
         uses: actions/cache@v4
@@ -179,7 +187,7 @@ jobs:
             src/Rack/dep/libarchive-3.4.3
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/zstd-1.4.5
-          key: macos-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+          key: macos-${{ matrix.target }}${{ env.TARGET_SUFFIX }}-v${{ env.CACHE_VERSION }}
       - name: Setup dependencies
         run: |
           ./deps/PawPaw/.github/workflows/bootstrap-deps.sh macos-${{ matrix.target }}
@@ -191,7 +199,7 @@ jobs:
         if: steps.cache.outputs.cache-hit == 'true'
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ccache-macos-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+          key: ccache-macos-${{ matrix.target }}${{ env.TARGET_SUFFIX }}-v${{ env.CACHE_VERSION }}
       - name: Build macOS (base)
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
@@ -215,14 +223,14 @@ jobs:
       - name: Rename macOS bundle
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}.pkg
+          mv ${{ github.event.repository.name }}-macOS.pkg ${{ github.event.repository.name }}-macOS-${{ matrix.target }}${{ env.TARGET_SUFFIX }}-${{ github.event.pull_request.number || env.SHA8 }}.pkg
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.repository.name }}-macOS-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
+          name: ${{ github.event.repository.name }}-macOS-${{ matrix.target }}${{ env.TARGET_SUFFIX }}-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             ${{ github.event.repository.name }}-*.pkg
       - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        if: ${{ matrix.debug == '0' && startsWith(github.ref, 'refs/tags/') }}
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
