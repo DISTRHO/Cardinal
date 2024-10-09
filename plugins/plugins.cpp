@@ -3110,6 +3110,7 @@ static void initStatic__Sapphire()
         p->addModel(modelSapphireFrolic);
         p->addModel(modelSapphireGalaxy);
         p->addModel(modelSapphireGlee);
+        p->addModel(modelSapphireGravy);
         p->addModel(modelSapphireHiss);
         p->addModel(modelSapphireMoots);
         p->addModel(modelSapphireNucleus);
