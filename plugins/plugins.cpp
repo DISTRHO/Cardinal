@@ -759,6 +759,9 @@ extern Model* modelBlankPanel;
 #undef modelVCA
 #undef modelVCO
 
+// MUS-X
+#include "MUS-X/src/plugin.hpp"
+
 // myth-modules
 #include "myth-modules/src/plugin.hpp"
 
@@ -955,6 +958,7 @@ Plugin* pluginInstance__MockbaModular;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__MSM;
+Plugin* pluginInstance__MUS_X;
 Plugin* pluginInstance__myth_modules;
 Plugin* pluginInstance__nonlinearcircuits;
 Plugin* pluginInstance__Orbits;
@@ -1590,9 +1594,13 @@ static void initStatic__Befaco()
         p->addModel(modelMotionMTR);
         p->addModel(modelBurst);
         p->addModel(modelVoltio);
+        p->addModel(modelOctaves);
 #undef modelADSR
 #undef modelMixer
 #undef modelBurst
+
+        // NOTE disabled in Cardinal due to MIDI usage
+        spl.removeModule("MidiThingV2");
     }
 }
 
@@ -2846,6 +2854,30 @@ static void initStatic__MSM()
     }
 }
 
+static void initStatic__MUS_X()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__MUS_X = p;
+
+    const StaticPluginLoader spl(p, "MUS-X");
+    if (spl.ok())
+    {
+    	p->addModel(musx::modelADSR);
+    	p->addModel(musx::modelDelay);
+    	p->addModel(musx::modelDrift);
+    	p->addModel(musx::modelFilter);
+    	p->addModel(musx::modelLast);
+    	p->addModel(musx::modelLFO);
+    	p->addModel(musx::modelModMatrix);
+    	p->addModel(musx::modelOnePole);
+    	p->addModel(musx::modelOnePoleLP);
+    	p->addModel(musx::modelOscillators);
+    	p->addModel(musx::modelSplitStack);
+    	p->addModel(musx::modelSynth);
+    	p->addModel(musx::modelTuner);
+    }
+}
+
 static void initStatic__myth_modules()
 {
     Plugin* const p = new Plugin;
@@ -3074,17 +3106,23 @@ static void initStatic__Sapphire()
     const StaticPluginLoader spl(p, "Sapphire");
     if (spl.ok())
     {
-        p->addModel(modelElastika);
-        p->addModel(modelFrolic);
-        p->addModel(modelGlee);
-        p->addModel(modelHiss);
-        p->addModel(modelMoots);
-        p->addModel(modelNucleus);
-        p->addModel(modelPolynucleus);
-        p->addModel(modelTin);
-        p->addModel(modelTout);
-        p->addModel(modelTricorder);
-        p->addModel(modelTubeUnit);
+        p->addModel(modelSapphireElastika);
+        p->addModel(modelSapphireFrolic);
+        p->addModel(modelSapphireGalaxy);
+        p->addModel(modelSapphireGlee);
+        p->addModel(modelSapphireGravy);
+        p->addModel(modelSapphireHiss);
+        p->addModel(modelSapphireMoots);
+        p->addModel(modelSapphireNucleus);
+        p->addModel(modelSapphirePivot);
+        p->addModel(modelSapphirePolynucleus);
+        p->addModel(modelSapphirePop);
+        p->addModel(modelSapphireRotini);
+        p->addModel(modelSapphireSam);
+        p->addModel(modelSapphireTin);
+        p->addModel(modelSapphireTout);
+        p->addModel(modelSapphireTricorder);
+        p->addModel(modelSapphireTubeUnit);
     }
 }
 
@@ -3341,26 +3379,33 @@ static void initStatic__Voxglitch()
     if (spl.ok())
     {
 #define modelLooper modelVoxglitchLooper
-      p->addModel(modelAutobreak);
-      p->addModel(modelByteBeat);
-      p->addModel(modelDigitalProgrammer);
-      p->addModel(modelDigitalSequencer);
-      p->addModel(modelDigitalSequencerXP);
-      p->addModel(modelGlitchSequencer);
-      p->addModel(modelGhosts);
-      p->addModel(modelGrainEngineMK2);
-      p->addModel(modelGrainEngineMK2Expander);
-      p->addModel(modelGrainFx);
-      p->addModel(modelGrooveBox);
-      p->addModel(modelGrooveBoxExpander);
-      p->addModel(modelHazumi);
-      p->addModel(modelLooper);
-      p->addModel(modelRepeater);
-      p->addModel(modelSamplerX8);
-      p->addModel(modelSatanonaut);
-      p->addModel(modelWavBank);
-      p->addModel(modelWavBankMC);
-      p->addModel(modelXY);
+        p->addModel(modelArpSeq);
+        p->addModel(modelAutobreak);
+        p->addModel(modelAutobreakStudio);
+        p->addModel(modelByteBeat);
+        p->addModel(modelDigitalProgrammer);
+        p->addModel(modelDigitalSequencer);
+        p->addModel(modelDigitalSequencerXP);
+        p->addModel(modelDrumRandomizer);
+        p->addModel(modelGlitchSequencer);
+        p->addModel(modelGhosts);
+        p->addModel(modelGrainEngineMK2);
+        p->addModel(modelGrainEngineMK2Expander);
+        p->addModel(modelGrainFx);
+        p->addModel(modelGrooveBox);
+        p->addModel(modelGrooveBoxExpander);
+        p->addModel(modelHazumi);
+        p->addModel(modelOnePoint);
+        p->addModel(modelOneZero);
+        p->addModel(modelLooper);
+        p->addModel(modelNoteDetector);
+        p->addModel(modelRepeater);
+        p->addModel(modelSamplerX8);
+        p->addModel(modelSampler16P);
+        p->addModel(modelSatanonaut);
+        p->addModel(modelWavBank);
+        p->addModel(modelWavBankMC);
+        p->addModel(modelXY);
 #undef modelLooper
     }
 }
@@ -3479,6 +3524,7 @@ void initStaticPlugins()
     initStatic__Mog();
     initStatic__mscHack();
     initStatic__MSM();
+    initStatic__MUS_X();
     initStatic__myth_modules();
     initStatic__nonlinearcircuits();
     initStatic__Orbits();

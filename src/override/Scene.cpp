@@ -1,18 +1,7 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2023 Filipe Coelho <falktx@falktx.com>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * For a full copy of the GNU General Public License see the LICENSE file.
+ * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 /**
@@ -207,14 +196,19 @@ void Scene::step() {
 	if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote()) {
 		idleRemote(remoteDetails);
 
-		if (remoteDetails->autoDeploy) {
+		if (remoteDetails->autoDeploy && remoteDetails->connected) {
 			const int actionIndex = APP->history->actionIndex;
 			const double time = system::getTime();
 
 			if (internal->historyActionIndex == -1) {
 				internal->historyActionIndex = actionIndex;
 				internal->lastSceneChangeTime = time;
-			} else if (internal->historyActionIndex != actionIndex && actionIndex > 0 && time - internal->lastSceneChangeTime >= 1.0) {
+			} else if (remoteDetails->first ||
+				(internal->historyActionIndex != actionIndex
+				&& actionIndex > 0
+				&& time - internal->lastSceneChangeTime >= 1.0)) {
+				remoteDetails->first = false;
+
 				const std::string& name(APP->history->actions[actionIndex - 1]->name);
 				static const std::vector<std::string> ignoredNames = {
 					"move knob",
@@ -224,7 +218,10 @@ void Scene::step() {
 				if (std::find(ignoredNames.cbegin(), ignoredNames.cend(), name) == ignoredNames.cend()) {
 					printf("action '%s'\n", APP->history->actions[actionIndex - 1]->name.c_str());
 					remoteUtils::sendFullPatchToRemote(remoteDetails);
-					window::generateScreenshot();
+
+					if (remoteDetails->screenshot) {
+						window::generateScreenshot();
+					}
 				}
 				internal->historyActionIndex = actionIndex;
 				internal->lastSceneChangeTime = time;
@@ -334,8 +331,13 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 		if (e.key == GLFW_KEY_F7 && (e.mods & RACK_MOD_MASK) == 0) {
 			if (remoteUtils::RemoteDetails* const remoteDetails = remoteUtils::getRemote())
 			{
-				remoteUtils::sendFullPatchToRemote(remoteDetails);
-				window::generateScreenshot();
+				if (remoteDetails->connected) {
+					remoteUtils::sendFullPatchToRemote(remoteDetails);
+
+					if (remoteDetails->screenshot) {
+						window::generateScreenshot();
+					}
+				}
 			}
 			e.consume(this);
 		}

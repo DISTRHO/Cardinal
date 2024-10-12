@@ -6,12 +6,12 @@ While Cardinal itself is licensed under GPLv3+, some modules/plugins used by it 
 And since Cardinal builds the entire Rack and modules as a static library,
 the more restrictive of the **code licenses** will apply to the final binary.
 
-Bellow follows a list of all code licenses used in Cardinal and linked submodules.
+Below follows a list of all code licenses used in Cardinal and linked submodules.
 
 | Name                    | License(s)               | Additional notes |
 |-------------------------|--------------------------|------------------|
 | Carla                   | GPL-2.0-or-later         | Used as plugin host within Cardinal |
-| DPF                     | ISC, GPL-2.0-or-later    | Used as the plugin framework, VST2 binary GPLv2+ licensed |
+| DPF                     | ISC                      | Used as the plugin framework |
 | Rack                    | GPL-3.0-or-later         | The actual Rack code, internal dependencies are compatible with GPLv3+ |
 | 21kHz                   | MIT                      | |
 | 8Mode                   | BSD-3-Clause             | |
@@ -68,6 +68,7 @@ Bellow follows a list of all code licenses used in Cardinal and linked submodule
 | Mog                     | CC0-1.0                  | |
 | mscHack                 | BSD-3-Clause             | |
 | MSM                     | MIT                      | Repo's [LICENSE-dist.md](https://github.com/netboy3/MSM-vcvrack-plugin/issues/10) includes wrong information |
+| MUS-X                   | GPL-3.0-or-later         | |
 | Myth                    | GPL-3.0-or-later         | |
 | Nonlinear Circuits      | CC0-1.0                  | |
 | Orbits                  | GPL-3.0-or-later         | |
@@ -227,6 +228,7 @@ Below is a list of artwork licenses from plugins
 | MSM/Fonts/DejaVuSansMono.ttf            | Bitstream-Vera   | |
 | MSM/Fonts/Segment7Standard.ttf          | OFL-1.1-RFN      | |
 | MSM/Fonts/Sudo.ttf                      | OFL-1.1-no-RFN   | |
+| MUS-X/*                                 | GPL-3.0-or-later | No artwork specific license provided |
 | Myth/*                                  | GPL-3.0-or-later | No artwork specific license provided |
 | nonlinearcircuits/*                     | CC0-1.0          | No artwork specific license provided |
 | nonlinearcircuits/Audiowide-Regular.ttf | OFL-1.1-RFN      | |

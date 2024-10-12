@@ -78,6 +78,9 @@ export MACOSX_DEPLOYMENT_TARGET = $(subst -mmacosx-version-min=,,$(filter -mmaco
 CMAKE += -DCMAKE_OSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET)
 else ifeq ($(CIBUILD),true)
 $(error CI build requires -mmacosx-version-min flag on macOS)
+else
+export MACOSX_DEPLOYMENT_TARGET = 10.15
+CMAKE += -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
 endif
 CMAKE += -DCMAKE_OSX_SYSROOT="macosx"
 endif

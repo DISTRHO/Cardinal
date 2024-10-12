@@ -551,7 +551,7 @@ MINIPLUGIN_FILES += BaconPlugs/src/Style.cpp
 # --------------------------------------------------------------
 # Befaco
 
-PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp,$(wildcard Befaco/src/*.cpp))
+PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp Befaco/src/MidiThing.cpp,$(wildcard Befaco/src/*.cpp))
 PLUGIN_FILES += $(wildcard Befaco/src/noise-plethora/*/*.cpp)
 
 # modules/types which are present in other plugins
@@ -931,6 +931,11 @@ PLUGIN_FILES += $(filter-out MSM/src/MSM.cpp,$(wildcard MSM/src/*.cpp))
 MSM_CUSTOM = ADSR BlankPanel Delay LFO LowFrequencyOscillator Mult Noise OP VCA VCO sawTable triTable
 
 # --------------------------------------------------------------
+# MUS-X
+
+PLUGIN_FILES += $(filter-out MUS-X/src/plugin.cpp,$(wildcard MUS-X/src/*.cpp))
+
+# --------------------------------------------------------------
 # myth-modules
 
 PLUGIN_FILES += $(filter-out myth-modules/src/plugin.cpp,$(wildcard myth-modules/src/*.cpp))
@@ -1301,9 +1306,10 @@ VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 # Voxglitch
 
 PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
+PLUGIN_FILES += voxglitch/src/vgLib-2.0/constants.cpp
 
 # modules/types which are present in other plugins
-VOXGLITCH_CUSTOM = ADSR AudioFile Looper Readout
+VOXGLITCH_CUSTOM = $(DRWAV) ADSR AudioFile Looper Quantizer Random Readout SlewLimiter constants
 VOXGLITCH_CUSTOM_PER_FILE = AudioBuffer GateSequencer Grain SamplePlayer Sequencer SequencerDisplay VoltageSequencer
 
 # --------------------------------------------------------------
@@ -1466,6 +1472,7 @@ RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/MindMeldShapes
 RESOURCE_FILES += Mog/res
+RESOURCE_FILES += MUS-X/presets
 RESOURCE_FILES += nonlinearcircuits/res
 RESOURCE_FILES += ParableInstruments/res/Neil.png
 RESOURCE_FILES += surgext/build/surge-data/configuration.xml
@@ -2619,6 +2626,13 @@ $(BUILD_DIR)/MSM/%.cpp.o: MSM/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MSM_CUSTOM),$(call custom_module_names,$(m),MSM)) \
 		-DpluginInstance=pluginInstance__MSM
+
+$(BUILD_DIR)/MUS-X/%.cpp.o: MUS-X/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(MUS_X_CUSTOM),$(call custom_module_names,$(m),MUS_X)) \
+		-DpluginInstance=pluginInstance__MUS_X
 
 $(BUILD_DIR)/myth-modules/%.cpp.o: myth-modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
