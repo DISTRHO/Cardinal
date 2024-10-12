@@ -1977,25 +1977,29 @@ static void initStatic__CVfunk()
     const StaticPluginLoader spl(p, "CVfunk");
     if (spl.ok())
     {
-#define modelSteps modelCVfunkSteps
-		p->addModel(modelSteps);
-		p->addModel(modelEnvelopeArray);
-		p->addModel(modelPentaSequencer);
-		p->addModel(modelImpulseController);
-		p->addModel(modelSignals);
-		p->addModel(modelRanges);
-		p->addModel(modelHexMod);
-		p->addModel(modelCollatz);
-		p->addModel(modelStrings);
-		p->addModel(modelMagnets);
-		p->addModel(modelOuros);
-		p->addModel(modelPressedDuck);
-		p->addModel(modelFlowerPatch);
-		p->addModel(modelSyncro);
-		p->addModel(modelNona);
-		p->addModel(modelDecima);
-		p->addModel(modelMorta);
-#undef modelSteps
+        #define modelSteps modelCVfunkSteps
+        p->addModel(modelSteps);
+        p->addModel(modelEnvelopeArray);
+        p->addModel(modelPentaSequencer);
+        p->addModel(modelImpulseController);
+        p->addModel(modelSignals);
+        p->addModel(modelRanges);
+        p->addModel(modelHexMod);
+        p->addModel(modelCollatz);
+        p->addModel(modelStrings);
+        p->addModel(modelMagnets);
+        p->addModel(modelOuros);
+        p->addModel(modelPressedDuck);
+        p->addModel(modelFlowerPatch);
+        p->addModel(modelSyncro);
+        p->addModel(modelNona);
+        p->addModel(modelDecima);
+        p->addModel(modelMorta);
+        p->addModel(modelStepWave);
+        p->addModel(modelPreeeeeeeeeeessedDuck);
+        p->addModel(modelArrange);
+        p->addModel(modelTriDelay);            
+        #undef modelSteps
     }
 }
 
