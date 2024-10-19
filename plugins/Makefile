@@ -2878,7 +2878,6 @@ $(BUILD_DIR)/SanguineMutants/%.o: SanguineMutants/%
 		$(foreach m,$(SANGUINEMUTANTS_CUSTOM),$(call custom_module_names,$(m),SanguineMutants)) \
 		-DpluginInstance=pluginInstance__SanguineMutants \
 		-DNOASM \
-		-DSANGUINE_CARDINAL \
 		-ISanguineMutants/eurorack \
 		-ISanguineMutants/alt_firmware \
 		-Wno-unused-local-typedefs
