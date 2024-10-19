@@ -257,3 +257,6 @@
 [submodule "plugins/rcm-modules"]
 	path = plugins/rcm-modules
 	url = https://github.com/Rcomian/rcm-modules.git
+[submodule "plugins/SanguineMutants"]
+	path = plugins/SanguineMutants
+	url = https://github.com/Bloodbat/SanguineMutants.git
