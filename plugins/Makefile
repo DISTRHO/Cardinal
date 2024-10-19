@@ -2874,7 +2874,7 @@ $(BUILD_DIR)/repelzen/%.cpp.o: repelzen/%.cpp
 $(BUILD_DIR)/SanguineMutants/%.o: SanguineMutants/%
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(SANGUINEMUTANTS_CUSTOM),$(call custom_module_names,$(m),SanguineMutants)) \
 		-DpluginInstance=pluginInstance__SanguineMutants \
 		-DNOASM \
