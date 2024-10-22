@@ -260,4 +260,3 @@
 [submodule "plugins/SanguineMutants"]
 	path = plugins/SanguineMutants
 	url = https://github.com/Bloodbat/SanguineMutants.git
-	branch = Cardinal
