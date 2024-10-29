@@ -101,6 +101,26 @@ sudo apt install cmake libdbus-1-dev libgl1-mesa-dev liblo-dev libfftw3-dev libm
 sudo apt install wget
 ```
 
+### Fedora
+
+Dependencies for using system libraries, that is, with `SYSDEPS=true`:
+
+```
+# common
+sudo dnf install cmake dbus file fftw mesa-libGL liblo libsndfile libX11 libXcursor libXext libXrandr python3
+# system libraries
+sudo dnf install libarchive libsamplerate speexdsp
+```
+
+Dependencies for vendored libraries:
+
+```
+# common
+sudo dnf install cmake dbus file fftw mesa-libGL liblo libsndfile libX11 libXcursor libXext libXrandr python3
+# nedeed by vendored libraries
+sudo dnf install wget
+```
+
 ## macOS
 
 Installing Xcode and the "Command-Line utilities" add-on is required.  
