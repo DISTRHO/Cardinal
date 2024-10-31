@@ -103,15 +103,6 @@ sudo apt install wget
 
 ### Fedora
 
-Dependencies for using system libraries, that is, with `SYSDEPS=true`:
-
-```
-# common
-sudo dnf install cmake dbus file fftw mesa-libGL liblo libsndfile libX11 libXcursor libXext libXrandr python3
-# system libraries
-sudo dnf install libarchive libsamplerate speexdsp
-```
-
 Dependencies for vendored libraries:
 
 ```
