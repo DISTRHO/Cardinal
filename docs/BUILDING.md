@@ -103,6 +103,8 @@ sudo apt install wget
 
 ### Fedora
 
+At this time, it is only possible to build with vendored libraries.
+
 Dependencies for vendored libraries:
 
 ```
