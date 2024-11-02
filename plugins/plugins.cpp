@@ -28,7 +28,13 @@
 #include "AaronStatic/src/plugin.hpp"
 
 // Admiral
-#include "admiral/src/plugin.hpp"
+/* NOTE too much noise in original include, do this a different way
+// #include "admiral/src/plugin.hpp"
+*/
+extern Model* modelWatches;
+extern Model* modelShifts;
+extern Model* modelTables;
+extern Model* modelDivisions;
 
 // Alef's Bits
 #define modelSteps modelalefsbitsSteps
