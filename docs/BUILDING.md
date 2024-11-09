@@ -77,7 +77,7 @@ Dependencies for vendored libraries:
 ```
 # common
 sudo pacman -S cmake dbus file fftw libgl liblo libsndfile libx11 libxcursor libxext libxrandr python3
-# nedeed by vendored libraries
+# needed by vendored libraries
 sudo pacman -S wget
 ```
 
@@ -97,8 +97,21 @@ Dependencies for vendored libraries:
 ```
 # common
 sudo apt install cmake libdbus-1-dev libgl1-mesa-dev liblo-dev libfftw3-dev libmagic-dev libsndfile1-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev python3
-# nedeed by vendored libraries
+# needed by vendored libraries
 sudo apt install wget
+```
+
+### Fedora
+
+At this time, it is only possible to build with vendored libraries.
+
+Dependencies for vendored libraries:
+
+```
+# common
+sudo dnf install cmake dbus file fftw mesa-libGL liblo libsndfile libX11 libXcursor libXext libXrandr python3
+# needed by vendored libraries
+sudo dnf install wget
 ```
 
 ## macOS

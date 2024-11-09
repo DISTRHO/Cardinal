@@ -470,6 +470,7 @@ static const struct {
     { kModeBefaco, "/Befaco/res/panels/SpringReverb.svg" },
     { kModeBefaco, "/Befaco/res/panels/StereoStrip.svg" },
     { kModeBefaco, "/Befaco/res/panels/Voltio.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Octaves.svg" },
     // GPLv3+
     { kModeCardinal, "/Cardinal/res/AudioFile.svg" },
     { kModeCardinal, "/Cardinal/res/AudioToCVPitch.svg" },
