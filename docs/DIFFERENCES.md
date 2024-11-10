@@ -46,6 +46,7 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 
 Additionally, Cardinal contains the following built-in modules not present in the official plugin or standalone:
 
+ * Admiral (never updated to v2)
  * Aria Salvatrice modules (except Arcane related modules, due to their online requirement)
  * Arable Instruments and Parable Instruments (never updated to v2)
  * Mog (never updated to v2)
