@@ -3,7 +3,7 @@ name: build
 on: [push, pull_request]
 
 env:
-  CACHE_VERSION: 10
+  CACHE_VERSION: 11
   CARDINAL_UNDER_WINE: 1
   CIBUILD: true
   DEBIAN_FRONTEND: noninteractive
@@ -143,7 +143,7 @@ jobs:
           # multiple jobs for building carla, deps and plugins
           make DEBUG=true carla deps dgl plugins resources -j $(nproc)
           # single job for final build stage, otherwise we might get killed due to OOM
-          make DEBUG=true HAVE_PULSEAUDIO=false clap lv2 vst2 vst3 -j 1
+          make DEBUG=true HAVE_PULSEAUDIO=false jack -j 1
       - name: Set sha8
         id: slug
         run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
@@ -171,6 +171,7 @@ jobs:
         run: |
           if [ "${{ matrix.debug }}" -eq 1 ]; then
             echo "TARGET_SUFFIX=-debug" >> $GITHUB_ENV
+            echo "MAKE_ARGS='DEBUG=true jack au'" >> $GITHUB_ENV
             echo "PAWPAW_DEBUG=1" >> $GITHUB_ENV
           fi
       - name: Set up cache
@@ -207,7 +208,7 @@ jobs:
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
           source deps/PawPaw/local.env macos-${{ matrix.target }}
           make features
-          make NOOPT=true -j $(sysctl -n hw.logicalcpu)
+          make NOOPT=true ${MAKE_ARGS} -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS (packaging)
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
