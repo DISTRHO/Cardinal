@@ -339,6 +339,11 @@ ALEFSBITS_CUSTOM = Steps Logic
 PLUGIN_FILES += $(filter-out Algoritmarte/src/plugin.cpp,$(wildcard Algoritmarte/src/*.cpp))
 
 # --------------------------------------------------------------
+# AlliewayAudio_Freebies
+
+PLUGIN_FILES += $(filter-out AlliewayAudio_Freebies/src/plugin.cpp,$(wildcard AlliewayAudio_Freebies/src/*.cpp))
+
+# --------------------------------------------------------------
 # Aaron Static
 
 PLUGIN_FILES += $(wildcard AaronStatic/src/*.cpp)
@@ -2154,6 +2159,13 @@ $(BUILD_DIR)/Algoritmarte/%.cpp.o: Algoritmarte/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ALGORITMARTE_CUSTOM),$(call custom_module_names,$(m),Algoritmarte)) \
 		-DpluginInstance=pluginInstance__Algoritmarte
+
+$(BUILD_DIR)/AlliewayAudio_Freebies/src/%.cpp.o: AlliewayAudio_Freebies/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ALLIEWAYAUDIO_FREEBIES_CUSTOM),$(call custom_module_names,$(m),AlliewayAudio_Freebies)) \
+		-DpluginInstance=pluginInstance__AlliewayAudio_Freebies
 
 $(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

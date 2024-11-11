@@ -125,6 +125,7 @@ At the moment the following 3rd-party modules are provided:
 - [Admiral](https://github.com/wapiflapi/admiral)
 - [alef's bits](https://github.com/alefnull/alefsbits)
 - [AlgoritmArte](https://github.com/algoritmarte/AlgoritmarteVCVPlugin)
+- [AlliewayAudio_Freebies](https://github.com/AlliewayAudio/AlliewayAudio_Freebies)
 - [Amalgamated Harmonics](https://github.com/jhoar/AmalgamatedHarmonics)
 - [Animated Circuits](https://github.com/AnimatedCircuits/RackModules)
 - [Arable Instruments](https://github.com/adbrant/ArableInstruments)
