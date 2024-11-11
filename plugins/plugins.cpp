@@ -3119,6 +3119,7 @@ static void initStatic__Sapphire()
         p->addModel(modelSapphirePop);
         p->addModel(modelSapphireRotini);
         p->addModel(modelSapphireSam);
+        p->addModel(modelSapphireSauce);
         p->addModel(modelSapphireTin);
         p->addModel(modelSapphireTout);
         p->addModel(modelSapphireTricorder);
