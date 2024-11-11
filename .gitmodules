@@ -257,3 +257,6 @@
 [submodule "plugins/rcm-modules"]
 	path = plugins/rcm-modules
 	url = https://github.com/Rcomian/rcm-modules.git
+[submodule "plugins/AlliewayAudio_Freebies"]
+	path = plugins/AlliewayAudio_Freebies
+	url = https://github.com/AlliewayAudio/AlliewayAudio_Freebies.git

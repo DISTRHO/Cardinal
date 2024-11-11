@@ -18,6 +18,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | Aaron Static            | MIT                      | |
 | alef's bits             | GPL-3.0-or-later         | |
 | AlgoritmArte            | GPL-3.0-or-later         | |
+| AlliewayAudio_Freebies  | GPL-3.0-or-later         | |
 | Amalgamated Harmonics   | BSD-3-Clause             | |
 | Animated Circuits       | GPL-3.0-or-later         | |
 | Arable Instruments      | GPL-3.0-or-later         | |

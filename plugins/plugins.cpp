@@ -37,6 +37,9 @@
 // Algoritmarte
 #include "Algoritmarte/src/plugin.hpp"
 
+// AlliewayAudio_Freebies
+#include "AlliewayAudio_Freebies/src/plugin.hpp"
+
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
@@ -909,6 +912,7 @@ Plugin* pluginInstance__8Mode;
 extern Plugin* pluginInstance__AaronStatic;
 Plugin* pluginInstance__alefsbits;
 Plugin* pluginInstance__Algoritmarte;
+Plugin* pluginInstance__AlliewayAudio_Freebies;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__ArableInstruments;
 Plugin* pluginInstance__AnimatedCircuits;
@@ -1287,6 +1291,18 @@ static void initStatic__Algoritmarte()
         p->addModel(modelHoldMeTight);
         p->addModel(modelCyclicCA);
         p->addModel(modelMusiMath);
+    }
+}
+
+static void initStatic__AlliewayAudio_Freebies()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__AlliewayAudio_Freebies = p;
+
+    const StaticPluginLoader spl(p, "AlliewayAudio_Freebies");
+    if (spl.ok())
+    {
+        p->addModel(modelChilly_cheese);
     }
 }
 
@@ -3475,6 +3491,7 @@ void initStaticPlugins()
     initStatic__AaronStatic();
     initStatic__alefsbits();
     initStatic__Algoritmarte();
+    initStatic__AlliewayAudio_Freebies();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__ArableInstruments();
