@@ -343,6 +343,8 @@ PLUGIN_FILES += $(filter-out Algoritmarte/src/plugin.cpp,$(wildcard Algoritmarte
 
 PLUGIN_FILES += $(filter-out AlliewayAudio_Freebies/src/plugin.cpp,$(wildcard AlliewayAudio_Freebies/src/*.cpp))
 
+ALLIEWAYAUDIO_FREEBIES_CUSTOM = DCBlocker
+
 # --------------------------------------------------------------
 # Aaron Static
 
