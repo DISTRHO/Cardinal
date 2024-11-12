@@ -16,6 +16,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | 21kHz                   | MIT                      | |
 | 8Mode                   | BSD-3-Clause             | |
 | Aaron Static            | MIT                      | |
+| admiral                 | MIT                      | |
 | alef's bits             | GPL-3.0-or-later         | |
 | AlgoritmArte            | GPL-3.0-or-later         | |
 | Amalgamated Harmonics   | BSD-3-Clause             | |
