@@ -354,6 +354,11 @@ PLUGIN_FILES += $(wildcard AaronStatic/src/*.cpp)
 AARONSTATIC_CUSTOM = RefreshCounter
 
 # --------------------------------------------------------------
+# Admiral
+
+PLUGIN_FILES += $(filter-out admiral/src/plugin.cpp,$(wildcard admiral/src/*.cpp))
+
+# --------------------------------------------------------------
 # AmalgamatedHarmonics
 
 PLUGIN_FILES += $(filter-out AmalgamatedHarmonics/src/AH.cpp,$(wildcard AmalgamatedHarmonics/src/*.cpp))
@@ -2135,6 +2140,13 @@ $(BUILD_DIR)/AaronStatic/%.cpp.o: AaronStatic/%.cpp
 		$(foreach m,$(AARONSTATIC_CUSTOM),$(call custom_module_names,$(m),AaronStatic)) \
 		-DpluginInstance=pluginInstance__AaronStatic \
 		-Dinit=init__AaronStatic
+
+$(BUILD_DIR)/admiral/%.cpp.o: admiral/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ADMIRAL_CUSTOM),$(call custom_module_names,$(m),admiral)) \
+		-DpluginInstance=pluginInstance__admiral
 
 $(BUILD_DIR)/alefsbits/%.cpp.o: alefsbits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
