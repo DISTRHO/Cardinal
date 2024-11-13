@@ -3137,6 +3137,7 @@ static void initStatic__Sapphire()
         p->addModel(modelSapphireGlee);
         p->addModel(modelSapphireGravy);
         p->addModel(modelSapphireHiss);
+        p->addModel(modelSapphireLark);
         p->addModel(modelSapphireMoots);
         p->addModel(modelSapphireNucleus);
         p->addModel(modelSapphirePivot);
