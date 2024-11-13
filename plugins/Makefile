@@ -710,6 +710,13 @@ PLUGIN_FILES += $(wildcard DrumKit/deps/SynthDevKit/src/*.cpp)
 DRUMKIT_CUSTOM = ADSR Envelope LowFrequencyOscillator
 
 # --------------------------------------------------------------
+# eightfold
+
+PLUGIN_FILES += $(filter-out eightfold/src/plugin.cpp,$(wildcard eightfold/src/*.cpp))
+# modules/types which are present in other plugins
+EIGHTFOLD_CUSTOM = Comparator comparator
+
+# --------------------------------------------------------------
 # EnigmaCurry
 
 PLUGIN_FILES += $(filter-out EnigmaCurry/src/plugin.cpp,$(wildcard EnigmaCurry/src/*.cpp))
@@ -2365,6 +2372,13 @@ $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 		-DpluginInstance=pluginInstance__DrumKit \
 		-Dinit=init__DrumKit \
 		-Wno-sign-compare
+
+$(BUILD_DIR)/eightfold/src/%.cpp.o: eightfold/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(EIGHTFOLD_CUSTOM),$(call custom_module_names,$(m),eightfold)) \
+		-DpluginInstance=pluginInstance__eightfold
 
 $(BUILD_DIR)/EnigmaCurry/src/%.cpp.o: EnigmaCurry/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
