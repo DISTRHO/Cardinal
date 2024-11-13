@@ -395,6 +395,9 @@ namespace xycloid { void init(Plugin*); }
 #include "DrumKit/src/DrumKit.hpp"
 void setupSamples();
 
+// eightfold
+#include "eightfold/src/plugin.hpp"
+
 // EnigmaCurry
 #define modelPulse modelEnigmaCurryPulse
 #include "EnigmaCurry/src/plugin.hpp"
@@ -940,6 +943,7 @@ Plugin* pluginInstance__CVfunk;
 Plugin* pluginInstance__dBiz;
 Plugin* pluginInstance__DHE;
 extern Plugin* pluginInstance__DrumKit;
+Plugin* pluginInstance__eightfold;
 Plugin* pluginInstance__EnigmaCurry;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
@@ -2123,6 +2127,22 @@ static void initStatic__DrumKit()
         p->addModel(modelTomi);
         p->addModel(modelBaronial);
         p->addModel(modelMarionette);
+    }
+}
+
+static void initStatic__eightfold()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__eightfold = p;
+
+    const StaticPluginLoader spl(p, "eightfold");
+    if (spl.ok())
+    {
+        p->addModel(modelSDOrcasHeartV2);
+        p->addModel(modelSDFormation);
+        p->addModel(modelSDLines);
+        p->addModel(modelSDTransgate);
+        p->addModel(modelSDComparator);
     }
 }
 
@@ -3524,6 +3544,7 @@ void initStaticPlugins()
     initStatic__dBiz();
     initStatic__DHE();
     initStatic__DrumKit();
+    initStatic__eightfold();
     initStatic__EnigmaCurry();
     initStatic__ESeries();
     initStatic__ExpertSleepersEncoders();
