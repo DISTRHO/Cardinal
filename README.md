@@ -193,6 +193,7 @@ At the moment the following 3rd-party modules are provided:
 - [Starling Via](https://github.com/starlingcode/Via-for-Rack)
 - [Stoermelder Pack-One](https://github.com/stoermelder/vcvrack-packone)
 - [Surge XT](https://github.com/surge-synthesizer/surge-rack)
+- [SynthKit](https://github.com/SVModular/SynthKit)
 - [unless_modules](https://gitlab.com/unlessgames/unless_modules)
 - [Valley](https://github.com/ValleyAudio/ValleyRackFree)
 - [Voxglitch](https://github.com/clone45/voxglitch)

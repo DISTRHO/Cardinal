@@ -1167,6 +1167,13 @@ MINIPLUGIN_FILES += surgext/src/XTStyle.cpp
 MINIPLUGIN_FILES += surgext-helper/surgext-helper.cpp
 
 # --------------------------------------------------------------
+# SynthKit
+
+PLUGIN_FILES += $(filter-out SynthKit/src/SynthKit.cpp,$(wildcard SynthKit/src/*.cpp))
+PLUGIN_FILES += $(wildcard SynthKit/src/controller/*.cpp)
+PLUGIN_FILES += $(wildcard SynthKit/src/view/*.cpp)
+
+# --------------------------------------------------------------
 # unless_modules
 
 PLUGIN_FILES += $(filter-out unless_modules/src/unless.cpp,$(wildcard unless_modules/src/*.cpp))
@@ -2783,6 +2790,13 @@ $(BUILD_DIR)/surgext%.cpp.o: surgext%.cpp
 	$(SILENT)$(CXX) $< $(SURGEXT_FLAGS) -c -o $@ \
 		$(foreach m,$(SURGEXT_CUSTOM),$(call custom_module_names,$(m),surgext)) \
 		-DpluginInstance=pluginInstance__surgext
+
+$(BUILD_DIR)/SynthKit/src/%.cpp.o: SynthKit/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(SYNTHKIT_CUSTOM),$(call custom_module_names,$(m),SynthKit)) \
+		-DpluginInstance=pluginInstance__SynthKit
 
 $(BUILD_DIR)/unless_modules/%.cpp.o: unless_modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

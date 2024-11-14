@@ -859,6 +859,9 @@ void StoermelderSettings::readFromJson() {}
 void surgext_rack_initialize();
 void surgext_rack_update_theme();
 
+// SynthKit
+#include "SynthKit/src/SynthKit.hpp"
+
 // unless_modules
 #include "unless_modules/src/unless.hpp"
 
@@ -977,6 +980,7 @@ Plugin* pluginInstance__StarlingVia;
 Plugin* pluginInstance__stocaudio;
 extern Plugin* pluginInstance__stoermelder_p1;
 Plugin* pluginInstance__surgext;
+Plugin* pluginInstance__SynthKit;
 Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__Voxglitch;
@@ -3328,6 +3332,30 @@ static void initStatic__surgext()
     }
 }
 
+static void initStatic__SynthKit()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__SynthKit = p;
+
+    const StaticPluginLoader spl(p, "SynthKit");
+    if (spl.ok())
+    {
+        p->addModel(modelAddition);
+        p->addModel(modelSubtraction);
+        p->addModel(modelAnd);
+        p->addModel(modelOr);
+        p->addModel(modelM1x8);
+        p->addModel(modelM1x8CV);
+        p->addModel(modelClockDivider);
+        p->addModel(modelRotatingClockDivider);
+        p->addModel(modelRotatingClockDivider2);
+        p->addModel(modelPrimeClockDivider);
+        p->addModel(modelFibonacciClockDivider);
+        p->addModel(modelSeq4);
+        p->addModel(modelSeq8);
+    }
+}
+
 static void initStatic__unless_modules()
 {
     Plugin* const p = new Plugin;
@@ -3543,6 +3571,7 @@ void initStaticPlugins()
     initStatic__stocaudio();
     initStatic__stoermelder_p1();
     initStatic__surgext();
+    initStatic__SynthKit();
     initStatic__unless_modules();
     initStatic__ValleyAudio();
     initStatic__Voxglitch();
