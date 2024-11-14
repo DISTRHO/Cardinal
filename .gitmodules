@@ -260,3 +260,7 @@
 [submodule "plugins/admiral"]
 	path = plugins/admiral
 	url = https://github.com/wapiflapi/admiral.git
+[submodule "plugins/AlliewayAudio_Freebies"]
+	path = plugins/AlliewayAudio_Freebies
+	url = https://github.com/AlliewayAudio/AlliewayAudio_Freebies.git
+  
