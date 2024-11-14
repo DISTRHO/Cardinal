@@ -27,6 +27,15 @@
 // Aaron Static
 #include "AaronStatic/src/plugin.hpp"
 
+// Admiral
+/* NOTE too much noise in original include, do this a different way
+// #include "admiral/src/plugin.hpp"
+*/
+extern Model* modelWatches;
+extern Model* modelShifts;
+extern Model* modelTables;
+extern Model* modelDivisions;
+
 // Alef's Bits
 #define modelSteps modelalefsbitsSteps
 #define modelLogic modelalefsbitsLogic
@@ -910,6 +919,7 @@ Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
 extern Plugin* pluginInstance__AaronStatic;
+Plugin* pluginInstance__admiral;
 Plugin* pluginInstance__alefsbits;
 Plugin* pluginInstance__Algoritmarte;
 Plugin* pluginInstance__AmalgamatedHarmonics;
@@ -1246,6 +1256,21 @@ static void initStatic__AaronStatic()
         p->addModel(modelScaleCV);
         p->addModel(modelRandomNoteCV);
         p->addModel(modelDiatonicCV);
+    }
+}
+
+static void initStatic__admiral()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__admiral = p;
+
+    const StaticPluginLoader spl(p, "admiral");
+    if (spl.ok())
+    {
+        p->addModel(modelWatches);
+        p->addModel(modelShifts);
+        p->addModel(modelTables);
+        p->addModel(modelDivisions);
     }
 }
 
@@ -3116,6 +3141,7 @@ static void initStatic__Sapphire()
         p->addModel(modelSapphireGlee);
         p->addModel(modelSapphireGravy);
         p->addModel(modelSapphireHiss);
+        p->addModel(modelSapphireLark);
         p->addModel(modelSapphireMoots);
         p->addModel(modelSapphireNucleus);
         p->addModel(modelSapphirePivot);
@@ -3123,6 +3149,7 @@ static void initStatic__Sapphire()
         p->addModel(modelSapphirePop);
         p->addModel(modelSapphireRotini);
         p->addModel(modelSapphireSam);
+        p->addModel(modelSapphireSauce);
         p->addModel(modelSapphireTin);
         p->addModel(modelSapphireTout);
         p->addModel(modelSapphireTricorder);
@@ -3501,6 +3528,7 @@ void initStaticPlugins()
     initStatic__21kHz();
     initStatic__8Mode();
     initStatic__AaronStatic();
+    initStatic__admiral();
     initStatic__alefsbits();
     initStatic__Algoritmarte();
     initStatic__AmalgamatedHarmonics();
