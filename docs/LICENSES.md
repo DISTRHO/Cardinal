@@ -90,6 +90,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | stocaudio               | GPL-3.0-or-later         | |
 | Stoermelder Pack-One    | GPL-3.0-or-later         | |
 | Surge XT                | GPL-3.0-or-later         | |
+| SynthKit                | CC0-1.0                  | |
 | unless_modules          | GPL-3.0-or-later         | |
 | Valley                  | GPL-3.0-or-later         | |
 | Voxglitch               | GPL-3.0-or-later         | |
