@@ -260,3 +260,6 @@
 [submodule "plugins/admiral"]
 	path = plugins/admiral
 	url = https://github.com/wapiflapi/admiral.git
+[submodule "plugins/SynthKit"]
+	path = plugins/SynthKit
+	url = https://github.com/SVModular/SynthKit.git
