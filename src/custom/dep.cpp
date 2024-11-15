@@ -66,7 +66,6 @@ enum DarkMode {
     kModeDHE,
     kModeDrumKit,
     kModeESeries,
-    kModeJW,
     kModeLilacLoop,
     kModeLittleUtils,
     kModeKocmoc,
@@ -283,30 +282,6 @@ static const struct {
     { kModeDrumKit, "/DrumKit/res/Tomi.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
     { kModeESeries,"/ESeries/res/E340.svg", {}, -1 },
-    // CC0-1.0
-    // BSD-3-Clause
-    { kModeJW, "/JW-Modules/res/Add5.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/BlankPanel1hp.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/BlankPanelLarge.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/BlankPanelMedium.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/BlankPanelSmall.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/BouncyBalls.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/D1v1de.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/DivSeq.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/EightSeq.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/GridSeq.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/MinMax.svg", {"path38411"}, -1 },
-    { kModeJW, "/JW-Modules/res/NoteSeq.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/NoteSeq16.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/NoteSeqFu.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/OnePattern.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/Patterns.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/Pres1t.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/PT.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/Str1ker.svg", {"rect2094","rect995","rect169"}, -1 },
-    { kModeJW, "/JW-Modules/res/Trigs.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/WavHeadPanel.svg", {}, -1 },
-    { kModeJW, "/JW-Modules/res/XYPad.svg", {}, -1 },
     // GPL3.0-or-later
     { kModeLilacLoop, "/LilacLoop/res/Looper.svg", {}, -1 },
     // EUPL-1.2
@@ -710,42 +685,6 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
     case kModeDHE:
         paint.color = darkerColor(paint.color);
         return true;
-    // Special case for JW-Modules colors
-    case kModeJW:
-        switch (paint.color)
-        {
-        // do nothing
-        case 0x320997ff:
-        case 0x32099aff:
-        case 0x3209f1ff:
-        case 0x3209f3ff:
-        case 0x32fc1a8f:
-        case 0x32fc1a90:
-        case 0x32fc9418:
-        case 0x32fc9619:
-        case 0xc7fc9619:
-        case 0xff050505:
-        case 0xffead7be:
-        case 0xfff7a540:
-        case 0xfffa9c2a:
-        case 0xfffc9619:
-        case 0xfffcb654:
-        case 0xfffd9c17:
-        case 0xffffffff:
-            return false;
-        // make more transparent
-        case 0xffbad6eb:
-        case 0xffbae8eb:
-        case 0xffeabed5:
-        case 0xffead6bd:
-            paint.color = 0x32000000 | (paint.color & 0xffffff);
-            return true;
-        // make it more white
-        case 0xffa0a0a0:
-            paint.color = 0xffc0c0c0;
-            return true;
-        }
-        break;
     // Special case for Lilac
     case kModeLilacLoop:
         switch (paint.color)
