@@ -2497,6 +2497,7 @@ static void initStatic__JW()
     {
 #define modelQuantizer modelJWQuantizer
         p->addModel(modelAdd5);
+        p->addModel(modelAbcdSeq);
         p->addModel(modelBouncyBalls);
         p->addModel(modelCat);
         p->addModel(modelTree);
@@ -2524,6 +2525,7 @@ static void initStatic__JW()
         p->addModel(modelBlankPanelLarge);
         p->addModel(modelCoolBreeze);
         p->addModel(modelPete);
+        p->addModel(modelTimer);
        #ifndef STATIC_BUILD
         p->addModel(modelStr1ker);
        #else
