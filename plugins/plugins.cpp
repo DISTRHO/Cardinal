@@ -2939,6 +2939,7 @@ static void initStatic__nonlinearcircuits()
         p->addModel(modelSlothApathy);
         p->addModel(modelSlothInertia);
         p->addModel(modelSlothTorpor);
+        p->addModel(modelSplish);
         p->addModel(modelSquidAxon);
         p->addModel(modelStatues);
         p->addModel(modelTripleSloth);
