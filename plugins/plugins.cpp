@@ -46,6 +46,9 @@ extern Model* modelDivisions;
 // Algoritmarte
 #include "Algoritmarte/src/plugin.hpp"
 
+// AlliewayAudio_Freebies
+#include "AlliewayAudio_Freebies/src/plugin.hpp"
+
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
@@ -394,6 +397,9 @@ namespace xycloid { void init(Plugin*); }
 // DrumKit
 #include "DrumKit/src/DrumKit.hpp"
 void setupSamples();
+
+// eightfold
+#include "eightfold/src/plugin.hpp"
 
 // EnigmaCurry
 #define modelPulse modelEnigmaCurryPulse
@@ -868,6 +874,9 @@ void StoermelderSettings::readFromJson() {}
 void surgext_rack_initialize();
 void surgext_rack_update_theme();
 
+// SynthKit
+#include "SynthKit/src/SynthKit.hpp"
+
 // unless_modules
 #include "unless_modules/src/unless.hpp"
 
@@ -919,6 +928,7 @@ extern Plugin* pluginInstance__AaronStatic;
 Plugin* pluginInstance__admiral;
 Plugin* pluginInstance__alefsbits;
 Plugin* pluginInstance__Algoritmarte;
+Plugin* pluginInstance__AlliewayAudio_Freebies;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__ArableInstruments;
 Plugin* pluginInstance__AnimatedCircuits;
@@ -940,6 +950,7 @@ Plugin* pluginInstance__CVfunk;
 Plugin* pluginInstance__dBiz;
 Plugin* pluginInstance__DHE;
 extern Plugin* pluginInstance__DrumKit;
+Plugin* pluginInstance__eightfold;
 Plugin* pluginInstance__EnigmaCurry;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
@@ -987,6 +998,7 @@ Plugin* pluginInstance__StarlingVia;
 Plugin* pluginInstance__stocaudio;
 extern Plugin* pluginInstance__stoermelder_p1;
 Plugin* pluginInstance__surgext;
+Plugin* pluginInstance__SynthKit;
 Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__Voxglitch;
@@ -1312,6 +1324,18 @@ static void initStatic__Algoritmarte()
         p->addModel(modelHoldMeTight);
         p->addModel(modelCyclicCA);
         p->addModel(modelMusiMath);
+    }
+}
+
+static void initStatic__AlliewayAudio_Freebies()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__AlliewayAudio_Freebies = p;
+
+    const StaticPluginLoader spl(p, "AlliewayAudio_Freebies");
+    if (spl.ok())
+    {
+        p->addModel(modelChilly_cheese);
     }
 }
 
@@ -2123,6 +2147,22 @@ static void initStatic__DrumKit()
         p->addModel(modelTomi);
         p->addModel(modelBaronial);
         p->addModel(modelMarionette);
+    }
+}
+
+static void initStatic__eightfold()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__eightfold = p;
+
+    const StaticPluginLoader spl(p, "eightfold");
+    if (spl.ok())
+    {
+        p->addModel(modelSDOrcasHeartV2);
+        p->addModel(modelSDFormation);
+        p->addModel(modelSDLines);
+        p->addModel(modelSDTransgate);
+        p->addModel(modelSDComparator);
     }
 }
 
@@ -3356,6 +3396,30 @@ static void initStatic__surgext()
     }
 }
 
+static void initStatic__SynthKit()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__SynthKit = p;
+
+    const StaticPluginLoader spl(p, "SynthKit");
+    if (spl.ok())
+    {
+        p->addModel(modelAddition);
+        p->addModel(modelSubtraction);
+        p->addModel(modelAnd);
+        p->addModel(modelOr);
+        p->addModel(modelM1x8);
+        p->addModel(modelM1x8CV);
+        p->addModel(modelClockDivider);
+        p->addModel(modelRotatingClockDivider);
+        p->addModel(modelRotatingClockDivider2);
+        p->addModel(modelPrimeClockDivider);
+        p->addModel(modelFibonacciClockDivider);
+        p->addModel(modelSeq4);
+        p->addModel(modelSeq8);
+    }
+}
+
 static void initStatic__unless_modules()
 {
     Plugin* const p = new Plugin;
@@ -3504,6 +3568,7 @@ void initStaticPlugins()
     initStatic__admiral();
     initStatic__alefsbits();
     initStatic__Algoritmarte();
+    initStatic__AlliewayAudio_Freebies();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__ArableInstruments();
@@ -3525,6 +3590,7 @@ void initStaticPlugins()
     initStatic__dBiz();
     initStatic__DHE();
     initStatic__DrumKit();
+    initStatic__eightfold();
     initStatic__EnigmaCurry();
     initStatic__ESeries();
     initStatic__ExpertSleepersEncoders();
@@ -3572,6 +3638,7 @@ void initStaticPlugins()
     initStatic__stocaudio();
     initStatic__stoermelder_p1();
     initStatic__surgext();
+    initStatic__SynthKit();
     initStatic__unless_modules();
     initStatic__ValleyAudio();
     initStatic__Voxglitch();
