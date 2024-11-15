@@ -260,3 +260,4 @@
 [submodule "plugins/admiral"]
 	path = plugins/admiral
 	url = https://github.com/wapiflapi/admiral.git
+
