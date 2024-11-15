@@ -260,13 +260,3 @@
 [submodule "plugins/admiral"]
 	path = plugins/admiral
 	url = https://github.com/wapiflapi/admiral.git
-[submodule "plugins/AlliewayAudio_Freebies"]
-	path = plugins/AlliewayAudio_Freebies
-	url = https://github.com/AlliewayAudio/AlliewayAudio_Freebies.git
-[submodule "plugins/eightfold"]
-	path = plugins/eightfold
-	url = https://github.com/scanner-darkly/eightfold.git
-[submodule "plugins/SynthKit"]
-	path = plugins/SynthKit
-	url = https://github.com/SVModular/SynthKit.git
-  

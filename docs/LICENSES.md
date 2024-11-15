@@ -19,7 +19,6 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | admiral                 | MIT                      | |
 | alef's bits             | GPL-3.0-or-later         | |
 | AlgoritmArte            | GPL-3.0-or-later         | |
-| AlliewayAudio_Freebies  | GPL-3.0-or-later         | |
 | Amalgamated Harmonics   | BSD-3-Clause             | |
 | Animated Circuits       | GPL-3.0-or-later         | |
 | Arable Instruments      | GPL-3.0-or-later         | |
@@ -41,7 +40,6 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | dBiz                    | GPL-3.0-or-later         | |
 | DHE-Modules             | MIT                      | |
 | DrumKit                 | CC0-1.0                  | |
-| eightfold               | GPL-3.0-or-later         | |
 | EnigmaCurry             | GPL-3.0-or-later         | |
 | E-Series                | GPL-3.0-or-later         | |
 | ExpertSleepers Encoders | MIT                      | |
@@ -90,7 +88,6 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | stocaudio               | GPL-3.0-or-later         | |
 | Stoermelder Pack-One    | GPL-3.0-or-later         | |
 | Surge XT                | GPL-3.0-or-later         | |
-| SynthKit                | CC0-1.0                  | |
 | unless_modules          | GPL-3.0-or-later         | |
 | Valley                  | GPL-3.0-or-later         | |
 | Voxglitch               | GPL-3.0-or-later         | |

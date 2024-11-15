@@ -339,13 +339,6 @@ ALEFSBITS_CUSTOM = Steps Logic
 PLUGIN_FILES += $(filter-out Algoritmarte/src/plugin.cpp,$(wildcard Algoritmarte/src/*.cpp))
 
 # --------------------------------------------------------------
-# AlliewayAudio_Freebies
-
-PLUGIN_FILES += $(filter-out AlliewayAudio_Freebies/src/plugin.cpp,$(wildcard AlliewayAudio_Freebies/src/*.cpp))
-
-ALLIEWAYAUDIO_FREEBIES_CUSTOM = DCBlocker
-
-# --------------------------------------------------------------
 # Aaron Static
 
 PLUGIN_FILES += $(wildcard AaronStatic/src/*.cpp)
@@ -708,13 +701,6 @@ PLUGIN_FILES += $(wildcard DrumKit/deps/SynthDevKit/src/*.cpp)
 
 # modules/types which are present in other plugins
 DRUMKIT_CUSTOM = ADSR Envelope LowFrequencyOscillator
-
-# --------------------------------------------------------------
-# eightfold
-
-PLUGIN_FILES += $(filter-out eightfold/src/plugin.cpp,$(wildcard eightfold/src/*.cpp))
-# modules/types which are present in other plugins
-EIGHTFOLD_CUSTOM = Comparator comparator
 
 # --------------------------------------------------------------
 # EnigmaCurry
@@ -1184,13 +1170,6 @@ MINIPLUGIN_FILES += surgext/src/XTModule.cpp
 MINIPLUGIN_FILES += surgext/src/XTModuleWidget.cpp
 MINIPLUGIN_FILES += surgext/src/XTStyle.cpp
 MINIPLUGIN_FILES += surgext-helper/surgext-helper.cpp
-
-# --------------------------------------------------------------
-# SynthKit
-
-PLUGIN_FILES += $(filter-out SynthKit/src/SynthKit.cpp,$(wildcard SynthKit/src/*.cpp))
-PLUGIN_FILES += $(wildcard SynthKit/src/controller/*.cpp)
-PLUGIN_FILES += $(wildcard SynthKit/src/view/*.cpp)
 
 # --------------------------------------------------------------
 # unless_modules
@@ -2176,13 +2155,6 @@ $(BUILD_DIR)/Algoritmarte/%.cpp.o: Algoritmarte/%.cpp
 		$(foreach m,$(ALGORITMARTE_CUSTOM),$(call custom_module_names,$(m),Algoritmarte)) \
 		-DpluginInstance=pluginInstance__Algoritmarte
 
-$(BUILD_DIR)/AlliewayAudio_Freebies/src/%.cpp.o: AlliewayAudio_Freebies/src/%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(ALLIEWAYAUDIO_FREEBIES_CUSTOM),$(call custom_module_names,$(m),AlliewayAudio_Freebies)) \
-		-DpluginInstance=pluginInstance__AlliewayAudio_Freebies
-
 $(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -2379,13 +2351,6 @@ $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 		-DpluginInstance=pluginInstance__DrumKit \
 		-Dinit=init__DrumKit \
 		-Wno-sign-compare
-
-$(BUILD_DIR)/eightfold/src/%.cpp.o: eightfold/src/%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(EIGHTFOLD_CUSTOM),$(call custom_module_names,$(m),eightfold)) \
-		-DpluginInstance=pluginInstance__eightfold
 
 $(BUILD_DIR)/EnigmaCurry/src/%.cpp.o: EnigmaCurry/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
@@ -2830,13 +2795,6 @@ $(BUILD_DIR)/surgext%.cpp.o: surgext%.cpp
 	$(SILENT)$(CXX) $< $(SURGEXT_FLAGS) -c -o $@ \
 		$(foreach m,$(SURGEXT_CUSTOM),$(call custom_module_names,$(m),surgext)) \
 		-DpluginInstance=pluginInstance__surgext
-
-$(BUILD_DIR)/SynthKit/src/%.cpp.o: SynthKit/src/%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(SYNTHKIT_CUSTOM),$(call custom_module_names,$(m),SynthKit)) \
-		-DpluginInstance=pluginInstance__SynthKit
 
 $(BUILD_DIR)/unless_modules/%.cpp.o: unless_modules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
