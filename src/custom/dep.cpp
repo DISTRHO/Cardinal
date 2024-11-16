@@ -329,7 +329,7 @@ static const struct {
     { kModeMyth, "/myth-modules/res/Mavka.svg", {}, -1 },
     { kModeMyth, "/myth-modules/res/Molphar.svg", {}, -1 },
     // CC0-1.0
-    { kModeNonlinearcircuits, "/nonlinearcircuits/res/BOOLs2.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/BOOLs.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/DoubleNeuron.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/LetsSplosh.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/4seq.svg", {}, -1 },
