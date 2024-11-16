@@ -343,7 +343,7 @@ static const struct {
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/Segue.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/Splish.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/Statues.svg", {}, -1 },
-    { kModeNonlinearcircuits, "/nonlinearcircuits/res/squid-axon-papernoise-panel.svg", {}, -1 },
+    { kModeNonlinearcircuits, "/nonlinearcircuits/res/SquidAxon.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/SlothApathy.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/SlothInertia.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/SlothTorpor.svg", {}, -1 },
