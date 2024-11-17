@@ -177,6 +177,7 @@ At the moment the following 3rd-party modules are provided:
 - [MSM](https://github.com/netboy3/MSM-vcvrack-plugin)
 - [MUS-X](https://github.com/Jojosito/MUS-X)
 - [Myth](https://github.com/Ahineya/vcv-myth-plugin)
+- [Nocturnal Encoder](https://github.com/djpeterso23662/NocturnalEncoder)
 - [Nonlinear Circuits](https://github.com/mhetrick/nonlinearcircuits)
 - [Orbits](https://github.com/RareBreeds/Orbits)
 - [Parable Instruments](https://github.com/adbrant/ArableInstruments)
