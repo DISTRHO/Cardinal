@@ -946,6 +946,11 @@ PLUGIN_FILES += $(filter-out MUS-X/src/plugin.cpp,$(wildcard MUS-X/src/*.cpp))
 PLUGIN_FILES += $(filter-out myth-modules/src/plugin.cpp,$(wildcard myth-modules/src/*.cpp))
 
 # --------------------------------------------------------------
+# Nocturnal Encoder
+
+PLUGIN_FILES += $(filter-out NocturnalEncoder/src/plugin.cpp,$(wildcard NocturnalEncoder/src/*.cpp))
+
+# --------------------------------------------------------------
 # Nonlinear Circuits
 
 PLUGIN_FILES += $(filter-out nonlinearcircuits/src/NLC.cpp,$(wildcard nonlinearcircuits/src/*.cpp))
@@ -2652,6 +2657,13 @@ $(BUILD_DIR)/myth-modules/%.cpp.o: myth-modules/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MYTH_MODULES_CUSTOM),$(call custom_module_names,$(m),myth_modules)) \
 		-DpluginInstance=pluginInstance__myth_modules
+
+$(BUILD_DIR)/NocturnalEncoder/src/%.cpp.o: NocturnalEncoder/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(CF_CUSTOM),$(call custom_module_names,$(m),NocturnalEncoder)) \
+		-DpluginInstance=pluginInstance__NocturnalEncoder
 
 $(BUILD_DIR)/nonlinearcircuits/%.cpp.o: nonlinearcircuits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

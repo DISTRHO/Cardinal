@@ -260,4 +260,6 @@
 [submodule "plugins/admiral"]
 	path = plugins/admiral
 	url = https://github.com/wapiflapi/admiral.git
-
+[submodule "plugins/NocturnalEncoder"]
+	path = plugins/NocturnalEncoder
+	url = https://github.com/djpeterso23662/NocturnalEncoder.git
