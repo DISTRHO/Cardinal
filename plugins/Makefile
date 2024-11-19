@@ -560,7 +560,10 @@ PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp Befaco/src/MidiThing.cpp,$(wi
 PLUGIN_FILES += $(wildcard Befaco/src/noise-plethora/*/*.cpp)
 
 # modules/types which are present in other plugins
-BEFACO_CUSTOM = ADSR Mixer chowdsp Burst
+BEFACO_CUSTOM = ADSR Mixer chowdsp Burst RecordButton
+
+BEFACO_FLAGS = $(filter-out -fsingle-precision-constant,$(filter-out -std=gnu++11,$(BUILD_CXX_FLAGS)))
+BEFACO_FLAGS += -std=gnu++17
 
 # --------------------------------------------------------------
 # Bidoo
@@ -2238,7 +2241,7 @@ $(BUILD_DIR)/BaconPlugs/%.cpp.o: BaconPlugs/%.cpp
 $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BEFACO_FLAGS) -c -o $@ \
 		$(foreach m,$(BEFACO_CUSTOM),$(call custom_module_names,$(m),Befaco)) \
 		-DpluginInstance=pluginInstance__Befaco
 

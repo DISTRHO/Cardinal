@@ -1620,6 +1620,8 @@ static void initStatic__Befaco()
         p->addModel(modelBurst);
         p->addModel(modelVoltio);
         p->addModel(modelOctaves);
+        p->addModel(modelBypass);
+        p->addModel(modelBandit);
 #undef modelADSR
 #undef modelMixer
 #undef modelBurst
