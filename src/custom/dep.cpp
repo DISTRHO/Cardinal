@@ -316,7 +316,6 @@ static const struct {
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/Numberwang.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/Router.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/Segue.svg", {}, -1 },
-    { kModeNonlinearcircuits, "/nonlinearcircuits/res/Splish.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/Statues.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/SquidAxon.svg", {}, -1 },
     { kModeNonlinearcircuits, "/nonlinearcircuits/res/SlothApathy.svg", {}, -1 },
