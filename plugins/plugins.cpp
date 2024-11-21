@@ -1582,6 +1582,8 @@ static void initStatic__Bacon()
         p->addModel(modelPolyGenerator);
         p->addModel(modelLintBuddy);
         p->addModel(modelLuckyHold);
+        p->addModel(modelPatchNameDisplay);
+        p->addModel(modelPleaseQuit);
     }
 }
 

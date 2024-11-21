@@ -2235,6 +2235,8 @@ $(BUILD_DIR)/BaconPlugs/%.cpp.o: BaconPlugs/%.cpp
 		-DDARK_BACON \
 		-IBaconPlugs/libs/midifile/include \
 		-IBaconPlugs/libs/open303-code/Source/DSPCode \
+		-IBaconPlugs/libs/sst/sst-basic-blocks/include \
+		-IBaconPlugs/libs/sst/sst-rackhelpers/include \
 		-Wno-array-bounds \
 		-Wno-strict-aliasing
 
