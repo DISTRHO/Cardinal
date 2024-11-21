@@ -1686,6 +1686,7 @@ static void initStatic__Bidoo()
         p->addModel(modelSIGMA);
         p->addModel(modelFLAME);
         p->addModel(modelVOID);
+        p->addModel(modelRATEAU);
 
         // NOTE disabled in Cardinal due to curl usage
         // p->addModel(modelANTN);
