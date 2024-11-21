@@ -614,7 +614,9 @@ extern Model* modelZeta;
 #undef modelDelta
 
 // Meander
-extern int panelTheme;
+extern int Meander_panelTheme;
+extern int MSQ_panelTheme;
+extern int MSP_panelTheme;
 #include "Meander/src/plugin.hpp"
 
 // MindMeldModular
@@ -2651,8 +2653,12 @@ static void initStatic__Meander()
     if (spl.ok())
     {
         // for dark theme
-        panelTheme = 1;
+        Meander_panelTheme = 1;
+        MSQ_panelTheme = 1;
+        MSP_panelTheme = 1;
         p->addModel(modelMeander);
+        p->addModel(modelModeScaleQuant);
+        p->addModel(modelModeScaleProgressions);
     }
 }
 
@@ -3607,7 +3613,9 @@ void updateStaticPluginsDarkMode()
     }
     // meander
     {
-        panelTheme = darkMode ? 1 : 0;
+        Meander_panelTheme = darkMode ? 1 : 0;
+        MSQ_panelTheme = darkMode ? 1 : 0;
+        MSP_panelTheme = darkMode ? 1 : 0;
     }
     // glue the giant
     {

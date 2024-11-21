@@ -2577,7 +2577,7 @@ $(BUILD_DIR)/LyraeModules/%.cpp.o: LyraeModules/%.cpp
 		$(foreach m,$(LYRAE_CUSTOM),$(call custom_module_names,$(m),Lyrae)) \
 		-DpluginInstance=pluginInstance__Lyrae
 
-$(BUILD_DIR)/Meander/src/Meander.cpp.o: Meander/src/Meander.cpp
+$(BUILD_DIR)/Meander/src/%.cpp.o: Meander/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
