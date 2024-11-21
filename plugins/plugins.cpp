@@ -1584,6 +1584,10 @@ static void initStatic__Bacon()
         p->addModel(modelLuckyHold);
         p->addModel(modelPatchNameDisplay);
         p->addModel(modelPleaseQuit);
+
+        // Used for testing in BaconPlugs
+        spl.removeModule("ContrastBNDEditor");
+        spl.removeModule("BaconTest");
     }
 }
 
