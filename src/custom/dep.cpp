@@ -179,6 +179,7 @@ static const struct {
     { kModeBidoo, "/Bidoo/res/PILOT.svg", {"rect843-6-4-5","rect843","rect843-4","rect843-6-4","rect843-6-7"}, -1 },
     { kModeBidoo, "/Bidoo/res/POUPRE.svg", {}, -1 },
     { kModeBidoo, "/Bidoo/res/RABBIT.svg", {}, -1 },
+    { kModeBidoo, "/Bidoo/res/RATEAU.svg", {"rect930"}, -1 },
     { kModeBidoo, "/Bidoo/res/REI.svg", {}, -1 },
     { kModeBidoo, "/Bidoo/res/SIGMA.svg", {}, -1 },
     { kModeBidoo, "/Bidoo/res/SPORE.svg", {}, -1 },
