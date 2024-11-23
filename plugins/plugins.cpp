@@ -1583,11 +1583,11 @@ static void initStatic__Bacon()
         p->addModel(modelLintBuddy);
         p->addModel(modelLuckyHold);
         p->addModel(modelPatchNameDisplay);
-        p->addModel(modelPleaseQuit);
 
-        // Used for testing in BaconPlugs
+        // Used for testing or not practical
         spl.removeModule("ContrastBNDEditor");
         spl.removeModule("BaconTest");
+        spl.removeModule("PleaseQuit");
     }
 }
 
