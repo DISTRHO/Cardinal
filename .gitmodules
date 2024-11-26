@@ -261,3 +261,6 @@
 	path = plugins/admiral
 	url = https://github.com/wapiflapi/admiral.git
 
+[submodule "plugins/4ms"]
+	path = plugins/4ms
+	url = https://github.com/4ms/4ms-vcv.git

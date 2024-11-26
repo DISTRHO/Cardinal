@@ -321,6 +321,11 @@ FUNDAMENTAL_CUSTOM = $(DRWAV)
 PLUGIN_FILES += $(filter-out 21kHz/src/21kHz.cpp,$(wildcard 21kHz/src/*.cpp))
 
 # --------------------------------------------------------------
+# 4ms
+
+PLUGIN_FILES += $(filter-out 4ms/src/plugin.cc,$(wildcard 4ms/src/models/*.cc))
+
+# --------------------------------------------------------------
 # 8Mode
 
 PLUGIN_FILES += $(filter-out 8Mode/src/8mode.cpp,$(wildcard 8Mode/src/*.cpp))
@@ -2121,6 +2126,17 @@ $(BUILD_DIR)/21kHz/%.cpp.o: 21kHz/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(21KHZ_CUSTOM),$(call custom_module_names,$(m),21kHz)) \
 		-DpluginInstance=pluginInstance__21kHz
+
+$(BUILD_DIR)/4ms/%.o: 4ms/%
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(4ms_CUSTOM),$(call custom_module_names,$(m),4ms)) \
+		-DpluginInstance=pluginInstance__4ms \
+		-I4ms/src \
+		-I4ms/lib \
+		-I4ms/lib/metamodule-core-interface \
+		-I4ms/lib/cpputil
 
 $(BUILD_DIR)/8Mode/%.cpp.o: 8Mode/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

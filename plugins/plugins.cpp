@@ -21,6 +21,57 @@
 // 21kHz
 #include "21kHz/src/21kHz.hpp"
 
+// 4ms
+#include "4ms/src/plugin.hh"
+extern Model* modelOctave;
+extern Model* modelNoise;
+extern Model* modelSHEV;
+extern Model* modelENVVCA;
+extern Model* modelDEV;
+extern Model* modelFreeverb;
+extern Model* modelVCAM;
+extern Model* modelTapo;
+extern Model* modelSISM;
+extern Model* modelSH;
+extern Model* modelSCM;
+extern Model* modelRCD;
+extern Model* modelQPLFO;
+extern Model* modelQCD;
+extern Model* modelPI;
+extern Model* modelPEG;
+extern Model* modelLPG;
+extern Model* modelL4;
+extern Model* modelDLD;
+extern Model* modelCLKM;
+extern Model* modelCLKD;
+extern Model* modelVerb;
+extern Model* modelSwitch41;
+extern Model* modelSwitch14;
+extern Model* modelSeq8;
+extern Model* modelProb8;
+extern Model* modelMNMX;
+extern Model* modelAtvert2;
+extern Model* modelBPF;
+extern Model* modelComplexEG;
+extern Model* modelDetune;
+extern Model* modelDjembe;
+extern Model* modelDrum;
+extern Model* modelEnOsc;
+extern Model* modelFM;
+extern Model* modelFollow;
+extern Model* modelGate;
+extern Model* modelHPF;
+extern Model* modelHubMedium;
+extern Model* modelKPLS;
+extern Model* modelMultiLFO;
+extern Model* modelPan;
+extern Model* modelPitchShift;
+extern Model* modelSlew;
+extern Model* modelSource;
+extern Model* modelStMix;
+extern Model* modelMPEG;
+
+
 // 8Mode
 #include "8Mode/src/8mode.hpp"
 
@@ -914,6 +965,7 @@ Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__Fundamental;
 // Plugin* pluginInstance__ZamAudio;
 Plugin* pluginInstance__21kHz;
+Plugin* pluginInstance__4ms;
 Plugin* pluginInstance__8Mode;
 extern Plugin* pluginInstance__AaronStatic;
 Plugin* pluginInstance__admiral;
@@ -1225,6 +1277,64 @@ static void initStatic__21kHz()
         p->addModel(modelPalmLoop);
         p->addModel(modelD_Inf);
         p->addModel(modelTachyonEntangler);
+    }
+}
+
+static void initStatic__4ms()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__4ms = p;
+
+    const StaticPluginLoader spl(p, "4ms");
+    if (spl.ok())
+    {
+        p->addModel(modelOctave);
+        p->addModel(modelNoise);
+        p->addModel(modelSHEV);
+        p->addModel(modelENVVCA);
+        p->addModel(modelDEV);
+        p->addModel(modelFreeverb);
+        p->addModel(modelVCAM);
+        p->addModel(modelTapo);
+        p->addModel(modelSISM);
+        p->addModel(modelSH);
+        p->addModel(modelSCM);
+        p->addModel(modelRCD);
+        p->addModel(modelQPLFO);
+        p->addModel(modelQCD);
+        p->addModel(modelPI);
+        p->addModel(modelPEG);
+        p->addModel(modelLPG);
+        p->addModel(modelL4);
+        p->addModel(modelDLD);
+        p->addModel(modelCLKM);
+        p->addModel(modelCLKD);
+        p->addModel(modelVerb);
+        p->addModel(modelSwitch41);
+        p->addModel(modelSwitch14);
+        p->addModel(modelSeq8);
+        p->addModel(modelProb8);
+        p->addModel(modelMNMX);
+        p->addModel(modelAtvert2);
+        p->addModel(modelBPF);
+        p->addModel(modelComplexEG);
+        p->addModel(modelDetune);
+        p->addModel(modelDjembe);
+        p->addModel(modelDrum);
+        p->addModel(modelEnOsc);
+        p->addModel(modelFM);
+        p->addModel(modelFollow);
+        p->addModel(modelGate);
+        p->addModel(modelHPF);
+        p->addModel(modelHubMedium);
+        p->addModel(modelKPLS);
+        p->addModel(modelMultiLFO);
+        p->addModel(modelPan);
+        p->addModel(modelPitchShift);
+        p->addModel(modelSlew);
+        p->addModel(modelSource);
+        p->addModel(modelStMix);
+        p->addModel(modelMPEG);
     }
 }
 
@@ -3511,6 +3621,7 @@ void initStaticPlugins()
     initStatic__Fundamental();
     // initStatic__ZamAudio();
     initStatic__21kHz();
+    initStatic__4ms();
     initStatic__8Mode();
     initStatic__AaronStatic();
     initStatic__admiral();
