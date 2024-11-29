@@ -260,6 +260,18 @@
 [submodule "plugins/admiral"]
 	path = plugins/admiral
 	url = https://github.com/wapiflapi/admiral.git
+<<<<<<< HEAD
 [submodule "plugins/eightfold"]
 	path = plugins/eightfold
 	url = https://github.com/scanner-darkly/eightfold.git
+=======
+[submodule "plugins/Venom"]
+	path = plugins/Venom
+	url = https://github.com/DaveBenham/VenomModules
+[submodule "plugins/countmodula"]
+	path = plugins/countmodula
+	url = https://github.com/countmodula/VCVRackPlugins.git
+[submodule "plugins/dbRackModules"]
+	path = plugins/dbRackModules
+	url = https://github.com/docb/dbRackModules.git
+>>>>>>> ac289ab (init dbRackModules)

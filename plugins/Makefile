@@ -690,6 +690,25 @@ DBIZ_CUSTOM  = Chord DarkDefaultItem Divider FourSeq FourSeqWidget OrangeLight V
 DBIZ_CUSTOM_PER_FILE = LERP MultiFilter Oscillator calcOutput sineOsc subBank
 
 # --------------------------------------------------------------
+# dbRackModules
+
+PLUGIN_FILES += $(filter-out dbRackModules/src/plugin.cpp dbRackModules/src/Drums.cpp,$(wildcard dbRackModules/src/*.cpp))
+
+# modules/types which are present in other plugins
+DBRACKMODULES_CUSTOM = SKF X4 MVerb Osc3
+
+PLUGIN_FILES += dbRackModules/Gamma/src/arr.cpp
+PLUGIN_FILES += dbRackModules/Gamma/src/Domain.cpp
+PLUGIN_FILES += dbRackModules/Gamma/src/scl.cpp
+PLUGIN_FILES += dbRackModules/Gamma/src/DFT.cpp
+PLUGIN_FILES += dbRackModules/Gamma/src/FFT_fftpack.cpp
+PLUGIN_FILES += dbRackModules/Gamma/src/fftpack++1.cpp
+PLUGIN_FILES += dbRackModules/Gamma/src/fftpack++2.cpp
+
+RESOURCE_FILES += $(wildcard dbRackModules/images/*.png)
+RESOURCE_FILES += $(wildcard dbRackModules/presets)
+
+# --------------------------------------------------------------
 # DHE-Modules
 
 PLUGIN_FILES += $(filter-out DHE-Modules/src/plugin.cpp,$(wildcard DHE-Modules/src/modules/*/init.cpp))
@@ -2341,6 +2360,16 @@ $(BUILD_DIR)/dBiz/src/%.cpp.o: dBiz/src/%.cpp
 		$(foreach m,$(DBIZ_CUSTOM),$(call custom_module_names,$(m),dBiz)) \
 		$(foreach m,$(DBIZ_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),dBiz_$(shell basename -- $*))) \
 		-DpluginInstance=pluginInstance__dBiz
+
+$(BUILD_DIR)/dbRackModules/%.cpp.o: dbRackModules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(DBRACKMODULES_CUSTOM),$(call custom_module_names,$(m),dbRackModules)) \
+		-DpluginInstance=pluginInstance__dbRackModules \
+		-DSTDIO_OVERRIDE=dbRackModules \
+		-IdbRackModules/Gamma \
+		-Wno-unused-but-set-variable
 
 $(BUILD_DIR)/DHE-Modules/src/%.cpp.o: DHE-Modules/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
