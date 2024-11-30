@@ -27,16 +27,6 @@ void refreshTheme();
 
 #include "nanovg.h"
 
-// fix bogaudio build, another missing symbol
-#ifndef NDEBUG
-namespace bogaudio {
-struct FollowerBase {
-    static float efGainMaxDecibelsDebug;
-};
-float FollowerBase::efGainMaxDecibelsDebug = 12.0f;
-}
-#endif
-
 // Special nvgRGB for blank panels
 extern "C" {
 NVGcolor nvgRGBblank(const unsigned char r, const unsigned char g, const unsigned char b)

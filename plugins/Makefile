@@ -595,6 +595,7 @@ BISET_CUSTOM = Blank ButtonTrigger Clock Tree TreeDisplay
 PLUGIN_FILES += $(filter-out BogaudioModules/src/bogaudio.cpp,$(wildcard BogaudioModules/src/*.cpp))
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/*.cpp)
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/filters/*.cpp)
+PLUGIN_FILES += BogaudioModules-helper/BogaudioModules-helper.cpp
 
 MINIPLUGIN_FILES += BogaudioModules/src/AD.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/LFO.cpp
@@ -631,10 +632,11 @@ MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/experiments.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/filter.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/multimode.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/resample.cpp
+MINIPLUGIN_FILES += BogaudioModules-helper/BogaudioModules-helper.cpp
 
 # modules/types which are present in other plugins
 BOGAUDIO_CUSTOM = ADSR BlueNoiseGenerator LFO Noise VCA VCO VCF
-BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
+BOGAUDIO_CUSTOM_PER_FILE = ARQuantity ARSlider AttackMenuItem ReleaseMenuItem
 
 # --------------------------------------------------------------
 # ChowDSP
@@ -2265,19 +2267,7 @@ $(BUILD_DIR)/Biset/src/%.cpp.o: Biset/src/%.cpp
 		$(foreach m,$(BISET_CUSTOM),$(call custom_module_names,$(m),Biset)) \
 		-DpluginInstance=pluginInstance__Biset
 
-$(BUILD_DIR)/BogaudioModules/src/follower_base.cpp.o: BogaudioModules/src/follower_base.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(BOGAUDIO_CUSTOM),$(call custom_module_names,$(m),Bogaudio)) \
-		-DpluginInstance=pluginInstance__BogaudioModules \
-		-DefGainMaxDecibels=efGainMaxDecibelsDebug \
-		-DRACK_SIMD=1 \
-		-DSKIP_MINGW_FORMAT \
-		-IBogaudioModules/lib \
-		-IBogaudioModules/src/dsp
-
-$(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
+$(BUILD_DIR)/BogaudioModules%.cpp.o: BogaudioModules%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
