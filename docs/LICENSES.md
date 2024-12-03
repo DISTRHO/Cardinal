@@ -71,6 +71,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | MSM                     | MIT                      | Repo's [LICENSE-dist.md](https://github.com/netboy3/MSM-vcvrack-plugin/issues/10) includes wrong information |
 | MUS-X                   | GPL-3.0-or-later         | |
 | Myth                    | GPL-3.0-or-later         | |
+| NocturnalEncoder        | BSD-3-Clause             | | 
 | Nonlinear Circuits      | CC0-1.0                  | |
 | Orbits                  | GPL-3.0-or-later         | |
 | Parable Instruments     | GPL-3.0-or-later         | |
