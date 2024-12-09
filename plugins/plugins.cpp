@@ -3150,6 +3150,7 @@ static void initStatic__Sapphire()
     const StaticPluginLoader spl(p, "Sapphire");
     if (spl.ok())
     {
+        p->addModel(modelSapphireChaops);
         p->addModel(modelSapphireElastika);
         p->addModel(modelSapphireFrolic);
         p->addModel(modelSapphireGalaxy);
