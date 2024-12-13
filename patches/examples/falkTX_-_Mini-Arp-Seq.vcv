@@ -1,0 +1,540 @@
+{
+  "version": "2.4.1",
+  "unsaved": true,
+  "zoom": 1.0,
+  "gridOffset": [
+    -4.1235675811767578,
+    -0.064504526555538177
+  ],
+  "modules": [
+    {
+      "id": 3781955267578472,
+      "plugin": "rcm",
+      "model": "rcm-pianoroll",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        },
+        {
+          "value": 0.0,
+          "id": 1
+        }
+      ],
+      "leftModuleId": 6820180775829814,
+      "data": {
+        "backgroundHue": 0.5,
+        "backgroundSaturation": 1.0,
+        "backgroundLuminosity": 0.25,
+        "patterns": [
+          {
+            "numberOfMeasures": 1,
+            "beatsPerMeasure": 4,
+            "divisionsPerBeat": 4,
+            "measures": [
+              {
+                "notes": [
+                  {
+                    "pitch": 43,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 45,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 43,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 47,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 45,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 50,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 45,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 48,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 43,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 45,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 43,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 40,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 45,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 50,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 45,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  },
+                  {
+                    "pitch": 40,
+                    "velocity": 0.75,
+                    "retrigger": true,
+                    "active": true
+                  }
+                ]
+              },
+              {
+                "notes": [
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  },
+                  {
+                    "pitch": 0,
+                    "velocity": 0.0,
+                    "retrigger": false,
+                    "active": false
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "currentPattern": 0,
+        "currentStep": 12,
+        "clockDelay": 0,
+        "sequenceRunning": true,
+        "lowestDisplayNote": 36,
+        "notesToShow": 18,
+        "currentMeasure": 0,
+        "driverMode": false
+      },
+      "pos": [
+        15,
+        0
+      ]
+    },
+    {
+      "id": 5726895899473528,
+      "plugin": "Fundamental",
+      "model": "ADSR",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.13614450395107269,
+          "id": 0
+        },
+        {
+          "value": 0.22289082407951355,
+          "id": 1
+        },
+        {
+          "value": 0.40602409839630127,
+          "id": 2
+        },
+        {
+          "value": 0.84699004888534546,
+          "id": 3
+        },
+        {
+          "value": 0.0,
+          "id": 4
+        },
+        {
+          "value": 0.0,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        },
+        {
+          "value": 0.0,
+          "id": 7
+        },
+        {
+          "value": 0.0,
+          "id": 8
+        }
+      ],
+      "leftModuleId": 5708118528523616,
+      "rightModuleId": 4828178296911509,
+      "pos": [
+        38,
+        1
+      ]
+    },
+    {
+      "id": 4849601226601697,
+      "plugin": "Fundamental",
+      "model": "LFO",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        },
+        {
+          "value": 0.0,
+          "id": 1
+        },
+        {
+          "value": 9.1108551025390625,
+          "id": 2
+        },
+        {
+          "value": 0.0,
+          "id": 3
+        },
+        {
+          "value": 0.0,
+          "id": 4
+        },
+        {
+          "value": 0.5,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        }
+      ],
+      "rightModuleId": 5708118528523616,
+      "pos": [
+        15,
+        1
+      ]
+    },
+    {
+      "id": 5708118528523616,
+      "plugin": "AudibleInstruments",
+      "model": "Rings",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        },
+        {
+          "value": 0.0,
+          "id": 1
+        },
+        {
+          "value": 30.0,
+          "id": 2
+        },
+        {
+          "value": 0.26506146788597107,
+          "id": 3
+        },
+        {
+          "value": 0.5,
+          "id": 4
+        },
+        {
+          "value": 0.5,
+          "id": 5
+        },
+        {
+          "value": 0.5,
+          "id": 6
+        },
+        {
+          "value": 0.0,
+          "id": 7
+        },
+        {
+          "value": 0.0,
+          "id": 8
+        },
+        {
+          "value": 0.0,
+          "id": 9
+        },
+        {
+          "value": 0.2293335497379303,
+          "id": 10
+        },
+        {
+          "value": 0.0,
+          "id": 11
+        }
+      ],
+      "leftModuleId": 4849601226601697,
+      "rightModuleId": 5726895899473528,
+      "data": {
+        "polyphony": 0,
+        "model": 0,
+        "easterEgg": false
+      },
+      "pos": [
+        24,
+        1
+      ]
+    },
+    {
+      "id": 4828178296911509,
+      "plugin": "Fundamental",
+      "model": "VCA-1",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        },
+        {
+          "value": 1.0,
+          "id": 1
+        }
+      ],
+      "leftModuleId": 5726895899473528,
+      "rightModuleId": 1,
+      "pos": [
+        47,
+        1
+      ]
+    },
+    {
+      "id": 1,
+      "plugin": "Cardinal",
+      "model": "HostAudio2",
+      "version": "2.0",
+      "params": [
+        {
+          "value": 0.79432821273803711,
+          "id": 0
+        }
+      ],
+      "leftModuleId": 4828178296911509,
+      "data": {
+        "dcFilter": true
+      },
+      "pos": [
+        50,
+        1
+      ]
+    },
+    {
+      "id": 6820180775829814,
+      "plugin": "Cardinal",
+      "model": "HostTime",
+      "version": "2.0",
+      "params": [],
+      "rightModuleId": 3781955267578472,
+      "pos": [
+        7,
+        0
+      ]
+    }
+  ],
+  "cables": [
+    {
+      "id": 3464471860196875,
+      "outputModuleId": 5726895899473528,
+      "outputId": 0,
+      "inputModuleId": 4828178296911509,
+      "inputId": 0,
+      "color": "#e8ff52"
+    },
+    {
+      "id": 739552540616113,
+      "outputModuleId": 4828178296911509,
+      "outputId": 0,
+      "inputModuleId": 1,
+      "inputId": 0,
+      "color": "#52beff"
+    },
+    {
+      "id": 5881920486582986,
+      "outputModuleId": 3781955267578472,
+      "outputId": 6,
+      "inputModuleId": 5726895899473528,
+      "inputId": 4,
+      "color": "#ff9352"
+    },
+    {
+      "id": 7657052036566932,
+      "outputModuleId": 3781955267578472,
+      "outputId": 7,
+      "inputModuleId": 5726895899473528,
+      "inputId": 5,
+      "color": "#ffd452"
+    },
+    {
+      "id": 3027399326509518,
+      "outputModuleId": 3781955267578472,
+      "outputId": 5,
+      "inputModuleId": 5708118528523616,
+      "inputId": 6,
+      "color": "#ff5252"
+    },
+    {
+      "id": 1398852441915612,
+      "outputModuleId": 5708118528523616,
+      "outputId": 0,
+      "inputModuleId": 4828178296911509,
+      "inputId": 1,
+      "color": "#a8ff52"
+    },
+    {
+      "id": 3464388186872028,
+      "outputModuleId": 4849601226601697,
+      "outputId": 0,
+      "inputModuleId": 5708118528523616,
+      "inputId": 3,
+      "color": "#e8ff52"
+    },
+    {
+      "id": 5512382435010554,
+      "outputModuleId": 6820180775829814,
+      "outputId": 4,
+      "inputModuleId": 4849601226601697,
+      "inputId": 4,
+      "color": "#ff5252"
+    },
+    {
+      "id": 1138454520134661,
+      "outputModuleId": 6820180775829814,
+      "outputId": 4,
+      "inputModuleId": 3781955267578472,
+      "inputId": 0,
+      "color": "#ff5252"
+    }
+  ]
+}
