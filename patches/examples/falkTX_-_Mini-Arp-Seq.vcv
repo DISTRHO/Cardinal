@@ -1,11 +1,6 @@
 {
   "version": "2.4.1",
-  "unsaved": true,
   "zoom": 1.0,
-  "gridOffset": [
-    -4.1235675811767578,
-    -0.064504526555538177
-  ],
   "modules": [
     {
       "id": 3781955267578472,
@@ -535,6 +530,14 @@
       "inputModuleId": 3781955267578472,
       "inputId": 0,
       "color": "#ff5252"
+    },
+    {
+      "id": 2498215696665084,
+      "outputModuleId": 6820180775829814,
+      "outputId": 1,
+      "inputModuleId": 3781955267578472,
+      "inputId": 2,
+      "color": "#527dff"
     }
   ]
 }
