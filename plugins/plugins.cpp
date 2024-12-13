@@ -1005,6 +1005,8 @@ std::string pluginPath(const std::string& dirname);
 
 namespace plugin {
 
+static uint32_t numPluginModules = 0;
+
 struct StaticPluginLoader {
     Plugin* const plugin;
     FILE* file;
@@ -1059,6 +1061,8 @@ struct StaticPluginLoader {
 
             json_decref(rootJ);
             plugins.push_back(plugin);
+
+            numPluginModules += plugin->models.size();
         }
 
         if (file != nullptr)
@@ -3597,6 +3601,9 @@ void initStaticPlugins()
     initStatic__WhatTheRack();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();
+
+    INFO("Have %u modules from %u plugin collections",
+         numPluginModules, static_cast<uint32_t>(plugins.size()));
 }
 
 void destroyStaticPlugins()
