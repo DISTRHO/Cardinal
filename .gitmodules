@@ -260,3 +260,6 @@
 [submodule "plugins/rcm-modules"]
 	path = plugins/rcm-modules
 	url = https://github.com/Rcomian/rcm-modules.git
+[submodule "plugins/admiral"]
+	path = plugins/admiral
+	url = https://github.com/wapiflapi/admiral.git

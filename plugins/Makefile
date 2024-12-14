@@ -347,6 +347,11 @@ PLUGIN_FILES += $(wildcard AaronStatic/src/*.cpp)
 AARONSTATIC_CUSTOM = RefreshCounter
 
 # --------------------------------------------------------------
+# Admiral
+
+PLUGIN_FILES += $(filter-out admiral/src/plugin.cpp,$(wildcard admiral/src/*.cpp))
+
+# --------------------------------------------------------------
 # AmalgamatedHarmonics
 
 PLUGIN_FILES += $(filter-out AmalgamatedHarmonics/src/AH.cpp,$(wildcard AmalgamatedHarmonics/src/*.cpp))
@@ -555,7 +560,10 @@ PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp Befaco/src/MidiThing.cpp,$(wi
 PLUGIN_FILES += $(wildcard Befaco/src/noise-plethora/*/*.cpp)
 
 # modules/types which are present in other plugins
-BEFACO_CUSTOM = ADSR Mixer chowdsp Burst
+BEFACO_CUSTOM = ADSR Mixer chowdsp Burst RecordButton
+
+BEFACO_FLAGS = $(filter-out -fsingle-precision-constant,$(filter-out -std=gnu++11,$(BUILD_CXX_FLAGS)))
+BEFACO_FLAGS += -std=gnu++17
 
 # --------------------------------------------------------------
 # Bidoo
@@ -587,6 +595,7 @@ BISET_CUSTOM = Blank ButtonTrigger Clock Tree TreeDisplay
 PLUGIN_FILES += $(filter-out BogaudioModules/src/bogaudio.cpp,$(wildcard BogaudioModules/src/*.cpp))
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/*.cpp)
 PLUGIN_FILES += $(wildcard BogaudioModules/src/dsp/filters/*.cpp)
+PLUGIN_FILES += BogaudioModules-helper/BogaudioModules-helper.cpp
 
 MINIPLUGIN_FILES += BogaudioModules/src/AD.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/LFO.cpp
@@ -623,10 +632,11 @@ MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/experiments.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/filter.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/multimode.cpp
 MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/resample.cpp
+MINIPLUGIN_FILES += BogaudioModules-helper/BogaudioModules-helper.cpp
 
 # modules/types which are present in other plugins
 BOGAUDIO_CUSTOM = ADSR BlueNoiseGenerator LFO Noise VCA VCO VCF
-BOGAUDIO_CUSTOM_PER_FILE = ARQuantity AttackMenuItem ReleaseMenuItem
+BOGAUDIO_CUSTOM_PER_FILE = ARQuantity ARSlider AttackMenuItem ReleaseMenuItem
 
 # --------------------------------------------------------------
 # ChowDSP
@@ -2135,6 +2145,13 @@ $(BUILD_DIR)/AaronStatic/%.cpp.o: AaronStatic/%.cpp
 		-DpluginInstance=pluginInstance__AaronStatic \
 		-Dinit=init__AaronStatic
 
+$(BUILD_DIR)/admiral/%.cpp.o: admiral/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ADMIRAL_CUSTOM),$(call custom_module_names,$(m),admiral)) \
+		-DpluginInstance=pluginInstance__admiral
+
 $(BUILD_DIR)/alefsbits/%.cpp.o: alefsbits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -2226,13 +2243,15 @@ $(BUILD_DIR)/BaconPlugs/%.cpp.o: BaconPlugs/%.cpp
 		-DDARK_BACON \
 		-IBaconPlugs/libs/midifile/include \
 		-IBaconPlugs/libs/open303-code/Source/DSPCode \
+		-IBaconPlugs/libs/sst/sst-basic-blocks/include \
+		-IBaconPlugs/libs/sst/sst-rackhelpers/include \
 		-Wno-array-bounds \
 		-Wno-strict-aliasing
 
 $(BUILD_DIR)/Befaco/%.cpp.o: Befaco/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(BEFACO_FLAGS) -c -o $@ \
 		$(foreach m,$(BEFACO_CUSTOM),$(call custom_module_names,$(m),Befaco)) \
 		-DpluginInstance=pluginInstance__Befaco
 
@@ -2256,19 +2275,7 @@ $(BUILD_DIR)/Biset/src/%.cpp.o: Biset/src/%.cpp
 		$(foreach m,$(BISET_CUSTOM),$(call custom_module_names,$(m),Biset)) \
 		-DpluginInstance=pluginInstance__Biset
 
-$(BUILD_DIR)/BogaudioModules/src/follower_base.cpp.o: BogaudioModules/src/follower_base.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(BOGAUDIO_CUSTOM),$(call custom_module_names,$(m),Bogaudio)) \
-		-DpluginInstance=pluginInstance__BogaudioModules \
-		-DefGainMaxDecibels=efGainMaxDecibelsDebug \
-		-DRACK_SIMD=1 \
-		-DSKIP_MINGW_FORMAT \
-		-IBogaudioModules/lib \
-		-IBogaudioModules/src/dsp
-
-$(BUILD_DIR)/BogaudioModules/%.cpp.o: BogaudioModules/%.cpp
+$(BUILD_DIR)/BogaudioModules%.cpp.o: BogaudioModules%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
@@ -2575,7 +2582,7 @@ $(BUILD_DIR)/LyraeModules/%.cpp.o: LyraeModules/%.cpp
 		$(foreach m,$(LYRAE_CUSTOM),$(call custom_module_names,$(m),Lyrae)) \
 		-DpluginInstance=pluginInstance__Lyrae
 
-$(BUILD_DIR)/Meander/src/Meander.cpp.o: Meander/src/Meander.cpp
+$(BUILD_DIR)/Meander/src/%.cpp.o: Meander/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \

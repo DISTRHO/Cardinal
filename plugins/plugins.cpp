@@ -27,6 +27,15 @@
 // Aaron Static
 #include "AaronStatic/src/plugin.hpp"
 
+// Admiral
+/* NOTE too much noise in original include, do this a different way
+// #include "admiral/src/plugin.hpp"
+*/
+extern Model* modelWatches;
+extern Model* modelShifts;
+extern Model* modelTables;
+extern Model* modelDivisions;
+
 // Alef's Bits
 #define modelSteps modelalefsbitsSteps
 #define modelLogic modelalefsbitsLogic
@@ -608,7 +617,9 @@ extern Model* modelZeta;
 #undef modelDelta
 
 // Meander
-extern int panelTheme;
+extern int Meander_panelTheme;
+extern int MSQ_panelTheme;
+extern int MSP_panelTheme;
 #include "Meander/src/plugin.hpp"
 
 // MindMeldModular
@@ -910,6 +921,7 @@ Plugin* pluginInstance__Fundamental;
 Plugin* pluginInstance__21kHz;
 Plugin* pluginInstance__8Mode;
 extern Plugin* pluginInstance__AaronStatic;
+Plugin* pluginInstance__admiral;
 Plugin* pluginInstance__alefsbits;
 Plugin* pluginInstance__Algoritmarte;
 Plugin* pluginInstance__AmalgamatedHarmonics;
@@ -997,6 +1009,8 @@ std::string pluginPath(const std::string& dirname);
 
 namespace plugin {
 
+static uint32_t numPluginModules = 0;
+
 struct StaticPluginLoader {
     Plugin* const plugin;
     FILE* file;
@@ -1051,6 +1065,8 @@ struct StaticPluginLoader {
 
             json_decref(rootJ);
             plugins.push_back(plugin);
+
+            numPluginModules += plugin->models.size();
         }
 
         if (file != nullptr)
@@ -1246,6 +1262,21 @@ static void initStatic__AaronStatic()
         p->addModel(modelScaleCV);
         p->addModel(modelRandomNoteCV);
         p->addModel(modelDiatonicCV);
+    }
+}
+
+static void initStatic__admiral()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__admiral = p;
+
+    const StaticPluginLoader spl(p, "admiral");
+    if (spl.ok())
+    {
+        p->addModel(modelWatches);
+        p->addModel(modelShifts);
+        p->addModel(modelTables);
+        p->addModel(modelDivisions);
     }
 }
 
@@ -1561,6 +1592,12 @@ static void initStatic__Bacon()
         p->addModel(modelPolyGenerator);
         p->addModel(modelLintBuddy);
         p->addModel(modelLuckyHold);
+        p->addModel(modelPatchNameDisplay);
+
+        // Used for testing or not practical
+        spl.removeModule("ContrastBNDEditor");
+        spl.removeModule("BaconTest");
+        spl.removeModule("PleaseQuit");
     }
 }
 
@@ -1599,6 +1636,8 @@ static void initStatic__Befaco()
         p->addModel(modelBurst);
         p->addModel(modelVoltio);
         p->addModel(modelOctaves);
+        p->addModel(modelBypass);
+        p->addModel(modelBandit);
 #undef modelADSR
 #undef modelMixer
 #undef modelBurst
@@ -1663,6 +1702,7 @@ static void initStatic__Bidoo()
         p->addModel(modelSIGMA);
         p->addModel(modelFLAME);
         p->addModel(modelVOID);
+        p->addModel(modelRATEAU);
 
         // NOTE disabled in Cardinal due to curl usage
         // p->addModel(modelANTN);
@@ -2118,6 +2158,7 @@ static void initStatic__EnigmaCurry()
       p->addModel(modelLatch);
       p->addModel(modelPulse);
       p->addModel(modelRange);
+      p->addModel(modelNegativeHarmony);
 #undef modelPulse
     }
 }
@@ -2476,6 +2517,7 @@ static void initStatic__JW()
     {
 #define modelQuantizer modelJWQuantizer
         p->addModel(modelAdd5);
+        p->addModel(modelAbcdSeq);
         p->addModel(modelBouncyBalls);
         p->addModel(modelCat);
         p->addModel(modelTree);
@@ -2503,6 +2545,7 @@ static void initStatic__JW()
         p->addModel(modelBlankPanelLarge);
         p->addModel(modelCoolBreeze);
         p->addModel(modelPete);
+        p->addModel(modelTimer);
        #ifndef STATIC_BUILD
         p->addModel(modelStr1ker);
        #else
@@ -2640,8 +2683,12 @@ static void initStatic__Meander()
     if (spl.ok())
     {
         // for dark theme
-        panelTheme = 1;
+        Meander_panelTheme = 1;
+        MSQ_panelTheme = 1;
+        MSP_panelTheme = 1;
         p->addModel(modelMeander);
+        p->addModel(modelModeScaleQuant);
+        p->addModel(modelModeScaleProgressions);
     }
 }
 
@@ -2933,6 +2980,7 @@ static void initStatic__nonlinearcircuits()
         p->addModel(modelSlothApathy);
         p->addModel(modelSlothInertia);
         p->addModel(modelSlothTorpor);
+        p->addModel(modelSplish);
         p->addModel(modelSquidAxon);
         p->addModel(modelStatues);
         p->addModel(modelTripleSloth);
@@ -3125,12 +3173,14 @@ static void initStatic__Sapphire()
     const StaticPluginLoader spl(p, "Sapphire");
     if (spl.ok())
     {
+        p->addModel(modelSapphireChaops);
         p->addModel(modelSapphireElastika);
         p->addModel(modelSapphireFrolic);
         p->addModel(modelSapphireGalaxy);
         p->addModel(modelSapphireGlee);
         p->addModel(modelSapphireGravy);
         p->addModel(modelSapphireHiss);
+        p->addModel(modelSapphireLark);
         p->addModel(modelSapphireMoots);
         p->addModel(modelSapphireNucleus);
         p->addModel(modelSapphirePivot);
@@ -3138,6 +3188,7 @@ static void initStatic__Sapphire()
         p->addModel(modelSapphirePop);
         p->addModel(modelSapphireRotini);
         p->addModel(modelSapphireSam);
+        p->addModel(modelSapphireSauce);
         p->addModel(modelSapphireTin);
         p->addModel(modelSapphireTout);
         p->addModel(modelSapphireTricorder);
@@ -3492,6 +3543,7 @@ void initStaticPlugins()
     initStatic__21kHz();
     initStatic__8Mode();
     initStatic__AaronStatic();
+    initStatic__admiral();
     initStatic__alefsbits();
     initStatic__Algoritmarte();
     initStatic__AmalgamatedHarmonics();
@@ -3569,6 +3621,9 @@ void initStaticPlugins()
     initStatic__WhatTheRack();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();
+
+    INFO("Have %u modules from %u plugin collections",
+         numPluginModules, static_cast<uint32_t>(plugins.size()));
 }
 
 void destroyStaticPlugins()
@@ -3593,7 +3648,9 @@ void updateStaticPluginsDarkMode()
     }
     // meander
     {
-        panelTheme = darkMode ? 1 : 0;
+        Meander_panelTheme = darkMode ? 1 : 0;
+        MSQ_panelTheme = darkMode ? 1 : 0;
+        MSP_panelTheme = darkMode ? 1 : 0;
     }
     // glue the giant
     {

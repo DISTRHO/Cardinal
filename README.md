@@ -122,6 +122,7 @@ At the moment the following 3rd-party modules are provided:
 - [21kHz](https://github.com/netboy3/21kHz-rack-plugins)
 - [8Mode](https://github.com/8Mode/8Mode-VCV_Modules)
 - [Aaron Static](https://github.com/aaronstatic/AaronStatic_modules)
+- [Admiral](https://github.com/wapiflapi/admiral)
 - [alef's bits](https://github.com/alefnull/alefsbits)
 - [AlgoritmArte](https://github.com/algoritmarte/AlgoritmarteVCVPlugin)
 - [Amalgamated Harmonics](https://github.com/jhoar/AmalgamatedHarmonics)
