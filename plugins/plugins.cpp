@@ -781,6 +781,12 @@ extern Model* modelBlankPanel;
 // Nonlinear Circuits
 #include "nonlinearcircuits/src/NLC.hpp"
 
+// OptikEcho
+/* Does not define the file in plugin.hpp
+// #include "OptikEcho/src/plugin.hpp"
+*/
+extern Model* modelInterferometer; 
+
 // Orbits
 #include "Orbits/src/plugin.hpp"
 
@@ -975,6 +981,7 @@ Plugin* pluginInstance__MSM;
 Plugin* pluginInstance__MUS_X;
 Plugin* pluginInstance__myth_modules;
 Plugin* pluginInstance__nonlinearcircuits;
+Plugin* pluginInstance__OptikEcho;
 Plugin* pluginInstance__Orbits;
 Plugin* pluginInstance__ParableInstruments;
 Plugin* pluginInstance__PathSet;
@@ -2976,6 +2983,18 @@ static void initStatic__nonlinearcircuits()
     }
 }
 
+static void initStatic__OptikEcho()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__OptikEcho = p;
+
+    const StaticPluginLoader spl(p, "OptikEcho");
+    if (spl.ok())
+    {
+        p->addModel(modelInterferometer);
+    }
+}
+
 static void initStatic__Orbits()
 {
     Plugin* const p = new Plugin;
@@ -3587,6 +3606,7 @@ void initStaticPlugins()
     initStatic__MUS_X();
     initStatic__myth_modules();
     initStatic__nonlinearcircuits();
+    initStatic__OptikEcho();
     initStatic__Orbits();
     initStatic__ParableInstruments();
     initStatic__PathSet();
