@@ -611,6 +611,8 @@ extern Model* modelDelta;
 extern Model* modelVega;
 extern Model* modelBD383238;
 extern Model* modelZeta;
+extern Model* modelSheliak;
+extern Model* modelBeta;
 #undef modelDelta
 
 // Meander
@@ -2655,6 +2657,8 @@ static void initStatic__Lyrae()
         p->addModel(modelVega);
         p->addModel(modelBD383238);
         p->addModel(modelZeta);
+        p->addModel(modelSheliak);
+        p->addModel(modelBeta);
 #undef modelDelta
     }
 }
