@@ -954,10 +954,6 @@ PLUGIN_FILES += $(filter-out myth-modules/src/plugin.cpp,$(wildcard myth-modules
 # Nonlinear Circuits
 
 PLUGIN_FILES += $(filter-out nonlinearcircuits/src/NLC.cpp,$(wildcard nonlinearcircuits/src/*.cpp))
-# --------------------------------------------------------------
-# OptikEcho
-
-PLUGIN_FILES += $(filter-out OptikEcho/src/plugin.cpp,$(wildcard OptikEcho/src/*.cpp))
 
 # --------------------------------------------------------------
 # Orbits
@@ -2658,13 +2654,6 @@ $(BUILD_DIR)/nonlinearcircuits/%.cpp.o: nonlinearcircuits/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(NONLINEARCIRCUITS_CUSTOM),$(call custom_module_names,$(m),nonlinearcircuits)) \
 		-DpluginInstance=pluginInstance__nonlinearcircuits
-
-$(BUILD_DIR)/OptikEcho/%.cpp.o: OptikEcho/%.cpp
-	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
-	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(OPTIKTCHO_CUSTOM),$(call custom_module_names,$(m),OptikEcho)) \
-		-DpluginInstance=pluginInstance__OptikEcho
 
 $(BUILD_DIR)/Orbits/%.cpp.o: Orbits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

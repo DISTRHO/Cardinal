@@ -261,6 +261,3 @@
 	path = plugins/admiral
 	url = https://github.com/wapiflapi/admiral.git
 
-[submodule "plugins/OptikEcho"]
-	path = plugins/OptikEcho
-	url = https://github.com/gregh3285/OptikEcho.git
