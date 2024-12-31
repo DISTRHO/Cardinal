@@ -1438,6 +1438,7 @@ endif
 
 clean:
 	rm -f *.a
+	rm -f plugin_objs_list.txt mini_plugin_objs_list.txt
 	rm -rf $(BUILD_DIR)
 	rm -rf surgext/build
 
@@ -2060,12 +2061,18 @@ custom_per_file_names = -D${1}=${2}_${1}
 plugins$(TARGET_SUFFIX).a: $(PLUGIN_OBJS)
 	@echo "Creating $@"
 	$(SILENT)rm -f $@
-	$(SILENT)$(AR) crs $@ $^
+	# Write object file list to a response file and use it in the `ar` command
+	# to avoid hitting stack limits when using large number of modules
+	$(SILENT)$(file > plugin_objs_list.txt,$(PLUGIN_OBJS))
+	$(SILENT)$(AR) crs $@ @plugin_objs_list.txt
+	$(SILENT)rm -f plugin_objs_list.txt
 
 plugins-mini$(TARGET_SUFFIX).a: $(MINIPLUGIN_OBJS)
 	@echo "Creating $@"
 	$(SILENT)rm -f $@
-	$(SILENT)$(AR) crs $@ $^
+	$(SILENT)$(file > mini_plugin_objs_list.txt,$(MINIPLUGIN_OBJS))
+	$(SILENT)$(AR) crs $@ @mini_plugin_objs_list.txt
+	$(SILENT)rm -f mini_plugin_objs_list.txt
 
 $(BUILD_DIR)/%.bin.c: % ../deps/res2c.py
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
