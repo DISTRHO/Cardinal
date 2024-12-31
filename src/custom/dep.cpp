@@ -285,11 +285,13 @@ static const struct {
     // GPL-3.0-or-later
     { kModeKocmoc, "/kocmoc/res/DDLY.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/LADR.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/uLADR.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/MUL.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/OP.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/PHASR.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/SKF.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/SVF.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/uSVF.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/TRG.svg", {}, -1 },
     // GPL-3.0-or-later
     { kModeMyth, "/myth-modules/res/Mavka.svg", {}, -1 },
