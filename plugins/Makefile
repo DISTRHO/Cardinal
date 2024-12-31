@@ -709,6 +709,9 @@ PLUGIN_FILES += $(filter-out eightfold/src/plugin.cpp,$(wildcard eightfold/src/*
 # modules/types which are present in other plugins
 EIGHTFOLD_CUSTOM = Comparator comparator
 
+EIGHTFOLD_FLAGS = $(filter-out -std=gnu++11,$(BUILD_CXX_FLAGS))
+EIGHTFOLD_FLAGS += -std=gnu++17
+
 # --------------------------------------------------------------
 # EnigmaCurry
 
@@ -2362,7 +2365,7 @@ $(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
 $(BUILD_DIR)/eightfold/src/%.cpp.o: eightfold/src/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
-	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+	$(SILENT)$(CXX) $< $(EIGHTFOLD_FLAGS) -c -o $@ \
 		$(foreach m,$(EIGHTFOLD_CUSTOM),$(call custom_module_names,$(m),eightfold)) \
 		-DpluginInstance=pluginInstance__eightfold
 
