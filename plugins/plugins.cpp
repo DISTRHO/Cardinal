@@ -2565,16 +2565,16 @@ static void initStatic__kocmoc()
     const StaticPluginLoader spl(p, "kocmoc");
     if (spl.ok())
     {
-	p->addModel(modelSVF_1);
-	p->addModel(modeluSVF);
-	p->addModel(modelTRG);
- 	p->addModel(modelLADR);
- 	p->addModel(modeluLADR);
-	p->addModel(modelOP);
-	p->addModel(modelPHASR);
-	p->addModel(modelMUL);
-	p->addModel(modelSKF);
-	p->addModel(modelDDLY);
+        p->addModel(modelSVF_1);
+        p->addModel(modeluSVF);
+        p->addModel(modelTRG);
+        p->addModel(modelLADR);
+        p->addModel(modeluLADR);
+        p->addModel(modelOP);
+        p->addModel(modelPHASR);
+        p->addModel(modelMUL);
+        p->addModel(modelSKF);
+        p->addModel(modelDDLY);
     }
 }
 
