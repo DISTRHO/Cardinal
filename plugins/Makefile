@@ -714,7 +714,7 @@ PLUGIN_FILES += $(filter-out eightfold/src/plugin.cpp,$(wildcard eightfold/src/*
 # modules/types which are present in other plugins
 EIGHTFOLD_CUSTOM = Comparator comparator
 
-# custom C++17 flags
+
 EIGHTFOLD_FLAGS = $(filter-out -std=gnu++11,$(BUILD_CXX_FLAGS))
 EIGHTFOLD_FLAGS += -std=gnu++17
 
