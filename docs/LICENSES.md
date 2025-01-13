@@ -179,7 +179,7 @@ Below is a list of artwork licenses from plugins
 | DHE-Modules/*                           | MIT              | Same license as source code |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
-| eightfold                               | GPL-3.0-or-later | No artwork specific license provided |
+| eightfold/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | EnigmaCurry/res/fonts/dseg/*            | OFL-1.1-RFN      | |
 | EnigmaCurry/res/fonts/Fantasque/*       | OFL-1.1          | |
 | EnigmaCurry/res/fonts/manrope/*         | OFL-1.1          | |
