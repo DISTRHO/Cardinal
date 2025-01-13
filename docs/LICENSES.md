@@ -232,6 +232,7 @@ Below is a list of artwork licenses from plugins
 | MSM/Fonts/Sudo.ttf                      | OFL-1.1-no-RFN   | |
 | MUS-X/*                                 | GPL-3.0-or-later | No artwork specific license provided |
 | Myth/*                                  | GPL-3.0-or-later | No artwork specific license provided |
+| NocturnalEncoder/*                      | BSD-3-Clause     | No artwork specific license provided | 
 | nonlinearcircuits/*                     | CC0-1.0          | No artwork specific license provided |
 | nonlinearcircuits/Audiowide-Regular.ttf | OFL-1.1-RFN      | |
 | Orbits/*                                | CC-BY-NC-ND-4.0  | |
