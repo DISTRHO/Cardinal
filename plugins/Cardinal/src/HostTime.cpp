@@ -40,11 +40,18 @@ struct HostTime : TerminalModule {
         kHostTimeCount
     };
 
+    enum BarDivisions {
+        Bars1 = 1,
+        Bars4 = 4,
+        Bars8 = 8
+    };
+
     const CardinalPluginContext* const pcontext;
 
     rack::dsp::PulseGenerator pulseReset, pulseBar, pulseBeat, pulseClock;
     float sampleTime = 0.0f;
     uint32_t lastProcessCounter = 0;
+    BarDivisions barDivision = Bars1;
     // cached time values
     struct {
         bool reset = true;
@@ -122,7 +129,9 @@ struct HostTime : TerminalModule {
                 {
                     timeInfo.beat = 1;
                     ++timeInfo.bar;
-                    pulseBar.trigger();
+
+                    if (timeInfo.bar % barDivision == 1)
+                        pulseBar.trigger();
                 }
             }
 
@@ -148,7 +157,8 @@ struct HostTime : TerminalModule {
                               ? tick / pcontext->ticksPerBeat
                               : 0.0f;
         const float barPhase = playingWithBBT && pcontext->beatsPerBar > 0
-                              ? ((float) (timeInfo.beat - 1) + beatPhase) / pcontext->beatsPerBar
+                              ? ((timeInfo.bar - 1) % barDivision) / (float) barDivision
+                                     + ((tick / pcontext->ticksPerBeat) / pcontext->beatsPerBar)
                               : 0.0f;
 
         lights[kHostTimeRolling].setBrightness(playing ? 1.0f : 0.0f);
@@ -165,11 +175,25 @@ struct HostTime : TerminalModule {
         outputs[kHostTimeBeat].setVoltage(hasBeat ? 10.0f : 0.0f);
         outputs[kHostTimeClock].setVoltage(hasClock ? 10.0f : 0.0f);
         outputs[kHostTimeBarPhase].setVoltage(barPhase * 10.0f);
-        outputs[kHostTimeBeatPhase].setVoltage(beatPhase * 10.0f);
+        outputs[kHostTimeBeatPhase].setVoltage((tick / pcontext->ticksPerBeat) * 10.0f);
     }
 
     void processTerminalOutput(const ProcessArgs&) override
     {}
+
+    json_t* dataToJson() override {
+        json_t* rootJ = json_object();
+        json_object_set_new(rootJ, "barDivision", json_integer(barDivision));
+        return rootJ;
+    }
+
+    void dataFromJson(json_t* rootJ) override {
+        if (json_t* bdJ = json_object_get(rootJ, "barDivision")) {
+            int value = json_integer_value(bdJ);
+            if (value == Bars1 || value == Bars4 || value == Bars8)
+                barDivision = static_cast<BarDivisions>(value);
+        }
+    }
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -285,6 +309,22 @@ struct HostTimeWidget : ModuleWidgetWith8HP {
         }
 
         ModuleWidget::drawLayer(args, layer);
+    }
+
+    void appendContextMenu(Menu* menu) override {
+        struct BarDivisionItem : MenuItem {
+            HostTime* module;
+            HostTime::BarDivisions value;
+            void onAction(const event::Action& e) override {
+                module->barDivision = value;
+            }
+        };
+
+        menu->addChild(new MenuSeparator);
+        menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Bar Division"));
+        menu->addChild(construct<BarDivisionItem>(&BarDivisionItem::text, "Bars/1", &BarDivisionItem::module, module, &BarDivisionItem::value, HostTime::Bars1));
+        menu->addChild(construct<BarDivisionItem>(&BarDivisionItem::text, "Bars/4", &BarDivisionItem::module, module, &BarDivisionItem::value, HostTime::Bars4));
+        menu->addChild(construct<BarDivisionItem>(&BarDivisionItem::text, "Bars/8", &BarDivisionItem::module, module, &BarDivisionItem::value, HostTime::Bars8));
     }
 };
 #else
