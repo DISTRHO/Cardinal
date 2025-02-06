@@ -157,10 +157,10 @@ struct HostTime : TerminalModule {
                               ? tick / pcontext->ticksPerBeat
                               : 0.0f;
         const float barPhase = playingWithBBT && pcontext->beatsPerBar > 0
-                              ? ((timeInfo.bar - 1) % barDivision) / (float) barDivision
-                                     + ((tick / pcontext->ticksPerBeat) / pcontext->beatsPerBar)
+                              ? ((float)((timeInfo.bar - 1) % barDivision) + (timeInfo.beat - 1) + beatPhase)
+                              / (pcontext->beatsPerBar * barDivision)
                               : 0.0f;
-
+        
         lights[kHostTimeRolling].setBrightness(playing ? 1.0f : 0.0f);
         lights[kHostTimeReset].setBrightnessSmooth(hasReset ? 1.0f : 0.0f, args.sampleTime * 0.5f);
         lights[kHostTimeBar].setBrightnessSmooth(hasBar ? 1.0f : 0.0f, args.sampleTime * 0.5f);
