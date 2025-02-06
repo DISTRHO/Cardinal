@@ -175,7 +175,7 @@ struct HostTime : TerminalModule {
         outputs[kHostTimeBeat].setVoltage(hasBeat ? 10.0f : 0.0f);
         outputs[kHostTimeClock].setVoltage(hasClock ? 10.0f : 0.0f);
         outputs[kHostTimeBarPhase].setVoltage(barPhase * 10.0f);
-        outputs[kHostTimeBeatPhase].setVoltage((tick / pcontext->ticksPerBeat) * 10.0f);
+        outputs[kHostTimeBeatPhase].setVoltage(beatPhase * 10.0f);
     }
 
     void processTerminalOutput(const ProcessArgs&) override
