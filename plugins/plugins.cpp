@@ -450,6 +450,7 @@ void saveGtgPluginDefault(const char*, int) {}
 extern Model* modelTwoToFour;
 extern Model* modelAnalogToDigital;
 extern Model* modelASR;
+extern Model* modelBinaryCounter;
 extern Model* modelBinaryGate;
 extern Model* modelBinaryNoise;
 extern Model* modelBitshift;
@@ -2383,6 +2384,7 @@ static void initStatic__HetrickCV()
         p->addModel(modelTwoToFour);
         p->addModel(modelAnalogToDigital);
         p->addModel(modelASR);
+        p->addModel(modelBinaryCounter);
         p->addModel(modelBinaryGate);
         p->addModel(modelBinaryNoise);
         p->addModel(modelBitshift);

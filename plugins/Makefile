@@ -1446,6 +1446,7 @@ clean:
 PLUGIN_LIST = $(subst /plugin.json,,$(wildcard */plugin.json))
 
 UNWANTED_FILES  = HetrickCV/res/illustrator - deprecated/MyModule.svg
+UNWANTED_FILES += $(wildcard "HetrickCV/res/affinity redo/*")
 UNWANTED_FILES += $(wildcard Meander/res/*)
 UNWANTED_FILES += $(wildcard Mog/res/*)
 UNWANTED_FILES += $(wildcard Mog/res/*/*)
