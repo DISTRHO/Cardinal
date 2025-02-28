@@ -3174,6 +3174,7 @@ static void initStatic__Sapphire()
     {
         p->addModel(modelSapphireChaops);
         p->addModel(modelSapphireElastika);
+        p->addModel(modelSapphireEnv);
         p->addModel(modelSapphireFrolic);
         p->addModel(modelSapphireGalaxy);
         p->addModel(modelSapphireGlee);
