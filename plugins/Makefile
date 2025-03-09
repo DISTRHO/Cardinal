@@ -560,7 +560,7 @@ PLUGIN_FILES += $(filter-out Befaco/src/plugin.cpp Befaco/src/MidiThing.cpp,$(wi
 PLUGIN_FILES += $(wildcard Befaco/src/noise-plethora/*/*.cpp)
 
 # modules/types which are present in other plugins
-BEFACO_CUSTOM = ADSR Mixer chowdsp Burst RecordButton
+BEFACO_CUSTOM = ADSR Mixer chowdsp Burst RecordButton Mixer2 Slew
 
 BEFACO_FLAGS = $(filter-out -fsingle-precision-constant,$(filter-out -std=gnu++11,$(BUILD_CXX_FLAGS)))
 BEFACO_FLAGS += -std=gnu++17

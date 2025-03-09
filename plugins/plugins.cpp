@@ -147,10 +147,14 @@ extern Model* modelChord;
 #define modelADSR modelBefacoADSR
 #define modelMixer modelBefacoMixer
 #define modelBurst modelBefacoBurst
+#define modelMixer2 modelBefacoMixer2
+#define modelSlew modelBefacoSlew
 #include "Befaco/src/plugin.hpp"
 #undef modelADSR
 #undef modelMixer
 #undef modelBurst
+#undef modelMixer2
+#undef modelSlew
 
 // Bidoo
 #include "Bidoo/src/plugin.hpp"
@@ -1614,6 +1618,8 @@ static void initStatic__Befaco()
 #define modelADSR modelBefacoADSR
 #define modelMixer modelBefacoMixer
 #define modelBurst modelBefacoBurst
+#define modelMixer2 modelBefacoMixer2
+#define modelSlew modelBefacoSlew
         p->addModel(modelEvenVCO);
         p->addModel(modelRampage);
         p->addModel(modelABC);
@@ -1640,9 +1646,16 @@ static void initStatic__Befaco()
         p->addModel(modelOctaves);
         p->addModel(modelBypass);
         p->addModel(modelBandit);
+        p->addModel(modelAtte);
+        p->addModel(modelAxBC);
+        p->addModel(modelMixer2);
+        p->addModel(modelMuDi);
+        p->addModel(modelSlew);
 #undef modelADSR
 #undef modelMixer
 #undef modelBurst
+#undef modelMixer2
+#undef modelSlew
 
         // NOTE disabled in Cardinal due to MIDI usage
         spl.removeModule("MidiThingV2");
@@ -2044,7 +2057,7 @@ static void initStatic__CVfunk()
         p->addModel(modelStepWave);
         p->addModel(modelPreeeeeeeeeeessedDuck);
         p->addModel(modelArrange);
-        p->addModel(modelTriDelay);            
+        p->addModel(modelTriDelay);
         #undef modelSteps
     }
 }
