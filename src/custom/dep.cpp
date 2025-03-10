@@ -435,6 +435,11 @@ static const struct {
     { kModeBefaco, "/Befaco/res/panels/Octaves.svg" },
     { kModeBefaco, "/Befaco/res/panels/Bypass.svg" },
     { kModeBefaco, "/Befaco/res/panels/Bandit.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Atte.svg" },
+    { kModeBefaco, "/Befaco/res/panels/AxBC.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Mixer2.svg" },
+    { kModeBefaco, "/Befaco/res/panels/MuDi.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Slew.svg" },
     // GPLv3+
     { kModeCardinal, "/Cardinal/res/AudioFile.svg" },
     { kModeCardinal, "/Cardinal/res/AudioToCVPitch.svg" },
