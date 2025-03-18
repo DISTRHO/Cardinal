@@ -786,6 +786,9 @@ extern Model* modelBlankPanel;
 // myth-modules
 #include "myth-modules/src/plugin.hpp"
 
+// Nocturnal Encoder
+#include "NocturnalEncoder/src/plugin.hpp"
+
 // Nonlinear Circuits
 #include "nonlinearcircuits/src/NLC.hpp"
 
@@ -982,6 +985,7 @@ extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__MSM;
 Plugin* pluginInstance__MUS_X;
 Plugin* pluginInstance__myth_modules;
+Plugin* pluginInstance__NocturnalEncoder;
 Plugin* pluginInstance__nonlinearcircuits;
 Plugin* pluginInstance__Orbits;
 Plugin* pluginInstance__ParableInstruments;
@@ -2969,6 +2973,18 @@ static void initStatic__myth_modules()
     }
 }
 
+static void initStatic__NocturnalEncoder()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__NocturnalEncoder = p;
+
+    const StaticPluginLoader spl(p, "NocturnalEncoder");
+    if (spl.ok())
+    {
+        p->addModel(modelAMDecoder);
+        p->addModel(modelAMEncoder);
+    }
+}
 static void initStatic__nonlinearcircuits()
 {
     Plugin* const p = new Plugin;
@@ -3610,6 +3626,7 @@ void initStaticPlugins()
     initStatic__MSM();
     initStatic__MUS_X();
     initStatic__myth_modules();
+    initStatic__NocturnalEncoder();
     initStatic__nonlinearcircuits();
     initStatic__Orbits();
     initStatic__ParableInstruments();
