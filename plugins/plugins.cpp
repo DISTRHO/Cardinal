@@ -604,6 +604,9 @@ extern Model* modelDriftgen;
 extern Model* modelLooperOne;
 extern Model* modelLooperTwo;
 
+// LOGinstruments
+#include "LOGinstruments/src/LOGinstruments.hpp"
+
 // LomasModules
 #include "LomasModules/src/plugin.hpp"
 #undef DR_WAV_IMPLEMENTATION
@@ -971,6 +974,7 @@ Plugin* pluginInstance__kocmoc;
 Plugin* pluginInstance__LifeFormModular;
 Plugin* pluginInstance__LilacLoop;
 Plugin* pluginInstance__LittleUtils;
+Plugin* pluginInstance__LOGinstruments;
 Plugin* pluginInstance__Lomas;
 Plugin* pluginInstance__Lyrae;
 Plugin* pluginInstance__Meander;
@@ -2652,6 +2656,21 @@ static void initStatic__LittleUtils()
     }
 }
 
+static void initStatic__LOGinstruments()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__LOGinstruments = p;
+
+    const StaticPluginLoader spl(p, "LOGinstruments");
+    if (spl.ok())
+    {
+        p->addModel(modelSpeck);
+		p->addModel(modelLessMess);
+		p->addModel(modelVelvet);
+		p->addModel(modelCrystal);
+    }
+}
+
 static void initStatic__Lomas()
 {
     Plugin* const p = new Plugin;
@@ -3599,6 +3618,7 @@ void initStaticPlugins()
     initStatic__LifeFormModular();
     initStatic__LilacLoop();
     initStatic__LittleUtils();
+    initStatic__LOGinstruments();
     initStatic__Lomas();
     initStatic__Lyrae();
     initStatic__Meander();
