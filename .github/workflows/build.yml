@@ -583,8 +583,8 @@ jobs:
       - name: Set up dependencies
         run: |
           # custom repos
-          wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_11.1.0_all.deb
-          sudo dpkg -i kxstudio-repos_11.1.0_all.deb
+          wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_11.2.0_all.deb
+          sudo dpkg -i kxstudio-repos_11.2.0_all.deb
           sudo apt-get update -qq
           # build-deps
           sudo apt-get install -yqq libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
