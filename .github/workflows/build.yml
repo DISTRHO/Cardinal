@@ -157,7 +157,7 @@ jobs:
             *.tar.xz
 
   macos:
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
         with:
@@ -179,11 +179,11 @@ jobs:
           key: macos-universal-v${{ env.CACHE_VERSION }}
       - name: Setup dependencies
         run: |
-          ./deps/PawPaw/.github/workflows/bootstrap-deps.sh macos-universal-10.15
+          ./deps/PawPaw/.github/workflows/bootstrap-deps.sh macos-universal-14
       - name: Build extra dependencies
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          ./deps/PawPaw/bootstrap-cardinal.sh macos-universal-10.15 && ./deps/PawPaw/.cleanup.sh macos-universal-10.15
+          ./deps/PawPaw/bootstrap-cardinal.sh macos-universal-14 && ./deps/PawPaw/.cleanup.sh macos-universal-14
       - name: Set up ccache
         if: steps.cache.outputs.cache-hit == 'true'
         uses: hendrikmuhs/ccache-action@v1.2
@@ -194,14 +194,14 @@ jobs:
         shell: bash
         run: |
           export PATH="/usr/local/opt/ccache/libexec:${PATH}"
-          source deps/PawPaw/local.env macos-universal-10.15
+          source deps/PawPaw/local.env macos-universal-14
           make features
           make NOOPT=true ${MAKE_ARGS} -j $(sysctl -n hw.logicalcpu)
       - name: Build macOS (packaging)
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
         run: |
-          source deps/PawPaw/local.env macos-universal-10.15
+          source deps/PawPaw/local.env macos-universal-14
           ./utils/create-macos-installer.sh
       - name: Set sha8 (non-release)
         if: startsWith(github.ref, 'refs/tags/') != true
