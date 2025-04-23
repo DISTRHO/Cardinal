@@ -23,7 +23,7 @@ jobs:
         target: [aarch64, armhf, i686, riscv64, x86_64]
     runs-on: ubuntu-latest
     container:
-      image: ubuntu:20.04
+      image: ubuntu:24.04
     steps:
       - name: Install git
         run: |
@@ -125,7 +125,7 @@ jobs:
             *.tar.gz
 
   linux-x86_64-debug:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -239,7 +239,7 @@ jobs:
             target: modduox-static
           - name: moddwarf
             target: moddwarf
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -471,7 +471,7 @@ jobs:
             Cardinal-*.zip
 
   headless:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -488,7 +488,7 @@ jobs:
           make HEADLESS=true -j $(nproc)
 
   lto:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -505,7 +505,7 @@ jobs:
           make WITH_LTO=true -j $(nproc) native
 
   sysdeps:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -521,7 +521,7 @@ jobs:
           make SYSDEPS=true -j $(nproc)
 
   source-tarball:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -561,7 +561,7 @@ jobs:
             /home/runner/*/*/cardinal*.tar.xz
 
   plugin-validation:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
