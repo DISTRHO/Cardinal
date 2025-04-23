@@ -254,7 +254,7 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python python-is-python3 libtool-bin liblo-dev qemu-user-static
+          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python3 libtool-bin liblo-dev qemu-user-static
           sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
           sudo apt-get clean
       - name: Bootstrap toolchain
