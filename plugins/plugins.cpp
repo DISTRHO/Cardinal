@@ -147,10 +147,14 @@ extern Model* modelChord;
 #define modelADSR modelBefacoADSR
 #define modelMixer modelBefacoMixer
 #define modelBurst modelBefacoBurst
+#define modelMixer2 modelBefacoMixer2
+#define modelSlew modelBefacoSlew
 #include "Befaco/src/plugin.hpp"
 #undef modelADSR
 #undef modelMixer
 #undef modelBurst
+#undef modelMixer2
+#undef modelSlew
 
 // Bidoo
 #include "Bidoo/src/plugin.hpp"
@@ -484,6 +488,7 @@ extern Model* modelPhasorAnalyzer;
 extern Model* modelPhasorBurstGen;
 extern Model* modelPhasorDivMult;
 extern Model* modelPhasorEuclidean;
+extern Model* modelPhasorFreezer;
 extern Model* modelPhasorGates;
 extern Model* modelPhasorGates32;
 extern Model* modelPhasorGates64;
@@ -492,6 +497,7 @@ extern Model* modelPhasorGeometry;
 extern Model* modelPhasorHumanizer;
 extern Model* modelPhasorMixer;
 extern Model* modelPhasorOctature;
+extern Model* modelPhasorProbability;
 extern Model* modelPhasorQuadrature;
 extern Model* modelPhasorRandom;
 extern Model* modelPhasorRanger;
@@ -499,6 +505,7 @@ extern Model* modelPhasorReset;
 extern Model* modelPhasorRhythmGroup;
 extern Model* modelPhasorShape;
 extern Model* modelPhasorShift;
+extern Model* modelPhasorSplitter;
 extern Model* modelPhasorStutter;
 extern Model* modelPhasorSubstepShape;
 extern Model* modelPhasorSwing;
@@ -511,6 +518,7 @@ extern Model* modelRandomGates;
 extern Model* modelRotator;
 extern Model* modelRungler;
 extern Model* modelScanner;
+extern Model* modelTrigShaper;
 extern Model* modelVectorMix;
 extern Model* modelWaveshape;
 extern Model* modelXYToPolar;
@@ -611,10 +619,14 @@ extern Model* modelDelta;
 extern Model* modelVega;
 extern Model* modelBD383238;
 extern Model* modelZeta;
+extern Model* modelSheliak;
+extern Model* modelBeta;
 #undef modelDelta
 
 // Meander
-extern int panelTheme;
+extern int Meander_panelTheme;
+extern int MSQ_panelTheme;
+extern int MSP_panelTheme;
 #include "Meander/src/plugin.hpp"
 
 // MindMeldModular
@@ -1003,6 +1015,8 @@ std::string pluginPath(const std::string& dirname);
 
 namespace plugin {
 
+static uint32_t numPluginModules = 0;
+
 struct StaticPluginLoader {
     Plugin* const plugin;
     FILE* file;
@@ -1057,6 +1071,8 @@ struct StaticPluginLoader {
 
             json_decref(rootJ);
             plugins.push_back(plugin);
+
+            numPluginModules += plugin->models.size();
         }
 
         if (file != nullptr)
@@ -1582,6 +1598,12 @@ static void initStatic__Bacon()
         p->addModel(modelPolyGenerator);
         p->addModel(modelLintBuddy);
         p->addModel(modelLuckyHold);
+        p->addModel(modelPatchNameDisplay);
+
+        // Used for testing or not practical
+        spl.removeModule("ContrastBNDEditor");
+        spl.removeModule("BaconTest");
+        spl.removeModule("PleaseQuit");
     }
 }
 
@@ -1596,6 +1618,8 @@ static void initStatic__Befaco()
 #define modelADSR modelBefacoADSR
 #define modelMixer modelBefacoMixer
 #define modelBurst modelBefacoBurst
+#define modelMixer2 modelBefacoMixer2
+#define modelSlew modelBefacoSlew
         p->addModel(modelEvenVCO);
         p->addModel(modelRampage);
         p->addModel(modelABC);
@@ -1620,9 +1644,18 @@ static void initStatic__Befaco()
         p->addModel(modelBurst);
         p->addModel(modelVoltio);
         p->addModel(modelOctaves);
+        p->addModel(modelBypass);
+        p->addModel(modelBandit);
+        p->addModel(modelAtte);
+        p->addModel(modelAxBC);
+        p->addModel(modelMixer2);
+        p->addModel(modelMuDi);
+        p->addModel(modelSlew);
 #undef modelADSR
 #undef modelMixer
 #undef modelBurst
+#undef modelMixer2
+#undef modelSlew
 
         // NOTE disabled in Cardinal due to MIDI usage
         spl.removeModule("MidiThingV2");
@@ -1684,6 +1717,7 @@ static void initStatic__Bidoo()
         p->addModel(modelSIGMA);
         p->addModel(modelFLAME);
         p->addModel(modelVOID);
+        p->addModel(modelRATEAU);
 
         // NOTE disabled in Cardinal due to curl usage
         // p->addModel(modelANTN);
@@ -2002,25 +2036,29 @@ static void initStatic__CVfunk()
     const StaticPluginLoader spl(p, "CVfunk");
     if (spl.ok())
     {
-#define modelSteps modelCVfunkSteps
-		p->addModel(modelSteps);
-		p->addModel(modelEnvelopeArray);
-		p->addModel(modelPentaSequencer);
-		p->addModel(modelImpulseController);
-		p->addModel(modelSignals);
-		p->addModel(modelRanges);
-		p->addModel(modelHexMod);
-		p->addModel(modelCollatz);
-		p->addModel(modelStrings);
-		p->addModel(modelMagnets);
-		p->addModel(modelOuros);
-		p->addModel(modelPressedDuck);
-		p->addModel(modelFlowerPatch);
-		p->addModel(modelSyncro);
-		p->addModel(modelNona);
-		p->addModel(modelDecima);
-		p->addModel(modelMorta);
-#undef modelSteps
+        #define modelSteps modelCVfunkSteps
+        p->addModel(modelSteps);
+        p->addModel(modelEnvelopeArray);
+        p->addModel(modelPentaSequencer);
+        p->addModel(modelImpulseController);
+        p->addModel(modelSignals);
+        p->addModel(modelRanges);
+        p->addModel(modelHexMod);
+        p->addModel(modelCollatz);
+        p->addModel(modelStrings);
+        p->addModel(modelMagnets);
+        p->addModel(modelOuros);
+        p->addModel(modelPressedDuck);
+        p->addModel(modelFlowerPatch);
+        p->addModel(modelSyncro);
+        p->addModel(modelNona);
+        p->addModel(modelDecima);
+        p->addModel(modelMorta);
+        p->addModel(modelStepWave);
+        p->addModel(modelPreeeeeeeeeeessedDuck);
+        p->addModel(modelArrange);
+        p->addModel(modelTriDelay);
+        #undef modelSteps
     }
 }
 
@@ -2139,6 +2177,7 @@ static void initStatic__EnigmaCurry()
       p->addModel(modelLatch);
       p->addModel(modelPulse);
       p->addModel(modelRange);
+      p->addModel(modelNegativeHarmony);
 #undef modelPulse
     }
 }
@@ -2391,6 +2430,7 @@ static void initStatic__HetrickCV()
         p->addModel(modelPhasorBurstGen);
         p->addModel(modelPhasorDivMult);
         p->addModel(modelPhasorEuclidean);
+        p->addModel(modelPhasorFreezer);
         p->addModel(modelPhasorGates);
         p->addModel(modelPhasorGates32);
         p->addModel(modelPhasorGates64);
@@ -2399,6 +2439,7 @@ static void initStatic__HetrickCV()
         p->addModel(modelPhasorHumanizer);
         p->addModel(modelPhasorMixer);
         p->addModel(modelPhasorOctature);
+        p->addModel(modelPhasorProbability);
         p->addModel(modelPhasorQuadrature);
         p->addModel(modelPhasorRandom);
         p->addModel(modelPhasorRanger);
@@ -2406,6 +2447,7 @@ static void initStatic__HetrickCV()
         p->addModel(modelPhasorRhythmGroup);
         p->addModel(modelPhasorShape);
         p->addModel(modelPhasorShift);
+        p->addModel(modelPhasorSplitter);
         p->addModel(modelPhasorStutter);
         p->addModel(modelPhasorSubstepShape);
         p->addModel(modelPhasorSwing);
@@ -2418,6 +2460,7 @@ static void initStatic__HetrickCV()
         p->addModel(modelRotator);
         p->addModel(modelRungler);
         p->addModel(modelScanner);
+        p->addModel(modelTrigShaper);
         p->addModel(modelVectorMix);
         p->addModel(modelWaveshape);
         p->addModel(modelXYToPolar);
@@ -2497,6 +2540,7 @@ static void initStatic__JW()
     {
 #define modelQuantizer modelJWQuantizer
         p->addModel(modelAdd5);
+        p->addModel(modelAbcdSeq);
         p->addModel(modelBouncyBalls);
         p->addModel(modelCat);
         p->addModel(modelTree);
@@ -2524,6 +2568,7 @@ static void initStatic__JW()
         p->addModel(modelBlankPanelLarge);
         p->addModel(modelCoolBreeze);
         p->addModel(modelPete);
+        p->addModel(modelTimer);
        #ifndef STATIC_BUILD
         p->addModel(modelStr1ker);
        #else
@@ -2542,8 +2587,10 @@ static void initStatic__kocmoc()
     if (spl.ok())
     {
         p->addModel(modelSVF_1);
+        p->addModel(modeluSVF);
         p->addModel(modelTRG);
         p->addModel(modelLADR);
+        p->addModel(modeluLADR);
         p->addModel(modelOP);
         p->addModel(modelPHASR);
         p->addModel(modelMUL);
@@ -2633,6 +2680,8 @@ static void initStatic__Lyrae()
         p->addModel(modelVega);
         p->addModel(modelBD383238);
         p->addModel(modelZeta);
+        p->addModel(modelSheliak);
+        p->addModel(modelBeta);
 #undef modelDelta
     }
 }
@@ -2646,8 +2695,12 @@ static void initStatic__Meander()
     if (spl.ok())
     {
         // for dark theme
-        panelTheme = 1;
+        Meander_panelTheme = 1;
+        MSQ_panelTheme = 1;
+        MSP_panelTheme = 1;
         p->addModel(modelMeander);
+        p->addModel(modelModeScaleQuant);
+        p->addModel(modelModeScaleProgressions);
     }
 }
 
@@ -2939,6 +2992,7 @@ static void initStatic__nonlinearcircuits()
         p->addModel(modelSlothApathy);
         p->addModel(modelSlothInertia);
         p->addModel(modelSlothTorpor);
+        p->addModel(modelSplish);
         p->addModel(modelSquidAxon);
         p->addModel(modelStatues);
         p->addModel(modelTripleSloth);
@@ -3131,7 +3185,9 @@ static void initStatic__Sapphire()
     const StaticPluginLoader spl(p, "Sapphire");
     if (spl.ok())
     {
+        p->addModel(modelSapphireChaops);
         p->addModel(modelSapphireElastika);
+        p->addModel(modelSapphireEnv);
         p->addModel(modelSapphireFrolic);
         p->addModel(modelSapphireGalaxy);
         p->addModel(modelSapphireGlee);
@@ -3578,6 +3634,9 @@ void initStaticPlugins()
     initStatic__WhatTheRack();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();
+
+    INFO("Have %u modules from %u plugin collections",
+         numPluginModules, static_cast<uint32_t>(plugins.size()));
 }
 
 void destroyStaticPlugins()
@@ -3602,7 +3661,9 @@ void updateStaticPluginsDarkMode()
     }
     // meander
     {
-        panelTheme = darkMode ? 1 : 0;
+        Meander_panelTheme = darkMode ? 1 : 0;
+        MSQ_panelTheme = darkMode ? 1 : 0;
+        MSP_panelTheme = darkMode ? 1 : 0;
     }
     // glue the giant
     {
