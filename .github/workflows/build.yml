@@ -228,10 +228,12 @@ jobs:
           files: |
             ${{ github.event.repository.name }}-*.pkg
 
-  modaudio:
+  mod-plugin-builder:
     strategy:
       matrix:
         include:
+          - name: darkglass-anagram
+            target: darkglass-anagram
           - name: modduo
             target: modduo-static
             extraflags: MODDUO=true
