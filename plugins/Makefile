@@ -824,7 +824,7 @@ endif
 endif
 
 # modules/types which are present in other plugins
-JW_CUSTOM = PlayHead Quantizer
+JW_CUSTOM = PlayHead Quantizer Arrange
 
 # --------------------------------------------------------------
 # kocmoc

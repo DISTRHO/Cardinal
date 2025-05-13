@@ -570,8 +570,10 @@ extern Model* modelBlankPanel;
 
 // JW-Modules
 #define modelQuantizer modelJWQuantizer
+#define modelArrange modelJWArrange
 #include "JW-Modules/src/JWModules.hpp"
 #undef modelQuantizer
+#undef modelArrange
 
 // kocmoc
 #include "kocmoc/src/plugin.hpp"
@@ -2539,6 +2541,7 @@ static void initStatic__JW()
     if (spl.ok())
     {
 #define modelQuantizer modelJWQuantizer
+#define modelArrange modelJWArrange
         p->addModel(modelAdd5);
         p->addModel(modelAbcdSeq);
         p->addModel(modelBouncyBalls);
@@ -2574,7 +2577,9 @@ static void initStatic__JW()
        #else
         spl.removeModule("Str1ker");
        #endif
+       p->addModel(modelArrange);
 #undef modelQuantizer
+#undef modelArrange
     }
 }
 
