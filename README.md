@@ -146,6 +146,7 @@ At the moment the following 3rd-party modules are provided:
 - [dBiz](https://github.com/dBiz/dBiz)
 - [DHE Modules](https://github.com/dhemery/DHE-Modules)
 - [DrumKit](https://svmodular.com/plugin/vcv/drumkit.html)
+- [eightfold](https://github.com/scanner-darkly/eightfold)
 - [EnigmaCurry](https://github.com/EnigmaCurry/EnigmaCurry-vcv-pack)
 - [E-Series](https://github.com/VCVRack/ESeries)
 - [ExpertSleepers Encoders](https://expert-sleepers.co.uk/vcvrack_encoders.html)
