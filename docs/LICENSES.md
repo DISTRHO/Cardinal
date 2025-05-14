@@ -203,6 +203,7 @@ Below is a list of artwork licenses from plugins
 | ImpromptuModular/res/comp/complib/*     | CC-BY-NC-4.0     | |
 | JW-Modules/*                            | BSD-3-Clause     | No artwork specific license provided |
 | JW-Modules/DejaVuSansMono.ttf           | Bitstream-Vera   | Unused in Cardinal |
+| JW-Modules/res/fonts/ShareTechMono-Regular.ttf | OFL-1.1 | |
 | kocmoc/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | LifeFormModular/*                       | MIT              | No artwork specific license provided |
 | LilacLoop/*                             | GPL-3.0-or-later | No artwork specific license provided |
