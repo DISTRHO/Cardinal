@@ -532,6 +532,8 @@ void undefer_input(__G)
          * before calling undefer_input() when (G.incnt_leftover > 0)
          * (single exception: see read_byte()'s  "G.csize <= 0" handling) !!
          */
+        if (G.csize < 0L)
+            G.csize = 0L;
         G.incnt = G.incnt_leftover + (int)G.csize;
         G.inptr = G.inptr_leftover - (int)G.csize;
         G.incnt_leftover = 0;
