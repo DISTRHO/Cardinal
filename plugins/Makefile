@@ -2763,6 +2763,7 @@ $(BUILD_DIR)/Sapphire/%.cpp.o: Sapphire/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -std=gnu++17 -c -o $@ \
 		$(foreach m,$(SAPPHIRE_CUSTOM),$(call custom_module_names,$(m),Sapphire)) \
+		-DSKIP_MINGW_FORMAT \
 		-DpluginInstance=pluginInstance__sapphire
 
 $(BUILD_DIR)/sonusmodular/%.cpp.o: sonusmodular/%.cpp
