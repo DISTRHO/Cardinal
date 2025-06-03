@@ -329,7 +329,6 @@ PLUGIN_FILES += $(wildcard 4ms-XOXDrums/src/modules/*.cc)
 # PLUGIN_FILES += 4ms-XOXDrums-helper/comm_module.cc
 PLUGIN_FILES += $(wildcard 4ms-XOXDrums/src/helpers/*.cc)
 4MS_XOXDRUM_FLAGS = -std=gnu++20
-4MS_XOXDRUM_FLAGS = -I../src/Rack/include/rack.hpp
 
 4MSXOXDRUMS_CUSTOM = Duck
 
