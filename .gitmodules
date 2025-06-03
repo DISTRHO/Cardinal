@@ -264,3 +264,6 @@
 	path = plugins/eightfold
 	url = https://github.com/scanner-darkly/eightfold.git
 
+[submodule "plugins/4ms-XOXDrums"]
+	path = plugins/4ms-XOXDrums
+	url = https://github.com/4ms/XOXDrums

@@ -21,6 +21,23 @@
 // 21kHz
 #include "21kHz/src/21kHz.hpp"
 
+// 4ms XOX Drums
+//#define modelDuck model4msXOXDrumsDuck
+#include "4ms-XOXDrums/src/plugin-vcv.hh"
+rack::Model* modelClave;
+rack::Model* modelCowbell; 
+rack::Model* modelAccent;
+rack::Model* modelClap;
+rack::Model* modelCongabongo;
+rack::Model* modelHiHat;
+rack::Model* modelMaraca; 
+rack::Model* modelRimshot;
+rack::Model* modelKick;
+rack::Model* modelTom;
+rack::Model* modelDuck; 
+rack::Model* modelSnare;
+//#undef modelDuck
+
 // 8Mode
 #include "8Mode/src/8mode.hpp"
 
@@ -827,7 +844,9 @@ extern Model* modelBlankPanel;
 #include "rackwindows/src/plugin.hpp"
 
 // RCM
+#define modelDuck modelRCMDuck
 #include "rcm-modules/src/plugin.hpp"
+#undef modelDuck
 
 // RebelTech
 #define BefacoInputPort BefacoInputPortRebelTech
@@ -932,6 +951,7 @@ Plugin* pluginInstance__Cardinal;
 Plugin* pluginInstance__Fundamental;
 // Plugin* pluginInstance__ZamAudio;
 Plugin* pluginInstance__21kHz;
+Plugin* pluginInstance__4msXOXDrums;
 Plugin* pluginInstance__8Mode;
 extern Plugin* pluginInstance__AaronStatic;
 Plugin* pluginInstance__admiral;
@@ -1248,6 +1268,31 @@ static void initStatic__21kHz()
         p->addModel(modelPalmLoop);
         p->addModel(modelD_Inf);
         p->addModel(modelTachyonEntangler);
+    }
+}
+
+static void initStatic__4msXOXDrums()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__4msXOXDrums = p;
+
+    const StaticPluginLoader spl(p, "4ms-XOXDrums");
+    if (spl.ok())
+    {
+//#define modelDuck model4msXOXDrumsDuck
+        p->addModel(modelClave);
+        p->addModel(modelCowbell);
+        p->addModel(modelAccent);
+        p->addModel(modelClap);
+        p->addModel(modelCongabongo);
+        p->addModel(modelHiHat);
+        p->addModel(modelMaraca);
+        p->addModel(modelRimshot);
+        p->addModel(modelKick);
+        p->addModel(modelSnare);
+        p->addModel(modelTom);
+        p->addModel(modelDuck);
+//#undef modelDuck
     }
 }
 
@@ -3150,6 +3195,7 @@ static void initStatic__RCM()
     const StaticPluginLoader spl(p, "rcm-modules");
     if (spl.ok())
     {
+#define modelDuck modelRCMDuck
         p->addModel(modelGVerbModule);
         p->addModel(modelCV0to10Module);
         p->addModel(modelCVS0to10Module);
@@ -3161,6 +3207,7 @@ static void initStatic__RCM()
         p->addModel(modelSEQAdapterModule);
         p->addModel(modelSyncModule);
         p->addModel(modelPolyNosModule);
+#undef modelDuck
     }
 }
 
@@ -3584,6 +3631,7 @@ void initStaticPlugins()
     initStatic__Fundamental();
     // initStatic__ZamAudio();
     initStatic__21kHz();
+    initStatic__4msXOXDrums();
     initStatic__8Mode();
     initStatic__AaronStatic();
     initStatic__admiral();
