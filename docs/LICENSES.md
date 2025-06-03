@@ -14,6 +14,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | DPF                     | ISC                      | Used as the plugin framework |
 | Rack                    | GPL-3.0-or-later         | The actual Rack code, internal dependencies are compatible with GPLv3+ |
 | 21kHz                   | MIT                      | |
+| 4MS XOX Drums           | GPL-3.0-or-later         | |
 | 8Mode                   | BSD-3-Clause             | |
 | Aaron Static            | MIT                      | |
 | admiral                 | MIT                      | |
@@ -113,6 +114,7 @@ Below is a list of artwork licenses from plugins
 | Name                                    | License(s)       | Additional notes |
 |-----------------------------------------|------------------|------------------|
 | 21kHz                                   | MIT              | No artwork specific license provided |
+| 4ms-XOXDrums/*                          | GPL-3.0-or-later | No artwork specific license provided |
 | 8Mode                                   | BSD-3-Clause     | No artwork specific license provided |
 | AaronStatic/*                           | MIT              | No artwork specific license provided |
 | AaronStatic/fonts/PixelOperator.ttf     | CC0-1.0          | |

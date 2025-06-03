@@ -321,6 +321,19 @@ FUNDAMENTAL_CUSTOM = $(DRWAV)
 PLUGIN_FILES += $(filter-out 21kHz/src/21kHz.cpp,$(wildcard 21kHz/src/*.cpp))
 
 # --------------------------------------------------------------
+# 4ms XOX Drums
+
+PLUGIN_FILES += $(filter-out 4ms-XOXDrums/src/plugin-vcv.cc 4ms-XOXDrums/src/plugin-mm.cc,$(wildcard 4ms-XOXDrums/src/*.cc))
+PLUGIN_FILES += $(wildcard 4ms-XOXDrums/src/vcv/*.cc)
+PLUGIN_FILES += $(wildcard 4ms-XOXDrums/src/modules/*.cc)
+# PLUGIN_FILES += 4ms-XOXDrums-helper/comm_module.cc
+PLUGIN_FILES += $(wildcard 4ms-XOXDrums/src/helpers/*.cc)
+4MS_XOXDRUM_FLAGS = -std=gnu++20
+4MS_XOXDRUM_FLAGS = -I../src/Rack/include/rack.hpp
+
+4MSXOXDRUMS_CUSTOM = Duck
+
+# --------------------------------------------------------------
 # 8Mode
 
 PLUGIN_FILES += $(filter-out 8Mode/src/8mode.cpp,$(wildcard 8Mode/src/*.cpp))
@@ -1036,7 +1049,7 @@ PLUGIN_FILES += $(wildcard rcm-modules/src/*.c)
 PLUGIN_FILES += $(wildcard rcm-modules/src/PianoRoll/*.cpp)
 
 # modules/types which are present in other plugins
-RCM_CUSTOM = Transport
+RCM_CUSTOM = Transport Duck
 
 # --------------------------------------------------------------
 # RebelTech
@@ -2135,6 +2148,13 @@ $(BUILD_DIR)/21kHz/%.cpp.o: 21kHz/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(21KHZ_CUSTOM),$(call custom_module_names,$(m),21kHz)) \
 		-DpluginInstance=pluginInstance__21kHz
+
+$(BUILD_DIR)/4ms-XOXDrums/%.o: 4ms-XOXDrums/%
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(4MS_XOXDRUM_FLAGS) -c -o $@ \
+		$(foreach m,$(4MSXOXDRUMS_CUSTOM),$(call custom_module_names,$(m),4ms-XOXDrums)) \
+		-DpluginInstance=pluginInstance__4msXOXDrums
 
 $(BUILD_DIR)/8Mode/%.cpp.o: 8Mode/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

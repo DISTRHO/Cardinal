@@ -120,6 +120,7 @@ But a couple of modules background's have their colors flipped, because damn we 
 At the moment the following 3rd-party modules are provided:
 
 - [21kHz](https://github.com/netboy3/21kHz-rack-plugins)
+- [4ms XOX Drums](https://github.com/4ms/XOXDrums)
 - [8Mode](https://github.com/8Mode/8Mode-VCV_Modules)
 - [Aaron Static](https://github.com/aaronstatic/AaronStatic_modules)
 - [Admiral](https://github.com/wapiflapi/admiral)
