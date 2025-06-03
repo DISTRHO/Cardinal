@@ -326,7 +326,6 @@ PLUGIN_FILES += $(filter-out 21kHz/src/21kHz.cpp,$(wildcard 21kHz/src/*.cpp))
 PLUGIN_FILES += $(filter-out 4ms-XOXDrums/src/plugin-vcv.cc 4ms-XOXDrums/src/plugin-mm.cc,$(wildcard 4ms-XOXDrums/src/*.cc))
 PLUGIN_FILES += $(wildcard 4ms-XOXDrums/src/vcv/*.cc)
 PLUGIN_FILES += $(wildcard 4ms-XOXDrums/src/modules/*.cc)
-# PLUGIN_FILES += 4ms-XOXDrums-helper/comm_module.cc
 PLUGIN_FILES += $(wildcard 4ms-XOXDrums/src/helpers/*.cc)
 4MS_XOXDRUM_FLAGS = -std=gnu++20
 
