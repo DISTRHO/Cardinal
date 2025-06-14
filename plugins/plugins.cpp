@@ -395,8 +395,8 @@ namespace truth { void init(Plugin*); }
 namespace xycloid { void init(Plugin*); }
 }
 
-// DrumKit
-#include "DrumKit/src/DrumKit.hpp"
+// WSTD-Drums
+#include "WSTD-Drums/src/WSTD_Drums.hpp"
 void setupSamples();
 
 // eightfold
@@ -957,7 +957,7 @@ Plugin* pluginInstance__Computerscare;
 Plugin* pluginInstance__CVfunk;
 Plugin* pluginInstance__dBiz;
 Plugin* pluginInstance__DHE;
-extern Plugin* pluginInstance__DrumKit;
+extern Plugin* pluginInstance__WSTD_Drums;
 Plugin* pluginInstance__eightfold;
 Plugin* pluginInstance__EnigmaCurry;
 Plugin* pluginInstance__ESeries;
@@ -2147,12 +2147,12 @@ static void initStatic__DHE()
     }
 }
 
-static void initStatic__DrumKit()
+static void initStatic__WSTD_Drums()
 {
     Plugin* const p = new Plugin;
-    pluginInstance__DrumKit = p;
+    pluginInstance__WSTD_Drums = p;
 
-    const StaticPluginLoader spl(p, "DrumKit");
+    const StaticPluginLoader spl(p, "WSTD-Drums");
     if (spl.ok())
     {
         setupSamples();
@@ -3609,7 +3609,7 @@ void initStaticPlugins()
     initStatic__CVfunk();
     initStatic__dBiz();
     initStatic__DHE();
-    initStatic__DrumKit();
+    initStatic__WSTD_Drums();
     initStatic__eightfold();
     initStatic__EnigmaCurry();
     initStatic__ESeries();

@@ -54,7 +54,6 @@ enum DarkMode {
     kModeCf,
     kModeComputerscare,
     kModeDHE,
-    kModeDrumKit,
     kModeESeries,
     kModeLilacLoop,
     kModeLittleUtils,
@@ -258,19 +257,6 @@ static const struct {
     { kModeDHE, "/DHE-Modules/svg/truth-4.svg", {}, -1 },
     { kModeDHE, "/DHE-Modules/svg/upstage.svg", {}, -1 },
     { kModeDHE, "/DHE-Modules/svg/xycloid.svg", {}, -1 },
-    // CC0-1.0
-    { kModeDrumKit, "/DrumKit/res/Baronial.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/BD9.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/ClosedHH.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/CR78.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/DMX.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/Gnome.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/Marionette.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/OpenHH.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/SBD.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/Sequencer.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/Snare.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/Tomi.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
     { kModeESeries,"/ESeries/res/E340.svg", {}, -1 },
     // GPL3.0-or-later
@@ -360,6 +346,7 @@ enum LightMode {
     kModeBefaco,
     kModeCardinal,
     kModeComputerscareLight,
+    kModeWSTDDrums,
     kModeExtratone,
     kModeFehlerFabrik,
     kModeForsitan,
@@ -456,6 +443,21 @@ static const struct {
     { kModeCardinal, "/Cardinal/res/HostParamsMap.svg" },
     { kModeCardinal, "/Cardinal/res/HostTime.svg" },
     { kModeCardinal, "/Cardinal/res/Ildaeil.svg" },
+    // CC0-1.0
+    { kModeWSTDDrums, "/WSTD-Drums/res/Baronial.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/BD9.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/ClosedHH.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/CR78.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/DMX.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Gnome.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Marionette.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/OpenHH.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/SBD.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Sequencer.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Snare.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Tomi.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/component/Knob.svg" },
+
     // BSD-3 Clause
     { kModeComputerscareLight, "/Computerscare/res/ComputerscareStolyFickPigurePanel.svg" },
     // GPLv3+
@@ -629,12 +631,6 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
     {
         switch (mode)
         {
-        // Special case for DrumKit background gradient
-        case kModeDrumKit:
-            std::free(paint.gradient);
-            paint.type = NSVG_PAINT_COLOR;
-            paint.color = 0xff191919;
-            return true;
         // Special case for PathSet shifty gradient
         case kModePathSet:
             paint.gradient->stops[0].color = 0xff7c4919; // 50% darker than main blue

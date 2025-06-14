@@ -695,17 +695,17 @@ DBIZ_CUSTOM_PER_FILE = LERP MultiFilter Oscillator calcOutput sineOsc subBank
 PLUGIN_FILES += $(filter-out DHE-Modules/src/plugin.cpp,$(wildcard DHE-Modules/src/modules/*/init.cpp))
 
 # --------------------------------------------------------------
-# DrumKit
+# WSTD-Drums
 
-PLUGIN_FILES += $(wildcard DrumKit/src/*.cpp)
-PLUGIN_FILES += $(wildcard DrumKit/src/controller/*.cpp)
-PLUGIN_FILES += $(wildcard DrumKit/src/view/*.cpp)
-PLUGIN_FILES += $(wildcard DrumKit/src/model/*.cpp)
-PLUGIN_FILES += $(wildcard DrumKit/deps/*.cpp)
-PLUGIN_FILES += $(wildcard DrumKit/deps/SynthDevKit/src/*.cpp)
+PLUGIN_FILES += $(wildcard WSTD-Drums/src/*.cpp)
+PLUGIN_FILES += $(wildcard WSTD-Drums/src/controller/*.cpp)
+PLUGIN_FILES += $(wildcard WSTD-Drums/src/view/*.cpp)
+PLUGIN_FILES += $(wildcard WSTD-Drums/src/model/*.cpp)
+PLUGIN_FILES += $(wildcard WSTD-Drums/deps/*.cpp)
+PLUGIN_FILES += $(wildcard WSTD-Drums/deps/SynthDevKit/src/*.cpp)
 
 # modules/types which are present in other plugins
-DRUMKIT_CUSTOM = ADSR Envelope LowFrequencyOscillator
+WSTD_DRUMS_CUSTOM = ADSR Envelope LowFrequencyOscillator
 
 # --------------------------------------------------------------
 # eightfold
@@ -1487,7 +1487,7 @@ RESOURCE_FILES += BaconPlugs/res/midi/goldberg
 RESOURCE_FILES += Befaco/res/SpringReverbIR.f32
 RESOURCE_FILES += cf/playeroscs
 RESOURCE_FILES += DHE-Modules/svg
-RESOURCE_FILES += DrumKit/res/samples
+RESOURCE_FILES += WSTD-Drums/res/samples
 RESOURCE_FILES += Meander/res
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityPresets
 RESOURCE_FILES += MindMeldModular/res/ShapeMaster/CommunityShapes
@@ -2350,13 +2350,13 @@ $(BUILD_DIR)/DHE-Modules/src/%.cpp.o: DHE-Modules/src/%.cpp
 		-DpluginInstance=pluginInstance__DHE \
 		-IDHE-Modules/src
 
-$(BUILD_DIR)/DrumKit/%.cpp.o: DrumKit/%.cpp
+$(BUILD_DIR)/WSTD-Drums/%.cpp.o: WSTD-Drums/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
-		$(foreach m,$(DRUMKIT_CUSTOM),$(call custom_module_names,$(m),DrumKit)) \
-		-DpluginInstance=pluginInstance__DrumKit \
-		-Dinit=init__DrumKit \
+		$(foreach m,$(WSTD_DRUMS_CUSTOM),$(call custom_module_names,$(m),WSTD_Drums)) \
+		-DpluginInstance=pluginInstance__WSTD_Drums \
+		-Dinit=init__WSTD_Drums \
 		-Wno-sign-compare
 
 $(BUILD_DIR)/eightfold/src/%.cpp.o: eightfold/src/%.cpp
