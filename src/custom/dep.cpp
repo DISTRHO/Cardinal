@@ -346,7 +346,6 @@ enum LightMode {
     kModeBefaco,
     kModeCardinal,
     kModeComputerscareLight,
-    kModeWSTDDrums,
     kModeExtratone,
     kModeFehlerFabrik,
     kModeForsitan,
@@ -360,6 +359,7 @@ enum LightMode {
     kModePrism,
     kModeRepelzen,
     kModeSonusmodular,
+    kModeWSTDDrums,
 };
 
 static const struct {
@@ -443,21 +443,6 @@ static const struct {
     { kModeCardinal, "/Cardinal/res/HostParamsMap.svg" },
     { kModeCardinal, "/Cardinal/res/HostTime.svg" },
     { kModeCardinal, "/Cardinal/res/Ildaeil.svg" },
-    // CC0-1.0
-    { kModeWSTDDrums, "/WSTD-Drums/res/Baronial.svg" },
-    { kModeWSTDDrums, "/WSTD-Drums/res/BD9.svg" },
-    { kModeWSTDDrums, "/WSTD-Drums/res/ClosedHH.svg" },
-    { kModeWSTDDrums, "/WSTD-Drums/res/CR78.svg" },
-    { kModeWSTDDrums, "/WSTD-Drums/res/DMX.svg" },
-    { kModeWSTDDrums, "/WSTD-Drums/res/Gnome.svg" },
-    { kModeWSTDDrums, "/WSTD-Drums/res/Marionette.svg" },
-    { kModeWSTDDrums, "/WSTD-Drums/res/OpenHH.svg" },
-    { kModeWSTDDrums, "/WSTD-Drums/res/SBD.svg" },
-    { kModeWSTDDrums, "/WSTD-Drums/res/Sequencer.svg" },
-    { kModeWSTDDrums, "/WSTD-Drums/res/Snare.svg" },
-    { kModeWSTDDrums, "/WSTD-Drums/res/Tomi.svg" },
-    { kModeWSTDDrums, "/WSTD-Drums/res/component/Knob.svg" },
-
     // BSD-3 Clause
     { kModeComputerscareLight, "/Computerscare/res/ComputerscareStolyFickPigurePanel.svg" },
     // GPLv3+
@@ -595,6 +580,20 @@ static const struct {
     { kModeSonusmodular, "/sonusmodular/res/tropicana.svg" },
     { kModeSonusmodular, "/sonusmodular/res/twoff.svg" },
     { kModeSonusmodular, "/sonusmodular/res/yabp.svg" },
+    // CC0-1.0
+    { kModeWSTDDrums, "/WSTD-Drums/res/Baronial.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/BD9.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/ClosedHH.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/CR78.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/DMX.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Gnome.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Marionette.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/OpenHH.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/SBD.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Sequencer.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Snare.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Tomi.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/component/Knob.svg" },
 };
 
 static inline
