@@ -2618,6 +2618,7 @@ static void initStatic__kocmoc()
         p->addModel(modelTRG);
         p->addModel(modelLADR);
         p->addModel(modeluLADR);
+        p->addModel(modelDIOD);
         p->addModel(modelOP);
         p->addModel(modelPHASR);
         p->addModel(modelMUL);
