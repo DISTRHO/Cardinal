@@ -284,6 +284,7 @@ static const struct {
     { kModeLittleUtils, "/LittleUtils/res/TeleportOut.svg", {}, -1 },
     // GPL-3.0-or-later
     { kModeKocmoc, "/kocmoc/res/DDLY.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/DIOD.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/LADR.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/uLADR.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/MUL.svg", {}, -1 },
