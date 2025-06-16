@@ -843,7 +843,7 @@ JW_CUSTOM = PlayHead Quantizer Arrange
 PLUGIN_FILES += $(filter-out kocmoc/src/plugin.cpp,$(wildcard kocmoc/src/*.cpp))
 
 # modules/types which are present in other plugins
-KOCMOC_CUSTOM = Phasor __ct_base __ct_comp
+KOCMOC_CUSTOM = Diode Phasor __ct_base __ct_comp
 
 # --------------------------------------------------------------
 # LifeFormModular
