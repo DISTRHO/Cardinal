@@ -395,10 +395,6 @@ namespace truth { void init(Plugin*); }
 namespace xycloid { void init(Plugin*); }
 }
 
-// DrumKit
-#include "DrumKit/src/DrumKit.hpp"
-void setupSamples();
-
 // eightfold
 #include "eightfold/src/plugin.hpp"
 
@@ -900,6 +896,10 @@ void surgext_rack_update_theme();
 // WhatTheRack
 #include "WhatTheRack/src/WhatTheRack.hpp"
 
+// WSTD-Drums
+#include "WSTD-Drums/src/WSTD_Drums.hpp"
+void setupSamples();
+
 // ZetaCarinaeModules
 #include "ZetaCarinaeModules/src/plugin.hpp"
 
@@ -957,7 +957,6 @@ Plugin* pluginInstance__Computerscare;
 Plugin* pluginInstance__CVfunk;
 Plugin* pluginInstance__dBiz;
 Plugin* pluginInstance__DHE;
-extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__eightfold;
 Plugin* pluginInstance__EnigmaCurry;
 Plugin* pluginInstance__ESeries;
@@ -1010,6 +1009,7 @@ Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__Voxglitch;
 Plugin* pluginInstance__WhatTheRack;
+extern Plugin* pluginInstance__WSTD_Drums;
 Plugin* pluginInstance__ZetaCarinaeModules;
 Plugin* pluginInstance__ZZC;
 
@@ -2144,30 +2144,6 @@ static void initStatic__DHE()
         dhe::tapers::init(p);
         dhe::truth::init(p);
         dhe::xycloid::init(p);
-    }
-}
-
-static void initStatic__DrumKit()
-{
-    Plugin* const p = new Plugin;
-    pluginInstance__DrumKit = p;
-
-    const StaticPluginLoader spl(p, "DrumKit");
-    if (spl.ok())
-    {
-        setupSamples();
-        p->addModel(modelBD9);
-        p->addModel(modelSnare);
-        p->addModel(modelClosedHH);
-        p->addModel(modelOpenHH);
-        p->addModel(modelDMX);
-        p->addModel(modelCR78);
-        p->addModel(modelSBD);
-        p->addModel(modelGnome);
-        p->addModel(modelSequencer);
-        p->addModel(modelTomi);
-        p->addModel(modelBaronial);
-        p->addModel(modelMarionette);
     }
 }
 
@@ -3538,6 +3514,30 @@ static void initStatic__WhatTheRack()
     }
 }
 
+static void initStatic__WSTD_Drums()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__WSTD_Drums = p;
+
+    const StaticPluginLoader spl(p, "WSTD-Drums");
+    if (spl.ok())
+    {
+        setupSamples();
+        p->addModel(modelBD9);
+        p->addModel(modelSnare);
+        p->addModel(modelClosedHH);
+        p->addModel(modelOpenHH);
+        p->addModel(modelDMX);
+        p->addModel(modelCR78);
+        p->addModel(modelSBD);
+        p->addModel(modelGnome);
+        p->addModel(modelSequencer);
+        p->addModel(modelTomi);
+        p->addModel(modelBaronial);
+        p->addModel(modelMarionette);
+    }
+}
+
 static void initStatic__ZetaCarinaeModules()
 {
     Plugin* p = new Plugin;
@@ -3610,7 +3610,6 @@ void initStaticPlugins()
     initStatic__CVfunk();
     initStatic__dBiz();
     initStatic__DHE();
-    initStatic__DrumKit();
     initStatic__eightfold();
     initStatic__EnigmaCurry();
     initStatic__ESeries();
@@ -3663,6 +3662,7 @@ void initStaticPlugins()
     initStatic__ValleyAudio();
     initStatic__Voxglitch();
     initStatic__WhatTheRack();
+    initStatic__WSTD_Drums();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();
 
