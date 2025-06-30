@@ -395,9 +395,8 @@ namespace truth { void init(Plugin*); }
 namespace xycloid { void init(Plugin*); }
 }
 
-// DrumKit
-#include "DrumKit/src/DrumKit.hpp"
-void setupSamples();
+// eightfold
+#include "eightfold/src/plugin.hpp"
 
 // EnigmaCurry
 #define modelPulse modelEnigmaCurryPulse
@@ -454,6 +453,7 @@ void saveGtgPluginDefault(const char*, int) {}
 extern Model* modelTwoToFour;
 extern Model* modelAnalogToDigital;
 extern Model* modelASR;
+extern Model* modelBinaryCounter;
 extern Model* modelBinaryGate;
 extern Model* modelBinaryNoise;
 extern Model* modelBitshift;
@@ -464,6 +464,7 @@ extern Model* modelChaos2Op;
 extern Model* modelChaos3Op;
 extern Model* modelChaoticAttractors;
 extern Model* modelClockedNoise;
+extern Model* modelClockToPhasor;
 extern Model* modelComparator;
 extern Model* modelContrast;
 extern Model* modelCrackle;
@@ -482,6 +483,7 @@ extern Model* modelGingerbread;
 extern Model* modelLogicCombine;
 extern Model* modelMidSide;
 extern Model* modelMinMax;
+extern Model* modelNormals;
 extern Model* modelPhaseDrivenSequencer;
 extern Model* modelPhaseDrivenSequencer32;
 extern Model* modelPhasorAnalyzer;
@@ -511,8 +513,10 @@ extern Model* modelPhasorSubstepShape;
 extern Model* modelPhasorSwing;
 extern Model* modelPhasorTimetable;
 extern Model* modelPhasorToClock;
+extern Model* modelPhasorToRandom;
 extern Model* modelPhasorToLFO;
 extern Model* modelPhasorToWaveforms;
+extern Model* modelPolymetricPhasors;
 extern Model* modelProbability;
 extern Model* modelRandomGates;
 extern Model* modelRotator;
@@ -570,8 +574,10 @@ extern Model* modelBlankPanel;
 
 // JW-Modules
 #define modelQuantizer modelJWQuantizer
+#define modelArrange modelJWArrange
 #include "JW-Modules/src/JWModules.hpp"
 #undef modelQuantizer
+#undef modelArrange
 
 // kocmoc
 #include "kocmoc/src/plugin.hpp"
@@ -894,6 +900,10 @@ void surgext_rack_update_theme();
 // WhatTheRack
 #include "WhatTheRack/src/WhatTheRack.hpp"
 
+// WSTD-Drums
+#include "WSTD-Drums/src/WSTD_Drums.hpp"
+void setupSamples();
+
 // ZetaCarinaeModules
 #include "ZetaCarinaeModules/src/plugin.hpp"
 
@@ -951,7 +961,7 @@ Plugin* pluginInstance__Computerscare;
 Plugin* pluginInstance__CVfunk;
 Plugin* pluginInstance__dBiz;
 Plugin* pluginInstance__DHE;
-extern Plugin* pluginInstance__DrumKit;
+Plugin* pluginInstance__eightfold;
 Plugin* pluginInstance__EnigmaCurry;
 Plugin* pluginInstance__ESeries;
 Plugin* pluginInstance__ExpertSleepersEncoders;
@@ -1003,6 +1013,7 @@ Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__Voxglitch;
 Plugin* pluginInstance__WhatTheRack;
+extern Plugin* pluginInstance__WSTD_Drums;
 Plugin* pluginInstance__ZetaCarinaeModules;
 Plugin* pluginInstance__ZZC;
 
@@ -2140,27 +2151,19 @@ static void initStatic__DHE()
     }
 }
 
-static void initStatic__DrumKit()
+static void initStatic__eightfold()
 {
     Plugin* const p = new Plugin;
-    pluginInstance__DrumKit = p;
+    pluginInstance__eightfold = p;
 
-    const StaticPluginLoader spl(p, "DrumKit");
+    const StaticPluginLoader spl(p, "eightfold");
     if (spl.ok())
     {
-        setupSamples();
-        p->addModel(modelBD9);
-        p->addModel(modelSnare);
-        p->addModel(modelClosedHH);
-        p->addModel(modelOpenHH);
-        p->addModel(modelDMX);
-        p->addModel(modelCR78);
-        p->addModel(modelSBD);
-        p->addModel(modelGnome);
-        p->addModel(modelSequencer);
-        p->addModel(modelTomi);
-        p->addModel(modelBaronial);
-        p->addModel(modelMarionette);
+        p->addModel(modelSDOrcasHeartV2);
+        p->addModel(modelSDFormation);
+        p->addModel(modelSDLines);
+        p->addModel(modelSDTransgate);
+        p->addModel(modelSDComparator);
     }
 }
 
@@ -2396,6 +2399,7 @@ static void initStatic__HetrickCV()
         p->addModel(modelTwoToFour);
         p->addModel(modelAnalogToDigital);
         p->addModel(modelASR);
+        p->addModel(modelBinaryCounter);
         p->addModel(modelBinaryGate);
         p->addModel(modelBinaryNoise);
         p->addModel(modelBitshift);
@@ -2406,6 +2410,7 @@ static void initStatic__HetrickCV()
         p->addModel(modelChaos3Op);
         p->addModel(modelChaoticAttractors);
         p->addModel(modelClockedNoise);
+        p->addModel(modelClockToPhasor);
         p->addModel(modelComparator);
         p->addModel(modelContrast);
         p->addModel(modelCrackle);
@@ -2424,6 +2429,7 @@ static void initStatic__HetrickCV()
         p->addModel(modelLogicCombine);
         p->addModel(modelMidSide);
         p->addModel(modelMinMax);
+        p->addModel(modelNormals);
         p->addModel(modelPhaseDrivenSequencer);
         p->addModel(modelPhaseDrivenSequencer32);
         p->addModel(modelPhasorAnalyzer);
@@ -2453,8 +2459,10 @@ static void initStatic__HetrickCV()
         p->addModel(modelPhasorSwing);
         p->addModel(modelPhasorTimetable);
         p->addModel(modelPhasorToClock);
+        p->addModel(modelPhasorToRandom);
         p->addModel(modelPhasorToLFO);
         p->addModel(modelPhasorToWaveforms);
+        p->addModel(modelPolymetricPhasors);
         p->addModel(modelProbability);
         p->addModel(modelRandomGates);
         p->addModel(modelRotator);
@@ -2539,6 +2547,7 @@ static void initStatic__JW()
     if (spl.ok())
     {
 #define modelQuantizer modelJWQuantizer
+#define modelArrange modelJWArrange
         p->addModel(modelAdd5);
         p->addModel(modelAbcdSeq);
         p->addModel(modelBouncyBalls);
@@ -2574,7 +2583,9 @@ static void initStatic__JW()
        #else
         spl.removeModule("Str1ker");
        #endif
+       p->addModel(modelArrange);
 #undef modelQuantizer
+#undef modelArrange
     }
 }
 
@@ -2591,6 +2602,7 @@ static void initStatic__kocmoc()
         p->addModel(modelTRG);
         p->addModel(modelLADR);
         p->addModel(modeluLADR);
+        p->addModel(modelDIOD);
         p->addModel(modelOP);
         p->addModel(modelPHASR);
         p->addModel(modelMUL);
@@ -3186,6 +3198,9 @@ static void initStatic__Sapphire()
     if (spl.ok())
     {
         p->addModel(modelSapphireChaops);
+        p->addModel(modelSapphireEcho);
+        p->addModel(modelSapphireEchoOut);
+        p->addModel(modelSapphireEchoTap);
         p->addModel(modelSapphireElastika);
         p->addModel(modelSapphireEnv);
         p->addModel(modelSapphireFrolic);
@@ -3508,6 +3523,30 @@ static void initStatic__WhatTheRack()
     }
 }
 
+static void initStatic__WSTD_Drums()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__WSTD_Drums = p;
+
+    const StaticPluginLoader spl(p, "WSTD-Drums");
+    if (spl.ok())
+    {
+        setupSamples();
+        p->addModel(modelBD9);
+        p->addModel(modelSnare);
+        p->addModel(modelClosedHH);
+        p->addModel(modelOpenHH);
+        p->addModel(modelDMX);
+        p->addModel(modelCR78);
+        p->addModel(modelSBD);
+        p->addModel(modelGnome);
+        p->addModel(modelSequencer);
+        p->addModel(modelTomi);
+        p->addModel(modelBaronial);
+        p->addModel(modelMarionette);
+    }
+}
+
 static void initStatic__ZetaCarinaeModules()
 {
     Plugin* p = new Plugin;
@@ -3580,7 +3619,7 @@ void initStaticPlugins()
     initStatic__CVfunk();
     initStatic__dBiz();
     initStatic__DHE();
-    initStatic__DrumKit();
+    initStatic__eightfold();
     initStatic__EnigmaCurry();
     initStatic__ESeries();
     initStatic__ExpertSleepersEncoders();
@@ -3632,6 +3671,7 @@ void initStaticPlugins()
     initStatic__ValleyAudio();
     initStatic__Voxglitch();
     initStatic__WhatTheRack();
+    initStatic__WSTD_Drums();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();
 
