@@ -317,7 +317,6 @@ SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/debussy
 SYMLINKED_DIRS_RESOURCES += BaconPlugs/res/midi/goldberg
 SYMLINKED_DIRS_RESOURCES += cf/playeroscs
 SYMLINKED_DIRS_RESOURCES += DHE-Modules/svg
-SYMLINKED_DIRS_RESOURCES += DrumKit/res/samples
 SYMLINKED_DIRS_RESOURCES += GrandeModular/presets
 SYMLINKED_DIRS_RESOURCES += LyraeModules/presets
 SYMLINKED_DIRS_RESOURCES += Meander/res
@@ -332,6 +331,7 @@ SYMLINKED_DIRS_RESOURCES += Orbits/presets
 SYMLINKED_DIRS_RESOURCES += stoermelder-packone/presets
 SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/fx_presets
 SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/wavetables
+SYMLINKED_DIRS_RESOURCES += WSTD-Drums/res/samples
 endif
 LINK_FLAGS += $(foreach d,$(SYMLINKED_DIRS_RESOURCES),--preload-file=../../bin/CardinalNative.lv2/resources/$(d)@/resources/$(d))
 
