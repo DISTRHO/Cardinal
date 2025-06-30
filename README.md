@@ -145,7 +145,6 @@ At the moment the following 3rd-party modules are provided:
 - [CVfunk](https://github.com/codygeary/CVfunk-Modules)
 - [dBiz](https://github.com/dBiz/dBiz)
 - [DHE Modules](https://github.com/dhemery/DHE-Modules)
-- [DrumKit](https://svmodular.com/plugin/vcv/drumkit.html)
 - [eightfold](https://github.com/scanner-darkly/eightfold)
 - [EnigmaCurry](https://github.com/EnigmaCurry/EnigmaCurry-vcv-pack)
 - [E-Series](https://github.com/VCVRack/ESeries)
@@ -199,6 +198,7 @@ At the moment the following 3rd-party modules are provided:
 - [Valley](https://github.com/ValleyAudio/ValleyRackFree)
 - [Voxglitch](https://github.com/clone45/voxglitch)
 - [WhatTheRack](https://github.com/korfuri/WhatTheRack)
+- [WSTD-Drums](https://github.com/Wasted-Audio/WSTD-Drums)
 - [ZetaCarinae](https://github.com/mhampton/ZetaCarinaeModules)
 - [ZZC](https://github.com/zezic/ZZC)
 

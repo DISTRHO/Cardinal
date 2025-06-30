@@ -39,7 +39,6 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | CVfunk                  | MIT                      | |
 | dBiz                    | GPL-3.0-or-later         | |
 | DHE-Modules             | MIT                      | |
-| DrumKit                 | CC0-1.0                  | |
 | eightfold               | GPL-3.0-or-later         | |
 | EnigmaCurry             | GPL-3.0-or-later         | |
 | E-Series                | GPL-3.0-or-later         | |
@@ -92,6 +91,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | unless_modules          | GPL-3.0-or-later         | |
 | Valley                  | GPL-3.0-or-later         | |
 | Voxglitch               | GPL-3.0-or-later         | |
+| WSTD-Drums              | CC0-1.0                  | |
 | WhatTheRack             | WTFPL                    | |
 | ZetaCarinae             | GPL-3.0-or-later         | |
 | ZZC                     | GPL-3.0-or-later         | |

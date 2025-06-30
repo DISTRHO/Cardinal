@@ -395,10 +395,6 @@ namespace truth { void init(Plugin*); }
 namespace xycloid { void init(Plugin*); }
 }
 
-// DrumKit
-#include "DrumKit/src/DrumKit.hpp"
-void setupSamples();
-
 // eightfold
 #include "eightfold/src/plugin.hpp"
 
@@ -468,6 +464,7 @@ extern Model* modelChaos2Op;
 extern Model* modelChaos3Op;
 extern Model* modelChaoticAttractors;
 extern Model* modelClockedNoise;
+extern Model* modelClockToPhasor;
 extern Model* modelComparator;
 extern Model* modelContrast;
 extern Model* modelCrackle;
@@ -486,6 +483,7 @@ extern Model* modelGingerbread;
 extern Model* modelLogicCombine;
 extern Model* modelMidSide;
 extern Model* modelMinMax;
+extern Model* modelNormals;
 extern Model* modelPhaseDrivenSequencer;
 extern Model* modelPhaseDrivenSequencer32;
 extern Model* modelPhasorAnalyzer;
@@ -515,8 +513,10 @@ extern Model* modelPhasorSubstepShape;
 extern Model* modelPhasorSwing;
 extern Model* modelPhasorTimetable;
 extern Model* modelPhasorToClock;
+extern Model* modelPhasorToRandom;
 extern Model* modelPhasorToLFO;
 extern Model* modelPhasorToWaveforms;
+extern Model* modelPolymetricPhasors;
 extern Model* modelProbability;
 extern Model* modelRandomGates;
 extern Model* modelRotator;
@@ -900,6 +900,10 @@ void surgext_rack_update_theme();
 // WhatTheRack
 #include "WhatTheRack/src/WhatTheRack.hpp"
 
+// WSTD-Drums
+#include "WSTD-Drums/src/WSTD_Drums.hpp"
+void setupSamples();
+
 // ZetaCarinaeModules
 #include "ZetaCarinaeModules/src/plugin.hpp"
 
@@ -957,7 +961,6 @@ Plugin* pluginInstance__Computerscare;
 Plugin* pluginInstance__CVfunk;
 Plugin* pluginInstance__dBiz;
 Plugin* pluginInstance__DHE;
-extern Plugin* pluginInstance__DrumKit;
 Plugin* pluginInstance__eightfold;
 Plugin* pluginInstance__EnigmaCurry;
 Plugin* pluginInstance__ESeries;
@@ -1010,6 +1013,7 @@ Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
 Plugin* pluginInstance__Voxglitch;
 Plugin* pluginInstance__WhatTheRack;
+extern Plugin* pluginInstance__WSTD_Drums;
 Plugin* pluginInstance__ZetaCarinaeModules;
 Plugin* pluginInstance__ZZC;
 
@@ -2147,30 +2151,6 @@ static void initStatic__DHE()
     }
 }
 
-static void initStatic__DrumKit()
-{
-    Plugin* const p = new Plugin;
-    pluginInstance__DrumKit = p;
-
-    const StaticPluginLoader spl(p, "DrumKit");
-    if (spl.ok())
-    {
-        setupSamples();
-        p->addModel(modelBD9);
-        p->addModel(modelSnare);
-        p->addModel(modelClosedHH);
-        p->addModel(modelOpenHH);
-        p->addModel(modelDMX);
-        p->addModel(modelCR78);
-        p->addModel(modelSBD);
-        p->addModel(modelGnome);
-        p->addModel(modelSequencer);
-        p->addModel(modelTomi);
-        p->addModel(modelBaronial);
-        p->addModel(modelMarionette);
-    }
-}
-
 static void initStatic__eightfold()
 {
     Plugin* const p = new Plugin;
@@ -2430,6 +2410,7 @@ static void initStatic__HetrickCV()
         p->addModel(modelChaos3Op);
         p->addModel(modelChaoticAttractors);
         p->addModel(modelClockedNoise);
+        p->addModel(modelClockToPhasor);
         p->addModel(modelComparator);
         p->addModel(modelContrast);
         p->addModel(modelCrackle);
@@ -2448,6 +2429,7 @@ static void initStatic__HetrickCV()
         p->addModel(modelLogicCombine);
         p->addModel(modelMidSide);
         p->addModel(modelMinMax);
+        p->addModel(modelNormals);
         p->addModel(modelPhaseDrivenSequencer);
         p->addModel(modelPhaseDrivenSequencer32);
         p->addModel(modelPhasorAnalyzer);
@@ -2477,8 +2459,10 @@ static void initStatic__HetrickCV()
         p->addModel(modelPhasorSwing);
         p->addModel(modelPhasorTimetable);
         p->addModel(modelPhasorToClock);
+        p->addModel(modelPhasorToRandom);
         p->addModel(modelPhasorToLFO);
         p->addModel(modelPhasorToWaveforms);
+        p->addModel(modelPolymetricPhasors);
         p->addModel(modelProbability);
         p->addModel(modelRandomGates);
         p->addModel(modelRotator);
@@ -2618,6 +2602,7 @@ static void initStatic__kocmoc()
         p->addModel(modelTRG);
         p->addModel(modelLADR);
         p->addModel(modeluLADR);
+        p->addModel(modelDIOD);
         p->addModel(modelOP);
         p->addModel(modelPHASR);
         p->addModel(modelMUL);
@@ -3537,6 +3522,30 @@ static void initStatic__WhatTheRack()
     }
 }
 
+static void initStatic__WSTD_Drums()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__WSTD_Drums = p;
+
+    const StaticPluginLoader spl(p, "WSTD-Drums");
+    if (spl.ok())
+    {
+        setupSamples();
+        p->addModel(modelBD9);
+        p->addModel(modelSnare);
+        p->addModel(modelClosedHH);
+        p->addModel(modelOpenHH);
+        p->addModel(modelDMX);
+        p->addModel(modelCR78);
+        p->addModel(modelSBD);
+        p->addModel(modelGnome);
+        p->addModel(modelSequencer);
+        p->addModel(modelTomi);
+        p->addModel(modelBaronial);
+        p->addModel(modelMarionette);
+    }
+}
+
 static void initStatic__ZetaCarinaeModules()
 {
     Plugin* p = new Plugin;
@@ -3609,7 +3618,6 @@ void initStaticPlugins()
     initStatic__CVfunk();
     initStatic__dBiz();
     initStatic__DHE();
-    initStatic__DrumKit();
     initStatic__eightfold();
     initStatic__EnigmaCurry();
     initStatic__ESeries();
@@ -3662,6 +3670,7 @@ void initStaticPlugins()
     initStatic__ValleyAudio();
     initStatic__Voxglitch();
     initStatic__WhatTheRack();
+    initStatic__WSTD_Drums();
     initStatic__ZetaCarinaeModules();
     initStatic__ZZC();
 
