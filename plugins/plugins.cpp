@@ -380,6 +380,7 @@ extern Model* modelTestVCF;
 #define modelX4 modeldbRackModulesX4
 #define modelMVerb modeldbRackModulesMVerb
 #define modelOsc3 modeldbRackModulesOsc3
+#define modelDCBlock modeldbRackModulesDCBlock
 extern Model* modelGeneticTerrain;
 extern Model* modelGeneticSuperTerrain;
 extern Model* modelDCBlock;
@@ -465,6 +466,7 @@ extern Model* modelDTrig;
 #undef modelX4
 #undef modelMVerb
 #undef modelOsc3
+#undef modelDCBlock
 
 // DHEModules
 // NOTE very unique way of handling init, needs special handling
@@ -2229,6 +2231,7 @@ static void initStatic__dbRackModules()
 #define modelX4 modeldbRackModulesX4
 #define modelMVerb modeldbRackModulesMVerb
 #define modelOsc3 modeldbRackModulesOsc3
+#define modelDCBlock modeldbRackModulesDCBlock
         p->addModel(modelGeneticTerrain);
         p->addModel(modelGeneticSuperTerrain);
         p->addModel(modelDCBlock);
@@ -2318,6 +2321,7 @@ static void initStatic__dbRackModules()
 #undef modelX4
 #undef modelMVerb
 #undef modelOsc3
+#undef modelDCBlock
     }
 }
 
