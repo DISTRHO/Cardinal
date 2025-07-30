@@ -331,7 +331,7 @@ PLUGIN_FILES += $(filter-out 8Mode/src/8mode.cpp,$(wildcard 8Mode/src/*.cpp))
 PLUGIN_FILES += $(filter-out alefsbits/src/plugin.cpp,$(wildcard alefsbits/src/*.cpp))
 
 # modules/types which are present in other plugins
-ALEFSBITS_CUSTOM = Steps Logic
+ALEFSBITS_CUSTOM = Steps Logic SimplexNoise
 
 # --------------------------------------------------------------
 # AlgoritmArte
@@ -577,7 +577,7 @@ PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/s
 PLUGIN_FILES += BidooDark/plugin.cpp
 
 # modules/types which are present in other plugins
-BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter PitchShifter $(DRWAV)
+BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter PitchShifter ScaleDisplay $(DRWAV)
 BIDOO_CUSTOM_PER_FILE = channel channel filterType
 
 # --------------------------------------------------------------
@@ -635,7 +635,7 @@ MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/resample.cpp
 MINIPLUGIN_FILES += BogaudioModules-helper/BogaudioModules-helper.cpp
 
 # modules/types which are present in other plugins
-BOGAUDIO_CUSTOM = ADSR BlueNoiseGenerator LFO Noise VCA VCO VCF
+BOGAUDIO_CUSTOM = ADSR BlueNoiseGenerator LFO Noise VCA VCO VCF ScaleKnob
 BOGAUDIO_CUSTOM_PER_FILE = ARQuantity ARSlider AttackMenuItem ReleaseMenuItem
 
 # --------------------------------------------------------------
@@ -694,9 +694,6 @@ DBIZ_CUSTOM_PER_FILE = LERP MultiFilter Oscillator calcOutput sineOsc subBank
 
 PLUGIN_FILES += $(filter-out dbRackModules/src/plugin.cpp dbRackModules/src/Drums.cpp,$(wildcard dbRackModules/src/*.cpp))
 
-# modules/types which are present in other plugins
-DBRACKMODULES_CUSTOM = SKF X4 MVerb Osc3
-
 PLUGIN_FILES += dbRackModules/Gamma/src/arr.cpp
 PLUGIN_FILES += dbRackModules/Gamma/src/Domain.cpp
 PLUGIN_FILES += dbRackModules/Gamma/src/scl.cpp
@@ -708,6 +705,9 @@ PLUGIN_FILES += dbRackModules/Gamma/src/fftpack++2.cpp
 RESOURCE_FILES += $(wildcard dbRackModules/images/*.png)
 RESOURCE_FILES += $(wildcard dbRackModules/presets)
 
+# modules/types which are present in other plugins
+DBRACKMODULES_CUSTOM = SKF X4 MVerb Osc3 SlewLimiter SimplexNoise ScaleDisplay DCBlock ScaleKnob Grad Shaper
+DBRACKMODULES_CUSTOM_PER_FILE = SinPOsc
 # --------------------------------------------------------------
 # DHE-Modules
 
@@ -752,7 +752,7 @@ PLUGIN_FILES += $(filter-out Extratone/src/plugin.cpp,$(wildcard Extratone/src/*
 PLUGIN_FILES += $(filter-out FehlerFabrik/src/plugin.cpp,$(wildcard FehlerFabrik/src/*.cpp))
 
 # modules/types which are present in other plugins
-FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter SimpleDelay
+FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter SimpleDelay DCBlock 
 
 # --------------------------------------------------------------
 # forsitan modulare
@@ -1018,7 +1018,7 @@ PLUGIN_FILES += $(filter-out PinkTrombone/src/plugin.cpp,$(wildcard PinkTrombone
 PLUGIN_FILES += $(wildcard PinkTrombone/src/PinkTrombone/*.cpp)
 
 # modules/types which are present in other plugins
-PINKTROMBONE_CUSTOM = WhiteNoise
+PINKTROMBONE_CUSTOM = WhiteNoise Grad
 
 # --------------------------------------------------------------
 # Prism
@@ -1326,7 +1326,7 @@ PLUGIN_BINARIES += ValleyAudio/src/XFADE.bin
 # MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_5.bin
 
 # modules/types which are present in other plugins
-VALLEYAUDIO_CUSTOM = $(DRWAV) Chord DigitalDisplay
+VALLEYAUDIO_CUSTOM = $(DRWAV) Chord DigitalDisplay Shaper
 VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 
 # --------------------------------------------------------------
@@ -2366,6 +2366,7 @@ $(BUILD_DIR)/dbRackModules/%.cpp.o: dbRackModules/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(DBRACKMODULES_CUSTOM),$(call custom_module_names,$(m),dbRackModules)) \
+		$(foreach m,$(DBRACKMODULES_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),DBRACKMODULES_$(shell basename -- $*))) \
 		-DpluginInstance=pluginInstance__dbRackModules \
 		-DSTDIO_OVERRIDE=dbRackModules \
 		-IdbRackModules/Gamma \
