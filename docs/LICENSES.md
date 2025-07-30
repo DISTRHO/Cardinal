@@ -38,6 +38,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | Computerscare           | BSD-3-Clause             | |
 | CVfunk                  | MIT                      | |
 | dBiz                    | GPL-3.0-or-later         | |
+| dbRackModules           | GPL-3.0-or-later         | |
 | DHE-Modules             | MIT                      | |
 | eightfold               | GPL-3.0-or-later         | |
 | EnigmaCurry             | GPL-3.0-or-later         | |
@@ -176,6 +177,7 @@ Below is a list of artwork licenses from plugins
 | dBiz/*                                  | CC-BY-NC-ND-4.0  | |
 | dBiz/DejaVuSansMono.ttf                 | Bitstream-Vera   | |
 | dBiz/ShareTechMono-Regular.ttf          | OFL-1.1          | |
+| dbRackModules/*                         | GPL-3.0-or-later | |
 | DHE-Modules/*                           | MIT              | Same license as source code |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
