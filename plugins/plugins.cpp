@@ -2048,6 +2048,7 @@ static void initStatic__CVfunk()
     if (spl.ok())
     {
         #define modelSteps modelCVfunkSteps
+        #define modelNode modelCVfunkNode
         p->addModel(modelSteps);
         p->addModel(modelEnvelopeArray);
         p->addModel(modelPentaSequencer);
@@ -2078,6 +2079,7 @@ static void initStatic__CVfunk()
         p->addModel(modelWonk);
         p->addModel(modelHammer);
         p->addModel(modelHub);
+        #undef modelNode
         #undef modelSteps
     }
 }
