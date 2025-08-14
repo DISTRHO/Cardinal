@@ -343,9 +343,11 @@ extern Model* modelTestVCF;
 #include "cf/src/plugin.hpp"
 
 // CVfunk
+#define modelNode modelCVfunkNode
 #define modelSteps modelCVfunkSteps
 #include "CVfunk/src/plugin.hpp"
 #undef modelSteps
+#undef modelNode
 
 // ChowDSP
 #include "ChowDSP/src/plugin.hpp"
