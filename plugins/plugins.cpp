@@ -2069,6 +2069,15 @@ static void initStatic__CVfunk()
         p->addModel(modelPreeeeeeeeeeessedDuck);
         p->addModel(modelArrange);
         p->addModel(modelTriDelay);
+        p->addModel(modelTatami);
+        p->addModel(modelCartesia);
+        p->addModel(modelJunkDNA);
+        p->addModel(modelPicus);
+        p->addModel(modelNode);
+        p->addModel(modelWeave);
+        p->addModel(modelWonk);
+        p->addModel(modelHammer);
+        p->addModel(modelHub);
         #undef modelSteps
     }
 }
