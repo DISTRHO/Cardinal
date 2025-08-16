@@ -264,6 +264,9 @@ endif
 
 ifeq ($(WASM),true)
 APP_EXT = .js
+UI_TYPE = gles2
+else
+UI_TYPE = opengl
 endif
 
 USE_VST2_BUNDLE = true
