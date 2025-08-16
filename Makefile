@@ -1,12 +1,12 @@
 #!/usr/bin/make -f
 # DISTRHO Cardinal Plugin
-# Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+# Copyright (C) 2021-2025 Filipe Coelho <falktx@falktx.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ROOT = .
 include $(ROOT)/Makefile.base.mk
 
-# -----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 # Set version
 
 # also set in:
@@ -17,18 +17,18 @@ include $(ROOT)/Makefile.base.mk
 # .github/ISSUE_TEMPLATE/bug.yaml src/CardinalCommon.cpp src/CardinalPlugin.cpp utils/macOS/Info_{JACK,Native}.plist
 VERSION = 25.06
 
-# --------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 # Build targets
 
 all: cardinal carla deps dgl plugins gen resources
 
-# --------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 # Build config
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
 
-# --------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 # Carla config
 
 CARLA_EXTRA_ARGS = \
@@ -44,7 +44,16 @@ ifneq ($(DEBUG),true)
 CARLA_EXTRA_ARGS += EXTERNAL_PLUGINS=true
 endif
 
-# --------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+# DGL config
+
+ifeq ($(WASM),true)
+UI_TYPE = gles2
+else
+UI_TYPE = opengl
+endif
+
+# ---------------------------------------------------------------------------------------------------------------------
 # Check for required system-wide dependencies
 
 ifeq ($(SYSDEPS),true)
@@ -183,7 +192,7 @@ endif
 
 dgl:
 ifneq ($(HEADLESS),true)
-	$(MAKE) opengl -C dpf/dgl $(DGL_EXTRA_ARGS)
+	$(MAKE) $(UI_TYPE) -C dpf/dgl $(DGL_EXTRA_ARGS)
 endif
 
 plugins: deps
