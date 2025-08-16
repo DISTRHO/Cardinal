@@ -144,6 +144,7 @@ At the moment the following 3rd-party modules are provided:
 - [Computerscare](https://github.com/freddyz/computerscare-vcv-modules)
 - [CVfunk](https://github.com/codygeary/CVfunk-Modules)
 - [dBiz](https://github.com/dBiz/dBiz)
+- [dbRackModules](https://github.com/docb/dbRackModules)
 - [DHE Modules](https://github.com/dhemery/DHE-Modules)
 - [eightfold](https://github.com/scanner-darkly/eightfold)
 - [EnigmaCurry](https://github.com/EnigmaCurry/EnigmaCurry-vcv-pack)
