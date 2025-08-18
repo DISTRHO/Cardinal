@@ -678,7 +678,7 @@ COMPUTERSCARE_CUSTOM = Quantizer PanelBorder
 PLUGIN_FILES += $(filter-out CVfunk/src/plugin.cpp,$(wildcard CVfunk/src/*.cpp))
 
 # modules/types which are present in other plugins
-CVFUNK_CUSTOM = Steps
+CVFUNK_CUSTOM = Steps Node
 
 # --------------------------------------------------------------
 # dBiz

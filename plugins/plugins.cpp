@@ -343,9 +343,11 @@ extern Model* modelTestVCF;
 #include "cf/src/plugin.hpp"
 
 // CVfunk
+#define modelNode modelCVfunkNode
 #define modelSteps modelCVfunkSteps
 #include "CVfunk/src/plugin.hpp"
 #undef modelSteps
+#undef modelNode
 
 // ChowDSP
 #include "ChowDSP/src/plugin.hpp"
@@ -2142,6 +2144,7 @@ static void initStatic__CVfunk()
     if (spl.ok())
     {
         #define modelSteps modelCVfunkSteps
+        #define modelNode modelCVfunkNode
         p->addModel(modelSteps);
         p->addModel(modelEnvelopeArray);
         p->addModel(modelPentaSequencer);
@@ -2163,6 +2166,16 @@ static void initStatic__CVfunk()
         p->addModel(modelPreeeeeeeeeeessedDuck);
         p->addModel(modelArrange);
         p->addModel(modelTriDelay);
+        p->addModel(modelTatami);
+        p->addModel(modelCartesia);
+        p->addModel(modelJunkDNA);
+        p->addModel(modelPicus);
+        p->addModel(modelNode);
+        p->addModel(modelWeave);
+        p->addModel(modelWonk);
+        p->addModel(modelHammer);
+        p->addModel(modelHub);
+        #undef modelNode
         #undef modelSteps
     }
 }
