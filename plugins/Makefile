@@ -331,7 +331,7 @@ PLUGIN_FILES += $(filter-out 8Mode/src/8mode.cpp,$(wildcard 8Mode/src/*.cpp))
 PLUGIN_FILES += $(filter-out alefsbits/src/plugin.cpp,$(wildcard alefsbits/src/*.cpp))
 
 # modules/types which are present in other plugins
-ALEFSBITS_CUSTOM = Steps Logic SimplexNoise
+ALEFSBITS_CUSTOM = Steps Logic
 
 # --------------------------------------------------------------
 # AlgoritmArte
@@ -577,7 +577,7 @@ PLUGIN_FILES += $(filter-out Bidoo/src/dep/resampler/main.cpp,$(wildcard Bidoo/s
 PLUGIN_FILES += BidooDark/plugin.cpp
 
 # modules/types which are present in other plugins
-BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter PitchShifter ScaleDisplay $(DRWAV)
+BIDOO_CUSTOM = ChannelDisplay InstantiateExpanderItem LadderFilter PitchShifter $(DRWAV)
 BIDOO_CUSTOM_PER_FILE = channel channel filterType
 
 # --------------------------------------------------------------
@@ -635,7 +635,7 @@ MINIPLUGIN_FILES += BogaudioModules/src/dsp/filters/resample.cpp
 MINIPLUGIN_FILES += BogaudioModules-helper/BogaudioModules-helper.cpp
 
 # modules/types which are present in other plugins
-BOGAUDIO_CUSTOM = ADSR BlueNoiseGenerator LFO Noise VCA VCO VCF ScaleKnob
+BOGAUDIO_CUSTOM = ADSR BlueNoiseGenerator LFO Noise VCA VCO VCF
 BOGAUDIO_CUSTOM_PER_FILE = ARQuantity ARSlider AttackMenuItem ReleaseMenuItem
 
 # --------------------------------------------------------------
@@ -752,7 +752,7 @@ PLUGIN_FILES += $(filter-out Extratone/src/plugin.cpp,$(wildcard Extratone/src/*
 PLUGIN_FILES += $(filter-out FehlerFabrik/src/plugin.cpp,$(wildcard FehlerFabrik/src/*.cpp))
 
 # modules/types which are present in other plugins
-FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter SimpleDelay DCBlock 
+FEHLERFABRIK_CUSTOM = Operator Sequencer SlewLimiter SimpleDelay 
 
 # --------------------------------------------------------------
 # forsitan modulare
@@ -1018,7 +1018,7 @@ PLUGIN_FILES += $(filter-out PinkTrombone/src/plugin.cpp,$(wildcard PinkTrombone
 PLUGIN_FILES += $(wildcard PinkTrombone/src/PinkTrombone/*.cpp)
 
 # modules/types which are present in other plugins
-PINKTROMBONE_CUSTOM = WhiteNoise Grad
+PINKTROMBONE_CUSTOM = WhiteNoise
 
 # --------------------------------------------------------------
 # Prism
@@ -1326,7 +1326,7 @@ PLUGIN_BINARIES += ValleyAudio/src/XFADE.bin
 # MINIPLUGIN_BINARIES += ValleyAudio/src/VOICE_5.bin
 
 # modules/types which are present in other plugins
-VALLEYAUDIO_CUSTOM = $(DRWAV) Chord DigitalDisplay Shaper
+VALLEYAUDIO_CUSTOM = $(DRWAV) Chord DigitalDisplay
 VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 
 # --------------------------------------------------------------
