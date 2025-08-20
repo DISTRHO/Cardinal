@@ -626,47 +626,7 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
 
     if (asset::userDir.empty())
     {
-       #if defined(DISTRHO_OS_WASM)
-        asset::userDir = "/userfiles";
-       #elif defined(ARCH_MAC)
-        asset::userDir = system::join(homeDir(), "Documents", "Cardinal");
-       #elif defined(ARCH_WIN)
-        asset::userDir = system::join(getSpecialPath(kSpecialPathMyDocuments), "Cardinal");
-       #else
-        std::string xdgConfigDir;
-        if (const char* const xdgEnv = getenv("XDG_CONFIG_HOME"))
-            xdgConfigDir = xdgEnv;
-        if (xdgConfigDir.empty())
-            xdgConfigDir = system::join(homeDir(), ".config");
-
-        const std::string xdgDirsConfigPath(system::join(xdgConfigDir, "user-dirs.dirs"));
-
-        if (system::exists(xdgDirsConfigPath))
-        {
-            std::ifstream xdgDirsConfigFile(xdgDirsConfigPath, std::ios::in|std::ios::ate);
-            std::string xdgDirsConfig(xdgDirsConfigFile.tellg(), 0);
-
-            xdgDirsConfigFile.seekg(0);
-            xdgDirsConfigFile.read(&xdgDirsConfig[0], xdgDirsConfig.size());
-
-            if (const char* const xdgDocsDir = std::strstr(xdgDirsConfig.c_str(), "XDG_DOCUMENTS_DIR=\""))
-            {
-                if (const char* const xdgDocsDirNL = std::strstr(xdgDocsDir, "\"\n"))
-                {
-                    asset::userDir = std::string(xdgDocsDir + 19, xdgDocsDirNL - xdgDocsDir - 19);
-
-                    if (string::startsWith(asset::userDir, "$HOME"))
-                        asset::userDir.replace(asset::userDir.begin(), asset::userDir.begin() + 5, homeDir());
-
-                    if (! system::exists(asset::userDir))
-                        asset::userDir.clear();
-                }
-            }
-        }
-
-        if (asset::userDir.empty())
-            asset::userDir = system::join(homeDir(), "Documents", "Cardinal");
-       #endif
+        asset::userDir = system::join(getSpecialDir(kSpecialDirDocuments), "Cardinal");
 
         if (isRealInstance)
         {
@@ -683,17 +643,10 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
    #ifndef CARDINAL_COMMON_DSP_ONLY
     if (asset::configDir.empty())
     {
-       #if defined(ARCH_MAC) || defined(ARCH_WIN) || defined(DISTRHO_OS_WASM)
-        asset::configDir = asset::userDir;
-       #else
-        if (const char* const xdgEnv = getenv("XDG_CONFIG_HOME"))
-            asset::configDir = system::join(xdgEnv, "Cardinal");
-        else
-            asset::configDir = system::join(homeDir(), ".config", "Cardinal");
+        asset::configDir = system::join(getSpecialDir(kSpecialDirConfig), "Cardinal");
 
         if (isRealInstance)
             system::createDirectory(asset::configDir);
-       #endif
     }
    #endif
    
