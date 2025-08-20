@@ -3234,6 +3234,7 @@ static void initStatic__Sapphire()
         p->addModel(modelSapphireTout);
         p->addModel(modelSapphireTricorder);
         p->addModel(modelSapphireTubeUnit);
+        p->addModel(modelSapphireZoo);
     }
 }
 
