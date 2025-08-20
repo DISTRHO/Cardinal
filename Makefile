@@ -238,6 +238,9 @@ clap: carla deps dgl plugins resources
 lv2: carla deps dgl plugins resources
 	$(MAKE) lv2 -C src $(CARLA_EXTRA_ARGS)
 
+mapi: carla deps dgl plugins resources
+	$(MAKE) mapi -C src $(CARLA_EXTRA_ARGS)
+
 vst2: carla deps dgl plugins resources
 	$(MAKE) vst2 -C src $(CARLA_EXTRA_ARGS)
 

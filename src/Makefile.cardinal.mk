@@ -410,6 +410,11 @@ endif
 BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
 
 # --------------------------------------------------------------
+# we know what we are doing, promise!
+
+BUILD_CXX_FLAGS += -DDISTRHO_NO_WARNINGS
+
+# --------------------------------------------------------------
 # Enable all possible plugin types and setup resources
 
 ifeq ($(CARDINAL_VARIANT),main)

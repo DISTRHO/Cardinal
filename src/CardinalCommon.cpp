@@ -875,7 +875,8 @@ void Initializer::stopRemoteServer()
         lo_server_thread_stop(oscServerThread);
         lo_server_thread_del_method(oscServerThread, nullptr, nullptr);
         lo_server_thread_free(oscServerThread);
-        oscServerThread = oscServer = nullptr;
+        oscServerThread = nullptr;
+        oscServer = nullptr;
     }
    #else
     if (oscServer != nullptr)
