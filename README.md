@@ -3,7 +3,7 @@
 *Cardinal, the Rack!*
 
 Cardinal is a free and open-source virtual modular synthesizer plugin,
-available in AudioUnit/CLAP/LV2/VST2/VST3 plugin formats and as a standalone app for FreeBSD, Linux, macOS, Windows and the Web.  
+available in AudioUnit/CLAP/LV2/VST2/VST3 plugin formats and as a standalone app for FreeBSD, Linux ([WINE](https://github.com/DISTRHO/Cardinal/issues/854#issuecomment-3234751096)), macOS, Windows and the Web.  
 It is based on the popular [VCV Rack](https://vcvrack.com/) but with a focus on being a fully self-contained plugin version.
 
 More specifically, this is a [DPF-based](https://github.com/DISTRHO/DPF/)
