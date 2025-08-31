@@ -54,7 +54,6 @@ enum DarkMode {
     kModeCf,
     kModeComputerscare,
     kModeDHE,
-    kModeDrumKit,
     kModeESeries,
     kModeLilacLoop,
     kModeLittleUtils,
@@ -259,19 +258,6 @@ static const struct {
     { kModeDHE, "/DHE-Modules/svg/truth-4.svg", {}, -1 },
     { kModeDHE, "/DHE-Modules/svg/upstage.svg", {}, -1 },
     { kModeDHE, "/DHE-Modules/svg/xycloid.svg", {}, -1 },
-    // CC0-1.0
-    { kModeDrumKit, "/DrumKit/res/Baronial.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/BD9.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/ClosedHH.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/CR78.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/DMX.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/Gnome.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/Marionette.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/OpenHH.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/SBD.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/Sequencer.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/Snare.svg", {}, -1 },
-    { kModeDrumKit, "/DrumKit/res/Tomi.svg", {}, -1 },
     // Custom, runtime dark mode used with permission
     { kModeESeries,"/ESeries/res/E340.svg", {}, -1 },
     // GPL3.0-or-later
@@ -290,12 +276,15 @@ static const struct {
     { kModeLOGinstruments, "/LOGinstruments/res/velvet-nofonts.svg", {}, -1 },
     // GPL-3.0-or-later
     { kModeKocmoc, "/kocmoc/res/DDLY.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/DIOD.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/LADR.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/uLADR.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/MUL.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/OP.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/PHASR.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/SKF.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/SVF.svg", {}, -1 },
+    { kModeKocmoc, "/kocmoc/res/uSVF.svg", {}, -1 },
     { kModeKocmoc, "/kocmoc/res/TRG.svg", {}, -1 },
     // GPL-3.0-or-later
     { kModeMyth, "/myth-modules/res/Mavka.svg", {}, -1 },
@@ -377,6 +366,7 @@ enum LightMode {
     kModePrism,
     kModeRepelzen,
     kModeSonusmodular,
+    kModeWSTDDrums,
 };
 
 static const struct {
@@ -439,6 +429,11 @@ static const struct {
     { kModeBefaco, "/Befaco/res/panels/Octaves.svg" },
     { kModeBefaco, "/Befaco/res/panels/Bypass.svg" },
     { kModeBefaco, "/Befaco/res/panels/Bandit.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Atte.svg" },
+    { kModeBefaco, "/Befaco/res/panels/AxBC.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Mixer2.svg" },
+    { kModeBefaco, "/Befaco/res/panels/MuDi.svg" },
+    { kModeBefaco, "/Befaco/res/panels/Slew.svg" },
     // GPLv3+
     { kModeCardinal, "/Cardinal/res/AudioFile.svg" },
     { kModeCardinal, "/Cardinal/res/AudioToCVPitch.svg" },
@@ -592,6 +587,20 @@ static const struct {
     { kModeSonusmodular, "/sonusmodular/res/tropicana.svg" },
     { kModeSonusmodular, "/sonusmodular/res/twoff.svg" },
     { kModeSonusmodular, "/sonusmodular/res/yabp.svg" },
+    // CC0-1.0
+    { kModeWSTDDrums, "/WSTD-Drums/res/Baronial.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/BD9.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/ClosedHH.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/CR78.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/DMX.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Gnome.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Marionette.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/OpenHH.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/SBD.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Sequencer.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Snare.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/Tomi.svg" },
+    { kModeWSTDDrums, "/WSTD-Drums/res/component/Knob.svg" },
 };
 
 static inline
@@ -628,12 +637,6 @@ bool invertPaintForDarkMode(const DarkMode mode, NSVGshape* const shape, NSVGpai
     {
         switch (mode)
         {
-        // Special case for DrumKit background gradient
-        case kModeDrumKit:
-            std::free(paint.gradient);
-            paint.type = NSVG_PAINT_COLOR;
-            paint.color = 0xff191919;
-            return true;
         // Special case for LOGinstruments gradient
         case kModeLOGinstruments:
             // original color from stop 1 was copied to this stop and made ~25% darker
