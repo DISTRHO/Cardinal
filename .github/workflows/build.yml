@@ -180,6 +180,7 @@ jobs:
           key: macos-universal-v${{ env.CACHE_VERSION }}
       - name: Setup dependencies
         run: |
+          brew uninstall --force --ignore-dependencies cmake
           ./deps/PawPaw/.github/workflows/bootstrap-deps.sh macos-universal-10.15
       - name: Build extra dependencies
         run: |
