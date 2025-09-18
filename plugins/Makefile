@@ -706,7 +706,9 @@ RESOURCE_FILES += $(wildcard dbRackModules/images/*.png)
 RESOURCE_FILES += $(wildcard dbRackModules/presets)
 
 # modules/types which are present in other plugins
-DBRACKMODULES_CUSTOM = SKF X4 MVerb Osc3 SlewLimiter SimplexNoise ScaleDisplay DCBlock ScaleKnob Grad Shaper
+DBRACKMODULES_CUSTOM = $(DRWAV) SKF X4 MVerb Osc3 SlewLimiter SimplexNoise ScaleDisplay DCBlock ScaleKnob Grad Shaper 
+DBRACKMODULES_CUSTOM += linToDB clip1 compact zeroCross zeroCrossFirst zeroCrossN DomainObserver Domainmaster Domain domain attach
+DBRACKMODULES_CUSTOM += spu gam notifyObservers ups sampleRate #operator
 DBRACKMODULES_CUSTOM_PER_FILE = SinPOsc
 # --------------------------------------------------------------
 # DHE-Modules
