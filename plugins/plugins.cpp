@@ -3527,11 +3527,7 @@ static void initStatic__Venom()
         p->addModel(modelVenomMixPan);
         p->addModel(modelVenomMixSend);
         p->addModel(modelVenomMixSolo);
-#if defined(VENOM_MOUSEPAD_CARDINAL)
         p->addModel(modelVenomMousePad);
-#else
-        spl.removeModule("MousePad");
-#endif
         p->addModel(modelVenomMultiMerge);
         p->addModel(modelVenomMultiSplit);
         p->addModel(modelVenomOscillator);
