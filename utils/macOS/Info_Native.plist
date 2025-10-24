@@ -11,7 +11,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>studio.kx.distrho.cardinal.native</string>
 	<key>CFBundleShortVersionString</key>
-	<string>25.06</string>
+	<string>25.10</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.15</string>
 	<key>NSHumanReadableCopyright</key>
