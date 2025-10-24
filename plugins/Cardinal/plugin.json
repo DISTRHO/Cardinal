@@ -193,15 +193,6 @@
       ]
     },
     {
-      "slug": "MPV",
-      "name": "MPV",
-      "description": "An embed video player inside Cardinal",
-      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#mpv",
-      "tags": [
-        "Visual"
-      ]
-    },
-    {
       "slug": "SassyScope",
       "name": "Sassy Scope",
       "description": "Scope from Sassy Audio Spreadsheet",

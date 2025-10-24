@@ -1157,12 +1157,12 @@ static void initStatic__Cardinal()
        #else
         spl.removeModule("glBars");
        #endif
-       #ifndef STATIC_BUILD
+       #ifndef __MOD_DEVICES__
         p->addModel(modelAudioFile);
        #else
         spl.removeModule("AudioFile");
        #endif
-       #if !(defined(DISTRHO_OS_WASM) || defined(STATIC_BUILD))
+       #if !(defined(DISTRHO_OS_WASM) || defined(__MOD_DEVICES__))
         p->addModel(modelCarla);
         p->addModel(modelIldaeil);
        #else
@@ -1173,11 +1173,6 @@ static void initStatic__Cardinal()
         p->addModel(modelSassyScope);
        #else
         spl.removeModule("SassyScope");
-       #endif
-       #if defined(HAVE_X11) && !defined(HEADLESS) && !defined(STATIC_BUILD)
-        p->addModel(modelMPV);
-       #else
-        spl.removeModule("MPV");
        #endif
        #ifdef HAVE_FFTW3F
         p->addModel(modelAudioToCVPitch);
@@ -2599,7 +2594,7 @@ static void initStatic__JW()
         p->addModel(modelCoolBreeze);
         p->addModel(modelPete);
         p->addModel(modelTimer);
-       #ifndef STATIC_BUILD
+       #ifndef __MOD_DEVICES__
         p->addModel(modelStr1ker);
        #else
         spl.removeModule("Str1ker");
