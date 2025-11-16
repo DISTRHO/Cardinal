@@ -405,7 +405,7 @@ ARIA_CUSTOM = Blank
 # --------------------------------------------------------------
 # AS
 
-PLUGIN_FILES += $(filter-out AS/src/AS.cpp,$(wildcard AS/src/*.cpp))
+PLUGIN_FILES += $(filter-out AS/src/AS.cpp AS/src/BlankPanelSpecial.cpp,$(wildcard AS/src/*.cpp))
 PLUGIN_FILES += AS/freeverb/revmodel.cpp
 
 # modules/types which are present in other plugins
