@@ -1313,6 +1313,7 @@ PLUGIN_FILES += $(filter-out Venom/src/plugin.cpp,$(wildcard Venom/src/*.cpp))
 # Voxglitch
 
 PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
+PLUGIN_FILES += $(wildcard voxglitch/src/modules/*.cpp)
 PLUGIN_FILES += voxglitch/src/vgLib-2.0/constants.cpp
 
 # modules/types which are present in other plugins
