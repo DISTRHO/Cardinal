@@ -426,7 +426,7 @@ jobs:
           export PATH="/usr/lib/ccache:${PATH}"
           source deps/PawPaw/local.env ${{ matrix.target }}
           make features
-          make NOOPT=true -j $(nproc)
+          xvfb-run make NOOPT=true -j $(nproc)
       - name: Build cross-compiled (carla)
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash

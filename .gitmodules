@@ -263,6 +263,9 @@
 [submodule "plugins/eightfold"]
 	path = plugins/eightfold
 	url = https://github.com/scanner-darkly/eightfold.git
+[submodule "plugins/Venom"]
+	path = plugins/Venom
+	url = https://github.com/DaveBenham/VenomModules
 [submodule "plugins/dbRackModules"]
 	path = plugins/dbRackModules
 	url = https://github.com/docb/dbRackModules.git

@@ -255,17 +255,11 @@ PLUGIN_FILES += Cardinal/src/glBars.cpp
 endif
 endif
 
-ifneq ($(STATIC_BUILD),true)
+ifneq ($(MOD_BUILD),true)
 PLUGIN_FILES += Cardinal/src/AudioFile.cpp
 ifneq ($(WASM),true)
 PLUGIN_FILES += Cardinal/src/Carla.cpp
 PLUGIN_FILES += Cardinal/src/Ildaeil.cpp
-endif
-ifneq ($(HEADLESS),true)
-ifeq ($(HAVE_X11),true)
-PLUGIN_FILES += Cardinal/src/EmbedWidget.cpp
-PLUGIN_FILES += Cardinal/src/MPV.cpp
-endif
 endif
 endif
 
@@ -831,7 +825,7 @@ IHTSYN_CUSTOM_PER_FILE += mv_statevariable
 
 PLUGIN_FILES += $(filter-out JW-Modules/src/JWModules.cpp JW-Modules/src/Str1ker.cpp,$(wildcard JW-Modules/src/*.cpp))
 
-ifneq ($(STATIC_BUILD),true)
+ifneq ($(MOD_BUILD),true)
 PLUGIN_FILES += JW-Modules/src/Str1ker.cpp
 PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/*.cpp)
 PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/osc/*.cpp)
@@ -1330,6 +1324,11 @@ PLUGIN_BINARIES += ValleyAudio/src/XFADE.bin
 # modules/types which are present in other plugins
 VALLEYAUDIO_CUSTOM = $(DRWAV) Chord DigitalDisplay
 VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
+
+# --------------------------------------------------------------
+# Venom
+
+PLUGIN_FILES += $(filter-out Venom/src/plugin.cpp,$(wildcard Venom/src/*.cpp))
 
 # --------------------------------------------------------------
 # Voxglitch
@@ -2852,6 +2851,15 @@ $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 		-IValleyAudio/src \
 		-Wno-sign-compare \
 		-Wno-unused-but-set-variable
+
+$(BUILD_DIR)/Venom/%.cpp.o: Venom/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(VENOM_CUSTOM),$(call custom_module_names,$(m),Venom)) \
+		-DSKIP_MINGW_FORMAT \
+		-DpluginInstance=pluginInstance__Venom \
+		-lglfw
 
 $(BUILD_DIR)/voxglitch/%.cpp.o: voxglitch/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
