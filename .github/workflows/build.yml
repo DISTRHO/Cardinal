@@ -180,6 +180,7 @@ jobs:
           key: macos-universal-v${{ env.CACHE_VERSION }}
       - name: Setup dependencies
         run: |
+          brew uninstall --force --ignore-dependencies cmake
           ./deps/PawPaw/.github/workflows/bootstrap-deps.sh macos-universal-10.15
       - name: Build extra dependencies
         run: |
@@ -425,7 +426,7 @@ jobs:
           export PATH="/usr/lib/ccache:${PATH}"
           source deps/PawPaw/local.env ${{ matrix.target }}
           make features
-          make NOOPT=true -j $(nproc)
+          xvfb-run make NOOPT=true -j $(nproc)
       - name: Build cross-compiled (carla)
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
