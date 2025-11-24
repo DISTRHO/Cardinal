@@ -266,3 +266,6 @@
 [submodule "plugins/Venom"]
 	path = plugins/Venom
 	url = https://github.com/DaveBenham/VenomModules
+[submodule "plugins/TMT"]
+	path = plugins/TMT
+	url = https://github.com/Jadael/TMT.git
