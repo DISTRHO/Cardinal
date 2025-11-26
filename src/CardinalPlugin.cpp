@@ -28,7 +28,6 @@
 #endif
 
 #include <cfloat>
-#include <cstddef>
 #include <list>
 
 #include "CardinalCommon.hpp"
@@ -1105,10 +1104,9 @@ protected:
         rack::system::removeRecursively(fAutosavePath);
         rack::system::createDirectories(fAutosavePath);
 
-        static constexpr const std::size_t zstdMagicSize = 4
-        static constexpr const char zstdMagic[zstdMagicSize + 1] = "\x28\xb5\x2f\xfd";
+        static constexpr const uint8_t zstdMagic[] = { 0x28, 0xb5, 0x2f, 0xfd };
 
-        if (std::memcmp(data.data(), zstdMagic, zstdMagicSize) != 0)
+        if (std::memcmp(data.data(), zstdMagic, sizeof(zstdMagic)) != 0)
         {
             FILE* const f = std::fopen(rack::system::join(fAutosavePath, "patch.json").c_str(), "w");
             DISTRHO_SAFE_ASSERT_RETURN(f != nullptr,);
