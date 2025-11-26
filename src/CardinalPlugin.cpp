@@ -1104,7 +1104,7 @@ protected:
         rack::system::removeRecursively(fAutosavePath);
         rack::system::createDirectories(fAutosavePath);
 
-        static constexpr const uint8_t zstdMagic[] = { 0x28, 0xb5, 0x2f, 0xfd };
+        static constexpr const uint8_t zstdMagic[4] = { 0x28, 0xb5, 0x2f, 0xfd };
 
         if (std::memcmp(data.data(), zstdMagic, sizeof(zstdMagic)) != 0)
         {
