@@ -23,6 +23,14 @@ If all went well opening the "Engine" menu again should show a checkmark, indica
 For the moment there is no error dialog or information in case things go wrong.  
 If you are unable to connect, make sure your OS network firewall settings allows opening port 2228.
 
+### Automatic startup using command line
+
+To start the OSC server automatically when Cardinal starts up, you can do a headless build and pass the environment variable
+```sh
+cardinal CARDINAL_REMOTE_HOST_PORT=2228
+```
+This can be useful, for example: starting Cardinal for an art exhibit where no mouse/keyboard are attached but you want remote control.
+
 ## TouchOSC example setup
 
 A TouchOSC compatible file is available [here](https://github.com/DISTRHO/Cardinal/raw/main/patches/touchosc/24-direct-fader-params.tosc).
