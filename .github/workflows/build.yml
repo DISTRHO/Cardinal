@@ -3,7 +3,7 @@ name: build
 on: [push, pull_request]
 
 env:
-  CACHE_VERSION: 13
+  CACHE_VERSION: 14
   CARDINAL_UNDER_WINE: 1
   CIBUILD: true
   DEBIAN_FRONTEND: noninteractive
@@ -158,7 +158,7 @@ jobs:
             *.tar.xz
 
   macos:
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
         with:
