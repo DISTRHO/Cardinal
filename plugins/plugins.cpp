@@ -1069,8 +1069,14 @@ struct StaticPluginLoader {
             return;
         }
 
+        std::string oldVersion = "0.0.0" ;
+
+        auto versionJ = json_object_get(rootJ, "version");
+        if (versionJ != nullptr)
+            oldVersion = json_string_value(versionJ);
+
         // force ABI, we use static plugins so this doesnt matter as long as it builds
-        json_t* const version = json_string((APP_VERSION_MAJOR + ".0").c_str());
+        json_t* const version = json_string(oldVersion.replace(0, 1, APP_VERSION_MAJOR).c_str());
         json_object_set(rootJ, "version", version);
         json_decref(version);
 
