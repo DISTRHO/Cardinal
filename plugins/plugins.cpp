@@ -1075,8 +1075,11 @@ struct StaticPluginLoader {
         if (versionJ != nullptr)
             oldVersion = json_string_value(versionJ);
 
-        // force ABI, we use static plugins so this doesnt matter as long as it builds
-        json_t* const version = json_string(oldVersion.replace(0, 1, APP_VERSION_MAJOR).c_str());
+        json_t* version = json_string(oldVersion.c_str());
+        if ( (int) oldVersion.at(0) < (int) APP_VERSION_MAJOR.at(0) )
+            // force ABI, we use static plugins so this doesnt matter as long as it builds
+            version = json_string(oldVersion.replace(0, 1, APP_VERSION_MAJOR).c_str());
+
         json_object_set(rootJ, "version", version);
         json_decref(version);
 
