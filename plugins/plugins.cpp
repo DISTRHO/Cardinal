@@ -1076,9 +1076,9 @@ struct StaticPluginLoader {
         if (!string::startsWith(version, APP_VERSION_MAJOR + "."))
         {
             // force ABI, we use static plugins so this doesnt matter as long as it builds
-            json_t* json_version = json_string((APP_VERSION_MAJOR + ".0").c_str());
-            json_object_set(rootJ, "version", json_version);
-            json_decref(json_version);
+            json_t* const versionJ = json_string((APP_VERSION_MAJOR + ".0").c_str());
+            json_object_set(rootJ, "version", versionJ);
+            json_decref(versionJ);
         }
 
         // Load manifest
