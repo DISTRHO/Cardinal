@@ -1069,10 +1069,17 @@ struct StaticPluginLoader {
             return;
         }
 
-        // force ABI, we use static plugins so this doesnt matter as long as it builds
-        json_t* const version = json_string((APP_VERSION_MAJOR + ".0").c_str());
-        json_object_set(rootJ, "version", version);
-        json_decref(version);
+        std::string version;
+        if (json_t* const versionJ = json_object_get(rootJ, "version"))
+            version = json_string_value(versionJ);
+
+        if (!string::startsWith(version, APP_VERSION_MAJOR + "."))
+        {
+            // force ABI, we use static plugins so this doesnt matter as long as it builds
+            json_t* const versionJ = json_string((APP_VERSION_MAJOR + ".0").c_str());
+            json_object_set(rootJ, "version", versionJ);
+            json_decref(versionJ);
+        }
 
         // Load manifest
         p->fromJson(rootJ);
