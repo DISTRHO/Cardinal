@@ -1069,19 +1069,18 @@ struct StaticPluginLoader {
             return;
         }
 
-        std::string oldVersion = "0.0.0" ;
+        std::string version = "0.0.0";
+        json_t* versionJ = json_object_get(rootJ, "version");
+        if (versionJ)
+            version = json_string_value(versionJ);
 
-        auto versionJ = json_object_get(rootJ, "version");
-        if (versionJ != nullptr)
-            oldVersion = json_string_value(versionJ);
-
-        json_t* version = json_string(oldVersion.c_str());
-        if ( (int) oldVersion.at(0) < (int) APP_VERSION_MAJOR.at(0) )
+        if (!string::startsWith(version, APP_VERSION_MAJOR + "."))
             // force ABI, we use static plugins so this doesnt matter as long as it builds
-            version = json_string(oldVersion.replace(0, 1, APP_VERSION_MAJOR).c_str());
+            version = version.replace(0, 1, APP_VERSION_MAJOR).c_str();
 
-        json_object_set(rootJ, "version", version);
-        json_decref(version);
+        json_t* json_version = json_string(version.c_str());
+        json_object_set(rootJ, "version", json_version);
+        json_decref(json_version);
 
         // Load manifest
         p->fromJson(rootJ);
