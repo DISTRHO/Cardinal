@@ -339,7 +339,7 @@ class CardinalUI : public CardinalBaseUI,
 
 public:
     CardinalUI()
-        : CardinalBaseUI(DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT),
+        : CardinalBaseUI(),
         #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
          #ifdef DISTRHO_OS_WASM
           fInitializer(new Initializer(static_cast<const CardinalBasePlugin*>(nullptr), this)),

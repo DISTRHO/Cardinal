@@ -155,8 +155,8 @@ public:
     std::function<void(char* path)> filebrowseraction;
     FileBrowserHandle filebrowserhandle;
 
-    CardinalBaseUI(const uint width, const uint height)
-        : UI(width, height),
+    CardinalBaseUI()
+        : UI(),
          #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
           context(getRackContextFromPlugin(getPluginInstancePointer())),
          #else
