@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2025 Filipe Coelho <falktx@falktx.com>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -414,7 +414,7 @@ protected:
 
     uint32_t getVersion() const override
     {
-        return d_version(0, 24, 12);
+        return d_version(0, 25, 12);
     }
 
     int64_t getUniqueId() const override

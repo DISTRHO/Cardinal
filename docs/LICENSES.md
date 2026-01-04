@@ -39,7 +39,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | CVfunk                  | MIT                      | |
 | dBiz                    | GPL-3.0-or-later         | |
 | DHE-Modules             | MIT                      | |
-| DrumKit                 | CC0-1.0                  | |
+| eightfold               | GPL-3.0-or-later         | |
 | EnigmaCurry             | GPL-3.0-or-later         | |
 | E-Series                | GPL-3.0-or-later         | |
 | ExpertSleepers Encoders | MIT                      | |
@@ -90,7 +90,9 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | Surge XT                | GPL-3.0-or-later         | |
 | unless_modules          | GPL-3.0-or-later         | |
 | Valley                  | GPL-3.0-or-later         | |
+| Venom                   | GPL-3.0-or-later         | |
 | Voxglitch               | GPL-3.0-or-later         | |
+| WSTD-Drums              | CC0-1.0                  | |
 | WhatTheRack             | WTFPL                    | |
 | ZetaCarinae             | GPL-3.0-or-later         | |
 | ZZC                     | GPL-3.0-or-later         | |
@@ -178,6 +180,7 @@ Below is a list of artwork licenses from plugins
 | DHE-Modules/*                           | MIT              | Same license as source code |
 | DrumKit/*                               | CC0-1.0          | |
 | DrumKit/component/NovaMono.ttf          | OFL-1.1-RFN      | |
+| eightfold/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | EnigmaCurry/res/fonts/dseg/*            | OFL-1.1-RFN      | |
 | EnigmaCurry/res/fonts/Fantasque/*       | OFL-1.1          | |
 | EnigmaCurry/res/fonts/manrope/*         | OFL-1.1          | |
@@ -201,6 +204,7 @@ Below is a list of artwork licenses from plugins
 | ImpromptuModular/res/comp/complib/*     | CC-BY-NC-4.0     | |
 | JW-Modules/*                            | BSD-3-Clause     | No artwork specific license provided |
 | JW-Modules/DejaVuSansMono.ttf           | Bitstream-Vera   | Unused in Cardinal |
+| JW-Modules/res/fonts/ShareTechMono-Regular.ttf | OFL-1.1 | |
 | kocmoc/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | LifeFormModular/*                       | MIT              | No artwork specific license provided |
 | LilacLoop/*                             | GPL-3.0-or-later | No artwork specific license provided |
@@ -263,6 +267,7 @@ Below is a list of artwork licenses from plugins
 | ValleyAudio/din1451alt.ttf              | CC-BY-3.0-DE     | |
 | ValleyAudio/DSEG14Classic-*.ttf         | OFL-1.1-RFN      | |
 | ValleyAudio/ShareTechMono-*.ttf         | OFL-1.1-RFN      | |
+| Venom/*                                 | GPL-3.0-or-later | No artwork specific license provided |
 | voxglitch/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | voxglitch/ShareTechMono-Regular.ttf     | OFL-1.1-RFN      | |
 | WhatTheRack/*                           | WTFPL            | |
