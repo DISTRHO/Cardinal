@@ -3263,6 +3263,7 @@ static void initStatic__sonusmodular()
         p->addModel(modelChainsaw);
         p->addModel(modelCtrl);
         p->addModel(modelDeathcrush);
+        p->addModel(modelFluidmix);
         p->addModel(modelFraction);
         p->addModel(modelHarmony);
         p->addModel(modelLadrone);
