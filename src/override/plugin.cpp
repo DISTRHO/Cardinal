@@ -48,6 +48,7 @@ static const std::map<std::string, std::string> pluginSlugFallbacks = {
 	{"AudibleInstrumentsPreview", "AudibleInstruments"},
 	{"SequelSequencers", "DanielDavies"},
 	{"DelexanderVol1", "DelexandraVol1"},
+	{"DrumKit", "WSTD-Drums"}
 	// {"", ""},
 };
 
@@ -102,6 +103,18 @@ static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = 
 	{{"Core", "Notes"}, {"Cardinal", "TextEditor"}},
 	{{"Core", "Blank"}, {"Cardinal", "Blank"}},
 	{{"MindMeld-ShapeMasterPro", "ShapeMasterPro"}, {"MindMeldModular", "ShapeMaster"}},
+	{{"DrumKit", "BassDrum9"}, {"WSTD-Drums", "BassDrum9"}},
+	{{"DrumKit", "ClosedHiHat"}, {"WSTD-Drums", "ClosedHiHat"}},
+	{{"DrumKit", "CR78"}, {"WSTD-Drums", "CR78"}},
+	{{"DrumKit", "DMX"}, {"WSTD-Drums", "DMX"}},
+	{{"DrumKit", "OpenHiHat"}, {"WSTD-Drums", "OpenHiHat"}},
+	{{"DrumKit", "SyntheticBassDrum"}, {"WSTD-Drums", "SyntheticBassDrum"}},
+	{{"DrumKit", "SnareDrumN"}, {"WSTD-Drums", "SnareDrumN"}},
+	{{"DrumKit", "Tomi"}, {"WSTD-Drums", "Tomi"}},
+	{{"DrumKit", "Gnome"}, {"WSTD-Drums", "Gnome"}},
+	{{"DrumKit", "Sequencer"}, {"WSTD-Drums", "Sequencer"}},
+	{{"DrumKit", "Baronial"}, {"WSTD-Drums", "Baronial"}},
+	{{"DrumKit", "MarionetteBass"}, {"WSTD-Drums", "MarionetteBass"}},
 	// {{"", ""}, {"", ""}},
 };
 

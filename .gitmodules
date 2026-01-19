@@ -49,9 +49,9 @@
 [submodule "plugins/ValleyAudio"]
 	path = plugins/ValleyAudio
 	url = https://github.com/ValleyAudio/ValleyRackFree.git
-[submodule "plugins/DrumKit"]
-	path = plugins/DrumKit
-	url = https://github.com/SVModular/DrumKit.git
+[submodule "plugins/WSTD-Drums"]
+	path = plugins/WSTD-Drums
+	url = https://github.com/Wasted-Audio/WSTD-Drums.git
 [submodule "carla"]
 	path = carla
 	url = https://github.com/falkTX/Carla.git
@@ -260,4 +260,9 @@
 [submodule "plugins/admiral"]
 	path = plugins/admiral
 	url = https://github.com/wapiflapi/admiral.git
-
+[submodule "plugins/eightfold"]
+	path = plugins/eightfold
+	url = https://github.com/scanner-darkly/eightfold.git
+[submodule "plugins/Venom"]
+	path = plugins/Venom
+	url = https://github.com/DaveBenham/VenomModules

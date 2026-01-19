@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -339,7 +339,7 @@ class CardinalUI : public CardinalBaseUI,
 
 public:
     CardinalUI()
-        : CardinalBaseUI(DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT),
+        : CardinalBaseUI(),
         #if ! DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
          #ifdef DISTRHO_OS_WASM
           fInitializer(new Initializer(static_cast<const CardinalBasePlugin*>(nullptr), this)),
@@ -1258,20 +1258,6 @@ protected:
         rack::settings::save();
        #endif
     }
-
-#if 0
-    void uiReshape(const uint width, const uint height) override
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0.0, width, 0.0, height, -1.0, 1.0);
-        glViewport(0, 0, width, height);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-    }
-#endif
 
 private:
    /**
