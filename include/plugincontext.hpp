@@ -68,7 +68,7 @@ using CardinalDGL::IdleCallback;
 // --------------------------------------------------------------------------------------------------------------------
 // Cardinal specific context
 
-static constexpr const uint32_t kModuleParameterCount = 24;
+static constexpr const uint32_t kModuleParameterCount = 48;
 
 enum CardinalVariant {
     kCardinalVariantMain,

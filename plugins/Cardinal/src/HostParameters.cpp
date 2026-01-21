@@ -149,7 +149,7 @@ struct HostParametersWidget : ModuleWidgetWith9HP {
         setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/HostParameters.svg")));
         createAndAddScrews();
 
-        for (int i=0; i<24; ++i)
+        for (int i=0; i<kModuleParameterCount; ++i)
         {
             const float x = startX + int(i / 6) * paddingH;
             const float y = startY + int(i % 6) * paddingV;
@@ -165,7 +165,7 @@ struct HostParametersWidget : ModuleWidgetWith9HP {
         nvgFontSize(args.vg, 14);
 
         char text[] = { '0', '0', '\0' };
-        for (int i=0; i<24; ++i)
+        for (int i=0; i<kModuleParameterCount; ++i)
         {
             const float x = startX + int(i / 6) * paddingH;
             const float y = startY + int(i % 6) * paddingV;
