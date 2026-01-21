@@ -185,6 +185,17 @@ Unlike Rack, Cardinal does not use PPQN (pulses per quarter note) values, but BB
 The top of the panel has a timer display to help understand how and what the host is doing.  
 The first line is the song time in seconds, and second line is the BBT.
 
+The meaning of the outputs is:
+
+- Playing: On if the host transport is rolling or Off if paused/stopped
+- Reset: Trigger for when the host transport has been relocated or has been restarted
+- Bar: Trigger for bar change
+- Beat: Trigger for beat change
+- Step: Trigger for step change
+- Bar Phase: 0-10v smooth ramp for the bar position (with bar division being a right-click option)
+- Beat Phase: 0-10v smooth ramp for the beat position
+- BPM: Volts per Beat per Second, as supported by Impromptu Clocked/Clkd and ZZC Clock
+
 ## Extra modules
 
 ### Blank
