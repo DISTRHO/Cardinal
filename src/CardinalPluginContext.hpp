@@ -131,7 +131,7 @@ public:
           context(new CardinalPluginContext(this)) {}
     ~CardinalBasePlugin() override {}
 
-   #ifdef HAVE_LIBLO
+   #if defined(HAVE_LIBLO) && !CARDINAL_VARIANT_LOADER
     virtual bool startRemoteServer(const char* port) = 0;
     virtual void stopRemoteServer() = 0;
     virtual void stepRemoteServer() = 0;
