@@ -5,4 +5,5 @@
 #
 
 NAME = CardinalSynth
+CARDINAL_VARIANT = synth
 include ../Makefile.cardinal.mk

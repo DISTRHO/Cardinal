@@ -5,4 +5,5 @@
 #
 
 NAME = CardinalMini
+CARDINAL_VARIANT = mini
 include ../Makefile.cardinal.mk

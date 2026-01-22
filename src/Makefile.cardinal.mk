@@ -10,17 +10,8 @@
 ifeq ($(NAME),)
 $(error invalid usage)
 endif
-
-ifeq ($(NAME),Cardinal)
-CARDINAL_VARIANT = main
-else ifeq ($(NAME),CardinalMini)
-CARDINAL_VARIANT = mini
-else ifeq ($(NAME),CardinalFX)
-CARDINAL_VARIANT = fx
-else ifeq ($(NAME),CardinalNative)
-CARDINAL_VARIANT = native
-else ifeq ($(NAME),CardinalSynth)
-CARDINAL_VARIANT = synth
+ifeq ($(CARDINAL_VARIANT),)
+$(error invalid usage)
 endif
 
 # --------------------------------------------------------------

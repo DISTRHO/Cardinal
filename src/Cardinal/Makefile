@@ -5,4 +5,5 @@
 #
 
 NAME = Cardinal
+CARDINAL_VARIANT = main
 include ../Makefile.cardinal.mk
