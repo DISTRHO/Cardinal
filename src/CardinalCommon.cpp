@@ -36,7 +36,7 @@
 # error wrong build
 #endif
 
-#if (defined(STATIC_BUILD) && !defined(__MOD_DEVICES__)) || CARDINAL_VARIANT_MINI
+#if (defined(STATIC_BUILD) && !defined(__MOD_DEVICES__)) || CARDINAL_VARIANT_LOADER || CARDINAL_VARIANT_MINI
 # undef CARDINAL_INIT_OSC_THREAD
 #endif
 
@@ -70,6 +70,8 @@
 
 #if CARDINAL_VARIANT_FX
 # define CARDINAL_VARIANT_NAME "fx"
+#elif CARDINAL_VARIANT_LOADER
+# define CARDINAL_VARIANT_NAME "loader"
 #elif CARDINAL_VARIANT_MINI
 # define CARDINAL_VARIANT_NAME "mini"
 #elif CARDINAL_VARIANT_NATIVE
@@ -128,12 +130,14 @@ CardinalPluginContext::CardinalPluginContext(Plugin* const p)
     : bufferSize(p != nullptr ? p->getBufferSize() : 0),
       processCounter(0),
       sampleRate(p != nullptr ? p->getSampleRate() : 0.0),
-     #if CARDINAL_VARIANT_MAIN
+     #if CARDINAL_VARIANT_FX
+      variant(kCardinalVariantFX),
+     #elif CARDINAL_VARIANT_LOADER
+      variant(kCardinalVariantLoader),
+     #elif CARDINAL_VARIANT_MAIN
       variant(kCardinalVariantMain),
      #elif CARDINAL_VARIANT_MINI
       variant(kCardinalVariantMini),
-     #elif CARDINAL_VARIANT_FX
-      variant(kCardinalVariantFX),
      #elif CARDINAL_VARIANT_NATIVE
       variant(kCardinalVariantNative),
      #elif CARDINAL_VARIANT_SYNTH

@@ -74,11 +74,13 @@ endif
 endif
 
 ifeq ($(HEADLESS),true)
+ifneq ($(STATIC_BUILD),true)
 
 ifneq ($(shell $(PKG_CONFIG) --exists liblo && echo true),true)
 $(error liblo dependency not installed/available)
 endif
 
+endif
 endif
 
 # --------------------------------------------------------------
@@ -201,6 +203,9 @@ plugins: deps
 resources:
 	$(MAKE) resources -C plugins
 
+loader-resources:
+	$(MAKE) loader-resources -C plugins
+
 mini-plugins: deps
 	$(MAKE) mini -C plugins
 
@@ -211,10 +216,14 @@ ifneq ($(CROSS_COMPILING),true)
 gen: cardinal resources dpf/utils/lv2_ttl_generator
 	@$(CURDIR)/dpf/utils/generate-ttl.sh
 
+loader-gen: loader loader-resources dpf/utils/lv2_ttl_generator
+	@$(CURDIR)/dpf/utils/generate-ttl.sh
+
 dpf/utils/lv2_ttl_generator:
 	$(MAKE) -C dpf/utils/lv2-ttl-generator
 else
 gen:
+loader-gen:
 endif
 
 # --------------------------------------------------------------
@@ -252,6 +261,15 @@ vst3: carla deps dgl plugins resources
 
 modgui:
 	$(MAKE) modgui -C src/CardinalMiniSep
+
+ifeq ($(HEADLESS)$(STATIC_BUILD),truetrue)
+loader: deps dgl plugins loader-gen
+	$(MAKE) loader -C src $(CARLA_EXTRA_ARGS)
+	@$(CURDIR)/dpf/utils/generate-ttl.sh
+else
+loader:
+	$(MAKE) loader HEADLESS=true STATIC_BUILD=true
+endif
 
 # --------------------------------------------------------------
 # Packaging standalone for CI

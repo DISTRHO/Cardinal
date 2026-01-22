@@ -46,22 +46,19 @@ class UI;
 // --------------------------------------------------------------------------------------------------------------------
 // Base DGL classes
 
-#ifndef DGL_BASE_HPP_INCLUDED
-
 namespace CardinalDGL {
-
+#ifndef DGL_BASE_HPP_INCLUDED
 class TopLevelWidget;
-template <class BaseWidget> class NanoBaseWidget;
-typedef NanoBaseWidget<TopLevelWidget> NanoTopLevelWidget;
-
 struct IdleCallback {
     virtual ~IdleCallback() {}
     virtual void idleCallback() = 0;
 };
-
-}
-
 #endif
+#ifndef DGL_NANO_WIDGET_HPP_INCLUDED
+template <class BaseWidget> class NanoBaseWidget;
+typedef NanoBaseWidget<TopLevelWidget> NanoTopLevelWidget;
+#endif
+}
 
 using CardinalDGL::IdleCallback;
 
@@ -71,9 +68,10 @@ using CardinalDGL::IdleCallback;
 static constexpr const uint32_t kModuleParameterCount = 48;
 
 enum CardinalVariant {
+    kCardinalVariantFX,
+    kCardinalVariantLoader,
     kCardinalVariantMain,
     kCardinalVariantMini,
-    kCardinalVariantFX,
     kCardinalVariantNative,
     kCardinalVariantSynth,
 };

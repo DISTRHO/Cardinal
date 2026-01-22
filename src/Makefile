@@ -139,6 +139,10 @@ jack: $(TARGETS)
 native: $(TARGETS)
 	$(MAKE) jack -C CardinalNative
 
+loader: $(TARGETS)
+	$(MAKE) lv2_dsp -C CardinalLoader
+	$(MAKE) mapi -C CardinalLoader
+
 mini: $(TARGETS)
 	$(MAKE) jack -C CardinalMini
 	$(MAKE) lv2_sep -C CardinalMiniSep
