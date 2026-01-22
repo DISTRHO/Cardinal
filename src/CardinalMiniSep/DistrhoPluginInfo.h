@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -18,9 +18,10 @@
 #ifndef DISTRHO_PLUGIN_INFO_H_INCLUDED
 #define DISTRHO_PLUGIN_INFO_H_INCLUDED
 
+#define CARDINAL_VARIANT_FX     0
+#define CARDINAL_VARIANT_LOADER 0
 #define CARDINAL_VARIANT_MAIN   0
 #define CARDINAL_VARIANT_MINI   1
-#define CARDINAL_VARIANT_FX     0
 #define CARDINAL_VARIANT_NATIVE 0
 #define CARDINAL_VARIANT_SYNTH  0
 

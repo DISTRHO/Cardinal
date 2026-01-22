@@ -47,7 +47,9 @@ START_NAMESPACE_DISTRHO
 enum CardinalParameters {
     kCardinalParameterCountAtModules = kModuleParameterCount,
     kCardinalParameterBypass = kCardinalParameterCountAtModules,
-  #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+  #if CARDINAL_VARIANT_LOADER
+    kCardinalParameterCount = kCardinalParameterBypass
+  #elif CARDINAL_VARIANT_MINI || !defined(HEADLESS)
     kCardinalParameterStartWindow,
     kCardinalParameterCountAtWindow = kCardinalParameterStartWindow + kWindowParameterCount,
    #if CARDINAL_VARIANT_MINI
@@ -85,6 +87,7 @@ enum CardinalParameters {
 
 enum CardinalStates {
     kCardinalStatePatch,
+  #if ! CARDINAL_VARIANT_LOADER
     kCardinalStateScreenshot,
     kCardinalStateComment,
    #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
@@ -93,11 +96,13 @@ enum CardinalStates {
    #if CARDINAL_VARIANT_MINI
     kCardinalStateParamChange,
    #endif
+  #endif
     kCardinalStateCount
 };
 
 static_assert(kCardinalParameterBypass == kModuleParameterCount, "valid parameter indexes");
-#if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+#if CARDINAL_VARIANT_LOADER
+#elif CARDINAL_VARIANT_MINI || !defined(HEADLESS)
 static_assert(kCardinalParameterStartWindow == kModuleParameterCount + 1, "valid parameter indexes");
 static_assert(kCardinalParameterStartWindow == kCardinalParameterBypass + 1, "valid parameter indexes");
 static_assert(kCardinalParameterCountAtWindow == kModuleParameterCount + kWindowParameterCount + 1, "valid parameter indexes");
