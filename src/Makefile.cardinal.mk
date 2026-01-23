@@ -190,6 +190,9 @@ EXTRA_DSP_LIBS += -framework Accelerate -framework AppKit -framework AudioToolbo
 else ifeq ($(WINDOWS),true)
 EXTRA_DSP_LIBS += -lole32 -lshlwapi -luuid -lversion
 endif
+ifneq ($(HAIKU_OR_MACOS_OR_WASM_OR_WINDOWS),true)
+EXTRA_DSP_LIBS += -ldl
+endif
 
 # --------------------------------------------------------------
 # Setup resources
