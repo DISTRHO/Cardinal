@@ -634,12 +634,14 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
 
         if (isRealInstance)
         {
-            system::createDirectory(asset::userDir);
            #if defined(DISTRHO_OS_WASM) && !defined(CARDINAL_COMMON_UI_ONLY)
             EM_ASM({
+                Module.FS.mkdir('/userfiles');
                 Module.FS.mount(Module.IDBFS, {}, '/userfiles');
                 Module.FS.syncfs(true, function(err) { if (!err) { dynCall('vi', $0, [$1]) } });
             }, WebBrowserDataLoaded, this);
+           #else
+            system::createDirectory(asset::userDir);
            #endif
         }
     }
