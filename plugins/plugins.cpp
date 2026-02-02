@@ -1506,7 +1506,9 @@ static void initStatic__AS()
         p->addModel(modelBlankPanel4);
         p->addModel(modelBlankPanel6);
         p->addModel(modelBlankPanel8);
-        p->addModel(modelBlankPanelSpecial);
+
+        //Copyright Violation
+        spl.removeModule("BlankPanelSpecial");
 #undef modelADSR
 #undef modelVCA
 #undef modelWaveShaper
