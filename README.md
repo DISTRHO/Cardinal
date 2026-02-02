@@ -208,7 +208,7 @@ Additionally Cardinal provides its own modules for DAW/Host automation, time pos
 ### Adding modules
 
 Installing new modules on a Cardinal build is not possible, but we can integrate existing open-source modules to be part of Cardinal.
-Details on this are available [here](https://github.com/DISTRHO/Cardinal/discussions/28).  
+Details on this are available [here](docs/ADDING-MODULES.md).  
 Also check [this wiki page](https://github.com/DISTRHO/Cardinal/wiki/Possible-modules-to-include)
 where we discuss possible modules to include.  
 
