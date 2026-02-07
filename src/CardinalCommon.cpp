@@ -796,6 +796,29 @@ void Initializer::loadSettings(const bool isRealInstance)
 }
 
 #ifdef HAVE_LIBLO
+struct OscMethod {
+    const char* path;
+    const char* types;
+    lo_method_handler handler;
+};
+
+static const OscMethod kOscMethods[] = {
+    {"/hello", "", osc_hello_handler},
+    {"/host-param", "if", osc_host_param_handler},
+    {"/load", "b", osc_load_handler},
+    {"/param", "hif", osc_param_handler},
+   #ifdef CARDINAL_INIT_OSC_THREAD
+    {"/screenshot", "b", osc_screenshot_handler},
+   #endif
+};
+
+template <typename AddFn, typename Server>
+static void addOscMethods(Server srv, AddFn addFn, void* self) {
+    for (const auto& m : kOscMethods)
+        addFn(srv, m.path, m.types, m.handler, self);
+    addFn(srv, nullptr, nullptr, osc_fallback_handler, nullptr);
+}
+
 bool Initializer::startRemoteServer(const char* const port)
 {
    #ifdef CARDINAL_INIT_OSC_THREAD
@@ -808,13 +831,7 @@ bool Initializer::startRemoteServer(const char* const port)
         return false;
 
     oscServer = lo_server_thread_get_server(oscServerThread);
-
-    lo_server_thread_add_method(oscServerThread, "/hello", "", osc_hello_handler, this);
-    lo_server_thread_add_method(oscServerThread, "/host-param", "if", osc_host_param_handler, this);
-    lo_server_thread_add_method(oscServerThread, "/load", "b", osc_load_handler, this);
-    lo_server_thread_add_method(oscServerThread, "/param", "hif", osc_param_handler, this);
-    lo_server_thread_add_method(oscServerThread, "/screenshot", "b", osc_screenshot_handler, this);
-    lo_server_thread_add_method(oscServerThread, nullptr, nullptr, osc_fallback_handler, nullptr);
+    addOscMethods(oscServerThread, lo_server_thread_add_method, this);
     lo_server_thread_start(oscServerThread);
    #else
     if (oscServer != nullptr)
@@ -825,11 +842,7 @@ bool Initializer::startRemoteServer(const char* const port)
     if ((oscServer = lo_server_new_with_proto(port, LO_UDP, osc_error_handler)) == nullptr)
         return false;
 
-    lo_server_add_method(oscServer, "/hello", "", osc_hello_handler, this);
-    lo_server_add_method(oscServer, "/host-param", "if", osc_host_param_handler, this);
-    lo_server_add_method(oscServer, "/load", "b", osc_load_handler, this);
-    lo_server_add_method(oscServer, "/param", "hif", osc_param_handler, this);
-    lo_server_add_method(oscServer, nullptr, nullptr, osc_fallback_handler, nullptr);
+    addOscMethods(oscServer, lo_server_add_method, this);
    #endif
 
     return true;
