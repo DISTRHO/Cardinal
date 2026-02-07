@@ -728,10 +728,6 @@ struct ViewButton : MenuButton {
 
 
 struct EngineButton : MenuButton {
-#ifdef HAVE_LIBLO
-	bool remoteServerStarted = false;
-#endif
-
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->cornerFlags = BND_CORNER_TOP;
@@ -749,12 +745,11 @@ struct EngineButton : MenuButton {
 			CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
 			CardinalBasePlugin* const plugin = static_cast<CardinalBasePlugin*>(context->plugin);
 
-			// const bool remoteServerStarted = this->remoteServerStarted;
+			const bool remoteServerStarted = plugin->remoteServerStarted();
 			const std::string remoteControlText = remoteServerStarted ? " " CHECKMARK_STRING : "";
 
 			menu->addChild(createMenuItem("Enable OSC remote control", remoteControlText, [=]() {
 				if (remoteServerStarted) {
-					remoteServerStarted = false;
 					plugin->stopRemoteServer();
 					return;
 				}
@@ -763,8 +758,7 @@ struct EngineButton : MenuButton {
 					if (port == nullptr)
 						return;
 
-					if (plugin->startRemoteServer(port))
-						remoteServerStarted = true;
+					plugin->startRemoteServer(port);
 
 					std::free(port);
 				});
@@ -818,9 +812,9 @@ struct EngineButton : MenuButton {
 	void step() override {
 		MenuButton::step();
 
-		if (remoteServerStarted) {
-			CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
-			CardinalBasePlugin* const plugin = static_cast<CardinalBasePlugin*>(context->plugin);
+		CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+		CardinalBasePlugin* const plugin = static_cast<CardinalBasePlugin*>(context->plugin);
+		if (plugin->remoteServerStarted()) {
 			plugin->stepRemoteServer();
 		}
 	}
