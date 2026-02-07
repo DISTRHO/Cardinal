@@ -80,6 +80,7 @@ DEP_LIB_PATH = $(RACK_DEP_PATH)/lib
 
 FILES_DSP  = CardinalPlugin.cpp
 FILES_DSP += CardinalCommon.cpp
+FILES_DSP += CardinalOSC.cpp
 FILES_DSP += CardinalRemote.cpp
 FILES_DSP += common.cpp
 
