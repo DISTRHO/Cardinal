@@ -363,20 +363,20 @@ static int osc_fallback_handler(const char* const path, const char* const types,
     return 0;
 }
 
+#ifdef CARDINAL_INIT_OSC_THREAD
+static const char* oscFeatures = ":screenshot:";
+#else
+static const char* oscFeatures = "";
+#endif
+
 static int osc_hello_handler(const char*, const char*, lo_arg**, int, const lo_message m, void* const self)
 {
     d_stdout("Hello received from OSC, saying hello back to them o/");
     const lo_address source = lo_message_get_source(m);
     const lo_server server = static_cast<Initializer*>(self)->oscServer;
 
-    // send list of features first
-   #ifdef CARDINAL_INIT_OSC_THREAD
-    lo_send_from(source, server, LO_TT_IMMEDIATE, "/resp", "ss", "features", ":screenshot:");
-   #else
-    lo_send_from(source, server, LO_TT_IMMEDIATE, "/resp", "ss", "features", "");
-   #endif
-
-    // then finally hello reply
+    // send list of features first and then hello!
+    lo_send_from(source, server, LO_TT_IMMEDIATE, "/resp", "ss", "features", oscFeatures);
     lo_send_from(source, server, LO_TT_IMMEDIATE, "/resp", "ss", "hello", "ok");
     return 0;
 }
