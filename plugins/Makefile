@@ -531,7 +531,7 @@ MINIPLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
 
 PLUGIN_FILES += $(wildcard Autinn/src/*.cpp)
 
-AUTINN_CUSTOM = Chord Vibrato
+AUTINN_CUSTOM = Chord Vibrato Snare
 
 # --------------------------------------------------------------
 # Axioma
