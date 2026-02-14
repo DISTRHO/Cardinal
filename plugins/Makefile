@@ -531,7 +531,7 @@ MINIPLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
 
 PLUGIN_FILES += $(wildcard Autinn/src/*.cpp)
 
-AUTINN_CUSTOM = Chord Vibrato Snare Scope
+AUTINN_CUSTOM = Chord Vibrato Snare Scope ScopeDisplay
 AUTINN_CUSTOM_PER_FILE = AutoLevelMenuItem
 
 # --------------------------------------------------------------

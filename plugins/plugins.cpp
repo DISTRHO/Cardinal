@@ -1595,8 +1595,7 @@ static void initStatic__Autinn()
 	    p->addModel(modelCoil);
 	    p->addModel(modelGeiger);
 	    p->addModel(modelSaw2);
-
-        spl.removeModule("Scope40"); // WIP
+        p->addModel(modelScope);
 #undef modelChord
 #undef modelVibrato
 #undef modelSnare
