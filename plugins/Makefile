@@ -1351,7 +1351,8 @@ PLUGIN_FILES += $(wildcard ZZC/src/Phaseque/*.cpp)
 # PLUGIN_FILES += ZZC/src/filetypes/WavSupport.cpp
 
 # modules/types which are present in other plugins
-ZZC_CUSTOM = Clock LowFrequencyOscillator LedLight Step
+ZZC_CUSTOM = Clock LowFrequencyOscillator LedLight Step PolyModeValueItem PolyModeItem
+ZZC_CUSTOM_PER_FILE = ExternalCVModeCompatibleOptionItem ExternalCVModeVBPSOptionItem SnapCVOptionItem ExternalCVModeItem
 
 # --------------------------------------------------------------
 # Build setup
