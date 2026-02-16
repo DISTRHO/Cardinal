@@ -2875,6 +2875,7 @@ $(BUILD_DIR)/ZZC/%.cpp.o: ZZC/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ZZC_CUSTOM),$(call custom_module_names,$(m),ZZC)) \
+		$(foreach m,$(ZZC_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ZZC_$(shell basename -- $*))) \
 		-DpluginInstance=pluginInstance__ZZC
 
 # --------------------------------------------------------------
