@@ -1346,11 +1346,12 @@ PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCa
 # ZZC
 
 PLUGIN_FILES += $(filter-out ZZC/src/ZZC.cpp ZZC/src/WavetablePlayer.cpp,$(wildcard ZZC/src/*.cpp))
+PLUGIN_FILES += $(wildcard ZZC/src/Phaseque/*.cpp)
 # PLUGIN_FILES += ZZC/src/dsp/Wavetable.cpp
 # PLUGIN_FILES += ZZC/src/filetypes/WavSupport.cpp
 
 # modules/types which are present in other plugins
-ZZC_CUSTOM = Clock LowFrequencyOscillator
+ZZC_CUSTOM = Clock LowFrequencyOscillator LedLight
 
 # --------------------------------------------------------------
 # Build setup
