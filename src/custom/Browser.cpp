@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,17 +15,14 @@
  * For a full copy of the GNU General Public License see the LICENSE file.
  */
 
-#pragma once
-
+// little hack to force browser yellow color to cardinal red
 #define SCHEME_YELLOW SCHEME_YELLOW_OldVCV
-#include_next "componentlibrary.hpp"
+#include "componentlibrary.hpp"
 #undef SCHEME_YELLOW
-
 namespace rack {
 namespace componentlibrary {
-
-// Yellow? What's that?
 static const NVGcolor SCHEME_YELLOW = nvgRGBf(0.76f, 0.11f, 0.22f);
+}
+}
 
-}
-}
+#include "../src/app/Browser.cpp"

@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2025 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -99,7 +99,7 @@ void destroyStaticPlugins();
 }
 }
 
-const std::string CARDINAL_VERSION = "25.06";
+const std::string CARDINAL_VERSION = "26.01";
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -630,12 +630,14 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
 
         if (isRealInstance)
         {
-            system::createDirectory(asset::userDir);
            #if defined(DISTRHO_OS_WASM) && !defined(CARDINAL_COMMON_UI_ONLY)
             EM_ASM({
+                Module.FS.mkdir('/userfiles');
                 Module.FS.mount(Module.IDBFS, {}, '/userfiles');
                 Module.FS.syncfs(true, function(err) { if (!err) { dynCall('vi', $0, [$1]) } });
             }, WebBrowserDataLoaded, this);
+           #else
+            system::createDirectory(asset::userDir);
            #endif
         }
     }

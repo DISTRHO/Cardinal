@@ -897,6 +897,13 @@ void surgext_rack_update_theme();
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
 
+// Venom
+#include "Venom/src/plugin.hpp"
+namespace Venom
+{
+    void readDefaultThemes();
+}
+
 // Voxglitch
 #define modelLooper modelVoxglitchLooper
 #include "voxglitch/src/plugin.hpp"
@@ -1017,6 +1024,7 @@ extern Plugin* pluginInstance__stoermelder_p1;
 Plugin* pluginInstance__surgext;
 Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
+Plugin* pluginInstance__Venom;
 Plugin* pluginInstance__Voxglitch;
 Plugin* pluginInstance__WhatTheRack;
 extern Plugin* pluginInstance__WSTD_Drums;
@@ -1065,10 +1073,17 @@ struct StaticPluginLoader {
             return;
         }
 
-        // force ABI, we use static plugins so this doesnt matter as long as it builds
-        json_t* const version = json_string((APP_VERSION_MAJOR + ".0").c_str());
-        json_object_set(rootJ, "version", version);
-        json_decref(version);
+        std::string version;
+        if (json_t* const versionJ = json_object_get(rootJ, "version"))
+            version = json_string_value(versionJ);
+
+        if (!string::startsWith(version, APP_VERSION_MAJOR + "."))
+        {
+            // force ABI, we use static plugins so this doesnt matter as long as it builds
+            json_t* const versionJ = json_string((APP_VERSION_MAJOR + ".0").c_str());
+            json_object_set(rootJ, "version", versionJ);
+            json_decref(versionJ);
+        }
 
         // Load manifest
         p->fromJson(rootJ);
@@ -1153,12 +1168,12 @@ static void initStatic__Cardinal()
        #else
         spl.removeModule("glBars");
        #endif
-       #ifndef STATIC_BUILD
+       #ifndef __MOD_DEVICES__
         p->addModel(modelAudioFile);
        #else
         spl.removeModule("AudioFile");
        #endif
-       #if !(defined(DISTRHO_OS_WASM) || defined(STATIC_BUILD))
+       #if !(defined(DISTRHO_OS_WASM) || defined(__MOD_DEVICES__))
         p->addModel(modelCarla);
         p->addModel(modelIldaeil);
        #else
@@ -1169,11 +1184,6 @@ static void initStatic__Cardinal()
         p->addModel(modelSassyScope);
        #else
         spl.removeModule("SassyScope");
-       #endif
-       #if defined(HAVE_X11) && !defined(HEADLESS) && !defined(STATIC_BUILD)
-        p->addModel(modelMPV);
-       #else
-        spl.removeModule("MPV");
        #endif
        #ifdef HAVE_FFTW3F
         p->addModel(modelAudioToCVPitch);
@@ -2595,7 +2605,7 @@ static void initStatic__JW()
         p->addModel(modelCoolBreeze);
         p->addModel(modelPete);
         p->addModel(modelTimer);
-       #ifndef STATIC_BUILD
+       #ifndef __MOD_DEVICES__
         p->addModel(modelStr1ker);
        #else
         spl.removeModule("Str1ker");
@@ -3501,6 +3511,82 @@ static void initStatic__ValleyAudio()
     }
 }
 
+static void initStatic__Venom()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Venom = p;
+
+    const StaticPluginLoader spl(p, "Venom");
+    if (spl.ok())
+    {
+        p->addModel(modelVenomAD_ASR);
+        p->addModel(modelVenomAuxClone);
+        p->addModel(modelVenomBayInput);
+        p->addModel(modelVenomBayNorm);
+        p->addModel(modelVenomBayOutput);
+        p->addModel(modelVenomBenjolinOsc);
+        p->addModel(modelVenomBenjolinGatesExpander);
+        p->addModel(modelVenomBenjolinVoltsExpander);
+        p->addModel(modelVenomBernoulliSwitch);
+        p->addModel(modelVenomBernoulliSwitchExpander);
+        p->addModel(modelVenomBlocker);
+        p->addModel(modelVenomBypass);
+        p->addModel(modelVenomCloneMerge);
+        p->addModel(modelVenomCompare2);
+        p->addModel(modelVenomCrossFade3D);
+        p->addModel(modelVenomHQ);
+        p->addModel(modelVenomKnob5);
+        p->addModel(modelVenomLinearBeats);
+        p->addModel(modelVenomLinearBeatsExpander);
+        p->addModel(modelVenomLogic);
+        p->addModel(modelVenomMix4);
+        p->addModel(modelVenomMix4Stereo);
+        p->addModel(modelVenomMixFade);
+        p->addModel(modelVenomMixFade2);
+        p->addModel(modelVenomMixMute);
+        p->addModel(modelVenomMixOffset);
+        p->addModel(modelVenomMixPan);
+        p->addModel(modelVenomMixSend);
+        p->addModel(modelVenomMixSolo);
+        p->addModel(modelVenomMousePad);
+        p->addModel(modelVenomMultiMerge);
+        p->addModel(modelVenomMultiSplit);
+        p->addModel(modelVenomSVF);
+        p->addModel(modelVenomOscillator);
+        p->addModel(modelVenomNORS_IQ);
+        p->addModel(modelVenomNORSIQChord2Scale);
+        p->addModel(modelVenomPan3D);
+        p->addModel(modelVenomPolyClone);
+        p->addModel(modelVenomPolyFade);
+        p->addModel(modelVenomPolyOffset);
+        p->addModel(modelVenomPolySHASR);
+        p->addModel(modelVenomPolyScale);
+        p->addModel(modelVenomPolyUnison);
+        p->addModel(modelVenomPush5);
+        p->addModel(modelVenomQuadVCPolarizer);
+        p->addModel(modelVenomRecurse);
+        p->addModel(modelVenomRecurseStereo);
+        p->addModel(modelVenomReformation);
+        p->addModel(modelVenomRhythmExplorer);
+        p->addModel(modelVenomShapedVCA);
+        p->addModel(modelVenomSlew);
+        p->addModel(modelVenomSphereToXYZ);
+        p->addModel(modelVenomThru);
+        p->addModel(modelVenomVCAMix4);
+        p->addModel(modelVenomVCAMix4Stereo);
+        p->addModel(modelVenomVCOUnit);
+        p->addModel(modelVenomBlank);
+        p->addModel(modelVenomWaveFolder);
+        p->addModel(modelVenomWaveMangler);
+        p->addModel(modelVenomWaveMultiplier);
+        p->addModel(modelVenomWidgetMenuExtender);
+        p->addModel(modelVenomWinComp);
+        p->addModel(modelVenomXM_OP);
+
+        Venom::readDefaultThemes();
+    }
+}
+
 static void initStatic__Voxglitch()
 {
     Plugin* p = new Plugin;
@@ -3702,6 +3788,7 @@ void initStaticPlugins()
     initStatic__surgext();
     initStatic__unless_modules();
     initStatic__ValleyAudio();
+    initStatic__Venom();
     initStatic__Voxglitch();
     initStatic__WhatTheRack();
     initStatic__WSTD_Drums();

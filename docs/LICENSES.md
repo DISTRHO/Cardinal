@@ -91,6 +91,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | Surge XT                | GPL-3.0-or-later         | |
 | unless_modules          | GPL-3.0-or-later         | |
 | Valley                  | GPL-3.0-or-later         | |
+| Venom                   | GPL-3.0-or-later         | |
 | Voxglitch               | GPL-3.0-or-later         | |
 | WSTD-Drums              | CC0-1.0                  | |
 | WhatTheRack             | WTFPL                    | |
@@ -99,7 +100,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 
 ## ARTWORK / PANEL LICENSES
 
-Bellow follows a list of all licenses related to **artwork and module panels**, sorted by file name.  
+Below follows a list of all licenses related to **artwork and module panels**, sorted by file name.  
 Licenses were retrieved from the official project's LICENSE, README or related files.  
 When * is used, it is meant as wildcard of all files, with potential exceptions mentioned afterwards.  
 When a license is uncertain, ??? is used.
@@ -269,6 +270,7 @@ Below is a list of artwork licenses from plugins
 | ValleyAudio/din1451alt.ttf              | CC-BY-3.0-DE     | |
 | ValleyAudio/DSEG14Classic-*.ttf         | OFL-1.1-RFN      | |
 | ValleyAudio/ShareTechMono-*.ttf         | OFL-1.1-RFN      | |
+| Venom/*                                 | GPL-3.0-or-later | No artwork specific license provided |
 | voxglitch/*                             | GPL-3.0-or-later | No artwork specific license provided |
 | voxglitch/ShareTechMono-Regular.ttf     | OFL-1.1-RFN      | |
 | WhatTheRack/*                           | WTFPL            | |

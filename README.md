@@ -26,7 +26,7 @@ Cardinal should be considered stable, if you spot any bugs please report them.
 Currently the following should be noted:
 
 - CLAP support is a work-in-progress [DPF#383](https://github.com/DISTRHO/DPF/issues/383)
-- VST3 plugin hosting (inside Carla or Ildaeil modules) mostly works but is considered experimental
+- VST3 plugin hosting (inside [Carla](https://github.com/falkTX/Carla/) or [Ildaeil](https://github.com/DISTRHO/Ildaeil) modules) mostly works but is considered experimental
 - Windows 32bit builds still have a few problematic modules [#80](https://github.com/DISTRHO/Cardinal/issues/80)
 
 ### Stable release
@@ -106,7 +106,7 @@ But a couple of modules background's have their colors flipped, because damn we 
 
 ![screenshot](docs/Screenshot_Basic-Patching.png "Screenshot")
 
-### Carla and Ildaeil plugin hosts
+### [Carla](https://github.com/falkTX/Carla/) and [Ildaeil](https://github.com/DISTRHO/Ildaeil) plugin hosts
 
 ![screenshot](docs/Screenshot_Carla+Ildaeil.png "Screenshot")
 
@@ -197,6 +197,7 @@ At the moment the following 3rd-party modules are provided:
 - [Surge XT](https://github.com/surge-synthesizer/surge-rack)
 - [unless_modules](https://gitlab.com/unlessgames/unless_modules)
 - [Valley](https://github.com/ValleyAudio/ValleyRackFree)
+- [Venom](https://github.com/DaveBenham/VenomModules)
 - [Voxglitch](https://github.com/clone45/voxglitch)
 - [WhatTheRack](https://github.com/korfuri/WhatTheRack)
 - [WSTD-Drums](https://github.com/Wasted-Audio/WSTD-Drums)
