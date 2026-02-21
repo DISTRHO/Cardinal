@@ -138,6 +138,7 @@ extern Model* modelCoil;
 extern Model* modelGeiger;
 extern Model* modelSaw2;
 extern Model *modelScope;
+extern Model *modelExcavi;
 #undef modelChord
 #undef modelVibrato
 #undef modelSnare
@@ -1596,6 +1597,7 @@ static void initStatic__Autinn()
 	    p->addModel(modelGeiger);
 	    p->addModel(modelSaw2);
         p->addModel(modelScope);
+        p->addModel(modelExcavi);
 #undef modelChord
 #undef modelVibrato
 #undef modelSnare
