@@ -531,7 +531,8 @@ MINIPLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
 
 PLUGIN_FILES += $(wildcard Autinn/src/*.cpp)
 
-AUTINN_CUSTOM = Chord Vibrato
+AUTINN_CUSTOM = Chord Vibrato Snare Scope ScopeDisplay DCBlocker
+AUTINN_CUSTOM_PER_FILE = AutoLevelMenuItem
 
 # --------------------------------------------------------------
 # Axioma
@@ -2229,6 +2230,7 @@ $(BUILD_DIR)/Autinn/%.cpp.o: Autinn/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(AUTINN_CUSTOM),$(call custom_module_names,$(m),Autinn)) \
+		$(foreach m,$(AUTINN_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),autinn_$(shell basename -- $*))) \
 		-DpluginInstance=pluginInstance__Autinn \
 		-Dinit=init__Autinn
 
