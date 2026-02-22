@@ -1177,6 +1177,12 @@ PLUGIN_FILES += $(filter-out unless_modules/src/unless.cpp,$(wildcard unless_mod
 # modules/types which are present in other plugins
 UNLESS_MODULES_CUSTOM = Selection sign
 
+
+# --------------------------------------------------------------
+# TMT
+
+PLUGIN_FILES += $(filter-out TMT/src/plugin.cpp,$(wildcard TMT/src/*.cpp))
+
 # --------------------------------------------------------------
 # ValleyAudio
 
@@ -2811,6 +2817,11 @@ $(BUILD_DIR)/unless_modules/%.cpp.o: unless_modules/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(UNLESS_MODULES_CUSTOM),$(call custom_module_names,$(m),unless_modules)) \
 		-DpluginInstance=pluginInstance__unless_modules
+$(BUILD_DIR)/TMT/%.cpp.o: TMT/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		-DpluginInstance=pluginInstance__TMT
 
 $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
