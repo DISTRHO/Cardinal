@@ -1347,11 +1347,13 @@ PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCa
 # ZZC
 
 PLUGIN_FILES += $(filter-out ZZC/src/ZZC.cpp ZZC/src/WavetablePlayer.cpp,$(wildcard ZZC/src/*.cpp))
+PLUGIN_FILES += $(wildcard ZZC/src/Phaseque/*.cpp)
 # PLUGIN_FILES += ZZC/src/dsp/Wavetable.cpp
 # PLUGIN_FILES += ZZC/src/filetypes/WavSupport.cpp
 
 # modules/types which are present in other plugins
-ZZC_CUSTOM = Clock LowFrequencyOscillator
+ZZC_CUSTOM = Clock LowFrequencyOscillator LedLight Step PolyModeValueItem PolyModeItem
+ZZC_CUSTOM_PER_FILE = ExternalCVModeCompatibleOptionItem ExternalCVModeVBPSOptionItem SnapCVOptionItem ExternalCVModeItem
 
 # --------------------------------------------------------------
 # Build setup
@@ -2875,6 +2877,7 @@ $(BUILD_DIR)/ZZC/%.cpp.o: ZZC/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ZZC_CUSTOM),$(call custom_module_names,$(m),ZZC)) \
+		$(foreach m,$(ZZC_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ZZC_$(shell basename -- $*))) \
 		-DpluginInstance=pluginInstance__ZZC
 
 # --------------------------------------------------------------

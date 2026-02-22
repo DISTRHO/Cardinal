@@ -932,8 +932,10 @@ void setupSamples();
 #define ZZC_SHARED_H
 #define ZZC_WIDGETS_H
 #define modelClock modelZZCClock
+#define LedLight ZZCLedLight
 #include "ZZC/src/ZZC.hpp"
 #undef modelClock
+#undef LedLight
 
 // known terminal modules
 std::vector<Model*> hostTerminalModels;
@@ -3705,6 +3707,7 @@ static void initStatic__ZZC()
         p->addModel(modelDiv);
         p->addModel(modelDivExp);
         p->addModel(modelPolygate);
+        p->addModel(modelPhaseque);
 #undef modelClock
     }
 }
