@@ -80,6 +80,7 @@ DEP_LIB_PATH = $(RACK_DEP_PATH)/lib
 
 FILES_DSP  = CardinalPlugin.cpp
 FILES_DSP += CardinalCommon.cpp
+FILES_DSP += CardinalOSC.cpp
 FILES_DSP += CardinalRemote.cpp
 FILES_DSP += common.cpp
 
@@ -246,6 +247,7 @@ ifeq ($(DSP_UI_SPLIT),true)
 ifneq ($(HEADLESS),true)
 FILES_UI  = CardinalUI.cpp
 FILES_UI += CardinalCommon-UI.cpp
+FILES_UI += CardinalOSC.cpp
 FILES_UI += CardinalRemote.cpp
 FILES_UI += common.cpp
 FILES_UI += glfw.cpp
