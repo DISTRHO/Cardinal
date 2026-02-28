@@ -852,6 +852,12 @@ PLUGIN_FILES += $(filter-out LittleUtils/src/plugin.cpp,$(wildcard LittleUtils/s
 LITTLEUTILS_CUSTOM = MsDisplayWidget
 
 # --------------------------------------------------------------
+# LOGinstruments
+
+PLUGIN_FILES += $(filter-out LOGinstruments/src/LOGinstruments.cpp,$(wildcard LOGinstruments/src/*.cpp))
+PLUGIN_FILES += LOGinstruments/src/kiss_fft.c
+
+# --------------------------------------------------------------
 # LomasModules
 
 PLUGIN_FILES += $(filter-out LomasModules/src/plugin.cpp,$(wildcard LomasModules/src/*.cpp))
@@ -2567,6 +2573,13 @@ $(BUILD_DIR)/LittleUtils/%.cpp.o: LittleUtils/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(LITTLEUTILS_CUSTOM),$(call custom_module_names,$(m),LittleUtils)) \
 		-DpluginInstance=pluginInstance__LittleUtils
+
+$(BUILD_DIR)/LOGinstruments/src/%.o: LOGinstruments/src/%
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(LOGINSTRUMENTS_CUSTOM),$(call custom_module_names,$(m),LOGinstruments)) \
+		-DpluginInstance=pluginInstance__LOGinstruments
 
 $(BUILD_DIR)/LomasModules/%.cpp.o: LomasModules/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"

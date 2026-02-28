@@ -248,6 +248,9 @@
 [submodule "plugins/Biset"]
 	path = plugins/Biset
 	url = https://github.com/gibbonjoyeux/VCV-Biset.git
+[submodule "plugins/LOGinstruments"]
+	path = plugins/LOGinstruments
+	url = https://github.com/LOGUNIVPM/LOGinstruments.git
 [submodule "plugins/PdArray"]
 	path = plugins/PdArray
 	url = https://github.com/mgunyho/PdArray.git
@@ -266,3 +269,4 @@
 [submodule "plugins/Venom"]
 	path = plugins/Venom
 	url = https://github.com/DaveBenham/VenomModules
+
