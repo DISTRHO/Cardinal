@@ -101,7 +101,7 @@ void destroyStaticPlugins();
 }
 }
 
-const std::string CARDINAL_VERSION = "26.01";
+const std::string CARDINAL_VERSION = "26.02";
 
 // -----------------------------------------------------------------------------------------------------------
 

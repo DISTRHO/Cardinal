@@ -99,7 +99,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 
 ## ARTWORK / PANEL LICENSES
 
-Bellow follows a list of all licenses related to **artwork and module panels**, sorted by file name.  
+Below follows a list of all licenses related to **artwork and module panels**, sorted by file name.  
 Licenses were retrieved from the official project's LICENSE, README or related files.  
 When * is used, it is meant as wildcard of all files, with potential exceptions mentioned afterwards.  
 When a license is uncertain, ??? is used.

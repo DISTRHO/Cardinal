@@ -414,7 +414,7 @@ protected:
 
     uint32_t getVersion() const override
     {
-        return d_version(0, 26, 1);
+        return d_version(0, 26, 2);
     }
 
     int64_t getUniqueId() const override
@@ -1104,7 +1104,7 @@ protected:
         rack::system::removeRecursively(fAutosavePath);
         rack::system::createDirectories(fAutosavePath);
 
-        static constexpr const char zstdMagic[] = "\x28\xb5\x2f\xfd";
+        static constexpr const uint8_t zstdMagic[4] = { 0x28, 0xb5, 0x2f, 0xfd };
 
         if (std::memcmp(data.data(), zstdMagic, sizeof(zstdMagic)) != 0)
         {

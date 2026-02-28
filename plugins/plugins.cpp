@@ -106,6 +106,8 @@ extern Model* modelBlank;
 */
 #define modelChord modelAutinnChord
 #define modelVibrato modelAutinnVibrato
+#define modelSnare modelAutinnSnare
+#define modelScope modelAutinnScope
 extern Model* modelJette;
 extern Model* modelFlora;
 extern Model* modelOxcart;
@@ -130,8 +132,17 @@ extern Model* modelFil;
 extern Model* modelNap;
 extern Model* modelMelody;
 extern Model* modelChord;
+extern Model* modelKicker;
+extern Model* modelSnare;
+extern Model* modelCoil;
+extern Model* modelGeiger;
+extern Model* modelSaw2;
+extern Model *modelScope;
+extern Model *modelExcavi;
 #undef modelChord
 #undef modelVibrato
+#undef modelSnare
+#undef modelScope
 
 // Axioma
 #include "Axioma/src/plugin.hpp"
@@ -921,8 +932,10 @@ void setupSamples();
 #define ZZC_SHARED_H
 #define ZZC_WIDGETS_H
 #define modelClock modelZZCClock
+#define LedLight ZZCLedLight
 #include "ZZC/src/ZZC.hpp"
 #undef modelClock
+#undef LedLight
 
 // known terminal modules
 std::vector<Model*> hostTerminalModels;
@@ -1554,6 +1567,8 @@ static void initStatic__Autinn()
     {
 #define modelChord modelAutinnChord
 #define modelVibrato modelAutinnVibrato
+#define modelSnare modelAutinnSnare
+#define modelScope modelAutinnScope
         p->addModel(modelAmp);
         p->addModel(modelDeadband);
         p->addModel(modelBass);
@@ -1578,8 +1593,17 @@ static void initStatic__Autinn()
         p->addModel(modelNap);
         p->addModel(modelMelody);
         p->addModel(modelChord);
+        p->addModel(modelKicker);
+	    p->addModel(modelSnare);
+	    p->addModel(modelCoil);
+	    p->addModel(modelGeiger);
+	    p->addModel(modelSaw2);
+        p->addModel(modelScope);
+        p->addModel(modelExcavi);
 #undef modelChord
 #undef modelVibrato
+#undef modelSnare
+#undef modelScope
     }
 }
 
@@ -3683,6 +3707,7 @@ static void initStatic__ZZC()
         p->addModel(modelDiv);
         p->addModel(modelDivExp);
         p->addModel(modelPolygate);
+        p->addModel(modelPhaseque);
 #undef modelClock
     }
 }

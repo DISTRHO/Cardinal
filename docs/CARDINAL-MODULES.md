@@ -194,7 +194,7 @@ The meaning of the outputs is:
 - Step: Trigger for step change
 - Bar Phase: 0-10v smooth ramp for the bar position (with bar division being a right-click option)
 - Beat Phase: 0-10v smooth ramp for the beat position
-- BPM: Volts per Beat per Second, as supported by Impromptu Clocked/Clkd and ZZC Clock
+- BPM: Beats per minute in [Rack standard](https://vcvrack.com/manual/VoltageStandards#Pitch-and-Frequencies), supported by Impromptu Clocked/Clkd and ZZC Clock
 
 ## Extra modules
 

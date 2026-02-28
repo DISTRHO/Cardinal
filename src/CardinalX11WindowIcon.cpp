@@ -1214,7 +1214,7 @@ static constexpr const unsigned long sCardinalX11Icon[] = {
 
 static constexpr const uint32_t sCardinalX11IconSize = 2 + 16 * 16 + 2 + 48 * 48 + 2 + 128 * 128;
 
-// declaration first, ensuring extern/visiblity status is respected
+// declaration first, ensuring extern/visibility status is respected
 extern const unsigned long* gCardinalX11Icon;
 
 // definition afterwards
