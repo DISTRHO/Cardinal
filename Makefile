@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 # DISTRHO Cardinal Plugin
-# Copyright (C) 2021-2025 Filipe Coelho <falktx@falktx.com>
+# Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ROOT = .
@@ -15,7 +15,7 @@ include $(ROOT)/Makefile.base.mk
 # src/CardinalPlugin.cpp `getVersion`
 # utils/macOS/Info_{JACK,Native}.plist
 # .github/ISSUE_TEMPLATE/bug.yaml src/CardinalCommon.cpp src/CardinalPlugin.cpp utils/macOS/Info_{JACK,Native}.plist
-VERSION = 26.01
+VERSION = 26.02
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Build targets
