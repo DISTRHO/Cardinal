@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -65,8 +65,6 @@ using CardinalDGL::IdleCallback;
 // --------------------------------------------------------------------------------------------------------------------
 // Cardinal specific context
 
-static constexpr const uint32_t kModuleParameterCount = 24;
-
 enum CardinalVariant {
     kCardinalVariantFX,
     kCardinalVariantLoader,
@@ -77,10 +75,11 @@ enum CardinalVariant {
 };
 
 struct CardinalPluginContext : rack::Context {
+    const CardinalVariant variant;
+    const uint32_t parameterCount;
+    float* const parameters;
     uint32_t bufferSize, processCounter;
     double sampleRate;
-    float parameters[kModuleParameterCount];
-    CardinalVariant variant;
     bool bypassed, playing, reset, bbtValid;
     int32_t bar, beat, beatsPerBar, beatType;
     uint64_t frame;

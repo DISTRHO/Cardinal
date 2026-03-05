@@ -334,7 +334,10 @@ public:
             const ScopedValueSetter<bool> svs(rack::settings::headless, true);
            #endif
             Engine_setAboutToClose(context->engine);
+            delete[] context->parameters;
             delete context;
+
+            rack::contextSet(nullptr);
         }
 
         if (! fAutosavePath.empty())

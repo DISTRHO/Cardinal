@@ -44,6 +44,8 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
+static constexpr const uint32_t kModuleParameterCount = CARDINAL_NUM_PARAMETERS;
+
 enum CardinalParameters {
     kCardinalParameterCountAtModules = kModuleParameterCount,
     kCardinalParameterBypass = kCardinalParameterCountAtModules,

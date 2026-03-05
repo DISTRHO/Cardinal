@@ -38,6 +38,12 @@
 # include "extra/SharedResourcePointer.hpp"
 #endif
 
+struct ParamStateChange {
+    uint64_t moduleId;
+    int32_t paramId;
+    float value;
+};
+
 namespace rack {
 namespace app {
 rack::widget::Widget* createMenuBar() { return new rack::widget::Widget; }
@@ -179,7 +185,10 @@ public:
             context->patch->clear();
 
             Engine_setAboutToClose(context->engine);
+            delete[] context->parameters;
             delete context;
+
+            rack::contextSet(nullptr);
         }
 
         if (! fAutosavePath.empty())
@@ -311,18 +320,12 @@ protected:
     {
         if (std::strcmp(key, "param") == 0)
         {
-            long long moduleId = 0;
-            int paramId = 0;
-            float paramValue = 0.f;
-            {
-                const ScopedSafeLocale cssl;
-                std::sscanf(value, "%lld:%d:%f", &moduleId, &paramId, &paramValue);
-            }
+            const ParamStateChange* const state = reinterpret_cast<const ParamStateChange*>(value);
 
-            rack::engine::Module* const module = context->engine->getModule(moduleId);
+            rack::engine::Module* const module = context->engine->getModule(state->moduleId);
             DISTRHO_SAFE_ASSERT_RETURN(module != nullptr,);
 
-            context->engine->setParamValue(module, paramId, paramValue);
+            context->engine->setParamValue(module, state->paramId, state->value);
             return;
         }
 

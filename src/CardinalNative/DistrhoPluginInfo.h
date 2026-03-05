@@ -27,6 +27,7 @@
 
 #define CARDINAL_NUM_AUDIO_INPUTS  2
 #define CARDINAL_NUM_AUDIO_OUTPUTS 2
+#define CARDINAL_NUM_PARAMETERS    24
 
 #define DISTRHO_PLUGIN_BRAND "DISTRHO"
 #define DISTRHO_PLUGIN_URI   "https://distrho.kx.studio/plugins/cardinal"

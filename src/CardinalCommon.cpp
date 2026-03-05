@@ -127,24 +127,26 @@ void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, 
 // --------------------------------------------------------------------------------------------------------------------
 
 CardinalPluginContext::CardinalPluginContext(Plugin* const p)
-    : bufferSize(p != nullptr ? p->getBufferSize() : 0),
+   #if CARDINAL_VARIANT_FX
+    : variant(kCardinalVariantFX),
+   #elif CARDINAL_VARIANT_LOADER
+    : variant(kCardinalVariantLoader),
+   #elif CARDINAL_VARIANT_MAIN
+    : variant(kCardinalVariantMain),
+   #elif CARDINAL_VARIANT_MINI
+    : variant(kCardinalVariantMini),
+   #elif CARDINAL_VARIANT_NATIVE
+    : variant(kCardinalVariantNative),
+   #elif CARDINAL_VARIANT_SYNTH
+    : variant(kCardinalVariantSynth),
+   #else
+    #error cardinal variant not set
+   #endif
+      parameterCount(CARDINAL_NUM_PARAMETERS),
+      parameters(new float[CARDINAL_NUM_PARAMETERS]),
+      bufferSize(p != nullptr ? p->getBufferSize() : 0),
       processCounter(0),
       sampleRate(p != nullptr ? p->getSampleRate() : 0.0),
-     #if CARDINAL_VARIANT_FX
-      variant(kCardinalVariantFX),
-     #elif CARDINAL_VARIANT_LOADER
-      variant(kCardinalVariantLoader),
-     #elif CARDINAL_VARIANT_MAIN
-      variant(kCardinalVariantMain),
-     #elif CARDINAL_VARIANT_MINI
-      variant(kCardinalVariantMini),
-     #elif CARDINAL_VARIANT_NATIVE
-      variant(kCardinalVariantNative),
-     #elif CARDINAL_VARIANT_SYNTH
-      variant(kCardinalVariantSynth),
-     #else
-      #error cardinal variant not set
-     #endif
       bypassed(false),
       playing(false),
       reset(false),
@@ -170,7 +172,7 @@ CardinalPluginContext::CardinalPluginContext(Plugin* const p)
       tlw(nullptr),
       ui(nullptr)
 {
-    std::memset(parameters, 0, sizeof(parameters));
+    std::memset(parameters, 0, sizeof(float) * CARDINAL_NUM_PARAMETERS);
 }
 
 bool CardinalPluginContext::addIdleCallback(IdleCallback* const cb) const
