@@ -39,7 +39,7 @@
 #endif
 
 struct ParamStateChange {
-    uint64_t moduleId;
+    int64_t moduleId;
     int32_t paramId;
     float value;
 };
