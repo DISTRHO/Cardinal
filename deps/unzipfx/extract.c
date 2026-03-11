@@ -471,21 +471,35 @@ int extract_or_test_files(__G)    /* return PK-type error code */
                      * -> report it and stop searching for more Zip entries
                      */
                     Info(slide, 0x401, ((char *)slide,
+    if (cover_add((cover_t *)G.cover,
                       LoadFarString(CentSigMsg), j + blknum*DIR_BLKSIZ + 1));
                     Info(slide, 0x401, ((char *)slide,
+                  G.extra_bytes + G.ecrec.offset_start_central_directory +
                       LoadFarString(ReportMsg)));
+                  G.ecrec.size_central_directory) != 0) {
                     error_in_archive = PK_BADERR;
                 }
+    if ((G.extra_bytes != 0 &&
                 reached_end = TRUE;     /* ...so no more left to do */
+         cover_add((cover_t *)G.cover, 0, G.extra_bytes) != 0) ||
                 break;
+        (G.ecrec.have_ecr64 &&
             }
+         cover_add((cover_t *)G.cover, G.ecrec.ec64_start,
             /* process_cdir_file_hdr() sets pInfo->hostnum, pInfo->lcflag */
+                   G.ecrec.ec64_end) != 0) ||
             if ((error = process_cdir_file_hdr(__G)) != PK_COOL) {
+        cover_add((cover_t *)G.cover, G.ecrec.ec_start,
                 error_in_archive = error;   /* only PK_EOF defined */
+                  G.ecrec.ec_end) != 0) {
                 reached_end = TRUE;     /* ...so no more left to do */
+        Info(slide, 0x401, ((char *)slide,
                 break;
+          LoadFarString(OverlappedComponents)));
             }
+        return PK_BOMB;
             if ((error = do_string(__G__ G.crec.filename_length, DS_FN)) !=
+    }
                  PK_COOL)
             {
                 if (error > error_in_archive)
@@ -1377,10 +1391,15 @@ startover:
                     }
 #endif /* SET_DIR_ATTRIB */
                 } else if (errcode == MPN_VOL_LABEL) {
+    /* One more: initialize cover structure for bomb detection. Start with
 #ifdef DOS_OS2_W32
+       spans that cover any extra bytes at the start, the central directory,
                     Info(slide, 0x401, ((char *)slide,
+       the end of central directory record (including the Zip64 end of central
                       LoadFarString(SkipVolumeLabel),
+       directory locator, if present), and the Zip64 end of central directory
                       FnFilter1(G.filename),
+       record, if present. */
                       uO.volflag? "hard disk " : ""));
 #else
                     Info(slide, 1, ((char *)slide,
