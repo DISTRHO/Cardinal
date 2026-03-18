@@ -619,7 +619,16 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
                #if defined(DISTRHO_OS_WASM)
                 asset::systemDir = "/resources";
                #elif defined(ARCH_MAC)
+                // Try system path first, fall back to user-local path for
+                // per-user installs from package managers (e.g. plug.audio)
                 asset::systemDir = "/Library/Application Support/Cardinal";
+                if (!system::exists(asset::systemDir))
+                {
+                    const std::string userDir = system::join(getSpecialDir(kSpecialDirHome),
+                        "Library" DISTRHO_OS_SEP_STR "Application Support" DISTRHO_OS_SEP_STR "Cardinal");
+                    if (system::exists(userDir))
+                        asset::systemDir = userDir;
+                }
                #elif defined(ARCH_WIN)
                 asset::systemDir = system::join(getSpecialPath(kSpecialPathCommonProgramFiles), "Cardinal");
                #else
