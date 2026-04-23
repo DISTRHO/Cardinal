@@ -46,6 +46,9 @@ extern Model* modelDivisions;
 // Algoritmarte
 #include "Algoritmarte/src/plugin.hpp"
 
+// alteredstatemachines
+#include "alteredstatemachines-vcv/src/plugin.hpp"
+
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
@@ -963,6 +966,7 @@ extern Plugin* pluginInstance__AaronStatic;
 Plugin* pluginInstance__admiral;
 Plugin* pluginInstance__alefsbits;
 Plugin* pluginInstance__Algoritmarte;
+Plugin* pluginInstance__alteredstatemachines;
 Plugin* pluginInstance__AmalgamatedHarmonics;
 Plugin* pluginInstance__ArableInstruments;
 Plugin* pluginInstance__AnimatedCircuits;
@@ -1364,6 +1368,19 @@ static void initStatic__Algoritmarte()
         p->addModel(modelHoldMeTight);
         p->addModel(modelCyclicCA);
         p->addModel(modelMusiMath);
+    }
+}
+static void initStatic__alteredstatemachines()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__alteredstatemachines = p;
+
+    const StaticPluginLoader spl(p, "alteredstatemachines-vcv");
+    if (spl.ok())
+    {
+        p->addModel(modelAristotle);
+        p->addModel(modelMedusa);
+        p->addModel(modelEris);
     }
 }
 
@@ -3723,6 +3740,7 @@ void initStaticPlugins()
     initStatic__admiral();
     initStatic__alefsbits();
     initStatic__Algoritmarte();
+    initStatic__alteredstatemachines();
     initStatic__AmalgamatedHarmonics();
     initStatic__AnimatedCircuits();
     initStatic__ArableInstruments();
