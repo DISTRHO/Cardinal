@@ -5,4 +5,5 @@
 #
 
 NAME = CardinalFX
+CARDINAL_VARIANT = fx
 include ../Makefile.cardinal.mk

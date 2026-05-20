@@ -26,7 +26,7 @@ Cardinal should be considered stable, if you spot any bugs please report them.
 Currently the following should be noted:
 
 - CLAP support is a work-in-progress [DPF#383](https://github.com/DISTRHO/DPF/issues/383)
-- VST3 plugin hosting (inside Carla or Ildaeil modules) mostly works but is considered experimental
+- VST3 plugin hosting (inside [Carla](https://github.com/falkTX/Carla/) or [Ildaeil](https://github.com/DISTRHO/Ildaeil) modules) mostly works but is considered experimental
 - Windows 32bit builds still have a few problematic modules [#80](https://github.com/DISTRHO/Cardinal/issues/80)
 
 ### Stable release
@@ -34,9 +34,12 @@ Currently the following should be noted:
 Cardinal releases have official builds for Linux, macOS and Windows.  
 You can find these under https://github.com/DISTRHO/Cardinal/releases.
 
+#### Installing & Updating releases
+See our Wiki on installing official builds [Wiki/Install](https://github.com/DISTRHO/Cardinal/wiki/Install).
+There are additional notes in [BUILDING.md#installing](docs/BUILDING.md#installing)
+
 There are Linux builds for various architectures (armhf, arm64, i686, riscv64 and x86_64), macOS "universal" (arm64 + intel) and Windows 32 and 64bit builds.
 Both macOS and Windows builds have an installer.  
-Install instructions are available [here](https://github.com/DISTRHO/Cardinal/wiki/Install).
 
 Note: Neither the macOS or Windows builds are signed, so expect warnings saying they are from an "untrusted developer".
 
@@ -51,7 +54,6 @@ A GitHub account is required in order to download these builds.
 ### Building
 
 Basic building instructions are available in [BUILDING.md](docs/BUILDING.md).
-
 
 ## Plugin variants
 
@@ -106,7 +108,7 @@ But a couple of modules background's have their colors flipped, because damn we 
 
 ![screenshot](docs/Screenshot_Basic-Patching.png "Screenshot")
 
-### Carla and Ildaeil plugin hosts
+### [Carla](https://github.com/falkTX/Carla/) and [Ildaeil](https://github.com/DISTRHO/Ildaeil) plugin hosts
 
 ![screenshot](docs/Screenshot_Carla+Ildaeil.png "Screenshot")
 
@@ -196,6 +198,7 @@ At the moment the following 3rd-party modules are provided:
 - [Surge XT](https://github.com/surge-synthesizer/surge-rack)
 - [unless_modules](https://gitlab.com/unlessgames/unless_modules)
 - [Valley](https://github.com/ValleyAudio/ValleyRackFree)
+- [Venom](https://github.com/DaveBenham/VenomModules)
 - [Voxglitch](https://github.com/clone45/voxglitch)
 - [WhatTheRack](https://github.com/korfuri/WhatTheRack)
 - [WSTD-Drums](https://github.com/Wasted-Audio/WSTD-Drums)

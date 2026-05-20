@@ -27,7 +27,7 @@
 #include "water/xml/XmlDocument.h"
 
 #ifndef CARDINAL_SYSDEPS
-// private method that takes ownership, we can use it to avoid superfulous allocations
+// private method that takes ownership, we can use it to avoid superfluous allocations
 extern "C" {
 json_t *jsonp_stringn_nocheck_own(const char* value, size_t len);
 }
@@ -244,7 +244,7 @@ struct CarlaModule : Module {
     {
         switch (opcode)
         {
-        // cannnot be supported
+        // cannot be supported
         case NATIVE_HOST_OPCODE_HOST_IDLE:
             break;
         // other stuff

@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2025 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -55,6 +55,7 @@ GLFWAPI void glfwSetClipboardString(GLFWwindow*, const char*) {}
 GLFWAPI GLFWcursor* glfwCreateStandardCursor(int) { return nullptr; }
 GLFWAPI void glfwSetCursor(GLFWwindow*, GLFWcursor*) {}
 GLFWAPI const char* glfwGetKeyName(int, int) { return nullptr; }
+GLFWAPI int glfwGetKey(GLFWwindow*, int) { return 0; }
 GLFWAPI int glfwGetKeyScancode(int) { return 0; }
 GLFWAPI double glfwGetTime(void) { return 0.0; }
 

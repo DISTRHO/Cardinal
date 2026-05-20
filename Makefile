@@ -1,12 +1,12 @@
 #!/usr/bin/make -f
 # DISTRHO Cardinal Plugin
-# Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+# Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ROOT = .
 include $(ROOT)/Makefile.base.mk
 
-# -----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 # Set version
 
 # also set in:
@@ -15,20 +15,20 @@ include $(ROOT)/Makefile.base.mk
 # src/CardinalPlugin.cpp `getVersion`
 # utils/macOS/Info_{JACK,Native}.plist
 # .github/ISSUE_TEMPLATE/bug.yaml src/CardinalCommon.cpp src/CardinalPlugin.cpp utils/macOS/Info_{JACK,Native}.plist
-VERSION = 25.06
+VERSION = 26.02
 
-# --------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 # Build targets
 
 all: cardinal carla deps dgl plugins gen resources
 
-# --------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 # Build config
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
 
-# --------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 # Carla config
 
 CARLA_EXTRA_ARGS = \
@@ -44,7 +44,16 @@ ifneq ($(DEBUG),true)
 CARLA_EXTRA_ARGS += EXTERNAL_PLUGINS=true
 endif
 
-# --------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+# DGL config
+
+ifeq ($(WASM),true)
+UI_TYPE = gles2
+else
+UI_TYPE = opengl
+endif
+
+# ---------------------------------------------------------------------------------------------------------------------
 # Check for required system-wide dependencies
 
 ifeq ($(SYSDEPS),true)
@@ -65,11 +74,13 @@ endif
 endif
 
 ifeq ($(HEADLESS),true)
+ifneq ($(STATIC_BUILD),true)
 
 ifneq ($(shell $(PKG_CONFIG) --exists liblo && echo true),true)
 $(error liblo dependency not installed/available)
 endif
 
+endif
 endif
 
 # --------------------------------------------------------------
@@ -183,7 +194,7 @@ endif
 
 dgl:
 ifneq ($(HEADLESS),true)
-	$(MAKE) opengl -C dpf/dgl $(DGL_EXTRA_ARGS)
+	$(MAKE) $(UI_TYPE) -C dpf/dgl $(DGL_EXTRA_ARGS)
 endif
 
 plugins: deps
@@ -191,6 +202,9 @@ plugins: deps
 
 resources:
 	$(MAKE) resources -C plugins
+
+loader-resources:
+	$(MAKE) loader-resources -C plugins
 
 mini-plugins: deps
 	$(MAKE) mini -C plugins
@@ -202,10 +216,14 @@ ifneq ($(CROSS_COMPILING),true)
 gen: cardinal resources dpf/utils/lv2_ttl_generator
 	@$(CURDIR)/dpf/utils/generate-ttl.sh
 
+loader-gen: loader loader-resources dpf/utils/lv2_ttl_generator
+	@$(CURDIR)/dpf/utils/generate-ttl.sh
+
 dpf/utils/lv2_ttl_generator:
 	$(MAKE) -C dpf/utils/lv2-ttl-generator
 else
 gen:
+loader-gen:
 endif
 
 # --------------------------------------------------------------
@@ -229,6 +247,9 @@ clap: carla deps dgl plugins resources
 lv2: carla deps dgl plugins resources
 	$(MAKE) lv2 -C src $(CARLA_EXTRA_ARGS)
 
+mapi: carla deps dgl plugins resources
+	$(MAKE) mapi -C src $(CARLA_EXTRA_ARGS)
+
 vst2: carla deps dgl plugins resources
 	$(MAKE) vst2 -C src $(CARLA_EXTRA_ARGS)
 
@@ -240,6 +261,15 @@ vst3: carla deps dgl plugins resources
 
 modgui:
 	$(MAKE) modgui -C src/CardinalMiniSep
+
+ifeq ($(HEADLESS)$(STATIC_BUILD),truetrue)
+loader: deps dgl plugins loader-gen
+	$(MAKE) loader -C src $(CARLA_EXTRA_ARGS)
+	@$(CURDIR)/dpf/utils/generate-ttl.sh
+else
+loader:
+	$(MAKE) loader HEADLESS=true STATIC_BUILD=true
+endif
 
 # --------------------------------------------------------------
 # Packaging standalone for CI

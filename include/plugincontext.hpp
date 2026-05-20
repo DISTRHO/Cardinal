@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -46,43 +46,40 @@ class UI;
 // --------------------------------------------------------------------------------------------------------------------
 // Base DGL classes
 
-#ifndef DGL_BASE_HPP_INCLUDED
-
 namespace CardinalDGL {
-
+#ifndef DGL_BASE_HPP_INCLUDED
 class TopLevelWidget;
-template <class BaseWidget> class NanoBaseWidget;
-typedef NanoBaseWidget<TopLevelWidget> NanoTopLevelWidget;
-
 struct IdleCallback {
     virtual ~IdleCallback() {}
     virtual void idleCallback() = 0;
 };
-
-}
-
 #endif
+#ifndef DGL_NANO_WIDGET_HPP_INCLUDED
+template <class BaseWidget> class NanoBaseWidget;
+typedef NanoBaseWidget<TopLevelWidget> NanoTopLevelWidget;
+#endif
+}
 
 using CardinalDGL::IdleCallback;
 
 // --------------------------------------------------------------------------------------------------------------------
 // Cardinal specific context
 
-static constexpr const uint32_t kModuleParameterCount = 24;
-
 enum CardinalVariant {
+    kCardinalVariantFX,
+    kCardinalVariantLoader,
     kCardinalVariantMain,
     kCardinalVariantMini,
-    kCardinalVariantFX,
     kCardinalVariantNative,
     kCardinalVariantSynth,
 };
 
 struct CardinalPluginContext : rack::Context {
+    const CardinalVariant variant;
+    const uint32_t parameterCount;
+    float* const parameters;
     uint32_t bufferSize, processCounter;
     double sampleRate;
-    float parameters[kModuleParameterCount];
-    CardinalVariant variant;
     bool bypassed, playing, reset, bbtValid;
     int32_t bar, beat, beatsPerBar, beatType;
     uint64_t frame;

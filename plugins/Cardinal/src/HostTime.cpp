@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -37,6 +37,7 @@ struct HostTime : TerminalModule {
         kHostTimeClock,
         kHostTimeBarPhase,
         kHostTimeBeatPhase,
+        kHostTimeBPM,
         kHostTimeCount
     };
 
@@ -160,7 +161,7 @@ struct HostTime : TerminalModule {
                               ? ((float)((timeInfo.bar - 1) % barDivision) + (timeInfo.beat - 1) + beatPhase)
                               / (pcontext->beatsPerBar * barDivision)
                               : 0.0f;
-        
+
         lights[kHostTimeRolling].setBrightness(playing ? 1.0f : 0.0f);
         lights[kHostTimeReset].setBrightnessSmooth(hasReset ? 1.0f : 0.0f, args.sampleTime * 0.5f);
         lights[kHostTimeBar].setBrightnessSmooth(hasBar ? 1.0f : 0.0f, args.sampleTime * 0.5f);
@@ -176,6 +177,7 @@ struct HostTime : TerminalModule {
         outputs[kHostTimeClock].setVoltage(hasClock ? 10.0f : 0.0f);
         outputs[kHostTimeBarPhase].setVoltage(barPhase * 10.0f);
         outputs[kHostTimeBeatPhase].setVoltage(beatPhase * 10.0f);
+        outputs[kHostTimeBPM].setVoltage(playingWithBBT ? std::log2(pcontext->beatsPerMinute / 120.0) : 0.0);
     }
 
     void processTerminalOutput(const ProcessArgs&) override
@@ -224,6 +226,7 @@ struct HostTimeWidget : ModuleWidgetWith8HP {
         addOutput(createOutput<PJ301MPort>(Vec(startX, startY_cv + 4 * padding), m, HostTime::kHostTimeClock));
         addOutput(createOutput<PJ301MPort>(Vec(startX, startY_cv + 5 * padding), m, HostTime::kHostTimeBarPhase));
         addOutput(createOutput<PJ301MPort>(Vec(startX, startY_cv + 6 * padding), m, HostTime::kHostTimeBeatPhase));
+        addOutput(createOutput<PJ301MPort>(Vec(startX, startY_cv + 7 * padding), m, HostTime::kHostTimeBPM));
 
         const float x = startX + 28;
         addChild(createLightCentered<SmallLight<GreenLight>> (Vec(x, startY_cv + 0 * padding + 12), m, HostTime::kHostTimeRolling));
@@ -263,6 +266,7 @@ struct HostTimeWidget : ModuleWidgetWith8HP {
         nvgFontSize(args.vg, 11);
         drawOutputLine(args.vg, 5, "Bar Phase");
         drawOutputLine(args.vg, 6, "Beat Phase");
+        drawOutputLine(args.vg, 7, "BPM");
 
         nvgBeginPath(args.vg);
         nvgRoundedRect(args.vg, startX - 1.0f, startY_top, 98.0f, 38.0f, 4); // 98

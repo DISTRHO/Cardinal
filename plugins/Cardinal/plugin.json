@@ -171,6 +171,7 @@
       "description": "Converts a monophonic audio signal to CV pitch",
       "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#audio-to-cv-pitch",
       "tags": [
+        "Tuner",
         "Utility"
       ]
     },
@@ -190,15 +191,6 @@
       "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#ildaeil",
       "tags": [
         "Utility"
-      ]
-    },
-    {
-      "slug": "MPV",
-      "name": "MPV",
-      "description": "An embed video player inside Cardinal",
-      "manualUrl": "https://github.com/DISTRHO/Cardinal/blob/main/docs/CARDINAL-MODULES.md#mpv",
-      "tags": [
-        "Visual"
       ]
     },
     {

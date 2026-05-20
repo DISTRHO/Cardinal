@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2025 Filipe Coelho <falktx@falktx.com>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -207,20 +207,23 @@ void Scene::step() {
 				(internal->historyActionIndex != actionIndex
 				&& actionIndex > 0
 				&& time - internal->lastSceneChangeTime >= 1.0)) {
-				remoteDetails->first = false;
-
-				const std::string& name(APP->history->actions[actionIndex - 1]->name);
-				static const std::vector<std::string> ignoredNames = {
-					"move knob",
-					"move modules",
-					"move switch",
-				};
-				if (std::find(ignoredNames.cbegin(), ignoredNames.cend(), name) == ignoredNames.cend()) {
-					printf("action '%s'\n", APP->history->actions[actionIndex - 1]->name.c_str());
+				if (remoteDetails->first) {
+					remoteDetails->first = false;
 					remoteUtils::sendFullPatchToRemote(remoteDetails);
+				} else {
+					const std::string& name(APP->history->actions[actionIndex - 1]->name);
+					static const std::vector<std::string> ignoredNames = {
+						"move knob",
+						"move modules",
+						"move switch",
+					};
+					if (std::find(ignoredNames.cbegin(), ignoredNames.cend(), name) == ignoredNames.cend()) {
+						d_debug("action '%s'\n", APP->history->actions[actionIndex - 1]->name.c_str());
+						remoteUtils::sendFullPatchToRemote(remoteDetails);
 
-					if (remoteDetails->screenshot) {
-						window::generateScreenshot();
+						if (remoteDetails->screenshot) {
+							window::generateScreenshot();
+						}
 					}
 				}
 				internal->historyActionIndex = actionIndex;

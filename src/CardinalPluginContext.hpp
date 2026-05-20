@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -44,10 +44,14 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
+static constexpr const uint32_t kModuleParameterCount = CARDINAL_NUM_PARAMETERS;
+
 enum CardinalParameters {
     kCardinalParameterCountAtModules = kModuleParameterCount,
     kCardinalParameterBypass = kCardinalParameterCountAtModules,
-  #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+  #if CARDINAL_VARIANT_LOADER
+    kCardinalParameterCount = kCardinalParameterBypass
+  #elif CARDINAL_VARIANT_MINI || !defined(HEADLESS)
     kCardinalParameterStartWindow,
     kCardinalParameterCountAtWindow = kCardinalParameterStartWindow + kWindowParameterCount,
    #if CARDINAL_VARIANT_MINI
@@ -85,6 +89,7 @@ enum CardinalParameters {
 
 enum CardinalStates {
     kCardinalStatePatch,
+  #if ! CARDINAL_VARIANT_LOADER
     kCardinalStateScreenshot,
     kCardinalStateComment,
    #if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
@@ -93,11 +98,13 @@ enum CardinalStates {
    #if CARDINAL_VARIANT_MINI
     kCardinalStateParamChange,
    #endif
+  #endif
     kCardinalStateCount
 };
 
 static_assert(kCardinalParameterBypass == kModuleParameterCount, "valid parameter indexes");
-#if CARDINAL_VARIANT_MINI || !defined(HEADLESS)
+#if CARDINAL_VARIANT_LOADER
+#elif CARDINAL_VARIANT_MINI || !defined(HEADLESS)
 static_assert(kCardinalParameterStartWindow == kModuleParameterCount + 1, "valid parameter indexes");
 static_assert(kCardinalParameterStartWindow == kCardinalParameterBypass + 1, "valid parameter indexes");
 static_assert(kCardinalParameterCountAtWindow == kModuleParameterCount + kWindowParameterCount + 1, "valid parameter indexes");
@@ -126,7 +133,7 @@ public:
           context(new CardinalPluginContext(this)) {}
     ~CardinalBasePlugin() override {}
 
-   #ifdef HAVE_LIBLO
+   #if defined(HAVE_LIBLO) && !CARDINAL_VARIANT_LOADER
     virtual bool startRemoteServer(const char* port) = 0;
     virtual void stopRemoteServer() = 0;
     virtual void stepRemoteServer() = 0;
@@ -155,8 +162,8 @@ public:
     std::function<void(char* path)> filebrowseraction;
     FileBrowserHandle filebrowserhandle;
 
-    CardinalBaseUI(const uint width, const uint height)
-        : UI(width, height),
+    CardinalBaseUI()
+        : UI(),
          #if DISTRHO_PLUGIN_WANT_DIRECT_ACCESS
           context(getRackContextFromPlugin(getPluginInstancePointer())),
          #else

@@ -23,25 +23,13 @@
 // -----------------------------------------------------------------------------------------------------------
 
 struct HostParameters : TerminalModule {
-    enum ParamIds {
-        NUM_PARAMS
-    };
-    enum InputIds {
-        NUM_INPUTS
-    };
-    enum OutputIds {
-        NUM_OUTPUTS = kModuleParameterCount
-    };
-    enum LightIds {
-        NUM_LIGHTS
-    };
-
     CardinalPluginContext* const pcontext;
-    rack::dsp::SlewLimiter parameters[kModuleParameterCount];
-    bool parametersConnected[kModuleParameterCount] = {};
+    rack::dsp::SlewLimiter* parameters = nullptr;
+    bool* parametersConnected = nullptr;
     bool bypassed = false;
     bool smooth = true;
     uint32_t lastProcessCounter = 0;
+    uint32_t numHostParameters = 0;
 
     HostParameters()
         : pcontext(static_cast<CardinalPluginContext*>(APP))
@@ -49,7 +37,22 @@ struct HostParameters : TerminalModule {
         if (pcontext == nullptr)
             throw rack::Exception("Plugin context is null.");
 
-        config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+        numHostParameters = pcontext->parameterCount;
+
+        config(0, 0, numHostParameters, 0);
+
+        parameters = new rack::dsp::SlewLimiter[numHostParameters];
+        parametersConnected = new bool[numHostParameters];
+        std::memset(parametersConnected, 0, sizeof(bool) * numHostParameters);
+    }
+
+    ~HostParameters() override
+    {
+        if (pcontext == nullptr)
+            return;
+
+        delete[] parameters;
+        delete[] parametersConnected;
     }
 
     void processTerminalInput(const ProcessArgs& args) override
@@ -61,7 +64,7 @@ struct HostParameters : TerminalModule {
             bypassed = isBypassed();
             lastProcessCounter = processCounter;
 
-            for (uint32_t i=0; i<kModuleParameterCount; ++i)
+            for (uint32_t i=0; i<numHostParameters; ++i)
             {
                 const bool connected = outputs[i].isConnected();
 
@@ -76,7 +79,7 @@ struct HostParameters : TerminalModule {
         if (bypassed)
             return;
 
-        for (uint32_t i=0; i<kModuleParameterCount; ++i)
+        for (uint32_t i=0; i<numHostParameters; ++i)
         {
             if (parametersConnected[i])
                 outputs[i].setVoltage(smooth ? parameters[i].process(args.sampleTime, pcontext->parameters[i])
@@ -91,7 +94,7 @@ struct HostParameters : TerminalModule {
     {
         const double fall = 1.0 / (double(pcontext->bufferSize) / e.sampleRate);
 
-        for (uint32_t i=0; i<kModuleParameterCount; ++i)
+        for (uint32_t i=0; i<numHostParameters; ++i)
         {
             parameters[i].reset();
             parameters[i].setRiseFall(fall, fall);
@@ -197,7 +200,10 @@ struct HostParametersWidget : ModuleWidgetWith9HP {
 struct HostParametersWidget : ModuleWidget {
     HostParametersWidget(HostParameters* const module) {
         setModule(module);
-        for (uint i=0; i<HostParameters::NUM_OUTPUTS; ++i)
+
+        const uint numHostParameters = static_cast<CardinalPluginContext*>(APP)->parameterCount;
+
+        for (uint i=0; i<numHostParameters; ++i)
             addOutput(createOutput<PJ301MPort>({}, module, i));
     }
 };

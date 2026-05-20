@@ -5,4 +5,5 @@
 #
 
 NAME = CardinalNative
+CARDINAL_VARIANT = native
 include ../Makefile.cardinal.mk

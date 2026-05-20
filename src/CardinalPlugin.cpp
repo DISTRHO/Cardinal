@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2025 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -334,7 +334,10 @@ public:
             const ScopedValueSetter<bool> svs(rack::settings::headless, true);
            #endif
             Engine_setAboutToClose(context->engine);
+            delete[] context->parameters;
             delete context;
+
+            rack::contextSet(nullptr);
         }
 
         if (! fAutosavePath.empty())
@@ -414,7 +417,7 @@ protected:
 
     uint32_t getVersion() const override
     {
-        return d_version(0, 25, 6);
+        return d_version(0, 26, 2);
     }
 
     int64_t getUniqueId() const override
@@ -1104,7 +1107,7 @@ protected:
         rack::system::removeRecursively(fAutosavePath);
         rack::system::createDirectories(fAutosavePath);
 
-        static constexpr const char zstdMagic[] = "\x28\xb5\x2f\xfd";
+        static constexpr const uint8_t zstdMagic[4] = { 0x28, 0xb5, 0x2f, 0xfd };
 
         if (std::memcmp(data.data(), zstdMagic, sizeof(zstdMagic)) != 0)
         {

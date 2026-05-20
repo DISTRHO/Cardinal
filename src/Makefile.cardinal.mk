@@ -10,17 +10,8 @@
 ifeq ($(NAME),)
 $(error invalid usage)
 endif
-
-ifeq ($(NAME),Cardinal)
-CARDINAL_VARIANT = main
-else ifeq ($(NAME),CardinalMini)
-CARDINAL_VARIANT = mini
-else ifeq ($(NAME),CardinalFX)
-CARDINAL_VARIANT = fx
-else ifeq ($(NAME),CardinalNative)
-CARDINAL_VARIANT = native
-else ifeq ($(NAME),CardinalSynth)
-CARDINAL_VARIANT = synth
+ifeq ($(CARDINAL_VARIANT),)
+$(error invalid usage)
 endif
 
 # --------------------------------------------------------------
@@ -264,6 +255,7 @@ endif
 
 ifeq ($(WASM),true)
 APP_EXT = .js
+UI_TYPE = gles2
 endif
 
 USE_VST2_BUNDLE = true
@@ -290,7 +282,9 @@ endif
 
 ifeq ($(WASM),true)
 
+ifneq ($(DEBUG),true)
 LINK_FLAGS += -O3
+endif
 LINK_FLAGS += -sALLOW_MEMORY_GROWTH
 LINK_FLAGS += -sINITIAL_MEMORY=64Mb
 LINK_FLAGS += -sLZ4=1
@@ -333,7 +327,12 @@ SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/fx_presets
 SYMLINKED_DIRS_RESOURCES += surgext/build/surge-data/wavetables
 SYMLINKED_DIRS_RESOURCES += WSTD-Drums/res/samples
 endif
+
+ifeq ($(CARDINAL_VARIANT),mini)
+LINK_FLAGS += $(foreach d,$(SYMLINKED_DIRS_RESOURCES),--preload-file=../../bin/CardinalMini.lv2/resources/$(d)@/resources/$(d))
+else
 LINK_FLAGS += $(foreach d,$(SYMLINKED_DIRS_RESOURCES),--preload-file=../../bin/CardinalNative.lv2/resources/$(d)@/resources/$(d))
+endif
 
 else ifeq ($(HAIKU),true)
 
@@ -407,6 +406,11 @@ endif
 # install path prefix for resource files
 
 BUILD_CXX_FLAGS += -DCARDINAL_PLUGIN_PREFIX='"$(PREFIX)"'
+
+# --------------------------------------------------------------
+# we know what we are doing, promise!
+
+BUILD_CXX_FLAGS += -DDISTRHO_NO_WARNINGS
 
 # --------------------------------------------------------------
 # Enable all possible plugin types and setup resources

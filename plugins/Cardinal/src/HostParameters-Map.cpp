@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -65,17 +65,20 @@ struct HostParametersMap : TerminalModule {
     uint8_t learningId = UINT8_MAX;
 
     CardinalPluginContext* const pcontext;
-    bool parametersChanged[kModuleParameterCount] = {};
-    float parameterValues[kModuleParameterCount];
+    bool* parametersChanged = nullptr;
+    float* parameterValues = nullptr;
     bool bypassed = false;
     bool firstRun = true;
     uint32_t lastProcessCounter = 0;
+    uint32_t numHostParameters = 0;
 
     HostParametersMap()
         : pcontext(static_cast<CardinalPluginContext*>(APP))
     {
         if (pcontext == nullptr)
             throw rack::Exception("Plugin context is null.");
+
+        numHostParameters = pcontext->parameterCount;
 
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
@@ -86,16 +89,23 @@ struct HostParametersMap : TerminalModule {
             pcontext->engine->addParamHandle(&mappings[id].paramHandle);
         }
 
-        std::memcpy(parameterValues, pcontext->parameters, sizeof(parameterValues));
+        parametersChanged = new bool[numHostParameters];
+        std::memset(parametersChanged, 0, sizeof(bool) * numHostParameters);
+
+        parameterValues = new float[numHostParameters];
+        std::memcpy(parameterValues, pcontext->parameters, sizeof(float) * numHostParameters);
     }
 
-    ~HostParametersMap()
+    ~HostParametersMap() override
     {
         if (pcontext == nullptr)
             return;
 
         for (uint8_t id = 0; id < MAX_MAPPED_PARAMS; ++id)
             pcontext->engine->removeParamHandle(&mappings[id].paramHandle);
+
+        delete[] parametersChanged;
+        delete[] parameterValues;
     }
 
     void onReset() override
@@ -121,8 +131,8 @@ struct HostParametersMap : TerminalModule {
         }
 
         firstRun = true;
-        std::memcpy(parameterValues, pcontext->parameters, sizeof(parameterValues));
-        std::memset(parametersChanged, 0, sizeof(parametersChanged));
+        std::memcpy(parameterValues, pcontext->parameters, sizeof(float) * numHostParameters);
+        std::memset(parametersChanged, 0, sizeof(bool) * numHostParameters);
     }
 
     void processTerminalInput(const ProcessArgs& args) override
@@ -137,7 +147,7 @@ struct HostParametersMap : TerminalModule {
         if (isBypassed())
             return;
 
-        for (uint32_t i = 0; i < kModuleParameterCount; ++i)
+        for (uint32_t i = 0; i < numHostParameters; ++i)
         {
             if (d_isEqual(pcontext->parameters[i], parameterValues[i]))
                 continue;
@@ -163,7 +173,7 @@ struct HostParametersMap : TerminalModule {
 
             // Validate hostParamId
             const uint8_t hostParamId = mappings[id].hostParamId;
-            if (hostParamId >= kModuleParameterCount)
+            if (hostParamId >= numHostParameters)
                 continue;
 
             // Set filter from param value if filter is uninitialized
@@ -209,7 +219,7 @@ struct HostParametersMap : TerminalModule {
         }
 
         firstRun = false;
-        std::memset(parametersChanged, 0, sizeof(parametersChanged));
+        std::memset(parametersChanged, 0, sizeof(bool) * numHostParameters);
     }
 
     void processTerminalOutput(const ProcessArgs&) override
@@ -342,17 +352,22 @@ struct HostParametersMap : TerminalModule {
 #ifndef HEADLESS
 struct ParameterIndexQuantity : Quantity {
     HostParameterMapping& mapping;
+    uint32_t numHostParameters = 0;
     float v;
 
     ParameterIndexQuantity(HostParameterMapping& m)
       : mapping(m),
-        v(mapping.hostParamId) {}
+        v(mapping.hostParamId)
+    {
+        if (CardinalPluginContext* pcontext = static_cast<CardinalPluginContext*>(APP))
+            numHostParameters = pcontext->parameterCount;
+    }
 
     float getMinValue() override {
         return 0;
     }
     float getMaxValue() override {
-        return kModuleParameterCount - 1;
+        return numHostParameters - 1;
     }
     float getDefaultValue() override {
         return 0;
@@ -362,26 +377,26 @@ struct ParameterIndexQuantity : Quantity {
     }
     void setValue(float value) override {
         v = math::clamp(value, getMinValue(), getMaxValue());
-        mapping.hostParamId = math::clamp(static_cast<int>(v + 0.5f), 0, kModuleParameterCount - 1);
+        mapping.hostParamId = math::clamp(static_cast<int>(v + 0.5f), 0, numHostParameters - 1);
     }
     float getDisplayValue() override {
         return mapping.hostParamId + 1;
     }
     void setDisplayValue(float displayValue) override {
         setValue(displayValue - 1);
-	}
+    }
     std::string getLabel() override {
         return "Host Parameter";
     }
 };
 
 struct ParameterIndexSlider : ui::Slider {
-	ParameterIndexSlider(HostParameterMapping& m) {
-		quantity = new ParameterIndexQuantity(m);
-	}
-	~ParameterIndexSlider() {
-		delete quantity;
-	}
+    ParameterIndexSlider(HostParameterMapping& m) {
+        quantity = new ParameterIndexQuantity(m);
+    }
+    ~ParameterIndexSlider() {
+        delete quantity;
+    }
 };
 
 static HostParameterMapping& getDummyHostParameterMapping()
@@ -394,6 +409,7 @@ struct HostParametersMapChoice : CardinalLedDisplayChoice {
     HostParametersMap* const module;
     const uint8_t id;
     HostParameterMapping& mapping;
+    uint32_t numHostParameters = 0;
 
     HostParametersMapChoice(HostParametersMap* const m, const uint8_t i)
       : CardinalLedDisplayChoice(),
@@ -402,6 +418,9 @@ struct HostParametersMapChoice : CardinalLedDisplayChoice {
         mapping(m != nullptr ? m->mappings[i] : getDummyHostParameterMapping())
     {
         alignTextCenter = false;
+
+        if (CardinalPluginContext* pcontext = static_cast<CardinalPluginContext*>(APP))
+            numHostParameters = pcontext->parameterCount;
 
         // Module browser setup
         if (m == nullptr)
@@ -439,7 +458,7 @@ struct HostParametersMapChoice : CardinalLedDisplayChoice {
             if (ParamWidget* const touchedParam = APP->scene->rack->touchedParam)
             {
                 APP->scene->rack->touchedParam = nullptr;
-                DISTRHO_SAFE_ASSERT_RETURN(mapping.hostParamId < kModuleParameterCount,);
+                DISTRHO_SAFE_ASSERT_RETURN(mapping.hostParamId < numHostParameters,);
 
                 const int64_t moduleId = touchedParam->module->id;
                 const int paramId = touchedParam->paramId;
@@ -455,7 +474,7 @@ struct HostParametersMapChoice : CardinalLedDisplayChoice {
         text.clear();
 
         // mapped
-        if (module->mappings[id].hostParamId < kModuleParameterCount)
+        if (module->mappings[id].hostParamId < numHostParameters)
             text += string::f("P%02d: ", module->mappings[id].hostParamId + 1);
         if (module->mappings[id].paramHandle.moduleId >= 0)
             text += getParamName();

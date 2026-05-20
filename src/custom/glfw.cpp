@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2024 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2025 Filipe Coelho <falktx@falktx.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,6 +17,7 @@
 
 #include "Application.hpp"
 #include "CardinalPluginContext.hpp"
+#include "widget/event.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -206,4 +207,13 @@ GLFWAPI const char* glfwGetKeyName(const int key, int)
     case 'z': case 'Z': return "z";
     default: return nullptr;
     }
+}
+
+int glfwGetKey(GLFWwindow*, const int key)
+{
+    CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
+    DISTRHO_SAFE_ASSERT_RETURN(context != nullptr, GLFW_RELEASE);
+    DISTRHO_SAFE_ASSERT_RETURN(context->event != nullptr, GLFW_RELEASE);
+
+    return context->event->heldKeys.find(key) != context->event->heldKeys.end() ? GLFW_PRESS : GLFW_RELEASE;
 }

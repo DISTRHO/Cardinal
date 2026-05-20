@@ -10,7 +10,7 @@ Also, the official plugin works pretty much like the free standalone where you l
 This is intentionally not allowed/enabled in Cardinal, as the target is to make a self-contained plugin binary.
 Online access is also not allowed.
 
-Bellow follows a list of features comparing the official plugin to Cardinal.
+Below follows a list of features comparing the official plugin to Cardinal.
 
 | Feature                        | Rack Pro                  | Cardinal                        | Additional notes |
 |--------------------------------|---------------------------|---------------------------------|------------------|
@@ -36,7 +36,7 @@ Bellow follows a list of features comparing the official plugin to Cardinal.
 | FX plugin variant              | 16 ins, 16 outs           | 2 ins, 2 outs                   | |
 | Raw-CV plugin variant          | Unsupported               | 8 audio IO + 10 CV IO           | Available in JACK, LV2 and VST3 formats, not possible in AU and VST2 |
 | Arbitrary parameter automation | Yes                       | No (*)                          | Static 24 automatable params, use Host Params/Map modules to map them to module parameters |
-| Integrated plugin host         | No, Host payed separately | Yes, using Carla or Ildaeil     | |
+| Integrated plugin host         | No, Host paid separately  | Yes, using Carla or Ildaeil     | |
 | Host sync/timing               | Using MIDI signals        | Using dedicated module          | |
 | Linux/X11 event handling       | Runs on 2nd thread        | Runs on main/GUI thread         | |
 | v1 module compatibility        | No                        | No, but with less restrictions  | Module widgets can load resources at any point |

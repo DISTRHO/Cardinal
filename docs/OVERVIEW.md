@@ -45,7 +45,7 @@ Implementing new plugin formats will be done here.
 This directory contains special header files needed to build the original Rack code as required by Cardinal.  
 These headers are included before the official Rack ones, allowing us to override some implementation details.
 
-Additionally a few compatiblity headers are present, helping compile the code for more targets than officially supported in Rack.
+Additionally a few compatibility headers are present, helping compile the code for more targets than officially supported in Rack.
 
 ## lv2export
 

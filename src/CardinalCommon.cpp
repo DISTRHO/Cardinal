@@ -1,6 +1,6 @@
 /*
  * DISTRHO Cardinal Plugin
- * Copyright (C) 2021-2025 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2021-2026 Filipe Coelho <falktx@falktx.com>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -36,7 +36,7 @@
 # error wrong build
 #endif
 
-#if (defined(STATIC_BUILD) && !defined(__MOD_DEVICES__)) || CARDINAL_VARIANT_MINI
+#if (defined(STATIC_BUILD) && !defined(__MOD_DEVICES__)) || CARDINAL_VARIANT_LOADER || CARDINAL_VARIANT_MINI
 # undef CARDINAL_INIT_OSC_THREAD
 #endif
 
@@ -70,6 +70,8 @@
 
 #if CARDINAL_VARIANT_FX
 # define CARDINAL_VARIANT_NAME "fx"
+#elif CARDINAL_VARIANT_LOADER
+# define CARDINAL_VARIANT_NAME "loader"
 #elif CARDINAL_VARIANT_MINI
 # define CARDINAL_VARIANT_NAME "mini"
 #elif CARDINAL_VARIANT_NATIVE
@@ -99,7 +101,7 @@ void destroyStaticPlugins();
 }
 }
 
-const std::string CARDINAL_VERSION = "25.06";
+const std::string CARDINAL_VERSION = "26.02";
 
 // -----------------------------------------------------------------------------------------------------------
 
@@ -125,22 +127,26 @@ void handleHostParameterDrag(const CardinalPluginContext* pcontext, uint index, 
 // --------------------------------------------------------------------------------------------------------------------
 
 CardinalPluginContext::CardinalPluginContext(Plugin* const p)
-    : bufferSize(p != nullptr ? p->getBufferSize() : 0),
+   #if CARDINAL_VARIANT_FX
+    : variant(kCardinalVariantFX),
+   #elif CARDINAL_VARIANT_LOADER
+    : variant(kCardinalVariantLoader),
+   #elif CARDINAL_VARIANT_MAIN
+    : variant(kCardinalVariantMain),
+   #elif CARDINAL_VARIANT_MINI
+    : variant(kCardinalVariantMini),
+   #elif CARDINAL_VARIANT_NATIVE
+    : variant(kCardinalVariantNative),
+   #elif CARDINAL_VARIANT_SYNTH
+    : variant(kCardinalVariantSynth),
+   #else
+    #error cardinal variant not set
+   #endif
+      parameterCount(CARDINAL_NUM_PARAMETERS),
+      parameters(new float[CARDINAL_NUM_PARAMETERS]),
+      bufferSize(p != nullptr ? p->getBufferSize() : 0),
       processCounter(0),
       sampleRate(p != nullptr ? p->getSampleRate() : 0.0),
-     #if CARDINAL_VARIANT_MAIN
-      variant(kCardinalVariantMain),
-     #elif CARDINAL_VARIANT_MINI
-      variant(kCardinalVariantMini),
-     #elif CARDINAL_VARIANT_FX
-      variant(kCardinalVariantFX),
-     #elif CARDINAL_VARIANT_NATIVE
-      variant(kCardinalVariantNative),
-     #elif CARDINAL_VARIANT_SYNTH
-      variant(kCardinalVariantSynth),
-     #else
-      #error cardinal variant not set
-     #endif
       bypassed(false),
       playing(false),
       reset(false),
@@ -166,7 +172,7 @@ CardinalPluginContext::CardinalPluginContext(Plugin* const p)
       tlw(nullptr),
       ui(nullptr)
 {
-    std::memset(parameters, 0, sizeof(parameters));
+    std::memset(parameters, 0, sizeof(float) * CARDINAL_NUM_PARAMETERS);
 }
 
 bool CardinalPluginContext::addIdleCallback(IdleCallback* const cb) const
@@ -626,56 +632,18 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
 
     if (asset::userDir.empty())
     {
-       #if defined(DISTRHO_OS_WASM)
-        asset::userDir = "/userfiles";
-       #elif defined(ARCH_MAC)
-        asset::userDir = system::join(homeDir(), "Documents", "Cardinal");
-       #elif defined(ARCH_WIN)
-        asset::userDir = system::join(getSpecialPath(kSpecialPathMyDocuments), "Cardinal");
-       #else
-        std::string xdgConfigDir;
-        if (const char* const xdgEnv = getenv("XDG_CONFIG_HOME"))
-            xdgConfigDir = xdgEnv;
-        if (xdgConfigDir.empty())
-            xdgConfigDir = system::join(homeDir(), ".config");
-
-        const std::string xdgDirsConfigPath(system::join(xdgConfigDir, "user-dirs.dirs"));
-
-        if (system::exists(xdgDirsConfigPath))
-        {
-            std::ifstream xdgDirsConfigFile(xdgDirsConfigPath, std::ios::in|std::ios::ate);
-            std::string xdgDirsConfig(xdgDirsConfigFile.tellg(), 0);
-
-            xdgDirsConfigFile.seekg(0);
-            xdgDirsConfigFile.read(&xdgDirsConfig[0], xdgDirsConfig.size());
-
-            if (const char* const xdgDocsDir = std::strstr(xdgDirsConfig.c_str(), "XDG_DOCUMENTS_DIR=\""))
-            {
-                if (const char* const xdgDocsDirNL = std::strstr(xdgDocsDir, "\"\n"))
-                {
-                    asset::userDir = std::string(xdgDocsDir + 19, xdgDocsDirNL - xdgDocsDir - 19);
-
-                    if (string::startsWith(asset::userDir, "$HOME"))
-                        asset::userDir.replace(asset::userDir.begin(), asset::userDir.begin() + 5, homeDir());
-
-                    if (! system::exists(asset::userDir))
-                        asset::userDir.clear();
-                }
-            }
-        }
-
-        if (asset::userDir.empty())
-            asset::userDir = system::join(homeDir(), "Documents", "Cardinal");
-       #endif
+        asset::userDir = system::join(getSpecialDir(kSpecialDirDocuments), "Cardinal");
 
         if (isRealInstance)
         {
-            system::createDirectory(asset::userDir);
            #if defined(DISTRHO_OS_WASM) && !defined(CARDINAL_COMMON_UI_ONLY)
             EM_ASM({
+                Module.FS.mkdir('/userfiles');
                 Module.FS.mount(Module.IDBFS, {}, '/userfiles');
                 Module.FS.syncfs(true, function(err) { if (!err) { dynCall('vi', $0, [$1]) } });
             }, WebBrowserDataLoaded, this);
+           #else
+            system::createDirectory(asset::userDir);
            #endif
         }
     }
@@ -683,17 +651,10 @@ Initializer::Initializer(const CardinalBasePlugin* const plugin, const CardinalB
    #ifndef CARDINAL_COMMON_DSP_ONLY
     if (asset::configDir.empty())
     {
-       #if defined(ARCH_MAC) || defined(ARCH_WIN) || defined(DISTRHO_OS_WASM)
-        asset::configDir = asset::userDir;
-       #else
-        if (const char* const xdgEnv = getenv("XDG_CONFIG_HOME"))
-            asset::configDir = system::join(xdgEnv, "Cardinal");
-        else
-            asset::configDir = system::join(homeDir(), ".config", "Cardinal");
+        asset::configDir = system::join(getSpecialDir(kSpecialDirConfig), "Cardinal");
 
         if (isRealInstance)
             system::createDirectory(asset::configDir);
-       #endif
     }
    #endif
    
@@ -875,7 +836,8 @@ void Initializer::stopRemoteServer()
         lo_server_thread_stop(oscServerThread);
         lo_server_thread_del_method(oscServerThread, nullptr, nullptr);
         lo_server_thread_free(oscServerThread);
-        oscServerThread = oscServer = nullptr;
+        oscServerThread = nullptr;
+        oscServer = nullptr;
     }
    #else
     if (oscServer != nullptr)

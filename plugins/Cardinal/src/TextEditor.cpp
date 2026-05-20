@@ -85,7 +85,7 @@ struct TextEditorModule : Module {
     {
         file.clear();
 
-        // Rack Core Notes compatiblity
+        // Rack Core Notes compatibility
         if (json_t* const textJ = json_object_get(rootJ, "text"))
         {
             text = json_string_value(textJ);

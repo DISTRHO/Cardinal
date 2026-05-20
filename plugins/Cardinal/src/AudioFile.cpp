@@ -201,7 +201,7 @@ struct CarlaInternalPluginModule : Module, Runner {
     {
         switch (opcode)
         {
-        // cannnot be supported
+        // cannot be supported
         case NATIVE_HOST_OPCODE_HOST_IDLE:
             break;
         // other stuff
