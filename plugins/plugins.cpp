@@ -2122,6 +2122,7 @@ static void initStatic__CVfunk()
         p->addModel(modelCVfunkBlank);
         p->addModel(modelCVfunkBlank4HP);
         p->addModel(modelRat);
+        p->addModel(modelTuner);
         p->addModel(modelCount);
         p->addModel(modelClpy);
         p->addModel(modelAlloy);
