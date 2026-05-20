@@ -261,12 +261,6 @@ ifneq ($(WASM),true)
 PLUGIN_FILES += Cardinal/src/Carla.cpp
 PLUGIN_FILES += Cardinal/src/Ildaeil.cpp
 endif
-ifneq ($(HEADLESS),true)
-ifeq ($(HAVE_X11),true)
-PLUGIN_FILES += Cardinal/src/EmbedWidget.cpp
-PLUGIN_FILES += Cardinal/src/MPV.cpp
-endif
-endif
 endif
 
 ifneq ($(HEADLESS),true)
@@ -537,7 +531,8 @@ MINIPLUGIN_FILES += AudibleInstruments/eurorack/stmlib/utils/random.cc
 
 PLUGIN_FILES += $(wildcard Autinn/src/*.cpp)
 
-AUTINN_CUSTOM = Chord Vibrato
+AUTINN_CUSTOM = Chord Vibrato Snare Scope ScopeDisplay DCBlocker
+AUTINN_CUSTOM_PER_FILE = AutoLevelMenuItem
 
 # --------------------------------------------------------------
 # Axioma
@@ -810,7 +805,7 @@ IHTSYN_CUSTOM_PER_FILE += mv_statevariable
 
 PLUGIN_FILES += $(filter-out JW-Modules/src/JWModules.cpp JW-Modules/src/Str1ker.cpp,$(wildcard JW-Modules/src/*.cpp))
 
-ifneq ($(STATIC_BUILD),true)
+ifneq ($(MOD_BUILD),true)
 PLUGIN_FILES += JW-Modules/src/Str1ker.cpp
 PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/ip/*.cpp)
 PLUGIN_FILES += $(wildcard JW-Modules/lib/oscpack/osc/*.cpp)
@@ -1311,6 +1306,11 @@ VALLEYAUDIO_CUSTOM = $(DRWAV) Chord DigitalDisplay
 VALLEYAUDIO_CUSTOM_PER_FILE = TempoKnob
 
 # --------------------------------------------------------------
+# Venom
+
+PLUGIN_FILES += $(filter-out Venom/src/plugin.cpp,$(wildcard Venom/src/*.cpp))
+
+# --------------------------------------------------------------
 # Voxglitch
 
 PLUGIN_FILES += $(filter-out voxglitch/src/plugin.cpp,$(wildcard voxglitch/src/*.cpp))
@@ -1347,11 +1347,13 @@ PLUGIN_FILES += $(filter-out ZetaCarinaeModules/src/plugin.cpp,$(wildcard ZetaCa
 # ZZC
 
 PLUGIN_FILES += $(filter-out ZZC/src/ZZC.cpp ZZC/src/WavetablePlayer.cpp,$(wildcard ZZC/src/*.cpp))
+PLUGIN_FILES += $(wildcard ZZC/src/Phaseque/*.cpp)
 # PLUGIN_FILES += ZZC/src/dsp/Wavetable.cpp
 # PLUGIN_FILES += ZZC/src/filetypes/WavSupport.cpp
 
 # modules/types which are present in other plugins
-ZZC_CUSTOM = Clock LowFrequencyOscillator
+ZZC_CUSTOM = Clock LowFrequencyOscillator LedLight Step PolyModeValueItem PolyModeItem
+ZZC_CUSTOM_PER_FILE = ExternalCVModeCompatibleOptionItem ExternalCVModeVBPSOptionItem SnapCVOptionItem ExternalCVModeItem
 
 # --------------------------------------------------------------
 # Build setup
@@ -1847,7 +1849,7 @@ LV2_RESOURCES += $(PLUGIN_LIST:%=../bin/CardinalFX.lv2/resources/PluginManifests
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/Cardinal.lv2/resources/%)
 LV2_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalFX.lv2/resources/%)
 
-# MOD builds only have LV2 FX variant for now
+# wasm builds only have standalone and mini
 else ifeq ($(WASM),true)
 
 MINI_RESOURCES  = $(MINIPLUGIN_LIST:%=../bin/CardinalMini.lv2/resources/PluginManifests/%.json)
@@ -1897,7 +1899,12 @@ VST3_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalSynth.vst3/Contents/Resource
 
 endif
 
+LOADER_RESOURCES  = $(PLUGIN_LIST:%=../bin/CardinalLoader.lv2/resources/PluginManifests/%.json)
+LOADER_RESOURCES += $(RESOURCE_FILES:%=../bin/CardinalLoader.lv2/resources/%)
+
 resources: $(JACK_RESOURCES) $(LV2_RESOURCES) $(VST2_RESOURCES) $(VST3_RESOURCES) $(CLAP_RESOURCES)
+
+loader-resources: $(LOADER_RESOURCES)
 
 mini-resources: $(MINI_RESOURCES)
 
@@ -1906,6 +1913,10 @@ mini-resources: $(MINI_RESOURCES)
 	$(SILENT)ln -sf $(abspath $<) $@
 
 ../bin/CardinalFX.lv2/resources/%: %
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalLoader.lv2/resources/%: %
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
@@ -1935,11 +1946,19 @@ ifeq ($(MOD_BUILD),true)
 	$(SILENT)python3 ../deps/svg2stub.py $< $@
 endif
 
+../bin/CardinalLoader.lv2/resources/%.svg: %.svg ../deps/svg2stub.py
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)python3 ../deps/svg2stub.py $< $@
+
 ../bin/Cardinal.lv2/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
 ../bin/CardinalFX.lv2/resources/PluginManifests/%.json: %/plugin.json
+	-@mkdir -p "$(shell dirname $@)"
+	$(SILENT)ln -sf $(abspath $<) $@
+
+../bin/CardinalLoader.lv2/resources/PluginManifests/%.json: %/plugin.json
 	-@mkdir -p "$(shell dirname $@)"
 	$(SILENT)ln -sf $(abspath $<) $@
 
@@ -2230,6 +2249,7 @@ $(BUILD_DIR)/Autinn/%.cpp.o: Autinn/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(AUTINN_CUSTOM),$(call custom_module_names,$(m),Autinn)) \
+		$(foreach m,$(AUTINN_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),autinn_$(shell basename -- $*))) \
 		-DpluginInstance=pluginInstance__Autinn \
 		-Dinit=init__Autinn
 
@@ -2821,6 +2841,15 @@ $(BUILD_DIR)/ValleyAudio/%.cpp.o: ValleyAudio/%.cpp
 		-Wno-sign-compare \
 		-Wno-unused-but-set-variable
 
+$(BUILD_DIR)/Venom/%.cpp.o: Venom/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(VENOM_CUSTOM),$(call custom_module_names,$(m),Venom)) \
+		-DSKIP_MINGW_FORMAT \
+		-DpluginInstance=pluginInstance__Venom \
+		-lglfw
+
 $(BUILD_DIR)/voxglitch/%.cpp.o: voxglitch/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -2865,6 +2894,7 @@ $(BUILD_DIR)/ZZC/%.cpp.o: ZZC/%.cpp
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ZZC_CUSTOM),$(call custom_module_names,$(m),ZZC)) \
+		$(foreach m,$(ZZC_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),ZZC_$(shell basename -- $*))) \
 		-DpluginInstance=pluginInstance__ZZC
 
 # --------------------------------------------------------------

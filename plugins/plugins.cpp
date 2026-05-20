@@ -106,6 +106,8 @@ extern Model* modelBlank;
 */
 #define modelChord modelAutinnChord
 #define modelVibrato modelAutinnVibrato
+#define modelSnare modelAutinnSnare
+#define modelScope modelAutinnScope
 extern Model* modelJette;
 extern Model* modelFlora;
 extern Model* modelOxcart;
@@ -130,8 +132,17 @@ extern Model* modelFil;
 extern Model* modelNap;
 extern Model* modelMelody;
 extern Model* modelChord;
+extern Model* modelKicker;
+extern Model* modelSnare;
+extern Model* modelCoil;
+extern Model* modelGeiger;
+extern Model* modelSaw2;
+extern Model *modelScope;
+extern Model *modelExcavi;
 #undef modelChord
 #undef modelVibrato
+#undef modelSnare
+#undef modelScope
 
 // Axioma
 #include "Axioma/src/plugin.hpp"
@@ -350,6 +361,7 @@ extern Model* modelTestVCF;
 #undef modelSteps
 #undef modelNode
 #undef modelTuner
+
 
 // ChowDSP
 #include "ChowDSP/src/plugin.hpp"
@@ -896,6 +908,13 @@ void surgext_rack_update_theme();
 // ValleyAudio
 #include "ValleyAudio/src/Valley.hpp"
 
+// Venom
+#include "Venom/src/plugin.hpp"
+namespace Venom
+{
+    void readDefaultThemes();
+}
+
 // Voxglitch
 #define modelLooper modelVoxglitchLooper
 #include "voxglitch/src/plugin.hpp"
@@ -916,8 +935,10 @@ void setupSamples();
 #define ZZC_SHARED_H
 #define ZZC_WIDGETS_H
 #define modelClock modelZZCClock
+#define LedLight ZZCLedLight
 #include "ZZC/src/ZZC.hpp"
 #undef modelClock
+#undef LedLight
 
 // known terminal modules
 std::vector<Model*> hostTerminalModels;
@@ -1015,6 +1036,7 @@ extern Plugin* pluginInstance__stoermelder_p1;
 Plugin* pluginInstance__surgext;
 Plugin* pluginInstance__unless_modules;
 Plugin* pluginInstance__ValleyAudio;
+Plugin* pluginInstance__Venom;
 Plugin* pluginInstance__Voxglitch;
 Plugin* pluginInstance__WhatTheRack;
 extern Plugin* pluginInstance__WSTD_Drums;
@@ -1063,10 +1085,17 @@ struct StaticPluginLoader {
             return;
         }
 
-        // force ABI, we use static plugins so this doesnt matter as long as it builds
-        json_t* const version = json_string((APP_VERSION_MAJOR + ".0").c_str());
-        json_object_set(rootJ, "version", version);
-        json_decref(version);
+        std::string version;
+        if (json_t* const versionJ = json_object_get(rootJ, "version"))
+            version = json_string_value(versionJ);
+
+        if (!string::startsWith(version, APP_VERSION_MAJOR + "."))
+        {
+            // force ABI, we use static plugins so this doesnt matter as long as it builds
+            json_t* const versionJ = json_string((APP_VERSION_MAJOR + ".0").c_str());
+            json_object_set(rootJ, "version", versionJ);
+            json_decref(versionJ);
+        }
 
         // Load manifest
         p->fromJson(rootJ);
@@ -1167,11 +1196,6 @@ static void initStatic__Cardinal()
         p->addModel(modelSassyScope);
        #else
         spl.removeModule("SassyScope");
-       #endif
-       #if defined(HAVE_X11) && !defined(HEADLESS) && !defined(STATIC_BUILD)
-        p->addModel(modelMPV);
-       #else
-        spl.removeModule("MPV");
        #endif
        #ifdef HAVE_FFTW3F
         p->addModel(modelAudioToCVPitch);
@@ -1546,6 +1570,8 @@ static void initStatic__Autinn()
     {
 #define modelChord modelAutinnChord
 #define modelVibrato modelAutinnVibrato
+#define modelSnare modelAutinnSnare
+#define modelScope modelAutinnScope
         p->addModel(modelAmp);
         p->addModel(modelDeadband);
         p->addModel(modelBass);
@@ -1570,8 +1596,17 @@ static void initStatic__Autinn()
         p->addModel(modelNap);
         p->addModel(modelMelody);
         p->addModel(modelChord);
+        p->addModel(modelKicker);
+	    p->addModel(modelSnare);
+	    p->addModel(modelCoil);
+	    p->addModel(modelGeiger);
+	    p->addModel(modelSaw2);
+        p->addModel(modelScope);
+        p->addModel(modelExcavi);
 #undef modelChord
 #undef modelVibrato
+#undef modelSnare
+#undef modelScope
     }
 }
 
@@ -3247,6 +3282,7 @@ static void initStatic__Sapphire()
         p->addModel(modelSapphireTout);
         p->addModel(modelSapphireTricorder);
         p->addModel(modelSapphireTubeUnit);
+        p->addModel(modelSapphireZoo);
     }
 }
 
@@ -3494,6 +3530,82 @@ static void initStatic__ValleyAudio()
     }
 }
 
+static void initStatic__Venom()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Venom = p;
+
+    const StaticPluginLoader spl(p, "Venom");
+    if (spl.ok())
+    {
+        p->addModel(modelVenomAD_ASR);
+        p->addModel(modelVenomAuxClone);
+        p->addModel(modelVenomBayInput);
+        p->addModel(modelVenomBayNorm);
+        p->addModel(modelVenomBayOutput);
+        p->addModel(modelVenomBenjolinOsc);
+        p->addModel(modelVenomBenjolinGatesExpander);
+        p->addModel(modelVenomBenjolinVoltsExpander);
+        p->addModel(modelVenomBernoulliSwitch);
+        p->addModel(modelVenomBernoulliSwitchExpander);
+        p->addModel(modelVenomBlocker);
+        p->addModel(modelVenomBypass);
+        p->addModel(modelVenomCloneMerge);
+        p->addModel(modelVenomCompare2);
+        p->addModel(modelVenomCrossFade3D);
+        p->addModel(modelVenomHQ);
+        p->addModel(modelVenomKnob5);
+        p->addModel(modelVenomLinearBeats);
+        p->addModel(modelVenomLinearBeatsExpander);
+        p->addModel(modelVenomLogic);
+        p->addModel(modelVenomMix4);
+        p->addModel(modelVenomMix4Stereo);
+        p->addModel(modelVenomMixFade);
+        p->addModel(modelVenomMixFade2);
+        p->addModel(modelVenomMixMute);
+        p->addModel(modelVenomMixOffset);
+        p->addModel(modelVenomMixPan);
+        p->addModel(modelVenomMixSend);
+        p->addModel(modelVenomMixSolo);
+        p->addModel(modelVenomMousePad);
+        p->addModel(modelVenomMultiMerge);
+        p->addModel(modelVenomMultiSplit);
+        p->addModel(modelVenomSVF);
+        p->addModel(modelVenomOscillator);
+        p->addModel(modelVenomNORS_IQ);
+        p->addModel(modelVenomNORSIQChord2Scale);
+        p->addModel(modelVenomPan3D);
+        p->addModel(modelVenomPolyClone);
+        p->addModel(modelVenomPolyFade);
+        p->addModel(modelVenomPolyOffset);
+        p->addModel(modelVenomPolySHASR);
+        p->addModel(modelVenomPolyScale);
+        p->addModel(modelVenomPolyUnison);
+        p->addModel(modelVenomPush5);
+        p->addModel(modelVenomQuadVCPolarizer);
+        p->addModel(modelVenomRecurse);
+        p->addModel(modelVenomRecurseStereo);
+        p->addModel(modelVenomReformation);
+        p->addModel(modelVenomRhythmExplorer);
+        p->addModel(modelVenomShapedVCA);
+        p->addModel(modelVenomSlew);
+        p->addModel(modelVenomSphereToXYZ);
+        p->addModel(modelVenomThru);
+        p->addModel(modelVenomVCAMix4);
+        p->addModel(modelVenomVCAMix4Stereo);
+        p->addModel(modelVenomVCOUnit);
+        p->addModel(modelVenomBlank);
+        p->addModel(modelVenomWaveFolder);
+        p->addModel(modelVenomWaveMangler);
+        p->addModel(modelVenomWaveMultiplier);
+        p->addModel(modelVenomWidgetMenuExtender);
+        p->addModel(modelVenomWinComp);
+        p->addModel(modelVenomXM_OP);
+
+        Venom::readDefaultThemes();
+    }
+}
+
 static void initStatic__Voxglitch()
 {
     Plugin* p = new Plugin;
@@ -3609,6 +3721,7 @@ static void initStatic__ZZC()
         p->addModel(modelDiv);
         p->addModel(modelDivExp);
         p->addModel(modelPolygate);
+        p->addModel(modelPhaseque);
 #undef modelClock
     }
 }
@@ -3694,6 +3807,7 @@ void initStaticPlugins()
     initStatic__surgext();
     initStatic__unless_modules();
     initStatic__ValleyAudio();
+    initStatic__Venom();
     initStatic__Voxglitch();
     initStatic__WhatTheRack();
     initStatic__WSTD_Drums();
