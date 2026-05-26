@@ -915,7 +915,6 @@ MINIPLUGIN_FILES += MockbaModular/src/Shapah.cpp
 # Moffenzeef
 
 PLUGIN_FILES += $(filter-out Moffenzeef/src/plugin.cpp,$(wildcard Moffenzeef/src/*.cpp))
-# PLUGIN_FILES += $(wildcard Moffenzeef/src/*.c)
 
 # --------------------------------------------------------------
 # Mog

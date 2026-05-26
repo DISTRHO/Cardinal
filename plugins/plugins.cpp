@@ -2929,7 +2929,6 @@ static void initStatic__Moffenzeef()
         p->addModel(modelTantz);
         p->addModel(modelStargazer);
         p->addModel(modelQuadDeviant);
-        // p->addModel(modelTehom);
     }
 }
 
