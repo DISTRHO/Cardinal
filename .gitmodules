@@ -268,4 +268,4 @@
 	url = https://github.com/DaveBenham/VenomModules
 [submodule "plugins/Moffenzeef"]
 	path = plugins/Moffenzeef
-	url = https://github.com/moffenzeefmodular/Moffenzeef-VCV.git
+	url = https://github.com/moffenzeefmodular/VCVrack-submission.git

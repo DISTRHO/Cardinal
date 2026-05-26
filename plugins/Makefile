@@ -914,7 +914,8 @@ MINIPLUGIN_FILES += MockbaModular/src/Shapah.cpp
 # --------------------------------------------------------------
 # Moffenzeef
 
-PLUGIN_FILES += $(filter-out Moffenzeef/src/plugin.cpp,$(wildcard Moffenzeef/src/*.cpp))
+PLUGIN_FILES += $(filter-out Moffenzeef/src/plugin.cpp ,$(wildcard Moffenzeef/src/*.cpp))
+PLUGIN_FILES += $(wildcard Moffenzeef/src/*.c)
 
 # --------------------------------------------------------------
 # Mog
@@ -2641,6 +2642,12 @@ $(BUILD_DIR)/MockbaModular/%.cpp.o: MockbaModular/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(MOCKBAMODULAR_CUSTOM),$(call custom_module_names,$(m),MockbaModular)) \
 		-DpluginInstance=pluginInstance__MockbaModular
+
+$(BUILD_DIR)/Moffenzeef/%.c.o: Moffenzeef/%.c
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CC) $< $(BUILD_C_FLAGS) -c -o $@ \
+		$(foreach m,$(MOFFENZEEF_CUSTOM),$(call custom_module_names,$(m),Moffenzeef))
 
 $(BUILD_DIR)/Moffenzeef/%.cpp.o: Moffenzeef/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
