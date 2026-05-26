@@ -726,6 +726,9 @@ extern Model* modelArpeggiator;
 #undef loadBack
 std::string loadBack(int) { return "res/Empty_gray.svg"; }
 
+// Moffenzeef
+#include "Moffenzeef/src/plugin.hpp"
+
 // Mog
 #include "Mog/src/plugin.hpp"
 
@@ -1009,6 +1012,7 @@ Plugin* pluginInstance__Meander;
 extern Plugin* pluginInstance__MindMeld;
 Plugin* pluginInstance__ML;
 Plugin* pluginInstance__MockbaModular;
+Plugin* pluginInstance__Moffenzeef;
 Plugin* pluginInstance__Mog;
 extern Plugin* pluginInstance__mscHack;
 Plugin* pluginInstance__MSM;
@@ -2896,6 +2900,39 @@ static void initStatic__MockbaModular()
     }
 }
 
+static void initStatic__Moffenzeef()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Moffenzeef = p;
+
+    const StaticPluginLoader spl(p, "Moffenzeef");
+    if (spl.ok())
+    {
+        p->addModel(modelBadIdea9);
+        p->addModel(modelBadIdea1800);
+        p->addModel(modelBobcat);
+        p->addModel(modelBusMult);
+        p->addModel(modelCount);
+        p->addModel(modelDeviant);
+        p->addModel(modelDialUp);
+        p->addModel(modelGMO);
+        p->addModel(modelKriket);
+        p->addModel(modelMito);
+        p->addModel(modelMoffenmix);
+        p->addModel(modelMongrel);
+        p->addModel(modelMuskrat);
+        p->addModel(modelSimplify);
+        p->addModel(modelSwarm);
+        p->addModel(modelINTENSIFIES);
+        p->addModel(modelTheRunner);
+        p->addModel(modelKleztizer);
+        p->addModel(modelTantz);
+        p->addModel(modelStargazer);
+        p->addModel(modelQuadDeviant);
+        // p->addModel(modelTehom);
+    }
+}
+
 static void initStatic__Mog()
 {
     Plugin* const p = new Plugin;
@@ -3769,6 +3806,7 @@ void initStaticPlugins()
     initStatic__MindMeld();
     initStatic__ML();
     initStatic__MockbaModular();
+    initStatic__Moffenzeef();
     initStatic__Mog();
     initStatic__mscHack();
     initStatic__MSM();
