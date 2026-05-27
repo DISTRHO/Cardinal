@@ -7,6 +7,7 @@
 #pragma once
 
 #include "DistrhoUtils.hpp"
+#include "CardinalOSC.hpp"
 
 #include <string>
 
@@ -74,14 +75,6 @@ void openBrowser(const std::string& url);
 
 // -----------------------------------------------------------------------------------------------------------
 
-#if defined(HAVE_LIBLO) && defined(HEADLESS)
-# define CARDINAL_INIT_OSC_THREAD
-#endif
-
-#ifdef HAVE_LIBLO
-# include <lo/lo_types.h>
-#endif
-
 START_NAMESPACE_DISTRHO
 
 class CardinalBasePlugin;
@@ -92,22 +85,12 @@ struct Initializer
     std::string templatePath;
     std::string factoryTemplatePath;
     bool shouldSaveSettings = false;
+    CARDINAL_OSC_FIELDS
 
     Initializer(const CardinalBasePlugin* plugin, const CardinalBaseUI* ui);
     ~Initializer();
     void loadSettings(bool isRealInstance);
-
-  #ifdef HAVE_LIBLO
-    lo_server oscServer = nullptr;
-   #ifdef CARDINAL_INIT_OSC_THREAD
-    lo_server_thread oscServerThread = nullptr;
-   #endif
-    CardinalBasePlugin* remotePluginInstance = nullptr;
-
-    bool startRemoteServer(const char* port);
-    void stopRemoteServer();
-    void stepRemoteServer();
-  #endif
+    CARDINAL_OSC_METHODS
 };
 
 #ifndef HEADLESS
