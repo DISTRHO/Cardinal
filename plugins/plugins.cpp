@@ -2619,13 +2619,24 @@ static void initStatic__JW()
         p->addModel(modelWavHead);
         p->addModel(modelXYPad);
         p->addModel(modelBlankPanel1hp);
+        p->addModel(modelBlankPanel2hp);
+        p->addModel(modelBlankPanel4hp);
         p->addModel(modelBlankPanelSmall);
         p->addModel(modelBlankPanelMedium);
         p->addModel(modelBlankPanelLarge);
         p->addModel(modelCoolBreeze);
         p->addModel(modelPete);
         p->addModel(modelTimer);
-       #ifndef STATIC_BUILD
+        p->addModel(modelSubtract5);
+        p->addModel(modelGrains);
+        p->addModel(modelSampleGrid);
+        p->addModel(modelBuffer);
+        p->addModel(modelRandomSound);
+        p->addModel(modelShiftRegRnd);
+        p->addModel(modelStereoSwitch);
+        p->addModel(modelStereoSwitchInv);
+        p->addModel(modelArrange16);
+       #ifndef STATIC_BUILD 
         p->addModel(modelStr1ker);
        #else
         spl.removeModule("Str1ker");
