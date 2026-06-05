@@ -3260,6 +3260,9 @@ static void initStatic__Sapphire()
         p->addModel(modelSapphireEchoOut);
         p->addModel(modelSapphireEchoTap);
         p->addModel(modelSapphireElastika);
+        p->addModel(modelSapphireEmpathInput);
+        p->addModel(modelSapphireEmpathFilter);
+        p->addModel(modelSapphireEmpathOutput);
         p->addModel(modelSapphireEnv);
         p->addModel(modelSapphireFrolic);
         p->addModel(modelSapphireGalaxy);
