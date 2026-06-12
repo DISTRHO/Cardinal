@@ -266,3 +266,6 @@
 [submodule "plugins/Venom"]
 	path = plugins/Venom
 	url = https://github.com/DaveBenham/VenomModules
+[submodule "plugins/Moffenzeef"]
+	path = plugins/Moffenzeef
+	url = https://github.com/moffenzeefmodular/VCVrack-submission.git

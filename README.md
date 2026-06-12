@@ -174,6 +174,7 @@ At the moment the following 3rd-party modules are provided:
 - [MindMeld](https://github.com/MarcBoule/MindMeldModular)
 - [ML Modules](https://github.com/martin-lueders/ML_modules)
 - [Mockba Modular](https://github.com/MockbaTheBorg/MockbaModular)
+- [Moffenzeef](https://github.com/moffenzeefmodular/Moffenzeef-VCV)
 - [Mog](https://github.com/JustMog/Mog-VCV)
 - [mscHack](https://github.com/mschack/VCV-Rack-Plugins)
 - [MSM](https://github.com/netboy3/MSM-vcvrack-plugin)

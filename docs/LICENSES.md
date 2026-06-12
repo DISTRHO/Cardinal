@@ -66,6 +66,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | MindMeld                | GPL-3.0-or-later         | |
 | ML Modules              | BSD-3-Clause             | |
 | Mockba Modular          | MIT                      | |
+| Moffenzeef              | GPL-3.0-or-later         | |
 | Mog                     | CC0-1.0                  | |
 | mscHack                 | BSD-3-Clause             | |
 | MSM                     | MIT                      | Repo's [LICENSE-dist.md](https://github.com/netboy3/MSM-vcvrack-plugin/issues/10) includes wrong information |
@@ -225,6 +226,7 @@ Below is a list of artwork licenses from plugins
 | ML_modules/DejaVuSansMono.ttf           | Bitstream-Vera   | |
 | ML_modules/Segment7Standard.ttf         | OFL-1.1-RFN      | |
 | MockbaModular/*                         | MIT              | No artwork specific license provided |
+| Moffenzeef/*                            | GPL-3.0-or-later | No artwork specific license provided |
 | Mog/*                                   | CC0-1.0          | |
 | Mog/components/*                        | CC-BY-NC-4.0     | |
 | Mog/Exo2-BoldItalic.ttf                 | OFL-1.1-RFN      | |
