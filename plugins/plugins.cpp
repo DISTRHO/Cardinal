@@ -2066,6 +2066,7 @@ static void initStatic__Computerscare()
         p->addModel(modelComputerscareRolyPouter);
         p->addModel(modelComputerscareSolyPequencer);
         p->addModel(modelComputerscareTolyPools);
+        p->addModel(modelComputerscareTolyPoolsV2);
         p->addModel(modelComputerscareMolyPatrix);
         p->addModel(modelComputerscareGolyPenerator);
         p->addModel(modelComputerscareFolyPace);
