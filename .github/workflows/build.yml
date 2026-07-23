@@ -1,6 +1,6 @@
 name: build
 
-on: [push, pull_request, workflow_dispatch]
+on: [push, pull_request]
 
 env:
   CACHE_VERSION: 15
