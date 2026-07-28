@@ -21,7 +21,7 @@ jobs:
   linux:
     strategy:
       matrix:
-        target: [aarch64, armhf, i686, riscv64, x86_64]
+        target: [aarch64, armhf, i686, x86_64]
     runs-on: ubuntu-latest
     container:
       image: ubuntu:22.04
@@ -128,6 +128,85 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-linux-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
+          path: |
+            *.tar.gz
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            *.tar.gz
+
+  linux-riscv64:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:22.04
+    steps:
+      - name: Install git
+        run: |
+          apt-get update -qq && apt-get install -yqq --no-install-recommends ca-certificates curl git openssl
+          curl -sLO https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/git_2.34.1-1ubuntu1~bpo20.04.1~ppa1_amd64.deb
+          curl -sLO https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/git-man_2.34.1-1ubuntu1~bpo20.04.1~ppa1_all.deb
+          dpkg -i *.deb
+          rm *.deb
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Set up build cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/PawPawBuilds
+            src/Rack/dep/bin
+            src/Rack/dep/include
+            src/Rack/dep/lib
+            src/Rack/dep/share
+            src/Rack/dep/jansson-2.12
+            src/Rack/dep/libarchive-3.4.3
+            src/Rack/dep/libsamplerate-0.1.9
+            src/Rack/dep/zstd-1.4.5
+          key: linux-riscv64-v${{ env.CACHE_VERSION }}
+      - name: Setup dependencies
+        shell: bash
+        run: |
+          ./deps/PawPaw/.github/workflows/bootstrap-deps.sh linux-riscv64
+          apt-get install -yqq wget zip
+      - name: Setup dependencies (riscv64)
+        shell: bash
+        run: |
+          apt-get install -yqq libsdl2-dev:riscv64
+          apt-get clean
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-linux-riscv64-v${{ env.CACHE_VERSION }}
+      - name: Build extra dependencies
+        run: |
+          ./deps/PawPaw/bootstrap-cardinal.sh linux-riscv64 && ./deps/PawPaw/.cleanup.sh linux-riscv64
+      - name: Build linux
+        shell: bash
+        run: |
+          export PATH="/usr/lib/ccache:${PATH}"
+          source deps/PawPaw/local.env linux-riscv64
+          make features
+          make HAVE_PULSEAUDIO=false NOOPT=true -j $(nproc)
+          make unzipfx
+      - name: Set sha8 (non-release)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
+      - name: Set sha8 (release)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
+      - name: Pack binaries
+        run: |
+          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep -e lv2 -e vst -e clap) ../CardinalJACK ../CardinalNative ../LICENSE ../README.md ../docs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}-linux-riscv64-${{ github.event.pull_request.number || env.SHA8 }}
           path: |
             *.tar.gz
       - uses: softprops/action-gh-release@v1
