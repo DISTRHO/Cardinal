@@ -3623,6 +3623,7 @@ static void initStatic__Voxglitch()
         p->addModel(modelDigitalSequencer);
         p->addModel(modelDigitalSequencerXP);
         p->addModel(modelDrumRandomizer);
+        p->addModel(modelCueResearch); 
         p->addModel(modelGlitchSequencer);
         p->addModel(modelGhosts);
         p->addModel(modelGrainEngineMK2);
@@ -3639,6 +3640,8 @@ static void initStatic__Voxglitch()
         p->addModel(modelSamplerX8);
         p->addModel(modelSampler16P);
         p->addModel(modelSatanonaut);
+        p->addModel(modelSatanonautUnearthed);
+        p->addModel(modelVectorRotation);
         p->addModel(modelWavBank);
         p->addModel(modelWavBankMC);
         p->addModel(modelXY);
