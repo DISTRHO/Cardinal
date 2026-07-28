@@ -266,3 +266,6 @@
 [submodule "plugins/Venom"]
 	path = plugins/Venom
 	url = https://github.com/DaveBenham/VenomModules
+[submodule "plugins/alteredstatemachines-vcv"]
+	path = plugins/alteredstatemachines-vcv
+	url = https://codeberg.org/alteredstatemachines/alteredstatemachines-vcv.git

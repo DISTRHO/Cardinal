@@ -346,6 +346,11 @@ AARONSTATIC_CUSTOM = RefreshCounter
 PLUGIN_FILES += $(filter-out admiral/src/plugin.cpp,$(wildcard admiral/src/*.cpp))
 
 # --------------------------------------------------------------
+# Alteredstatemachines
+
+PLUGIN_FILES += $(filter-out alteredstatemachines-vcv/src/plugin.cpp,$(wildcard alteredstatemachines-vcv/src/*.cpp))
+
+# --------------------------------------------------------------
 # AmalgamatedHarmonics
 
 PLUGIN_FILES += $(filter-out AmalgamatedHarmonics/src/AH.cpp,$(wildcard AmalgamatedHarmonics/src/*.cpp))
@@ -2190,6 +2195,13 @@ $(BUILD_DIR)/Algoritmarte/%.cpp.o: Algoritmarte/%.cpp
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
 		$(foreach m,$(ALGORITMARTE_CUSTOM),$(call custom_module_names,$(m),Algoritmarte)) \
 		-DpluginInstance=pluginInstance__Algoritmarte
+
+$(BUILD_DIR)/alteredstatemachines-vcv/src/%.cpp.o: alteredstatemachines-vcv/src/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ALTEREDSTATEMACHINES_CUSTOM),$(call custom_module_names,$(m),alteredstatemachines)) \
+		-DpluginInstance=pluginInstance__alteredstatemachines
 
 $(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
