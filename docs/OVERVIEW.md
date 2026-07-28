@@ -62,7 +62,7 @@ Must be stored as plain text files (not zstd compressed) so they play nicely wit
 Module/Plugin related code and build setup.  
 Only Cardinal internal modules are hosted here, everything else uses a git submodule reference.
 
-See https://github.com/DISTRHO/Cardinal/discussions/28 for how to add more modules yourself.
+See [these instructions](ADDING-MODULES.md) for how to add more modules yourself.
 
 ## src
 
