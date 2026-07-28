@@ -90,6 +90,11 @@ GLFWAPI GLFWcursor* glfwCreateStandardCursor(const int shape)
     }
 }
 
+GLFWAPI void glfwGetCursorPos(GLFWwindow* handle, double* xpos, double* ypos)
+{
+    // stub for now, only used for the Mouse Tracker functionality in Moffenzeep/Particles
+}
+
 GLFWAPI void glfwSetCursor(GLFWwindow*, GLFWcursor* const cursor)
 {
     CardinalPluginContext* const context = static_cast<CardinalPluginContext*>(APP);
