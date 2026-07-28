@@ -134,6 +134,7 @@ public:
     ~CardinalBasePlugin() override {}
 
    #if defined(HAVE_LIBLO) && !CARDINAL_VARIANT_LOADER
+    virtual bool remoteServerStarted() const = 0;
     virtual bool startRemoteServer(const char* port) = 0;
     virtual void stopRemoteServer() = 0;
     virtual void stepRemoteServer() = 0;

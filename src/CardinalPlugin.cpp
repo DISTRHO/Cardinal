@@ -313,7 +313,7 @@ public:
             context->scene->rackScroll->reset();
         }
 
-       #ifdef CARDINAL_INIT_OSC_THREAD
+       #ifdef HAVE_LIBLO
         fInitializer->remotePluginInstance = this;
        #endif
     }
@@ -350,6 +350,11 @@ public:
     }
 
    #ifdef HAVE_LIBLO
+    bool remoteServerStarted() const override
+    {
+        return fInitializer->oscServer != nullptr;
+    }
+
     bool startRemoteServer(const char* const port) override
     {
         if (fInitializer->remotePluginInstance != nullptr)
