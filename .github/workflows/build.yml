@@ -54,6 +54,21 @@ jobs:
       - name: Setup dependencies
         shell: bash
         run: |
+          # workaround for ncurses riscv64 build failure
+          if [[ "${{ matrix.target }}" = "riscv64" ]]; then
+              echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" | tee -a /etc/apt/sources.list
+              echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" | tee -a /etc/apt/sources.list
+              echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports jammy-backports main restricted universe multiverse" | tee -a /etc/apt/sources.list
+              apt-get update -qq
+              apt-get purge -yqq libncurses-dev
+              apt-get install -yqq wget
+              wget \
+                  http://kx.studio/tmp/libtinfo6_6.3-2ubuntu0.1_amd64.deb \
+                  http://kx.studio/tmp/libncurses6_6.3-2ubuntu0.1_amd64.deb \
+                  http://kx.studio/tmp/libncursesw6_6.3-2ubuntu0.1_amd64.deb \
+                  && dpkg -i *.deb && rm *.deb
+              apt-get install -yqq libtinfo6:riscv64
+          fi
           ./deps/PawPaw/.github/workflows/bootstrap-deps.sh linux-${{ matrix.target }}
           apt-get install -yqq wget zip
       - name: Setup dependencies (aarch64)
