@@ -355,6 +355,14 @@ AMALGAMATEDHARMONICS_CUSTOM = BasePinkNoiseGenerator EvenVCO LowFrequencyOscilla
 AMALGAMATEDHARMONICS_CUSTOM += bogaudio
 
 # --------------------------------------------------------------
+# AmbientModules
+
+PLUGIN_FILES += $(filter-out AmbientModules/src/plugin.cpp,$(wildcard AmbientModules/src/*.cpp))
+
+# modules/types which are present in other plugins
+AMBIENTMODULES_CUSTOM = Blank
+
+# --------------------------------------------------------------
 # AnimatedCircuits
 
 PLUGIN_FILES += $(wildcard AnimatedCircuits/src/Folding/*.cpp)
@@ -2198,6 +2206,13 @@ $(BUILD_DIR)/AmalgamatedHarmonics/%.cpp.o: AmalgamatedHarmonics/%.cpp
 		$(foreach m,$(AMALGAMATEDHARMONICS_CUSTOM),$(call custom_module_names,$(m),AmalgamatedHarmonics)) \
 		-DpluginInstance=pluginInstance__AmalgamatedHarmonics
 
+$(BUILD_DIR)/AmbientModules/%.cpp.o: AmbientModules/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(AMBIENTMODULES_CUSTOM),$(call custom_module_names,$(m),AmbientModules)) \
+		-DpluginInstance=pluginInstance__AmbientModules
+
 $(BUILD_DIR)/AnimatedCircuits/%.cpp.o: AnimatedCircuits/%.cpp
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
@@ -2608,7 +2623,16 @@ $(BUILD_DIR)/Meander/src/%.cpp.o: Meander/src/%.cpp
 		-Wno-format-security \
 		-Wno-format-zero-length
 
-$(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp
+MINDMELD_XCODE_COMPAT_PATCH = ../utils/patches/MindMeldModular-xcode27.patch
+
+.PHONY: mindmeld-xcode-compat
+mindmeld-xcode-compat: $(MINDMELD_XCODE_COMPAT_PATCH)
+	@if grep -q 'std::abs<T>' MindMeldModular/src/ShapeMaster/Shape.hpp; then \
+		echo "Applying MindMeldModular Xcode compatibility patch"; \
+		patch -p1 -d MindMeldModular < $(MINDMELD_XCODE_COMPAT_PATCH); \
+	fi
+
+$(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/MindMeldModular.cpp | mindmeld-xcode-compat
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
@@ -2616,7 +2640,7 @@ $(BUILD_DIR)/MindMeldModular/src/MindMeldModular.cpp.o: MindMeldModular/src/Mind
 		-DpluginInstance=pluginInstance__MindMeld \
 		-Dinit=init__MindMeld
 
-$(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp
+$(BUILD_DIR)/MindMeldModular/%.cpp.o: MindMeldModular/%.cpp | mindmeld-xcode-compat
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
@@ -2815,7 +2839,16 @@ $(BUILD_DIR)/stocaudio/%.cpp.o: stocaudio/%.cpp
 		$(foreach m,$(STOCAUDIO_CUSTOM),$(call custom_module_names,$(m),stocaudio)) \
 		-DpluginInstance=pluginInstance__stocaudio
 
-$(BUILD_DIR)/surgext%.cpp.o: surgext%.cpp
+SURGEXT_XCODE_COMPAT_PATCH = ../utils/patches/surgext-xcode27.patch
+
+.PHONY: surgext-xcode-compat
+surgext-xcode-compat: $(SURGEXT_XCODE_COMPAT_PATCH)
+	@if grep -q '\.template emplace_back' surgext/src/VCO.cpp; then \
+		echo "Applying surgext Xcode compatibility patch"; \
+		patch -p1 -d surgext < $(SURGEXT_XCODE_COMPAT_PATCH); \
+	fi
+
+$(BUILD_DIR)/surgext%.cpp.o: surgext%.cpp | surgext-xcode-compat
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
 	@echo "Compiling $<"
 	$(SILENT)$(CXX) $< $(SURGEXT_FLAGS) -c -o $@ \

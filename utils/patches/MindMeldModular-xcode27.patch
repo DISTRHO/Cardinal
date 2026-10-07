@@ -1,0 +1,5 @@
+--- a/src/ShapeMaster/Shape.hpp
++++ b/src/ShapeMaster/Shape.hpp
+@@ -160 +160 @@
+-		T dx = std::abs<T>((T)points[p + 1].x - (T)points[p].x);
++		T dx = std::abs((T)points[p + 1].x - (T)points[p].x);

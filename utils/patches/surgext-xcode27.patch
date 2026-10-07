@@ -1,0 +1,8 @@
+--- a/src/VCO.cpp
++++ b/src/VCO.cpp
+@@ -1051 +1051 @@
+-                p.template emplace_back(x, y0 + (-tb[s] + 1) * 0.5 * hw);
++                p.emplace_back(x, y0 + (-tb[s] + 1) * 0.5 * hw);
+@@ -1068 +1068 @@
+-                    ribbon.template emplace_back(x, y0 + (-tb[s] + 1) * 0.5 * hw);
++                    ribbon.emplace_back(x, y0 + (-tb[s] + 1) * 0.5 * hw);

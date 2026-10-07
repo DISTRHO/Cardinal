@@ -20,6 +20,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | alef's bits             | GPL-3.0-or-later         | |
 | AlgoritmArte            | GPL-3.0-or-later         | |
 | Amalgamated Harmonics   | BSD-3-Clause             | |
+| AmbientModules          | GPL-3.0-or-later         | Includes artwork derived from Valley Audio and the VCV Rack Component Library; see artwork licenses below |
 | Animated Circuits       | GPL-3.0-or-later         | |
 | Arable Instruments      | GPL-3.0-or-later         | |
 | Aria Salvatrice         | GPL-3.0-or-later         | |
@@ -123,6 +124,9 @@ Below is a list of artwork licenses from plugins
 | AmalgamatedHarmonics/*                  | BSD-3-Clause     | No artwork specific license provided |
 | AmalgamatedHarmonics/DSEG*.ttf          | OFL-1.1-RFN      | |
 | AmalgamatedHarmonics/Roboto*.ttf        | Apache-2.0       | |
+| AmbientModules/*                        | GPL-3.0-or-later | No separate license stated except where noted below |
+| AmbientModules/res/knobs/*              | GPL-3.0-or-later | Copied or adapted from ValleyRackFree; see `res/knobs/NOTICE.md` |
+| AmbientModules/res/switches/*           | CC-BY-NC-4.0     | Adapted from the VCV Rack Component Library; see `res/switches/NOTICE.md` |
 | AnimatedCircuits/*                      | CC-BY-NC-SA-4.0  | |
 | ArableInstruments/*                     | Custom           | Copyright © Alex Brandt, [used and distributed with permission](https://github.com/adbrant/ArableInstruments/issues/21) |
 | AriaModules/*                           | CC-BY-SA-4.0     | |

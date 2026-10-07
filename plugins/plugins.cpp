@@ -49,6 +49,20 @@ extern Model* modelDivisions;
 // AmalgamatedHarmonics
 #include "AmalgamatedHarmonics/src/AH.hpp"
 
+// AmbientModules
+void loadAmbientTheme();
+extern Model* modelAmbientModulesBlank;
+extern Model* modelLunar50Drone;
+extern Model* modelLunarLFO;
+extern Model* modelLunarVCO;
+extern Model* modelLunarPapaSrapa;
+extern Model* modelLunarSequencer;
+extern Model* modelLunarJoystick;
+extern Model* modelLunarMixer;
+extern Model* modelLunarPads;
+extern Model* modelLunarDetector;
+extern Model* modelLunarFilter;
+
 // AnimatedCircuits
 #include "AnimatedCircuits/src/plugin.hpp"
 
@@ -964,6 +978,7 @@ Plugin* pluginInstance__admiral;
 Plugin* pluginInstance__alefsbits;
 Plugin* pluginInstance__Algoritmarte;
 Plugin* pluginInstance__AmalgamatedHarmonics;
+Plugin* pluginInstance__AmbientModules;
 Plugin* pluginInstance__ArableInstruments;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
@@ -1396,6 +1411,29 @@ static void initStatic__AmalgamatedHarmonics()
         p->addModel(modelScaleQuantizer);
         p->addModel(modelArpeggiator2);
         p->addModel(modelProgress);
+    }
+}
+
+static void initStatic__AmbientModules()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__AmbientModules = p;
+
+    const StaticPluginLoader spl(p, "AmbientModules");
+    if (spl.ok())
+    {
+        loadAmbientTheme();
+        p->addModel(modelAmbientModulesBlank);
+        p->addModel(modelLunar50Drone);
+        p->addModel(modelLunarLFO);
+        p->addModel(modelLunarVCO);
+        p->addModel(modelLunarPapaSrapa);
+        p->addModel(modelLunarSequencer);
+        p->addModel(modelLunarJoystick);
+        p->addModel(modelLunarMixer);
+        p->addModel(modelLunarPads);
+        p->addModel(modelLunarDetector);
+        p->addModel(modelLunarFilter);
     }
 }
 
@@ -3738,6 +3776,7 @@ void initStaticPlugins()
     initStatic__alefsbits();
     initStatic__Algoritmarte();
     initStatic__AmalgamatedHarmonics();
+    initStatic__AmbientModules();
     initStatic__AnimatedCircuits();
     initStatic__ArableInstruments();
     initStatic__Aria();
