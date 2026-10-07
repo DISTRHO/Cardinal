@@ -111,6 +111,10 @@ extern Model* modelBlank;
 #undef LedLight
 #undef YellowRedLight
 
+// Astravox
+extern Model* modelVocoder;
+extern Model* modelTapeEcho;
+
 // AudibleInstruments
 #include "AudibleInstruments/src/plugin.hpp"
 
@@ -983,6 +987,7 @@ Plugin* pluginInstance__ArableInstruments;
 Plugin* pluginInstance__AnimatedCircuits;
 Plugin* pluginInstance__Aria;
 Plugin* pluginInstance__AS;
+Plugin* pluginInstance__Astravox;
 Plugin* pluginInstance__AudibleInstruments;
 extern Plugin* pluginInstance__Autinn;
 Plugin* pluginInstance__Axioma;
@@ -1561,6 +1566,19 @@ static void initStatic__AS()
 #undef modelADSR
 #undef modelVCA
 #undef modelWaveShaper
+    }
+}
+
+static void initStatic__Astravox()
+{
+    Plugin* const p = new Plugin;
+    pluginInstance__Astravox = p;
+
+    const StaticPluginLoader spl(p, "Astravox");
+    if (spl.ok())
+    {
+        p->addModel(modelVocoder);
+        p->addModel(modelTapeEcho);
     }
 }
 
@@ -3781,6 +3799,7 @@ void initStaticPlugins()
     initStatic__ArableInstruments();
     initStatic__Aria();
     initStatic__AS();
+    initStatic__Astravox();
     initStatic__AudibleInstruments();
     initStatic__Autinn();
     initStatic__Axioma();

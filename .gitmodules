@@ -269,3 +269,6 @@
 [submodule "plugins/AmbientModules"]
 	path = plugins/AmbientModules
 	url = https://github.com/neilbgr/AmbientModules.git
+[submodule "plugins/Astravox"]
+	path = plugins/Astravox
+	url = https://github.com/JackArkyDev/Astravox.git

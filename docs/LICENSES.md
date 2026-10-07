@@ -25,6 +25,7 @@ Below follows a list of all code licenses used in Cardinal and linked submodules
 | Arable Instruments      | GPL-3.0-or-later         | |
 | Aria Salvatrice         | GPL-3.0-or-later         | |
 | AS                      | MIT                      | |
+| Astravox                | GPL-3.0-only             | Tape Echo hysteresis code is adapted from AnalogTapeModel, also GPL-3.0-only |
 | Audible Instruments     | GPL-3.0-or-later         | |
 | Autinn                  | GPL-3.0-or-later         | |
 | Axioma                  | GPL-3.0-or-later         | |
@@ -139,6 +140,8 @@ Below is a list of artwork licenses from plugins
 | AS/*                                    | CC-BY-NC-ND-4.0  | The AS Logo/Monogram is Copyright (c) 2017 Alfredo Santamaria and cannot be used in derivative works; Cardinal has [explicit permission](https://github.com/AScustomWorks/AS/issues/60#issuecomment-1133488586) for its use. |
 | AS/saxmono.ttf                          | Custom           | You may download this font, circulate it und use it freely. You may not alter, rename, change copyrights or modify this font in any way. |
 | AS/Segment7Standard.ttf                 | OFL-1.1-RFN      | |
+| Astravox/*                              | GPL-3.0-only     | No separate artwork license stated except where noted below |
+| Astravox/res/fonts/Inter-Light.otf      | OFL-1.1          | See `res/fonts/OFL.txt` |
 | AudibleInstruments/*                    | Custom           | Copyright © Emilie Gillet, [used and distributed with permission](LICENSE-PERMISSIONS.md#audible-instruments-émilie-gillet--mutable-instruments) |
 | Autinn/*                                | GPL-3.0-or-later | No artwork specific license provided |
 | Axioma/*                                | GPL-3.0-or-later | No artwork specific license provided |

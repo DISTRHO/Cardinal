@@ -421,6 +421,14 @@ AS_CUSTOM = ADSR BpmDisplayWidget LabelDisplayWidget LedLight LowFrequencyOscill
 AS_CUSTOM_PER_FILE = NumberDisplayWidget
 
 # --------------------------------------------------------------
+# Astravox
+
+PLUGIN_FILES += $(filter-out Astravox/src/plugin.cpp,$(wildcard Astravox/src/*.cpp))
+
+# modules/types which are present in other plugins
+ASTRAVOX_CUSTOM = Biquad DecayEnvelope ShelfFilter SpringReverb SVFilter
+
+# --------------------------------------------------------------
 # AudibleInstruments
 
 PLUGIN_FILES += $(filter-out AudibleInstruments/src/plugin.cpp,$(wildcard AudibleInstruments/src/*.cpp))
@@ -1488,6 +1496,9 @@ RESOURCE_FILES = \
 		$(wildcard */res/*/*/*.ttf))
 
 RESOURCE_FILES += $(wildcard */presets)
+RESOURCE_FILES += $(wildcard Astravox/res/*.json)
+RESOURCE_FILES += $(wildcard Astravox/res/*.png)
+RESOURCE_FILES += $(wildcard Astravox/res/*.wav)
 RESOURCE_FILES += $(wildcard Orbits/res/*.json)
 RESOURCE_FILES += ArableInstruments/res/Joni.png
 RESOURCE_FILES += BaconPlugs/res/Keypunch029.json
@@ -2247,6 +2258,13 @@ $(BUILD_DIR)/AS/%.cpp.o: AS/%.cpp
 		$(foreach m,$(AS_CUSTOM_PER_FILE),$(call custom_per_file_names,$(m),AS_$(shell basename -- $*))) \
 		-DpluginInstance=pluginInstance__AS \
 		-Wno-unused-private-field
+
+$(BUILD_DIR)/Astravox/%.cpp.o: Astravox/%.cpp
+	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
+	@echo "Compiling $<"
+	$(SILENT)$(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@ \
+		$(foreach m,$(ASTRAVOX_CUSTOM),$(call custom_module_names,$(m),Astravox)) \
+		-DpluginInstance=pluginInstance__Astravox
 
 $(BUILD_DIR)/AudibleInstruments/%.o: AudibleInstruments/%
 	-@mkdir -p "$(shell dirname $(BUILD_DIR)/$<)"
