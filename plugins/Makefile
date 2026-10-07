@@ -360,7 +360,7 @@ AMALGAMATEDHARMONICS_CUSTOM += bogaudio
 PLUGIN_FILES += $(filter-out AmbientModules/src/plugin.cpp,$(wildcard AmbientModules/src/*.cpp))
 
 # modules/types which are present in other plugins
-AMBIENTMODULES_CUSTOM = Blank
+AMBIENTMODULES_CUSTOM = Blank XYPad RoganMedSmallWhite RoganSmallRed
 
 # --------------------------------------------------------------
 # AnimatedCircuits
