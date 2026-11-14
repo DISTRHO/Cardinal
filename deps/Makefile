@@ -164,7 +164,7 @@ DEP_MAKE += VERBOSE=1
 
 ifeq ($(shell uname -s),Darwin)
 ifeq ($(CIBUILD),true)
-DEP_MAKE += SHA256SUM="shasum5.30 -a 256"
+DEP_MAKE += SHA256SUM="shasum5.34 -a 256"
 else
 DEP_MAKE += SHA256SUM="shasum5.34 -a 256"
 endif
