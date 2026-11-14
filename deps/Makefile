@@ -162,13 +162,13 @@ DEP_MAKE += DEP_MAC_SDK_FLAGS=
 DEP_MAKE += MACHINE=$(MACHINE)$(MACHINE_SUFFIX)
 DEP_MAKE += VERBOSE=1
 
-ifeq ($(shell uname -s),Darwin)
-ifeq ($(CIBUILD),true)
-DEP_MAKE += SHA256SUM="shasum5.30 -a 256"
-else
-DEP_MAKE += SHA256SUM="shasum5.34 -a 256"
-endif
-endif
+# ifeq ($(shell uname -s),Darwin)
+# ifeq ($(CIBUILD),true)
+# DEP_MAKE += SHA256SUM="shasum5.34 -a 256"
+# else
+# DEP_MAKE += SHA256SUM="shasum5.34 -a 256"
+# endif
+# endif
 
 DEP_MAKE2  = $(DEP_MAKE)
 DEP_MAKE2 += CMAKE="$(ENV) $(CMAKE)"
