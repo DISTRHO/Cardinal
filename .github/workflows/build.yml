@@ -383,13 +383,8 @@ jobs:
     strategy:
       matrix:
         target: [win32, win64]
-    runs-on: ubuntu-latest
-    container:
-      image: ubuntu:22.04
+    runs-on: ubuntu-22.04
     steps:
-      - name: Install git
-        run: |
-          apt-get update -qq && apt-get install -yqq --no-install-recommends ca-certificates git openssl
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -408,11 +403,16 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/zstd-1.4.5
           key: ${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+      - name: Fix GitHub's mess
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
       - name: Set up dependencies
         run: |
           ./deps/PawPaw/.github/workflows/bootstrap-deps.sh ${{ matrix.target }}
-          apt-get install -yqq wget xvfb zip
-          apt-get clean
+          sudo apt-get install -yqq wget xvfb zip
+          sudo apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
