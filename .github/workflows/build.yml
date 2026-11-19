@@ -21,7 +21,7 @@ jobs:
   linux:
     strategy:
       matrix:
-        target: [aarch64, armhf, i686, riscv64, x86_64]
+        target: [aarch64, armhf, i686, x86_64]
     runs-on: ubuntu-latest
     container:
       image: ubuntu:22.04
@@ -54,21 +54,6 @@ jobs:
       - name: Setup dependencies
         shell: bash
         run: |
-          # workaround for ncurses riscv64 build failure
-          if [[ "${{ matrix.target }}" = "riscv64" ]]; then
-              echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" | tee -a /etc/apt/sources.list
-              echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" | tee -a /etc/apt/sources.list
-              echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports jammy-backports main restricted universe multiverse" | tee -a /etc/apt/sources.list
-              apt-get update -qq
-              apt-get purge -yqq libncurses-dev
-              apt-get install -yqq wget
-              wget \
-                  http://kx.studio/tmp/libtinfo6_6.3-2ubuntu0.1_amd64.deb \
-                  http://kx.studio/tmp/libncurses6_6.3-2ubuntu0.1_amd64.deb \
-                  http://kx.studio/tmp/libncursesw6_6.3-2ubuntu0.1_amd64.deb \
-                  && dpkg -i *.deb && rm *.deb
-              apt-get install -yqq libtinfo6:riscv64
-          fi
           ./deps/PawPaw/.github/workflows/bootstrap-deps.sh linux-${{ matrix.target }}
           apt-get install -yqq wget zip
       - name: Setup dependencies (aarch64)
@@ -88,12 +73,6 @@ jobs:
         shell: bash
         run: |
           apt-get install -yqq libsdl2-dev:i386
-          apt-get clean
-      - name: Setup dependencies (riscv64)
-        if: ${{ matrix.target == 'riscv64' }}
-        shell: bash
-        run: |
-          apt-get install -yqq libsdl2-dev:riscv64
           apt-get clean
       - name: Setup dependencies (x86_64)
         if: ${{ matrix.target == 'x86_64' }}
@@ -173,7 +152,7 @@ jobs:
             *.tar.xz
 
   macos:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -252,60 +231,60 @@ jobs:
           files: |
             ${{ github.event.repository.name }}-*.pkg
 
-  mod-plugin-builder:
-    strategy:
-      matrix:
-        include:
-          - name: darkglass-anagram
-            target: darkglass-anagram
-          - name: modduo
-            target: modduo-static
-            extraflags: MODDUO=true
-          - name: modduox
-            target: modduox-static
-          - name: moddwarf
-            target: moddwarf
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Set up cache
-        uses: actions/cache@v4
-        id: mpb-cache
-        with:
-          path: |
-            ~/mod-workdir
-          key: ${{ matrix.target }}-v${{ env.CACHE_VERSION }}
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python3 libtool-bin liblo-dev qemu-user-static
-          sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
-          sudo apt-get clean
-      - name: Bootstrap toolchain
-        if: steps.mpb-cache.outputs.cache-hit != 'true'
-        run: |
-          git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
-          sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
-          $(pwd)/deps/mod-plugin-builder/bootstrap.sh ${{ matrix.target }} minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh ${{ matrix.target }}
-      - name: Build for modaudio
-        if: steps.mpb-cache.outputs.cache-hit == 'true'
-        run: |
-          make HEADLESS=true ${{ matrix.name }}-features
-          make HEADLESS=true ${{ matrix.extraflags }} ${{ matrix.name }} -j $(nproc)
-      - name: Set sha8
-        id: slug
-        run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
-      - name: Pack binaries
-        if: steps.mpb-cache.outputs.cache-hit == 'true'
-        run: |
-          tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-${{ matrix.name }}-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep lv2)
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.event.repository.name }}-${{ matrix.name }}-${{ github.event.pull_request.number || env.SHA8 }}
-          path: |
-            *.tar.gz
+  # mod-plugin-builder:
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - name: darkglass-anagram
+  #           target: darkglass-anagram
+  #         - name: modduo
+  #           target: modduo-static
+  #           extraflags: MODDUO=true
+  #         - name: modduox
+  #           target: modduox-static
+  #         - name: moddwarf
+  #           target: moddwarf
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive
+  #     - name: Set up cache
+  #       uses: actions/cache@v4
+  #       id: mpb-cache
+  #       with:
+  #         path: |
+  #           ~/mod-workdir
+  #         key: ${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+  #     - name: Set up dependencies
+  #       run: |
+  #         sudo apt-get update -qq
+  #         sudo apt-get install -yqq acl bc curl cvs git mercurial rsync subversion wget bison bzip2 flex gawk gperf gzip help2man nano perl patch tar texinfo unzip automake binutils build-essential cpio libtool libncurses-dev pkg-config python3 libtool-bin liblo-dev qemu-user-static
+  #         sudo apt-get install -yqq pandoc texlive-latex-recommended texlive-latex-extra
+  #         sudo apt-get clean
+  #     - name: Bootstrap toolchain
+  #       if: steps.mpb-cache.outputs.cache-hit != 'true'
+  #       run: |
+  #         git clone --depth=1 https://github.com/moddevices/mod-plugin-builder.git deps/mod-plugin-builder
+  #         sed -i "s/CT_LOG_PROGRESS_BAR=y/CT_LOG_PROGRESS_BAR=n/" deps/mod-plugin-builder/toolchain/*.config
+  #         $(pwd)/deps/mod-plugin-builder/bootstrap.sh ${{ matrix.target }} minimal && $(pwd)/deps/mod-plugin-builder/.clean-install.sh ${{ matrix.target }}
+  #     - name: Build for modaudio
+  #       if: steps.mpb-cache.outputs.cache-hit == 'true'
+  #       run: |
+  #         make HEADLESS=true ${{ matrix.name }}-features
+  #         make HEADLESS=true ${{ matrix.extraflags }} ${{ matrix.name }} -j $(nproc)
+  #     - name: Set sha8
+  #       id: slug
+  #       run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
+  #     - name: Pack binaries
+  #       if: steps.mpb-cache.outputs.cache-hit == 'true'
+  #       run: |
+  #         tar -c -h --hard-dereference -z -f ${{ github.event.repository.name }}-${{ matrix.name }}-${{ github.event.pull_request.number || env.SHA8 }}.tar.gz -C bin $(ls bin | grep lv2)
+  #     - uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ${{ github.event.repository.name }}-${{ matrix.name }}-${{ github.event.pull_request.number || env.SHA8 }}
+  #         path: |
+  #           *.tar.gz
 
   wasm:
     strategy:
@@ -404,13 +383,8 @@ jobs:
     strategy:
       matrix:
         target: [win32, win64]
-    runs-on: ubuntu-latest
-    container:
-      image: ubuntu:22.04
+    runs-on: ubuntu-22.04
     steps:
-      - name: Install git
-        run: |
-          apt-get update -qq && apt-get install -yqq --no-install-recommends ca-certificates git openssl
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -429,11 +403,16 @@ jobs:
             src/Rack/dep/libsamplerate-0.1.9
             src/Rack/dep/zstd-1.4.5
           key: ${{ matrix.target }}-v${{ env.CACHE_VERSION }}
+      - name: Fix GitHub's mess
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
       - name: Set up dependencies
         run: |
           ./deps/PawPaw/.github/workflows/bootstrap-deps.sh ${{ matrix.target }}
-          apt-get install -yqq wget xvfb zip
-          apt-get clean
+          sudo apt-get install -yqq wget xvfb zip
+          sudo apt-get clean
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
